@@ -34,7 +34,6 @@
 package net.sourceforge.waters.gui.simulator;
 
 
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -66,7 +65,7 @@ public class AutomatonInternalFrame
   implements ModelObserver
 {
 
-  //##########################################################################
+  //#########################################################################
   //# Constructor
   public AutomatonInternalFrame(final AutomatonProxy aut,
                                 final GraphSubject graph,
@@ -96,7 +95,7 @@ public class AutomatonInternalFrame
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Overrides for javax.swing.JInternalFrame
   @Override
   public void dispose()
@@ -106,56 +105,78 @@ public class AutomatonInternalFrame
     super.dispose();
   }
 
-  //##########################################################################
+  //#########################################################################
   //# Aspect-preserving resizing
   /**
    * Resizes the window to preserve the graph's aspect ratio.
-   * @param  grow   A flag, indicating whether the window should grow or
-   *                shrink.
+   * This method is called graph has changed externally, and it attempts
+   * to change the height of the frame to accommodate the new aspect
+   * ratio.
    */
-  void adjustSize(final boolean grow)
+  void adjustSize()
   {
-    // First find the size of the panel and the automaton.
-    final int panelWidth = mDisplayPane.getWidth();
-    final int panelHeight = mDisplayPane.getHeight();
+    final Rectangle bounds = getBounds();
+    adjustSize(bounds, true);
+    storeReferenceFrame();
+  }
+
+  /**
+   * Resizes the window to preserve the graph's aspect ratio.
+   * @param  newBounds  The new size and position of the frame, including
+   *                    window decorations.
+   * @param  force      <CODE>true</CODE> to force resize even if the frame
+   *                    size has not been changed. This is needed when the
+   *                    graph has changed externally, as opposed to drag
+   *                    events changing the frame.
+   */
+  void adjustSize(final Rectangle newBounds,
+                  final boolean force)
+  {
+    // First check whether anything has changed at all.
+    if (mOldBounds == null) {
+      return;
+    }
+    final int newWidth = newBounds.width;
+    final int newHeight = newBounds.height;
+    final int oldWidth = mOldBounds.width;
+    final int oldHeight = mOldBounds.height;
+    final int widthChange = Math.abs(newWidth - oldWidth);
+    final int heightChange = Math.abs(newHeight - oldHeight);
+    if (!force && widthChange == 0 && heightChange == 0) {
+      return;
+    }
+    // Find the natural size of the automaton and aspect ratio.
     final Rectangle2D automatonSize =
       mDisplayPane.getMinimumBoundingRectangle();
-    final double automatonWidth = automatonSize.getWidth();
-    final double automatonHeight = automatonSize.getHeight();
-    // Calculate preferred panel sizes with high precision.
-    final int scaledWidth =
-      (int) Math.round(automatonWidth * panelHeight / automatonHeight);
-    final int scaledHeight =
-      (int) Math.round(automatonHeight * panelWidth / automatonWidth);
-    // Calculate an aspect-preserving new panel size,
-    // smaller (when shrinking) or larger (when growing) than the current size.
-    final int finalWidth;
-    final int finalHeight;
-    if (grow) {
-      finalWidth = Math.max(panelWidth, scaledWidth);
-      finalHeight = Math.max(panelHeight, scaledHeight);
+    final double aspectRatio =
+      automatonSize.getHeight() / automatonSize.getWidth();
+    // Scale the height and width to aspect ratio.
+    // Should we adjust the height or width?
+    // Keep whatever quantity has changed more and scale the other.
+    final int newAutomatonWidth, newAutomatonHeight;
+    if (widthChange >= heightChange) {
+      newAutomatonWidth = newWidth - mBorderWidth;
+      newAutomatonHeight = (int) Math.round(newAutomatonWidth * aspectRatio);
     } else {
-      finalWidth = Math.min(panelWidth, scaledWidth);
-      finalHeight = Math.min(panelHeight, scaledHeight);
+      newAutomatonHeight = newHeight - mBorderHeight;
+      newAutomatonWidth = (int) Math.round(newAutomatonHeight / aspectRatio);
     }
-    // Do not resize if the width and height are unchanged, or if the old bounds haven't yet been loaded
-    if ((finalWidth != panelWidth || finalHeight != panelHeight) && mOldBounds != null) {
-      // Before resizing, check whether we need to adjust the position.
-      // This is necessary when dragging the window to the left or up,
-      // otherwise the window may be moved due to rounding errors.
-      final Point pos = getLocation();
-      int x = pos.x;
-      if (x != mOldBounds.x) {
-        x += panelWidth - finalWidth;
-      }
-      int y = pos.y;
-      if (y != mOldBounds.y) {
-        y += panelHeight - finalHeight;
-      }
-      // Set the new position and size with a single call to reduce
-      // spurious events.
-      setBounds(x, y, finalWidth + mBorderWidth, finalHeight + mBorderHeight);
+    newBounds.width = newAutomatonWidth + mBorderWidth;
+    newBounds.height = newAutomatonHeight + mBorderHeight;
+    // If the window is being dragged to the left or up,
+    // we now may also have to adjust the position.
+    if (widthChange > 0 && newBounds.x != mOldBounds.x) {
+      // anchor is at the right
+      newBounds.x = mOldBounds.x + oldWidth - newBounds.width;
     }
+    if (heightChange > 0 && newBounds.y != mOldBounds.y) {
+      // anchor is at the bottom
+      newBounds.y = mOldBounds.y + oldHeight - newBounds.height;
+    }
+    // Set the new position and size with a single call to reduce
+    // spurious events.
+    setBounds(newBounds);
+    // Don't set mOldBounds - this is done by mouse handler.
   }
 
   @Override
@@ -164,6 +185,7 @@ public class AutomatonInternalFrame
     return mParent;
   }
 
+  static int i = 0;
   /**
    * Stores the current position of the window as a reference frame for
    * aspect-preserving resizing. Also calculates the size of the window
@@ -213,8 +235,8 @@ public class AutomatonInternalFrame
   public void modelChanged(final ModelChangeEvent event)
   {
     if (event.getKind() == ModelChangeEvent.GEOMETRY_CHANGED) {
-      this.adjustSize(false);
-      this.repaint();
+      adjustSize();
+      repaint();
     }
   }
 
@@ -282,7 +304,7 @@ public class AutomatonInternalFrame
   {
 
     //#######################################################################
-    //# Interface java.awt.event.MouseListener
+    //# Interface java.awt.event.ComponentListener
     /**
      * Listener for component-moved events.
      * When the window has been moved, we must update the reference frame,
@@ -310,9 +332,8 @@ public class AutomatonInternalFrame
     {
       if (mOldBounds != null && !mDisplayPane.isEmbedderRunning()) {
         final Rectangle bounds = getBounds();
-        final boolean grow =
-          bounds.width > mOldBounds.width || bounds.height > mOldBounds.height;
-        adjustSize(grow);
+        adjustSize(bounds, false);
+        // Don't set mOldBounds - this is done by mouse handler.
       }
     }
 
@@ -328,6 +349,7 @@ public class AutomatonInternalFrame
    * The reference position of this internal frame.
    * This represents the last known stable position of the frame and is
    * used as a reference while resizing.
+   * The bounding box includes the window decorations.
    */
   private Rectangle mOldBounds = null;
   /**
@@ -346,7 +368,6 @@ public class AutomatonInternalFrame
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
-
+  private static final long serialVersionUID = 5838879656333394405L;
 
 }

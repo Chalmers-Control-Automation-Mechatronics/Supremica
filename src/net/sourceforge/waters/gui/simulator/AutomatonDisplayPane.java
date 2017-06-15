@@ -194,8 +194,7 @@ public class AutomatonDisplayPane
     super.embedderChanged(event);
     if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
       mParent.storeReferenceFrame();
-      mParent.adjustSize(false);
-      mParent.storeReferenceFrame();
+      mParent.adjustSize();
       mTransform = mInverseTransform = null;
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
