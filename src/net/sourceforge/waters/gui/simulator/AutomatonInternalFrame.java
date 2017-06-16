@@ -228,6 +228,7 @@ public class AutomatonInternalFrame
     // If the calculated size is the same as the current size, then cancel.
     if (newBounds.width == finalBounds.width &&
         newBounds.height == finalBounds.height) {
+      mPreviousResizeBounds = newBounds;
       return;
     }
     // Calculate the new window position depending on anchors.
