@@ -53,6 +53,7 @@ import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.MoveCommand;
 import net.sourceforge.waters.gui.command.UpdateCommand;
+import net.sourceforge.waters.gui.renderer.GuardActionBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.model.base.Proxy;
@@ -729,8 +730,15 @@ class EditorGraph
   {
     final GuardActionBlockSubject block1 =
       (GuardActionBlockSubject) getCopy(block0);
-    final LabelGeometrySubject geo0 = block0.getGeometry();
-    final LabelGeometrySubject geo1 = block1.getGeometry();
+    LabelGeometrySubject geo0 = block0.getGeometry();
+    LabelGeometrySubject geo1 = block1.getGeometry();
+    if (geo0 == null) {
+      geo0 = DEFAULT_GUARDACTIONBLOCK_GEO;
+    }
+    if (geo1 == null) {
+      geo1 = DEFAULT_GUARDACTIONBLOCK_GEO.clone();
+      block1.setGeometry(geo1);
+    }
     moveLabelGeometry(geo0, geo1, dx, dy);
   }
 
@@ -2175,5 +2183,7 @@ class EditorGraph
 
   private static final LabelGeometrySubject DEFAULT_LABELBLOCK_GEO =
     new LabelGeometrySubject(LabelBlockProxyShape.DEFAULT_OFFSET);
+  private static final LabelGeometrySubject DEFAULT_GUARDACTIONBLOCK_GEO =
+    new LabelGeometrySubject(GuardActionBlockProxyShape.DEFAULT_OFFSET);
 
 }

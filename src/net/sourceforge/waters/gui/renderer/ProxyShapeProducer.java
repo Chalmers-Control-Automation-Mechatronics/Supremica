@@ -470,8 +470,8 @@ public class ProxyShapeProducer
       double y = turn.getY();
       final LabelGeometryProxy geo = block.getGeometry();
       if (geo == null) {
-        x += GuardActionBlockProxyShape.DEFAULTOFFSETX;
-        y += GuardActionBlockProxyShape.DEFAULTOFFSETY;
+        x += GuardActionBlockProxyShape.DEFAULT_OFFSET_X;
+        y += GuardActionBlockProxyShape.DEFAULT_OFFSET_Y;
       } else {
         final Point2D offset = geo.getOffset();
         x += offset.getX();
@@ -512,8 +512,8 @@ public class ProxyShapeProducer
       }
       final RoundRectangle2D bounds =
         new RoundRectangle2D.Double(x, y, width, height,
-                                    GuardActionBlockProxyShape.DEFAULTARCW,
-                                    GuardActionBlockProxyShape.DEFAULTARCH);
+                                    GuardActionBlockProxyShape.DEFAULT_ARC_WIDTH,
+                                    GuardActionBlockProxyShape.DEFAULT_ARC_HEIGHT);
       shape = new GuardActionBlockProxyShape(block, bounds);
       mMap.put(block, shape);
     }

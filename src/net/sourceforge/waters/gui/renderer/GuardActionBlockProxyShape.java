@@ -34,52 +34,70 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 
 
-public class GuardActionBlockProxyShape
-    extends AbstractProxyShape
+public class GuardActionBlockProxyShape extends AbstractProxyShape
 {
-    public GuardActionBlockProxyShape(final GuardActionBlockProxy block, final RoundRectangle2D bounds)
-    {
-        super(block);
-        mBlock = block;
-        mBounds = bounds;
-    }
+  //#########################################################################
+  //# Constructor
+  public GuardActionBlockProxyShape(final GuardActionBlockProxy block,
+                                    final RoundRectangle2D bounds)
+  {
+    super(block);
+    mBounds = bounds;
+  }
 
-    public GuardActionBlockProxy getProxy()
-    {
-        return (GuardActionBlockProxy)super.getProxy();
-    }
 
-    public RoundRectangle2D getShape()
-    {
-        return mBounds;
-    }
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.renderer.AbstractProxyShape
+  @Override
+  public GuardActionBlockProxy getProxy()
+  {
+    return (GuardActionBlockProxy) super.getProxy();
+  }
 
-    public void draw(final Graphics2D g, final RenderingInformation status)
-    {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        if (status.isFocused())
-        {
-            g.setColor(status.getShadowColor());
-            g.setStroke(SHADOWSTROKE);
-            g.fill(getShape());
-        }
-        if (status.isSelected()) {
-          g.setColor(status.getColor());
-          g.setStroke(BASICSTROKE);
-          g.draw(getShape());
-        }
-    }
+  @Override
+  public RoundRectangle2D getShape()
+  {
+    return mBounds;
+  }
 
-    private final RoundRectangle2D mBounds;
-    GuardActionBlockProxy mBlock;
-    public static final int DEFAULTARCW = 8;
-    public static final int DEFAULTARCH = 8;
-    public static final int DEFAULTOFFSETX = 0;
-    public static final int DEFAULTOFFSETY = 10;
+  @Override
+  public void draw(final Graphics2D g, final RenderingInformation status)
+  {
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                       RenderingHints.VALUE_ANTIALIAS_ON);
+    if (status.isFocused()) {
+      g.setColor(status.getShadowColor());
+      g.setStroke(SHADOWSTROKE);
+      g.fill(getShape());
+    }
+    if (status.isSelected()) {
+      g.setColor(status.getColor());
+      g.setStroke(BASICSTROKE);
+      g.draw(getShape());
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final RoundRectangle2D mBounds;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final int DEFAULT_ARC_WIDTH = 8;
+  public static final int DEFAULT_ARC_HEIGHT = 8;
+  public static final int DEFAULT_OFFSET_X = 0;
+  public static final int DEFAULT_OFFSET_Y = 10;
+
+  public static final Point2D DEFAULT_OFFSET =
+    new Point(DEFAULT_OFFSET_X, DEFAULT_OFFSET_Y);
 }
