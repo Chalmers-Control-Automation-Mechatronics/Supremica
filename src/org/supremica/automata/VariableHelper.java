@@ -134,17 +134,15 @@ public class VariableHelper {
             markings = null;
         } else {
             markings = new LinkedList<VariableMarkingSubject>();
-            final IdentifierSubject accepting =
-                factory.createSimpleIdentifierProxy
-                (EventDeclProxy.DEFAULT_MARKING_NAME);
-            final IdentifierSubject iclone2 = ident.clone();
-
-            for(final String mv:markedValues)
-            {
+            for (final String mv : markedValues) {
                 final IdentifierSubject markedval =
                     factory.createSimpleIdentifierProxy(mv);
+                final IdentifierSubject iclone2 = ident.clone();
                 final BinaryExpressionSubject pred =
                     factory.createBinaryExpressionProxy(opeq, iclone2, markedval);
+                final IdentifierSubject accepting =
+                    factory.createSimpleIdentifierProxy
+                      (EventDeclProxy.DEFAULT_MARKING_NAME);
                 markings.add(factory.createVariableMarkingProxy(accepting, pred));
             }
         }
