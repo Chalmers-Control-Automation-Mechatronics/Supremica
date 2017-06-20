@@ -34,6 +34,9 @@
 package net.sourceforge.waters.gui.simulator;
 
 
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -124,128 +127,8 @@ public class AutomatonInternalFrame
   {
     mPreviousResizeBounds = null;
     final Rectangle bounds = getBounds();
-    adjustSize(bounds);
+    adjustSize(bounds, false);
     storeReferenceFrame();
-  }
-
-  /**
-   * Resizes the window to preserve the graph's aspect ratio.
-   * @param  newBounds  The new size and position of the frame, including
-   *                    window decorations.
-   */
-  void adjustSize(final Rectangle newBounds)
-  {
-    if (mReferenceBounds == null) {
-      // Don't even try if there is no reference frame.
-      return;
-    } else if (newBounds.equals(mPreviousResizeBounds)) {
-      // Also skip if the new bounds are those just set by this method.
-      return;
-    }
-    final int newLeft = newBounds.x;
-    final int newRight = newLeft + newBounds.width;
-    final int newTop = newBounds.y;
-    final int newBottom = newTop + newBounds.height;
-    if (mPreviousResizeBounds != null) {
-      // Continuing previous resize.
-      // Check whether the reference frame has changed. This can be detected
-      // if the the latest drag has changed a window edge opposite to an
-      // edge changed before.
-      final int prevLeft = mPreviousResizeBounds.x;
-      final int prevRight = prevLeft + mPreviousResizeBounds.width;
-      final int prevTop = mPreviousResizeBounds.y;
-      final int prevBottom = prevTop + mPreviousResizeBounds.height;
-      if (mHorizontalAnchor == ANCHOR_LEFT && newLeft != prevLeft ||
-          mHorizontalAnchor == ANCHOR_RIGHT && newRight != prevRight ||
-          mVerticalAnchor == ANCHOR_TOP && newTop != prevTop ||
-          mVerticalAnchor == ANCHOR_BOTTOM && newBottom != prevBottom) {
-        mReferenceBounds = mPreviousResizeBounds;
-        mHorizontalAnchor = mVerticalAnchor = ANCHOR_UNKNOWN;
-      }
-      // Try to improve on previous guesses of the anchors.
-      if (mHorizontalAnchor == ANCHOR_UNKNOWN) {
-        if (newRight != prevRight) {
-          mHorizontalAnchor = ANCHOR_LEFT;
-        } else if (newLeft != prevLeft) {
-          mHorizontalAnchor = ANCHOR_RIGHT;
-        }
-      }
-      if (mVerticalAnchor == ANCHOR_UNKNOWN) {
-        if (newBottom != prevBottom) {
-          mVerticalAnchor = ANCHOR_TOP;
-        } else if (newTop != prevTop) {
-          mVerticalAnchor = ANCHOR_BOTTOM;
-        }
-      }
-    } else {
-      // Starting a new resize. Guess the anchors as best we can.
-      final int refLeft = mReferenceBounds.x;
-      final int refRight = refLeft + mReferenceBounds.width;
-      if (newRight != refRight) {
-        mHorizontalAnchor = ANCHOR_LEFT;
-      } else if (newLeft != refLeft) {
-        mHorizontalAnchor = ANCHOR_RIGHT;
-      } else {
-        mHorizontalAnchor = ANCHOR_UNKNOWN;
-      }
-      final int refTop = mReferenceBounds.y;
-      final int refBottom = refTop + mReferenceBounds.height;
-      if (newBottom != refBottom) {
-        mVerticalAnchor = ANCHOR_TOP;
-      } else if (newTop != refTop) {
-        mVerticalAnchor = ANCHOR_BOTTOM;
-      } else {
-        mVerticalAnchor = ANCHOR_UNKNOWN;
-      }
-    }
-
-    // Find how the new size has changed compared to the reference size.
-    final int newWidth = newBounds.width;
-    final int newHeight = newBounds.height;
-    final int refWidth = mReferenceBounds.width;
-    final int refHeight = mReferenceBounds.height;
-    final int widthChange = Math.abs(newWidth - refWidth);
-    final int heightChange = Math.abs(newHeight - refHeight);
-    // Find the natural size of the automaton and aspect ratio.
-    final Rectangle2D automatonSize =
-      mDisplayPane.getMinimumBoundingRectangle();
-    final double aspectRatio =
-      automatonSize.getHeight() / automatonSize.getWidth();
-    // Scale the height and width to aspect ratio.
-    // Should we adjust the height or width?
-    // Keep whatever quantity has changed more and scale the other.
-    final int newAutomatonWidth, newAutomatonHeight;
-    if (widthChange >= heightChange) {
-      newAutomatonWidth = newWidth - mBorderWidth;
-      newAutomatonHeight = (int) Math.round(newAutomatonWidth * aspectRatio);
-    } else {
-      newAutomatonHeight = newHeight - mBorderHeight;
-      newAutomatonWidth = (int) Math.round(newAutomatonHeight / aspectRatio);
-    }
-    final Rectangle finalBounds = new Rectangle();
-    finalBounds.width = newAutomatonWidth + mBorderWidth;
-    finalBounds.height = newAutomatonHeight + mBorderHeight;
-    // If the calculated size is the same as the current size, then cancel.
-    if (newBounds.width == finalBounds.width &&
-        newBounds.height == finalBounds.height) {
-      mPreviousResizeBounds = newBounds;
-      return;
-    }
-    // Calculate the new window position depending on anchors.
-    if (mHorizontalAnchor != ANCHOR_RIGHT) {
-      finalBounds.x = mReferenceBounds.x;
-    } else {
-      finalBounds.x = mReferenceBounds.x + refWidth - finalBounds.width;
-    }
-    if (mVerticalAnchor != ANCHOR_BOTTOM) {
-      finalBounds.y = mReferenceBounds.y;
-    } else {
-      finalBounds.y = mReferenceBounds.y + refHeight - finalBounds.height;
-    }
-
-    // Set the new position and size with a single call (reduce events).
-    setBounds(finalBounds);
-    mPreviousResizeBounds = finalBounds;
   }
 
   /**
@@ -278,16 +161,22 @@ public class AutomatonInternalFrame
     if (canResize())
     {
       this.pack(); // This code automatically resizes the Internal Frame to the size it was when it started
-      SwingUtilities.invokeLater(new Thread(){@Override
-      public void run(){AutomatonInternalFrame.this.repaint();}});
+      SwingUtilities.invokeLater(new Thread() {
+        @Override
+        public void run() {
+          AutomatonInternalFrame.this.repaint();
+        }
+      });
       storeReferenceFrame();
     }
   }
 
   public boolean canResize()
   {
-    return (Math.abs(mDisplayPane.getSize().getHeight() - mDisplayPane.getPreferredSize().getHeight()) > 10
-            && Math.abs(mDisplayPane.getSize().getWidth() - mDisplayPane.getPreferredSize().getWidth()) > 10);
+    return Math.abs(mDisplayPane.getSize().getHeight() -
+                    mDisplayPane.getPreferredSize().getHeight()) > 10 &&
+           Math.abs(mDisplayPane.getSize().getWidth() -
+                    mDisplayPane.getPreferredSize().getWidth()) > 10;
   }
 
 
@@ -372,7 +261,169 @@ public class AutomatonInternalFrame
     {
       if (mReferenceBounds != null && !mDisplayPane.isEmbedderRunning()) {
         final Rectangle bounds = getBounds();
-        adjustSize(bounds);
+        adjustSize(bounds, true);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  /**
+   * Resizes the window to preserve the graph's aspect ratio.
+   * @param  newBounds   The new size and position of the frame, including
+   *                     window decorations.
+   * @param  interactive <CODE>true</CODE> if the resize occurs during
+   *                     drag operation by the user, <CODE>false</CODE>
+   *                     if called programmatically in response to model
+   *                     change.
+   */
+  private void adjustSize(final Rectangle newBounds,
+                          final boolean interactive)
+  {
+    if (mReferenceBounds == null) {
+      // Don't even try if there is no reference frame.
+      return;
+    } else if (newBounds.equals(mPreviousResizeBounds)) {
+      // Also skip if the new bounds are those just set by this method.
+      return;
+    }
+    final int newLeft = newBounds.x;
+    final int newRight = newLeft + newBounds.width;
+    final int newTop = newBounds.y;
+    final int newBottom = newTop + newBounds.height;
+    if (mPreviousResizeBounds != null) {
+      // Continuing previous resize.
+      // Check whether the reference frame has changed. This can be detected
+      // if the the latest drag has changed a window edge opposite to an
+      // edge changed before.
+      final int prevLeft = mPreviousResizeBounds.x;
+      final int prevRight = prevLeft + mPreviousResizeBounds.width;
+      final int prevTop = mPreviousResizeBounds.y;
+      final int prevBottom = prevTop + mPreviousResizeBounds.height;
+      if (mHorizontalAnchor == ANCHOR_LEFT && newLeft != prevLeft ||
+          mHorizontalAnchor == ANCHOR_RIGHT && newRight != prevRight ||
+          mVerticalAnchor == ANCHOR_TOP && newTop != prevTop ||
+          mVerticalAnchor == ANCHOR_BOTTOM && newBottom != prevBottom) {
+        mReferenceBounds = mPreviousResizeBounds;
+        mHorizontalAnchor = mVerticalAnchor = ANCHOR_UNKNOWN;
+      }
+      // Try to improve on previous guesses of the anchors.
+      if (mHorizontalAnchor == ANCHOR_UNKNOWN) {
+        if (newRight != prevRight) {
+          mHorizontalAnchor = ANCHOR_LEFT;
+        } else if (newLeft != prevLeft) {
+          mHorizontalAnchor = ANCHOR_RIGHT;
+        }
+      }
+      if (mVerticalAnchor == ANCHOR_UNKNOWN) {
+        if (newBottom != prevBottom) {
+          mVerticalAnchor = ANCHOR_TOP;
+        } else if (newTop != prevTop) {
+          mVerticalAnchor = ANCHOR_BOTTOM;
+        }
+      }
+    } else {
+      // Starting a new resize. Guess the anchors as best we can.
+      final int refLeft = mReferenceBounds.x;
+      final int refRight = refLeft + mReferenceBounds.width;
+      if (newRight != refRight) {
+        mHorizontalAnchor = ANCHOR_LEFT;
+      } else if (newLeft != refLeft) {
+        mHorizontalAnchor = ANCHOR_RIGHT;
+      } else {
+        mHorizontalAnchor = ANCHOR_UNKNOWN;
+      }
+      final int refTop = mReferenceBounds.y;
+      final int refBottom = refTop + mReferenceBounds.height;
+      if (newBottom != refBottom) {
+        mVerticalAnchor = ANCHOR_TOP;
+      } else if (newTop != refTop) {
+        mVerticalAnchor = ANCHOR_BOTTOM;
+      } else {
+        mVerticalAnchor = ANCHOR_UNKNOWN;
+      }
+    }
+    if (interactive) {
+      updateAnchorsFromMouse();
+    }
+
+    // Find how the new size has changed compared to the reference size.
+    final int newWidth = newBounds.width;
+    final int newHeight = newBounds.height;
+    final int refWidth = mReferenceBounds.width;
+    final int refHeight = mReferenceBounds.height;
+    final int widthChange = Math.abs(newWidth - refWidth);
+    final int heightChange = Math.abs(newHeight - refHeight);
+    // Find the natural size of the automaton and aspect ratio.
+    final Rectangle2D automatonSize =
+      mDisplayPane.getMinimumBoundingRectangle();
+    final double aspectRatio =
+      automatonSize.getHeight() / automatonSize.getWidth();
+    // Scale the height and width to aspect ratio.
+    // Should we adjust the height or width?
+    // Keep whatever quantity has changed more and scale the other.
+    final int newAutomatonWidth, newAutomatonHeight;
+    if (widthChange >= heightChange) {
+      newAutomatonWidth = newWidth - mBorderWidth;
+      newAutomatonHeight = (int) Math.round(newAutomatonWidth * aspectRatio);
+    } else {
+      newAutomatonHeight = newHeight - mBorderHeight;
+      newAutomatonWidth = (int) Math.round(newAutomatonHeight / aspectRatio);
+    }
+    final Rectangle finalBounds = new Rectangle();
+    finalBounds.width = newAutomatonWidth + mBorderWidth;
+    finalBounds.height = newAutomatonHeight + mBorderHeight;
+    // If the calculated size is the same as the current size, then cancel.
+    if (newBounds.width == finalBounds.width &&
+        newBounds.height == finalBounds.height) {
+      mPreviousResizeBounds = newBounds;
+      return;
+    }
+    // Calculate the new window position depending on anchors.
+    if (mHorizontalAnchor != ANCHOR_RIGHT) {
+      finalBounds.x = mReferenceBounds.x;
+    } else {
+      finalBounds.x = mReferenceBounds.x + refWidth - finalBounds.width;
+    }
+    if (mVerticalAnchor != ANCHOR_BOTTOM) {
+      finalBounds.y = mReferenceBounds.y;
+    } else {
+      finalBounds.y = mReferenceBounds.y + refHeight - finalBounds.height;
+    }
+
+    // Set the new position and size with a single call (reduce events).
+    setBounds(finalBounds);
+    mPreviousResizeBounds = finalBounds;
+  }
+
+  /**
+   * Tries to guess anchor positions based on the current position of the
+   * mouse pointer. If any anchors are unknown, the are set to the frame
+   * edges farthest away from the mouse.
+   */
+  private void updateAnchorsFromMouse()
+  {
+    if (mHorizontalAnchor == ANCHOR_UNKNOWN ||
+        mVerticalAnchor == ANCHOR_UNKNOWN) {
+      final PointerInfo info = MouseInfo.getPointerInfo();
+      if (info != null) {
+        final Point location = info.getLocation();
+        SwingUtilities.convertPointFromScreen(location, this);
+        if (mHorizontalAnchor == ANCHOR_UNKNOWN) {
+          if (location.x < getWidth() >> 1) {
+            mHorizontalAnchor = ANCHOR_RIGHT;
+          } else {
+            mHorizontalAnchor = ANCHOR_LEFT;
+          }
+        }
+        if (mVerticalAnchor == ANCHOR_UNKNOWN) {
+          if (location.y < getHeight() >> 1) {
+            mVerticalAnchor = ANCHOR_BOTTOM;
+          } else {
+            mVerticalAnchor = ANCHOR_TOP;
+          }
+        }
       }
     }
   }
