@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -36,16 +36,30 @@ package net.sourceforge.waters.model.analysis;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.xsd.des.ConflictKind;
 
+
+/**
+ * The base class for all deadlock checker tests.
+ *
+ * @author Hani al-Bahri, Robi Malik
+ */
 
 public abstract class AbstractDeadlockCheckerTest
   extends AbstractModelVerifierTest
@@ -1247,6 +1261,52 @@ public abstract class AbstractDeadlockCheckerTest
     final ProductDESProxy des =
       getCompiledDES(bindings, "handwritten", "transferline.wmod");
     runModelVerifier(des, bindings, true);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final TraceProxy trace)
+    throws Exception
+  {
+    super.checkCounterExample(des, trace);
+    final ConflictTraceProxy counterExample = (ConflictTraceProxy) trace;
+    assertEquals(counterExample.getKind(), ConflictKind.DEADLOCK);
+
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    final int numAutomata = automata.size();
+    final Map<AutomatonProxy,StateProxy> tuple = new HashMap<>(numAutomata);
+    for (final AutomatonProxy aut : automata){
+      final StateProxy state = checkCounterExample(aut, trace);
+      tuple.put(aut, state);
+    }
+
+    events:
+    for (final EventProxy event : des.getEvents()) {
+      if (event.getKind() != EventKind.PROPOSITION) {
+        for (final AutomatonProxy aut : automata) {
+          boolean locallyEnabled = aut.getEvents().contains(event);
+          if (locallyEnabled) {
+            final StateProxy state = tuple.get(aut);
+            locallyEnabled = false;
+            for (final TransitionProxy trans : aut.getTransitions()) {
+              if (trans.getSource() == state && trans.getEvent() == event) {
+                locallyEnabled = true;
+                break;
+              }
+            }
+          }
+          if (!locallyEnabled) {
+            continue events;
+          }
+        }
+        fail("Event '" + event.getName() +
+             "' is enabled in end state of counterexample!");
+      }
+    }
   }
 
 }
