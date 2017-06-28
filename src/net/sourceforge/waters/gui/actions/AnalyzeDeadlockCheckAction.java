@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -48,8 +48,6 @@ extends WatersAnalyzeAction
     super(ide);
   }
 
-  private static final long serialVersionUID = -8684703946705836025L;
-
   @Override
   protected String getCheckName()
   {
@@ -67,14 +65,15 @@ extends WatersAnalyzeAction
                                            final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException
   {
-    // Should chnage this ?!
-    return factory.createConflictChecker(desFactory);
-    //return factory.createDeadlockChecker(desFactory);
+    // TODO
+    return null;
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "No deadlock";
+    return "is deadlock-free";
   }
+
+  private static final long serialVersionUID = -8684703946705836025L;
 }

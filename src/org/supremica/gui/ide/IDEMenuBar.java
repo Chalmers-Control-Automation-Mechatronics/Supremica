@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2015 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -52,7 +52,6 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
-import net.sourceforge.waters.gui.actions.AnalyzeDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
@@ -385,6 +384,13 @@ public class IDEMenuBar extends JMenuBar
         final Action conflict =
             actions.getAction(AnalyzeConflictCheckAction.class);
         mVerifyMenu.add(conflict);
+        //********** Hani ***************
+        // Maybe I should add an action here; for deadlock check
+        // Yes, but it should not (yet) show by default ~~~Robi
+        // final Action deadlock =
+        //   actions.getAction(AnalyzeDeadlockCheckAction.class);
+        // mVerifyMenu.add(deadlock);
+        //*************END ******************
         final Action controllability =
             actions.getAction(AnalyzeControllabilityAction.class);
         mVerifyMenu.add(controllability);
@@ -394,14 +400,6 @@ public class IDEMenuBar extends JMenuBar
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mVerifyMenu.add(languageInclusion);
-        //********** Hani ***************
-        // Maybe I should add an action here; for deadlock check
-
-        final Action deadlock =
-          actions.getAction(AnalyzeDeadlockCheckAction.class);
-          mVerifyMenu.add(deadlock);
-        //*************END ******************
-
         if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
           mVerifyMenu.addSeparator();
           final Action sic5 =
