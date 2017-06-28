@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="nondet_counter_2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="nondet_counter_2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test for BDD trace expansion.
 The blocking states in FSM main are reached by nondeterministic transitions from states S1 and S2, but only one of this predecessors forms a correct counterexample.</ns2:Comment>
     <EventDeclList>

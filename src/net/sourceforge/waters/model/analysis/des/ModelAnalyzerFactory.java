@@ -95,6 +95,15 @@ public interface ModelAnalyzerFactory
     (ProductDESProxyFactory factory)
     throws AnalysisConfigurationException;
 
+ //************************ Hani ***************************
+  /**
+   * Creates a deadlock checker.
+   */
+  /*public DeadlockChecker createDeadlockChecker
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;*/
+
+  //************** The END *************************************
 
   //#########################################################################
   //# Command Line Arguments

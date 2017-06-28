@@ -101,6 +101,18 @@ public abstract class TRDeadlockChecker
     try {
       setUp();
       exploreStateSpace();
+
+      //********** Hani ***************
+      if(getDeadlockState()<0) {
+        System.out.println("No deadlock; Yes !");
+      }
+      else {
+        System.out.println("There is a deadlock; state:"+getDeadlockState());
+      }
+
+      //************ END *************
+
+
       return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);

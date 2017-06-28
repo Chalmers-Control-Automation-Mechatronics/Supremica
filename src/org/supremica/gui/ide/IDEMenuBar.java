@@ -52,6 +52,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
@@ -393,6 +394,14 @@ public class IDEMenuBar extends JMenuBar
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mVerifyMenu.add(languageInclusion);
+        //********** Hani ***************
+        // Maybe I should add an action here; for deadlock check
+
+        final Action deadlock =
+          actions.getAction(AnalyzeDeadlockCheckAction.class);
+          mVerifyMenu.add(deadlock);
+        //*************END ******************
+
         if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
           mVerifyMenu.addSeparator();
           final Action sic5 =
