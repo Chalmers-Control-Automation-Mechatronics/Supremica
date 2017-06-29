@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +48,8 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -181,12 +181,11 @@ public class TRReducingSynchronousProductBuilder
   //# Overrides for
   //# net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
   @Override
-  protected void expandState(final int[] encoded, final int[] decoded)
+  protected boolean expandState(final int[] encoded, final int[] decoded)
     throws OverflowException
   {
     if (mStronglyLocalEvents == null) {
-      super.expandState(encoded, decoded);
-      return;
+      return super.expandState(encoded, decoded);
     }
     for (final StronglyLocalEventInfo info : mStronglyLocalEvents) {
       if (info.isTauEnabled(decoded)) {
@@ -211,7 +210,7 @@ public class TRReducingSynchronousProductBuilder
         // If this is a dump state, then stop
         for (final EventInfo event : mStronglyForbiddenEvents) {
           if (!expandIntermediateStates(decoded, 0, event, true)) {
-            return;
+            return true;
           }
         }
         // Otherwise first expand tau transitions
@@ -224,6 +223,7 @@ public class TRReducingSynchronousProductBuilder
           expandIntermediateStates(decoded, 0, event, true);
         }
       }
+      return true;
     } finally {
       mEnabledLocalEvents.clear();
     }

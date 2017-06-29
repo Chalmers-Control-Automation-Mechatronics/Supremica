@@ -35,11 +35,14 @@ package net.sourceforge.waters.analysis.monolithic;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 import org.apache.log4j.Logger;
 
@@ -51,7 +54,7 @@ import org.apache.log4j.Logger;
  * @author Hani al-Bahri
  */
 
-public abstract class TRDeadlockChecker
+public class TRDeadlockChecker
   extends TRAbstractModelAnalyzer
   implements DeadlockChecker
 {
@@ -76,7 +79,46 @@ public abstract class TRDeadlockChecker
 
 
   //#########################################################################
-  //# Configuration
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public boolean isSatisfied()
+  {
+    final VerificationResult result = getAnalysisResult();
+    if (result != null) {
+      return result.isSatisfied();
+    } else {
+      throw new IllegalStateException("Call run() first!");
+    }
+  }
+
+  @Override
+  public ConflictTraceProxy getCounterExample()
+  {
+    if (isSatisfied()) {
+      throw new IllegalStateException("No trace for satisfied property!");
+    } else {
+      final VerificationResult result = getAnalysisResult();
+      return (ConflictTraceProxy) result.getCounterExample();
+    }
+  }
+
+  @Override
+  public VerificationResult getAnalysisResult()
+  {
+    return (VerificationResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public void setCounterExampleEnabled(final boolean enable)
+  {
+    setDetailedOutputEnabled(enable);
+  }
+
+  @Override
+  public boolean isCounterExampleEnabled()
+  {
+    return isDetailedOutputEnabled();
+  }
 
 
   //#########################################################################
@@ -89,9 +131,9 @@ public abstract class TRDeadlockChecker
   }
 
   @Override
-  public TRSynchronousProductResult createAnalysisResult()
+  public DefaultVerificationResult createAnalysisResult()
   {
-    return new TRSynchronousProductResult(this);
+    return new DefaultVerificationResult(this);
   }
 
   @Override
@@ -103,17 +145,17 @@ public abstract class TRDeadlockChecker
       exploreStateSpace();
 
       //********** Hani ***************
-      if(getDeadlockState()<0) {
-        System.out.println("No deadlock; Yes !");
-      }
-      else {
-        System.out.println("There is a deadlock; state:"+getDeadlockState());
-      }
+//      if(getDeadlockState()<0) {
+//        System.out.println("No deadlock; Yes !");
+//      }
+//      else {
+//        System.out.println("There is a deadlock; state:"+getDeadlockState());
+//      }
 
       //************ END *************
 
 
-      return true;
+      return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -136,10 +178,30 @@ public abstract class TRDeadlockChecker
     super.tearDown();
   }
 
-  @Override
-  public VerificationResult getAnalysisResult()
+
+  //#########################################################################
+  //# Setting the Result
+  /**
+   * Stores a verification result indicating that the property checked
+   * is satisfied and marks the run as completed.
+   * @return <CODE>true</CODE>
+   */
+  protected boolean setSatisfiedResult()
   {
-    return (VerificationResult) super.getAnalysisResult();
+    return setBooleanResult(true);
+  }
+
+  /**
+   * Stores a verification result indicating that the property checked
+   * is not satisfied and marks the run as completed.
+   * @param  counterexample The counterexample obtained by verification.
+   * @return <CODE>false</CODE>
+   */
+  protected boolean setFailedResult(final TraceProxy counterexample)
+  {
+    final VerificationResult result = getAnalysisResult();
+    result.setCounterExample(counterexample);
+    return setBooleanResult(false);
   }
 
 

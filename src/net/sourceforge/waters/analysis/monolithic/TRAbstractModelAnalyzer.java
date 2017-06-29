@@ -584,11 +584,22 @@ public abstract class TRAbstractModelAnalyzer
   {
     storeInitialStates();
     for (int current = 0; current < mStateSpace.size(); current++) {
-      expandState(current);
+      if (!expandState(current)) {
+        return;
+      }
     }
   }
 
-  protected void expandState(final int[] encoded, final int[] decoded)
+  /**
+   * Expands the given state.
+   * @param  encoded  Compressed state tuple to be expanded.
+   * @param  decoded  Decompressed version of the same state tuple.
+   * @return The default implementation always returns <CODE>true</CODE>
+   *         to indicate that exploration should continue after the call.
+   *         Subclasses may override and return <CODE>false</CODE>,
+   *         causing exploration to stop early.
+   */
+  protected boolean expandState(final int[] encoded, final int[] decoded)
     throws OverflowException
   {
     for (final EventInfo event : mEventInfo) {
@@ -596,6 +607,7 @@ public abstract class TRAbstractModelAnalyzer
         break;
       }
     }
+    return true;
   }
 
   protected boolean expandState(final int[] encoded,
@@ -695,14 +707,22 @@ public abstract class TRAbstractModelAnalyzer
     }
   }
 
-  private void expandState(final int source)
+  /**
+   * Expands the given state.
+   * @param  source  Number of state to be expanded.
+   * @return <CODE>true</CODE> if exploration should continue after this
+   *         call, <CODE>false</CODE> if it should stop.
+   */
+  private boolean expandState(final int source)
     throws OverflowException
   {
     if (source != mDeadlockState) {
       mCurrentSource = source;
       mStateSpace.getContents(source, mEncodedSource);
       mStateTupleEncoding.decode(mEncodedSource, mDecodedSource);
-      expandState(mEncodedSource, mDecodedSource);
+      return expandState(mEncodedSource, mDecodedSource);
+    } else {
+      return true;
     }
   }
 
