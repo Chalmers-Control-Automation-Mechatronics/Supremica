@@ -172,7 +172,7 @@ public abstract class AbstractDeadlockCheckerTest
     final ProductDESProxy des =
       getCompiledDES("tests", "nondeterministic",
                      "NondeterministicNonconflicting.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testMultiNondeterministicConflicting() throws Exception
@@ -188,7 +188,7 @@ public abstract class AbstractDeadlockCheckerTest
     final ProductDESProxy des =
       getCompiledDES("tests", "nondeterministic",
                      "multiNondeterministicNonconflicting.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testMultiNondeterministicSepPlacesConflicting() throws Exception
@@ -222,7 +222,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("handwritten", "DosingTankWithJellyEFA1.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testElevatorSafety() throws Exception
@@ -231,6 +231,10 @@ public abstract class AbstractDeadlockCheckerTest
       getCompiledDES("handwritten", "elevator_safety.wmod");
     runModelVerifier(des, true);
   }
+
+  // The following two files have .wdes extension !
+  // is the same as .wmod ?
+  // already tested.
 
   public void testSmallFactory2() throws Exception
   {
@@ -243,7 +247,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("handwritten", "tictactoe.wdes");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
 
@@ -253,14 +257,14 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "hisc", "aip0sub1p0.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testHISCAIP0Sub1Patch1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "hisc", "aip0sub1p1.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testHISCAIP0Sub1Patch2() throws Exception
@@ -280,11 +284,12 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, false);
   }
 
+  //*** forbidden event ?: I didn't delete it
   public void testAgvbPart1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "agvb_part1.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testAmpleStutterTest() throws Exception
@@ -319,7 +324,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "certainconf4.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testCertainConf5() throws Exception
@@ -354,28 +359,28 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "disjoint1.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testDisjoint2() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "disjoint2.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testDisjoint3() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "disjoint3.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testDisjoint4() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "disjoint4.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testDropSelfloopConf01() throws Exception
@@ -389,7 +394,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "drop_selfloop_conf_02.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testEmptySpec() throws Exception
@@ -427,6 +432,7 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
+  // Not sure about this one; it has only one state and no events !
   public void testNeverMarked() throws Exception
   {
     final ProductDESProxy des =
@@ -455,11 +461,13 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, false);
   }
 
+
+  // Not sure about this one; it has only one state and no events !
   public void testOneState() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "onestate.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testOnlySelfLoop01() throws Exception
@@ -473,7 +481,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "onlySelfLoop02.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testOrphanEvents() throws Exception
@@ -508,14 +516,14 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "selfloop_removal_02.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testSelfloopRemoval03() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "selfloop_removal_03.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testSelfloopSubsumption01() throws Exception
@@ -529,7 +537,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "selfloop_subsumption_02.wmod");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testSelfloopSubsumption03() throws Exception
@@ -560,12 +568,14 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
+  // Not sure; it has one state and no events
   public void testTwoInit1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "twoinit1.wmod");
     runModelVerifier(des, false);
   }
+
 
   public void testTwoInit2() throws Exception
   {
@@ -585,7 +595,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "verriegel4counter2.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testWickedCounting() throws Exception
@@ -711,7 +721,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "jbr2.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testBatchtank2005_jmr30() throws Exception
@@ -739,7 +749,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "batchtank2005", "lsr1_1.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testBatchtank2005_lsr1_2() throws Exception
@@ -1010,14 +1020,14 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "rms33.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testTrafficLights2006_sdh7() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "trafficlights2006", "sdh7.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testTrafficLights2006_sgc9_1() throws Exception
@@ -1090,14 +1100,14 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("valid", "central_locking", "koordwsp_block.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testWspTimer() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("valid", "central_locking", "wsp_timer.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testWspTimerNoreset() throws Exception
@@ -1125,7 +1135,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("valid", "smd", "smdreset.wdes");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testWeiche() throws Exception
@@ -1138,6 +1148,8 @@ public abstract class AbstractDeadlockCheckerTest
 
   //#########################################################################
   //# Test Cases -- Parameterised
+
+  //**** Not sure about the following because of numeric parameter (n)
   public void testControlledPhilosophers__2() throws Exception
   {
     checkPhilosophers("controlled_philosophers.wmod", 2, true);
@@ -1170,7 +1182,7 @@ public abstract class AbstractDeadlockCheckerTest
 
   public void testOrderedPhilosophers__2() throws Exception
   {
-    checkPhilosophers("ordered_philosophers.wmod", 2, true);
+    checkPhilosophers("ordered_philosophers.falsewmod", 2, true);
   }
 
   public void testOrderedPhilosophers__4() throws Exception
@@ -1249,7 +1261,7 @@ public abstract class AbstractDeadlockCheckerTest
       Collections.singletonList(binding);
     final ProductDESProxy des =
       getCompiledDES(bindings, "efa", "round_robin_efa.wmod");
-    runModelVerifier(des, bindings, false);
+    runModelVerifier(des, bindings, true);
   }
 
   protected void checkTransferline(final int n)
