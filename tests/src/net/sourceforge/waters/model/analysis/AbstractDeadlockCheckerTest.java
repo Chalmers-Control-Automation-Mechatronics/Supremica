@@ -1177,12 +1177,12 @@ public abstract class AbstractDeadlockCheckerTest
 
   public void testDirtyPhilosophers__3() throws Exception
   {
-    checkPhilosophers("dirty_philosophers.wmod", 2, false);
+    checkPhilosophers("dirty_philosophers.wmod", 3, false);
   }
 
   public void testOrderedPhilosophers__2() throws Exception
   {
-    checkPhilosophers("ordered_philosophers.falsewmod", 2, true);
+    checkPhilosophers("ordered_philosophers.wmod", 2, true);
   }
 
   public void testOrderedPhilosophers__4() throws Exception
@@ -1222,7 +1222,7 @@ public abstract class AbstractDeadlockCheckerTest
 
   public void testDynamicSieve__2() throws Exception
   {
-    checkDynamicSieve("dynamic_prime_sieve.wmod", 2, 24, true);
+    checkDynamicSieve("dynamic_prime_sieve.wmod", 2, 24, false);
   }
 
 

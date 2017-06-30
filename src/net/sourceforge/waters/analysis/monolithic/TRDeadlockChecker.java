@@ -140,22 +140,21 @@ public class TRDeadlockChecker
   public boolean run()
     throws AnalysisException
   {
+
     try {
       setUp();
-      exploreStateSpace();
+     if(exploreStateSpace()) {
 
-      //********** Hani ***************
-//      if(getDeadlockState()<0) {
-//        System.out.println("No deadlock; Yes !");
-//      }
-//      else {
-//        System.out.println("There is a deadlock; state:"+getDeadlockState());
-//      }
+       System.out.println( "deadlock free");
+       return setSatisfiedResult();
+     }else {
+       System.out.println("DEADLOCK ");
 
-      //************ END *************
+       return setFailedResult(getCounterExample());
+     }
 
 
-      return setSatisfiedResult();
+     // return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -177,6 +176,40 @@ public class TRDeadlockChecker
   {
     super.tearDown();
   }
+
+
+
+  /**
+   * Expands the given state.
+   * @param  encoded  Compressed state tuple to be expanded.
+   * @param  decoded  Decompressed version of the same state tuple.
+   * @return The default implementation always returns <CODE>true</CODE>
+   *         to indicate that exploration should continue after the call.
+   *         Subclasses may override and return <CODE>false</CODE>,
+   *         causing exploration to stop early.
+   */
+  @Override
+  protected boolean expandState(final int[] encoded, final int[] decoded)
+    throws OverflowException
+  {
+    boolean isDeadlockFree=false;
+    for (final EventInfo event : getEventInfo()) {
+        if(event.isEnabled(decoded)) {
+          // Expand ..
+          if (getStateCallback() == null) {
+            System.arraycopy(encoded, 0, getEncodedTarget(), 0, encoded.length);
+            event.createSuccessorStatesEncoded( getEncodedTarget(), this);
+          } else {
+            System.arraycopy(decoded, 0,  getDecodedTarget(), 0, decoded.length);
+            event.createSuccessorStatesDecoded(getDecodedTarget(), this);
+          }
+          isDeadlockFree=true;
+        }
+    }
+
+    return isDeadlockFree;
+  }
+
 
 
   //#########################################################################

@@ -579,15 +579,17 @@ public abstract class TRAbstractModelAnalyzer
     return mDeadlockState;
   }
 
-  protected void exploreStateSpace()
+  protected boolean exploreStateSpace()
     throws OverflowException
   {
     storeInitialStates();
     for (int current = 0; current < mStateSpace.size(); current++) {
       if (!expandState(current)) {
-        return;
+        return false;
       }
     }
+    return true;
+
   }
 
   /**
@@ -599,6 +601,8 @@ public abstract class TRAbstractModelAnalyzer
    *         Subclasses may override and return <CODE>false</CODE>,
    *         causing exploration to stop early.
    */
+
+  // This method always returns true !
   protected boolean expandState(final int[] encoded, final int[] decoded)
     throws OverflowException
   {
@@ -1627,6 +1631,15 @@ public abstract class TRAbstractModelAnalyzer
   private int[] mDecodedDeadlockState;
   private int mDeadlockState;
 
+
+  //*********** Hani ****Getters*****
+  public int[] getEncodedTarget() {
+    return mEncodedTarget;
+  }
+
+  public int[] getDecodedTarget() {
+    return mDecodedTarget;
+  }
 
   //#########################################################################
   //# Class Constants
