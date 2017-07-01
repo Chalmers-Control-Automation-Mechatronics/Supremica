@@ -55,7 +55,6 @@ import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.constraint.SplitCandidate;
 import net.sourceforge.waters.model.compiler.constraint.SplitComputer;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
-import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierException;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -467,33 +466,30 @@ public class EFACompiler extends AbortableCompiler
       (final SimpleComponentProxy comp)
       throws VisitorException
     {
-      try {
-        final GraphProxy graph = comp.getGraph();
-        final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
-        final CompiledRange range = new CompiledEnumRange(list);
-        mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
-        return range;
-      } catch (final DuplicateIdentifierException exception) {
-        throw wrap(exception);
-      }
+      final GraphProxy graph = comp.getGraph();
+      visitGraphProxy(graph);
+      return null;
+      // TODO Generation of automaton variable - disabled for now
+      // (see also two compiler tests for this)
+      // final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
+      // final CompiledRange range = new CompiledEnumRange(list);
+      // mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
+      //  return range;
     }
 
     @Override
     public IdentifierProxy visitSimpleNodeProxy(final SimpleNodeProxy node)
       throws VisitorException
     {
-      try {
-        checkAbortInVisitor();
-        final String name = node.getName();
-        final SimpleIdentifierProxy ident =
-          mFactory.createSimpleIdentifierProxy(name);
-        mCompilationInfo.add(ident, node);
-        mRootContext.insertEnumAtom(ident);
-        mCurrentRange.add(ident);
-        return ident;
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
+      checkAbortInVisitor();
+      final String name = node.getName();
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(name);
+      mCompilationInfo.add(ident, node);
+      // TODO Generation of automaton variable - disabled for now
+      // mRootContext.insertEnumAtom(ident);
+      mCurrentRange.add(ident);
+      return ident;
     }
 
     @Override

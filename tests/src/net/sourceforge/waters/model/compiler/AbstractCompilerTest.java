@@ -666,12 +666,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, TypeMismatchException.class, "'2'");
   }
 
+  // TODO Generation of automaton variables - disabled for now
+  /*
   public void testCompile_duplicate_identifier()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "duplicate_identifier");
     compileError(module, DuplicateIdentifierException.class, "'x'");
   }
+  */
 
   public void testCompile_edge0()
     throws IOException, WatersException
@@ -680,12 +683,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, EmptyLabelBlockException.class, "q0");
   }
 
+  // TODO Generation of automaton variables - disabled for now
+  /*
   public void testCompile_error_batch_tank_out()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "batch_tank_out");
     compileError(module, DuplicateIdentifierException.class, "'out'");
   }
+  */
 
   public void testCompile_error_ims()
     throws IOException, WatersException
