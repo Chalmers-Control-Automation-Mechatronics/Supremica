@@ -160,7 +160,7 @@ private:
   static const uint32_t FLAG_TAKEN = 0x00000002;
 
   static const int PROBABILITY_1 = 0x40000000;
-  static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
+# define PROBABILITY_ADJUST (1.0f / PROBABILITY_1)
 
   static const TransitionRecordAccessorForSearch theControllableSearchAccessor;
   static const TransitionRecordAccessorForSearch
