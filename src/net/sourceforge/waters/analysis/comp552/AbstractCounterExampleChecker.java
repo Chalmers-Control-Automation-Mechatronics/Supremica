@@ -110,17 +110,19 @@ abstract class AbstractCounterExampleChecker
     }
     final List<EventProxy> traceEvents = trace.getEvents();
     final Collection<EventProxy> events = des.getEvents();
+    int step = 0;
     for (final EventProxy event : traceEvents) {
       if (event == null) {
-        reportMalformedCounterExample(trace, "contains NULL event", null);
+        reportMalformedCounterExample(trace, "contains NULL event", null, step);
         return false;
       } else if (event.getKind() == EventKind.PROPOSITION) {
-        reportMalformedCounterExample(trace, "contains proposition", event);
+        reportMalformedCounterExample(trace, "contains proposition", event, step);
         return false;
       } else if (!events.contains(event)) {
-        reportMalformedCounterExample(trace, "contains unknown event", event);
+        reportMalformedCounterExample(trace, "contains unknown event", event, step);
         return false;
       }
+      step++;
     }
     return true;
   }
