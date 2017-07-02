@@ -40,7 +40,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -77,6 +79,26 @@ public abstract class AbstractDeadlockCheckerTest
   }
 
 
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractAnalysisTest
+  @Override
+  protected void configure(final ModuleCompiler compiler)
+  {
+
+    final Collection<String> empty = Collections.emptyList();
+    compiler.setEnabledPropertyNames(empty);
+  }
+
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
+  protected DeadlockChecker getModelVerifier()
+  {
+    return (DeadlockChecker) super.getModelVerifier();
+  }
 
 
   //#########################################################################
