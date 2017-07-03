@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -147,10 +148,10 @@ public class TRDeadlockChecker
 
       final VerificationResult result = getAnalysisResult();
       if (result.isFinished()) {
-        System.out.println("DEADLOCK ");
+        //System.out.println("DEADLOCK ");
         return false;
       } else {
-        System.out.println( "deadlock free");
+        //System.out.println( "deadlock free");
         return setSatisfiedResult();
       }
     } catch (final AnalysisException exception) {
@@ -189,7 +190,13 @@ public class TRDeadlockChecker
     }
     if (!isDeadlockFree) {
       // TODO find counterexample
-      setFailedResult(null);
+      try {
+
+        createTrace(getStateTupleEncoding());
+        setFailedResult(null);
+      }catch(final Exception ex) {
+
+      }
     }
   }
 
@@ -242,7 +249,111 @@ public class TRDeadlockChecker
   }
 
 
+    //********** Hani***********/
+  // Methods to build the counter example
+  private void createTrace(final StateTupleEncoding state) throws Exception{
+    setUpReverseTransitions();
+    final StateCallback deadlockCallback = new DeadlockCallback(state.getNumberOfWords());
+    setStateCallback(deadlockCallback);
+
+
+  }
+/*
+  private ConflictTraceProxy buildCounterExample
+  (final int firstBlockingState,
+   final ConflictKind kind,
+   final ProductDESProxy model,
+   final SyncStateSchema stateSchema,
+   final AutomatonSchema[] automata)
+{
+  // Generate a counter example. As each state is numbered in the
+  // order it is encountered, and a breadth first exploration
+  // strategy is used, and all states are reachable, following the
+  // transition to a state with the lowest id will give a
+  // counterexample.
+  final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
+  final ProductDESProxyFactory factory = getFactory();
+  final int numaut = automata.length;
+  final Map<TRAutomatonProxy,StateProxy> stateMap =
+    new HashMap<TRAutomatonProxy,StateProxy>(numaut);
+  final int numInit = getNumberOfInitialStates();
+  // Find the unchecked state with the lowest
+  // id, as this should give the shortest counterexample.
+  // or if a second marking condition is simultaneously used, look
+  // for the first non-coreachable precondition marked state.
+  int current = firstBlockingState;
+  // Until we reach the start state...
+  do {
+    final int[] tuple = new int[numaut];
+    final long packed = getState(current);
+    stateSchema.decodeState(packed, tuple);
+    for (int a = 0; a < automata.length; a++) {
+      final AutomatonSchema schema = automata[a];
+      final AutomatonProxy aut = schema.getAutomatonProxy();
+      final int s = tuple[a];
+      final StateProxy state = schema.getStateProxyFromID(s);
+      stateMap.put(aut, state);
+    }
+    final TraceStepProxy step;
+    if (current >= numInit) {
+      final TIntArrayList preds = mSyncProduct.getPredecessors(current);
+      final int pred = preds.get(0);
+      final EventProxy event = mSyncProduct.findEvent(pred, current);
+      step = factory.createTraceStepProxy(event, stateMap);
+      stateMap.clear();
+      current = pred;
+    } else {
+      step = factory.createTraceStepProxy(null, stateMap);
+      current = -1;
+    }
+    steps.add(0, step);
+  } while (current >= 0);
+  final String tracename = getTraceName();
+  final ConflictTraceProxy trace =
+      factory.createConflictTraceProxy(tracename, null, null, model,
+                                       model.getAutomata(), steps, kind);
+  return trace;
+}
+
+  */
+
   //#########################################################################
   //# Data Members
+
+
+
+
+
+  //#########################################################################
+  //*********** Hani*********/
+  private class DeadlockCallback implements StateCallback{
+
+    public DeadlockCallback(final int size) {
+      mEncoded= new int[size];
+    }
+
+    @Override
+    public boolean newState(final int[] tuple) throws OverflowException
+    {
+      getStateTupleEncoding().encode(tuple, mEncoded);
+      // if -1; then not visited, so skip
+      if(getStateSpace().getIndex(mEncoded) !=-1) {
+
+        if(getStateSpace().getIndex(mEncoded)< mStateIndex) {
+          mStateIndex = getStateSpace().getIndex(mEncoded);
+          return true;
+        }
+      }
+      // TODO Auto-generated method stub
+      return false;
+    }
+
+    //###############################
+    // Data Members
+    private final int[] mEncoded;
+    private int mStateIndex;
+    private EventProxy mEvent;
+
+  }
 
 }
