@@ -143,18 +143,16 @@ public class TRDeadlockChecker
 
     try {
       setUp();
-     if(exploreStateSpace()) {
+      exploreStateSpace();
 
-       System.out.println( "deadlock free");
-       return setSatisfiedResult();
-     }else {
-       System.out.println("DEADLOCK ");
-
-       return setFailedResult(getCounterExample());
-     }
-
-
-     // return setSatisfiedResult();
+      final VerificationResult result = getAnalysisResult();
+      if (result.isFinished()) {
+        System.out.println("DEADLOCK ");
+        return false;
+      } else {
+        System.out.println( "deadlock free");
+        return setSatisfiedResult();
+      }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -178,36 +176,21 @@ public class TRDeadlockChecker
   }
 
 
-
-  /**
-   * Expands the given state.
-   * @param  encoded  Compressed state tuple to be expanded.
-   * @param  decoded  Decompressed version of the same state tuple.
-   * @return The default implementation always returns <CODE>true</CODE>
-   *         to indicate that exploration should continue after the call.
-   *         Subclasses may override and return <CODE>false</CODE>,
-   *         causing exploration to stop early.
-   */
   @Override
-  protected boolean expandState(final int[] encoded, final int[] decoded)
+  protected void expandState(final int[] encoded, final int[] decoded)
     throws OverflowException
   {
-    boolean isDeadlockFree=false;
+    boolean isDeadlockFree = false;
     for (final EventInfo event : getEventInfo()) {
-        if(event.isEnabled(decoded)) {
-          // Expand ..
-          if (getStateCallback() == null) {
-            System.arraycopy(encoded, 0, getEncodedTarget(), 0, encoded.length);
-            event.createSuccessorStatesEncoded( getEncodedTarget(), this);
-          } else {
-            System.arraycopy(decoded, 0,  getDecodedTarget(), 0, decoded.length);
-            event.createSuccessorStatesDecoded(getDecodedTarget(), this);
-          }
-          isDeadlockFree=true;
-        }
+      if (event.isEnabled(decoded)) {
+        createSuccessorStates(encoded, decoded, event);
+        isDeadlockFree = true;
+      }
     }
-
-    return isDeadlockFree;
+    if (!isDeadlockFree) {
+      // TODO find counterexample
+      setFailedResult(null);
+    }
   }
 
 

@@ -181,11 +181,11 @@ public class TRReducingSynchronousProductBuilder
   //# Overrides for
   //# net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
   @Override
-  protected boolean expandState(final int[] encoded, final int[] decoded)
+  protected void expandState(final int[] encoded, final int[] decoded)
     throws OverflowException
   {
     if (mStronglyLocalEvents == null) {
-      return super.expandState(encoded, decoded);
+      super.expandState(encoded, decoded);
     }
     for (final StronglyLocalEventInfo info : mStronglyLocalEvents) {
       if (info.isTauEnabled(decoded)) {
@@ -210,7 +210,7 @@ public class TRReducingSynchronousProductBuilder
         // If this is a dump state, then stop
         for (final EventInfo event : mStronglyForbiddenEvents) {
           if (!expandIntermediateStates(decoded, 0, event, true)) {
-            return true;
+            return;
           }
         }
         // Otherwise first expand tau transitions
@@ -223,7 +223,6 @@ public class TRReducingSynchronousProductBuilder
           expandIntermediateStates(decoded, 0, event, true);
         }
       }
-      return true;
     } finally {
       mEnabledLocalEvents.clear();
     }

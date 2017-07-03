@@ -112,7 +112,7 @@ public abstract class AbstractDeadlockCheckerTest
     final Collection<EventProxy> events = Collections.singletonList(marking);
     final ProductDESProxy des =
         factory.createProductDESProxy("empty", events, null);
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   public void testReentrant1()
