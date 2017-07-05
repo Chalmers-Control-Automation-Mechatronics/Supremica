@@ -41,8 +41,8 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
@@ -76,18 +76,12 @@ public class TRDeadlockChecker
   //# Constructors
   public TRDeadlockChecker()
   {
+    super(null, ConflictKindTranslator.getInstanceControllable());
   }
 
   public TRDeadlockChecker(final ProductDESProxy model)
   {
-    super(model);
-  }
-
-  public TRDeadlockChecker
-    (final ProductDESProxy model,
-     final KindTranslator translator)
-  {
-    super(model, translator);
+    super(model, ConflictKindTranslator.getInstanceControllable());
   }
 
 

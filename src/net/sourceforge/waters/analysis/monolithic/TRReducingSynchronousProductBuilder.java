@@ -186,6 +186,7 @@ public class TRReducingSynchronousProductBuilder
   {
     if (mStronglyLocalEvents == null) {
       super.expandState(encoded, decoded);
+      return;
     }
     for (final StronglyLocalEventInfo info : mStronglyLocalEvents) {
       if (info.isTauEnabled(decoded)) {

@@ -284,7 +284,7 @@ public abstract class TRAbstractModelAnalyzer
     setUpDeadlockInfo();
     // Add transition information to event info ...
     final List<EventInfo> eventInfoList =
-      setUpTransitions(mInputAutomata, eventInfoMap);
+      setUpTransitions(mInputAutomata, eventInfoMap, true);
     // Sort event info and merge local events
     postprocessEventInfo(eventInfoList);
   }
@@ -462,7 +462,8 @@ public abstract class TRAbstractModelAnalyzer
 
   protected List<EventInfo> setUpTransitions
     (final TRAutomatonProxy[] automata,
-     final Map<EventProxy,EventInfo> eventInfoMap)
+     final Map<EventProxy,EventInfo> eventInfoMap,
+     final boolean eventInfoRequired)
     throws OverflowException, EventNotFoundException
   {
     final KindTranslator translator = getKindTranslator();
@@ -499,7 +500,9 @@ public abstract class TRAbstractModelAnalyzer
               mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
             if (info == null) {
-              throw new EventNotFoundException(des, event.getName());
+              if (eventInfoRequired) {
+                throw new EventNotFoundException(des, event.getName());
+              }
             } else if (!info.isBlocked()) {
               info.setOutputCode(global);
               final AutomatonEventInfo autInfo =
@@ -569,7 +572,7 @@ public abstract class TRAbstractModelAnalyzer
       eventInfoMap.put(event, info);
     }
     final List<EventInfo> eventInfoList =
-      setUpTransitions(reversedAutomata, eventInfoMap);
+      setUpTransitions(reversedAutomata, eventInfoMap, false);
     postprocessEventInfo(eventInfoList);
     return eventInfoList;
   }
