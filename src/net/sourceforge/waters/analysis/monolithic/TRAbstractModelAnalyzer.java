@@ -557,7 +557,7 @@ public abstract class TRAbstractModelAnalyzer
       final ListBufferTransitionRelation reversedRel =
         new ListBufferTransitionRelation(rel, reversedEnc,
                                          ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      rel.reverse();
+      reversedRel.reverse();
       final TRAutomatonProxy reversedAut =
         new TRAutomatonProxy(reversedEnc, reversedRel);
       reversedAutomata[a] = reversedAut;
@@ -660,31 +660,16 @@ public abstract class TRAbstractModelAnalyzer
    * or it can stop prematurely if the analysis result is found to have been
    * set.
    */
-
-  // The following is for testing purposes ..
-  protected boolean isDeadlockfound=false;
-
   protected void exploreStateSpace()
-    throws OverflowException
+    throws AnalysisException
   {
-    /*final AnalysisResult result = getAnalysisResult();
-    System.out.println("AnalysisResult is Finished ="+ result.isFinished());
+    final AnalysisResult result = getAnalysisResult();
     storeInitialStates();
     for (int current = 0;
          current < mStateSpace.size() && !result.isFinished();
          current++) {
-
-      expandState(current);
-    }*/
-
-    storeInitialStates();
-    for (int current = 0;
-         current < mStateSpace.size() && !isDeadlockfound;
-         current++) {
-
       expandState(current);
     }
-
   }
 
   /**
@@ -695,7 +680,7 @@ public abstract class TRAbstractModelAnalyzer
    * @param  decoded  Decompressed version of the same state tuple.
    */
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException
+    throws AnalysisException
   {
     for (final EventInfo event : mEventInfo) {
       if (!expandState(encoded, decoded, event)) {
@@ -830,7 +815,7 @@ public abstract class TRAbstractModelAnalyzer
    * @param  source  Number of state to be expanded.
    */
   private void expandState(final int source)
-    throws OverflowException
+    throws AnalysisException
   {
     if (source != mDeadlockState) {
       mCurrentSource = source;

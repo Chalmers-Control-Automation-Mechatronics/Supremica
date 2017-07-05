@@ -182,7 +182,7 @@ public class TRReducingSynchronousProductBuilder
   //# net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
   @Override
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException
+    throws AnalysisException
   {
     if (mStronglyLocalEvents == null) {
       super.expandState(encoded, decoded);

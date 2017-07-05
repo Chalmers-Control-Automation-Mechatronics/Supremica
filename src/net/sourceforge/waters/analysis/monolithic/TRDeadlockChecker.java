@@ -46,6 +46,7 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -156,25 +157,11 @@ public class TRDeadlockChecker
     try {
       setUp();
       exploreStateSpace();
-
       final VerificationResult result = getAnalysisResult();
-      if (isDeadlockfound) {
-        System.out.println("DEADLOCK ");
-        System.out.println("mCurrentSource:"+ getCurrentSource());
-
-        ConflictTraceProxy cp;
-        try {
-          cp = createTrace(getCurrentSource());
-          return setFailedResult(cp);
-        } catch (final Exception exception) {
-          // TODO Auto-generated catch block
-          exception.printStackTrace();
-        }
-        return false;
-      } else {
-        System.out.println( "deadlock free");
-        return setSatisfiedResult();
+      if (!result.isFinished()) {
+        result.setSatisfied(true);
       }
+      return result.isSatisfied();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -197,10 +184,9 @@ public class TRDeadlockChecker
     super.tearDown();
   }
 
-
   @Override
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException
+    throws OverflowException, EventNotFoundException
   {
     boolean isDeadlock = true;
     for (final EventInfo event : getEventInfo()) {
@@ -210,23 +196,9 @@ public class TRDeadlockChecker
       }
     }
     if (isDeadlock) {
-      // TODO find counterexample
-      try {
-        System.out.println("Deadlock found ..");
-        isDeadlockfound=true;
-       // final ConflictTraceProxy cp = createTrace(getStateTupleEncoding(), encoded, decoded);
-      //  setFailedResult(cp);
-
-      }catch(final Exception ex) {
-
-      }
+      final ConflictTraceProxy cp = createTrace(getCurrentSource());
+      setFailedResult(cp);
     }
-  }
-
-
-  // ----Testing method
-  public void copArrays (){
-
   }
 
 
@@ -277,153 +249,153 @@ public class TRDeadlockChecker
   }
 
 
-    //********** Hani***********/
-  // Methods to build the counter example
-  private ConflictTraceProxy createTrace(final int source) throws Exception{
-  //  setUpReverseTransitions();
-    final DeadlockCallback deadlockCallback = new DeadlockCallback(getStateTupleEncoding().getNumberOfWords());
+  //#########################################################################
+  //# Methods to Build the Counterexample
+  private ConflictTraceProxy createTrace(final int source)
+    throws OverflowException, EventNotFoundException
+  {
+    setUpReverseTransitions();
+    final DeadlockCallback deadlockCallback = new DeadlockCallback();
     setStateCallback(deadlockCallback);
-
-    final int firstDeadlockState= source;
-    System.out.println("No Exception yet in createTrace ..");
-
-     final ConflictTraceProxy counterexample =
+    final int firstDeadlockState = source;
+    final ConflictTraceProxy counterexample =
       buildCounterExample(firstDeadlockState,
                           getInputAutomata(),
                           deadlockCallback);
-
     return counterexample;
   }
 
-  private ConflictTraceProxy buildCounterExample (final int firstDeadlockState,
-                                                  final TRAutomatonProxy[] automataArray,
-                                                  final DeadlockCallback callback) throws Exception
-    {
-  // Generate a counter example. As each state is numbered in the
-  // order it is encountered, and a breadth first exploration
-  // strategy is used, and all states are reachable, following the
-  // transition to a state with the lowest id will give a
-  // counterexample.
+  private ConflictTraceProxy buildCounterExample(final int firstDeadlockState,
+                                                 final TRAutomatonProxy[] automataArray,
+                                                 final DeadlockCallback callback)
+    throws OverflowException
+  {
+    // Generate a counter example. As each state is numbered in the
+    // order it is encountered, and a breadth first exploration
+    // strategy is used, and all states are reachable, following the
+    // transition to a state with the lowest id will give a
+    // counterexample.
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-    final int numaut =  getInputAutomata().length;
+    final int numaut = getInputAutomata().length;
     final Map<AutomatonProxy,StateProxy> stateMap =
       new HashMap<AutomatonProxy,StateProxy>(numaut);
     final int numInit = getNumberOfInitialStates();
     final ProductDESProxyFactory factory = getFactory();
-    final int[] encodedSource = new int[getStateTupleEncoding().getNumberOfWords()];
-    final int[] decodedSource = new int[getStateTupleEncoding().getNumberOfAutomata()];
-  // Find the unchecked state with the lowest
-  // id, as this should give the shortest counterexample.
-  // or if a second marking condition is simultaneously used, look
-  // for the first non-coreachable precondition marked state.
-  int current = firstDeadlockState;
-  getStateSpace().getContents(current, encodedSource);
-  getStateTupleEncoding().decode(encodedSource, decodedSource);
-  // Until we reach the start state...
-  do {
-    for (final EventInfo event : getEventInfo()) {
-      if (event.isEnabled(decodedSource)) {
-        callback.setmEvent(event.getEvent());
-        // expand ..
-        createSuccessorStates(encodedSource, decodedSource, event);
+    final int[] encodedSource =
+      new int[getStateTupleEncoding().getNumberOfWords()];
+    final int[] decodedSource =
+      new int[getStateTupleEncoding().getNumberOfAutomata()];
+    // Find the unchecked state with the lowest
+    // id, as this should give the shortest counterexample.
+    // or if a second marking condition is simultaneously used, look
+    // for the first non-coreachable precondition marked state.
+    int current = firstDeadlockState;
+    getStateSpace().getContents(current, encodedSource);
+    getStateTupleEncoding().decode(encodedSource, decodedSource);
+    // Until we reach the start state...
+    do {
+      for (final EventInfo event : getEventInfo()) {
+        if (event.isEnabled(decodedSource)) {
+          callback.setEvent(event.getEvent());
+          // expand ..
+          createSuccessorStates(encodedSource, decodedSource, event);
+        }
       }
-    }
-    final int next = callback.getSmallestStateIndex();
-
-    for(int i=0; i<automataArray.length; i++) {
-    final TRAutomatonProxy aut= automataArray[i];
-    final int s = decodedSource[i];
-    final StateProxy state = aut.getState(s);
-    //getStateSpace()
-      stateMap.put(aut, state);
-
-      /*final AutomatonSchema schema = automata[a];
-      final AutomatonProxy aut = schema.getAutomatonProxy();
-      final int s = tuple[a];
-      final StateProxy state = schema.getStateProxyFromID(s);
-      stateMap.put(aut, state);*/
-    }
-
-
-    final TraceStepProxy step;
-    if (current >= numInit) {
-      final EventProxy event = callback.getSmallestStateEvent();
-      step = factory.createTraceStepProxy(event, stateMap);
-      stateMap.clear();
-      current = next;
-    } else {
-      step = factory.createTraceStepProxy(null, stateMap);
-      current = -1;
-    }
-    steps.add(0, step);
-  } while (current >= 0);
-  final String tracename = getTraceName();
-  final ConflictTraceProxy trace =
+      final int next = callback.getSmallestStateIndex();
+      for (int i = 0; i < automataArray.length; i++) {
+        final TRAutomatonProxy aut = automataArray[i];
+        final int s = decodedSource[i];
+        final StateProxy state = aut.getState(s);
+        //getStateSpace()
+        stateMap.put(aut, state);
+        /*
+         * final AutomatonSchema schema = automata[a]; final AutomatonProxy
+         * aut = schema.getAutomatonProxy(); final int s = tuple[a]; final
+         * StateProxy state = schema.getStateProxyFromID(s); stateMap.put(aut,
+         * state);
+         */
+      }
+      final TraceStepProxy step;
+      if (current >= numInit) {
+        final EventProxy event = callback.getSmallestStateEvent();
+        step = factory.createTraceStepProxy(event, stateMap);
+        stateMap.clear();
+        current = next;
+      } else {
+        step = factory.createTraceStepProxy(null, stateMap);
+        current = -1;
+      }
+      steps.add(0, step);
+    } while (current >= 0);
+    final String tracename = getTraceName();
+    final ConflictTraceProxy trace =
       factory.createConflictTraceProxy(tracename, null, null, getModel(),
-                                       getModel().getAutomata(), steps, ConflictKind.DEADLOCK);
-  return trace;
-}
+                                       getModel().getAutomata(),
+                                       steps, ConflictKind.DEADLOCK);
+    return trace;
+  }
 
+
+  //#########################################################################
+  //# Inner Class DeadlockCallback
+  private class DeadlockCallback implements StateCallback
+  {
+
+    //#######################################################################
+    //# Constructor
+    private DeadlockCallback()
+    {
+      final int size = getStateTupleEncoding().getNumberOfWords();
+      mEncoded = new int[size];
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.analysis.monolithic.
+    //# TRAbstractModelAnalyzer.StateCallback
+    @Override
+    public boolean newState(final int[] tuple)
+      throws OverflowException
+    {
+      getStateTupleEncoding().encode(tuple, mEncoded);
+      final int stateIndex = getStateSpace().getIndex(mEncoded);
+      // if -1; then not visited, so skip
+      if (stateIndex !=-1) {
+        if (stateIndex < mSmallestStateIndex) {
+          mSmallestStateIndex = stateIndex;
+          mSmallestStateEvent = mEvent;
+          return true;
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private void setEvent(final EventProxy event)
+    {
+      mEvent = event;
+    }
+
+    private int getSmallestStateIndex()
+    {
+      return mSmallestStateIndex;
+    }
+
+    private EventProxy getSmallestStateEvent()
+    {
+      return mSmallestStateEvent;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int[] mEncoded;
+    private int mSmallestStateIndex;
+    private EventProxy mEvent;
+    private EventProxy mSmallestStateEvent;
+  }
 
 
   //#########################################################################
   //# Data Members
-
-    boolean isDeadlock=false;
-
-    public boolean getIsDeadlock() {
-      return isDeadlock;
-    }
-
-
-
-  //#########################################################################
-  //*********** Hani*********/
-  private class DeadlockCallback implements StateCallback{
-
-    public DeadlockCallback(final int size) {
-      mEncoded= new int[size];
-    }
-
-    @Override
-    public boolean newState(final int[] tuple) throws OverflowException
-    {
-      getStateTupleEncoding().encode(tuple, mEncoded);
-      final int mStateIndex = getStateSpace().getIndex(mEncoded);
-      // if -1; then not visited, so skip
-      if(mStateIndex !=-1) {
-        if(mStateIndex< smallestStateIndex) {
-          smallestStateIndex = mStateIndex;
-          smallestStateEvent=mEvent;
-          return true;
-        }
-      }
-      // TODO Auto-generated method stub
-      return false;
-    }
-    //###############################
-    // Getters
-    public int getSmallestStateIndex() {
-      return smallestStateIndex;
-    }
-
-    public EventProxy getSmallestStateEvent() {
-      return smallestStateEvent;
-    }
-
-    //###############################
-    // Setters
-
-    public void setmEvent(final EventProxy e) {
-       mEvent=e;
-    }
-    //###############################
-    // Data Members
-    private final int[] mEncoded;
-    private int  smallestStateIndex;
-    private EventProxy mEvent;
-    private EventProxy smallestStateEvent;
-
-  }
 
 }
