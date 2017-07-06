@@ -42,7 +42,6 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
@@ -53,7 +52,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -68,7 +66,7 @@ import org.apache.log4j.Logger;
  */
 
 public class TRDeadlockChecker
-  extends TRAbstractModelAnalyzer
+  extends TRAbstractModelVerifier
   implements DeadlockChecker
 {
 
@@ -76,7 +74,7 @@ public class TRDeadlockChecker
   //# Constructors
   public TRDeadlockChecker()
   {
-    super(null, ConflictKindTranslator.getInstanceControllable());
+    super(ConflictKindTranslator.getInstanceControllable());
   }
 
   public TRDeadlockChecker(final ProductDESProxy model)
@@ -86,45 +84,11 @@ public class TRDeadlockChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
-  @Override
-  public boolean isSatisfied()
-  {
-    final VerificationResult result = getAnalysisResult();
-    if (result != null) {
-      return result.isSatisfied();
-    } else {
-      throw new IllegalStateException("Call run() first!");
-    }
-  }
-
+  //# Interface net.sourceforge.waters.model.analysis.des.DeadlockChecker
   @Override
   public ConflictTraceProxy getCounterExample()
   {
-    if (isSatisfied()) {
-      throw new IllegalStateException("No trace for satisfied property!");
-    } else {
-      final VerificationResult result = getAnalysisResult();
-      return (ConflictTraceProxy) result.getCounterExample();
-    }
-  }
-
-  @Override
-  public VerificationResult getAnalysisResult()
-  {
-    return (VerificationResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public void setCounterExampleEnabled(final boolean enable)
-  {
-    setDetailedOutputEnabled(enable);
-  }
-
-  @Override
-  public boolean isCounterExampleEnabled()
-  {
-    return isDetailedOutputEnabled();
+    return (ConflictTraceProxy) super.getCounterExample();
   }
 
 
@@ -135,12 +99,6 @@ public class TRDeadlockChecker
     throws AnalysisException
   {
     super.setUp();
-  }
-
-  @Override
-  public DefaultVerificationResult createAnalysisResult()
-  {
-    return new DefaultVerificationResult(this);
   }
 
   @Override
@@ -178,6 +136,7 @@ public class TRDeadlockChecker
     super.tearDown();
   }
 
+
   @Override
   protected void expandState(final int[] encoded, final int[] decoded)
     throws OverflowException, EventNotFoundException
@@ -193,32 +152,6 @@ public class TRDeadlockChecker
       final ConflictTraceProxy cp = createTrace(getCurrentSource());
       setFailedResult(cp);
     }
-  }
-
-
-  //#########################################################################
-  //# Setting the Result
-  /**
-   * Stores a verification result indicating that the property checked
-   * is satisfied and marks the run as completed.
-   * @return <CODE>true</CODE>
-   */
-  protected boolean setSatisfiedResult()
-  {
-    return setBooleanResult(true);
-  }
-
-  /**
-   * Stores a verification result indicating that the property checked
-   * is not satisfied and marks the run as completed.
-   * @param  counterexample The counterexample obtained by verification.
-   * @return <CODE>false</CODE>
-   */
-  protected boolean setFailedResult(final TraceProxy counterexample)
-  {
-    final VerificationResult result = getAnalysisResult();
-    result.setCounterExample(counterexample);
-    return setBooleanResult(false);
   }
 
 
@@ -254,7 +187,7 @@ public class TRDeadlockChecker
     final int firstDeadlockState = source;
     final ConflictTraceProxy counterexample =
       buildCounterExample(firstDeadlockState,
-                          getInputAutomata(),
+                          getTRAutomata(),
                           deadlockCallback);
     return counterexample;
   }
@@ -270,7 +203,7 @@ public class TRDeadlockChecker
     // transition to a state with the lowest id will give a
     // counterexample.
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
-    final int numaut = getInputAutomata().length;
+    final int numaut = getTRAutomata().length;
     final Map<AutomatonProxy,StateProxy> stateMap =
       new HashMap<AutomatonProxy,StateProxy>(numaut);
     final int numInit = getNumberOfInitialStates();

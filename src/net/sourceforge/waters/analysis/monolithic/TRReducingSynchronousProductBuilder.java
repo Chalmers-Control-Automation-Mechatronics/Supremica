@@ -90,7 +90,7 @@ public class TRReducingSynchronousProductBuilder
   {
     super.setUp();
 
-    final TRAutomatonProxy[] inputAutomata = getInputAutomata();
+    final TRAutomatonProxy[] inputAutomata = getTRAutomata();
     final int numAutomata = inputAutomata.length;
     int limit = getTransitionLimit();
     if (limit < Integer.MAX_VALUE) {

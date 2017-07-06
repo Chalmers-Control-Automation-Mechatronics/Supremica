@@ -393,7 +393,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       // Handle the state count.
       final StateTupleEncoding tupleEnc = getStateTupleEncoding();
       if (mCountingStates) {
-        final TRAutomatonProxy[] components = getInputAutomata();
+        final TRAutomatonProxy[] components = getTRAutomata();
         final int numComponents = components.length;
         final int[] encoded = new int[stateSpace.getArraySize()];
         final int[] decoded = new int[numComponents];
