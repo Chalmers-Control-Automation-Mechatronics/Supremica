@@ -864,6 +864,9 @@ public abstract class TRAbstractModelAnalyzer
           }
         }
       }
+      if (!found) {
+        return;
+      }
     }
     storeInitialStates(nondeterministicIndices, 0);
     mNumberOfInitialStates = mStateSpace.size();
