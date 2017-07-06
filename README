@@ -4,7 +4,7 @@ README
 You need a git client to checkout the sources. Please check
 the help system in github.com account for more information.
 
-To compile and run Supremica you need Java 1.6 or higher
+To compile and run Supremica you need Java 1.8 or higher
 and ANT.
 
 From 2001-09-27 JGrafChart is included. JGrafChart is a Grafcet/SFC 
@@ -97,7 +97,7 @@ Git documentation
 http://help.github.com/
 
 Java homepage
-http://java.sun.com/
+http://www.oracle.com/technetwork/java/
 
 NetBeans IDE
 http://www.netbeans.com/
