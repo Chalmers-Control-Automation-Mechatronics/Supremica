@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2016 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -580,20 +580,6 @@ public abstract class TRAbstractModelAnalyzer
     return eventInfoList;
   }
 
-  protected void setUpInputStateLists()
-  {
-    if (mInputStateLists == null) {
-      final int numAutomata = mInputAutomata.length;
-      @SuppressWarnings("unchecked")
-      final List<StateProxy>[] stateLists = new List[numAutomata];
-      for (int a = 0; a < numAutomata; a++) {
-        final AutomatonProxy aut = mInputAutomata[a];
-        stateLists[a] = new ArrayList<>(aut.getStates());
-      }
-      mInputStateLists = stateLists;
-    }
-  }
-
 
   @Override
   protected void addStatistics()
@@ -716,7 +702,7 @@ public abstract class TRAbstractModelAnalyzer
 
   /**
    * Retrieves a state from the input model.
-   * @param  autIndex    The index of the automaton to be retrieved. It
+   * @param  autIndex    The index of the automaton to be examined. It
    *                     corresponds the the position in state tuples and
    *                     to the array returned by {@link #getTRAutomata()}.
    * @param  stateIndex  The number of the state to be retrieved. It
@@ -726,10 +712,23 @@ public abstract class TRAbstractModelAnalyzer
    */
   protected StateProxy getInputState(final int autIndex, final int stateIndex)
   {
-    if (mInputStateLists == null) {
-      setUpInputStateLists();
+    final AutomatonProxy aut = mInputAutomata[autIndex];
+    if (aut instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+      return tr.getState(stateIndex);
+    } else {
+      if (mInputStateLists == null) {
+        final int numAutomata = mInputAutomata.length;
+        @SuppressWarnings("unchecked")
+        final List<StateProxy>[] stateLists = new List[numAutomata];
+        mInputStateLists = stateLists;
+      }
+      List<StateProxy> list = mInputStateLists[autIndex];
+      if (list == null) {
+        mInputStateLists[autIndex] = list = new ArrayList<>(aut.getStates());
+      }
+      return list.get(stateIndex);
     }
-    return mInputStateLists[autIndex].get(stateIndex);
   }
 
 
