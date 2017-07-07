@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -45,7 +45,6 @@ import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -105,7 +104,6 @@ public class TRDeadlockChecker
   public boolean run()
     throws AnalysisException
   {
-
     try {
       setUp();
       exploreStateSpace();
@@ -139,7 +137,7 @@ public class TRDeadlockChecker
 
   @Override
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException, EventNotFoundException
+    throws AnalysisException
   {
     boolean isDeadlock = true;
     for (final EventInfo event : getEventInfo()) {
@@ -179,7 +177,7 @@ public class TRDeadlockChecker
   //#########################################################################
   //# Methods to Build the Counterexample
   private ConflictTraceProxy createTrace(final int source)
-    throws OverflowException, EventNotFoundException
+    throws AnalysisException
   {
     setUpReverseTransitions();
     final DeadlockCallback deadlockCallback = new DeadlockCallback();

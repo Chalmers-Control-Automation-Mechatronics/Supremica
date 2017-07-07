@@ -51,6 +51,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -274,18 +275,19 @@ public abstract class TRAbstractModelAnalyzer
   //# Invocation
   @Override
   protected void setUp()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.setUp();
     // Set up input automata and state encoding
     setUpAutomata();
     // Set up output event encoding
     final Map<EventProxy,EventInfo> eventInfoMap = setUpEventEncoding();
+    checkEventsInAutomta(eventInfoMap);
     // Set up deadlock information ...
     setUpDeadlockInfo();
     // Add transition information to event info ...
     final List<EventInfo> eventInfoList =
-      setUpTransitions(mTRAutomata, eventInfoMap, true);
+      setUpTransitions(mTRAutomata, eventInfoMap);
     // Sort event info and merge local events
     postprocessEventInfo(eventInfoList);
   }
@@ -310,6 +312,7 @@ public abstract class TRAbstractModelAnalyzer
     int a = 0;
     boolean gotDump = false;
     for (final AutomatonProxy aut : automata) {
+      checkAbort();
       if (translator.getComponentKind(aut) != null) {
         mInputAutomata[a] = aut;
         final int config = getDefaultConfig();
@@ -346,7 +349,7 @@ public abstract class TRAbstractModelAnalyzer
   }
 
   protected Map<EventProxy,EventInfo> setUpEventEncoding()
-    throws OverflowException
+    throws OverflowException, AnalysisAbortException
   {
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
@@ -366,6 +369,7 @@ public abstract class TRAbstractModelAnalyzer
     // Add propositions to output event encoding ...
     final int numAutomata = mTRAutomata.length;
     for (int a = 0; a < numAutomata; a++) {
+      checkAbort();
       final TRAutomatonProxy aut = mTRAutomata[a];
       final EventEncoding enc = aut.getEventEncoding();
       for (int p = 0; p < enc.getNumberOfPropositions(); p++) {
@@ -388,6 +392,7 @@ public abstract class TRAbstractModelAnalyzer
     // Add proper events to output event encoding and create event info ...
     final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     for (final EventProxy event : events) {
+      checkAbort();
       if (translator.getEventKind(event) != EventKind.PROPOSITION) {
         final EventInfo info = new EventInfo(event);
         eventInfoMap.put(event, info);
@@ -419,6 +424,7 @@ public abstract class TRAbstractModelAnalyzer
   }
 
   protected void setUpDeadlockInfo()
+    throws AnalysisAbortException, OverflowException
   {
     final int numProps = mOutputEventEncoding.getNumberOfPropositions();
     if (mPruningDeadlocks && numProps > 0) {
@@ -449,6 +455,7 @@ public abstract class TRAbstractModelAnalyzer
           final DeadlockInfo info = new DeadlockInfo(rel, pattern);
           final int numStates = rel.getNumberOfStates();
           for (int s = 0; s < numStates; s++) {
+            checkAbort();
             if (rel.isReachable(s) && info.isDeadlockState(s)) {
               if (mDeadlockInfo == null) {
                 mDeadlockInfo = new DeadlockInfo[numAutomata];
@@ -465,9 +472,8 @@ public abstract class TRAbstractModelAnalyzer
 
   protected List<EventInfo> setUpTransitions
     (final TRAutomatonProxy[] automata,
-     final Map<EventProxy,EventInfo> eventInfoMap,
-     final boolean eventInfoRequired)
-    throws OverflowException, EventNotFoundException
+     final Map<EventProxy,EventInfo> eventInfoMap)
+    throws OverflowException, AnalysisAbortException
   {
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
@@ -482,6 +488,7 @@ public abstract class TRAbstractModelAnalyzer
       final EventEncoding enc = aut.getEventEncoding();
       final int numLocalEvents = enc.getNumberOfProperEvents();
       for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
+        checkAbort();
         final byte status = enc.getProperEventStatus(local);
         if (EventStatus.isUsedEvent(status)) {
           final EventProxy event = enc.getProperEvent(local);
@@ -502,11 +509,7 @@ public abstract class TRAbstractModelAnalyzer
             final int global =
               mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
-            if (info == null) {
-              if (eventInfoRequired) {
-                throw new EventNotFoundException(des, event.getName());
-              }
-            } else if (!info.isBlocked()) {
+            if (info != null && !info.isBlocked()) {
               info.setOutputCode(global);
               final AutomatonEventInfo autInfo =
                 new AutomatonEventInfo(a, aut, local, deadlockInfo, true);
@@ -527,13 +530,14 @@ public abstract class TRAbstractModelAnalyzer
   }
 
   protected void postprocessEventInfo(final List<EventInfo> eventInfoList)
-    throws OverflowException
+    throws OverflowException, AnalysisAbortException
   {
     Collections.sort(eventInfoList);
     mEventInfo = new ArrayList<>(eventInfoList.size());
     final List<EventInfo> group = new ArrayList<>();
     EventInfo current = null;
     for (final EventInfo info : eventInfoList) {
+      checkAbort();
       if (current == null) {
         current = info;
         group.add(info);
@@ -551,11 +555,12 @@ public abstract class TRAbstractModelAnalyzer
 
 
   protected List<EventInfo> setUpReverseTransitions()
-    throws OverflowException, EventNotFoundException
+    throws OverflowException, AnalysisAbortException
   {
     final int numAutomata = mTRAutomata.length;
     final TRAutomatonProxy[] reversedAutomata = new TRAutomatonProxy[numAutomata];
     for (int a = 0; a < numAutomata; a++) {
+      checkAbort();
       final TRAutomatonProxy aut = mTRAutomata[a];
       final EventEncoding enc = aut.getEventEncoding();
       final EventEncoding reversedEnc = enc.clone();
@@ -571,11 +576,12 @@ public abstract class TRAbstractModelAnalyzer
     final int numEvents = mEventInfo.size();
     final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     for (final EventInfo info : mEventInfo) {
+      info.reset();
       final EventProxy event = info.getEvent();
       eventInfoMap.put(event, info);
     }
     final List<EventInfo> eventInfoList =
-      setUpTransitions(reversedAutomata, eventInfoMap, false);
+      setUpTransitions(reversedAutomata, eventInfoMap);
     postprocessEventInfo(eventInfoList);
     return eventInfoList;
   }
@@ -748,6 +754,7 @@ public abstract class TRAbstractModelAnalyzer
     for (int current = 0;
          current < mStateSpace.size() && !result.isFinished();
          current++) {
+      checkAbort();
       expandState(current);
     }
   }
@@ -1009,6 +1016,7 @@ public abstract class TRAbstractModelAnalyzer
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Static Methods
   private static int getLastReachableState
@@ -1041,6 +1049,36 @@ public abstract class TRAbstractModelAnalyzer
       }
     }
     return -1;
+  }
+
+
+  //#########################################################################
+  //# Error Handling
+  /**
+   * Checks the event alphabets of all input automata to see whether all
+   * used non-proposition events have associated event information.
+   * @param  eventInfoMap  Event information map that contains an entry for
+   *                       all recognised events
+   * @throws EventNotFoundException to indicate that some input automaton
+   *                       uses an event not mapped to anything in the map.
+   */
+  private void checkEventsInAutomta(final Map<EventProxy,EventInfo> eventInfoMap)
+    throws EventNotFoundException
+  {
+    for (final TRAutomatonProxy aut : mTRAutomata) {
+      final EventEncoding enc = aut.getEventEncoding();
+      final int numLocalEvents = enc.getNumberOfProperEvents();
+      for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
+        final byte status = enc.getProperEventStatus(local);
+        if (EventStatus.isUsedEvent(status)) {
+          final EventProxy event = enc.getProperEvent(local);
+          if (event != null && !eventInfoMap.containsKey(event)) {
+            final ProductDESProxy des = getModel();
+            throw new EventNotFoundException(des, event.getName());
+          }
+        }
+      }
+    }
   }
 
 
@@ -1397,6 +1435,15 @@ public abstract class TRAbstractModelAnalyzer
 
     //#######################################################################
     //# Setup
+    private void reset()
+    {
+      mStatus = EventStatus.STATUS_NONE;
+      mBlocked = false;
+      mDisablingAutomata.clear();
+      mUpdatingAutomata.clear();
+      mUpdateSequence = null;
+    }
+
     private void setOutputCode(final int e)
     {
       mOutputCode = e;
