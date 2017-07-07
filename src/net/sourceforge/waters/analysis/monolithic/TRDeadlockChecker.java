@@ -147,8 +147,14 @@ public class TRDeadlockChecker
       }
     }
     if (isDeadlock) {
-      final ConflictTraceProxy cp = createTrace(getCurrentSource());
-      setFailedResult(cp);
+
+      setUpReverseTransitions();
+      final DeadlockCallback deadlockCallback = new DeadlockCallback();
+      setStateCallback(deadlockCallback);
+
+      // Create counter example ..
+      final ConflictTraceProxy counterexample = buildCounterExample( deadlockCallback);
+      setFailedResult(counterexample);
     }
   }
 
@@ -170,29 +176,14 @@ public class TRDeadlockChecker
   public static String getTraceName(final ProductDESProxy model)
   {
     final String modelname = model.getName();
-    return modelname + "-deadlock";
+    return modelname+"-deadlock";
   }
 
 
   //#########################################################################
   //# Methods to Build the Counterexample
-  private ConflictTraceProxy createTrace(final int source)
-    throws AnalysisException
-  {
-    setUpReverseTransitions();
-    final DeadlockCallback deadlockCallback = new DeadlockCallback();
-    setStateCallback(deadlockCallback);
-    final int firstDeadlockState = source;
-    final ConflictTraceProxy counterexample =
-      buildCounterExample(firstDeadlockState,
-                          getTRAutomata(),
-                          deadlockCallback);
-    return counterexample;
-  }
 
-  private ConflictTraceProxy buildCounterExample(final int firstDeadlockState,
-                                                 final TRAutomatonProxy[] automataArray,
-                                                 final DeadlockCallback callback)
+  private ConflictTraceProxy buildCounterExample(final DeadlockCallback callback)
     throws OverflowException
   {
     // Generate a counter example. As each state is numbered in the
@@ -200,25 +191,29 @@ public class TRDeadlockChecker
     // strategy is used, and all states are reachable, following the
     // transition to a state with the lowest id will give a
     // counterexample.
+    final TRAutomatonProxy[] automataArray= getTRAutomata();
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
     final int numaut = getTRAutomata().length;
     final Map<AutomatonProxy,StateProxy> stateMap =
       new HashMap<AutomatonProxy,StateProxy>(numaut);
     final int numInit = getNumberOfInitialStates();
     final ProductDESProxyFactory factory = getFactory();
-    final int[] encodedSource =
-      new int[getStateTupleEncoding().getNumberOfWords()];
-    final int[] decodedSource =
-      new int[getStateTupleEncoding().getNumberOfAutomata()];
+     int[] encodedSource;
+     int[] decodedSource;
     // Find the unchecked state with the lowest
     // id, as this should give the shortest counterexample.
     // or if a second marking condition is simultaneously used, look
     // for the first non-coreachable precondition marked state.
-    int current = firstDeadlockState;
-    getStateSpace().getContents(current, encodedSource);
-    getStateTupleEncoding().decode(encodedSource, decodedSource);
+    int current = getCurrentSource();
+
     // Until we reach the start state...
     do {
+      encodedSource =
+        new int[getStateTupleEncoding().getNumberOfWords()];
+      decodedSource =
+        new int[getStateTupleEncoding().getNumberOfAutomata()];
+      getStateSpace().getContents(current, encodedSource);
+      getStateTupleEncoding().decode(encodedSource, decodedSource);
       for (final EventInfo event : getEventInfo()) {
         if (event.isEnabled(decodedSource)) {
           callback.setEvent(event.getEvent());
@@ -228,17 +223,12 @@ public class TRDeadlockChecker
       }
       final int next = callback.getSmallestStateIndex();
       for (int i = 0; i < automataArray.length; i++) {
-        final TRAutomatonProxy aut = automataArray[i];
-        final int s = decodedSource[i];
-        final StateProxy state = aut.getState(s);
+        final TRAutomatonProxy aut = getTRAutomaton(i);
+        for(int j=0; j<aut.getStates().size(); j++){
+        final StateProxy state = aut.getState(j);
         //getStateSpace()
         stateMap.put(aut, state);
-        /*
-         * final AutomatonSchema schema = automata[a]; final AutomatonProxy
-         * aut = schema.getAutomatonProxy(); final int s = tuple[a]; final
-         * StateProxy state = schema.getStateProxyFromID(s); stateMap.put(aut,
-         * state);
-         */
+        }
       }
       final TraceStepProxy step;
       if (current >= numInit) {
@@ -270,8 +260,8 @@ public class TRDeadlockChecker
     //# Constructor
     private DeadlockCallback()
     {
-      final int size = getStateTupleEncoding().getNumberOfWords();
-      mEncoded = new int[size];
+      //final int size = getStateTupleEncoding().getNumberOfWords();
+     // mEncoded = new int[size];
     }
 
     //#######################################################################
@@ -281,13 +271,16 @@ public class TRDeadlockChecker
     public boolean newState(final int[] tuple)
       throws OverflowException
     {
+      final int size = getStateTupleEncoding().getNumberOfWords();
+      mEncoded = new int[size];
+
       getStateTupleEncoding().encode(tuple, mEncoded);
-      final int stateIndex = getStateSpace().getIndex(mEncoded);
+      final int currentStateIndex = getStateSpace().getIndex(mEncoded);
       // if -1; then not visited, so skip
-      if (stateIndex !=-1) {
-        if (stateIndex < mSmallestStateIndex) {
-          mSmallestStateIndex = stateIndex;
-          mSmallestStateEvent = mEvent;
+      if (currentStateIndex !=-1) {
+        if (currentStateIndex < mSmallestStateIndex) {
+          mSmallestStateIndex = currentStateIndex;
+          mSmallestStateEvent = mCurrentEvent;
           return true;
         }
       }
@@ -298,7 +291,7 @@ public class TRDeadlockChecker
     //# Simple Access
     private void setEvent(final EventProxy event)
     {
-      mEvent = event;
+      mCurrentEvent = event;
     }
 
     private int getSmallestStateIndex()
@@ -313,9 +306,9 @@ public class TRDeadlockChecker
 
     //#######################################################################
     //# Data Members
-    private final int[] mEncoded;
-    private int mSmallestStateIndex;
-    private EventProxy mEvent;
+    private int[] mEncoded;
+    private int mSmallestStateIndex=getCurrentSource();
+    private EventProxy mCurrentEvent;
     private EventProxy mSmallestStateEvent;
   }
 
