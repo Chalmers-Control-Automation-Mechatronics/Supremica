@@ -451,7 +451,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "just_property.wdes");
-    runModelVerifier(des, true);
+    runModelVerifier(des, false);
   }
 
   // Not sure about this one; it has only one state and no events !

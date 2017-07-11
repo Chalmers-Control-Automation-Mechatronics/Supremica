@@ -39,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -153,7 +152,7 @@ public class TRDeadlockChecker
       setStateCallback(deadlockCallback);
 
       // Create counter example ..
-      final ConflictTraceProxy counterexample = buildCounterExample( deadlockCallback);
+      final ConflictTraceProxy counterexample = buildCounterExample(deadlockCallback);
       setFailedResult(counterexample);
     }
   }
@@ -186,24 +185,17 @@ public class TRDeadlockChecker
   private ConflictTraceProxy buildCounterExample(final DeadlockCallback callback)
     throws OverflowException
   {
-    // Generate a counter example. As each state is numbered in the
-    // order it is encountered, and a breadth first exploration
-    // strategy is used, and all states are reachable, following the
-    // transition to a state with the lowest id will give a
-    // counterexample.
-    final TRAutomatonProxy[] automataArray= getTRAutomata();
+
+    final AutomatonProxy[] automataArray= getInputAutomata();
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
     final int numaut = getTRAutomata().length;
     final Map<AutomatonProxy,StateProxy> stateMap =
-      new HashMap<AutomatonProxy,StateProxy>(numaut);
+                          new HashMap<AutomatonProxy,StateProxy>(numaut);
     final int numInit = getNumberOfInitialStates();
     final ProductDESProxyFactory factory = getFactory();
      int[] encodedSource;
      int[] decodedSource;
-    // Find the unchecked state with the lowest
-    // id, as this should give the shortest counterexample.
-    // or if a second marking condition is simultaneously used, look
-    // for the first non-coreachable precondition marked state.
+
     int current = getCurrentSource();
 
     // Until we reach the start state...
@@ -223,12 +215,10 @@ public class TRDeadlockChecker
       }
       final int next = callback.getSmallestStateIndex();
       for (int i = 0; i < automataArray.length; i++) {
-        final TRAutomatonProxy aut = getTRAutomaton(i);
-        for(int j=0; j<aut.getStates().size(); j++){
-        final StateProxy state = aut.getState(j);
-        //getStateSpace()
+        final AutomatonProxy aut = getInputAutomaton(i);
+        final int indx = decodedSource[i];
+        final StateProxy state = getInputState(i, indx);
         stateMap.put(aut, state);
-        }
       }
       final TraceStepProxy step;
       if (current >= numInit) {
@@ -262,6 +252,7 @@ public class TRDeadlockChecker
     {
       //final int size = getStateTupleEncoding().getNumberOfWords();
      // mEncoded = new int[size];
+      mSmallestStateIndex=getCurrentSource();
     }
 
     //#######################################################################
@@ -307,7 +298,7 @@ public class TRDeadlockChecker
     //#######################################################################
     //# Data Members
     private int[] mEncoded;
-    private int mSmallestStateIndex=getCurrentSource();
+    private int mSmallestStateIndex;
     private EventProxy mCurrentEvent;
     private EventProxy mSmallestStateEvent;
   }

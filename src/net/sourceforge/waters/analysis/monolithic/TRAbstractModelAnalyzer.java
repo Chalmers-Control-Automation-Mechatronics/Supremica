@@ -616,6 +616,7 @@ public abstract class TRAbstractModelAnalyzer
     mEncodedSource = null;
     mDecodedTarget = null;
     mEncodedTarget = null;
+    mStateCallback=null;
   }
 
 
@@ -1865,6 +1866,10 @@ public abstract class TRAbstractModelAnalyzer
   private int[] mDecodedDeadlockState;
   private int mDeadlockState;
 
+  // ************** Test*************
+  public AutomatonProxy[] getInputAutomata(){
+    return mInputAutomata;
+  }
 
   //#########################################################################
   //# Class Constants
