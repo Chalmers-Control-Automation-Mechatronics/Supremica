@@ -1866,10 +1866,6 @@ public abstract class TRAbstractModelAnalyzer
   private int[] mDecodedDeadlockState;
   private int mDeadlockState;
 
-  // ************** Test*************
-  public AutomatonProxy[] getInputAutomata(){
-    return mInputAutomata;
-  }
 
   //#########################################################################
   //# Class Constants

@@ -186,7 +186,7 @@ public class TRDeadlockChecker
     throws OverflowException
   {
 
-    final AutomatonProxy[] automataArray= getInputAutomata();
+    final AutomatonProxy[] automataArray= getTRAutomata();
     final List<TraceStepProxy> steps = new LinkedList<TraceStepProxy>();
     final int numaut = getTRAutomata().length;
     final Map<AutomatonProxy,StateProxy> stateMap =
