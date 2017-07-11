@@ -612,7 +612,7 @@ public abstract class TRAbstractModelAnalyzer
     mStateSpace = null;
     mOutputEventEncoding = null;
     mDeadlockInfo = null;
-    mInputStateLists = null;
+    mInputStateArrays = null;
     mDecodedSource = null;
     mEncodedSource = null;
     mDecodedTarget = null;
@@ -724,17 +724,18 @@ public abstract class TRAbstractModelAnalyzer
       final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
       return tr.getState(stateIndex);
     } else {
-      if (mInputStateLists == null) {
+      if (mInputStateArrays == null) {
         final int numAutomata = mInputAutomata.length;
-        @SuppressWarnings("unchecked")
-        final List<StateProxy>[] stateLists = new List[numAutomata];
-        mInputStateLists = stateLists;
+        mInputStateArrays = new StateProxy[numAutomata][];
       }
-      List<StateProxy> list = mInputStateLists[autIndex];
-      if (list == null) {
-        mInputStateLists[autIndex] = list = new ArrayList<>(aut.getStates());
+      StateProxy[] array = mInputStateArrays[autIndex];
+      if (array == null) {
+        final Collection<StateProxy> states = aut.getStates();
+        final int numStates = states.size();
+        array = new StateProxy[numStates];
+        mInputStateArrays[autIndex] = states.toArray(array);
       }
-      return list.get(stateIndex);
+      return array[stateIndex];
     }
   }
 
@@ -1855,7 +1856,7 @@ public abstract class TRAbstractModelAnalyzer
   private EventEncoding mOutputEventEncoding;
   private DeadlockInfo[] mDeadlockInfo;
   private int mNumberOfInitialStates;
-  private List<StateProxy>[] mInputStateLists;
+  private StateProxy[][] mInputStateArrays;
 
   // Temporary variables
   private int mCurrentSource;
