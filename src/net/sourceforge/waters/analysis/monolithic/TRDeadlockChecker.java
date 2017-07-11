@@ -130,6 +130,7 @@ public class TRDeadlockChecker
   @Override
   protected void tearDown()
   {
+    setStateCallback(null);
     super.tearDown();
   }
 

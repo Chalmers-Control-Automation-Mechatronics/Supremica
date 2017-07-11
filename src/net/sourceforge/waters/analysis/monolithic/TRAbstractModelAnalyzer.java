@@ -587,6 +587,7 @@ public abstract class TRAbstractModelAnalyzer
   }
 
 
+
   @Override
   protected void addStatistics()
   {
@@ -616,7 +617,6 @@ public abstract class TRAbstractModelAnalyzer
     mEncodedSource = null;
     mDecodedTarget = null;
     mEncodedTarget = null;
-    mStateCallback=null;
   }
 
 
