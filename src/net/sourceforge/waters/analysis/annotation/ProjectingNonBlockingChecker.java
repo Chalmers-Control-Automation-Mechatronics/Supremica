@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -32,10 +32,6 @@
 //###########################################################################
 
 package net.sourceforge.waters.analysis.annotation;
-
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -83,9 +79,18 @@ import net.sourceforge.waters.xsd.base.EventKind;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+
 
 /**
- * The projecting controllability check algorithm.
+ * <P>An implementation of the annotating conflict check algorithm.</P>
+ *
+ * <P><I>Reference:</I><BR>
+ * Simon Ware, Robi Malik. Conflict-preserving abstraction of discrete event
+ * systems using annotated automata. Discrete Event Dynamic Systems,
+ * <STRONG>22</STRONG>(4), 451-477, 2012.</P>
  *
  * @author Simon Ware
  */
