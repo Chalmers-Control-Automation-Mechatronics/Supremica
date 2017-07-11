@@ -254,10 +254,6 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
-  // The following two files have .wdes extension !
-  // is the same as .wmod ?
-  // already tested.
-
   public void testSmallFactory2() throws Exception
   {
     final ProductDESProxy des =
@@ -306,7 +302,6 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, false);
   }
 
-  //*** forbidden event ?: I didn't delete it
   public void testAgvbPart1() throws Exception
   {
     final ProductDESProxy des =
@@ -454,7 +449,6 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, false);
   }
 
-  // Not sure about this one; it has only one state and no events !
   public void testNeverMarked() throws Exception
   {
     final ProductDESProxy des =
@@ -484,7 +478,6 @@ public abstract class AbstractDeadlockCheckerTest
   }
 
 
-  // Not sure about this one; it has only one state and no events !
   public void testOneState() throws Exception
   {
     final ProductDESProxy des =
@@ -590,7 +583,6 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
-  // Not sure; it has one state and no events
   public void testTwoInit1() throws Exception
   {
     final ProductDESProxy des =
@@ -673,7 +665,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "robis_ball_sorter_attempt1.wmod");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testBatchtank2005_amk14() throws Exception

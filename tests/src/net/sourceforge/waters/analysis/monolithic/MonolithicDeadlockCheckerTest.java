@@ -68,7 +68,7 @@ public class MonolithicDeadlockCheckerTest extends
     (final ProductDESProxyFactory factory)
   {
     final DeadlockChecker checker = new TRDeadlockChecker();
-    checker.setNodeLimit(3000000);
+    //checker.setNodeLimit(3000000);
     return checker;
   }
 
