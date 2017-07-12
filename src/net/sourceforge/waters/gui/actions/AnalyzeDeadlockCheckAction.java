@@ -40,14 +40,26 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
-public class AnalyzeDeadlockCheckAction
-extends WatersAnalyzeAction
+
+/**
+ * The action to invoke the deadlock check operation.
+ *
+ * @author Hani al-Bahri
+ */
+
+public class AnalyzeDeadlockCheckAction extends WatersAnalyzeAction
 {
+
+  //#########################################################################
+  //# Constructor
   protected AnalyzeDeadlockCheckAction(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
   protected String getCheckName()
   {
@@ -65,8 +77,7 @@ extends WatersAnalyzeAction
                                            final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException
   {
-    // TODO
-    return null;
+    return factory.createDeadlockChecker(desFactory);
   }
 
   @Override
@@ -75,5 +86,9 @@ extends WatersAnalyzeAction
     return "is deadlock-free";
   }
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -8684703946705836025L;
+
 }
