@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -122,13 +122,25 @@ isSkippable(CheckType mode)
     return true;
   } else if (mUsedSearchRecords == 0 && mUnusedSearchRecords == 0) {
     return true;
-  } else if (mNumNonSelfloopingRecords) {
-    return false;
-  } else if (mode == CHECK_TYPE_SAFETY) {
-    return isControllable() ? true : !mIsDisabledInSpec;
-  } else if (mode == CHECK_TYPE_LOOP) {
-    return !isControllable();
+  } else if (isOnlySelfloops()) {
+    return isSkippableIfOnlySelfloops(mode);
   } else {
+    return false;
+  }
+}
+
+bool BroadEventRecord::
+isSkippableIfOnlySelfloops(CheckType mode)
+  const
+{
+  switch (mode) {
+  case CHECK_TYPE_SAFETY:
+    return isControllable() || !mIsDisabledInSpec;
+  case CHECK_TYPE_DEADLOCK:
+    return false;
+  case CHECK_TYPE_LOOP:
+    return !isControllable();
+  default:
     return true;
   }
 }
@@ -267,29 +279,23 @@ createUpdateRecord(int wordindex)
 void BroadEventRecord::
 optimizeTransitionRecordsForSearch(CheckType mode)
 {
-  bool safety = mode == CHECK_TYPE_SAFETY;
-  bool controllable;
-  if (safety && !mIsDisabledInSpec) {
+  if (mode == CHECK_TYPE_SAFETY && !mIsDisabledInSpec) {
     setControllable(true);
-    controllable = true;
-  } else {
-    controllable = isControllable();
   }
-  if (mNumNonSelfloopingRecords == 1) {
-    if (!safety || controllable) {
-      const bool unlinked = mNonSelfloopingRecord->isAlwaysEnabled();
-      const bool det = mNonSelfloopingRecord->isDeterministic();
-      mNonSelfloopingRecord->removeSelfloops();
-      if (unlinked && !mNonSelfloopingRecord->isAlwaysEnabled()) {
-        relink(mNonSelfloopingRecord);
-        const bool plant = mNonSelfloopingRecord->getAutomaton()->isPlant();
-        mIsDisabledInSpec &= !plant;
-      }
-      if (!det && mNonSelfloopingRecord->isDeterministic()) {
-        mNumNondeterministicRecords--;
-      }
+  if (mNumNonSelfloopingRecords == 1 && isSkippableIfOnlySelfloops(mode)) {
+    const bool unlinked = mNonSelfloopingRecord->isAlwaysEnabled();
+    const bool det = mNonSelfloopingRecord->isDeterministic();
+    mNonSelfloopingRecord->removeSelfloops();
+    if (unlinked && !mNonSelfloopingRecord->isAlwaysEnabled()) {
+      relink(mNonSelfloopingRecord);
+      const bool plant = mNonSelfloopingRecord->getAutomaton()->isPlant();
+      mIsDisabledInSpec &= !plant;
+    }
+    if (!det && mNonSelfloopingRecord->isDeterministic()) {
+      mNumNondeterministicRecords--;
     }
   }
+  const bool controllable = isControllable();
   const LinkedRecordAccessor<TransitionRecord>* accessor =
     TransitionRecord::getSearchAccessor(controllable);
   LinkedRecordList<TransitionRecord> list(accessor, mUsedSearchRecords);

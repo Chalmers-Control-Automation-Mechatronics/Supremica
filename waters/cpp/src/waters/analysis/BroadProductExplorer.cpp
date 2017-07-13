@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -281,6 +281,12 @@ setup()
       setupSafety(eventMap);
       break;
     case CHECK_TYPE_NONBLOCKING:
+      {
+        uint32_t numDump = setupNonblocking(eventMap);
+        setupDumpStates(numDump);
+      }
+      break;
+    case CHECK_TYPE_DEADLOCK:
       setupNonblocking(eventMap);
       break;
     case CHECK_TYPE_LOOP:
@@ -477,6 +483,44 @@ expandForwardSafety(uint32_t source,
     }
   }
   return true;
+}
+
+
+//----------------------------------------------------------------------------
+// expandForwardDeadlock()
+
+class DeadlockExpandHandler : public BroadExpandHandler
+{
+public:
+  //##########################################################################
+  //# Constructors & Destructors
+  explicit DeadlockExpandHandler(BroadProductExplorer& explorer) :
+    BroadExpandHandler(explorer)
+  {}
+
+  //##########################################################################
+  //# Callbacks
+  virtual bool handleEvent(uint32_t source,
+			   const uint32_t* sourceTuple,
+			   const uint32_t* sourcePacked,
+			   BroadEventRecord* event)
+  {
+    getExplorer().setConflictKind(jni::ConflictKind_CONFLICT);
+    return BroadExpandHandler::handleEvent
+      (source, sourceTuple, sourcePacked, event);
+  }
+};
+
+bool BroadProductExplorer::
+expandForwardDeadlock(uint32_t source,
+                      const uint32_t* sourceTuple,
+                      const uint32_t* sourcePacked,
+                      TransitionCallBack callBack)
+{
+  DeadlockExpandHandler handler(*this);
+  setConflictKind(jni::ConflictKind_DEADLOCK);
+  expandForward(source, sourceTuple, sourcePacked, handler);
+  return getConflictKind() != jni::ConflictKind_DEADLOCK;
 }
 
 
@@ -822,21 +866,21 @@ setupSafety
 }
 
 
-void BroadProductExplorer::
+uint32_t BroadProductExplorer::
 setupNonblocking
   (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
 {
   jni::ClassCache* cache = getCache();
 
   // Collect transitions ...
-  const int numaut = getNumberOfAutomata();
-  uint32_t numdump = 0;
-  for (int a = 0; a < numaut; a++) {
+  const int numAut = getNumberOfAutomata();
+  uint32_t numDump = 0;
+  for (int a = 0; a < numAut; a++) {
     AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
     const jni::AutomatonGlue& autglue = aut->getJavaAutomaton();
     if (aut->getNumberOfInitialStates() == 0) {
       setTrivial();
-      return;
+      return 0;
     }
     setupTransitions(aut, autglue, eventMap);
     const jni::SetGlue& events = autglue.getEventsGlue(cache);
@@ -856,23 +900,11 @@ setupNonblocking
         break;
       }
     }
-    numdump += aut->getNumberOfDumpStates();
+    numDump += aut->getNumberOfDumpStates();
   }
-
-  // Make dump states list ...
-  if (numdump > 0) {
-    mDumpStates = new uint32_t[2 * numdump + 1];
-    int d = 0;
-    for (int a = 0; a < numaut; a++) {
-      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
-      for (int i = 0; i < aut->getNumberOfDumpStates(); i++) {
-        mDumpStates[d++] = a;
-        mDumpStates[d++] = aut->getDumpState(i);
-      }
-    }
-    mDumpStates[d] = UINT32_MAX;
-  }
+  return numDump;
 }
+
 
 void BroadProductExplorer::
 setupLoop(const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
@@ -1059,6 +1091,26 @@ setupCompactEventList
   if (mMaxNondeterministicUpdates > 0) {
     mNondeterministicTransitionIterators =
       new NondeterministicTransitionIterator[mMaxNondeterministicUpdates];
+  }
+}
+
+
+void BroadProductExplorer::
+setupDumpStates(uint32_t numDump)
+{
+  // Make dump states list ...
+  if (numDump > 0) {
+    const int numAut = getNumberOfAutomata();
+    mDumpStates = new uint32_t[2 * numDump + 1];
+    int d = 0;
+    for (int a = 0; a < numAut; a++) {
+      const AutomatonRecord* aut = getAutomatonEncoding().getRecord(a);
+      for (int i = 0; i < aut->getNumberOfDumpStates(); i++) {
+        mDumpStates[d++] = a;
+        mDumpStates[d++] = aut->getDumpState(i);
+      }
+    }
+    mDumpStates[d] = UINT32_MAX;
   }
 }
 

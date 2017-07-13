@@ -69,6 +69,7 @@ namespace jni {
   class LoopTraceGlue;
   class NativeConflictCheckerGlue;
   class NativeControlLoopCheckerGlue;
+  class NativeModelVerifierGlue;
   class NativeSafetyVerifierGlue;
   class SafetyTraceGlue;
   class NativeVerificationResultGlue;
@@ -136,12 +137,13 @@ public:
   //# Invocation
   virtual bool runSafetyCheck();
   virtual bool runNonblockingCheck();
+  virtual bool runDeadlockCheck();
   virtual bool runLoopCheck();
   virtual void runStateCount();
   virtual jni::SafetyTraceGlue getSafetyCounterExample
     (const jni::NativeSafetyVerifierGlue& gchecker) const;
   virtual jni::ConflictTraceGlue getConflictCounterExample
-    (const jni::NativeConflictCheckerGlue& gchecker) const;
+    (const jni::NativeModelVerifierGlue& gchecker) const;
   virtual jni::LoopTraceGlue getLoopCounterExample
     (const jni::NativeControlLoopCheckerGlue& gchecker) const;
   virtual void addStatistics
@@ -173,6 +175,8 @@ public:
   inline uint32_t incNumberOfTransitions() {return mNumTransitions++;}
   inline uint32_t incNumberOfTransitionsExplored()
     {return mNumTransitionsExplored++;}
+  inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
+  inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
   inline const EventRecord* getTraceEvent() const {return mTraceEvent;}
   void setTraceEvent(const EventRecord* event) {mTraceEvent = event;}
   void setTraceEvent(const EventRecord* event, const AutomatonRecord* aut)
@@ -194,6 +198,8 @@ protected:
   //##########################################################################
   //# Search Algorithms
   virtual bool doSafetySearch();
+
+  virtual bool doDeadlockSearch();
 
   virtual bool doNonblockingReachabilitySearch();
   bool expandNonblockingReachabilityState
@@ -254,6 +260,9 @@ protected:
   virtual bool expandForwardSafety
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
+  virtual bool expandForwardDeadlock
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
   virtual bool expandForward
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0) = 0;
@@ -285,8 +294,6 @@ protected:
   inline void setTrivial() {mIsTrivial = true;}
   inline uint32_t getTraceState() const {return mTraceState;}
   inline void setTraceState(uint32_t state) {mTraceState = state;}
-  inline jni::ConflictKind getConflictKind() const {return mConflictKind;}
-  inline void setConflictKind(jni::ConflictKind kind) {mConflictKind = kind;}
   inline void setTarjanTraceSuccessors(BlockedArrayList<uint32_t>* successors)
     {mTarjanTraceSuccessors = successors;}
 

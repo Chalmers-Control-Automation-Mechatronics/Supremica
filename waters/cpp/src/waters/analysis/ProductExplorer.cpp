@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -64,6 +64,7 @@
 #include "jni/glue/LoopTraceGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeControlLoopCheckerGlue.h"
+#include "jni/glue/NativeDeadlockCheckerGlue.h"
 #include "jni/glue/NativeSafetyVerifierGlue.h"
 #include "jni/glue/NativeStateCounterGlue.h"
 #include "jni/glue/NativeVerificationResultGlue.h"
@@ -360,6 +361,33 @@ runNonblockingCheck()
 }
 
 bool ProductExplorer::
+runDeadlockCheck()
+{
+  try {
+    mStartTime = clock();
+    mCheckType = CHECK_TYPE_DEADLOCK;
+    setup();
+    bool result = true;
+    if (!mIsTrivial) {
+      storeInitialStates(true);
+      result = doDeadlockSearch();
+      if (!result) {
+        mTraceStartTime = clock();
+        mTraceList = new jni::LinkedListGlue(mCache);
+        const uint32_t level = getDepth(mTraceState);
+        computeBFSCounterExample(*mTraceList, level);
+      }
+    }
+    teardown();
+    mStopTime = clock();
+    return result;
+  } catch (...) {
+    teardown();
+    throw;
+  }
+}
+
+bool ProductExplorer::
 runLoopCheck()
 {
   try {
@@ -443,7 +471,7 @@ getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
 
 
 jni::ConflictTraceGlue ProductExplorer::
-getConflictCounterExample(const jni::NativeConflictCheckerGlue& gchecker)
+getConflictCounterExample(const jni::NativeModelVerifierGlue& gchecker)
   const
 {
   jstring name = gchecker.getTraceName();
@@ -582,6 +610,7 @@ setup()
     mDepthMap = new ArrayList<uint32_t>(2); // for number of init states
     break;
   case CHECK_TYPE_COUNT:
+  case CHECK_TYPE_DEADLOCK:
     mStateSpace = new StateSpace(mEncoding, mStateLimit);
     mDepthMap = new ArrayList<uint32_t>(128);
     break;
@@ -659,6 +688,18 @@ bool ProductExplorer::
 doSafetySearch()
 {    
 # define EXPAND expandForwardSafety
+  DO_REACHABILITY(0);
+# undef EXPAND
+}
+
+
+//----------------------------------------------------------------------------
+// doDeadlockSearch()
+
+bool ProductExplorer::
+doDeadlockSearch()
+{
+# define EXPAND expandForwardDeadlock
   DO_REACHABILITY(0);
 # undef EXPAND
 }
@@ -1694,6 +1735,51 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     }
+  } catch (const std::bad_alloc& error) {
+    finalizer.finalize();
+    jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jni::PreJavaException& pre) {
+    finalizer.finalize();
+    pre.throwJavaException(cache);
+    return 0;
+  } catch (const jni::ExceptionGlue& glue) {
+    finalizer.finalize();
+    cache.throwJavaException(glue);
+    return 0;
+  } catch (const jthrowable& throwable) {
+    env->ExceptionClear();
+    finalizer.finalize();
+    env->Throw(throwable);
+    return 0;
+  }
+}
+
+
+JNIEXPORT jobject JNICALL
+Java_net_sourceforge_waters_cpp_analysis_NativeDeadlockChecker_runNativeAlgorithm
+  (JNIEnv* env, jobject jchecker)
+{
+  jni::ClassCache cache(env);
+  jni::NativeDeadlockCheckerGlue gchecker(jchecker, &cache);
+  waters::ProductExplorerFinalizer finalizer(gchecker);
+  try {
+    jni::EventGlue noMarking(0, &cache);
+    waters::ProductExplorer* checker =
+      finalizer.createProductExplorer(noMarking, noMarking, cache);
+    bool result = checker->runDeadlockCheck();
+    jni::NativeVerificationResultGlue vresult =
+      gchecker.createAnalysisResultGlue(&cache);
+    if (result) {
+      vresult.setSatisfied(true);
+    } else {
+      jni::ConflictTraceGlue trace =
+        checker->getConflictCounterExample(gchecker);
+      vresult.setCounterExample(&trace);
+    }
+    checker->addStatistics(vresult);
+    return vresult.returnJavaObject();
   } catch (const std::bad_alloc& error) {
     finalizer.finalize();
     jni::OverflowExceptionGlue glue(jni::OverflowKind_MEMORY, &cache);

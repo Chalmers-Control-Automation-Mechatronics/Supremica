@@ -1,4 +1,4 @@
-//# This may look like C code, but it really is -*- C++ -*-
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
@@ -31,33 +31,45 @@
 //# exception.
 //###########################################################################
 
-#ifndef _CheckType_h_
-#define _CheckType_h_
+package net.sourceforge.waters.cpp.analysis;
 
-#ifdef __GNUG__
-#pragma interface
-#endif
+import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
+import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-#if _MSC_VER >= 1000
-#pragma once
-#endif
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
-//############################################################################
-//# enumeration CheckType
-//############################################################################
+public class NativeDeadlockCheckerTest
+  extends AbstractDeadlockCheckerTest
+{
 
-namespace waters {
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
+  {
+    final TestSuite testSuite =
+        new TestSuite(NativeDeadlockCheckerTest.class);
+    return testSuite;
+  }
 
-enum CheckType {
-  CHECK_TYPE_SAFETY,
-  CHECK_TYPE_NONBLOCKING,
-  CHECK_TYPE_DEADLOCK,
-  CHECK_TYPE_LOOP,
-  CHECK_TYPE_COUNT
-};
-
-}   /* namespace waters */
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
+  }
 
 
-#endif  /* !_CheckType_h_ */
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
+  protected DeadlockChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
+  {
+    final DeadlockChecker checker = new NativeDeadlockChecker(factory);
+    checker.setNodeLimit(3000000);
+    return checker;
+  }
+
+}
