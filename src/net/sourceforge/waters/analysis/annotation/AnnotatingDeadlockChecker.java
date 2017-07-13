@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,77 +31,95 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.analysis.annotation;
 
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.log4j.Logger;
+
 
 /**
- * An abstract base class that can be used for all deadlock checker
- * implementations. In addition to the model and factory members inherited
- * from {@link AbstractModelVerifier}, this class provides some support to
- * to return an error trace of the appropriate kind.
+ * A Java implementation of the annotating deadlock check algorithm.
  *
- * @author Robi Malik
+ * @author Hani al-Bahri
  */
 
-public abstract class AbstractDeadlockChecker
-  extends AbstractModelVerifier
-  implements DeadlockChecker
+public class AnnotatingDeadlockChecker
+  extends AbstractDeadlockChecker
 {
 
   //#########################################################################
   //# Constructors
-  /**
-   * Creates a new deadlock checker without a model.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxyFactory factory)
+  public AnnotatingDeadlockChecker(final ProductDESProxyFactory factory)
   {
-    this(null, factory);
+    super(factory);
   }
 
-  /**
-   * Creates a new deadlock checker to check whether the given model
-   * has a deadlock.
-   * @param  model      The model to be checked by this deadlock checker.
-   * @param  factory    Factory used for trace construction.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxy model,
-                                 final ProductDESProxyFactory factory)
+  public AnnotatingDeadlockChecker(final ProductDESProxy model,
+                                   final ProductDESProxyFactory factory)
   {
-    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
+    super(model, factory);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public boolean supportsNondeterminism()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+  }
+
+  @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    try {
+      setUp();
+      // TODO
+      return setSatisfiedResult();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
+    }
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Gets a name that can be used for a counterexample for the current model.
-   */
-  protected String getTraceName()
-  {
-    final ProductDESProxy model = getModel();
-    return getTraceName(model);
-  }
 
-  /**
-   * Gets a name that can be used for a counterexample for the given model.
-   */
-  public static String getTraceName(final ProductDESProxy model)
-  {
-    final String modelname = model.getName();
-    return modelname + "-deadlock";
-  }
+
+  //#########################################################################
+  //# Data Members
+
 }

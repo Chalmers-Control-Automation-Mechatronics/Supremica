@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,77 +31,45 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.analysis.annotation;
 
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
+import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-/**
- * An abstract base class that can be used for all deadlock checker
- * implementations. In addition to the model and factory members inherited
- * from {@link AbstractModelVerifier}, this class provides some support to
- * to return an error trace of the appropriate kind.
- *
- * @author Robi Malik
- */
 
-public abstract class AbstractDeadlockChecker
-  extends AbstractModelVerifier
-  implements DeadlockChecker
+public class AnnotatingDeadlockCheckerTest
+  extends AbstractDeadlockCheckerTest
 {
 
   //#########################################################################
-  //# Constructors
-  /**
-   * Creates a new deadlock checker without a model.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxyFactory factory)
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    this(null, factory);
+    final TestSuite testSuite =
+        new TestSuite(AnnotatingDeadlockCheckerTest.class);
+    return testSuite;
   }
 
-  /**
-   * Creates a new deadlock checker to check whether the given model
-   * has a deadlock.
-   * @param  model      The model to be checked by this deadlock checker.
-   * @param  factory    Factory used for trace construction.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxy model,
-                                 final ProductDESProxyFactory factory)
+  public static void main(final String[] args)
   {
-    super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  public ConflictTraceProxy getCounterExample()
+  protected DeadlockChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    final DeadlockChecker checker = new AnnotatingDeadlockChecker(factory);
+    checker.setNodeLimit(3000000);
+    return checker;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Gets a name that can be used for a counterexample for the current model.
-   */
-  protected String getTraceName()
-  {
-    final ProductDESProxy model = getModel();
-    return getTraceName(model);
-  }
-
-  /**
-   * Gets a name that can be used for a counterexample for the given model.
-   */
-  public static String getTraceName(final ProductDESProxy model)
-  {
-    final String modelname = model.getName();
-    return modelname + "-deadlock";
-  }
 }
