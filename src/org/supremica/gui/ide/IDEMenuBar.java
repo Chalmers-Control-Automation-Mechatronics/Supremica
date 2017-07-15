@@ -52,6 +52,7 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
@@ -100,6 +101,8 @@ import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
 import net.sourceforge.waters.gui.actions.ToolsFlexfactAction;
+import net.sourceforge.waters.gui.actions.WatersAction;
+import net.sourceforge.waters.gui.actions.WatersActionManager;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -137,11 +140,11 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * properties concerned.
  * </P>
  *
- * <P>
- * To add a new menu item, first implement its action, and then add it to a menu
- * in method {@link #createMenus()}. When creating menu items with hotkeys,
- * please check and update the list of used hotkeys in the comments below.
- * </P>
+ * <P>To add a new menu item, first implement its action as a subclass of
+ * {@link WatersAction}. Then register it in {@link WatersActionManager} and
+ * and add it to a menu in method {@link #createMenus()}. When creating menu
+ * items with hotkeys, please check and update the list of used hotkeys in
+ * the comments below.</P>
  *
  * <P>
  * To add a new menu, add a new data member for it at the end of the class,
@@ -235,8 +238,8 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 public class IDEMenuBar extends JMenuBar
 {
 
-  // #########################################################################
-  // # Constructor
+  //#########################################################################
+  //# Constructor
   public IDEMenuBar(final IDE ide)
   {
     mIDE = ide;
@@ -266,8 +269,8 @@ public class IDEMenuBar extends JMenuBar
       (analyzeListener);
   }
 
-  // #########################################################################
-  // # Initialisation
+  //#########################################################################
+  //# Initialisation
   private void createMenus()
   {
     final Actions actions = mIDE.getActions();
@@ -381,19 +384,15 @@ public class IDEMenuBar extends JMenuBar
           (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
         mVerifyMenu = new JMenu("Verify");
         mVerifyMenu.setMnemonic(KeyEvent.VK_R);
-        final Action conflict =
-            actions.getAction(AnalyzeConflictCheckAction.class);
-        mVerifyMenu.add(conflict);
-        //********** Hani ***************
-        // Maybe I should add an action here; for deadlock check
-        // Yes, but it should not (yet) show by default ~~~Robi
-        // final Action deadlock =
-        //   actions.getAction(AnalyzeDeadlockCheckAction.class);
-        // mVerifyMenu.add(deadlock);
-        //*************END ******************
         final Action controllability =
             actions.getAction(AnalyzeControllabilityAction.class);
         mVerifyMenu.add(controllability);
+        final Action conflict =
+          actions.getAction(AnalyzeConflictCheckAction.class);
+        mVerifyMenu.add(conflict);
+        final Action deadlock =
+          actions.getAction(AnalyzeDeadlockCheckAction.class);
+        mVerifyMenu.add(deadlock);
         final Action controlLoop =
             actions.getAction(AnalyzeControlLoopAction.class);
         mVerifyMenu.add(controlLoop);
@@ -672,8 +671,9 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
-  // #########################################################################
-  // # Auxiliary Methods
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void updateModulesMenu()
   {
     mModulesMenu.removeAll();
@@ -726,12 +726,12 @@ public class IDEMenuBar extends JMenuBar
   }
 
 
-  // #########################################################################
-  // # Inner Class IDEListener
+  //#########################################################################
+  //# Inner Class IDEListener
   private class IDEListener implements Observer
   {
-    // #######################################################################
-    // # Interface net.sourceforge.waters.gui.observer.Observer
+    //#######################################################################
+    //# Interface net.sourceforge.waters.gui.observer.Observer
     @Override
     public void update(final EditorChangedEvent event)
     {
@@ -838,13 +838,14 @@ public class IDEMenuBar extends JMenuBar
       }
     }
 
-    // #######################################################################
-    // # Data Members
+    //#######################################################################
+    //# Data Members
     private final TemplateItem mItem;
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private final IDE mIDE;
 
   private JMenu mFileMenu = null;
@@ -860,8 +861,8 @@ public class IDEMenuBar extends JMenuBar
   private JMenu mConfigureMenu = null;
   private JMenu mHelpMenu = null;
 
-  // #########################################################################
-  // # Class Constants
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 1L;
 
   private static final int MAX_MODULES = 24;

@@ -31,92 +31,95 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.annotation;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.StateCounter;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import org.apache.log4j.Logger;
 
 
 /**
- * A factory interface for all types of model verifiers.
+ * A Java implementation of the annotating deadlock check algorithm.
  *
- * @author Robi Malik
+ * @author Hani al-Bahri
  */
 
-public class MonolithicModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class AnnotatingDeadlockChecker
+  extends AbstractDeadlockChecker
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static MonolithicModelAnalyzerFactory getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final MonolithicModelAnalyzerFactory INSTANCE =
-      new MonolithicModelAnalyzerFactory();
-  }
-
-
-  //#########################################################################
   //# Constructors
-  private MonolithicModelAnalyzerFactory()
+  public AnnotatingDeadlockChecker(final ProductDESProxyFactory factory)
   {
+    super(factory);
+  }
+
+  public AnnotatingDeadlockChecker(final ProductDESProxy model,
+                                   final ProductDESProxyFactory factory)
+  {
+    super(model, factory);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
-  public MonolithicConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
+  public boolean supportsNondeterminism()
   {
-    return new MonolithicConflictChecker(factory);
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
   }
 
   @Override
-  public MonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
+  public boolean run()
+    throws AnalysisException
   {
-    return new MonolithicControllabilityChecker(factory);
+    try {
+      setUp();
+      // TODO
+      return setSatisfiedResult();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
+    }
   }
 
   @Override
-  public MonolithicControlLoopChecker createControlLoopChecker
-    (final ProductDESProxyFactory factory)
+  protected void tearDown()
   {
-    return new MonolithicControlLoopChecker(factory);
+    super.tearDown();
   }
 
-  @Override
-  public TRDeadlockChecker createDeadlockChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRDeadlockChecker();
-  }
 
-  @Override
-  public MonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicLanguageInclusionChecker(factory);
-  }
+  //#########################################################################
+  //# Auxiliary Methods
 
-  @Override
-  public StateCounter createStateCounter
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRStateCounter();
-  }
 
-  @Override
-  public MonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicSynthesizer(factory);
-  }
+  //#########################################################################
+  //# Data Members
 
 }

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -61,6 +61,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzeConflictCheckAction(ide));
     addAction(new AnalyzeControllabilityAction(ide));
     addAction(new AnalyzeControlLoopAction(ide));
+    addAction(new AnalyzeDeadlockCheckAction(ide));
     addAction(new AnalyzeHISCCPControllabilityAction(ide));
     try {
       addAction(new AnalyzeHISCCPInterfaceConsistencyAction(ide));

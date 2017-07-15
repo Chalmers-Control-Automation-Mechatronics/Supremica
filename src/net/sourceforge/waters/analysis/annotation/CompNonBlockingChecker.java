@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -32,12 +32,6 @@
 //###########################################################################
 
 package net.sourceforge.waters.analysis.annotation;
-
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -86,10 +80,14 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 
 /**
- * The projecting controllability check algorithm.
- *
  * @author Simon Ware
  */
 
@@ -138,6 +136,7 @@ public class CompNonBlockingChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -205,6 +204,7 @@ public class CompNonBlockingChecker
     }*/
   }
 
+  @Override
   public ConflictTraceProxy getCounterExample()
   {
     return null;
@@ -254,6 +254,7 @@ public class CompNonBlockingChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -263,6 +264,7 @@ public class CompNonBlockingChecker
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
   public void setNodeLimit(final int limit)
   {
     super.setNodeLimit(limit);
@@ -332,6 +334,7 @@ public class CompNonBlockingChecker
       }
     }
     Collections.sort(pairs, new Comparator<Set<AutomatonProxy>>() {
+        @Override
         public int compare(final Set<AutomatonProxy> a1, final Set<AutomatonProxy> a2)
         {
           final int local1 = numoccuring.get(a1);
@@ -499,6 +502,7 @@ public class CompNonBlockingChecker
       heur.put(s, size);
     }
     Collections.sort(possible, new Comparator<Set<AutomatonProxy>>() {
+        @Override
         public int compare(final Set<AutomatonProxy> a1, final Set<AutomatonProxy> a2)
         {
           final double heur1 = numoccuring.get(a1);
@@ -514,6 +518,7 @@ public class CompNonBlockingChecker
   private static class AutomataComparator
     implements Comparator<SortedSet<AutomatonProxy>>
   {
+    @Override
     public int compare(final SortedSet<AutomatonProxy> s1, final SortedSet<AutomatonProxy> s2)
     {
       if (s1.size() < s2.size()) {
@@ -731,6 +736,7 @@ public class CompNonBlockingChecker
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
@@ -1113,11 +1119,13 @@ public class CompNonBlockingChecker
         return events;
       }
 
+      @Override
       public int compareTo(final Place other)
       {
         return other.mIndex - mIndex;
       }
 
+      @Override
       public int hashCode()
       {
         int hash = 7;
@@ -1126,6 +1134,7 @@ public class CompNonBlockingChecker
         return hash;
       }
 
+      @Override
       public boolean equals(final Object o)
       {
         final Place p = (Place) o;
@@ -1149,11 +1158,13 @@ public class CompNonBlockingChecker
         mHash = hash;
       }
 
+      @Override
       public int hashCode()
       {
         return mHash;
       }
 
+      @Override
       public boolean equals(final Object other)
       {
         if (other != null && other.getClass() == getClass()) {
@@ -1177,6 +1188,7 @@ public class CompNonBlockingChecker
       mHidden = hidden;
     }
 
+    @Override
     public int hashCode()
     {
       int code = 31 + mAutomata.hashCode();
@@ -1184,6 +1196,7 @@ public class CompNonBlockingChecker
       return code;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof AutomataHidden) {
@@ -1207,6 +1220,7 @@ public class CompNonBlockingChecker
       mSize = size;
     }
 
+    @Override
     public int compareTo(final Tuple t)
     {
       if (mSize < t.mSize) {

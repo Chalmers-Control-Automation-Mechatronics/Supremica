@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -138,6 +138,14 @@ public abstract class AbstractModelAnalyzerFactory
     throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("control-loop check");
+  }
+
+  @Override
+  public DeadlockChecker createDeadlockChecker
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    throw createUnsupportedOperationException("deadlock check");
   }
 
   @Override

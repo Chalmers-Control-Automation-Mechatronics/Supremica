@@ -31,92 +31,45 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.cpp.analysis;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.StateCounter;
+import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
+import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-/**
- * A factory interface for all types of model verifiers.
- *
- * @author Robi Malik
- */
 
-public class MonolithicModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class NativeDeadlockCheckerTest
+  extends AbstractDeadlockCheckerTest
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static MonolithicModelAnalyzerFactory getInstance()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
-    return SingletonHolder.INSTANCE;
+    final TestSuite testSuite =
+        new TestSuite(NativeDeadlockCheckerTest.class);
+    return testSuite;
   }
 
-  private static class SingletonHolder {
-    private static final MonolithicModelAnalyzerFactory INSTANCE =
-      new MonolithicModelAnalyzerFactory();
-  }
-
-
-  //#########################################################################
-  //# Constructors
-  private MonolithicModelAnalyzerFactory()
+  public static void main(final String[] args)
   {
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  public MonolithicConflictChecker createConflictChecker
+  protected DeadlockChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    return new MonolithicConflictChecker(factory);
-  }
-
-  @Override
-  public MonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControllabilityChecker(factory);
-  }
-
-  @Override
-  public MonolithicControlLoopChecker createControlLoopChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicControlLoopChecker(factory);
-  }
-
-  @Override
-  public TRDeadlockChecker createDeadlockChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRDeadlockChecker();
-  }
-
-  @Override
-  public MonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicLanguageInclusionChecker(factory);
-  }
-
-  @Override
-  public StateCounter createStateCounter
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRStateCounter();
-  }
-
-  @Override
-  public MonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new MonolithicSynthesizer(factory);
+    final DeadlockChecker checker = new NativeDeadlockChecker(factory);
+    checker.setNodeLimit(3000000);
+    return checker;
   }
 
 }

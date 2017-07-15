@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,53 +31,87 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
+import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * An abstract base class that can be used for all deadlock checker
- * implementations. In addition to the model and factory members inherited
- * from {@link AbstractModelVerifier}, this class provides some support to
- * to return an error trace of the appropriate kind.
+ * <P>A monolithic deadlock checker implementation, written in C++. The
+ * native deadlock checker implements the standard {@link DeadlockChecker}
+ * interface and determines whether a given input model contains a deadlock.
+ *
+ * <P><STRONG>Supported Features.</STRONG></P>
+ *
+ * <P>This implementation supports both deterministic and nondeterministic
+ * models.</P>
+ *
+ * <P>Counterexamples are computed for all models with deadlock.</P>
+ *
+ * <P><STRONG>Algorithm.</STRONG></P>
+ *
+ * <P>This algorithm performs a breadth-first search of the synchronous
+ * product state space, terminating early as soon as a deadlock state is
+ * discovered.</P>
+ *
+ * <P>State tuples are stored in bit-packed form in a hash table. The number
+ * and size of the state tuples is the main limiting factor in terms of
+ * memory requirements. The number of states can be limited by specifying
+ * the node limit ({@link #setNodeLimit(int) setNodeLimit()}).</P>
+ *
+ * <P>The algorithm to determine which transitions are enabled is highly
+ * optimised. A lot of effort is taken to suppress the exploration of
+ * disabled transitions or transitions known to be selfloops early.</P>
+ *
+ * <P><STRONG>Configuration.</STRONG></P>
+ *
+ * <UL>
+ * <LI>If the node limit is specified ({@link #setNodeLimit(int)
+ *     setNodeLimit()}), it defines the maximum number of states that can
+ *     be constructed. If the synchronous product state space turns out to
+ *     be larger during the search, the verification attempt is aborted
+ *     and an {@link net.sourceforge.waters.model.analysis.OverflowException
+ *     OverflowException} is thrown.</LI>
+ * </UL>
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractDeadlockChecker
-  extends AbstractModelVerifier
+public class NativeDeadlockChecker
+  extends NativeModelVerifier
   implements DeadlockChecker
 {
 
   //#########################################################################
   //# Constructors
-  /**
-   * Creates a new deadlock checker without a model.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxyFactory factory)
+  public NativeDeadlockChecker(final ProductDESProxyFactory factory)
   {
     this(null, factory);
   }
 
-  /**
-   * Creates a new deadlock checker to check whether the given model
-   * has a deadlock.
-   * @param  model      The model to be checked by this deadlock checker.
-   * @param  factory    Factory used for trace construction.
-   */
-  public AbstractDeadlockChecker(final ProductDESProxy model,
-                                 final ProductDESProxyFactory factory)
+  public NativeDeadlockChecker(final ProductDESProxy model,
+                               final ProductDESProxyFactory factory)
+  {
+    this(model, null, factory);
+  }
+
+  public NativeDeadlockChecker(final ProductDESProxy model,
+                               final EventProxy marking,
+                               final ProductDESProxyFactory factory)
   {
     super(model, factory, ConflictKindTranslator.getInstanceUncontrollable());
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  //# Interface net.sourceforge.waters.model.analysis.DeadlockChecker
   @Override
   public ConflictTraceProxy getCounterExample()
   {
@@ -86,22 +120,18 @@ public abstract class AbstractDeadlockChecker
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Gets a name that can be used for a counterexample for the current model.
-   */
-  protected String getTraceName()
+  //# Native Methods
+  @Override
+  native VerificationResult runNativeAlgorithm();
+
+
+  //#########################################################################
+  //# Hooks
+  @Override
+  public String getTraceName()
   {
     final ProductDESProxy model = getModel();
-    return getTraceName(model);
+    return AbstractDeadlockChecker.getTraceName(model);
   }
 
-  /**
-   * Gets a name that can be used for a counterexample for the given model.
-   */
-  public static String getTraceName(final ProductDESProxy model)
-  {
-    final String modelname = model.getName();
-    return modelname + "-deadlock";
-  }
 }
