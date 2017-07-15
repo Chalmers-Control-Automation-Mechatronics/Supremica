@@ -661,12 +661,12 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testBallTSorter1() throws Exception
+ /* public void testBallTSorter1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "robis_ball_sorter_attempt1.wmod");
     runModelVerifier(des, true);
-  }
+  }*/
 
   public void testBatchtank2005_amk14() throws Exception
   {
