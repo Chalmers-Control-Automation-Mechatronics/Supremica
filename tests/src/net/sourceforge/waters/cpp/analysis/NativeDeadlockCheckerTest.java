@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.cpp.analysis;
 
 import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
@@ -41,8 +41,8 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
-public class MonolithicDeadlockCheckerTest extends
-    AbstractDeadlockCheckerTest
+public class NativeDeadlockCheckerTest
+  extends AbstractDeadlockCheckerTest
 {
 
   //#########################################################################
@@ -50,7 +50,7 @@ public class MonolithicDeadlockCheckerTest extends
   public static Test suite()
   {
     final TestSuite testSuite =
-        new TestSuite(MonolithicDeadlockCheckerTest.class);
+        new TestSuite(NativeDeadlockCheckerTest.class);
     return testSuite;
   }
 
@@ -67,7 +67,7 @@ public class MonolithicDeadlockCheckerTest extends
   protected DeadlockChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final DeadlockChecker checker = new TRDeadlockChecker();
+    final DeadlockChecker checker = new NativeDeadlockChecker(factory);
     checker.setNodeLimit(3000000);
     return checker;
   }

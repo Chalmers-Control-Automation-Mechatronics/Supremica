@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,45 +31,95 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.annotation;
 
-import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
-import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.apache.log4j.Logger;
 
 
-public class MonolithicDeadlockCheckerTest extends
-    AbstractDeadlockCheckerTest
+/**
+ * A Java implementation of the annotating deadlock check algorithm.
+ *
+ * @author Hani al-Bahri
+ */
+
+public class AnnotatingDeadlockChecker
+  extends AbstractDeadlockChecker
 {
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Constructors
+  public AnnotatingDeadlockChecker(final ProductDESProxyFactory factory)
   {
-    final TestSuite testSuite =
-        new TestSuite(MonolithicDeadlockCheckerTest.class);
-    return testSuite;
+    super(factory);
   }
 
-  public static void main(final String[] args)
+  public AnnotatingDeadlockChecker(final ProductDESProxy model,
+                                   final ProductDESProxyFactory factory)
   {
-    junit.textui.TestRunner.run(suite());
+    super(model, factory);
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
-  protected DeadlockChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  public boolean supportsNondeterminism()
   {
-    final DeadlockChecker checker = new TRDeadlockChecker();
-    checker.setNodeLimit(3000000);
-    return checker;
+    return true;
   }
+
+
+  //#########################################################################
+  //# Invocation
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+  }
+
+  @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    try {
+      setUp();
+      // TODO
+      return setSatisfiedResult();
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      tearDown();
+      final Logger logger = getLogger();
+      logger.debug("<out of memory>");
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final StackOverflowError error) {
+      final OverflowException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
+    }
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+
+
+  //#########################################################################
+  //# Data Members
 
 }

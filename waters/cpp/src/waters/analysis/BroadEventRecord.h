@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -79,6 +79,7 @@ public:
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mNumNonSelfloopingRecords == 0;}
   bool isSkippable(CheckType mode) const;
+  bool isSkippableIfOnlySelfloops(CheckType mode) const;
   inline bool isDeterministic() const
     {return mNumNondeterministicRecords == 0;}
   inline bool hasSearchRecord() const

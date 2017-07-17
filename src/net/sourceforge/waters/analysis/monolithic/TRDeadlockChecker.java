@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
@@ -167,16 +168,7 @@ public class TRDeadlockChecker
   protected String getTraceName()
   {
     final ProductDESProxy model = getModel();
-    return getTraceName(model);
-  }
-
-  /**
-   * Gets a name that can be used for a counterexample for the given model.
-   */
-  public static String getTraceName(final ProductDESProxy model)
-  {
-    final String modelname = model.getName();
-    return modelname+"-deadlock";
+    return AbstractDeadlockChecker.getTraceName(model);
   }
 
 

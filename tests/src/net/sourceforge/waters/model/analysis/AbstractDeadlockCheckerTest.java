@@ -583,6 +583,20 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
+  public void testTheViciousLoop1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "the_vicious_loop1.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testTheViciousLoop4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "the_vicious_loop4.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testTwoInit1() throws Exception
   {
     final ProductDESProxy des =
@@ -661,12 +675,12 @@ public abstract class AbstractDeadlockCheckerTest
     runModelVerifier(des, true);
   }
 
-  public void testBallTSorter1() throws Exception
+ /* public void testBallTSorter1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "ball_sorter", "robis_ball_sorter_attempt1.wmod");
     runModelVerifier(des, true);
-  }
+  }*/
 
   public void testBatchtank2005_amk14() throws Exception
   {

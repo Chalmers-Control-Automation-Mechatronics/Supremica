@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -52,6 +52,7 @@ namespace waters {
 enum CheckType {
   CHECK_TYPE_SAFETY,
   CHECK_TYPE_NONBLOCKING,
+  CHECK_TYPE_DEADLOCK,
   CHECK_TYPE_LOOP,
   CHECK_TYPE_COUNT
 };
