@@ -95,7 +95,7 @@ import org.supremica.util.SupremicaException;
 public final class AutomataSynchronizerExecuter
     extends Thread
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
+    private final static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
     private final Thread threadToBeInterruptedUponException;
     private Throwable causeOfInterrupt;
 
@@ -182,9 +182,11 @@ public final class AutomataSynchronizerExecuter
      */
     public AutomataSynchronizerExecuter(final AutomataSynchronizerHelper synchronizerHelper)
     {
-        setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+        setUncaughtExceptionHandler(new UncaughtExceptionHandler() 
+		{
 			@Override
-      public void uncaughtException(final Thread thread, final Throwable cause) {
+			public void uncaughtException(final Thread thread, final Throwable cause) 
+			{
 				cause.printStackTrace();
 				causeOfInterrupt = cause;
 				getThreadToBeInterruptedUponException().interrupt();
@@ -253,7 +255,7 @@ public final class AutomataSynchronizerExecuter
         final Iterator<Automaton> autIt = automataToBeSelected.iterator();
         while(autIt.hasNext())
         {
-	    final Automaton automaton = autIt.next();
+			final Automaton automaton = autIt.next();
             automataIndices[i++] = indexForm.getAutomataIndexMap().getAutomatonIndex(automaton);
         }
 
@@ -353,7 +355,7 @@ public final class AutomataSynchronizerExecuter
         int currMinEventIndex = Integer.MAX_VALUE;
         final int nbrOfSelectedAutomata = automataIndices.length;
 
-        // Insert all events that leaves the current state
+        // Insert all events that leave the current state
         // into currOutgoingEvents, and intialize
         // currOutgoingEventsIndex.
         // Also find the smallest event index possible from

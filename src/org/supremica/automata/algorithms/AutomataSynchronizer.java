@@ -108,7 +108,7 @@ public class AutomataSynchronizer
         this.theAutomata = automata;
         this.syncOptions = options;
 
-        synchHelper = new AutomataSynchronizerHelper(automata, options,arc2edgeTable,autName2indexTable, false);
+        synchHelper = new AutomataSynchronizerHelper(automata, options, arc2edgeTable, autName2indexTable, false);
 
         initialize();
     }
@@ -181,13 +181,13 @@ public class AutomataSynchronizer
         }
         comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
         try
-	{
-	    synchHelper.addState(initialState);
-	}
-	catch (final SupremicaException e1)
-	{
-	    throw new RuntimeException(e1);
-	}
+		{
+			synchHelper.addState(initialState);
+		}
+		catch (final SupremicaException e1)
+		{
+			throw new RuntimeException(e1);
+		}
         synchHelper.addComment(comment.toString());
 
         // Start all the synchronization executers and wait for completetion
@@ -198,31 +198,31 @@ public class AutomataSynchronizer
 
         // Wait for completion
         try
-	{
-	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
-	    {
-		    synchExecuter.join();
-	    }
-	}
-	catch (final InterruptedException e)
-	{
-	    // Current thread has been interrupted, perhaps
-	    // due to an exception in one of the executers.
-	    // Stop all tasks and throw the original exception
-	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
-	    {
-		synchExecuter.requestStop();
-	    }
-	    for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
-	    {
-		    final Throwable cause = synchExecuter.getCauseOfInterrupt();
-		    if (cause != null)
-		    {
-			    if (cause instanceof RuntimeException) throw (RuntimeException) cause;
-			    else throw new RuntimeException(cause);
-		    }
-	    }
-	}
+		{
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+			{
+				synchExecuter.join();
+			}
+		}
+		catch (final InterruptedException e)
+		{
+			// Current thread has been interrupted, perhaps
+			// due to an exception in one of the executers.
+			// Stop all tasks and throw the original exception
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+			{
+				synchExecuter.requestStop();
+			}
+			for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
+			{
+				final Throwable cause = synchExecuter.getCauseOfInterrupt();
+				if (cause != null)
+				{
+					if (cause instanceof RuntimeException) throw (RuntimeException) cause;
+					else throw new RuntimeException(cause);
+				}
+			}
+		}
     }
 
     public void displayInfo()
@@ -305,6 +305,7 @@ public class AutomataSynchronizer
      * Method for synchronizing Automata with default options.
      *
      * @param automata the Automata to be synchronized.
+	 * @param sups_as_plants decides whether to treat supervisors as plants or specs
      * @return Automaton representing the synchronous composition.
      */
     public static Automaton synchronizeAutomata(final Automata automata, final boolean sups_as_plants)
@@ -319,6 +320,7 @@ public class AutomataSynchronizer
      *
      * @param automata the Automata to be synchronized.
      * @param options the SynchronizationOptions that should be used.
+	 * @param sups_as_plants decides whether to treat supervisors as plants or specs
      * @return Automaton representing the synchronous composition.
      */
     public static Automaton synchronizeAutomata(final Automata automata, final SynchronizationOptions options, final boolean sups_as_plants)
