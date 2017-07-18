@@ -103,6 +103,7 @@ public class AnnotatingDeadlockChecker
       for (final Iterator<AutomatonProxy> it = autset.iterator(); it.hasNext(); ) {
               final AutomatonProxy aut = it.next();
               final TransitionRelation tr = new TransitionRelation(aut,marked);
+              @SuppressWarnings("unused")
               final Annotate annotatedAutomaton= new Annotate(tr);
         }
 
