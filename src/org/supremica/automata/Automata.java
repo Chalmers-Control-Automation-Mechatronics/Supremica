@@ -180,20 +180,44 @@ public class Automata
      * Adds the automaton aut to this Automata. If there already is an automaton with the
      * same name as aut, aut is NOT added.
 	 * Returns false if aut has same name as an existing automaton
+	 * 
+	 * This one is for backward compatibility only, really all actions that add 
+	 * automata should use the one below with tweakName == true // MF
      */
     public boolean addAutomaton(final Automaton aut)
     {
-        if (!containsAutomaton(aut.getName()))
-        {
-            theAutomata.add(aut);
-            nameMap.put(aut.getName(), aut);
-            aut.addListener(this);
-            notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
-			return true;
-        }
-		return false;
+		return addAutomaton(aut, false);
     }
 
+	/**
+	 * Adds the given automaton the this Automata. If tweakName is true, 
+	 * and there already exists an automaton with the same name as the
+	 * the given automaton, then create a unique name and add it.
+	 * 
+	 * @param aut The Automaton to add
+	 * @param tweakName If true, the automaton is added with an altered unique name if necessary 
+	 * @return Returns false if the given automaton is not added, else true
+	 */
+	public boolean addAutomaton(final Automaton aut, final boolean tweakName)
+	{
+		if(containsAutomaton(aut.getName()))
+		{ 
+			if(!tweakName)
+			{
+				return false;	// Name exists already and we should not generate a new unique name
+			}
+			// Generate a unique name that does not already exist
+			aut.setName(this.getUniqueAutomatonName(aut.getName()));		
+		}
+
+		// Here we know the automaton has a unique name
+        theAutomata.add(aut);
+        nameMap.put(aut.getName(), aut);
+        aut.addListener(this);
+        notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
+		return true;
+	}
+	
     /**
      * Adds all automata in 'automata' to this Automata. Automata with the same name as
      * already present automata are NOT added.
@@ -1013,6 +1037,7 @@ public class Automata
         }
     }
 
+	@Override
     public String getName()
     {
         return name;
@@ -1023,6 +1048,7 @@ public class Automata
         this.comment = comment;
     }
 
+	@Override
     public String getComment()
     {
         if (comment == null)

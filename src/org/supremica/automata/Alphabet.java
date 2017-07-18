@@ -182,9 +182,9 @@ public class Alphabet
     }
 
     /**
-     * Add an event. Thorws exception if the event is null, has null label or
+     * Add an event. Throws exception if the event is null, has null label or
      * is already in the alphabet(!).
-     */
+     */// Why does it throw exception if the event is already in the alphabet? This is a set!
     public void addEvent(final LabeledEvent ev)
     throws IllegalArgumentException
     {
@@ -198,9 +198,13 @@ public class Alphabet
             throw new IllegalArgumentException("addEvent: event label mist be non-null");
         }
 
+// Why does it throw exception if the event is already in the alphabet? Is this correct?
+// Does all usages of addEvent have to test for containment before adding the event? It seems so.
+// Can this be changed to only throw if the new event has properties different from the old one?		
+// MF
         if (contains(ev))
         {
-            throw new IllegalArgumentException("getEvent: event is already in the alphabet ");
+            throw new IllegalArgumentException("addEvent: event is already in the alphabet ");
         }
 
         theEvents.put(ev.getLabel(), ev);

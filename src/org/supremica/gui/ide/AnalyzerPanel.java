@@ -66,7 +66,8 @@ public class AnalyzerPanel
     private final AnalyzerAutomataPanel automataPanel;
 
     private final DocumentContainer mDocumentContainer;
-
+    private final VisualProject mVisualProject = new VisualProject();
+	
     public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
@@ -199,9 +200,12 @@ public class AnalyzerPanel
 
     public boolean addAutomaton(final Automaton theAutomaton)
     {
+		/*** This is just an awkward way to implement the exact same things as...
         final int size = mVisualProject.nbrOfAutomata();
         mVisualProject.addAutomaton(theAutomaton);
         return mVisualProject.nbrOfAutomata() > size;
+		**********************************************/// this:
+		return mVisualProject.addAutomaton(theAutomaton, true);
     }
 
     public int addAutomata(final Automata theAutomata)
@@ -241,5 +245,5 @@ public class AnalyzerPanel
         return project.size();
     }
 
-    private final VisualProject mVisualProject = new VisualProject();
+
 }

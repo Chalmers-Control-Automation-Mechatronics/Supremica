@@ -72,13 +72,13 @@ public class VisualProject
     private Container theUserInterface = null;    // Lazy construction
     private SimulatorExecuter theSimulator = null;    // Lazy construction
     private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
-    private HashMap<String, AutomatonViewer> theAutomatonViewerContainer = new HashMap<String, AutomatonViewer>();
-    private HashMap<String, AutomatonExplorer> theAutomatonExplorerContainer = new HashMap<String, AutomatonExplorer>();
+    private final HashMap<String, AutomatonViewer> theAutomatonViewerContainer = new HashMap<String, AutomatonViewer>();
+    private final HashMap<String, AutomatonExplorer> theAutomatonExplorerContainer = new HashMap<String, AutomatonExplorer>();
 //	private HashMap theAutomatonFrameContainer = new HashMap();
-    private HashMap<String, AlphabetViewer> theAlphabetViewerContainer = new HashMap<String, AlphabetViewer>();
-    private LightTableModel lightTableModel = new LightTableModel();
-    private FullTableModel fullTableModel = new FullTableModel();
-    private AnalyzerTableModel analyzerTableModel = new AnalyzerTableModel();
+    private final HashMap<String, AlphabetViewer> theAlphabetViewerContainer = new HashMap<String, AlphabetViewer>();
+    private final LightTableModel lightTableModel = new LightTableModel();
+    private final FullTableModel fullTableModel = new FullTableModel();
+    private final AnalyzerTableModel analyzerTableModel = new AnalyzerTableModel();
     private File projectFile = null;
 
     public VisualProject()
@@ -100,6 +100,7 @@ public class VisualProject
         addListener(analyzerTableModel);
     }
 
+	@Override
     public void clear()
     {
         super.clear();
@@ -123,6 +124,7 @@ public class VisualProject
         projectFile = null;
     }
 
+	@Override
     public void automatonRenamed(Automaton aut, String oldName)
     {
         //System.err.println("Rename " + aut + " from " + oldName);
@@ -154,6 +156,7 @@ public class VisualProject
         super.automatonRenamed(aut, oldName);
     }
 
+	@Override
     public void removeAutomaton(Automaton aut)
     {
         super.removeAutomaton(aut);

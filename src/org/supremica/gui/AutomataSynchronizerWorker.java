@@ -171,13 +171,12 @@ public class AutomataSynchronizerWorker
         }
         else if (mode == MODE_UPDATE)
         {
-            // Display automaton
+            // Add the automaton to the panel
             try
             {
                 if (theAutomaton != null)
                 {
-                    // -- MF -- container.add(theAutomaton);
-                    // workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
+					// If an automaton with the same name already exists, this silently throws away the result. Not good.
                     ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
                 }
             }
