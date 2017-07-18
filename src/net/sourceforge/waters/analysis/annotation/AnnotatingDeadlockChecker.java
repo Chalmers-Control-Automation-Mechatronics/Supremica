@@ -33,9 +33,14 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -91,6 +96,17 @@ public class AnnotatingDeadlockChecker
     try {
       setUp();
       // TODO
+      // Annotate all automata
+      final EventProxy marked = null;
+      final Set<AutomatonProxy> autset = getModel().getAutomata();
+
+      for (final Iterator<AutomatonProxy> it = autset.iterator(); it.hasNext(); ) {
+              final AutomatonProxy aut = it.next();
+              final TransitionRelation tr = new TransitionRelation(aut,marked);
+              final Annotate annotatedAutomaton= new Annotate(tr);
+        }
+
+
       return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
