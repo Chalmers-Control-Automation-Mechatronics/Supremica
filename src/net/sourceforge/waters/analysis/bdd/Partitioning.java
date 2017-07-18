@@ -162,6 +162,22 @@ abstract class Partitioning<P extends PartitionBDD> implements Abortable
    */
   abstract List<P> nextGroup(boolean stable);
 
+  /**
+   * Returns whether the computed partition is trivially true or false.
+   * A conjunctive partition is dominant if it contains a single BDD
+   * representing representing false, while a disjunctive partition is
+   * dominant if it contains a single BDD representing representing true.
+   */
+  boolean isDominant()
+  {
+    if (mFullPartition.size() == 1) {
+      final P part = mFullPartition.get(0);
+      return part.isDominant();
+    } else {
+      return false;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members

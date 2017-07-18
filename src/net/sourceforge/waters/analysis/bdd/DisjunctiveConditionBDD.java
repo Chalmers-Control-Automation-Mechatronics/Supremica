@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.util.BitSet;
+
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
@@ -41,22 +43,39 @@ import net.sf.javabdd.BDDFactory;
  * @author Robi Malik
  */
 
-class ConditionPartitionBDD
+class DisjunctiveConditionBDD
   extends PartitionBDD
 {
 
   //#########################################################################
   //# Constructor
-  ConditionPartitionBDD(final EventBDD eventBDD)
+  /**
+   * Creates an atomic partition member, representing a single event.
+   */
+  DisjunctiveConditionBDD(final EventBDD event,
+                          final BDD bdd,
+                          final BitSet automata)
   {
-    super(eventBDD.getEvent(),
-          eventBDD.getControllabilityConditionBDD(), 
-          eventBDD.getControllabilityTestedAutomata());
+    super(event, bdd, automata);
   }
 
-  ConditionPartitionBDD(final ConditionPartitionBDD part1,
-                        final ConditionPartitionBDD part2,
-                        final BDD bdd)
+  /**
+   * Creates a partition member by copying event and automata information
+   * from another, but using a new BDD.
+   * @param  part   Partition to take event and automata information from.
+   * @param  bdd    BDD used for the new partition.
+   */
+  DisjunctiveConditionBDD(final PartitionBDD part, final BDD bdd)
+  {
+    super(part, bdd);
+  }
+
+  /**
+   * Creates a new composed partition member by combining two others.
+   */
+  DisjunctiveConditionBDD(final DisjunctiveConditionBDD part1,
+                          final DisjunctiveConditionBDD part2,
+                          final BDD bdd)
   {
     super(part1, part2, bdd);
   }
@@ -64,21 +83,28 @@ class ConditionPartitionBDD
 
   //#########################################################################
   //# Overrides for Abstract Base Class PartitionBDD
-  ConditionPartitionBDD compose(final PartitionBDD part,
-                                final AutomatonBDD[] automatonBDDs,
-                                final BDDFactory factory)
+  @Override
+  DisjunctiveConditionBDD compose(final PartitionBDD part,
+                                  final AutomatonBDD[] automatonBDDs,
+                                  final BDDFactory factory)
   {
-    return compose((ConditionPartitionBDD) part, automatonBDDs, factory);
+    return compose((DisjunctiveConditionBDD) part, automatonBDDs, factory);
   }
 
-  ConditionPartitionBDD compose(final ConditionPartitionBDD part,
-                                final AutomatonBDD[] automatonBDDs,
-                                final BDDFactory factory)
+  DisjunctiveConditionBDD compose(final DisjunctiveConditionBDD part,
+                                  final AutomatonBDD[] automatonBDDs,
+                                  final BDDFactory factory)
   {
     final BDD bdd1 = getBDD();
     final BDD bdd2 = part.getBDD();
-    final BDD bdd = bdd1.and(bdd2);
-    return new ConditionPartitionBDD(this, part, bdd);
+    final BDD bdd = bdd1.or(bdd2);
+    return new DisjunctiveConditionBDD(this, part, bdd);
+  }
+
+  @Override
+  boolean isDominant()
+  {
+    return getBDD().isOne();
   }
 
 }
