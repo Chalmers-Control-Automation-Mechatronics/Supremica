@@ -289,7 +289,7 @@ public abstract class TRAbstractModelAnalyzer
     final List<EventInfo> eventInfoList =
       setUpTransitions(mTRAutomata, eventInfoMap);
     // Sort event info and merge local events
-    postprocessEventInfo(eventInfoList);
+    postProcessEventInfo(eventInfoList);
   }
 
   protected void setUpAutomata()
@@ -529,8 +529,8 @@ public abstract class TRAbstractModelAnalyzer
     return eventInfoList;
   }
 
-  protected void postprocessEventInfo(final List<EventInfo> eventInfoList)
-    throws OverflowException, AnalysisAbortException
+  protected void postProcessEventInfo(final List<EventInfo> eventInfoList)
+    throws AnalysisException
   {
     Collections.sort(eventInfoList);
     mEventInfo = new ArrayList<>(eventInfoList.size());
@@ -555,7 +555,7 @@ public abstract class TRAbstractModelAnalyzer
 
 
   protected List<EventInfo> setUpReverseTransitions()
-    throws OverflowException, AnalysisAbortException
+    throws AnalysisException
   {
     final int numAutomata = mTRAutomata.length;
     final TRAutomatonProxy[] reversedAutomata = new TRAutomatonProxy[numAutomata];
@@ -582,7 +582,7 @@ public abstract class TRAbstractModelAnalyzer
     }
     final List<EventInfo> eventInfoList =
       setUpTransitions(reversedAutomata, eventInfoMap);
-    postprocessEventInfo(eventInfoList);
+    postProcessEventInfo(eventInfoList);
     return eventInfoList;
   }
 
@@ -1401,6 +1401,11 @@ public abstract class TRAbstractModelAnalyzer
     {
       return
         EventStatus.isLocalEvent(mStatus) && mDisablingAutomata.size() == 1;
+    }
+
+    public boolean isGloballyAlwaysEnabled()
+    {
+      return mDisablingAutomata.isEmpty() && !mBlocked;
     }
 
     public int getLocalAutomatonIndex()

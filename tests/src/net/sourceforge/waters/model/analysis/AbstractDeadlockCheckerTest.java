@@ -446,7 +446,7 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "just_property.wdes");
-    runModelVerifier(des, false);
+    runModelVerifier(des, true);
   }
 
   public void testNeverMarked() throws Exception
