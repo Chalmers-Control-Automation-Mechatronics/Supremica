@@ -75,6 +75,8 @@ public:
 
   //##########################################################################
   //# Simple Access
+  inline bool isGloballyAlwaysEnabled() const
+    {return mUsedSearchRecords == 0 && !mIsGloballyDisabled;}
   inline bool isGloballyDisabled() const {return mIsGloballyDisabled;}
   inline bool isDisabledInSpec() const {return mIsDisabledInSpec;}
   inline bool isOnlySelfloops() const {return mNumNonSelfloopingRecords == 0;}

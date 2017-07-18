@@ -192,6 +192,8 @@ private:
     (AutomatonRecord* aut,
      const jni::AutomatonGlue& autglue,
      const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+  void checkForUnusedEvent
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupCompactEventList
     (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupDumpStates(uint32_t numDump);

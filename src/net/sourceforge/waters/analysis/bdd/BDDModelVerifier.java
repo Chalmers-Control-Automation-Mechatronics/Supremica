@@ -231,7 +231,7 @@ public abstract class BDDModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public boolean supportsNondeterminism()
   {
@@ -262,6 +262,14 @@ public abstract class BDDModelVerifier
         }
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Access for Algorithms
+  int getNumberOfAutomata()
+  {
+    return mNumAutomata;
   }
 
 
@@ -396,21 +404,11 @@ public abstract class BDDModelVerifier
     int eventindex = 0;
     for (final EventProxy event : events) {
       checkAbort();
-      final EventBDD eventBDD;
-      switch (translator.getEventKind(event)) {
-      case UNCONTROLLABLE:
-        eventBDD =
-          new UncontrollableEventBDD(event, mNumAutomata, mBDDFactory);
-        break;
-      case CONTROLLABLE:
-        eventBDD =
-          new ControllableEventBDD(event, mNumAutomata, mBDDFactory);
-        break;
-      default:
-        continue;
+      final EventBDD eventBDD = createEventBDD(event);
+      if (eventBDD != null) {
+        eventmap.put(event, eventBDD);
+        eventBDDs[eventindex++] = eventBDD;
       }
-      eventmap.put(event, eventBDD);
-      eventBDDs[eventindex++] = eventBDD;
     }
 
     final BDD initial = mBDDFactory.one();
@@ -483,6 +481,19 @@ public abstract class BDDModelVerifier
       logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
     }
     return eventBDDs;
+  }
+
+  EventBDD createEventBDD(final EventProxy event)
+  {
+    final KindTranslator translator = getKindTranslator();
+    switch (translator.getEventKind(event)) {
+    case UNCONTROLLABLE:
+      return new UncontrollableEventBDD(event, mNumAutomata, mBDDFactory);
+    case CONTROLLABLE:
+      return new ControllableEventBDD(event, mNumAutomata, mBDDFactory);
+    default:
+      return null;
+    }
   }
 
   BDD createInitialStateBDD(final AutomatonBDD autBDD)

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -96,6 +96,9 @@ public class ArchitectureDetector
           break;
         }
       }
+      if (arch == null) {
+        System.err.println("Could not find any loadable library.");
+      }
       writePropertiesFile(args[1], arch);
     } catch (final IOException exception) {
       System.err.println("Error writing properties file: " + args[1]);
@@ -181,6 +184,7 @@ public class ArchitectureDetector
   private static class DirectoryFilter implements FilenameFilter
   {
 
+    @Override
     public boolean accept(final File dir, final String name)
     {
       final File subdir = new File(dir, name);
@@ -195,6 +199,7 @@ public class ArchitectureDetector
   private static class LibraryFilter implements FilenameFilter
   {
 
+    @Override
     public boolean accept(final File dir, final String name)
     {
       final File file = new File(dir, name);

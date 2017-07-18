@@ -275,19 +275,19 @@ setup()
 
   // Collect transitions ...
   if (!isTrivial()) {
+    uint32_t numDump;
     switch (getCheckType()) {
     case CHECK_TYPE_COUNT:
     case CHECK_TYPE_SAFETY:
       setupSafety(eventMap);
       break;
     case CHECK_TYPE_NONBLOCKING:
-      {
-        uint32_t numDump = setupNonblocking(eventMap);
-        setupDumpStates(numDump);
-      }
+      numDump = setupNonblocking(eventMap);
+      setupDumpStates(numDump);
       break;
     case CHECK_TYPE_DEADLOCK:
       setupNonblocking(eventMap);
+      checkForUnusedEvent(eventMap);
       break;
     case CHECK_TYPE_LOOP:
       setupLoop(eventMap);
@@ -1045,6 +1045,20 @@ setupTransitions
   aut->deleteStateMap(statemap);
 }
 
+
+void BroadProductExplorer::
+checkForUnusedEvent
+  (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap)
+{
+  HashTableIterator iter = eventMap.iterator();
+  while (eventMap.hasNext(iter)) {
+    const BroadEventRecord* event = eventMap.next(iter);
+    if (event->isGloballyAlwaysEnabled()) {
+      setTrivial();
+      return;
+    }
+  }
+}
 
 void BroadProductExplorer::
 setupCompactEventList

@@ -38,9 +38,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
@@ -94,22 +96,17 @@ public class TRDeadlockChecker
   //#########################################################################
   //# Invocation
   @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    super.setUp();
-  }
-
-  @Override
   public boolean run()
     throws AnalysisException
   {
     try {
       setUp();
-      exploreStateSpace();
       final VerificationResult result = getAnalysisResult();
-      if (!result.isFinished()) {
-        result.setSatisfied(true);
+      if (!isTriviallyDeadlockFree()) {
+        exploreStateSpace();
+        if (!result.isFinished()) {
+          result.setSatisfied(true);
+        }
       }
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
@@ -148,13 +145,12 @@ public class TRDeadlockChecker
       }
     }
     if (isDeadlock) {
-
       setUpReverseTransitions();
       final DeadlockCallback deadlockCallback = new DeadlockCallback();
       setStateCallback(deadlockCallback);
-
       // Create counter example ..
-      final ConflictTraceProxy counterexample = buildCounterExample(deadlockCallback);
+      final ConflictTraceProxy counterexample =
+        buildCounterExample(deadlockCallback);
       setFailedResult(counterexample);
     }
   }
@@ -163,18 +159,41 @@ public class TRDeadlockChecker
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Gets a name that can be used for a counterexample for the current model.
+   * Checks whether the model can be shown to be deadlock-free without
+   * state space exploration. There can obviously be no deadlock if there
+   * is an event unused in any component, or an event enabled in all states
+   * of all components where it is used. In such a case, the method sets a
+   * true verification result and returns <CODE>true</CODE>, otherwise it
+   * returns <CODE>false</CODE>.
    */
-  protected String getTraceName()
+  private boolean isTriviallyDeadlockFree()
   {
-    final ProductDESProxy model = getModel();
-    return AbstractDeadlockChecker.getTraceName(model);
+    final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy des = getModel();
+    final EventEncoding enc = getOutputEventEncoding();
+    for (final EventProxy event : des.getEvents()) {
+      switch (translator.getEventKind(event)) {
+      case CONTROLLABLE:
+      case UNCONTROLLABLE:
+        if (enc.getEventCode(event) < 0) {
+          return setSatisfiedResult();
+        }
+        // fall through ...
+      default:
+        break;
+      }
+    }
+    for (final EventInfo info : getEventInfo()) {
+      if (info.isGloballyAlwaysEnabled()) {
+        return setSatisfiedResult();
+      }
+    }
+    return false;
   }
 
 
   //#########################################################################
   //# Methods to Build the Counterexample
-
   private ConflictTraceProxy buildCounterExample(final DeadlockCallback callback)
     throws OverflowException
   {
@@ -233,6 +252,15 @@ public class TRDeadlockChecker
     return trace;
   }
 
+  /**
+   * Gets a name that can be used for a counterexample for the current model.
+   */
+  private String getTraceName()
+  {
+    final ProductDESProxy model = getModel();
+    return AbstractDeadlockChecker.getTraceName(model);
+  }
+
 
   //#########################################################################
   //# Inner Class DeadlockCallback
@@ -243,9 +271,9 @@ public class TRDeadlockChecker
     //# Constructor
     private DeadlockCallback()
     {
-      //final int size = getStateTupleEncoding().getNumberOfWords();
-     // mEncoded = new int[size];
-      mSmallestStateIndex=getCurrentSource();
+      final int size = getStateTupleEncoding().getNumberOfWords();
+      mEncoded = new int[size];
+      mSmallestStateIndex = getCurrentSource();
     }
 
     //#######################################################################
@@ -255,9 +283,6 @@ public class TRDeadlockChecker
     public boolean newState(final int[] tuple)
       throws OverflowException
     {
-      final int size = getStateTupleEncoding().getNumberOfWords();
-      mEncoded = new int[size];
-
       getStateTupleEncoding().encode(tuple, mEncoded);
       final int currentStateIndex = getStateSpace().getIndex(mEncoded);
       // if -1; then not visited, so skip
@@ -290,14 +315,10 @@ public class TRDeadlockChecker
 
     //#######################################################################
     //# Data Members
-    private int[] mEncoded;
+    private final int[] mEncoded;
     private int mSmallestStateIndex;
     private EventProxy mCurrentEvent;
     private EventProxy mSmallestStateEvent;
   }
-
-
-  //#########################################################################
-  //# Data Members
 
 }

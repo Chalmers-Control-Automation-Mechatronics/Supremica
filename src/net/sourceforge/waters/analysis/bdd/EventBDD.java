@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,20 +33,19 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.BitSet;
 import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
-
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -74,6 +73,7 @@ abstract class EventBDD
 
   //#########################################################################
   //# Interface java.util.Comparable
+  @Override
   public int compareTo(final EventBDD eventbdd)
   {
     final EventKind kind0 = getEventKind();
@@ -103,10 +103,15 @@ abstract class EventBDD
     return mCurrentAutomaton;
   }
 
+  boolean isSuppressedBecauseOnlySelfloops()
+  {
+    return mIsOnlySelfloops;
+  }
+
   BDD getTransitionsBDD()
   {
     if (mTransitionsBDD != null &&
-        (mIsOnlySelfloops || mTransitionsBDD.isZero())) {
+        (isSuppressedBecauseOnlySelfloops() || mTransitionsBDD.isZero())) {
       mTransitionsBDD.free();
       mTransitionsBDD = null;
     }
@@ -208,10 +213,6 @@ abstract class EventBDD
     final int size = mSynchronisedAutomataBitSet.size();
     final BitSet result = new BitSet(size);
     return result;
-  }
-
-  void disposeControllabilityConditionBDD()
-  {
   }
 
 

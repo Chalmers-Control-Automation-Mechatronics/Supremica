@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -268,14 +269,15 @@ public class BDDSafetyVerifier
       if (!result.isFinished()) {
         final BDDFactory bddFactory = getBDDFactory();
         final int limit = getPartitioningSizeLimit();
-        mConditionPartitioning = new GreedyPartitioning<ConditionPartitionBDD>
-          (bddFactory, ConditionPartitionBDD.class, limit);
+        mConditionPartitioning = new GreedyPartitioning<ConjunctiveConditionBDD>
+          (bddFactory, ConjunctiveConditionBDD.class, limit);
         int condcount0 = 0;
         for (final EventBDD eventBDD : eventBDDs) {
           final BDD cond = eventBDD.getControllabilityConditionBDD();
           if (cond != null) {
-            final ConditionPartitionBDD part =
-              new ConditionPartitionBDD(eventBDD);
+            final BitSet automata = eventBDD.getControllabilityTestedAutomata();
+            final ConjunctiveConditionBDD part =
+              new ConjunctiveConditionBDD(eventBDD, cond, automata);
             mConditionPartitioning.add(part);
             condcount0++;
           }
@@ -332,7 +334,7 @@ public class BDDSafetyVerifier
   boolean containsBadState(final BDD reached)
     throws AnalysisAbortException, OverflowException
   {
-    for (final ConditionPartitionBDD part : mConditionBDDs) {
+    for (final ConjunctiveConditionBDD part : mConditionBDDs) {
       BDD condpart = part.getBDD();
       BDD imp = reached.imp(condpart);
       if (!imp.isOne()) {
@@ -426,8 +428,8 @@ public class BDDSafetyVerifier
   //#########################################################################
   //# Data Members
   private final SafetyDiagnostics mDiagnostics;
-  private Partitioning<ConditionPartitionBDD> mConditionPartitioning;
-  private List<ConditionPartitionBDD> mConditionBDDs;
+  private Partitioning<ConjunctiveConditionBDD> mConditionPartitioning;
+  private List<ConjunctiveConditionBDD> mConditionBDDs;
   private BDD mBadStateBDD;
   private EventProxy mBadEvent;
 

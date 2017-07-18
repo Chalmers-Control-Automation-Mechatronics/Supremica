@@ -103,6 +103,13 @@ public class BDDModelVerifierFactory
   }
 
   @Override
+  public BDDDeadlockChecker createDeadlockChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new BDDDeadlockChecker(factory);
+  }
+
+  @Override
   public BDDLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
