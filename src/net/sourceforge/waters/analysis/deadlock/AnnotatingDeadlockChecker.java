@@ -31,11 +31,12 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.annotation;
+package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.Iterator;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
@@ -104,7 +105,7 @@ public class AnnotatingDeadlockChecker
               final AutomatonProxy aut = it.next();
               final TransitionRelation tr = new TransitionRelation(aut,marked);
               @SuppressWarnings("unused")
-              final Annotate annotatedAutomaton= new Annotate(tr);
+              final Annotator annotatedAutomaton= new Annotator(tr);
         }
 
 

@@ -31,8 +31,9 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.annotation;
+package net.sourceforge.waters.analysis.deadlock;
 
+import net.sourceforge.waters.analysis.deadlock.AnnotatingDeadlockChecker;
 import net.sourceforge.waters.model.analysis.AbstractDeadlockCheckerTest;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;

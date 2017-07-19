@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,16 +31,22 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.annotation;
+package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.Set;
+
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 
-public class Annotate
+/**
+ * @author Hani al-Bahri, Simon Ware
+ */
+
+public class Annotator
 {
   private final TransitionRelation mTransitionRelation;
   private final int mTau;
@@ -69,7 +75,7 @@ public class Annotate
             " TIME = " + TIME;
   }
 
-  public Annotate(final TransitionRelation transitionrelation)
+  public Annotator(final TransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
     mTau = 0;
