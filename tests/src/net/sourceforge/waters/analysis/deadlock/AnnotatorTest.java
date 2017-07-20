@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.List;
 
+import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -123,8 +124,10 @@ public class AnnotatorTest
     @SuppressWarnings("unused")
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
+    final TransitionRelation tr = annotate(before);
     // calculate unannotated form
-    final AutomatonProxy unannotated = null;
+     final AutomatonProxy expected = findAutomaton(des, AFTER);
+    final AutomatonProxy unannotated = unannotate(tr);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
   }
@@ -160,6 +163,19 @@ public class AnnotatorTest
   }
 
 
+ public TransitionRelation annotate(final AutomatonProxy aut){
+    final TransitionRelation tr = new TransitionRelation(aut, null);
+    final Annotator annotatedAutomaton= new Annotator(tr);
+    annotatedAutomaton.run();
+    return tr;
+  }
+
+  public AutomatonProxy unannotate(final TransitionRelation tr){
+    final UnAnnotator ua = new UnAnnotator(tr);
+    final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
+    return aut;
+  }
+
   //#########################################################################
   //# To be Provided by Subclasses
 
@@ -181,7 +197,6 @@ public class AnnotatorTest
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
-
 
   //#########################################################################
   //# Class Constants

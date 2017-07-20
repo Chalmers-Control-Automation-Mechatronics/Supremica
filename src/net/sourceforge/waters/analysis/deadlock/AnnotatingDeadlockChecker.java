@@ -107,8 +107,6 @@ public class AnnotatingDeadlockChecker
               @SuppressWarnings("unused")
               final Annotator annotatedAutomaton= new Annotator(tr);
         }
-
-
       return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -135,7 +133,18 @@ public class AnnotatingDeadlockChecker
 
   //#########################################################################
   //# Auxiliary Methods
+  public TransitionRelation annotate(final AutomatonProxy aut){
+    final TransitionRelation tr = new TransitionRelation(aut, null);
+    final Annotator annotatedAutomaton= new Annotator(tr);
+    annotatedAutomaton.run();
+    return tr;
+  }
 
+  public AutomatonProxy unannotate(final TransitionRelation tr){
+    final UnAnnotator ua = new UnAnnotator(tr);
+    final AutomatonProxy aut = ua.run(getFactory());
+    return aut;
+  }
 
   //#########################################################################
   //# Data Members
