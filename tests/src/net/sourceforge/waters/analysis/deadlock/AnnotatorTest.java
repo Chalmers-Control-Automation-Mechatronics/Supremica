@@ -121,12 +121,10 @@ public class AnnotatorTest
     throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    @SuppressWarnings("unused")
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
     final TransitionRelation tr = annotate(before);
     // calculate unannotated form
-     final AutomatonProxy expected = findAutomaton(des, AFTER);
     final AutomatonProxy unannotated = unannotate(tr);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
@@ -162,19 +160,21 @@ public class AnnotatorTest
     }
   }
 
-
- public TransitionRelation annotate(final AutomatonProxy aut){
+  public TransitionRelation annotate(final AutomatonProxy aut)
+  {
     final TransitionRelation tr = new TransitionRelation(aut, null);
-    final Annotator annotatedAutomaton= new Annotator(tr);
+    final Annotator annotatedAutomaton = new Annotator(tr);
     annotatedAutomaton.run();
     return tr;
   }
 
-  public AutomatonProxy unannotate(final TransitionRelation tr){
+  public AutomatonProxy unannotate(final TransitionRelation tr)
+  {
     final UnAnnotator ua = new UnAnnotator(tr);
     final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
     return aut;
   }
+
 
   //#########################################################################
   //# To be Provided by Subclasses
