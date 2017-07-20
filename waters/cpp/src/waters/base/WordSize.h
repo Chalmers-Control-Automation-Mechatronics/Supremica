@@ -31,10 +31,6 @@
 //# exception.
 //###########################################################################
 
-#ifdef __GNUG__
-#pragma interface
-#endif
-
 #ifndef __WORDSIZE
 
 // Check windows
@@ -60,3 +56,14 @@
 #endif
 
 #endif  /* !__WORDSIZE */
+
+
+#ifndef STATIC_FLOATCONST
+
+#if __cplusplus <= 199711L
+  #define STATIC_FLOATCONST static const
+#else
+  #define STATIC_FLOATCONST static constexpr
+#endif
+
+#endif  /* !STATIC_FLOATCONST */
