@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ProductDES Name="mazes" xmlns="http://waters.sourceforge.net/xsd/des">
 <EventList>
+<Event Kind="PROPOSITION" Name=":accepting"/>
 <Event Kind="CONTROLLABLE" Name="clear"/>
 <Event Kind="CONTROLLABLE" Name="crush"/>
 <Event Kind="CONTROLLABLE" Name="enter"/>

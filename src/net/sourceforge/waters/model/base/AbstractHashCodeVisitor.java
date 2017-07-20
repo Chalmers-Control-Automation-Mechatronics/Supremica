@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -85,6 +85,15 @@ public abstract class AbstractHashCodeVisitor
     }
   }
 
+  public <P extends Proxy> int getArrayHashCode(final P[] array)
+  {
+    try {
+      return computeArrayHashCode(array);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
   public int getListHashCode(final List<? extends Proxy> list)
   {
     try {
@@ -97,17 +106,20 @@ public abstract class AbstractHashCodeVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.base.ProxyVisitor
+  @Override
   public Integer visitProxy(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
     return iface.hashCode();
   }
 
+  @Override
   public Integer visitGeometryProxy(final GeometryProxy proxy)
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Integer visitNamedProxy(final NamedProxy proxy)
   {
     int result = visitProxy(proxy);
@@ -117,6 +129,7 @@ public abstract class AbstractHashCodeVisitor
     return result;
   }
 
+  @Override
   public Integer visitDocumentProxy(final DocumentProxy proxy)
   {
     int result = visitNamedProxy(proxy);
@@ -155,6 +168,25 @@ public abstract class AbstractHashCodeVisitor
       return HASH_NULL;
     } else {
       return proxy.refHashCode();
+    }
+  }
+
+  protected <P extends Proxy> int computeArrayHashCode(final P[] array)
+    throws VisitorException
+  {
+    if (array == null) {
+      return HASH_NULL;
+    } else {
+      int result = 0;
+      for (final Proxy proxy : array) {
+        result *= 5;
+        if (proxy == null) {
+          result += 0xabababab;
+        } else {
+          result += (Integer) proxy.acceptVisitor(this);
+        }
+      }
+      return result;
     }
   }
 

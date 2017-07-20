@@ -114,6 +114,26 @@ public class ModuleProxyPrinter
     }
   }
 
+  public static <P extends Proxy> String getPrintString(final P[] array)
+  {
+    try {
+      final StringWriter writer = new StringWriter();
+      final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
+      printer.print('[');
+      if (array != null) {
+        for (final Proxy proxy : array) {
+          printer.pprint(proxy);
+        }
+      }
+      printer.print(']');
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
 
   //#########################################################################
   //# Constructors

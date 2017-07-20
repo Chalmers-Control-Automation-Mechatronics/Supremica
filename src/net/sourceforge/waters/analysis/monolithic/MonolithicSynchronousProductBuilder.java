@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -356,22 +356,31 @@ public class MonolithicSynchronousProductBuilder
         }
       }
     }
+
+    Set<EventProxy> usedEvents = new THashSet<>(mNumEvents);
+    for (final AutomatonProxy aut : automata) {
+      usedEvents.addAll(aut.getEvents());
+    }
     int nextForbidden = 0;
     int nextNormal = forbidden.size();
     final KindTranslator translator = getKindTranslator();
     for (final EventProxy event : events) {
-      if (translator.getEventKind(event) == EventKind.PROPOSITION) {
-        if (mConfiguredPropositions == null) {
-          mCurrentPropositions.add(event);
+      if (usedEvents.contains(event)) {
+        if (translator.getEventKind(event) == EventKind.PROPOSITION) {
+          if (mConfiguredPropositions == null) {
+            mCurrentPropositions.add(event);
+          }
+        } else if (forbidden.contains(event)) {
+          eventToIndex.put(event, nextForbidden++);
+        } else {
+          eventToIndex.put(event, nextNormal++);
         }
-      } else if (forbidden.contains(event)) {
-        eventToIndex.put(event, nextForbidden++);
-      } else {
-        eventToIndex.put(event, nextNormal++);
       }
     }
+    usedEvents = null;
     mNumForbiddenEvents = nextForbidden;
     mNumInputEvents = nextNormal;
+
     final boolean pruning;
     if (!mPruningDeadlocks) {
       pruning = false;

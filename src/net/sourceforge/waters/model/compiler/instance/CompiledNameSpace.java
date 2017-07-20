@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -64,20 +64,33 @@ class CompiledNameSpace
 
   //#########################################################################
   //# Constructor
-  CompiledNameSpace()
+  CompiledNameSpace(final ModuleEqualityVisitor equality)
   {
-    this(null, null);
+    mIdentifier = null;
+    mParent = null;
+    mEquality = equality;
+    mNameSpaceMap = new ProxyAccessorHashMap<>(equality);
+    mComponentMap = new ProxyAccessorHashMap<>(equality);
+    mEventMap = new HashMap<>();
   }
 
   CompiledNameSpace(final IdentifierProxy ident,
                     final CompiledNameSpace parent)
   {
-    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mIdentifier = ident;
     mParent = parent;
-    mNameSpaceMap = new ProxyAccessorHashMap<>(eq);
-    mComponentMap = new ProxyAccessorHashMap<>(eq);
+    mEquality = parent.getEquality();
+    mNameSpaceMap = new ProxyAccessorHashMap<>(mEquality);
+    mComponentMap = new ProxyAccessorHashMap<>(mEquality);
     mEventMap = new HashMap<>();
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  ModuleEqualityVisitor getEquality()
+  {
+    return mEquality;
   }
 
 
@@ -765,6 +778,7 @@ class CompiledNameSpace
   //# Data Members
   private final IdentifierProxy mIdentifier;
   private final CompiledNameSpace mParent;
+  private final ModuleEqualityVisitor mEquality;
   private final Map<String,CompiledEvent>
     mEventMap;
   private final ProxyAccessorMap<IdentifierProxy,IdentifiedProxy>

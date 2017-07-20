@@ -84,8 +84,8 @@ public class SDActivityLoopChecker
      final ProductDESProxyFactory factory)
   {
     super(model,
-          SDActivityLoopKindTranslator.getInstance(),
-          factory);
+          factory,
+          SDActivityLoopKindTranslator.getInstance());
     mControlLoopChecker = checker;
   }
 
