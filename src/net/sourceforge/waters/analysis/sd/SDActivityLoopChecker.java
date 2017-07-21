@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -84,8 +84,8 @@ public class SDActivityLoopChecker
      final ProductDESProxyFactory factory)
   {
     super(model,
-          SDActivityLoopKindTranslator.getInstance(),
-          factory);
+          factory,
+          SDActivityLoopKindTranslator.getInstance());
     mControlLoopChecker = checker;
   }
 

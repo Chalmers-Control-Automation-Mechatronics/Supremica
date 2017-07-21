@@ -65,7 +65,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
@@ -351,7 +350,6 @@ public abstract class TRAbstractModelAnalyzer
   protected Map<EventProxy,EventInfo> setUpEventEncoding()
     throws OverflowException, AnalysisAbortException
   {
-    final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
 
     // Set up output event encoding
@@ -367,6 +365,7 @@ public abstract class TRAbstractModelAnalyzer
     }
 
     // Add propositions to output event encoding ...
+    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
     final int numAutomata = mTRAutomata.length;
     for (int a = 0; a < numAutomata; a++) {
       checkAbort();
@@ -387,39 +386,46 @@ public abstract class TRAbstractModelAnalyzer
           }
         }
       }
-    }
-
-    // Add proper events to output event encoding and create event info ...
-    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
-    for (final EventProxy event : events) {
-      checkAbort();
-      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-        final EventInfo info = new EventInfo(event);
-        eventInfoMap.put(event, info);
-        if (mConfiguredEventEncoding != null) {
-          final int e = mConfiguredEventEncoding.getEventCode(event);
-          if (e >= 0) {
-            final EventProxy output = mConfiguredEventEncoding.getProperEvent(e);
-            outputEvents.add(output);
-            final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-            info.setStatus(status);
+      for (int e = EventEncoding.TAU; e < enc.getNumberOfProperEvents(); e++) {
+        if ((enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
+          // For any used event: create event info if not yet present
+          final EventProxy event = enc.getProperEvent(e);
+          if (!eventInfoMap.containsKey(event)) {
+            final EventInfo info = new EventInfo(event);
+            eventInfoMap.put(event, info);
+            if (mConfiguredEventEncoding != null) {
+              final int confCode = mConfiguredEventEncoding.getEventCode(event);
+              if (confCode >= 0) {
+                // Set status from configured encoding if present
+                final byte status =
+                  mConfiguredEventEncoding.getProperEventStatus(confCode);
+                info.setStatus(status);
+                // Remember which event is in output
+                // (Note: output may be different from event if hiding)
+                final EventProxy output =
+                  mConfiguredEventEncoding.getProperEvent(confCode);
+                outputEvents.add(output);
+              }
+            }
           }
         }
       }
     }
+
+    // Mark events unused if in configured encoding but not in output
     if (mConfiguredEventEncoding != null) {
-      // Check for unused events in configured event encoding ...
       final int numConfigured =
         mConfiguredEventEncoding.getNumberOfProperEvents();
       for (int e = EventEncoding.TAU; e < numConfigured; e++) {
         final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
-        if (event != null && !outputEvents.contains(event)) {
+        if (!outputEvents.contains(event)) {
           final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
           mOutputEventEncoding.setProperEventStatus
             (e, status | EventStatus.STATUS_UNUSED);
         }
       }
     }
+
     return eventInfoMap;
   }
 

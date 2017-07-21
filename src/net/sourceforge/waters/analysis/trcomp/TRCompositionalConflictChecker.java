@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -61,6 +61,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckResult;
 import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -137,6 +138,21 @@ public class TRCompositionalConflictChecker
     setFailingEventsEnabled(true);
     setSelfloopOnlyEventsEnabled(true);
     setAlwaysEnabledEventsEnabled(true);
+  }
+
+
+  //#########################################################################
+  //# Interface for net.sourceforge.waters.model.analysis.des.ModelAnalyzer
+  @Override
+  public CompositionalConflictCheckResult getAnalysisResult()
+  {
+    return (CompositionalConflictCheckResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public CompositionalConflictCheckResult createAnalysisResult()
+  {
+    return new CompositionalConflictCheckResult(getClass());
   }
 
 
@@ -501,6 +517,13 @@ public class TRCompositionalConflictChecker
                                              getUsedDefaultMarking(),
                                              true,
                                              translator);
+  }
+
+  void recordCCLanguageInclusionCheck(final VerificationResult result)
+  {
+    final long time = result.getRunTime();
+    final CompositionalConflictCheckResult combinedResult = getAnalysisResult();
+    combinedResult.addCCLanguageInclusionCheck(time);
   }
 
 

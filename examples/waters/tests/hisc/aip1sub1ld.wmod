@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <Module Name="aip1sub1ld" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Low level of AIP example modified using low data events.
 This model is controllable and nonblocking. It has 30185 reachable states and a diameter of 155.</ns2:Comment>
@@ -52,7 +52,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS2"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -63,8 +62,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -88,10 +85,7 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
         <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletCL">
             <RangeList>
                 <EnumSetExpression>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU2"/>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -109,14 +103,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="NoPalletEL">
-            <RangeList>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
-                </EnumSetExpression>
-            </RangeList>
-        </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="PalletArvDrwEL">
             <RangeList>
                 <EnumSetExpression>
@@ -128,7 +114,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS3"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -144,9 +129,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -168,14 +150,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                </EnumSetExpression>
-            </RangeList>
-        </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="QPalletAtEL">
-            <RangeList>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -296,7 +270,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS2"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -382,9 +355,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -409,9 +379,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -450,9 +417,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -539,10 +503,7 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
         <EventDecl Kind="UNCONTROLLABLE" Name="IsPalletCL">
             <RangeList>
                 <EnumSetExpression>
-                    <SimpleIdentifier Name="TU2"/>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU4"/>
-                    <SimpleIdentifier Name="TU3"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -576,19 +537,10 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="IsPalletEL">
-            <RangeList>
-                <EnumSetExpression>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
-                </EnumSetExpression>
-            </RangeList>
-        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ZNotASUp">
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS2"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -613,7 +565,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS3"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -628,7 +579,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -654,9 +604,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -667,7 +614,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS2"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -707,7 +653,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS3"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -778,7 +723,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="AS1"/>
-                    <SimpleIdentifier Name="AS3"/>
                 </EnumSetExpression>
             </RangeList>
         </EventDecl>
@@ -788,9 +732,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
             <RangeList>
                 <EnumSetExpression>
                     <SimpleIdentifier Name="TU1"/>
-                    <SimpleIdentifier Name="TU2"/>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                 </EnumSetExpression>
             </RangeList>
             <ns2:AttributeMap>
@@ -800,8 +741,6 @@ This model is controllable and nonblocking. It has 30185 reachable states and a 
         <EventDecl Kind="CONTROLLABLE" Name="NoTrnsfEL">
             <RangeList>
                 <EnumSetExpression>
-                    <SimpleIdentifier Name="TU3"/>
-                    <SimpleIdentifier Name="TU4"/>
                     <SimpleIdentifier Name="TU1"/>
                 </EnumSetExpression>
             </RangeList>

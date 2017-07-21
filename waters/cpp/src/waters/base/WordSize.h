@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,10 +31,6 @@
 //# exception.
 //###########################################################################
 
-#ifdef __GNUG__
-#pragma interface
-#endif
-
 #ifndef __WORDSIZE
 
 // Check windows
@@ -60,3 +56,14 @@
 #endif
 
 #endif  /* !__WORDSIZE */
+
+
+#ifndef STATIC_FLOATCONST
+
+#if __cplusplus <= 199711L
+  #define STATIC_FLOATCONST static const
+#else
+  #define STATIC_FLOATCONST static constexpr
+#endif
+
+#endif  /* !STATIC_FLOATCONST */

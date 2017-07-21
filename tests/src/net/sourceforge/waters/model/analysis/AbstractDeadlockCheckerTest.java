@@ -270,6 +270,23 @@ public abstract class AbstractDeadlockCheckerTest
 
 
   //#########################################################################
+  //# Test Cases --- compiler
+  public void testSelfloop1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "compiler", "graph", "selfloop1.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testSelfloop2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "compiler", "graph", "selfloop2.wmod");
+    runModelVerifier(des, true);
+  }
+
+
+  //#########################################################################
   //# Test Cases --- hisc
   public void testHISCAIP0Sub1Patch0() throws Exception
   {
@@ -616,6 +633,13 @@ public abstract class AbstractDeadlockCheckerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "nasty", "twoinit3.wmod");
+    runModelVerifier(des, true);
+  }
+
+  public void testUnusedEvent() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "unused_event.wmod");
     runModelVerifier(des, true);
   }
 

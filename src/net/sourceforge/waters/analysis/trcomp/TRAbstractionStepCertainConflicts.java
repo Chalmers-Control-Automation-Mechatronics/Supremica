@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -136,9 +137,9 @@ class TRAbstractionStepCertainConflicts
                           final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    final TRCompositionalConflictChecker checker =
+    final TRCompositionalConflictChecker conflictChecker =
       (TRCompositionalConflictChecker) analyzer;
-    final TraceExpander expander = new TraceExpander(checker);
+    final TraceExpander expander = new TraceExpander(conflictChecker);
     expander.pruneTrace(trace);
     trace.replaceAutomaton(this, mPredecessor);
     int level = expander.getLevelOfEndState(trace);
@@ -200,6 +201,7 @@ class TRAbstractionStepCertainConflicts
     private TraceExpander(final TRCompositionalConflictChecker checker)
       throws AnalysisException
     {
+      mConflictChecker = checker;
       mLanguageInclusionChecker = checker.getLanguageInclusionChecker();
       final int config =
         mLanguageInclusionChecker.getPreferredInputConfiguration();
@@ -313,7 +315,11 @@ class TRAbstractionStepCertainConflicts
     {
       final ProductDESProxy des = createLanguageInclusionModel();
       mLanguageInclusionChecker.setModel(des);
-      if (mLanguageInclusionChecker.run()) {
+      mLanguageInclusionChecker.run();
+      final VerificationResult result =
+        mLanguageInclusionChecker.getAnalysisResult();
+      mConflictChecker.recordCCLanguageInclusionCheck(result);
+      if (result.isSatisfied()) {
         return null;
       } else {
         final TRTraceProxy trace =
@@ -374,6 +380,7 @@ class TRAbstractionStepCertainConflicts
 
     //#######################################################################
     //# Data Members
+    private final TRCompositionalConflictChecker mConflictChecker;
     private final TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
     private final EventProxy mCertainConflictsEvent;
     private final TRAutomatonProxy mPropertyAutomaton;

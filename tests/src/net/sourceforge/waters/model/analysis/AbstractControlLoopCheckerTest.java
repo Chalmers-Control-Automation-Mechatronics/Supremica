@@ -516,7 +516,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testSafetydisplay() throws Exception

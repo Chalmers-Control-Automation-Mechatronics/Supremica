@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -111,6 +111,26 @@ public class ModuleProxyPrinter
       return writer.toString();
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
+    }
+  }
+
+  public static <P extends Proxy> String getPrintString(final P[] array)
+  {
+    try {
+      final StringWriter writer = new StringWriter();
+      final ModuleProxyPrinter printer = new ModuleProxyPrinter(writer);
+      printer.print('[');
+      if (array != null) {
+        for (final Proxy proxy : array) {
+          printer.pprint(proxy);
+        }
+      }
+      printer.print(']');
+      return writer.toString();
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
     }
   }
 

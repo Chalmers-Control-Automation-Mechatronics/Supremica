@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -35,69 +35,130 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.set.hash.THashSet;
 
+
+/**
+ * The modular control-loop check algorithm.
+ *
+ * <P><I>Reference:</I><BR>
+ * Petra Malik, Robi Malik. Modular control-loop detection. Proc. 8th
+ * International Workshop on Discrete Event Systems, WODES&nbsp;2006,
+ * 119-124, Ann Arbor, MI, USA, 2006.</P>
+ *
+ * @author Andrew Holland
+ */
+
 public class ModularControlLoopChecker
-  extends AbstractModelVerifier
-  implements ControlLoopChecker
+  extends AbstractControlLoopChecker
 {
 
+  //#########################################################################
+  //# Constructors
+  /**
+   * Creates a new control-loop checker without a model and with default
+   * kind translator.
+   * @param  factory    Factory used for trace construction.
+   */
   public ModularControlLoopChecker(final ProductDESProxyFactory factory)
   {
-    this(ControllabilityKindTranslator.getInstance(), factory);
+    super(factory);
   }
 
-  public ModularControlLoopChecker(final KindTranslator translator,
-                                      final ProductDESProxyFactory factory)
+  /**
+   * Creates a new control-loop checker to check for loops with respect to
+   * an alternative set of events.
+   * @param  factory    Factory used for trace construction.
+   * @param  translator Kind translator to determine loop events. The checker
+   *                    will look for loops consisting of events designated
+   *                    as controllable by the kind translator.
+   */
+  public ModularControlLoopChecker(final ProductDESProxyFactory factory,
+                                   final KindTranslator translator)
   {
-    this(null, translator, factory);
+    super(factory, translator);
   }
 
+  /**
+   * Creates a new control-loop checker to check whether the given model
+   * is control-loop free.
+   * @param  model      The model to be checked by this control-loop checker.
+   * @param  factory    Factory used for trace construction.
+   */
   public ModularControlLoopChecker(final ProductDESProxy model,
-                                      final ProductDESProxyFactory factory)
-  {
-    this(model, ControllabilityKindTranslator.getInstance(), factory);
-  }
-
-  public ModularControlLoopChecker(final ProductDESProxy model,
-                                   final KindTranslator translator,
                                    final ProductDESProxyFactory factory)
   {
+    super(model, factory);
+  }
+
+  /**
+   * Creates a new control-loop checker to check whether the given model
+   * is loop free with respect to an alternative set of events.
+   * @param  model      The model to be checked by this control-loop checker.
+   * @param  factory    Factory used for trace construction.
+   * @param  translator Kind translator to determine loop events. The checker
+   *                    will look for loops consisting of events designated
+   *                    as controllable by the kind translator.
+   */
+  public ModularControlLoopChecker(final ProductDESProxy model,
+                                   final ProductDESProxyFactory factory,
+                                   final KindTranslator translator)
+  {
     super(model, factory, translator);
-    createAnalysisResult();
   }
 
 
+  //#########################################################################
+  //# Configuration
+  public void setMergeVersion(final AutomataGroup.MergeVersion m)
+  {
+    AutomataGroup.setMergeVersion(m);
+  }
+
+  public void setSelectVersion(final AutomataGroup.SelectVersion s)
+  {
+    AutomataGroup.setSelectVersion(s);
+  }
+
+  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
+  {
+    MonolithicSCCControlLoopChecker.setLoopDetector(c);
+  }
+
+
+  //#########################################################################
+  //# Invocation
   @Override
   public boolean run() throws AnalysisException
   {
     try {
       setUp();
-      if (getModel().getAutomata().size() == 0)
-      {
-        setSatisfiedResult();
-        return true;
+      final AnalysisResult result = getAnalysisResult();
+      if (result.isFinished()) {
+        return result.isSatisfied();
       }
-      final MonolithicSCCControlLoopChecker checker = new MonolithicSCCControlLoopChecker(getModel(), mTranslator, getFactory());
+
       boolean removedLoopEvents = false;
       while (true)
       {
@@ -107,7 +168,7 @@ public class ModularControlLoopChecker
           for (final AutomataGroup group : mAutoSets)
           {
             checkAbort();
-            group.run(checker, mNodesRemaining);
+            group.run(mMonolithicVerifier, mNodesRemaining);
             updateResult(group);
             final Collection<EventProxy> nonLoop = group.getNonLoopEvents();
             if (mLoopEvents.removeAll(nonLoop))
@@ -123,7 +184,7 @@ public class ModularControlLoopChecker
             mTranslator.removeLoopEvents(nonLoop);
             final LoopTraceProxy loop = testOne(group);
             if (loop != null) {
-              setFailedResult(loop);
+              setLiftedLoopTrace(loop);
               return false;
             }
           }
@@ -131,7 +192,7 @@ public class ModularControlLoopChecker
         while (removedLoopEvents);
         final LoopTraceProxy loop = testAll();
         if (loop != null) {
-          return setFailedResult(loop);
+          return setLiftedLoopTrace(loop);
         }
         AutomataGroup primary = null;
         int bestScore = Integer.MIN_VALUE;
@@ -170,117 +231,83 @@ public class ModularControlLoopChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    if (mMonolithicVerifier != null) {
+      mMonolithicVerifier.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mMonolithicVerifier != null) {
+      mMonolithicVerifier.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public boolean supportsNondeterminism()
   {
     return false;
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateResult(final AutomataGroup newGroup)
-  {
-    if (newGroup.rerun())
-    {
-      if (mPeakAutomata < newGroup.getStatistics().getTotalNumberOfAutomata() || mPeakAutomata == -1)
-        mPeakAutomata = newGroup.getStatistics().getTotalNumberOfAutomata();
-      if (mPeakStates < newGroup.getStatistics().getTotalNumberOfStates() || mPeakStates == -1)
-        mPeakStates = newGroup.getStatistics().getTotalNumberOfStates();
-      if (mPeakTransitions < newGroup.getStatistics().getTotalNumberOfTransitions() || mPeakTransitions == -1)
-        mPeakTransitions = newGroup.getStatistics().getTotalNumberOfTransitions();
-      mTotalStates += newGroup.getStatistics().getTotalNumberOfStates();
-      mTotalTransitions += newGroup.getStatistics().getTotalNumberOfTransitions();
-    }
-  }
-
-  private LoopTraceProxy testAll()
-  {
-    LoopTraceProxy output = null;
-    for (final AutomataGroup auto : mAutoSets)
-    {
-      output = testOne(auto);
-      if (output != null)
-        return output;
-    }
-    return null;
-  }
-
-  private LoopTraceProxy testOne(final AutomataGroup group)
-  {
-    if (group.getTrace() != null)
-    {
-      boolean acceptsAll = true;
-      for (final AutomataGroup checkLoop : mAutoSets)
-      {
-        if (checkLoop != group)
-        {
-          if (checkLoop.isControlLoop(group, mTranslator) != Integer.MIN_VALUE)
-          {
-            acceptsAll = false;
-            break;
-          }
-        }
-      }
-      if (acceptsAll)
-      {
-        return group.getLoopTraceProxy();
-      }
-    }
-    return null;
-  }
-
-  @SuppressWarnings("unused")
-  private String printLoopEvents()
-  {
-    String output = "\nmLoopEvents says they are ";
-    for (final EventProxy event : mLoopEvents)
-    {
-      output += event.getName() + " ";
-    }
-    /*
-    output += "\nmTranslator says they aren't ";
-    for (final EventProxy event : mTranslator.mFauxUncontrollable)
-    {
-      output += event.getName() + " ";
-    }*/
-    return output;
-  }
-
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
-  @Override
-  public void setKindTranslator(final KindTranslator translator)
-  {
-    super.setKindTranslator(translator);
-    mTranslator = new ManipulativeTranslator(translator);
-  }
-
-  @Override
-  public LoopTraceProxy getCounterExample()
-  {
-    return (LoopTraceProxy) super.getCounterExample();
-  }
-
   @Override
   protected void setUp() throws AnalysisException
   {
     super.setUp();
-    mAutoSets = new ArrayList<AutomataGroup>();
+
+    // Collect automata sets and used loop events
+    final ProductDESProxy model = getModel();
     final KindTranslator translator = getKindTranslator();
-    mTranslator = new ManipulativeTranslator(translator);
-    mLoopEvents = new THashSet<EventProxy>();
-    for (final EventProxy event : getModel().getEvents()) {
-      if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
-        mLoopEvents.add(event);
+    final Collection<EventProxy> events = model.getEvents();
+    mLoopEvents = new THashSet<>(events.size());
+    final Collection<AutomatonProxy> automata = model.getAutomata();
+    mAutoSets = new ArrayList<>(automata.size());
+    for (final AutomatonProxy aut: automata) {
+      switch (translator.getComponentKind(aut)) {
+      case PLANT:
+      case SPEC:
+        if (AutomatonTools.getFirstInitialState(aut) == null) {
+          setSatisfiedResult();
+          return;
+        }
+        mAutoSets.add(new AutomataGroup(aut));
+        for (final EventProxy event : aut.getEvents()) {
+          if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
+            mLoopEvents.add(event);
+          }
+        }
+        // fall through
+      default:
+        break;
       }
     }
-    for (final AutomatonProxy aut: getModel().getAutomata()) {
-      mAutoSets.add(new AutomataGroup(aut));
+
+    // If some controllable event is not used in any automaton: control loop!
+    for (final EventProxy event : model.getEvents()) {
+      if (translator.getEventKind(event) == EventKind.CONTROLLABLE &&
+          !mLoopEvents.contains(event)) {
+        setTrivialLoopTrace(event);
+        return;
+      }
     }
+    // Otherwise if there are no controllable events: control-loop free!
+    if (mLoopEvents.isEmpty()) {
+      setSatisfiedResult();
+      return;
+    }
+
+    mTranslator = new ManipulativeTranslator(translator);
+    mMonolithicVerifier =
+      new MonolithicSCCControlLoopChecker(mTranslator, getFactory());
     mPeakAutomata = 0;
     mPeakStates = 0;
     mPeakTransitions = 0;
@@ -296,6 +323,7 @@ public class ModularControlLoopChecker
     super.tearDown();
     mLoopEvents = null;
     mTranslator = null;
+    mMonolithicVerifier = null;
     mAutoSets = null;
     mPeakAutomata = -1;
     mPeakStates = -1;
@@ -307,49 +335,119 @@ public class ModularControlLoopChecker
   }
 
   @Override
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  public LoopResult createAnalysisResult()
   {
-    final LoopTraceProxy loop = (LoopTraceProxy) counterexample;
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + "-loop";
-    final String comment = loop.getComment();
-    final Collection<AutomatonProxy> automata = loop.getAutomata();
-    final List<TraceStepProxy> steps = loop.getTraceSteps();
-    final int index = loop.getLoopIndex();
-    final LoopTraceProxy wrapper =
-      factory.createLoopTraceProxy(tracename, comment, null,
-                                   des, automata, steps, index);
-    return super.setFailedResult(wrapper);
+    return new LoopResult(this);
+  }
+
+  @Override
+  public LoopResult getAnalysisResult()
+  {
+    return (LoopResult) super.getAnalysisResult();
+  }
+
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final LoopResult result = getAnalysisResult();
+    result.setPeakNumberOfAutomata(mPeakAutomata);
+    result.setPeakNumberOfStates(mPeakStates);
+    result.setPeakNumberOfTransitions(mPeakTransitions);
+    result.setTotalNumberOfAutomata(mTotalAutomata);
+    result.setTotalNumberOfStates(mTotalStates);
+    result.setTotalNumberOfTransitions(mTotalTransitions);
+    result.setNumberOfCompositions(mTotalCompositions);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
-  @Override
-  public Collection<EventProxy> getNonLoopEvents()
+  //# Auxiliary Methods
+  private void updateResult(final AutomataGroup newGroup)
   {
-    throw new UnsupportedOperationException
-      ("Modular Control Loop Checker does not calculate non-loop events");
+    if (newGroup.rerun()) {
+      if (mPeakAutomata < newGroup.getStatistics().getTotalNumberOfAutomata() || mPeakAutomata == -1)
+        mPeakAutomata = newGroup.getStatistics().getTotalNumberOfAutomata();
+      if (mPeakStates < newGroup.getStatistics().getTotalNumberOfStates() || mPeakStates == -1)
+        mPeakStates = newGroup.getStatistics().getTotalNumberOfStates();
+      if (mPeakTransitions < newGroup.getStatistics().getTotalNumberOfTransitions() || mPeakTransitions == -1)
+        mPeakTransitions = newGroup.getStatistics().getTotalNumberOfTransitions();
+      mTotalStates += newGroup.getStatistics().getTotalNumberOfStates();
+      mTotalTransitions += newGroup.getStatistics().getTotalNumberOfTransitions();
+    }
   }
 
-  public void setMergeVersion(final AutomataGroup.MergeVersion m)
+  private LoopTraceProxy testAll()
   {
-    AutomataGroup.setMergeVersion(m);
+    LoopTraceProxy output = null;
+    for (final AutomataGroup auto : mAutoSets) {
+      output = testOne(auto);
+      if (output != null) {
+        return output;
+      }
+    }
+    return null;
   }
 
-  public void setSelectVersion(final AutomataGroup.SelectVersion s)
+  private LoopTraceProxy testOne(final AutomataGroup group)
   {
-    AutomataGroup.setSelectVersion(s);
+    if (group.getTrace() != null) {
+      for (final AutomataGroup checkLoop : mAutoSets) {
+        if (checkLoop != group &&
+            checkLoop.isControlLoop(group,
+                                    mTranslator) != Integer.MIN_VALUE) {
+          return null;
+        }
+      }
+      return group.getLoopTraceProxy();
+    }
+    return null;
   }
 
-  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
+  private boolean setTrivialLoopTrace(final EventProxy event)
   {
-    MonolithicSCCControlLoopChecker.setLoopDetector(c);
+    final ProductDESProxy model = getModel();
+    final Collection<AutomatonProxy> automata = model.getAutomata();
+    final Map<AutomatonProxy,StateProxy> stateMap = new HashMap<>(automata.size());
+    for (final AutomatonProxy aut : automata) {
+      final StateProxy state = AutomatonTools.getFirstInitialState(aut);
+      stateMap.put(aut, state);
+    }
+    final List<TraceStepProxy> steps = new ArrayList<>(2);
+    final ProductDESProxyFactory factory = getFactory();
+    final TraceStepProxy step1 = factory.createTraceStepProxy(null, stateMap);
+    steps.add(step1);
+    final TraceStepProxy step2 = factory.createTraceStepProxy(event, stateMap);
+    steps.add(step2);
+    return setLoopTrace(null, automata, steps, 0);
+  }
+
+  private boolean setLiftedLoopTrace(final LoopTraceProxy loop)
+  {
+    final String comment = loop.getComment();
+    final Collection<AutomatonProxy> automata = loop.getAutomata();
+    final List<TraceStepProxy> steps = loop.getTraceSteps();
+    final int index = loop.getLoopIndex();
+    return setLoopTrace(comment, automata, steps, index);
+  }
+
+  private boolean setLoopTrace(final String comment,
+                               final Collection<AutomatonProxy> automata,
+                               final List<TraceStepProxy> steps,
+                               final int index)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final String name = getTraceName();
+    final ProductDESProxy model = getModel();
+    final LoopTraceProxy trace =
+      factory.createLoopTraceProxy(name, comment, null,
+                                   model, automata, steps, index);
+    return setFailedResult(trace);
   }
 
 
+  //#########################################################################
+  //# Inner Class ManipulativeTranslator
   private class ManipulativeTranslator implements KindTranslator
   {
 
@@ -389,31 +487,15 @@ public class ModularControlLoopChecker
     private final Set<EventProxy> mFauxUncontrollable;
   }
 
-  //#########################################################################
-  //# Setting the Result
-  @Override
-  public LoopResult createAnalysisResult()
-  {
-    return new LoopResult(this);
-  }
-
-  @Override
-  protected void addStatistics()
-  {
-    super.addStatistics();
-    final LoopResult result = (LoopResult) getAnalysisResult();
-    result.setPeakNumberOfAutomata(mPeakAutomata);
-    result.setPeakNumberOfStates(mPeakStates);
-    result.setPeakNumberOfTransitions(mPeakTransitions);
-    result.setTotalNumberOfAutomata(mTotalAutomata);
-    result.setTotalNumberOfStates(mTotalStates);
-    result.setTotalNumberOfTransitions(mTotalTransitions);
-    result.setNumberOfCompositions(mTotalCompositions);
-    setAnalysisResult(result);
-  }
 
   //#########################################################################
-  //# Output Data
+  //# Data Members
+  private ManipulativeTranslator mTranslator;
+  private MonolithicSCCControlLoopChecker mMonolithicVerifier;
+  private List<AutomataGroup> mAutoSets;
+  private Set<EventProxy> mLoopEvents;
+  private final int mNodesRemaining = 3000000;
+
   private int mPeakAutomata;
   private double mPeakStates;
   private double mPeakTransitions;
@@ -421,11 +503,4 @@ public class ModularControlLoopChecker
   private double mTotalStates;
   private double mTotalTransitions;
   private int mTotalCompositions;
-
-  //#########################################################################
-  //# Data Members
-  private ManipulativeTranslator mTranslator;
-  private List<AutomataGroup> mAutoSets;
-  private Set<EventProxy> mLoopEvents;
-  private final int mNodesRemaining = 3000000;
 }

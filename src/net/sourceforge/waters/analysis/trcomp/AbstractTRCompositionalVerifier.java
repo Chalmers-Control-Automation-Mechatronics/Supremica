@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -175,10 +175,11 @@ public abstract class AbstractTRCompositionalVerifier
   @Override
   protected TRTraceProxy computeCounterExample() throws AnalysisException
   {
-    final VerificationResult result = getAnalysisResult();
+    final CompositionalVerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
       final Logger logger = getLogger();
       logger.debug("Starting trace expansion ...");
+      final long start = System.currentTimeMillis();
       getSpecialEventsListener().setEnabled(true);
       final ProductDESProxy des = getModel();
       final TRTraceProxy trace = createEmptyTrace(des);
@@ -195,7 +196,9 @@ public abstract class AbstractTRCompositionalVerifier
         }
         iter.remove();
       }
+      final long stop = System.currentTimeMillis();
       result.setCounterExample(trace);
+      result.setCounterExampleTime(stop -start);
       return trace;
     } else {
       return null;
