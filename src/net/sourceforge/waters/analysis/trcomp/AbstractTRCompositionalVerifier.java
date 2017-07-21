@@ -175,10 +175,11 @@ public abstract class AbstractTRCompositionalVerifier
   @Override
   protected TRTraceProxy computeCounterExample() throws AnalysisException
   {
-    final VerificationResult result = getAnalysisResult();
+    final CompositionalVerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
       final Logger logger = getLogger();
       logger.debug("Starting trace expansion ...");
+      final long start = System.currentTimeMillis();
       getSpecialEventsListener().setEnabled(true);
       final ProductDESProxy des = getModel();
       final TRTraceProxy trace = createEmptyTrace(des);
@@ -195,7 +196,9 @@ public abstract class AbstractTRCompositionalVerifier
         }
         iter.remove();
       }
+      final long stop = System.currentTimeMillis();
       result.setCounterExample(trace);
+      result.setCounterExampleTime(stop -start);
       return trace;
     } else {
       return null;
