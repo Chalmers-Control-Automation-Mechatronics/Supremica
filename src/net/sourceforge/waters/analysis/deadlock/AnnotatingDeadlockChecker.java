@@ -36,7 +36,6 @@ package net.sourceforge.waters.analysis.deadlock;
 import java.util.Iterator;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
@@ -103,7 +102,7 @@ public class AnnotatingDeadlockChecker
 
       for (final Iterator<AutomatonProxy> it = autset.iterator(); it.hasNext(); ) {
               final AutomatonProxy aut = it.next();
-              final TransitionRelation tr = new TransitionRelation(aut,marked);
+              final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut,marked);
               @SuppressWarnings("unused")
               final Annotator annotatedAutomaton= new Annotator(tr);
         }
@@ -133,18 +132,7 @@ public class AnnotatingDeadlockChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  public TransitionRelation annotate(final AutomatonProxy aut){
-    final TransitionRelation tr = new TransitionRelation(aut, null);
-    final Annotator annotatedAutomaton= new Annotator(tr);
-    annotatedAutomaton.run();
-    return tr;
-  }
 
-  public AutomatonProxy unannotate(final TransitionRelation tr){
-    final UnAnnotator ua = new UnAnnotator(tr);
-    final AutomatonProxy aut = ua.run(getFactory());
-    return aut;
-  }
 
   //#########################################################################
   //# Data Members

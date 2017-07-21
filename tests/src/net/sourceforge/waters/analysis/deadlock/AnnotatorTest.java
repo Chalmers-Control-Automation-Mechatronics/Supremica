@@ -35,7 +35,6 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -124,9 +123,9 @@ public class AnnotatorTest
     @SuppressWarnings("unused")
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final TransitionRelation tr = annotate(before);
+    final GeneralizedTransitionRelation tr = annotate(before);
     // calculate unannotated form
-     final AutomatonProxy expected = findAutomaton(des, AFTER);
+    final AutomatonProxy expected = findAutomaton(des, AFTER);
     final AutomatonProxy unannotated = unannotate(tr);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
@@ -163,15 +162,15 @@ public class AnnotatorTest
   }
 
 
- public TransitionRelation annotate(final AutomatonProxy aut){
-    final TransitionRelation tr = new TransitionRelation(aut, null);
+ public GeneralizedTransitionRelation annotate(final AutomatonProxy aut){
+    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
     final Annotator annotatedAutomaton= new Annotator(tr);
     annotatedAutomaton.run();
     return tr;
   }
 
-  public AutomatonProxy unannotate(final TransitionRelation tr){
-    final UnAnnotator ua = new UnAnnotator(tr);
+  public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr){
+    final UnAnnotator2 ua = new UnAnnotator2(tr, null);
     final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
     return aut;
   }
