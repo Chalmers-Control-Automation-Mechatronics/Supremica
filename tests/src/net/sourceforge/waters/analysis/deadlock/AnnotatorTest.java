@@ -124,10 +124,9 @@ public class AnnotatorTest
     // calculate annotated form
     final GeneralizedTransitionRelation tr = annotate(before);
     // calculate unannotated form
-<<<<<<< HEAD
+
     final AutomatonProxy expected = findAutomaton(des, AFTER);
-=======
->>>>>>> a334c7fe4634d6860b989c81fc76a2099b7a55ea
+
     final AutomatonProxy unannotated = unannotate(tr);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
@@ -163,29 +162,18 @@ public class AnnotatorTest
     }
   }
 
-<<<<<<< HEAD
+
 
  public GeneralizedTransitionRelation annotate(final AutomatonProxy aut){
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
     final Annotator annotatedAutomaton= new Annotator(tr);
-=======
-  public TransitionRelation annotate(final AutomatonProxy aut)
-  {
-    final TransitionRelation tr = new TransitionRelation(aut, null);
-    final Annotator annotatedAutomaton = new Annotator(tr);
->>>>>>> a334c7fe4634d6860b989c81fc76a2099b7a55ea
     annotatedAutomaton.run();
     return tr;
   }
 
-<<<<<<< HEAD
   public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr){
     final UnAnnotator2 ua = new UnAnnotator2(tr, null);
-=======
-  public AutomatonProxy unannotate(final TransitionRelation tr)
-  {
-    final UnAnnotator ua = new UnAnnotator(tr);
->>>>>>> a334c7fe4634d6860b989c81fc76a2099b7a55ea
+   // final UnAnnotator ua = new UnAnnotator(tr);
     final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
     return aut;
   }
