@@ -26,7 +26,7 @@ import org.supremica.properties.Config;
 public class SearchStates
     extends MonitorableThread
 {
-    private static Logger logger = LoggerFactory.createLogger(SearchStates.class);
+    private static final Logger logger = LoggerFactory.createLogger(SearchStates.class);
     private AutomataSynchronizer syncher = null;
     private ArrayList<int[]> container = null;
     private StateMatcher matcher = null;

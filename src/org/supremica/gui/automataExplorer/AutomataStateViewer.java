@@ -47,19 +47,19 @@ public class AutomataStateViewer
 	private static final long serialVersionUID = 1L;
 	
 	@SuppressWarnings("unused")
-	private Automata theAutomata;
-    private AutomataSynchronizerHelper helper;
+	private final Automata theAutomata;
+    private final AutomataSynchronizerHelper helper;
     private int[] currState;
-    private AutomataEventList forwardEvents;
-    private AutomataEventList backwardEvents;
+    private final AutomataEventList forwardEvents;
+    private AutomataEventList backwardEvents;	// Never initialized, all such code is commented out. Why?
     private AutomataExplorerController controller;
-    private AutomataStateDisplayer stateDisplayer;
-    private JSplitPane eventSplitter;
-    private JSplitPane stateEventSplitter;
-    private LinkedList<int[]> prevStates = new LinkedList<int[]>();
-    private LinkedList<int[]> nextStates = new LinkedList<int[]>();
+    private final AutomataStateDisplayer stateDisplayer;
+    private final JSplitPane eventSplitter;
+    private final JSplitPane stateEventSplitter;
+    private final LinkedList<int[]> prevStates = new LinkedList<int[]>();
+    private final LinkedList<int[]> nextStates = new LinkedList<int[]>();
 
-    public AutomataStateViewer(AutomataSynchronizerHelper helper)
+    public AutomataStateViewer(final AutomataSynchronizerHelper helper)
     {
         setLayout(new BorderLayout());
 
@@ -80,12 +80,12 @@ public class AutomataStateViewer
         stateEventSplitter.setDividerLocation(0.6);
     }
 
-    public void setCurrState(int[] newState)
+    public void setCurrState(final int[] newState)
     {
         setCurrState(newState, false);
     }
 
-    private void setCurrState(int[] newState, boolean isUndo)
+    private void setCurrState(final int[] newState, final boolean isUndo)
     {
         if (!isUndo)
         {
@@ -116,7 +116,7 @@ public class AutomataStateViewer
     {
         if (prevStates.size() > 0)
         {
-            int[] newState = prevStates.removeLast();
+            final int[] newState = prevStates.removeLast();
 
             nextStates.addFirst(currState);
             setCurrState(newState, true);
@@ -132,7 +132,7 @@ public class AutomataStateViewer
     {
         if (nextStates.size() > 0)
         {
-            int[] newState = nextStates.removeFirst();
+            final int[] newState = nextStates.removeFirst();
 
             prevStates.addLast(currState);
             setCurrState(newState, true);
@@ -154,7 +154,7 @@ public class AutomataStateViewer
         controller.update();
     }
 
-    public void setController(AutomataExplorerController controller)
+    public void setController(final AutomataExplorerController controller)
     {
         this.controller = controller;
     }

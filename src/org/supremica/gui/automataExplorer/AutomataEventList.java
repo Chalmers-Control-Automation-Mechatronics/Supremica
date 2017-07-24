@@ -90,10 +90,12 @@ public class AutomataEventList
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
+			@Override
             public void mouseClicked(final MouseEvent e)
             {
-                if (e.getClickCount() == 2)
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
                 {
+					System.out.println("!mosueClicked: " + e.toString());
                     final int index = theList.locationToIndex(e.getPoint());
 
                     if (index >= 0)
@@ -104,7 +106,7 @@ public class AutomataEventList
                     }
                 }
             }
-        });
+        });	
     }
 
     public void setShowStateId(final boolean showStateId)

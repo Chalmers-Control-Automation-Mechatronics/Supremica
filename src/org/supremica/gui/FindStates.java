@@ -107,8 +107,7 @@ class FindStatesTableModel
 	implements AutomataListener    // could usefully inherit from AutomataTableModel or something like that
 {
 	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
+	private static final Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
 
 	// private Pattern[] patterns = null;
 	// private PatternCompiler comp = null;
@@ -153,7 +152,7 @@ class FindStatesTableModel
 	}
 
 	@Override
-  public String getColumnName(final int col)
+	public String getColumnName(final int col)
 	{
 		return columnNames[col];
 	}
@@ -165,20 +164,20 @@ class FindStatesTableModel
 		}
 */
 	@Override
-  public int getColumnCount()
+	public int getColumnCount()
 	{
 		return columnNames.length;
 	}
 
 	@Override
-  public int getRowCount()
+	public int getRowCount()
 	{
 		// return cells.length;
 		return automata.nbrOfAutomata();
 	}
 
 	@Override
-  public Object getValueAt(final int row, final int col)
+	public Object getValueAt(final int row, final int col)
 	{
 		final Automaton automaton = automata.getAutomatonAt(row);
 
@@ -224,7 +223,7 @@ class FindStatesTableModel
 	}
 
 	@Override
-  public void setValueAt(final Object obj, final int row, final int col)
+	public void setValueAt(final Object obj, final int row, final int col)
 	{
 
 		// cells[row][col] = obj;
@@ -288,7 +287,7 @@ class FindStatesTableModel
 	}
 
 	@Override
-  public boolean isCellEditable(final int row, final int col)
+	public boolean isCellEditable(final int row, final int col)
 	{
 		if (isAcceptingColumn(col))
 		{
@@ -381,13 +380,13 @@ class FindStatesTableModel
 	}
 
 	@Override
-  public void automatonAdded(final Automata automata, final Automaton automaton)
+	public void automatonAdded(final Automata automata, final Automaton automaton)
 	{
 		updateListeners();
 	}
 
 	@Override
-  public void automatonRemoved(final Automata automata, final Automaton automaton)
+	public void automatonRemoved(final Automata automata, final Automaton automaton)
 	{
 
 		// need to remove its pattern
@@ -397,18 +396,18 @@ class FindStatesTableModel
 	}
 
 	@Override
-  public void automatonRenamed(final Automata automata, final Automaton automaton)
+	public void automatonRenamed(final Automata automata, final Automaton automaton)
 	{
 		updateListeners();
 	}
 
 	@Override
-  public void actionsOrControlsChanged(final Automata automata)
+	public void actionsOrControlsChanged(final Automata automata)
 	{    // Do nothing
 	}
 
 	@Override
-  public void updated(final Object theObject)
+	public void updated(final Object theObject)
 	{
 		updateListeners();
 	}
@@ -419,7 +418,7 @@ class FindStatesTable
 	extends JTable
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
+	private static final Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
 	private Automata automata;
 	private FindStatesFrame frame;
 	@SuppressWarnings("unused")
@@ -505,7 +504,7 @@ class FindStatesTable
 			delete_item.addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)    // anonymous class
+				public void actionPerformed(final ActionEvent e)    // anonymous class
 				{
 					final Automaton automaton = getAutomaton(row);
 
@@ -517,7 +516,7 @@ class FindStatesTable
 			quit_item.addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)    // anonymous class
+				public void actionPerformed(final ActionEvent e)    // anonymous class
 				{
 					frame.dispose();
 				}
@@ -554,10 +553,10 @@ class FindStatesTable
 		}
 
 		@Override
-    public void editingCanceled(final ChangeEvent e) {}
+		public void editingCanceled(final ChangeEvent e) {}
 
 		@Override
-    public void editingStopped(final ChangeEvent e)
+		public void editingStopped(final ChangeEvent e)
 		{
 
 			// logger.info("editing stopped: " + getSelectedRow());
@@ -604,10 +603,10 @@ class FindStatesTable
 		}
 
 		@Override
-    public void editingCanceled(final ChangeEvent e) {}
+		public void editingCanceled(final ChangeEvent e) {}
 
 		@Override
-    public void editingStopped(final ChangeEvent e)
+		public void editingStopped(final ChangeEvent e)
 		{
 
 			//logger.info("editing stopped: " + getSelectedRow());
@@ -654,10 +653,10 @@ class FindStatesTable
 		}
 
 		@Override
-    public void editingCanceled(final ChangeEvent e) {}
+		public void editingCanceled(final ChangeEvent e) {}
 
 		@Override
-    public void editingStopped(final ChangeEvent e)
+		public void editingStopped(final ChangeEvent e)
 		{
 			if (stateMatcherTypeCombo.getSelectedIndex() >= 0)
 			{
@@ -699,7 +698,7 @@ class FindStatesTable
 		addMouseListener(new MouseAdapter()
 		{
 			@Override
-      public void mousePressed(final MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 
 				// This is needed for the Linux platform
@@ -708,7 +707,7 @@ class FindStatesTable
 			}
 
 			@Override
-      public void mouseReleased(final MouseEvent e)
+			public void mouseReleased(final MouseEvent e)
 			{
 
 				// This is for triggering the popup on Windows platforms
@@ -716,7 +715,7 @@ class FindStatesTable
 			}
 
 			@Override
-      public void mouseClicked(final MouseEvent e)
+			public void mouseClicked(final MouseEvent e)
 			{
 				if (e.getClickCount() == 2)
 				{
@@ -796,9 +795,7 @@ class FindStatesTable
 interface FindStatesTab
 {
 	String getTitle();
-
 	String getTip();
-
 	StateMatcher getMatcher();
 }
 
@@ -813,7 +810,7 @@ class FreeFormPanel
 	private final JTextField reg_exp;
 	private final JTextField sep_str;
 	@SuppressWarnings("unused")
-    private JCheckBox pairwise_equal;
+    private final JCheckBox pairwise_equal;
 	@SuppressWarnings("unused")
 	private boolean ok = false;
 
@@ -920,19 +917,19 @@ class FreeFormPanel
 	}
 
 	@Override
-  public String getTitle()
+	public String getTitle()
 	{
 		return title;
 	}
 
 	@Override
-  public String getTip()
+	public String getTip()
 	{
 		return tip;
 	}
 
 	@Override
-  public StateMatcher getMatcher()
+	public StateMatcher getMatcher()
 	{
 		try
 		{
@@ -952,7 +949,7 @@ class FreeFormPanel
 	}
 
 	@Override
-  public void setVisible(final boolean aFlag)
+	public void setVisible(final boolean aFlag)
 	{
 		super.setVisible(aFlag);
 
@@ -981,19 +978,19 @@ class FixedFormPanel
 	}
 
 	@Override
-  public String getTitle()
+	public String getTitle()
 	{
 		return title;
 	}
 
 	@Override
-  public String getTip()
+	public String getTip()
 	{
 		return tip;
 	}
 
 	@Override
-  public StateMatcher getMatcher()
+	public StateMatcher getMatcher()
 	{
 		return new FixedformMatcher(table.getRegexpPatterns(), table.getStateMatcherOptions());
 	}
@@ -1029,13 +1026,13 @@ class SettingsPanel
 	}
 
 	@Override
-  public String getTitle()
+	public String getTitle()
 	{
 		return title;
 	}
 
 	@Override
-  public String getTip()
+	public String getTip()
 	{
 		return tip;
 	}
@@ -1056,16 +1053,18 @@ class FindStatesFrame
 	extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
-	private FindStatesTable table = null;
-	private Automata automata = null;
-	private JTabbedPane tabbedPane = null;
+	private static final Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
+	
+	private final FindStatesTable table;
+	private final Automata automata;
+	private final JTabbedPane tabbedPane;
 	@SuppressWarnings("unused")
-	private CancelButton quit_button = null;
+	private final CancelButton quit_button;
 	@SuppressWarnings("unused")
-	private JButton find_button = null;
-	private ForbidButton forbid_button = null;
-	private VisualProject theVisualProject = null;
+	private final JButton find_button;
+	private final ForbidButton forbid_button;
+	// private final RemoveButton remove_button;
+	private final VisualProject theVisualProject;
 	private final SettingsPanel settingsPanel = new SettingsPanel();
 
 	private static void debug(final String s)
@@ -1097,6 +1096,7 @@ class FindStatesFrame
 		buttonPanel.add(quit_button = new CancelButton());
 		buttonPanel.add(find_button = Utility.setDefaultButton(this, new FindButton()));
 		buttonPanel.add(forbid_button = new ForbidButton());
+		// buttonPanel.add(remove_button = new RemoveButton());	// Does not make sense on this panel
 
 		// We only allow forbidding plant states, if you have specs, plantify first
 		forbid_button.setEnabled(selectedAutomata.isAllAutomataPlants());
@@ -1111,6 +1111,11 @@ class FindStatesFrame
 	{
 		forbid_button.setEnabled(b);
 	}
+//	void updateRemoveButton(final boolean b)
+//	{
+//		remove_button.setEnabled(b);
+//	}
+	
 	private Automata getAutomata()
 	{
 		return automata;
@@ -1119,6 +1124,25 @@ class FindStatesFrame
 	private FindStatesTab getSelectedComponent()
 	{
 		return (FindStatesTab) tabbedPane.getSelectedComponent();
+	}
+
+	class RemoveButton extends JButton
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public RemoveButton()
+		{
+			super("Remove");
+			setToolTipText("Remove outgoing transitions from selected states");
+			addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(final ActionEvent e)
+				{
+					
+				}
+			});
+		}
 	}
 
 	class FindButton
@@ -1134,7 +1158,7 @@ class FindStatesFrame
 			addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
@@ -1155,12 +1179,12 @@ class FindStatesFrame
 		public ForbidButton()
 		{
 			super("Forbid");
-			setToolTipText("Forbid found states. Only for plants. Plantify first if you have to.");
+			setToolTipText("Modularly forbid found states. Only for plants. Plantify first if you have to.");
 
 			addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
@@ -1180,7 +1204,7 @@ class FindStatesFrame
 		}
 	}
 
-        class CancelButton
+	class CancelButton
 		extends JButton
 	{
 		private static final long serialVersionUID = 1L;
@@ -1193,7 +1217,7 @@ class FindStatesFrame
 			addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
@@ -1274,12 +1298,12 @@ public class FindStates
 	{
 		super("Find States...");
 
-		putValue(SHORT_DESCRIPTION, "Specify and search for significant states");
+		putValue(SHORT_DESCRIPTION, "Specify, search for, and manipulate significant states");
 	}
 
 	// Note, we avoid (short-circut) the ActionMan here... should we?
 	@Override
-  public void actionPerformed(final ActionEvent e)
+	public void actionPerformed(final ActionEvent e)
 	{
 		final VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
 		final Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();

@@ -25,7 +25,7 @@ import org.supremica.log.LoggerFactory;
 
 public class Forbidder
 {
-    private static Logger logger = LoggerFactory.createLogger(Forbidder.class);
+    private static final Logger logger = LoggerFactory.createLogger(Forbidder.class);
 
     private static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
     private static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
