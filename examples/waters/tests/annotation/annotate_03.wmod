@@ -7,7 +7,7 @@
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
@@ -52,7 +52,7 @@
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
@@ -66,9 +66,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="240" Y="128"/>
                         </PointGeometry>
@@ -77,9 +74,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="144" Y="208"/>
                         </PointGeometry>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="annotate_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="annotate_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a">
             <ColorGeometry>
-                <Color Red="0" Green="255" Blue="204"/>
+                <Color Blue="204" Green="255" Red="0"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:b">
             <ColorGeometry>
-                <Color Red="255" Green="51" Blue="0"/>
+                <Color Blue="0" Green="51" Red="255"/>
             </ColorGeometry>
         </EventDecl>
     </EventDeclList>

@@ -68,9 +68,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="304" Y="96"/>
                         </PointGeometry>
@@ -79,9 +76,6 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="160" Y="192"/>
                         </PointGeometry>

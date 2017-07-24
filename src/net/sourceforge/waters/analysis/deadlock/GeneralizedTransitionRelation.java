@@ -76,6 +76,8 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
 
+  private final String ACCEPTING_PROP= ":accepting";
+
   public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy marked)
   {
     this(aut, marked, aut.getEvents());
@@ -451,11 +453,14 @@ public class GeneralizedTransitionRelation
     return mEventToInt.get(event);
   }
 
+
   public Set<EventProxy> getEvents()
   {
     final Set<EventProxy> events = new THashSet<EventProxy>();
     for (int i = 0; i < mEvents.length; i++) {
-      if (mEvents[i] != null) {
+      // ignore :accepting prop
+      if (mEvents[i] != null && !mEvents[i].getName().equals(ACCEPTING_PROP)) {
+        System.out.println(mEvents[i].getName());
         events.add(mEvents[i]);
       }
     }

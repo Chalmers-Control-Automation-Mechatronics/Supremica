@@ -113,20 +113,62 @@ public class AnnotatorTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_annotate_02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
 
+  /*public void test_annotate_03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_03.wmod");
+    runTransitionRelationSimplifier(des);
+  }*/
+
+  public void test_annotate_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_07() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
     throws Exception
   {
+
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
     final GeneralizedTransitionRelation tr = annotate(before);
     // calculate unannotated form
-    final AutomatonProxy unannotated = unannotate(tr);
+    final AutomatonProxy unannotated = unannotate(tr, des);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
+
   }
 
 
@@ -168,10 +210,10 @@ public class AnnotatorTest
     return tr;
   }
 
-  public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr){
+  public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr, final ProductDESProxy des){
     final UnAnnotator2 ua = new UnAnnotator2(tr, null);
    // final UnAnnotator ua = new UnAnnotator(tr);
-    final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
+    final AutomatonProxy aut = ua.run(getProductDESProxyFactory(), des);
     return aut;
   }
 

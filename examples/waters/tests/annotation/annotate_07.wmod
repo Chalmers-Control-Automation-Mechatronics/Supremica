@@ -13,15 +13,13 @@
                 <Color Blue="102" Green="102" Red="102"/>
             </ColorGeometry>
         </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="before">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name="initial"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="128" Y="208"/>
                         </PointGeometry>
@@ -29,10 +27,7 @@
                             <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name="initial"/>
-                        </EventList>
+                    <SimpleNode Initial="true" Name="S1">
                         <PointGeometry>
                             <Point X="320" Y="208"/>
                         </PointGeometry>
@@ -51,11 +46,10 @@
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph>
+            <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
-                            <SimpleIdentifier Name="initial"/>
                             <SimpleIdentifier Name="ann:a"/>
                         </EventList>
                         <PointGeometry>
@@ -65,11 +59,7 @@
                             <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S1">
-                        <EventList>
-                            <SimpleIdentifier Name="initial"/>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
+                    <SimpleNode Initial="true" Name="S1">
                         <PointGeometry>
                             <Point X="320" Y="208"/>
                         </PointGeometry>

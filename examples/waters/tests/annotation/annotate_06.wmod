@@ -22,9 +22,6 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="160" Y="96"/>
                         </PointGeometry>

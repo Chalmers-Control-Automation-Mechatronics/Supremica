@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,11 +43,11 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
@@ -63,8 +64,10 @@ public class UnAnnotator2
     mTransitionRelation = transitionrelation;
   }
 
-  public AutomatonProxy run(final ProductDESProxyFactory factory)
+  public AutomatonProxy run(final ProductDESProxyFactory factory, final ProductDESProxy des)
   {
+
+    final Set<EventProxy> desEvents = des.getEvents();
     final Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
       new THashMap<TIntHashSet, TIntArrayList>();
     final List<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
@@ -91,7 +94,7 @@ public class UnAnnotator2
       final TIntArrayList states = new TIntArrayList();
       states.add(statenum);
       newStates.put(s, states);
-      final Collection<EventProxy> props = new ArrayList<EventProxy>();
+      final Set<EventProxy> props = new HashSet<EventProxy>();
       for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
         final TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
         if (succs == null) {continue;}
@@ -101,10 +104,22 @@ public class UnAnnotator2
           newtransitionsI.add(new int[]{s, e, t});
           // create prop
           final EventProxy event = mTransitionRelation.getEvent(e);
-          final EventProxy prop = factory.createEventProxy("ann:" +event.getName(), EventKind.PROPOSITION);
-          props.add(prop);
-          eventsset.add(prop);
+          for(final EventProxy ep : desEvents){
+          final String[] tokens = ep.getName().split(":");
+          if(tokens.length>1) {
+            for(int i=1; i<tokens.length; i++) {
+              System.out.println("token:" + tokens[i]);
+              if(event.getName().equals(tokens[i])){
+                //final EventProxy prop = factory.createEventProxy("ann:" +event.getName(), EventKind.PROPOSITION);
+                //props.add(prop);
+                //eventsset.add(prop);
+                props.add(ep);
+                eventsset.add(ep);
+              }
+            }
+          }
         }
+          }
       }
      /* Collection<EventProxy> used = mTransitionRelation.isMarked(s) ?
                                     markedcol : notmarked;
