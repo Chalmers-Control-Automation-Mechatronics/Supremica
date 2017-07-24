@@ -70,10 +70,6 @@ public int getName(final DeterministicState d){
   return mDetStates.get(d).getName();
 }
 
-public DeterministicState getState (final int name){
-  return mDetStates.get(name);
-}
-
 public Collection<StateProxy> getAllStateProxy(){
   final ArrayList<StateProxy> result = new ArrayList<StateProxy>();
   for(final DeterministicState state : mDetStates.values()){

@@ -583,7 +583,7 @@ public class GraphEditorPanel
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "unlikely-arg-type"})
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     final GraphSubject graph = getGraph();
@@ -4277,6 +4277,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Auxiliary Methods
+    @SuppressWarnings("unlikely-arg-type")
     private boolean isParentMoved(final Proxy item)
     {
       final Subject subject = (Subject) item;
