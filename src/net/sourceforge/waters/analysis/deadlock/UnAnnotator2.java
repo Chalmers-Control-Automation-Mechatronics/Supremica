@@ -35,7 +35,6 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,17 +57,14 @@ import gnu.trove.set.hash.TIntHashSet;
 public class UnAnnotator2
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
-  private final EventProxy mMarked;
 
   public UnAnnotator2(final GeneralizedTransitionRelation transitionrelation, final EventProxy marked)
   {
     mTransitionRelation = transitionrelation;
-    mMarked = marked;
   }
 
   public AutomatonProxy run(final ProductDESProxyFactory factory)
   {
-    final boolean containsmarked = false;
     final Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
       new THashMap<TIntHashSet, TIntArrayList>();
     final List<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
@@ -88,8 +84,6 @@ public class UnAnnotator2
     }
     final TIntObjectHashMap<TIntArrayList> newStates =
       new TIntObjectHashMap<TIntArrayList>();
-    final Collection<EventProxy> markedcol = Collections.singleton(mMarked);
-    final Collection<EventProxy> notmarked = Collections.emptySet();
     final List<int[]> newtransitionsI = new ArrayList<int[]>();
     final Collection<EventProxy> eventsset = mTransitionRelation.getEvents();
     int statenum = 0;

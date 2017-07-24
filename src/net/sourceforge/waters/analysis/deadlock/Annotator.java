@@ -46,7 +46,6 @@ import gnu.trove.set.hash.TIntHashSet;
 public class Annotator
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
-  private final int mTau;
 
   public static int ANNOTATIONS_ADDED = 0;
   public static int ANNOTATIONS_REMOVED_SUBSET = 0;
@@ -75,7 +74,6 @@ public class Annotator
   public Annotator(final GeneralizedTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
-    mTau = 0;
   }
 
   public void run()

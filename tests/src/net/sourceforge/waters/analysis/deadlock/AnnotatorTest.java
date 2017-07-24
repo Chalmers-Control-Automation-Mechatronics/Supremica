@@ -124,9 +124,6 @@ public class AnnotatorTest
     // calculate annotated form
     final GeneralizedTransitionRelation tr = annotate(before);
     // calculate unannotated form
-
-    final AutomatonProxy expected = findAutomaton(des, AFTER);
-
     final AutomatonProxy unannotated = unannotate(tr);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
