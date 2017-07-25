@@ -154,6 +154,15 @@ public class AnnotatorTest
       getCompiledDES("tests", "annotation", "annotate_07.wmod");
     runTransitionRelationSimplifier(des);
   }
+
+  public void test_annotate_08() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_08.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
