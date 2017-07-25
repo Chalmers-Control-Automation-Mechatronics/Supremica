@@ -211,7 +211,7 @@ public class AnnotatorTest
   }
 
   public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr, final ProductDESProxy des){
-    final UnAnnotator2 ua = new UnAnnotator2(tr, null);
+    final UnAnnotator ua = new UnAnnotator(tr, null);
    // final UnAnnotator ua = new UnAnnotator(tr);
     final AutomatonProxy aut = ua.run(getProductDESProxyFactory(), des);
     return aut;
