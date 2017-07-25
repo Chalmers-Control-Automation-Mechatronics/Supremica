@@ -272,12 +272,12 @@ public class CompositionalAnalysisResult
     if (result == null || result.isFinished()) {
       mNumberOfMonolithicRuns++;
     }
-    if (mMonolithicStats == null) {
+    if (mMonolithicStats == null || !mMonolithicStats.isFinished()) {
       mMonolithicStats = result;
     } else if (result != null) {
       mMonolithicStats.merge(result);
     }
-    if (result != null) {
+    if (result != null && result.isFinished()) {
       final long usage = result.getPeakMemoryUsage();
       updatePeakMemoryUsage(usage);
     }
@@ -388,7 +388,7 @@ public class CompositionalAnalysisResult
     writer.println("--------------------------------------------------");
     writer.print("Number of monolithic analysis runs: ");
     writer.println(mNumberOfMonolithicRuns);
-    if (mMonolithicStats != null) {
+    if (mMonolithicStats != null && mNumberOfMonolithicRuns > 0) {
       mMonolithicStats.print(writer);
     }
   }

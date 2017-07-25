@@ -612,6 +612,8 @@ public abstract class AbstractTRCompositionalAnalyzer
       mono.setKindTranslator(translator);
       mono.setNodeLimit(getMonolithicStateLimit());
       mono.setTransitionLimit(getMonolithicTransitionLimit());
+      final AnalysisResult dummy = mono.createAnalysisResult();
+      result.addMonolithicAnalysisResult(dummy);
     }
 
     mSubsystemQueue = new PriorityQueue<>();

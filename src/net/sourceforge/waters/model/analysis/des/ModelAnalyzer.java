@@ -207,4 +207,11 @@ public interface ModelAnalyzer
    */
   public void clearAnalysisResult();
 
+  /**
+   * Creates an  empty analysis result of the type returned by this model
+   * analyser. This factory method merely creates the result record, without
+   * associating it with the model analyser.
+   */
+  public AnalysisResult createAnalysisResult();
+
 }

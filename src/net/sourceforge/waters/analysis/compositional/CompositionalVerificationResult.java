@@ -169,6 +169,7 @@ public class CompositionalVerificationResult
   {
     super.print(writer);
     if (mCounterExample != null) {
+      writer.println("--------------------------------------------------");
       final int len = mCounterExample.getEvents().size();
       writer.println("Counterexample length: " + len);
       if (mCounterExampleTime >= 0) {

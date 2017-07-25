@@ -133,4 +133,7 @@ public interface ModelVerifier extends ModelAnalyzer
   @Override
   public VerificationResult getAnalysisResult();
 
+  @Override
+  public VerificationResult createAnalysisResult();
+
 }
