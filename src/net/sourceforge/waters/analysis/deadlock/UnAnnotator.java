@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -59,23 +61,35 @@ public class UnAnnotator
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
 
-  public UnAnnotator(final GeneralizedTransitionRelation transitionrelation, final EventProxy marked)
+  public UnAnnotator(final GeneralizedTransitionRelation transitionrelation,
+                     final EventProxy marked)
   {
     mTransitionRelation = transitionrelation;
   }
 
-  public AutomatonProxy run(final ProductDESProxyFactory factory, final ProductDESProxy des)
+  public AutomatonProxy run(final ProductDESProxyFactory factory,
+                            final ProductDESProxy des)
   {
 
     final Set<EventProxy> desEvents = des.getEvents();
-    final Map<TIntHashSet, TIntArrayList> statesWithAnnotation =
-      new THashMap<TIntHashSet, TIntArrayList>();
-    final List<TransitionProxy> newTransitions = new ArrayList<TransitionProxy>();
+    final Set<EventProxy> desProps = new HashSet<EventProxy>();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getKind().toString().equals("PROPOSITION")) {
+        desProps.add(ep);
+      }
+    }
+
+    final Map<TIntHashSet,TIntArrayList> statesWithAnnotation =
+      new THashMap<TIntHashSet,TIntArrayList>();
+    final List<TransitionProxy> newTransitions =
+      new ArrayList<TransitionProxy>();
     final List<StateProxy> nextStates = new ArrayList<StateProxy>();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
-      final Set<TIntHashSet> annotations = mTransitionRelation.getAnnotation(s);
-      if (annotations == null) {continue;}
-      System.out.println(s+ "has annotation :" + annotations.toString());
+      final Set<TIntHashSet> annotations =
+        mTransitionRelation.getAnnotation(s);
+      if (annotations == null) {
+        continue;
+      }
       for (final TIntHashSet ann : annotations) {
         TIntArrayList states = statesWithAnnotation.get(ann);
         if (states == null) {
@@ -94,78 +108,70 @@ public class UnAnnotator
       final TIntArrayList states = new TIntArrayList();
       states.add(statenum);
       newStates.put(s, states);
-      final Set<EventProxy> props = new HashSet<EventProxy>();
       for (int e = 0; e < mTransitionRelation.numberOfEvents(); e++) {
         final TIntHashSet succs = mTransitionRelation.getSuccessors(s, e);
-        if (succs == null) {continue;}
+        if (succs == null) {
+          continue;
+        }
         final int[] array = succs.toArray();
         for (int ti = 0; ti < array.length; ti++) {
           final int t = array[ti];
-          newtransitionsI.add(new int[]{s, e, t});
-          // create prop
-          final EventProxy event = mTransitionRelation.getEvent(e);
-          for(final EventProxy ep : desEvents){
+          newtransitionsI.add(new int[] {s, e, t});
+        }
+      }
+
+      // get props for this state
+      final Set<EventProxy> stateProp = new HashSet<EventProxy>();
+      final Set<TIntHashSet> annotations =
+        mTransitionRelation.getAnnotation(s);
+      for (final TIntHashSet ann : annotations) {
+        for (final EventProxy ep : desProps) {
           final String[] tokens = ep.getName().split(":");
-          if(tokens.length>1) {
-            for(int i=1; i<tokens.length; i++) {
-              System.out.println("token:" + tokens[i]);
-              if(event.getName().equals(tokens[i])){
-                //final EventProxy prop = factory.createEventProxy("ann:" +event.getName(), EventKind.PROPOSITION);
-                //props.add(prop);
-                //eventsset.add(prop);
-                props.add(ep);
-                eventsset.add(ep);
+          boolean match = true;
+          if (tokens.length == ann.size() + 1) {
+            for (final TIntIterator it = ann.iterator(); it.hasNext();) {
+              final int e = it.next();
+              final EventProxy event = mTransitionRelation.getEvent(e);
+              if (!Arrays.asList(tokens).contains(event.getName())) {
+                match = false;
               }
             }
+            if (match) {
+              stateProp.add(ep);
+              eventsset.add(ep);
+            }
           }
+
         }
-          }
       }
-     /* Collection<EventProxy> used = mTransitionRelation.isMarked(s) ?
-                                    markedcol : notmarked;
-     if (!containsmarked) {
-        used = notmarked;
-      }
-      */
+
       final boolean isInitial = mTransitionRelation.isInitial(s);
-      final StateProxy sp = new AnnotatedMemStateProxy(statenum, props, isInitial);
+      final StateProxy sp =
+        new AnnotatedMemStateProxy(statenum, stateProp, isInitial);
       nextStates.add(sp);
       statenum++;
-      assert(statenum == nextStates.size());
+      assert (statenum == nextStates.size());
     }
 
-  /*  for (final TIntHashSet ann : statesWithAnnotation.keySet()) {
-      final int[] states = statesWithAnnotation.get(ann).toArray();
-      for (int i = 0; i < states.length; i++) {
-        final int state = states[i];
-        Collection<EventProxy> used = notmarked;
-        final TIntIterator it = ann.iterator();
-        while (it.hasNext()) {
-          final int event = it.next();
-          if (mTransitionRelation.isMarkingEvent(event)) {
-            used = markedcol;
-            continue;
-          }
-          final TIntHashSet succs = mTransitionRelation.getSuccessors(state, event);
-          final int[] array = succs.toArray();
-          for (int suci = 0; suci < array.length; suci++) {
-            final int suc = array[suci];
-            newtransitionsI.add(new int[]{statenum, event, suc});
-          }
-        }
-        final TIntArrayList sharedstates = newStates.get(state);
-        sharedstates.add(statenum);
-        if (!containsmarked) {
-          used = notmarked;
-        }
-        final StateProxy sp = new AnnotatedMemStateProxy(statenum, used, false);
-        //System.out.println("marking:" + used);
-        nextStates.add(sp);
-        statenum++;
-        assert(statenum == nextStates.size());
-      }
-    }*/
-   // eventsset.add(tau);
+    /*
+     * for (final TIntHashSet ann : statesWithAnnotation.keySet()) { final
+     * int[] states = statesWithAnnotation.get(ann).toArray(); for (int i = 0;
+     * i < states.length; i++) { final int state = states[i];
+     * Collection<EventProxy> used = notmarked; final TIntIterator it =
+     * ann.iterator(); while (it.hasNext()) { final int event = it.next(); if
+     * (mTransitionRelation.isMarkingEvent(event)) { used = markedcol;
+     * continue; } final TIntHashSet succs =
+     * mTransitionRelation.getSuccessors(state, event); final int[] array =
+     * succs.toArray(); for (int suci = 0; suci < array.length; suci++) {
+     * final int suc = array[suci]; newtransitionsI.add(new int[]{statenum,
+     * event, suc}); } } final TIntArrayList sharedstates =
+     * newStates.get(state); sharedstates.add(statenum); if (!containsmarked)
+     * { used = notmarked; } final StateProxy sp = new
+     * AnnotatedMemStateProxy(statenum, used, false);
+     * //System.out.println("marking:" + used); nextStates.add(sp);
+     * statenum++; assert(statenum == nextStates.size()); } }
+     */
+    // eventsset.add(tau);
     for (final int[] t : newtransitionsI) {
       final int s = t[0];
       final int e = t[1];
@@ -173,32 +179,29 @@ public class UnAnnotator
       final StateProxy source = nextStates.get(s);
       final EventProxy event = mTransitionRelation.getEvent(e);
       final StateProxy target = nextStates.get(ot);
-      newTransitions.add(factory.createTransitionProxy(source, event, target));
-      // add proposition
-     // final EventProxy prop = factory.createEventProxy("ann:" +event.getName(), EventKind.PROPOSITION);
-      //eventsset.add(prop);
+      newTransitions
+        .add(factory.createTransitionProxy(source, event, target));
     }
     //final EventProxy tau = factory.createEventProxy("tau:" + mTransitionRelation.getName(), EventKind.UNCONTROLLABLE);
-   /* for (int i = 0; i < newStates.size(); i++) {
-      final StateProxy source = nextStates.get(i);
-      final TIntArrayList taus = newStates.get(i);
-      for (int j = 0; j < taus.size(); j++) {
-        final int state = taus.get(j);
-        if (i == state) {continue;}
-        final StateProxy target = nextStates.get(state);
-        newTransitions.add(factory.createTransitionProxy(source, tau, target));
-      }
-    }*/
-   // final Collection<EventProxy> eventsset = mTransitionRelation.getEvents();
-   // eventsset.add(tau);
-   /* AutomatonProxy aut = factory.createAutomatonProxy(mTransitionRelation.getName(),
-                                                      ComponentKind.PLANT,
-                                                      eventsset,
-                                                      nextStates, newTransitions);*/
-    final AutomatonProxy aut = factory.createAutomatonProxy("after",
-                                                      ComponentKind.PLANT,
-                                                      eventsset,
-                                                      nextStates, newTransitions);
+    /*
+     * for (int i = 0; i < newStates.size(); i++) { final StateProxy source =
+     * nextStates.get(i); final TIntArrayList taus = newStates.get(i); for
+     * (int j = 0; j < taus.size(); j++) { final int state = taus.get(j); if
+     * (i == state) {continue;} final StateProxy target =
+     * nextStates.get(state);
+     * newTransitions.add(factory.createTransitionProxy(source, tau, target));
+     * } }
+     */
+    // final Collection<EventProxy> eventsset = mTransitionRelation.getEvents();
+    // eventsset.add(tau);
+    /*
+     * AutomatonProxy aut =
+     * factory.createAutomatonProxy(mTransitionRelation.getName(),
+     * ComponentKind.PLANT, eventsset, nextStates, newTransitions);
+     */
+    final AutomatonProxy aut =
+      factory.createAutomatonProxy("after", ComponentKind.PLANT, eventsset,
+                                   nextStates, newTransitions);
 
     return aut;
   }
