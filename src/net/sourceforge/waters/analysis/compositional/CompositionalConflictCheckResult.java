@@ -100,18 +100,20 @@ public class CompositionalConflictCheckResult
   }
 
   /**
-   * Registers an additional language inclusion check during counterexample
+   * Registers additional language inclusion checks during counterexample
    * expansion. This method increases the number of language inclusion checks
-   * by one and adds the given time to the total language inclusion time.
-   * @param  time    Time taken by this one language inclusion check.
+   * and adds the given time to the total language inclusion time.
+   * @param  count   The number of language inclusion checks to be added.
+   * @param  time    The time taken by these language inclusion checks,
+   *                 in milliseconds.
    */
-  public void addCCLanguageInclusionCheck(final long time)
+  public void addCCLanguageInclusionChecks(final int count, final long time)
   {
     if (mCCLanguageInclusionCount < 0) {
-      mCCLanguageInclusionCount = 1;
+      mCCLanguageInclusionCount = count;
       mCCLanguageInclusionTime = time;
     } else {
-      mCCLanguageInclusionCount++;
+      mCCLanguageInclusionCount += count;
       if (time > 0) {
         mCCLanguageInclusionTime += time;
       }

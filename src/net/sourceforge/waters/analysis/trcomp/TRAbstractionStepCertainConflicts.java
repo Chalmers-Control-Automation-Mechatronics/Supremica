@@ -137,6 +137,7 @@ class TRAbstractionStepCertainConflicts
                           final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
+    final long start = System.currentTimeMillis();
     final TRCompositionalConflictChecker conflictChecker =
       (TRCompositionalConflictChecker) analyzer;
     final TraceExpander expander = new TraceExpander(conflictChecker);
@@ -177,6 +178,9 @@ class TRAbstractionStepCertainConflicts
         trace.append(extension, numSteps);
       }
     }
+    final long stop = System.currentTimeMillis();
+    final int count = expander.getNumberOfLanguageInclusionChecks();
+    conflictChecker.recordCCLanguageInclusionChecks(count, stop - start);
   }
 
 
@@ -201,7 +205,6 @@ class TRAbstractionStepCertainConflicts
     private TraceExpander(final TRCompositionalConflictChecker checker)
       throws AnalysisException
     {
-      mConflictChecker = checker;
       mLanguageInclusionChecker = checker.getLanguageInclusionChecker();
       final int config =
         mLanguageInclusionChecker.getPreferredInputConfiguration();
@@ -214,6 +217,14 @@ class TRAbstractionStepCertainConflicts
         (PROPERTY_NAME, ComponentKind.PROPERTY, propertyEnc, 1, config);
       rel.setInitial(0, true);
       mPropertyAutomaton = new TRAutomatonProxy(propertyEnc, rel);
+      mNumberOfLanguageInclusionChecks = 0;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private int getNumberOfLanguageInclusionChecks()
+    {
+      return mNumberOfLanguageInclusionChecks;
     }
 
     //#######################################################################
@@ -318,7 +329,8 @@ class TRAbstractionStepCertainConflicts
       mLanguageInclusionChecker.run();
       final VerificationResult result =
         mLanguageInclusionChecker.getAnalysisResult();
-      mConflictChecker.recordCCLanguageInclusionCheck(result);
+      mNumberOfLanguageInclusionChecks++;
+      // TODO mConflictChecker.recordCCLanguageInclusionCheck(result);
       if (result.isSatisfied()) {
         return null;
       } else {
@@ -380,13 +392,13 @@ class TRAbstractionStepCertainConflicts
 
     //#######################################################################
     //# Data Members
-    private final TRCompositionalConflictChecker mConflictChecker;
     private final TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
     private final EventProxy mCertainConflictsEvent;
     private final TRAutomatonProxy mPropertyAutomaton;
     private List<LanguageInclusionAutomaton> mLanguageInclusionAutomata;
     private LanguageInclusionAutomaton mCertainConflictsAutomaton;
     private int mMaxLevel;
+    private int mNumberOfLanguageInclusionChecks;
   }
 
 

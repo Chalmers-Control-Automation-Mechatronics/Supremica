@@ -520,11 +520,10 @@ public class TRCompositionalConflictChecker
                                              translator);
   }
 
-  void recordCCLanguageInclusionCheck(final VerificationResult result)
+  void recordCCLanguageInclusionChecks(final int count, final long time)
   {
-    final long time = result.getRunTime();
-    final CompositionalConflictCheckResult combinedResult = getAnalysisResult();
-    combinedResult.addCCLanguageInclusionCheck(time);
+    final CompositionalConflictCheckResult result = getAnalysisResult();
+    result.addCCLanguageInclusionChecks(count, time);
   }
 
 
