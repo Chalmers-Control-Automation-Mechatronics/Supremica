@@ -180,6 +180,19 @@ abstract class Partitioning<P extends PartitionBDD> implements Abortable
 
 
   //#########################################################################
+  //# Clean up
+  /**
+   * Frees all the composed BDDs in this partition.
+   */
+  void disposeComposedBDDs()
+  {
+    for (final P part : mFullPartition) {
+      part.disposeComposedBDD();
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final List<P> mFullPartition;
   private final BDDFactory mBDDFactory;

@@ -225,11 +225,15 @@ public class BDDConflictChecker
       if (result.isFinished()) {
         return isSatisfied();
       }
-      createEventBDDs();
+      final BDD init = createInitialStateBDD(true);
       if (result.isFinished()) {
         return isSatisfied();
       }
-      final BDD reachable = computeReachability();
+      createTransitionBDDs();
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final BDD reachable = computeReachability(init);
       if (result.isFinished()) {
         return isSatisfied();
       }
@@ -292,36 +296,34 @@ public class BDDConflictChecker
   }
 
   @Override
-  EventBDD[] createEventBDDs()
+  void createTransitionBDDs(final TransitionPartitioningStrategy strategy,
+                            final EventBDD[] eventBDDs)
     throws AnalysisException
   {
-    final EventBDD[] eventBDDs = super.createEventBDDs();
-    final VerificationResult result = getAnalysisResult();
-    if (result.isFinished()) {
-      return eventBDDs;
-    }
+    super.createTransitionBDDs(strategy, eventBDDs);
+
     final EventProxy omega = getUsedMarkingProposition();
     mMarkingBDD = getMarkedStateBDD(omega);
     if (mMarkingBDD.isOne()) {
       setSatisfiedResult();
-      return eventBDDs;
+      return;
     }
     if (mPreconditionMarking != null) {
       mPreconditionBDD = getMarkedStateBDD(mPreconditionMarking);
       mPreconditionBDD.applyWith(mMarkingBDD.id(), BDDFactory.diff);
       if (mPreconditionBDD.isZero()) {
         setSatisfiedResult();
-        return eventBDDs;
+        return;
       } else if (mPreconditionBDD.isOne()) {
         mPreconditionBDD = null;
       }
     }
     if (mPreconditionBDD == null && mMarkingBDD.isZero()) {
-      final BDD init = getInitialStateBDD();
+      final BDD init = createInitialStateBDD(false);
       final ConflictTraceProxy counterexample =
         computeCounterExample(init, 0, ConflictKind.CONFLICT);
       setFailedResult(counterexample);
-      return eventBDDs;
+      return;
     }
     final int limit = getPartitioningSizeLimit();
     if (mEarlyDeadlockEnabled && limit > 0) {
@@ -337,7 +339,7 @@ public class BDDConflictChecker
         nondeadlock.orWith(nondeadlockPart);
         if (nondeadlock.nodeCount() > limit) {
           nondeadlock.free();
-          return eventBDDs;
+          return;
         }
       }
       final BDD deadlock = nondeadlock.not();
@@ -348,7 +350,6 @@ public class BDDConflictChecker
         mDeadlockBDD = deadlock;
       }
     }
-    return eventBDDs;
   }
 
   @Override
@@ -358,7 +359,7 @@ public class BDDConflictChecker
     if (mDeadlockBDD != null) {
       final BDD bad = reached.and(mDeadlockBDD);
       if (!bad.isZero()) {
-        final int level = getDepth() - 1;
+        final int level = getDepth();
         final ConflictTraceProxy counterexample =
           computeCounterExample(bad, level, ConflictKind.DEADLOCK);
         setFailedResult(counterexample);

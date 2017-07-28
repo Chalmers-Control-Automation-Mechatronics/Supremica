@@ -70,7 +70,7 @@ public class BDDDeadlockCheckerTest
   {
     final BDDDeadlockChecker checker = new BDDDeadlockChecker(factory);
     checker.setTransitionPartitioningStrategy
-      (TransitionPartitioningStrategy.AUTOMATA);
+      (TransitionPartitioningStrategy.GREEDY);
     return checker;
   }
 

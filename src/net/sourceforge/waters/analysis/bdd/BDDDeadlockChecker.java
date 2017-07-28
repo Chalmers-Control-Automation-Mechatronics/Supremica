@@ -107,11 +107,15 @@ public class BDDDeadlockChecker
       if (result.isFinished()) {
         return isSatisfied();
       }
-      createEventBDDs();
+      final BDD init = createInitialStateBDD(true);
       if (result.isFinished()) {
         return isSatisfied();
       }
-      final BDD reachable = computeReachability();
+      createTransitionBDDs();
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final BDD reachable = computeReachability(init);
       if (reachable != null) {
         reachable.free();
         setSatisfiedResult();
@@ -188,13 +192,11 @@ public class BDDDeadlockChecker
   }
 
   @Override
-  EventBDD[] createEventBDDs()
+  void createTransitionBDDs(final TransitionPartitioningStrategy strategy,
+                            final EventBDD[] eventBDDs)
     throws AnalysisException
   {
-    final EventBDD[] eventBDDs = super.createEventBDDs();
-    if (eventBDDs == null) {
-      return eventBDDs;
-    }
+    super.createTransitionBDDs(strategy, eventBDDs);
 
     final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
     final BDDFactory bddFactory = getBDDFactory();
@@ -234,21 +236,6 @@ public class BDDDeadlockChecker
       }
     }
     mDeadlockPartitioning = null;
-
-    return eventBDDs;
-  }
-
-  @Override
-  BDD createInitialStateBDD(final AutomatonBDD autBDD)
-  {
-    final BDDFactory bddFactory = getBDDFactory();
-    final BDD autInit = autBDD.createInitialStateBDD(bddFactory);
-    if (autInit.isZero()) {
-      setSatisfiedResult();
-      return null;
-    } else {
-      return autInit;
-    }
   }
 
   @Override
@@ -272,7 +259,7 @@ public class BDDDeadlockChecker
     for (final BDD part : mDeadlockBDDs) {
       part.free();
     }
-    final int level = getDepth() - 1;
+    final int level = getDepth();
     final List<TraceStepProxy> trace = computeTrace(mBadStateBDD, level);
     final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy des = getModel();

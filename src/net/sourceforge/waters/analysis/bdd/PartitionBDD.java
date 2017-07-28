@@ -127,8 +127,8 @@ abstract class PartitionBDD
   }
 
   /**
-   * Free the BDD representing this partition, if it is an atomic partition
-   * member.
+   * Free the BDD representing this partition, unless it is an atomic
+   * partition member.
    */
   void disposeComposedBDD()
   {
