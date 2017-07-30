@@ -68,7 +68,19 @@ public abstract class NativeModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
@@ -119,5 +131,10 @@ public abstract class NativeModelVerifier
   abstract VerificationResult runNativeAlgorithm() throws AnalysisException;
 
   public abstract String getTraceName();
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mShortCounterExampleRequested = false;
 
 }

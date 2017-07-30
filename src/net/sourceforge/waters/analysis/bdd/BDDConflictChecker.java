@@ -146,37 +146,6 @@ public class BDDConflictChecker
 
 
   //#########################################################################
-  //# Configuration
-  /**
-   * <P>Enables or disables early deadlock detection.</P>
-   * If enabled (the default), the conflict checker may stop during
-   * reachability computation if a deadlock is encountered. This is not
-   * guaranteed however, as the conflict checker may decide that the required
-   * BDDs are too large.</P>
-   * <P>If early deadlock detection is disabled, reachability computation
-   * must be completed regardless of possible deadlock states. By disabling
-   * early deadlock detection and using a transition partition that ensures
-   * breadth-first search, it can be guaranteed that computed counterexamples
-   * are of minimal length.</P>
-   * @see #setTransitionPartitioningStrategy(TransitionPartitioningStrategy)
-   *      setTransitionPartitioningStrategy()
-   */
-  public void setEarlyDeadlockEnabled(final boolean enabled)
-  {
-    mEarlyDeadlockEnabled = enabled;
-  }
-
-  /**
-   * Returns whether early deadlock detection is enabled.
-   * @see #setEarlyDeadlockEnabled(boolean) setEarlyDeadlockEnabled()
-   */
-  public boolean isEarlyDeadlockEnabled()
-  {
-    return mEarlyDeadlockEnabled;
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
@@ -326,7 +295,7 @@ public class BDDConflictChecker
       return;
     }
     final int limit = getPartitioningSizeLimit();
-    if (mEarlyDeadlockEnabled && limit > 0) {
+    if (isShortCounterExampleRequested() && limit > 0) {
       final BDD nondeadlock = mMarkingBDD.id();
       final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
       final BDDFactory factory = getBDDFactory();
@@ -450,7 +419,6 @@ public class BDDConflictChecker
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
-  private boolean mEarlyDeadlockEnabled = true;
   private BDD mMarkingBDD;
   private BDD mPreconditionBDD;
   private BDD mDeadlockBDD;
