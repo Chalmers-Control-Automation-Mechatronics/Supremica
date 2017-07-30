@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="prime_sieve4b" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="prime_sieve4b" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Distributed prime number sieve.
 This is version has four sieve processes for primes 2, 3, 5, and 7.
 It handles numbers up to 120.
 This is a blocking version, with broken sink.
-The number of reachable states is approximately 117071257580230280000,
+The number of reachable states is approximately 117071257580230300000,
 and the diameter is 166.
+A shortest counterexample to the nonblocking property has 31 steps.
 
 Source generates numbers and sends them to the first sieve process sieve2.
 There is one sieve process for each prime number p,
@@ -65,7 +66,7 @@ await c[11] &gt; 0</ns2:Comment>
         <EventDecl Kind="CONTROLLABLE" Name="tau7x7"/>
     </EventDeclList>
     <ComponentList>
-        <VariableComponent Deterministic="false" Name="x0">
+        <VariableComponent Name="x0">
             <VariableRange>
                 <BinaryExpression Operator="..">
                     <IntConstant Value="0"/>

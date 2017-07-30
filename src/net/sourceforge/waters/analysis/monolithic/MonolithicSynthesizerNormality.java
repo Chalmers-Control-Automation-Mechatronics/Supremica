@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -48,7 +48,7 @@ import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -481,7 +481,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     mFinalStateExplorer =
       new FinalStateExplorer(eventAutomata, transitions, ndTuple3,
                              EventEncoding.NONTAU, mNumProperEvents - 1);
-    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
+    mSupervisorSimplifier = new SuWonhamSupervisorReductionTRSimplifier();
     mDisabledEvents = new THashSet<>();
   }
 
@@ -687,31 +687,32 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       SpecialEventsTRSimplifier eventSimplifier =
         new SpecialEventsTRSimplifier(mTransitionRelation);
       eventSimplifier.run();
-      final AutomatonProxy eventsHiddenAut =
-        mTransitionRelation.createAutomaton(getFactory(), mEventEncoding);
+      final TRAutomatonProxy eventsHiddenAut =
+        new TRAutomatonProxy(mEventEncoding, mTransitionRelation);
       eventSimplifier = null;
 
       //Powerset construction
       final SubsetConstructionTRSimplifier subsetSimplifier =
         new SubsetConstructionTRSimplifier();
+      final EventEncoding copy = new EventEncoding(mEventEncoding);
       final ListBufferTransitionRelation powersetRel =
-        new ListBufferTransitionRelation(mTransitionRelation,
-                  subsetSimplifier.getPreferredInputConfiguration());
+        new ListBufferTransitionRelation(mTransitionRelation, copy,
+                                         subsetSimplifier.getPreferredInputConfiguration());
       powersetRel.setName("powerset_events_hidden");
       subsetSimplifier.setTransitionRelation(powersetRel);
       subsetSimplifier.run();
-      final AutomatonProxy powerSetAut =
-        powersetRel.createAutomaton(getFactory(), mEventEncoding);
+      final TRAutomatonProxy powerSetAut = new TRAutomatonProxy(copy, powersetRel);
 
       //Synchronous composition
       Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>(2);
-      automata.add(eventsHiddenAut);
       automata.add(powerSetAut);
+      automata.add(eventsHiddenAut);
       final ProductDESProxy autToSync =
         getFactory().createProductDESProxy("synchronous_comp",mEventEncoding.getUsedEvents(),automata);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(autToSync);
       builder.setEventEncoding(mEventEncoding);
+      builder.setPruningDeadlocks(true);
       builder.run();
       automata = null;
 
@@ -723,11 +724,11 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       int numDeletions = 1;
       final int dumpStateIndex = mTransitionRelation.getDumpStateIndex();
       final int markedStateCode = mEventEncoding.getEventCode(mUsedMarking);
-      while(numDeletions > 0){
+      while (numDeletions > 0) {
         numDeletions = 0;
         //Observability step
         mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        /*final TransitionIterator successorReadOnlyIter =
+        final TransitionIterator successorReadOnlyIter =
           mTransitionRelation.createSuccessorsReadOnlyIteratorByStatus(EventStatus.STATUS_CONTROLLABLE);
         //Loop through each state in sync product
         for(int source=0; source < mTransitionRelation.getNumberOfStates(); source++){
@@ -748,37 +749,36 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                   final int newState = resultMap.getComposedState(sourceTupleDash);
                   final TransitionIterator succIterSameEvent =
                     mTransitionRelation.createSuccessorsModifyingIterator();
-                  succIterSameEvent.resetState(newState);
-                  succIterSameEvent.setCurrentToState(dumpStateIndex);
-                  while(succIterSameEvent.advance()){
-                    succIterSameEvent.remove();
+                  succIterSameEvent.reset(newState, event);
+                  if (succIterSameEvent.advance()) {
+                    succIterSameEvent.setCurrentToState(dumpStateIndex);
+                    while(succIterSameEvent.advance()){
+                      succIterSameEvent.remove();
+                      //Increment removed state/transition counter
+                      numDeletions++;
+                    }
                   }
                 }
               }
             }
           }
-        }*/
+        }
 
         //Nonblocking step
-        //Check and set state reachability
-        //mTransitionRelation.checkReachability();
-
-        //Create a backwards transition iterator
-        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsModifyingIterator();
-
-        //A set of coreachable states
         final TIntHashSet coreachableStates = new TIntHashSet(mTransitionRelation.getNumberOfStates());
         final TIntStack open = new TIntArrayStack();
 
-        //For each state
+        //For each state: If it is reachable and accepting, add it to open
         for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
-          //If it is reachable and accepting, add it to open
           if(mTransitionRelation.isReachable(state) && mTransitionRelation.isMarked(state, markedStateCode)){
             open.push(state);
             coreachableStates.add(state);
           }
         }
+
+        //Create a backwards transition iterator
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+        final TransitionIterator predecessorIterator = mTransitionRelation.createPredecessorsModifyingIterator();
 
         //Add all states that can reach a coreachable state to the set
         while(open.size() != 0){
@@ -793,51 +793,56 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           }
         }
 
-        //If any state is not coreachable, change all incoming transitions to dump state
-        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
-          //TODO: not sure if reachability check here is correct
-          if(mTransitionRelation.isReachable(state) && !coreachableStates.contains(state)){
-            //TODO: This can be pulled out into a method as it is reused
-            //If source is initial state, stop and return empty set/no result
-            if(mTransitionRelation.isInitial(state)){
-              return setBooleanResult(false);
-            }
-            //Change all transitions pointing to this state, to point to dump
-            predecessorIterator.resetState(state);
-            while(predecessorIterator.advance()){
-              predecessorIterator.setCurrentToState(dumpStateIndex);
-            }
-            //Set the state as unreachable (will be removed later)
-            mTransitionRelation.setReachable(state, false);
+        //Change any transition that points to a non-coreachable state to dump
+        mTransitionRelation.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        final TransitionIterator allTransIter = mTransitionRelation
+          .createAllTransitionsModifyingIterator();
+        while(allTransIter.advance()){
+          final int targetState = allTransIter.getCurrentTargetState();
+          if(!coreachableStates.contains(targetState) && targetState != dumpStateIndex){
+            allTransIter.setCurrentToState(dumpStateIndex);
+            //Increment removed state/transition counter
             numDeletions++;
           }
         }
 
         //Controllability step
-        for(int e=EventEncoding.NONTAU; e<mNumProperEvents; e++){
-          final byte status = mEventEncoding.getProperEventStatus(e);
-          if(!EventStatus.isControllableEvent(status)){
-            final TransitionIterator iter = mTransitionRelation.createAllTransitionsReadOnlyIterator(e);
-            while(iter.advance()){
-              if(iter.getCurrentTargetState() == dumpStateIndex){
-                final int source = iter.getCurrentSourceState();
-                //TODO: This can be pulled out into a method as it is reused
-                //If source is initial state, stop and return empty set/no result
-                if(mTransitionRelation.isInitial(source)){
-                  return setBooleanResult(false);
-                }
-                //Change all transitions pointing to this state, to point to dump
-                predecessorIterator.resetState(source);
-                while(predecessorIterator.advance()){
-                  predecessorIterator.setCurrentToState(dumpStateIndex);
-                }
-                //Set the state as unreachable (will be removed later)
-                mTransitionRelation.setReachable(source, false);
-                numDeletions++;
-              }
-            }
+        final TransitionIterator successorIterator =
+          mTransitionRelation.createSuccessorsModifyingIterator();
+        for(int state=0; state<mTransitionRelation.getNumberOfStates(); state++){
+          //If a state is initial and not coreachable, return failed result
+          //This is part of the non-blocking check above but is more efficient here
+          if (mTransitionRelation.isInitial(state) && !coreachableStates.contains(state)){
+            return setBooleanResult(false);
+          }
+          successorIterator.resetState(state);
+          while(successorIterator.advance()){
+           if(successorIterator.getCurrentTargetState() == dumpStateIndex){
+             final int event = successorIterator.getCurrentEvent();
+             final byte status = mEventEncoding.getProperEventStatus(event);
+             if(!EventStatus.isControllableEvent(status)){
+               //If an initial state is removed as not controllable, synthesis has failed.
+               if (mTransitionRelation.isInitial(state)){
+                 return setBooleanResult(false);
+               }
+               //Remove all out-going transitions
+               final TransitionIterator stateSuccessorIterator =
+                 mTransitionRelation.createSuccessorsModifyingIterator();
+               stateSuccessorIterator.resetState(state);
+               while(stateSuccessorIterator.advance()){
+                 stateSuccessorIterator.remove();
+               }
+               //Remove marking
+               mTransitionRelation.removeMarkings(state, markedStateCode);
+               //Increment removed state/transition counter
+               numDeletions++;
+             }
+           }
           }
         }
+
+        //Check and set state reachability
+        mTransitionRelation.checkReachability();
       }
 
       //Extract supervisor
@@ -855,26 +860,32 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
               resultMap.getOriginalState(source, sourceTuple);
               //Get sourceSet from pair
               final int[] synthesisSourceSet = subsetSimplifier.getSourceSet(sourceTuple[0]);
-              //TODO: Check this is how I get the set of states from state id for the powersetRel
               final int[] powersetSourceSet = subsetSimplifier.getSourceSet(iter.getCurrentSourceState());
               if(Arrays.equals(synthesisSourceSet, powersetSourceSet)){
                 //Add new transition with same event pointing to dump
                 powersetRel.addTransition(iter.getCurrentSourceState(), event, psDumpIndex);
                 //Remove original transition from powerset
                 iter.remove();
+                break;
               }
             }
           }
         }
       }
+      mTransitionRelation = powersetRel;
+      mEventEncoding = copy;
 
-      if(isDetailedOutputEnabled()){
-        //Return result
+      // Return result
+      if (isDetailedOutputEnabled()) {
+        mTransitionRelation.removeDeadlockStateTransitions(markedStateCode);
+        mTransitionRelation.checkReachability();
         mTransitionRelation.removeRedundantPropositions();
-        final ProductDESProxy result = createDESProxy(mTransitionRelation);
-        setProxyResult(result);
+        final ProductDESProxy result =
+          createDESProxy(mTransitionRelation, mEventEncoding);
+        return setProxyResult(result);
+      } else {
+        return setBooleanResult(true);
       }
-      return true;
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -926,8 +937,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
           List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
           StateTupleEncoding stEncodingCopy = mSTEncoding;
           final ListBufferTransitionRelation transitionRelationCopy =
-            new ListBufferTransitionRelation(
-                                             mTransitionRelation,
+            new ListBufferTransitionRelation(mTransitionRelation,
                                              ListBufferTransitionRelation.CONFIG_SUCCESSORS);
           automata:
           for (int a = mAutomata.size() - 1; a >= 0; a--) {
@@ -1017,11 +1027,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                     merging = true;
                     break;
                   default:
-                    throw new IllegalStateException(
-                                                    "Unsupport state status "
-                                                      + mStatusMap
-                                                        .get(newTupEncoded)
-                                                      + "!");
+                    throw new IllegalStateException
+                      ("Unsupported state status " +
+                       mStatusMap.get(newTupEncoded) + "!");
                   }
                 }
               } else {
@@ -1048,8 +1056,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         }
 
         ListBufferTransitionRelation copy =
-          new ListBufferTransitionRelation(
-                                           mTransitionRelation,
+          new ListBufferTransitionRelation(mTransitionRelation,
                                            ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 
         final ChainTRSimplifier chain = new ChainTRSimplifier();
@@ -1061,7 +1068,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         bisimulator.setTransitionLimit(getTransitionLimit());
         chain.add(bisimulator);
 
-        mSupervisorSimplifier.setRestrictedEvent(e);
+        mSupervisorSimplifier.setSupervisedEvent(e);
 
         chain.add(mSupervisorSimplifier);
         chain.setTransitionRelation(copy);
@@ -1155,12 +1162,13 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     }
   }
 
-  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
+  private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel,
+                                         final EventEncoding encoding)
     throws EventNotFoundException
   {
     rel.setName(mOutputName);
     final AutomatonProxy aut =
-      rel.createAutomaton(getFactory(), mEventEncoding);
+      rel.createAutomaton(getFactory(), encoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
   }
 
@@ -1634,7 +1642,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   private FinalStateExplorer mFinalStateExplorer;
   private ListBufferTransitionRelation mTransitionRelation;
 
-  private SupervisorReductionTRSimplifier mSupervisorSimplifier;
+  private SuWonhamSupervisorReductionTRSimplifier mSupervisorSimplifier;
 
   private int mNumGoodStates;
   private BitSet mGoodStates;

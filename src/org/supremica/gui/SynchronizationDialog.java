@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2015 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -39,6 +39,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import org.supremica.automata.algorithms.*;
+import org.supremica.properties.Config;
 
 abstract class SynchronizationPanel
 	extends JPanel
@@ -49,7 +50,7 @@ abstract class SynchronizationPanel
 
 	public abstract void regain(SynchronizationOptions s);
 }
-
+//--------------------------------------- Standard panel
 class SynchronizationDialogStandardPanel
 	extends SynchronizationPanel
 {
@@ -83,6 +84,7 @@ class SynchronizationDialogStandardPanel
 		this.add(standardBox);
 	}
 
+	@Override
 	public void update(final SynchronizationOptions synchronizationOptions)
 	{
 		forbidUnconStatesBox.setSelected(synchronizationOptions.forbidUncontrollableStates());
@@ -91,6 +93,7 @@ class SynchronizationDialogStandardPanel
 		stateNameSeparator.setText(synchronizationOptions.getStateNameSeparator());
 	}
 
+	@Override
 	public void regain(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationOptions.setForbidUncontrollableStates(forbidUnconStatesBox.isSelected());
@@ -99,7 +102,7 @@ class SynchronizationDialogStandardPanel
 		synchronizationOptions.setStateNameSeparator(stateNameSeparator.getText());
 	}
 }
-
+//-------------------------------------- Advanced panel
 class SynchronizationDialogAdvancedPanel
 	extends SynchronizationPanel
 	implements ActionListener
@@ -108,20 +111,32 @@ class SynchronizationDialogAdvancedPanel
 	private final JComboBox<SynchronizationType> synchronizationTypeBox;
 	private final JCheckBox expandForbiddenStatesBox;
 	private final JCheckBox rememberDisabledEventsBox;
+	private final JCheckBox unobsEventsSyncBox;
 
 	public SynchronizationDialogAdvancedPanel()
 	{
 		this.setLayout(new BorderLayout());
 
-		synchronizationTypeBox = new JComboBox<SynchronizationType>(SynchronizationType.values());
-		synchronizationTypeBox.setToolTipText("Choose the type of composition");
-		expandForbiddenStatesBox = new JCheckBox("Expand forbidden states");
-		expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
-												"examined, otherwise, the states are considered terminal");
-		expandForbiddenStatesBox.addActionListener(this);
-		rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
-		rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
+		this.synchronizationTypeBox = new JComboBox<SynchronizationType>(SynchronizationType.values());
+		this.synchronizationTypeBox.setToolTipText("Choose the type of composition");
+		
+		this.expandForbiddenStatesBox = new JCheckBox(Config.SYNC_EXPAND_FORBIDDEN_STATES.getComment());
+		this.expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
+												"examined, otherwise, forbidden states are considered terminal");
+		this.expandForbiddenStatesBox.addActionListener(this);
+		
+		this.rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
+		this.rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
 
+		/*
+		 * This setting gets its default value from what is set in the Config dialog
+		 * Changing it on the SynchroniziationOptions dialog holds only for the current invokation.
+		 * (and this is the way it should work for all settings on the dialogs)
+		*/
+		this.unobsEventsSyncBox = new JCheckBox(Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
+		this.unobsEventsSyncBox.setToolTipText("If checked: " + Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
+		this.unobsEventsSyncBox.setSelected(Config.SYNC_UNOBS_EVENTS_SYNC.isTrue());
+		
 		final JPanel choicePanel = new JPanel();
 		choicePanel.setLayout(new FlowLayout());
 		choicePanel.add(synchronizationTypeBox);
@@ -133,6 +148,7 @@ class SynchronizationDialogAdvancedPanel
 		//checkBoxBox.setLayout(new FlowLayout());
 		checkBoxBox.add(expandForbiddenStatesBox);
 		checkBoxBox.add(rememberDisabledEventsBox);
+		checkBoxBox.add(unobsEventsSyncBox);
 		checkBoxPanel.add(checkBoxBox);
 		this.add("Center", checkBoxPanel);
 
@@ -155,12 +171,14 @@ class SynchronizationDialogAdvancedPanel
 		*/
 	}
 
+	@Override
 	public void update(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationTypeBox.setSelectedItem(synchronizationOptions.getSynchronizationType());
 		expandForbiddenStatesBox.setSelected(synchronizationOptions.expandForbiddenStates());
 		rememberDisabledEventsBox.setSelected(synchronizationOptions.rememberDisabledEvents());
-
+		this.unobsEventsSyncBox.setSelected(synchronizationOptions.getUnobsEventsSynch());
+		
 		if (!expandForbiddenStatesBox.isSelected())
 		{
 			rememberDisabledEventsBox.setEnabled(false);
@@ -172,13 +190,16 @@ class SynchronizationDialogAdvancedPanel
 		}
 	}
 
+	@Override
 	public void regain(final SynchronizationOptions synchronizationOptions)
 	{
 		synchronizationOptions.setSynchronizationType((SynchronizationType) synchronizationTypeBox.getSelectedItem());
 		synchronizationOptions.setExpandForbiddenStates(expandForbiddenStatesBox.isSelected());
 		synchronizationOptions.setRememberDisabledEvents(rememberDisabledEventsBox.isSelected());
+		synchronizationOptions.setUnobsEventsSynch(this.unobsEventsSyncBox.isSelected());
 	}
 
+	@Override
 	public void actionPerformed(final ActionEvent e)
 	{
 		if (!expandForbiddenStatesBox.isSelected())
@@ -192,8 +213,8 @@ class SynchronizationDialogAdvancedPanel
 		}
 	}
 }
-
-public class SynchronizationDialog
+//-------------------------------------- SynchronizationDialog
+public final class SynchronizationDialog
 	implements ActionListener
 {
 	private final JButton okButton;
@@ -269,6 +290,7 @@ public class SynchronizationDialog
 		dialog.setVisible(true);
 	}
 
+	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
 		final Object source = event.getSource();
@@ -295,5 +317,14 @@ public class SynchronizationDialog
 			dialog.setVisible(false);
 			dialog.dispose();
 		}
+	}
+	
+	//----------- Just for testing
+	public static void main(final String[] args)
+	{
+		SynchronizationOptions options = new SynchronizationOptions();
+		SynchronizationDialog dialog = new SynchronizationDialog(null, options);
+		dialog.show();
+		System.out.println("getUnobsEventsSynch : " + options.getUnobsEventsSynch());
 	}
 }

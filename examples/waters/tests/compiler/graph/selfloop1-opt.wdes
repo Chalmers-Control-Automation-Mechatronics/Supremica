@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:ProductDES Name="selfloop1" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
+<Comment>A compiler test. An event is selflooped on all states of the only automaton where it appears. This event can be removed by optimisation from the automaton (but not from the model). As a result, the automaton becomes a one-state event-less automaton, which can also be removed by optimisation.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="CONTROLLABLE" Name="e"/>
+</ns2:EventList>
+</ns2:ProductDES>

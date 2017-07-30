@@ -49,48 +49,70 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.supremica.util.BDD.JDDLoader;
 
 /**
  * Different kinds of algorithms for verification.
  */
 public enum VerificationAlgorithm
 {
-    MONOLITHIC("Monolithic (Explicit)"),
-    MONOLITHICBDD("Monolithic (Symbolic)"),
-    MODULAR("Modular"),
-    SAT("Satisfiability"),
-    COMPOSITIONAL("Compositional"),
-    COMBINED("Compositional + BDD"),
-    BDD("BDD"),
-    BBSD("BBSD");
-    //IDD("IDD");
-
-    /** Textual description. */
-    private final String description;
-
-    private VerificationAlgorithm(String description)
-    {
-        this.description = description;
+  MONOLITHIC("Monolithic (Explicit)"),
+  MONOLITHICBDD("Monolithic (Symbolic)"),
+  MODULAR("Modular"),
+  SAT("Satisfiability"),
+  COMPOSITIONAL("Compositional"),
+  COMBINED("Compositional + BDD"),
+  BDD("BDD") {
+    @Override
+    public boolean isLoadable() {
+      return JDDLoader.canLoadJDD();
     }
+  },
+  BBSD("BBSD");
+  //IDD("IDD");
 
-    public String toString()
-    {
-        return description;
-    }
 
-    /**
-     * Static method for figuring out which VerificationAlgorithm corresponds to
-     * a given description.
-     */
-    public static VerificationAlgorithm fromDescription(String description)
-    {
-        for (VerificationAlgorithm value: values())
-        {
-            if (value.description.equals(description))
-            {
-                return value;
-            }
-        }
-        return null;
+  //#########################################################################
+  //# Constructor
+  private VerificationAlgorithm(final String description)
+  {
+    mDescription = description;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  @Override
+  public String toString()
+  {
+    return mDescription;
+  }
+
+  public boolean isLoadable()
+  {
+    return true;
+  }
+
+  /**
+   * Static method for figuring out which VerificationAlgorithm corresponds to
+   * a given description.
+   */
+  public static VerificationAlgorithm fromDescription(final String description)
+  {
+    for (final VerificationAlgorithm value : values()) {
+      if (value.mDescription.equals(description)) {
+        return value;
+      }
     }
+    return null;
+  }
+
+
+  //#########################################################################
+  //# Instance Variables
+  /**
+   * Textual description.
+   */
+  private final String mDescription;
+
 }

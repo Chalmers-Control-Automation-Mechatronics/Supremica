@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.base;
 
-import gnu.trove.strategy.HashingStrategy;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -49,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.printer.ProxyPrinter;
+
+import gnu.trove.strategy.HashingStrategy;
 
 
 /**
@@ -140,6 +140,31 @@ public abstract class AbstractEqualityVisitor
     mDiagnosticPath.clear();
     try {
       return compareProxies(proxy, expected);
+    } catch (final VisitorException exception) {
+      throw exception.getRuntimeException();
+    }
+  }
+
+  /**
+   * Checks whether two arrays have the same contents. This method compares
+   * two arrays of proxies of the same type, and checks whether they have
+   * equal elements appearing in the same order. The equality used is defined
+   * by this visitor.
+   * @param  array     The first array to be compared.
+   * @param  expected  The second array to be compared. For the purpose
+   *                   of diagnostic information, the second argument will
+   *                   be referred to as the 'expected' value.
+   * @return <CODE>true</CODE> if the proxies in the two arrays were found
+   *         equal according to the parameterisation of this equality checker,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public <P extends Proxy> boolean isEqualArray(final P[] array,
+                                                final P[] expected)
+  {
+    mDiagnostics = null;
+    mDiagnosticPath.clear();
+    try {
+      return compareArrays(array, expected);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
@@ -418,6 +443,38 @@ public abstract class AbstractEqualityVisitor
       return compareProxies(geo, expected);
     } else {
       return true;
+    }
+  }
+
+
+  /**
+   * Checks whether two arrays have the same contents. This method compares
+   * two arrays of proxies of the same type, and checks whether they have
+   * equal elements appearing in the same order. The equality used is defined
+   * by this visitor.
+   */
+  protected <P extends Proxy> boolean compareArrays(final P[] array,
+                                                    final P[] expected)
+    throws VisitorException
+  {
+    if (array == expected) {
+      return true;
+    } else if (array == null) {
+      return false;
+    }
+    final int arrayLength = array.length;
+    final int expectedLength = expected.length;
+    if (arrayLength == expectedLength) {
+      for (int i = 0; i < arrayLength; i++) {
+        if (!compareProxies(array[i], expected[i])) {
+          return false;
+        }
+      }
+      return true;
+    } else if (arrayLength > expectedLength) {
+      return reportSuperfluousItem(array[expectedLength]);
+    } else {
+      return reportMissingItem(expected[arrayLength]);
     }
   }
 

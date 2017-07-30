@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -37,6 +37,10 @@
 
 #include <string.h>
 
+#ifdef DEBUG
+#include <iostream>
+#endif /* DEBUG */
+
 #include <jni.h>
 
 #include "waters/base/BitSet.h"
@@ -54,7 +58,7 @@ namespace waters {
 #define INDEX_MASK (__WORDSIZE - 1)
 
 #if __WORDSIZE == 64
-#  define ONE 1L
+#  define ONE 1ULL
 #  define INDEX_SHIFT 6
 #  define initHashFactors initHashFactors64
 #  define hashIntArray hashInt64Array
@@ -205,6 +209,29 @@ grow(uint32_t newArraySize)
     mArraySize = newArraySize;
   }      
 }
+
+
+//############################################################################
+//# Debugging
+//############################################################################
+
+#ifdef DEBUG
+
+void BitSet::
+dump()
+  const
+{
+  std::cerr << "RAW [";
+  for (uint32_t i = 0; i < mArraySize; i++) {
+    if (i > 0) {
+      std::cerr << ",";
+    }
+    std::cerr << mArray[i];
+  }
+  std::cerr << "]" << std::endl;
+}
+
+#endif  /* DEBUG */
 
 
 }   /* namespace waters */

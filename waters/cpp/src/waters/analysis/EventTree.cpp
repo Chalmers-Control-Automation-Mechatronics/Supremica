@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -881,7 +881,7 @@ renumber()
 
 
 
-//#################3##########################################################
+//############################################################################
 //# EventTreeGenerator: Hash Methods
 
 uint64_t EventTreeGenerator::

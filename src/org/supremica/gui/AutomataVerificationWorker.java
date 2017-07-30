@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2015 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -121,48 +121,49 @@ public class AutomataVerificationWorker
         // Perform verification according to the VerificationType.
         final VerificationType vtype =
           verificationOptions.getVerificationType();
-        switch (vtype) {
-        case CONTROLLABILITY:
-        case INVERSECONTROLLABILITY:
-          // Controllability verification...
-          successMessage = "The system is controllable!";
-          failureMessage = "The system is NOT controllable!";
-          break;
-        case CONTROLLABILITYNONBLOCKING:
-          // Controllability + nonblocking verification...
-          successMessage = "The system is controllable and nonblocking!";
-          failureMessage = "The system is uncontrollable or blocking!";
-          break;
-        case NONBLOCKING:
-          // Nonblocking verification...
-          successMessage = "The system is nonblocking!";
-          failureMessage = "The system is blocking!";
-          break;
-        case LANGUAGEINCLUSION:
-          // Language inclusion verification...
-          successMessage = "The language of the unselected automata is \n" +
-                           "included in the language of the selected automata.";
-          failureMessage = "The language of the unselected automata is NOT\n" +
-                           "included in the language of the selected automata.";
-          // In language inclusion, not only the currently selected automata are used!
-          //theAutomata = workbench.getAllAutomata(); // They are sent through the options instead
-          break;
-        case OP:
-            // OP-verifier ...
-            successMessage = "The observer property is satisfied.";
-            failureMessage = "The observer property is NOT satisfied.";
-            break;
-        case DIAGNOSABILITY:
-            // Diagnosability verification ...
-            successMessage = "The system is diagnosable.";
-            failureMessage = "The system is NOT diagnosable.";
-            break;
-        default:
-          // Error... this can't happen!
-          requestAbort();
-          logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " +
-                       "this can't happen.\nPlease send bug report to bugs@supremica.org.");
-          return;
+        switch (vtype)
+		{
+			case CONTROLLABILITY:
+			case INVERSECONTROLLABILITY:
+				// Controllability verification...
+				successMessage = "The system is controllable!";
+				failureMessage = "The system is NOT controllable!";
+				break;
+			case CONTROLLABILITYNONBLOCKING:
+				// Controllability + nonblocking verification...
+				successMessage = "The system is controllable and nonblocking!";
+				failureMessage = "The system is uncontrollable or blocking!";
+				break;
+			case NONBLOCKING:
+				// Nonblocking verification...
+				successMessage = "The system is nonblocking!";
+				failureMessage = "The system is blocking!";
+				break;
+			case LANGUAGEINCLUSION:
+				// Language inclusion verification...
+				successMessage = "The language of the unselected automata is \n" +
+								 "included in the language of the selected automata.";
+				failureMessage = "The language of the unselected automata is NOT\n" +
+								 "included in the language of the selected automata.";
+				// In language inclusion, not only the currently selected automata are used!
+				//theAutomata = workbench.getAllAutomata(); // They are sent through the options instead
+				break;
+			case OP:
+				// OP-verifier ...
+				successMessage = "The observer property is satisfied.";
+				failureMessage = "The observer property is NOT satisfied.";
+				break;
+			case DIAGNOSABILITY:
+				// Diagnosability verification ...
+				successMessage = "The system is diagnosable.";
+				failureMessage = "The system is NOT diagnosable.";
+				break;
+			default:
+				// Error... this can't happen!
+				requestAbort();
+				logger.error("Error in AutomataVerificationWorker. Unavailable option chosen... " +
+							 "this can't happen.\nPlease send bug report to bugs@supremica.org.");
+			  return;
         }
 
         // Did some initialization go wrong?
@@ -204,7 +205,8 @@ public class AutomataVerificationWorker
 
         // Add test result from Diagnosability verification
         if (vtype == VerificationType.DIAGNOSABILITY &&
-            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) {
+            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) 
+		{
             final Automata result = BBSDDiagnosabilityVerification.getFinalAutomata();
             if (result != null)
                 ((IDEActionInterface)workbench).getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);

@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -85,6 +85,12 @@ public:
   void clearBit(uint32_t index);
   bool equals(const BitSet& bitSet) const;
   uint64_t hash() const;
+
+  //##########################################################################
+  //# Debugging
+#ifdef DEBUG
+  void dump() const;
+#endif /* DEBUG */
 
 private:
   //##########################################################################

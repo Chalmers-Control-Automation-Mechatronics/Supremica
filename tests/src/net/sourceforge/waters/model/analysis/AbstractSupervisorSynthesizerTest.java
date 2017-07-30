@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,14 +33,14 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
@@ -57,12 +57,15 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -261,6 +264,13 @@ public abstract class AbstractSupervisorSynthesizerTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "coffee_machine.wmod");
+    runSynthesizer(des, true);
+  }
+
+  public void testCT3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "CT3.wmod");
     runSynthesizer(des, true);
   }
 
@@ -714,6 +724,9 @@ public abstract class AbstractSupervisorSynthesizerTest
         factory.createProductDESProxy(name, comment, null, events, automata);
       saveDES(replaced, basename);
       assertTrue("Expected failed synthesis, but got a result!", expect);
+      for (final AutomatonProxy aut : computedSupervisors) {
+        verifyReachability(aut);
+      }
       verifySupervisorControllability(replaced);
       verifySupervisorNonblocking(replaced);
       automata.addAll(expectedSupervisors);
@@ -739,6 +752,22 @@ public abstract class AbstractSupervisorSynthesizerTest
     throws Exception
   {
     verifySupervisor(des, mConflictChecker, null, "nonconflicting");
+  }
+
+  private void verifyReachability(final AutomatonProxy aut)
+    throws OverflowException
+  {
+    final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy(aut);
+    final ListBufferTransitionRelation rel = tr.getTransitionRelation();
+    if (rel.checkReachability()) {
+      for (int s = 0; s < rel.getNumberOfStates(); s++) {
+        if (!rel.isReachable(s) && s != rel.getDumpStateIndex()) {
+          final StateProxy state = tr.getState(s);
+          fail("Synthesised supervisor '" + aut.getName() +
+               "' contains unreachable state '" + state.getName() + "'!");
+        }
+      }
+    }
   }
 
   private void verifySupervisor(final ProductDESProxy des,

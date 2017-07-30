@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -45,6 +42,9 @@ import java.util.Collection;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -68,7 +68,9 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new state buffer. This constructor creates a new state buffer
+   * Creates a new state buffer.
+   * <p>
+   * This constructor creates a new state buffer
    * with the states in the given encoding. If the state encoding contains
    * a <CODE>null</CODE> state, it is used as a reachable dump state,
    * otherwise an additional unreachable dump state is added to the end of
@@ -114,12 +116,13 @@ public class LongStateCountBuffer extends AbstractStateBuffer
         }
         mStateInfo[s] = info;
       }
-      mStateInfo[s] += 1; // Default state count
+      mStateInfo[s] += 1; // Initial state count is one.
     }
   }
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
    * attributes and markings of the states are initialised to be
@@ -135,6 +138,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
    * attributes and markings of the states are initialised to be
@@ -151,10 +155,11 @@ public class LongStateCountBuffer extends AbstractStateBuffer
 
   /**
    * Creates a new empty state buffer.
+   * <p>
    * This constructor allocates a new state buffer with the given number
    * of states. States are initially marked as reachable, while all other
-   * attributes and markings of the states are initialised to be
-   * <CODE>false</CODE>.
+   * attributes and markings of the states are initialised to
+   * <CODE>false</CODE>. Also, the count of each state is initialised to 1.
    * @param  size       The number of states in the new buffer.
    * @param  dumpIndex  The index of the dump state in the new buffer.
    *                    The dump state signifies a unmarked state without
@@ -166,7 +171,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
   {
     setDumpStateIndex(dumpIndex);
     mStateInfo = new long[size];
-    Arrays.fill(mStateInfo, TAG_REACHABLE);
+    Arrays.fill(mStateInfo, TAG_REACHABLE | 1L);
   }
 
   /**
@@ -215,7 +220,7 @@ public class LongStateCountBuffer extends AbstractStateBuffer
    * @param propStatus Event status provider to determine the number of
    *                   propositions and which propositions are used.
    */
-  public LongStateCountBuffer(final IntStateBuffer buffer,
+  public LongStateCountBuffer(final AbstractStateBuffer buffer,
                               final EventStatusProvider propStatus)
   {
     setDumpStateIndex(buffer.getDumpStateIndex());

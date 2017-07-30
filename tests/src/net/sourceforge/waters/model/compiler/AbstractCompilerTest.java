@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -164,6 +164,22 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "graph", "colours");
+    testCompile(module);
+  }
+
+  public void testCompile_selfloop1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "selfloop1");
+    testCompile(module);
+  }
+
+  public void testCompile_selfloop2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "graph", "selfloop2");
     testCompile(module);
   }
 
@@ -334,6 +350,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     final ParameterBindingProxy binding = createBinding("N", 2);
     bindings.add(binding);
     testCompile(module, bindings, true);
+  }
+
+  public void testCompile_unused_event()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "nasty", "unused_event");
+    testCompile(module);
   }
 
   public void testCompile_unused_prop()
@@ -666,12 +689,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, TypeMismatchException.class, "'2'");
   }
 
+  // TODO Generation of automaton variables - disabled for now
+  /*
   public void testCompile_duplicate_identifier()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "duplicate_identifier");
     compileError(module, DuplicateIdentifierException.class, "'x'");
   }
+  */
 
   public void testCompile_edge0()
     throws IOException, WatersException
@@ -680,12 +706,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, EmptyLabelBlockException.class, "q0");
   }
 
+  // TODO Generation of automaton variables - disabled for now
+  /*
   public void testCompile_error_batch_tank_out()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "efsm", "batch_tank_out");
     compileError(module, DuplicateIdentifierException.class, "'out'");
   }
+  */
 
   public void testCompile_error_ims()
     throws IOException, WatersException

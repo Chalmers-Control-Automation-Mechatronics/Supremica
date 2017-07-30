@@ -1,0 +1,1646 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="traffic_lights" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>
+	</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="Streets">
+            <ConstantAliasExpression>
+                <EnumSetExpression>
+                    <SimpleIdentifier Name="main"/>
+                    <SimpleIdentifier Name="side"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="arrive_side"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="arrive_main"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="enter_side"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="enter_main"/>
+        <EventDecl Kind="CONTROLLABLE" Name="green_side"/>
+        <EventDecl Kind="CONTROLLABLE" Name="green_main"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="leave_side"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="leave_main"/>
+        <EventDecl Kind="CONTROLLABLE" Name="red_side"/>
+        <EventDecl Kind="CONTROLLABLE" Name="red_main"/>
+        <EventDecl Kind="CONTROLLABLE" Name="yellow_side"/>
+        <EventDecl Kind="CONTROLLABLE" Name="yellow_main"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="arrive">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="WAIT">
+                        <PointGeometry>
+                            <Point X="64" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="9" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="FREE">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="32"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="9" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="WAIT" Target="FREE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="52" Y="65"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="FREE" Target="WAIT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="76" Y="66"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="enter_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="GO">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-30" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="STOP">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-26" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="8" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="STOP" Target="STOP">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="19" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="82" Y="26"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="STOP" Target="GO">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="66" Y="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GO" Target="STOP">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GO" Target="GO">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <SimpleIdentifier Name="enter_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="13" Y="-43"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="164"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="enter_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="GO">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-29" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="STOP">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-24" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="8" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="STOP" Target="STOP">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="15" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="82" Y="26"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="STOP" Target="GO">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="66" Y="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GO" Target="STOP">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GO" Target="GO">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <SimpleIdentifier Name="enter_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="14" Y="-44"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="164"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="leave_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="CROSS1">
+                        <PointGeometry>
+                            <Point X="80" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-58" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="CROSS0">
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-58" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="OUT">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="0" Y="-19"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="-36" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="CROSS1" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-40"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="151" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="OUT" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="38" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="OUT" Target="CROSS0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="93" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="CROSS0" Target="CROSS1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="CROSS0" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="68" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="leave_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="CROSS1">
+                        <PointGeometry>
+                            <Point X="80" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-58" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="CROSS0">
+                        <PointGeometry>
+                            <Point X="80" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-59" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="OUT">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="80" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="0" Y="-20"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry>
+                            <Point X="-38" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="CROSS1" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="-41"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="151" Y="88"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="OUT" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="38" Y="64"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="OUT" Target="CROSS0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="93" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="CROSS0" Target="CROSS1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="CROSS0" Target="OUT">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="leave_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="68" Y="96"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="lights_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="RED">
+                        <PointGeometry>
+                            <Point X="112" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="7" Y="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="176" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-19" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="48" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-23" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="RED" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-32" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="67" Y="86"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RED" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-40" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="159" Y="85"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GREEN" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="94" Y="103"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GREEN" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-24" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="136" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-35" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="lights_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="RED">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="9" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="176" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-19" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point X="48" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-22" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="GREEN" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-30" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="127"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GREEN" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="94" Y="103"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-36" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="112" Y="159"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="136" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RED" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-33" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="69" Y="83"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="RED" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="-20"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="85"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="time">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="TIME">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="64" Y="80"/>
+                        </PointGeometry>
+                        <LabelGeometry>
+                            <Point X="-41" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="TIME" Target="TIME">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="91" Y="53"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="main_light_sequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point X="96" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-56" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="224" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="RED">
+                        <PointGeometry>
+                            <Point X="160" Y="48"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-40" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="GREEN" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="RED" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-71" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="side_light_sequence">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point X="128" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-56" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="256" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-4"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Initial="true" Name="RED">
+                        <PointGeometry>
+                            <Point X="192" Y="64"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-40" Y="0"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="GREEN" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="RED" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-63" Y="-27"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="main_yellow_min_timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="NON_YELLOW">
+                        <PointGeometry>
+                            <Point X="144" Y="80"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-26" Y="-3"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="208" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="15" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TIMER">
+                        <PointGeometry>
+                            <Point X="80" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-48" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="NON_YELLOW" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="NON_YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="207"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="NON_YELLOW" Target="NON_YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="144" Y="33"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="side_yellow_min_timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="NON_YELLOW">
+                        <PointGeometry>
+                            <Point X="144" Y="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-26" Y="-3"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="YELLOW">
+                        <PointGeometry>
+                            <Point X="208" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="15" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TIMER">
+                        <PointGeometry>
+                            <Point X="80" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-48" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="NON_YELLOW" Target="YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="YELLOW" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="NON_YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="80" Y="223"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="NON_YELLOW" Target="NON_YELLOW">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="144" Y="49"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="main_green_min_timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="NON_GREEN">
+                        <PointGeometry>
+                            <Point X="208" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-38" Y="-36"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point X="288" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-19" Y="-36"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FIVE">
+                        <PointGeometry>
+                            <Point X="368" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TEN">
+                        <PointGeometry>
+                            <Point X="368" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FIFTEEN">
+                        <PointGeometry>
+                            <Point X="288" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-21" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TWENTY">
+                        <PointGeometry>
+                            <Point X="208" Y="272"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-22" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TWENTY_FIVE">
+                        <PointGeometry>
+                            <Point X="128" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-66" Y="19"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="THIRTY">
+                        <PointGeometry>
+                            <Point X="128" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-57" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="NON_GREEN" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="GREEN" Target="FIVE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-23" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="FIVE" Target="TEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-31" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TEN" Target="FIFTEEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-25" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="FIFTEEN" Target="TWENTY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="-30"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TWENTY" Target="TWENTY_FIVE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TWENTY_FIVE" Target="THIRTY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="14" Y="-2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="THIRTY" Target="NON_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-66" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="THIRTY" Target="THIRTY">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="139"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="NON_GREEN" Target="NON_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="206" Y="97"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="side_green_timer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="NON_GREEN">
+                        <PointGeometry>
+                            <Point X="176" Y="80"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-29" Y="-5"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN">
+                        <PointGeometry>
+                            <Point X="256" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="16" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FIVE">
+                        <PointGeometry>
+                            <Point X="224" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="17" Y="-3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TEN">
+                        <PointGeometry>
+                            <Point X="128" Y="224"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FIFTEEN">
+                        <PointGeometry>
+                            <Point X="96" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-66" Y="-17"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="NON_GREEN" Target="GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="GREEN" Target="FIVE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="18" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="FIVE" Target="TEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TEN" Target="FIFTEEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-28" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="FIFTEEN" Target="NON_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="NON_GREEN" Target="NON_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-9" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="179" Y="39"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="FIFTEEN" Target="FIFTEEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-22" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="63" Y="157"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="lights_exclusivity">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="BOTH_RED">
+                        <PointGeometry>
+                            <Point X="160" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="18" Y="-13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="MAIN_GREEN">
+                        <PointGeometry>
+                            <Point X="256" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="SIDE_GREEN">
+                        <PointGeometry>
+                            <Point X="64" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-28" Y="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="BOTH_RED" Target="MAIN_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="218" Y="92"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="MAIN_GREEN" Target="BOTH_RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="198" Y="116"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="BOTH_RED" Target="SIDE_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-26" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="122" Y="116"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="SIDE_GREEN" Target="BOTH_RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="102" Y="92"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="side_clear_intersection">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="EMPTY_INTERSECTION">
+                        <PointGeometry>
+                            <Point X="128" Y="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-27" Y="-3"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="CAR_SIDE">
+                        <PointGeometry>
+                            <Point X="64" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-28" Y="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TIMER">
+                        <PointGeometry>
+                            <Point X="192" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="EMPTY_INTERSECTION" Target="CAR_SIDE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="EMPTY_INTERSECTION">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="EMPTY_INTERSECTION" Target="EMPTY_INTERSECTION">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-49" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="146" Y="51"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="CAR_SIDE" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SUPERVISOR" Name="main_clear_intersection">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="EMPTY_INTERSECTION">
+                        <PointGeometry>
+                            <Point X="144" Y="96"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-27" Y="-3"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="CAR_SIDE">
+                        <PointGeometry>
+                            <Point X="80" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-28" Y="13"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="TIMER">
+                        <PointGeometry>
+                            <Point X="208" Y="192"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="EMPTY_INTERSECTION" Target="CAR_SIDE">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="red_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="CAR_SIDE" Target="TIMER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="TIMER" Target="EMPTY_INTERSECTION">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="EMPTY_INTERSECTION" Target="EMPTY_INTERSECTION">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <SimpleIdentifier Name="tick"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="162" Y="51"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="prioritise_main">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="BOTH_RED">
+                        <PointGeometry>
+                            <Point X="240" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GREEN_MAIN">
+                        <PointGeometry>
+                            <Point X="320" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="SIDE_GREEN">
+                        <PointGeometry>
+                            <Point X="160" Y="208"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-94" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="FORCE_MAIN_ONE_ITER">
+                        <PointGeometry>
+                            <Point X="320" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-58" Y="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="SIDE_WAITING">
+                        <PointGeometry>
+                            <Point X="160" Y="128"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-109" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="GOING_RED">
+                        <PointGeometry>
+                            <Point X="160" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-45" Y="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="BOTH_RED" Target="GREEN_MAIN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="BOTH_RED" Target="SIDE_WAITING">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-55" Y="-28"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="SIDE_WAITING" Target="SIDE_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-69" Y="-13"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="SIDE_GREEN" Target="SIDE_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-59" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="142" Y="227"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="SIDE_WAITING" Target="SIDE_WAITING">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-46" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="141" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="SIDE_GREEN" Target="GOING_RED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-66" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="GOING_RED" Target="FORCE_MAIN_ONE_ITER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-29" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="GOING_RED" Target="GREEN_MAIN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-56"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="FORCE_MAIN_ONE_ITER" Target="SIDE_WAITING">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="23" Y="19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <EndPointGeometry>
+                            <Point X="160" Y="128"/>
+                        </EndPointGeometry>
+                    </Edge>
+                    <Edge Source="FORCE_MAIN_ONE_ITER" Target="FORCE_MAIN_ONE_ITER">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <SimpleIdentifier Name="green_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-1" Y="-18"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="354" Y="301"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="GREEN_MAIN" Target="SIDE_WAITING">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-34" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="GREEN_MAIN" Target="GREEN_MAIN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="355" Y="114"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="allow_side">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="MAIN_GREEN">
+                        <PointGeometry>
+                            <Point X="160" Y="48"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="14" Y="-8"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="CAR_DETECTED">
+                        <PointGeometry>
+                            <Point X="160" Y="160"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="16" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="CAR_DETECTED" Target="CAR_DETECTED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <SimpleIdentifier Name="yellow_main"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="153" Y="200"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="MAIN_GREEN" Target="CAR_DETECTED">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="arrive_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="176" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="CAR_DETECTED" Target="MAIN_GREEN">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="enter_side"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-62" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="144" Y="104"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

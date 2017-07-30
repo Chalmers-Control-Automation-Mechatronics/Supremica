@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -290,7 +290,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     try {
       mHasEFAElements = false;
       mContext = new ModuleBindingContext(mInputModule);
-      mNameSpace = new CompiledNameSpace();
+      mNameSpace = new CompiledNameSpace(mEquality);
       mCompiledEvents = new TreeSet<>();
       mCompiledComponents = new LinkedList<>();
       if (bindings != null) {
@@ -571,13 +571,11 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         final CompiledEventDecl entry =
           new CompiledEventDecl(mNameSpace, decl, ranges);
         event = entry.getCompiledEvent();
-        if (!mIsOptimizationEnabled) {
-          final Iterable<SingleEventOutput> outputs =
-            new EventOutputIterable(event, mCompilationInfo);
-          for (final SingleEventOutput output : outputs) {
-            final CompiledSingleEvent single = output.getEvent();
-            createEventDecl(single);
-          }
+        final Iterable<SingleEventOutput> outputs =
+          new EventOutputIterable(event, mCompilationInfo);
+        for (final SingleEventOutput output : outputs) {
+          final CompiledSingleEvent single = output.getEvent();
+          createEventDecl(single);
         }
       } else {
         // Use the event through parameter binding.
@@ -1160,7 +1158,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
             exception.provideLocation(prop);
             throw exception;
           }
-          final IdentifierProxy newident = createSingleEvent(output);
+          final IdentifierProxy newident = getSingleEvent(output);
           final VariableMarkingProxy newmarking =
             mFactory.createVariableMarkingProxy(newident, newpred);
           newmarkings.add(newmarking);
@@ -1238,19 +1236,19 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     final Iterable<SingleEventOutput> outputs =
       new EventOutputIterable(events, mCompilationInfo);
     for (final SingleEventOutput output : outputs) {
-      final IdentifierProxy ident = createSingleEvent(output);
+      final IdentifierProxy ident = getSingleEvent(output);
       elist.add(ident);
     }
   }
 
-  private IdentifierProxy createSingleEvent(final SingleEventOutput output)
+  private IdentifierProxy getSingleEvent(final SingleEventOutput output)
   {
     final CompiledSingleEvent event = output.getEvent();
-    IdentifierProxy ident = event.getIdentifier();
-    if (ident == null) {
-      createEventDecl(event);
-      ident = event.getIdentifier();
-    }
+    final IdentifierProxy ident = event.getIdentifier();
+    // if (ident == null) { TODO
+    //  createEventDecl(event);
+    //  ident = event.getIdentifier();
+    // }
     final IdentifierProxy iclone = ident.clone();
     mCompilationInfo.add(iclone, output.getSourceInfo());
     return iclone;

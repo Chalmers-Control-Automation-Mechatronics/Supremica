@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2015 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -36,7 +36,6 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 import javax.swing.Action;
 
@@ -45,7 +44,6 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
 public class CloseAction
@@ -89,14 +87,7 @@ public class CloseAction
             final boolean enabled = container != null;
             setEnabled(enabled);
 
-            if(Config.INCLUDE_FLEXFACT.isTrue()){
-              final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
-              try {
-                new ProcessBuilder(args1).start();
-              } catch (final IOException exception) {
-                exception.printStackTrace();
-              }
-            }
+
             break;
         default:
             break;

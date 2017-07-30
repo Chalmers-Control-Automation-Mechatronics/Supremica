@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -36,11 +36,9 @@ package net.sourceforge.waters.analysis.efa.unified;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
@@ -49,11 +47,15 @@ import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class UnifiedEFAVariableUnfolderTest
@@ -165,10 +167,21 @@ public class UnifiedEFAVariableUnfolderTest
   private void unfoldAndTest(final ModuleProxy module)
     throws IOException, WatersException
   {
-    final List<Proxy> components = new ArrayList<>();
+    final Collection<EventDeclProxy> moduleEvents = module.getEventDeclList();
+    final Collection<EventDeclProxy> inputEvents =
+      new ArrayList<>(moduleEvents.size());
+    for (final EventDeclProxy decl : moduleEvents) {
+      final String name = decl.getName();
+      if (name.indexOf(':') < 0 ||
+          name.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+        inputEvents.add(decl);
+      }
+    }
+    final Collection<Proxy> moduleComponents = module.getComponentList();
+    final List<Proxy> inputComponents = new ArrayList<>(moduleComponents.size());
     SimpleComponentProxy expectedUnfolding = null;
     SimpleComponentProxy expectedUpdates = null;
-    for (final Proxy proxy : module.getComponentList()) {
+    for (final Proxy proxy : moduleComponents) {
       if (proxy instanceof SimpleComponentProxy) {
         final SimpleComponentProxy comp = (SimpleComponentProxy) proxy;
         if (comp.getName().equals(":unfolded")) {
@@ -176,18 +189,19 @@ public class UnifiedEFAVariableUnfolderTest
         } else if (comp.getName().equals(":updates")) {
           expectedUpdates = comp;
         } else {
-          components.add(comp);
+          inputComponents.add(comp);
         }
       } else {
-        components.add(proxy);
+        inputComponents.add(proxy);
       }
     }
     final String moduleName = module.getName();
     final ModuleProxy inputModule =
       mModuleFactory.createModuleProxy(moduleName, null, null,
                                        module.getConstantAliasList(),
-                                       module.getEventDeclList(),
-                                       module.getEventAliasList(), components);
+                                       inputEvents,
+                                       module.getEventAliasList(),
+                                       inputComponents);
     final UnifiedEFACompiler compiler =
       new UnifiedEFACompiler(mDocumentManager, inputModule);
     configure(compiler);

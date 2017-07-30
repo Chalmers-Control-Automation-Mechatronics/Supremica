@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -223,7 +223,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     final List<TransitionProxy> list = new ArrayList<>(transitions);
     final int numStates = stateEnc.getNumberOfStates() + 1;
     final int numTrans = aut.getTransitions().size();
-    if ((config & CONFIG_COUNT) != 0) {
+    if ((config & CONFIG_COUNT_LONG) != 0) {
       mStateBuffer = new LongStateCountBuffer(stateEnc, dumpState);
     } else {
       mStateBuffer = new IntStateBuffer(eventEnc, stateEnc, dumpState);
@@ -319,7 +319,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     checkConfig(config);
     mName = name;
     mKind = kind;
-    if ((config & CONFIG_COUNT) != 0) {
+    if ((config & CONFIG_COUNT_LONG) != 0) {
       mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, eventEnc);
@@ -428,7 +428,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       new DefaultEventStatusProvider(numProperEvents, numPropositions);
     mEventStatus.setProperEventStatus(EventEncoding.TAU,
                                       EventStatus.STATUS_FULLY_LOCAL);
-    if ((config & CONFIG_COUNT) != 0) {
+    if ((config & CONFIG_COUNT_LONG) != 0) {
       mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
@@ -563,8 +563,8 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     if (mPredecessorBuffer != null) {
       config |= CONFIG_PREDECESSORS;
     }
-    if ((config & CONFIG_COUNT) != 0) {
-      config |= CONFIG_COUNT;
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      config |= CONFIG_COUNT_LONG;
     }
     return new ListBufferTransitionRelation(this, config);
   }
@@ -665,17 +665,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     mKind = kind;
   }
 
+
   //#########################################################################
   //# State Access
-  /**
-   * Gets the number of states in the transition relation, including any
-   * states set to be unreachable.
-   */
-  public int getNumberOfStates()
-  {
-    return mStateBuffer.getNumberOfStates();
-  }
-
   /**
    * Returns whether this transition relation is empty.
    * @return <CODE>true</CODE> if all states are marked as unreachable,
@@ -687,12 +679,34 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
+   * Gets the number of states in the transition relation, including any
+   * states set to be unreachable.
+   */
+  public int getNumberOfStates()
+  {
+    return mStateBuffer.getNumberOfStates();
+  }
+
+  /**
    * Gets the number of reachable states in the transition relation. A state
    * is considered reachable if its reachability flag is set.
    */
   public int getNumberOfReachableStates()
   {
     return mStateBuffer.getNumberOfReachableStates();
+  }
+
+  /**
+   * Gets the total state count of this transition relation. The total
+   * state count is the sum of state counts of each individual state.
+   */
+  public long getTotalStateCount()
+  {
+    long total = 0;
+    for (int i = 0; i < mStateBuffer.getNumberOfReachableStates(); i++) {
+      total += mStateBuffer.getStateCount(i);
+    }
+    return total;
   }
 
   /**
@@ -2341,55 +2355,70 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
-   * Reconfigures the current set of transition buffers.
-   *
+   * Reconfigures the current set of state and transition buffers.
    * @param config
    *          Configuration flags defining which transition buffers are to be
-   *          used from now on. Should be one of {@link #CONFIG_SUCCESSORS},
-   *          {@link #CONFIG_PREDECESSORS}, or {@link #CONFIG_ALL}.
+   *          used from now on. Should be a combination of the flags
+   *          {@link #CONFIG_SUCCESSORS}, {@link #CONFIG_PREDECESSORS},
+   *          {@link #CONFIG_COUNT_LONG}, and {@link #CONFIG_COUNT_OFF}.
+   *          If neither of the bits {@link #CONFIG_SUCCESSORS} or
+   *          {@link #CONFIG_PREDECESSORS} is set, the transition buffer
+   *          configuration is unchanged, otherwise it is changed precisely
+   *          to the indicated combination.
+   *          If neither of the bits {@link #CONFIG_COUNT_LONG} or
+   *          {@link #CONFIG_COUNT_OFF} is set, the state buffer is unchanged,
+   *          otherwise it is changed to the indicated type. It is an error
+   *          of both {@link #CONFIG_COUNT_LONG} and {@link #CONFIG_COUNT_OFF}
+   *          are set.
    */
   public void reconfigure(final int config)
   {
-    checkConfig(config);
     final int numStates = getNumberOfStates();
-    // Transition type
-    try {
-      if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
-        if (mPredecessorBuffer != null) {
-          mSuccessorBuffer =
-            new OutgoingTransitionListBuffer(numStates, mEventStatus);
-          mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
-        } else {
-          throw createNoBufferException(CONFIG_PREDECESSORS);
+
+    // Change transition buffers
+    if ((config & CONFIG_ALL) != 0) {
+      try {
+        if (mSuccessorBuffer == null && (config & CONFIG_SUCCESSORS) != 0) {
+          if (mPredecessorBuffer != null) {
+            mSuccessorBuffer =
+              new OutgoingTransitionListBuffer(numStates, mEventStatus);
+            mSuccessorBuffer.setUpTransitions(mPredecessorBuffer);
+          } else {
+            throw createNoBufferException(CONFIG_PREDECESSORS);
+          }
         }
-      }
-      if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
-        if (mSuccessorBuffer != null) {
-          mPredecessorBuffer =
-            new IncomingTransitionListBuffer(numStates, mEventStatus);
-          mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
-        } else {
-          throw createNoBufferException(CONFIG_SUCCESSORS);
+        if (mPredecessorBuffer == null && (config & CONFIG_PREDECESSORS) != 0) {
+          if (mSuccessorBuffer != null) {
+            mPredecessorBuffer =
+              new IncomingTransitionListBuffer(numStates, mEventStatus);
+            mPredecessorBuffer.setUpTransitions(mSuccessorBuffer);
+          } else {
+            throw createNoBufferException(CONFIG_SUCCESSORS);
+          }
         }
+      } catch (final OverflowException exception) {
+        // Can't have overflow because states and events have already been
+        // encoded successfully.
+        throw new WatersRuntimeException(exception);
       }
-    } catch (final OverflowException exception) {
-      // Can't have overflow because states and events have already been
-      // encoded successfully.
-      throw new WatersRuntimeException(exception);
+      if ((config & CONFIG_SUCCESSORS) == 0) {
+        mSuccessorBuffer = null;
+      } else if ((config & CONFIG_PREDECESSORS) == 0) {
+        mPredecessorBuffer = null;
+      }
     }
-    if ((config & CONFIG_SUCCESSORS) == 0) {
-      mSuccessorBuffer = null;
-    } else if ((config & CONFIG_PREDECESSORS) == 0) {
-      mPredecessorBuffer = null;
-    }
+
     // Change the type of the state buffer, if necessary.
-    if ((mStateBuffer instanceof IntStateBuffer) && ((config & CONFIG_COUNT) != 0)) {
-      // Normal buffer -> State-count buffer.
-      mStateBuffer = new LongStateCountBuffer((IntStateBuffer) mStateBuffer, mEventStatus);
-    }
-    if ((mStateBuffer instanceof LongStateCountBuffer) && ((config & CONFIG_COUNT) == 0)) {
-      // State-count buffer -> Normal buffer.
-      mStateBuffer = new IntStateBuffer((LongStateCountBuffer) mStateBuffer, mEventStatus);
+    if ((config & CONFIG_COUNT_LONG) != 0) {
+      if (!(mStateBuffer instanceof LongStateCountBuffer)) {
+        // Normal buffer -> State-count buffer.
+        mStateBuffer = new LongStateCountBuffer(mStateBuffer, mEventStatus);
+      }
+    } else if ((config & CONFIG_COUNT_OFF) != 0) {
+      if (!(mStateBuffer instanceof IntStateBuffer)) {
+        // State-count buffer -> Normal buffer.
+        mStateBuffer = new IntStateBuffer(mStateBuffer, mEventStatus);
+      }
     }
   }
 
@@ -2435,7 +2464,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    if ((config & CONFIG_COUNT) != 0) {
+    if ((config & CONFIG_COUNT_LONG) != 0) {
       mStateBuffer = new LongStateCountBuffer(numStates, dumpIndex);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, dumpIndex, mEventStatus);
@@ -2462,7 +2491,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                     final int config)
     throws OverflowException
   {
-    if ((config & CONFIG_COUNT) != 0) {
+    if ((config & CONFIG_COUNT_LONG) != 0) {
       mStateBuffer = new LongStateCountBuffer(numStates);
     } else {
       mStateBuffer = new IntStateBuffer(numStates, mEventStatus);
@@ -2701,6 +2730,29 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       }
       return removed;
     }
+  }
+
+  /**
+   * Removes all transitions to the dump state.
+   * This method removes all transitions to the transition relation's
+   * designated dump state, and marks the dump state as unreachable.
+   * @return <CODE>true</CODE> if at least one transition was removed,
+   *         <CODE>false</CODE> otherwise.
+   * @see #getDumpStateIndex()
+   */
+  public boolean removeDumpStateTransitions()
+  {
+    final int dump = getDumpStateIndex();
+    final TransitionIterator iter = createAllTransitionsModifyingIterator();
+    boolean removed = false;
+    while (iter.advance()) {
+      if (iter.getCurrentTargetState() == dump) {
+        iter.remove();
+        removed = true;
+      }
+    }
+    setReachable(dump, false);
+    return removed;
   }
 
   /**
@@ -3194,10 +3246,16 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   public static final int CONFIG_PREDECESSORS = 0x02;
   /**
    * Configuration setting specifying that the transition relation is to use
+   * a {@link IntStateBuffer}, which supports marking but not state counts.
+   * This is the default when creating a new transition relation.
+   */
+  public static final int CONFIG_COUNT_OFF = 0x04;
+  /**
+   * Configuration setting specifying that the transition relation is to use
    * a {@link LongStateCountBuffer}, which ignores the markings and
    * propositions, whilst retaining the state count.
    */
-  public static final int CONFIG_COUNT = 0x04;
+  public static final int CONFIG_COUNT_LONG = 0x08;
   /**
    * Configuration setting specifying that the transition relation is to use
    * both outgoing and incoming transition buffers.
@@ -3206,7 +3264,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
                                      | CONFIG_PREDECESSORS;
   /**
    * Configuration setting specifying that the transition relation is to use
-   * an outgoing transition buffers, and is to count the states.
+   * an outgoing transition buffer, and is to count the states.
    */
-  public static final int CONFIG_S_C = CONFIG_SUCCESSORS | CONFIG_COUNT;
+  public static final int CONFIG_S_C = CONFIG_SUCCESSORS | CONFIG_COUNT_LONG;
 }

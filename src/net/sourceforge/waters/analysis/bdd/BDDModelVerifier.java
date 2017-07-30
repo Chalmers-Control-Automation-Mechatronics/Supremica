@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -140,8 +140,8 @@ public abstract class BDDModelVerifier
     mVariableOrdering = VariableOrdering.FORCE;
     mIsReorderingEnabled = true;
     mInitialSize = 50000;
-    mPartitioningStrategy = TransitionPartitioningStrategy.GREEDY;
-    mPartitioningSizeLimit = Integer.MAX_VALUE;
+    mPartitioningStrategy = TransitionPartitioningStrategy.AUTOMATA;
+    mPartitioningSizeLimit = 10000;
   }
 
 
@@ -231,7 +231,7 @@ public abstract class BDDModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public boolean supportsNondeterminism()
   {
@@ -262,6 +262,14 @@ public abstract class BDDModelVerifier
         }
       }
     }
+  }
+
+
+  //#########################################################################
+  //# Access for Algorithms
+  int getNumberOfAutomata()
+  {
+    return mNumAutomata;
   }
 
 
@@ -361,6 +369,17 @@ public abstract class BDDModelVerifier
         new AutomatonBDD(aut, kind, index, mBDDFactory);
       mIsFullyDeterministic &= autBDD.isDeterministic();
     }
+
+    final int numVars = mBDDFactory.varNum();
+    mAutomatonBDDbyVarIndex = new AutomatonBDD[numVars];
+    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
+      final int first = autBDD.getFirstVariableIndex();
+      final int last = autBDD.getLastVariableIndex();
+      for (int i = first; i <= last; i++) {
+        mAutomatonBDDbyVarIndex[i] = autBDD;
+      }
+    }
+
     if (mIsReorderingEnabled) {
       try {
         for (final AutomatonBDD autBDD : mAutomatonBDDs) {
@@ -371,6 +390,16 @@ public abstract class BDDModelVerifier
         mIsReorderingEnabled = false;
       }
     }
+  }
+
+  EventBDD[] createTransitionBDDs()
+    throws AnalysisException
+  {
+    final EventBDD[] eventBDDs = createEventBDDs();
+    if (eventBDDs != null) {
+      createTransitionBDDs(mPartitioningStrategy, eventBDDs);
+    }
+    return eventBDDs;
   }
 
   EventBDD[] createEventBDDs()
@@ -396,73 +425,70 @@ public abstract class BDDModelVerifier
     int eventindex = 0;
     for (final EventProxy event : events) {
       checkAbort();
-      final EventBDD eventBDD;
-      switch (translator.getEventKind(event)) {
-      case UNCONTROLLABLE:
-        eventBDD =
-          new UncontrollableEventBDD(event, mNumAutomata, mBDDFactory);
-        break;
-      case CONTROLLABLE:
-        eventBDD =
-          new ControllableEventBDD(event, mNumAutomata, mBDDFactory);
-        break;
-      default:
-        continue;
+      final EventBDD eventBDD = createEventBDD(event);
+      if (eventBDD != null) {
+        eventmap.put(event, eventBDD);
+        eventBDDs[eventindex++] = eventBDD;
       }
-      eventmap.put(event, eventBDD);
-      eventBDDs[eventindex++] = eventBDD;
     }
 
-    final BDD initial = mBDDFactory.one();
-    mLevels = new ArrayList<BDD>();
-    mLevels.add(initial);
     for (final AutomatonBDD autBDD : mAutomatonBDDs) {
       checkAbort();
-      final BDD autinit = createInitialStateBDD(autBDD);
-      if (autinit != null) {
-        initial.andWith(autinit);
-        final AutomatonProxy aut = autBDD.getAutomaton();
-        final Collection<EventProxy> localevents = aut.getEvents();
-        for (final EventProxy event : localevents) {
-          if (isProperEvent(event)) {
-            final EventBDD eventBDD = eventmap.get(event);
-            eventBDD.startAutomaton(autBDD, mBDDFactory);
-          }
+      final AutomatonProxy aut = autBDD.getAutomaton();
+      final Collection<EventProxy> localevents = aut.getEvents();
+      for (final EventProxy event : localevents) {
+        if (isProperEvent(event)) {
+          final EventBDD eventBDD = eventmap.get(event);
+          eventBDD.startAutomaton(autBDD, mBDDFactory);
         }
-        for (final TransitionProxy trans : aut.getTransitions()) {
-          final StateProxy source = trans.getSource();
-          if (autBDD.isReachable(source)) {
-            final EventProxy event = trans.getEvent();
-            final EventBDD eventBDD = eventmap.get(event);
-            eventBDD.includeTransition(trans, mBDDFactory);
-          }
-        }
-        for (final EventProxy event : localevents) {
-          if (isProperEvent(event)) {
-            final EventBDD eventBDD = eventmap.get(event);
-            eventBDD.finishAutomaton(mBDDFactory);
-          }
-        }
-        mIsFullyDeterministic &= autBDD.isDeterministic();
       }
+      for (final TransitionProxy trans : aut.getTransitions()) {
+        final StateProxy source = trans.getSource();
+        if (autBDD.isReachable(source)) {
+          final EventProxy event = trans.getEvent();
+          final EventBDD eventBDD = eventmap.get(event);
+          eventBDD.includeTransition(trans, mBDDFactory);
+        }
+      }
+      for (final EventProxy event : localevents) {
+        if (isProperEvent(event)) {
+          final EventBDD eventBDD = eventmap.get(event);
+          eventBDD.finishAutomaton(mBDDFactory);
+        }
+      }
+      mIsFullyDeterministic &= autBDD.isDeterministic();
     }
     final VerificationResult result = getAnalysisResult();
     result.setTotalNumberOfEvents(numEvents);
     if (result.isFinished()) {
       return null;
     }
+    return eventBDDs;
+  }
 
-    final int numvars = mBDDFactory.varNum();
-    mAutomatonBDDbyVarIndex = new AutomatonBDD[numvars];
-    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
-      final int first = autBDD.getFirstVariableIndex();
-      final int last = autBDD.getLastVariableIndex();
-      for (int i = first; i <= last; i++) {
-        mAutomatonBDDbyVarIndex[i] = autBDD;
-      }
+  EventBDD createEventBDD(final EventProxy event)
+  {
+    final KindTranslator translator = getKindTranslator();
+    switch (translator.getEventKind(event)) {
+    case UNCONTROLLABLE:
+      return new UncontrollableEventBDD(event, mNumAutomata, mBDDFactory);
+    case CONTROLLABLE:
+      return new ControllableEventBDD(event, mNumAutomata, mBDDFactory);
+    default:
+      return null;
+    }
+  }
+
+  void createTransitionBDDs(final TransitionPartitioningStrategy strategy,
+                            final EventBDD[] eventBDDs)
+    throws AnalysisException
+  {
+    if (mTransitionPartitioning != null) {
+      mTransitionPartitioning.disposeComposedBDDs();
     }
 
-    mTransitionPartitioning = mPartitioningStrategy.createPartitioning
+    final ProductDESProxy model = getModel();
+    mTransitionPartitioning = strategy.createPartitioning
         (mBDDFactory, model, mPartitioningSizeLimit);
     int transcount0 = 0;
     for (final EventBDD eventBDD : eventBDDs) {
@@ -482,7 +508,29 @@ public abstract class BDDModelVerifier
     if (logger.isDebugEnabled() && transcount0 > transcount1) {
       logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
     }
-    return eventBDDs;
+  }
+
+  BDD createInitialStateBDD(final boolean withLevels)
+    throws AnalysisException
+  {
+    if (mLevels != null) {
+      return mLevels.get(0);
+    }
+    final BDD initial = mBDDFactory.one();
+    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
+      checkAbort();
+      final BDD autInit = createInitialStateBDD(autBDD);
+      if (autInit == null) {
+        return null;
+      }
+      initial.andWith(autInit);
+    }
+    if (withLevels) {
+      mLevels = new ArrayList<BDD>();
+      mLevels.add(initial.id());
+    }
+    mDepth = 0;
+    return initial;
   }
 
   BDD createInitialStateBDD(final AutomatonBDD autBDD)
@@ -494,11 +542,6 @@ public abstract class BDDModelVerifier
     } else {
       return autinit;
     }
-  }
-
-  BDD getInitialStateBDD()
-  {
-    return mLevels.iterator().next();
   }
 
   BDD getMarkedStateBDD(final EventProxy prop)
@@ -520,7 +563,7 @@ public abstract class BDDModelVerifier
     return result;
   }
 
-  BDD computeReachability()
+  BDD computeReachability(final BDD init)
     throws AnalysisException
   {
     resetReorderIndex();
@@ -531,18 +574,16 @@ public abstract class BDDModelVerifier
     }
     mTransitionPartitioning.startIteration();
     final Logger logger = getLogger();
-    final BDD init = getInitialStateBDD();
-    BDD current = init;
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     final boolean multiPart =
       group != null && group.size() < partitioning.size();
+    BDD current = multiPart ? init : init.id();
     while (true) {
       checkAbort();
       if (logger.isDebugEnabled()) {
         final int numNodes = mBDDFactory.getNodeNum();
-        logger.debug("Depth " + mLevels.size() + ", " +
-                     numNodes + " nodes ...");
+        logger.debug("Depth " + getDepth() + ", " + numNodes + " nodes ...");
       }
       if (containsBadState(current)) {
         recordStateCount(current);
@@ -564,15 +605,24 @@ public abstract class BDDModelVerifier
       }
       next.orWith(multiPart ? current.id() : init.id());
       final boolean stable = next.equals(current);
+      current.free();
+      current = next;
       if (!stable) {
-        mLevels.add(next);
+        addLevel(next);
         reorder();
       }
-      current = next;
       group = mTransitionPartitioning.nextGroup(stable);
     }
     recordStateCount(current);
     return current;
+  }
+
+  private void addLevel(final BDD level)
+  {
+    mDepth++;
+    if (mLevels != null) {
+      mLevels.add(level.id());
+    }
   }
 
   BDD computeCoreachability(final BDD endset, final BDD restriction)
@@ -837,7 +887,7 @@ public abstract class BDDModelVerifier
 
   int getDepth()
   {
-    return mLevels.size();
+    return mDepth;
   }
 
 
@@ -1040,6 +1090,7 @@ public abstract class BDDModelVerifier
   private int mPeakNodes;
   private Partitioning<TransitionPartitionBDD> mTransitionPartitioning;
   private List<BDD> mLevels;
+  private int mDepth;
   private int mCurrentReorderIndex;
   private int mNextReorderIndex;
 

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -43,8 +43,8 @@ import java.util.Map;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -64,7 +64,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>To use this class, it must be initialised with a
  * {@link ProductDESProxyFactory}. Afterwards, {@link
- * #checkCounterExample(ProductDESProxy,ConflictTraceProxy)
+ * #checkCounterExample(ProductDESProxy,TraceProxy)
  * checkCounterExample()} can be called repeatedly. If a check fails,
  * {@link #getDiagnostics()} can be called to retrieve an explanation.</P>
  *
@@ -76,8 +76,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <CODE>ConflictCounterExampleChecker checker =
  *   new {@link #ConflictCounterExampleChecker(ProductDESProxyFactory)
  *   ConflictCounterExampleChecker}(factory);</CODE><BR>
- * <CODE>if (checker.{@link
- *   #checkCounterExample(ProductDESProxy,ConflictTraceProxy)
+ * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,TraceProxy)
  *   checkCounterExample}(</CODE><I>des</I><CODE>, </CODE><I>trace</I><CODE>))
  *   {</CODE><BR>
  * <CODE>&nbsp;&nbsp;System.out.println(&quot;OK&quot;);</CODE><BR>
@@ -101,6 +100,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class ConflictCounterExampleChecker
+  extends AbstractCounterExampleChecker
 {
 
   //#########################################################################
@@ -112,25 +112,22 @@ public class ConflictCounterExampleChecker
    */
   public ConflictCounterExampleChecker(final ProductDESProxyFactory factory)
   {
-    mFactory = factory;
+    this(factory, true);
   }
 
-
-  //#########################################################################
-  //# Simple Access
   /**
-   * Retrieves a diagnostic message that explains why the last counterexample
-   * check is not correct conflict error trace.
-   * @return  Descriptive string or <CODE>null</CODE> if the last check
-   *          has passed.
+   * Creates a new counterexample checker.
+   * Creates a new conflict counterexample checker.
+   * @param  factory   Factory to be used to construct the language inclusion
+   *                   model and secondary counterexample if needed.
+   * @param  fullDiag  Whether the diagnostic text should include the
+   *                   name of the trace. The default is <CODE>true</CODE>.
    */
-  public String getDiagnostics()
+  public ConflictCounterExampleChecker(final ProductDESProxyFactory factory,
+                                       final boolean fullDiag)
   {
-    if (mDiagnostics == null) {
-      return null;
-    } else {
-      return mDiagnostics.toString();
-    }
+    super(fullDiag);
+    mFactory = factory;
   }
 
 
@@ -145,145 +142,74 @@ public class ConflictCounterExampleChecker
    * @throws AnalysisException to indicate a problem while attempting to
    *                   verify the counterexample.
    */
+  @Override
   public boolean checkCounterExample(final ProductDESProxy des,
-                                     final ConflictTraceProxy trace)
-  throws AnalysisException
+                                     final TraceProxy trace)
+    throws AnalysisException
   {
-    if (trace == null) {
-      reportMalformedCounterExample(trace, "is NULL", null);
+    if (!super.checkCounterExample(des, trace)) {
+      return false;
+    } else if (!(trace instanceof ConflictTraceProxy)) {
+      reportMalformedCounterExample(trace, "is not a ConflictTraceProxy", null);
       return false;
     }
-    final List<EventProxy> traceevents = trace.getEvents();
-    final Collection<EventProxy> events = des.getEvents();
-    for (final EventProxy event : traceevents) {
-      if (event == null) {
-        reportMalformedCounterExample(trace, "contains NULL event", null);
-        return false;
-      } else if (event.getKind() == EventKind.PROPOSITION) {
-        reportMalformedCounterExample(trace, "contains proposition", event);
-        return false;
-      } else if (!events.contains(event)) {
-        reportMalformedCounterExample(trace, "contains unknown event", event);
-        return false;
-      }
-    }
+    final ConflictTraceProxy conflictTrace = (ConflictTraceProxy) trace;
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
       new HashMap<AutomatonProxy,StateProxy>(size);
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, trace);
+      final StateProxy state = checkCounterExample(aut, conflictTrace);
       if (state == null) {
         reportMalformedCounterExample
-          (trace, "is not accepted by component", aut);
+          (conflictTrace, "is not accepted by component", aut);
         return false;
       }
       tuple.put(aut, state);
     }
-    final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
+    final ProductDESProxy lDES = createLanguageInclusionModel(des, tuple);
     final LanguageInclusionChecker checker =
-      new NativeLanguageInclusionChecker(ldes, mFactory);
+      new NativeLanguageInclusionChecker(lDES, mFactory);
     final boolean blocking = checker.run();
     if (!blocking) {
-      final SafetyTraceProxy ltrace = checker.getCounterExample();
-      reportMalformedCounterExample(trace, ltrace);
+      final SafetyTraceProxy lTrace = checker.getCounterExample();
+      reportMalformedCounterExample(conflictTrace, lTrace);
     } else {
-      mDiagnostics = null;
+      reportCorrectCounterExample();
     }
     return blocking;
   }
 
 
   //#########################################################################
+  //# Hooks
+  @Override
+  String getTraceLabel()
+  {
+    return "Conflict";
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private StateProxy checkCounterExample(final AutomatonProxy aut,
-                                         final ConflictTraceProxy trace)
+                                         final TraceProxy trace)
   {
     final Collection<EventProxy> events = aut.getEvents();
-    final Collection<StateProxy> states = aut.getStates();
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
-    StateProxy current = null;
-    for (final StateProxy state : states) {
-      if (state.isInitial()) {
-        current = state;
-        break;
-      }
-    }
+    StateProxy current = AutomatonTools.getFirstInitialState(aut);
     if (current == null) {
       return null;
     }
     final List<EventProxy> traceevents = trace.getEvents();
     for (final EventProxy event : traceevents) {
       if (events.contains(event) && event.getKind() != EventKind.PROPOSITION) {
-        boolean found = false;
-        for (final TransitionProxy trans : transitions) {
-          if (trans.getSource() == current && trans.getEvent().equals(event)) {
-            current = trans.getTarget();
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
+        current = AutomatonTools.getFirstSuccessorState(aut, current, event);
+        if (current == null) {
           return null;
         }
       }
     }
     return current;
-  }
-
-  private void reportMalformedCounterExample(final ConflictTraceProxy trace,
-                                             final String msg,
-                                             final NamedProxy item)
-  {
-    mDiagnostics = new StringBuilder();
-    mDiagnostics.append("Conflict error trace ");
-    final String name = trace.getName();
-    if (name != null) {
-      mDiagnostics.append('\'');
-      mDiagnostics.append(trace.getName());
-      mDiagnostics.append("' ");
-    }
-    mDiagnostics.append(msg);
-    if (item != null) {
-      mDiagnostics.append(" '");
-      mDiagnostics.append(item.getName());
-      mDiagnostics.append('\'');
-    }
-    mDiagnostics.append('.');
-  }
-
-  private synchronized void reportMalformedCounterExample
-    (final ConflictTraceProxy conftrace, final SafetyTraceProxy langtrace)
-  {
-    reportMalformedCounterExample
-      (conftrace, "does not lead to blocking state", null);
-    mDiagnostics.append("\nA marked state can be reached as follows:");
-    reportCounterCounterExample(langtrace);
-  }
-
-  private void reportCounterCounterExample(final TraceProxy trace)
-  {
-    final List<EventProxy> traceevents = trace.getEvents();
-    if (traceevents.isEmpty()) {
-      mDiagnostics.append("\n  <empty>");
-    } else {
-      mDiagnostics.append("\n  ");
-      int limit = mDiagnostics.length() + 74;
-      boolean first = true;
-      for (final EventProxy event : traceevents) {
-        if (first) {
-          first = false;
-        } else {
-          mDiagnostics.append(", ");
-        }
-        final String name = event == null ? "(null)" : event.getName();
-        if (mDiagnostics.length() + name.length() > limit) {
-          mDiagnostics.append("\n  ");
-          limit = mDiagnostics.length() + 74;
-        }
-        mDiagnostics.append(name);
-      }
-    }
   }
 
 
@@ -397,10 +323,18 @@ public class ConflictCounterExampleChecker
       (name, ComponentKind.PROPERTY, events, states, null, null);
   }
 
+  private void reportMalformedCounterExample
+    (final ConflictTraceProxy confTrace, final SafetyTraceProxy langTrace)
+  {
+    reportMalformedCounterExample
+      (confTrace, "does not lead to blocking state", null);
+    reportCounterCounterExample
+      ("A marked state can be reached as follows:", langTrace);
+  }
+
 
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private StringBuilder mDiagnostics;
 
 }

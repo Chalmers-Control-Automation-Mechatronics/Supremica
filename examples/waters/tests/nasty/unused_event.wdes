@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ProductDES Name="unused_event"
+  xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+  xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>A simple test involving an unused event (not proposition).</ns2:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="unused"/>
+</EventList>
+</ProductDES>

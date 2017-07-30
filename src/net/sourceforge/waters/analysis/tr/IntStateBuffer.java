@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -44,6 +41,9 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -191,34 +191,34 @@ public class IntStateBuffer extends AbstractStateBuffer
     mPropositionStatus = propStatus;
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
-    final IntStateBuffer buffer2 = buffer;
-    mStateInfo = Arrays.copyOf(buffer2.mStateInfo, size);
+    mStateInfo = Arrays.copyOf(buffer.mStateInfo, size);
   }
 
   /**
    * Creates a new ordinary state buffer corresponding to a given
-   * state-count buffer.
-   * <p>
-   * Since the new state buffer is copied from a state-count buffer,
-   * it would not contain markings.
-   *
+   * by copying from another buffer.
    * @param buffer     The state-count buffer to be copied from.
    * @param propStatus Event status provider to determine the number of
    *                   propositions and which propositions are used.
    */
-  public IntStateBuffer(final LongStateCountBuffer buffer,
+  public IntStateBuffer(final AbstractStateBuffer buffer,
                         final EventStatusProvider propStatus)
   {
     mPropositionStatus = propStatus;
     setDumpStateIndex(buffer.getDumpStateIndex());
     final int size = buffer.getNumberOfStates();
-    mStateInfo = new int[size];
-    for (int i = 0; i < size; i++) {
-      if (buffer.isInitial(i)) {
-        mStateInfo[i] |= TAG_INITIAL;
-      }
-      if (buffer.isReachable(i)) {
-        mStateInfo[i] |= TAG_REACHABLE;
+    if (buffer instanceof IntStateBuffer) {
+      final IntStateBuffer intBuffer = (IntStateBuffer) buffer;
+      mStateInfo = Arrays.copyOf(intBuffer.mStateInfo, size);
+    } else {
+      mStateInfo = new int[size];
+      for (int i = 0; i < size; i++) {
+        if (buffer.isInitial(i)) {
+          mStateInfo[i] |= TAG_INITIAL;
+        }
+        if (buffer.isReachable(i)) {
+          mStateInfo[i] |= TAG_REACHABLE;
+        }
       }
     }
   }
@@ -634,13 +634,12 @@ public class IntStateBuffer extends AbstractStateBuffer
    * @param state ID of the state.
    *
    * @return the count of the specified state, which is always 1 for
-   *         this particular type of buffer. Note that the count of 1
-   *         is implicitly represented by the number 0.
+   *         this particular type of buffer.
    */
   @Override
   public long getStateCount(final int state)
   {
-    return 0;
+    return 1;
   }
 
   /**

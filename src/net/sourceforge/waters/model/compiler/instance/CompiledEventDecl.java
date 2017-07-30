@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.compiler.instance;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +42,10 @@ import java.util.Map;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.ModuleHashCodeVisitor;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -72,8 +75,7 @@ class CompiledEventDecl
     for (final CompiledRange range : ranges) {
       size *= range.size();
     }
-    mIndexValueMap =
-      new HashMap<List<SimpleExpressionProxy>,CompiledEvent>(size);
+    mIndexValueMap = new HashMap<>(size);
   }
 
 
@@ -128,22 +130,18 @@ class CompiledEventDecl
     return getCompiledEvent(empty);
   }
 
-  CompiledEvent getCompiledEvent(List<? extends SimpleExpressionProxy> indexes)
+  CompiledEvent getCompiledEvent(final List<? extends SimpleExpressionProxy> indexes)
   {
-    CompiledEvent result = mIndexValueMap.get(indexes);
+    final HashableIndexList key = new HashableIndexList(indexes);
+    CompiledEvent result = mIndexValueMap.get(key);
     if (result == null) {
-      final List<SimpleExpressionProxy> indexcopy;
-      if (indexes.isEmpty()) {
-        indexcopy = Collections.emptyList();
-      } else {
-        indexcopy = new ArrayList<SimpleExpressionProxy>(indexes);
-      }
+      final List<SimpleExpressionProxy> indexCopy = key.getIndexList();
       if (indexes.size() < mRanges.size()) {
-	result = new CompiledArrayEvent(this, indexcopy);
+        result = new CompiledArrayEvent(this, indexCopy);
       } else {
-	result = new CompiledSingleEvent(this, indexcopy);
+        result = new CompiledSingleEvent(this, indexCopy);
       }
-      mIndexValueMap.put(indexcopy, result);
+      mIndexValueMap.put(key, result);
     }
     return result;
   }
@@ -159,10 +157,72 @@ class CompiledEventDecl
 
 
   //#########################################################################
+  //# Inner Class HashableIndexList
+  private class HashableIndexList
+  {
+    //#######################################################################
+    //# Constructor
+    private HashableIndexList(final List<? extends SimpleExpressionProxy> indexes)
+    {
+      final int size = indexes.size();
+      if (size == 0) {
+        mIndexes = null;
+      } else {
+        mIndexes = new SimpleExpressionProxy[size];
+        indexes.toArray(mIndexes);
+      }
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (other == null || !(other instanceof HashableIndexList)) {
+        return false;
+      } else {
+        final HashableIndexList list = (HashableIndexList) other;
+        final ModuleEqualityVisitor equality = mNameSpace.getEquality();
+        return equality.isEqualArray(mIndexes, list.mIndexes);
+      }
+    }
+
+    @Override
+    public int hashCode()
+    {
+      final ModuleEqualityVisitor equality = mNameSpace.getEquality();
+      final ModuleHashCodeVisitor visitor = equality.getHashCodeVisitor();
+      return visitor.getArrayHashCode(mIndexes);
+    }
+
+    @Override
+    public String toString()
+    {
+      return ModuleProxyPrinter.getPrintString(mIndexes);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private List<SimpleExpressionProxy> getIndexList()
+    {
+      if (mIndexes == null) {
+        return Collections.emptyList();
+      } else {
+        return Arrays.asList(mIndexes);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private SimpleExpressionProxy[] mIndexes;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final CompiledNameSpace mNameSpace;
   private final EventDeclProxy mDecl;
   private final List<CompiledRange> mRanges;
-  private final Map<List<SimpleExpressionProxy>,CompiledEvent> mIndexValueMap;
+  private final Map<HashableIndexList,CompiledEvent> mIndexValueMap;
 
 }

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="efsm16-unified" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="efsm16-unified" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau0"/>
@@ -16,6 +16,10 @@
         <EventDecl Kind="CONTROLLABLE" Name="tau2:3"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau2:4"/>
         <EventDecl Kind="CONTROLLABLE" Name="tau2:5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau3c3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau3c5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="tau3x3"/>
     </EventDeclList>
     <ComponentList>
         <VariableComponent Name="x0">

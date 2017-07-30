@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -150,6 +150,9 @@ protected:
   virtual bool expandForwardSafety
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
+  virtual bool expandForwardDeadlock
+    (uint32_t source, const uint32_t* sourceTuple,
+     const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
   virtual bool expandForwardAgain
     (uint32_t source, const uint32_t* sourceTuple,
      const uint32_t* sourcePacked, TransitionCallBack callBack = 0);
@@ -179,7 +182,7 @@ private:
   //# Private Auxiliary Methods
   void setupSafety
     (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
-  void setupNonblocking
+  uint32_t setupNonblocking
     (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
   void setupLoop
     (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventMap);
@@ -189,8 +192,11 @@ private:
     (AutomatonRecord* aut,
      const jni::AutomatonGlue& autglue,
      const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+  void checkForUnusedEvent
+    (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
   void setupCompactEventList
     (const PtrHashTable<const jni::EventGlue*,BroadEventRecord*>& eventmap);
+  void setupDumpStates(uint32_t numDump);
 
   //##########################################################################
   //# Data Members

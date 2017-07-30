@@ -97,11 +97,13 @@ public class BooleanProperty
       }
     }
 
+	@Override
     public String getAsString()
     {
         return Boolean.toString(mValue);
     }
 
+	@Override
     public boolean currentValueDifferentFromDefaultValue()
     {
         return mDefaultValue != mValue;

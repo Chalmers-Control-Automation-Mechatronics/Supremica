@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -228,7 +228,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     return
       new ListedEnumFactory<TRPreselectionHeuristic>() {
       {
-        register(PRESEL_MustL);
+        register(PRESEL_MustL, true);
         register(PRESEL_MustSp);
         register(PRESEL_Pairs);
         register(PRESEL_MaxS);
@@ -274,7 +274,7 @@ public abstract class AbstractTRCompositionalAnalyzer
         register(SEL_MinSSp);
         register(SEL_MinS0);
         register(SEL_MinS0a);
-        register(SEL_MinSync);
+        register(SEL_MinSync, true);
         register(SEL_MinSyncA);
         register(SEL_MaxC);
         register(SEL_MaxL);
@@ -608,9 +608,13 @@ public abstract class AbstractTRCompositionalAnalyzer
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
 
     final ModelAnalyzer mono = getMonolithicAnalyzer();
-    mono.setKindTranslator(translator);
-    mono.setNodeLimit(getMonolithicStateLimit());
-    mono.setTransitionLimit(getMonolithicTransitionLimit());
+    if (mono != null) {
+      mono.setKindTranslator(translator);
+      mono.setNodeLimit(getMonolithicStateLimit());
+      mono.setTransitionLimit(getMonolithicTransitionLimit());
+      final AnalysisResult dummy = mono.createAnalysisResult();
+      result.addMonolithicAnalysisResult(dummy);
+    }
 
     mSubsystemQueue = new PriorityQueue<>();
     mNeedsSimplification = new SimplificationQueue(trs);
@@ -914,10 +918,10 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
     countSpecialEvents(enc);
     try {
-      // Set up trace computation ...
+      // Set up trace computation.
       mIntermediateAbstractionSequence =
         new IntermediateAbstractionSequence(aut);
-      // Simplify ...
+      // Simplify.
       final int oldNumStates = rel.getNumberOfStates();
       mSpecialEventsListener.setEnabled(true);
       mTRSimplifier.setTransitionRelation(rel);
@@ -928,7 +932,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           aut.resetStateNames();
         }
       }
-      // Record steps and update event status ...
+      // Record steps and update event status.
       mIntermediateAbstractionSequence.commit();
       mNeedsSimplification.setSuppressed(aut);
       if (simplified || !mAlwaysEnabledDetectedInitially) {
@@ -936,6 +940,7 @@ public abstract class AbstractTRCompositionalAnalyzer
           mIntermediateAbstractionSequence.getInputEventEncoding();
         updateEventStatus(aut, oldEncoding);
       }
+      // Drop trivial automata if necessary.
       if (simplified && isTrivialAutomaton(aut)) {
         logger.debug("Dropping trivial automaton " + aut.getName());
         dropTrivialAutomaton(aut);
@@ -1703,7 +1708,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   //#########################################################################
   //# Data Members
   // Configuration
-  private int mInternalStateLimit = Integer.MAX_VALUE;
+  private int mInternalStateLimit = 100000;
   private int mInternalTransitionLimit = Integer.MAX_VALUE;
   private boolean mBlockedEventsEnabled = true;
   private boolean mFailingEventsEnabled = false;

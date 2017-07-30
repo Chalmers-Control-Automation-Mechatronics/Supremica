@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -38,9 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.WatersException;
@@ -50,6 +47,9 @@ import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
@@ -537,15 +537,14 @@ public class UnifiedEFAConflictCheckerTest extends AbstractAnalysisTest
   public void testPslBig()
     throws IOException, WatersException
   {
-    final ModuleProxy module = loadModule("tests", "psl", "pslBig");
+    final ModuleProxy module = loadModule("tests", "psl", "psl_big");
     checkConflict(module, false);
   }
 
   public void testPslBigWithManyRestartTrans()
     throws IOException, WatersException
   {
-    final ModuleProxy module =
-      loadModule("tests", "psl", "pslBigWithManyRestartTrans");
+    final ModuleProxy module = loadModule("tests", "psl", "psl_restart");
     checkConflict(module, false);
   }
 

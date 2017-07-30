@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -43,6 +40,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 /**
@@ -79,6 +79,7 @@ public class SubsetConstructionTRSimplifierTest
   {
     final SubsetConstructionTRSimplifier simplifier =
       new SubsetConstructionTRSimplifier();
+    simplifier.setDumpStateAware(true);
     simplifier.setFailingEventsAsSelfloops(true);
     return simplifier;
   }
@@ -174,6 +175,14 @@ public class SubsetConstructionTRSimplifierTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "abstraction", "determinisation_8.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_determinisation_9()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "determinisation_9.wmod");
     runTransitionRelationSimplifier(des);
   }
 

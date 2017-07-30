@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -40,7 +40,6 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
-
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -56,7 +55,7 @@ class TransitionPartitionBDD
   //# Constructor
   TransitionPartitionBDD(final EventBDD eventBDD)
   {
-    super(eventBDD.getEvent(),
+    super(eventBDD,
           eventBDD.getTransitionsBDD(),
           eventBDD.getSynchronisedAutomata());
   }
@@ -112,6 +111,12 @@ class TransitionPartitionBDD
     }
     final BDD bdd = bdd1.orWith(bdd2);
     return new TransitionPartitionBDD(this, part, bdd);
+  }
+
+  @Override
+  boolean isDominant()
+  {
+    return getBDD().isOne();
   }
 
 
@@ -200,27 +205,63 @@ class TransitionPartitionBDD
     }
   }
 
-  BDD getNonDeadlockBDD(final AutomatonBDD[] automatonBDDs,
-                        final BDDFactory factory)
+  /**
+   * Constructs a BDD representing the set of states where at least one of
+   * the events represented in this partition is enabled.
+   * @param  automatonBDDs  Array of automaton BDDs constituting the model.
+   * @param  factory        BDD factory to create BDDs.
+   * @return A BDD over the current state variables of the model that
+   *         indicates true if the partition's transition relation has at
+   *         least one successor state.
+   */
+  BDD getEnabledBDD(final AutomatonBDD[] automatonBDDs,
+                    final BDDFactory factory)
   {
-    BDD bdd = getBDD();
+    final BDD bdd = getBDD();
     if (bdd.isZero()) {
-      return factory.one();
+      return factory.zero();
+    } else {
+      buildBackwardCubes(automatonBDDs, factory);
+      return bdd.exist(mNextStateCube);
     }
-    final BitSet automata = getAutomata();
-    BDD unchanged = factory.one();
-    for (int a = automatonBDDs.length - 1; a >= 0; a--) {
-      if (automata.get(a)) {
-        final AutomatonBDD autBDD = automatonBDDs[a];
-        unchanged = autBDD.includeUnchangedBDD(unchanged, factory);
+  }
+
+  /**
+   * <P>Constructs a BDD representing the set of states where at least one of
+   * the events represented in this partition is enabled and leads to a
+   * successor state different from the current state.</P>
+   * <P>This method constructs a modified transition relation by removing
+   * selfloops, and possibly changes the partition's transition relation
+   * by removing selfloops, if it becomes smaller.</P>
+   * @param  automatonBDDs  Array of automaton BDDs constituting the model.
+   * @param  factory        BDD factory to create BDDs.
+   * @return A BDD over the current state variables of the model that
+   *         indicates true if the partition's transition relation has at
+   *         least one successor state that is different from the current
+   *         state.
+   */
+  BDD getStronglyEnabledBDD(final AutomatonBDD[] automatonBDDs,
+                            final BDDFactory factory)
+  {
+    final BDD bdd = getBDD();
+    if (bdd.isZero()) {
+      return factory.zero();
+    } else {
+      final BitSet automata = getAutomata();
+      BDD unchanged = factory.one();
+      for (int a = automatonBDDs.length - 1; a >= 0; a--) {
+        if (automata.get(a)) {
+          final AutomatonBDD autBDD = automatonBDDs[a];
+          unchanged = autBDD.includeUnchangedBDD(unchanged, factory);
+        }
       }
+      final BDD nonSelfloop = bdd.apply(unchanged, BDDFactory.diff);
+      unchanged.free();
+      buildBackwardCubes(automatonBDDs, factory);
+      final BDD stronglyEnabled = nonSelfloop.exist(mNextStateCube);
+      installSmallerBDD(nonSelfloop);
+      return stronglyEnabled;
     }
-    final BDD altBDD = bdd.apply(unchanged, BDDFactory.diff);
-    unchanged.free();
-    bdd = installSmallerBDD(altBDD);
-    buildBackwardCubes(automatonBDDs, factory);
-    final BDD nondeadlock = bdd.exist(mNextStateCube);
-    return nondeadlock;
   }
 
 

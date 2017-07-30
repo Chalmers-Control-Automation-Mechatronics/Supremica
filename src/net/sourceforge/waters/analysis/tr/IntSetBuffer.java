@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -46,6 +43,9 @@ import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonTools;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+
 
 /**
  * <P>A memory efficient container to store several sets of integers.</P>
@@ -53,11 +53,12 @@ import net.sourceforge.waters.model.des.AutomatonTools;
  * <P>An <I>integer set buffer</I> maintains a collection of sets of integers.
  * Each set is identified by its <I>index</I>, an integer that is assigned
  * by the set buffer upon creation of the set and remains a unique
- * identifier throughout the set's lifetime.</P>
+ * identifier throughout the set's lifetime. The set index is an internal
+ * offset; not all integers starting from zero are valid indices.</P>
  *
- * <P>Each set is represented by its size followed by its ordered list of
- * elements. These numbers are bit-packed into into pre-allocated integer
- * arrays to minimise memory usage and allocation.</P>
+ * <P>Internally, each set is represented by its size followed by its ordered
+ * list of elements. These numbers are bit-packed into into pre-allocated
+ * integer arrays to minimise memory usage and allocation.</P>
  *
  * <P>A hash table is used to identify sets already present in the buffer.
  * If the same set is added a second time, the already existing index is
@@ -76,15 +77,17 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   //# Constructors
   public IntSetBuffer(final int numValues)
   {
-    this(numValues, 0);
+    this(numValues, numValues);
   }
 
   public IntSetBuffer(final int numValues, final int initialSize)
   {
-    this(numValues, 0, 0);
+    this(numValues, initialSize, 0);
   }
 
-  public IntSetBuffer(final int numValues, final int initialSize, final int defaultHashSetValue)
+  public IntSetBuffer(final int numValues,
+                      final int initialSize,
+                      final int defaultHashSetValue)
   {
     mSizeShift = AutomatonTools.log2(numValues + 1);
     mSizeMask = (1 << mSizeShift) - 1;
@@ -94,6 +97,9 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     final int[] block = new int[BLOCK_SIZE];
     mBlocks.add(block);
     mDirectory = new WatersIntHashSet(initialSize, defaultHashSetValue, this);
+    final double entriesPerWord = 32.0 / mDataShift;
+    mBinarySearchThreshold = (int) Math.ceil
+      (2.0 * entriesPerWord + Math.log(entriesPerWord) / Math.log(2.0)) + 2;
     mSize = mNextFreeOffset = 0;
   }
 
@@ -147,6 +153,67 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   }
 
   /**
+   * Adds the data in the given list as a set to this integer set buffer.
+   * @param  data   List of integers forming a new set. The list must be
+   *                ordered and free from duplicates.
+   * @return A unique set index identifying a set with the given contents in
+   *         this buffer. This may be a newly created or an already existent
+   *         set.
+   */
+  public int add(final TIntArrayList data)
+  {
+    final int count = data.size();
+    final int words = getNumberOfWords(count);
+    ensureCapacity(words);
+    int blockno = mNextFreeOffset >>> BLOCK_SHIFT;
+    int[] block = mBlocks.get(blockno);
+    int offset = mNextFreeOffset & BLOCK_MASK;
+    long current = count;
+    int shift = mSizeShift;
+    for (int i = 0; i < count; i++) {
+      final long value = data.get(i);
+      current |= (value << shift);
+      shift += mDataShift;
+      if (shift >= 32) {
+        if (offset >= BLOCK_SIZE) {
+          offset = 0;
+          block = mBlocks.get(++blockno);
+        }
+        block[offset++] = (int) (current & 0xffffffffL);
+        current >>>= 32;
+        shift -= 32;
+      }
+    }
+    if (shift > 0) {
+      if (offset >= BLOCK_SIZE) {
+        offset = 0;
+        block = mBlocks.get(++blockno);
+      }
+      block[offset] = (int) (current & 0xffffffffL);
+    }
+    final int result = mDirectory.getOrAdd(mNextFreeOffset);
+    if (result == mNextFreeOffset) {
+      mSize++;
+      mNextFreeOffset += words;
+    }
+    return result;
+  }
+
+  /**
+   * Adds the data in the given hash set as a set to this integer set buffer.
+   * @param  data   Contents of the new set.
+   * @return A unique set index identifying a set with the given contents in
+   *         this buffer. This may be a newly created or an already existent
+   *         set.
+   */
+  public int add(final TIntHashSet data)
+  {
+    final int[] array = data.toArray();
+    Arrays.sort(array);
+    return add(array);
+  }
+
+  /**
    * Adds the contents of the given set in this buffer to the given hash set.
    * @param  set     The unique set index identifying the set to be examined
    *                 in this integer set buffer.
@@ -179,6 +246,32 @@ public class IntSetBuffer implements WatersIntHashingStrategy
     }
   }
 
+  /**
+   * Checks whether a set in the buffer contains a given element.
+   * This method uses a sequential or binary search depending on the length
+   * of the set to ensure that the worst-case complexity is logarithmic in
+   * the length of the set.
+   * @param  set     The unique set index identifying the set to be examined
+   *                 in this integer set buffer.
+   * @param  item    The element to be searched for in the set.
+   * @return <CODE>true</CODE> if the identified set contains the item,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean contains(final int set, final int item)
+  {
+    if (size(set) > mBinarySearchThreshold) {
+      return binarySearch(set, item);
+    } else {
+      return sequentialSearch(set, item);
+    }
+  }
+
+  /**
+   * Checks whether a set with the given contents exists in the buffer.
+   * @param  data  An array containing the set contents to be looked up.
+   * @return The set index of a set with the given contents, or -1 if the
+   *         buffer contains no such set.
+   */
   public int get(final int[] data) {
 
     final int count = data.length;
@@ -247,67 +340,6 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   }
 
   /**
-   * Adds the data in the given list as a set to this integer set buffer.
-   * @param  data   List of integers forming a new set. The list must be
-   *                ordered and free from duplicates.
-   * @return A unique set index identifying a set with the given contents in
-   *         this buffer. This may be a newly created or an already existent
-   *         set.
-   */
-  public int add(final TIntArrayList data)
-  {
-    final int count = data.size();
-    final int words = getNumberOfWords(count);
-    ensureCapacity(words);
-    int blockno = mNextFreeOffset >>> BLOCK_SHIFT;
-    int[] block = mBlocks.get(blockno);
-    int offset = mNextFreeOffset & BLOCK_MASK;
-    long current = count;
-    int shift = mSizeShift;
-    for (int i = 0; i < count; i++) {
-      final long value = data.get(i);
-      current |= (value << shift);
-      shift += mDataShift;
-      if (shift >= 32) {
-        if (offset >= BLOCK_SIZE) {
-          offset = 0;
-          block = mBlocks.get(++blockno);
-        }
-        block[offset++] = (int) (current & 0xffffffffL);
-        current >>>= 32;
-        shift -= 32;
-      }
-    }
-    if (shift > 0) {
-      if (offset >= BLOCK_SIZE) {
-        offset = 0;
-        block = mBlocks.get(++blockno);
-      }
-      block[offset] = (int) (current & 0xffffffffL);
-    }
-    final int result = mDirectory.getOrAdd(mNextFreeOffset);
-    if (result == mNextFreeOffset) {
-      mSize++;
-      mNextFreeOffset += words;
-    }
-    return result;
-  }
-
-  /**
-   * Adds the data in the given hash set as a set to this integer set buffer.
-   * @param  data   Contents of the new set.
-   * @return A unique set index identifying a set with the given contents in
-   *         this buffer. This may be a newly created or an already existent
-   *         set.
-   */
-  public int add(final TIntHashSet data)
-  {
-    final int[] array = data.toArray();
-    Arrays.sort(array);
-    return add(array);
-  }
-
-  /**
    * Returns an iterator over the indexes of the sets contained in this buffer.
    * The iterator returned by this methods produces the offsets of valid
    * sets in the buffer, in the order in which they have been created.
@@ -315,6 +347,33 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   public WatersIntIterator globalIterator()
   {
     return new GlobalIterator();
+  }
+
+  /**
+   * Determines whether two sets in this buffer have a non-empty intersection.
+   * @param  set1    The unique index of the first set to be compared.
+   * @param  set2    The unique index of the second set to be compared.
+   * @return <CODE>true</CODE> if the indicated sets have at least
+   *         one common element, <CODE>false</CODE> otherwise.
+   */
+  public boolean intersects(final int set1, final int set2)
+  {
+    final IntSetIterator iter1 = iterator(set1);
+    final IntSetIterator iter2 = iterator(set2);
+    boolean more1 = iter1.advance();
+    boolean more2 = iter2.advance();
+    while (more1 && more2) {
+      final int elem1 = iter1.getCurrentData();
+      final int elem2 = iter2.getCurrentData();
+      if (elem1 < elem2) {
+        more1 = iter1.advance();
+      } else if (elem2 < elem1) {
+        more2 = iter2.advance();
+      } else {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -495,6 +554,68 @@ public class IntSetBuffer implements WatersIntHashingStrategy
       mBlocks.add(block);
       capacity += BLOCK_SIZE;
     }
+  }
+
+  private boolean sequentialSearch(final int set, final int item)
+  {
+    int blockno = set >>> BLOCK_SHIFT;
+    int[] block = mBlocks.get(blockno);
+    int offset = set & BLOCK_MASK;
+    long data = block[offset] & 0xffffffffL;
+    final int count = (int) (data & mSizeMask);
+    int remainingBits = 32 - mSizeShift;
+    data >>>= mSizeShift;
+    for (int i = 0; i < count; i++) {
+      if (remainingBits < mDataShift) {
+        offset++;
+        if (offset > BLOCK_MASK) {
+          offset = 0;
+          blockno++;
+          block = mBlocks.get(blockno);
+        }
+        data |= ((block[offset] & 0xffffffffL) << remainingBits);
+        remainingBits += 32;
+      }
+      final int entry = (int) (data & mDataMask);
+      if (entry >= item) {
+        return entry == item;
+      }
+      data >>>= mDataShift;
+      remainingBits -= mDataShift;
+    }
+    return false;
+  }
+
+  private boolean binarySearch(final int set, final int item)
+  {
+    int lower = 0;
+    int upper = size(set) - 1;
+    while (lower < upper) {
+      final int mid = (lower + upper) >> 1;
+      final int entry = getItem(set, mid);
+      if (item <= entry) {
+        upper = mid;
+      } else {
+        lower = mid + 1;
+      }
+    }
+    return getItem(set, lower) == item;
+  }
+
+  private int getItem(final int set, final int index)
+  {
+    int bitIndex = mSizeShift + index * mDataShift;
+    final int wordIndex = set + (bitIndex >> 5);
+    bitIndex &= 31;
+    final int blockno = set >>> BLOCK_SHIFT;
+    final int[] block = mBlocks.get(blockno);
+    int offset = wordIndex & BLOCK_MASK;
+    long data = block[offset] & 0xffffffffL;
+    if (bitIndex + mDataShift > 32) {
+      offset = (offset + 1) & BLOCK_MASK;
+      data |= ((long) block[offset] << 32);
+    }
+    return (int) (data >>> bitIndex) & mDataMask;
   }
 
 
@@ -685,6 +806,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   private final int mDataMask;
   private final List<int[]> mBlocks;
   private final WatersIntHashSet mDirectory;
+  private final int mBinarySearchThreshold;
 
   private int mSize;
   private int mNextFreeOffset;

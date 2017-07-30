@@ -64,7 +64,7 @@ import org.supremica.properties.Config;
 public class SynchronizationOptions
 {
 	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
+	private final static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
 
 	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown
 	private boolean forbidUnconStates;    // mark uc-states as uncontrollable
@@ -78,6 +78,7 @@ public class SynchronizationOptions
 	private boolean requireConsistentControllability;    // check that common events have same controllability
 	private boolean requireConsistentImmediate;    // check that common evenst have same immediaticity
 	private boolean rememberDisabledEvents;    // redirect disabled transitions to forbidden dump-state
+	private boolean unobsEventsSynch; // Unobservable events synchronize or not (default is not)
     private boolean mEFAMode;
 	private boolean dialogOK = false;
 	private String automatonNameSeparator;
@@ -100,7 +101,7 @@ public class SynchronizationOptions
 		//The following check should ideally be done within SupremicaProperties
 		if (this.nbrOfExecuters != 1)
 		{
-			//			throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
+			// throw new SupremicaException("Error in SupremicaProperties. The property synchNbrOfExecuters must be at least 1.");
 		}
 
 		this.syncType = SynchronizationType.PRIORITIZED;
@@ -110,7 +111,7 @@ public class SynchronizationOptions
 		//The following check should ideally be done within SupremicaProperties
 		if (this.initialHashtableSize < 100)
 		{
-			//			throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
+			// throw new SupremicaException("Error in SupremicaProperties. The property syncInitialHashtableSize must be at least 100");
 		}
 
 		this.expandHashtable = Config.SYNC_EXPAND_HASHTABLE.isTrue();
@@ -122,6 +123,7 @@ public class SynchronizationOptions
 		this.requireConsistentControllability = true;
 		this.requireConsistentImmediate = true;
 		this.rememberDisabledEvents = false;
+		this.unobsEventsSynch = Config.SYNC_UNOBS_EVENTS_SYNC.get();
 		this.automatonNameSeparator = Config.SYNC_AUTOMATON_NAME_SEPARATOR.getAsString();
 		this.stateNameSeparator = Config.GENERAL_STATE_SEPARATOR.getAsString();
         this.EFAMode = false;
@@ -248,6 +250,15 @@ public class SynchronizationOptions
 		useShortStateNames = set;
 	}
 
+	public boolean getUnobsEventsSynch()
+	{
+		return this.unobsEventsSynch;
+	}
+	public void setUnobsEventsSynch(final boolean set)
+	{
+		this.unobsEventsSynch = set;
+	}
+	
     // Added these two methods and the mEFAMode member.
     // I hope I did it correctly. ~~~Robi
     public boolean getEFAMode()
@@ -281,6 +292,38 @@ public class SynchronizationOptions
 	}
 
 	/**
+	 * @param automatonNameSeparator The automatonNameSeparator to set.
+	 */
+	public void setAutomatonNameSeparator(final String automatonNameSeparator)
+	{
+		this.automatonNameSeparator = automatonNameSeparator;
+	}
+
+	/**
+	 * @return Returns the automatonNameSeparator.
+	 */
+	public String getAutomatonNameSeparator()
+	{
+		assert automatonNameSeparator != null;
+		return automatonNameSeparator;
+	}
+	/**
+	 * @return Returns the stateNameSeparator.
+	 */
+	public String getStateNameSeparator()
+	{
+		assert stateNameSeparator != null;
+		return stateNameSeparator;
+	}
+	/**
+	 * @param stateNameSeparator The stateNameSeparator to set.
+	 */
+	public void setStateNameSeparator(final String stateNameSeparator)
+	{
+		this.stateNameSeparator = stateNameSeparator;
+	}
+
+	/**
 	 * Returns the default options for synchronization. This is the same as
 	 * in the default constructor in this class.
 	 */
@@ -292,6 +335,7 @@ public class SynchronizationOptions
 		options.setForbidUncontrollableStates(false);   // So why was it like that?
 		options.setExpandForbiddenStates(true);
 		options.setExpandHashtable(true);
+		options.setUnobsEventsSynch(Config.SYNC_UNOBS_EVENTS_SYNC.get());
 		return options;
 	}
 
@@ -322,37 +366,5 @@ public class SynchronizationOptions
 
 		// Return result
 		return options;
-	}
-
-	/**
-	 * @param automatonNameSeparator The automatonNameSeparator to set.
-	 */
-	public void setAutomatonNameSeparator(final String automatonNameSeparator)
-	{
-		this.automatonNameSeparator = automatonNameSeparator;
-	}
-
-	/**
-	 * @return Returns the automatonNameSeparator.
-	 */
-	public String getAutomatonNameSeparator()
-	{
-		assert automatonNameSeparator != null;
-		return automatonNameSeparator;
-	}
-	/**
-	 * @return Returns the stateNameSeparator.
-	 */
-	public String getStateNameSeparator()
-	{
-		assert stateNameSeparator != null;
-		return stateNameSeparator;
-	}
-	/**
-	 * @param stateNameSeparator The stateNameSeparator to set.
-	 */
-	public void setStateNameSeparator(final String stateNameSeparator)
-	{
-		this.stateNameSeparator = stateNameSeparator;
 	}
 }

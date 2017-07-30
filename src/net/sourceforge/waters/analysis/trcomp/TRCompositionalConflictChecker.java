@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -61,6 +61,7 @@ import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
+import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckResult;
 import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -134,6 +135,24 @@ public class TRCompositionalConflictChecker
     super(model,
           ConflictKindTranslator.getInstanceControllable(),
           new NativeConflictChecker(ProductDESElementFactory.getInstance()));
+    setFailingEventsEnabled(true);
+    setSelfloopOnlyEventsEnabled(true);
+    setAlwaysEnabledEventsEnabled(true);
+  }
+
+
+  //#########################################################################
+  //# Interface for net.sourceforge.waters.model.analysis.des.ModelAnalyzer
+  @Override
+  public CompositionalConflictCheckResult getAnalysisResult()
+  {
+    return (CompositionalConflictCheckResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public CompositionalConflictCheckResult createAnalysisResult()
+  {
+    return new CompositionalConflictCheckResult(getClass());
   }
 
 
@@ -204,8 +223,9 @@ public class TRCompositionalConflictChecker
         register(NB0w);
         register(NB1);
         register(NB1w);
+        register(NB1x);
         register(NB2);
-        register(NB2w);
+        register(NB2w, true);
         register(NB3);
         register(NB3w);
         register(GNB);
@@ -500,6 +520,12 @@ public class TRCompositionalConflictChecker
                                              translator);
   }
 
+  void recordCCLanguageInclusionChecks(final int count, final long time)
+  {
+    final CompositionalConflictCheckResult result = getAnalysisResult();
+    result.addCCLanguageInclusionChecks(count, time);
+  }
+
 
   //#########################################################################
   //# Generalised Nonblocking Trace Extension
@@ -732,7 +758,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         false, false, false);
+         true, false, false, false);
     }
   };
 
@@ -767,7 +793,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         false, false, false);
+         true, false, false, false);
     }
   };
 
@@ -802,7 +828,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         true, false, false);
+         true, true, false, false);
     }
   };
 
@@ -838,7 +864,42 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, false, false);
+         true, true, false, false);
+    }
+  };
+
+  /**
+   * <P>An abstraction sequence for standard nonblocking verification.
+   * This tool creator produces a transition relation simplifier
+   * consisting of:</P>
+   * <UL>
+   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
+   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
+   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
+   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
+   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
+   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
+   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
+   *     Silent Continuation plus Active Events Rules)</LI>
+   * <LI>Weak observation equivalence
+   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
+   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
+   * </UL>.
+   */
+  public static final TRToolCreator<TransitionRelationSimplifier> NB1x =
+    new TRToolCreator<TransitionRelationSimplifier>("NB1x")
+  {
+    @Override
+    public TransitionRelationSimplifier create
+      (final AbstractTRCompositionalAnalyzer analyzer)
+      throws AnalysisConfigurationException
+    {
+      final TRCompositionalConflictChecker checker =
+        (TRCompositionalConflictChecker) analyzer;
+      return checker.createConflictEquivalenceChain
+        (ObservationEquivalenceTRSimplifier.
+         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
+         false, true, false, false);
     }
   };
 
@@ -874,7 +935,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         true, false, true);
+         true, true, false, true);
     }
   };
 
@@ -911,7 +972,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, false, true);
+         true, true, false, true);
     }
   };
 
@@ -948,7 +1009,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true, true);
+         true, true, true, true);
     }
   };
 
@@ -986,7 +1047,7 @@ public class TRCompositionalConflictChecker
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
          Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, true, true);
+         true, true, true, true);
     }
   };
 
@@ -1060,6 +1121,7 @@ public class TRCompositionalConflictChecker
 
   protected ChainTRSimplifier createConflictEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+     final boolean certainConflicts,
      final boolean earlyTransitionRemoval,
      final boolean selfloopSubsumption,
      final boolean nonAlphaDeterminisation)
@@ -1109,12 +1171,14 @@ public class TRCompositionalConflictChecker
     silentOutRemover.setDumpStateAware(true);
     silentOutRemover.setSimplificationListener(partitioningListener);
     chain.add(silentOutRemover);
-    final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
-      new LimitedCertainConflictsTRSimplifier();
-    final TRSimplificationListener certainConflictsListener =
-      new CertainConflictsListener();
-    certainConflictsRemover.setSimplificationListener(certainConflictsListener);
-    chain.add(certainConflictsRemover);
+    if (certainConflicts) {
+      final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
+        new LimitedCertainConflictsTRSimplifier();
+      final TRSimplificationListener certainConflictsListener =
+        new CertainConflictsListener();
+      certainConflictsRemover.setSimplificationListener(certainConflictsListener);
+      chain.add(certainConflictsRemover);
+    }
     final ObservationEquivalenceTRSimplifier bisimulator =
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);

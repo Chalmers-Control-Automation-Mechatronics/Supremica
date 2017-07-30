@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -214,7 +214,7 @@ public class ConflictChecker extends ModelChecker
     final String modelname = model.getName();
     final String tracename = modelname + "-conflicting";
     final Collection<EventProxy> events = model.getEvents();
-    final List<EventProxy> tracelist = new LinkedList<EventProxy>();
+    final List<EventProxy> tracelist = new LinkedList<>();
     for (final EventProxy event : events) {
       tracelist.add(event);
     }

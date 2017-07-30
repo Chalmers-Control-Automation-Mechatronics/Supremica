@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -583,7 +583,7 @@ public class GraphEditorPanel
   }
 
   @Override
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "unlikely-arg-type"})
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     final GraphSubject graph = getGraph();
@@ -4277,6 +4277,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Auxiliary Methods
+    @SuppressWarnings("unlikely-arg-type")
     private boolean isParentMoved(final Proxy item)
     {
       final Subject subject = (Subject) item;

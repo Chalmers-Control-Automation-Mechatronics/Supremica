@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +42,8 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -68,7 +68,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  */
 
 public class NonAlphaDeterminisationTRSimplifier
-  extends AbstractMarkingTRSimplifier
+  extends ReverseObservationEquivalenceTRSimplifier
 {
 
   //#########################################################################
@@ -82,98 +82,12 @@ public class NonAlphaDeterminisationTRSimplifier
     (final ListBufferTransitionRelation rel)
   {
     super(rel);
-    mBisimulator = new ObservationEquivalenceTRSimplifier();
-    mBisimulator.setEquivalence(ObservationEquivalenceTRSimplifier.
-                                Equivalence.OBSERVATION_EQUIVALENCE);
-    mBisimulator.setAppliesPartitionAutomatically(false);
-    mBisimulator.setStatistics(null);
   }
 
 
   //#########################################################################
-  //# Configuration
-  /**
-   * Sets the mode which redundant transitions are to be removed.
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
-   */
-  public void setTransitionRemovalMode
-    (final ObservationEquivalenceTRSimplifier.TransitionRemoval mode)
-  {
-    mBisimulator.setTransitionRemovalMode(mode);
-  }
-
-  /**
-   * Gets the mode which redundant transitions are to be removed.
-   * @see ObservationEquivalenceTRSimplifier.TransitionRemoval
-   */
-  public ObservationEquivalenceTRSimplifier.TransitionRemoval
-    getTransitionRemovalMode()
-  {
-    return mBisimulator.getTransitionRemovalMode();
-  }
-
-  /**
-   * Sets the transition limit. The transition limit specifies the maximum
-   * number of transitions (including stored silent transitions of the
-   * transitive closure) that will be stored.
-   * @param limit
-   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of transitions.
-   */
-  public void setTransitionLimit(final int limit)
-  {
-    mBisimulator.setTransitionLimit(limit);
-  }
-
-  /**
-   * Gets the transition limit.
-   * @see #setTransitionLimit(int) setTransitionLimit()
-   */
-  public int getTransitionLimit()
-  {
-    return mBisimulator.getTransitionLimit();
-  }
-
-  /**
-   * Sets whether this simplifier should consider deadlock states when
-   * removing selfloops.
-   * @see AbstractMarkingTRSimplifier#isDumpStateAware()
-   */
-  public void setDumpStateAware(final boolean aware)
-  {
-    mDumpStateAware = aware;
-  }
-
-  /**
-   * Gets whether this simplifier considers deadlock states when
-   * removing selfloops.
-   */
-  @Override
-  public boolean isDumpStateAware()
-  {
-    return mDumpStateAware;
-  }
-
-
-  //#########################################################################
-  //# Interface
-  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
-  @Override
-  public int getPreferredInputConfiguration()
-  {
-    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-  }
-
-  @Override
-  public void reset()
-  {
-    mBisimulator.reset();
-    super.reset();
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
     throws AnalysisException
@@ -190,25 +104,11 @@ public class NonAlphaDeterminisationTRSimplifier
   protected boolean runSimplifier()
     throws AnalysisException
   {
-    if (!hasNonPreconditionMarkedStates()) {
+    if (hasNonPreconditionMarkedStates()) {
+      return super.runSimplifier();
+    } else {
       return false;
     }
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    rel.reverse();
-    mBisimulator.setTransitionRelation(rel);
-    TRPartition partition = createInitialPartition();
-    mBisimulator.setUpInitialPartition(partition);
-    mBisimulator.refinePartitionBasedOnInitialStates();
-    final boolean modified = mBisimulator.run();
-    partition = mBisimulator.getResultPartition();
-    setResultPartition(partition);
-    applyResultPartitionAutomatically();
-    rel.reverse();
-    if (modified && getAppliesPartitionAutomatically() &&
-        mDumpStateAware && getDefaultMarkingID() >= 0) {
-      removeProperSelfLoopEvents();
-    }
-    return modified;
   }
 
   @Override
@@ -218,11 +118,39 @@ public class NonAlphaDeterminisationTRSimplifier
     mTauIterator = null;
   }
 
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction
+  //# ReverseObservationEquivalenceTRSimplifier
+  /**
+   * Creates an initial partition. This includes a separate equivalence class
+   * for every state marked alpha, and an equivalence class which contains all
+   * the remaining states.
+   */
   @Override
-  public void applyResultPartition()
-    throws AnalysisException
+  protected TRPartition createInitialPartition()
   {
-    mBisimulator.applyResultPartition();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int numStates = rel.getNumberOfStates();
+    final List<int[]> initialPartition = new ArrayList<int[]>();
+    final TIntArrayList remainingStates = new TIntArrayList();
+    for (int state = 0; state < numStates; state++) {
+      if (!rel.isReachable(state)) {
+        continue;
+      } else if (isAlphaMarked(state)) {
+        // create a separate equivalence class for every state marked alpha
+        final int[] alphaClass = new int[1];
+        alphaClass[0] = state;
+        initialPartition.add(alphaClass);
+      } else {
+        // create an equivalence class for all other states
+        remainingStates.add(state);
+      }
+    }
+    final int[] remainingStatesArray = remainingStates.toArray();
+    initialPartition.add(remainingStatesArray);
+    return new TRPartition(initialPartition, numStates);
   }
 
 
@@ -253,35 +181,6 @@ public class NonAlphaDeterminisationTRSimplifier
     return false;
   }
 
-  /**
-   * Creates an initial partition. This includes a separate equivalence class
-   * for every state marked alpha, and an equivalence class which contains all
-   * the remaining states.
-   */
-  private TRPartition createInitialPartition()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final List<int[]> initialPartition = new ArrayList<int[]>();
-    final TIntArrayList remainingStates = new TIntArrayList();
-    for (int state = 0; state < numStates; state++) {
-      if (!rel.isReachable(state)) {
-        continue;
-      } else if (isAlphaMarked(state)) {
-        // create a separate equivalence class for every state marked alpha
-        final int[] alphaClass = new int[1];
-        alphaClass[0] = state;
-        initialPartition.add(alphaClass);
-      } else {
-        // create an equivalence class for all other states
-        remainingStates.add(state);
-      }
-    }
-    final int[] remainingStatesArray = remainingStates.toArray();
-    initialPartition.add(remainingStatesArray);
-    return new TRPartition(initialPartition, numStates);
-  }
-
   private boolean isAlphaMarked(final int state)
   {
     if (mTauIterator == null) {
@@ -297,9 +196,6 @@ public class NonAlphaDeterminisationTRSimplifier
 
   //#########################################################################
   //# Data Members
-  private boolean mDumpStateAware = false;
-
-  private final ObservationEquivalenceTRSimplifier mBisimulator;
   private TransitionIterator mTauIterator;
 
 }

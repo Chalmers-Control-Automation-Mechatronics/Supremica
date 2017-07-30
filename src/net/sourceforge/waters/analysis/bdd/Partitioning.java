@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -161,6 +161,35 @@ abstract class Partitioning<P extends PartitionBDD> implements Abortable
    *         because there will be no further change.
    */
   abstract List<P> nextGroup(boolean stable);
+
+  /**
+   * Returns whether the computed partition is trivially true or false.
+   * A conjunctive partition is dominant if it contains a single BDD
+   * representing representing false, while a disjunctive partition is
+   * dominant if it contains a single BDD representing representing true.
+   */
+  boolean isDominant()
+  {
+    if (mFullPartition.size() == 1) {
+      final P part = mFullPartition.get(0);
+      return part.isDominant();
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Clean up
+  /**
+   * Frees all the composed BDDs in this partition.
+   */
+  void disposeComposedBDDs()
+  {
+    for (final P part : mFullPartition) {
+      part.disposeComposedBDD();
+    }
+  }
 
 
   //#########################################################################

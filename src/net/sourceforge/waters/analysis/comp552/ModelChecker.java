@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -62,7 +62,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  *   {@link net.sourceforge.waters.plain.des.ProductDESElementFactory}.{@link
  *   net.sourceforge.waters.plain.des.ProductDESElementFactory#getInstance()
  *   getInstance}();</CODE><BR>
- * <CODE>ModelChecker checker = new {@link ConflictChecker}(des, factory);
+ * <CODE>ModelChecker checker = new {@link ControllabilityChecker}(des, factory);
  * //</CODE> <I>e.g.</I><BR>
  * <CODE>boolean result = checker.{@link #run()};</CODE><BR>
  * <CODE>if (result) {</CODE><BR>

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -194,8 +194,7 @@ public class AutomatonDisplayPane
     super.embedderChanged(event);
     if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
       mParent.storeReferenceFrame();
-      mParent.adjustSize(false);
-      mParent.storeReferenceFrame();
+      mParent.adjustSize();
       mTransform = mInverseTransform = null;
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));

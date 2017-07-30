@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,12 +33,12 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class MonolithicSupervisorLocalizationTest extends
@@ -61,7 +61,7 @@ public class MonolithicSupervisorLocalizationTest extends
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionEnabled(false);
+    synthesizer.setSupervisorReductionEnabled(true);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }

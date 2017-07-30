@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="HalfwaySynthesisBasic_7" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="HalfwaySynthesisBasic_7" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A basic test for all abstraction rules to see whether they can handle an automaton without any marked states.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
@@ -16,55 +16,55 @@
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="38" X="96"/>
+                        <Point X="96" Y="38"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="64" X="64"/>
+                            <Point X="64" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="9"/>
+                            <Point X="9" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="144" X="64"/>
+                            <Point X="64" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="11"/>
+                            <Point X="11" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-11" X="7"/>
+                                <Point X="7" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="107" X="75"/>
+                            <Point X="75" Y="107"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S0" Source="S1">
+                    <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="-19"/>
+                                <Point X="-19" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="106" X="53"/>
+                            <Point X="53" Y="106"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph/>
+            <Graph Deterministic="false"/>
         </SimpleComponent>
     </ComponentList>
 </Module>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="HalfwaySynthesis_1" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="HalfwaySynthesis_1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A basic test for all abstraction rules to see whether they can handle a state with no outgoing transitions.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting">
@@ -15,44 +15,44 @@
                 <LabelBlock>
                     <SimpleIdentifier Name=":accepting"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="51" X="195"/>
+                        <Point X="195" Y="51"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point Y="64" X="112"/>
+                            <Point X="112" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-8" X="9"/>
+                            <Point X="9" Y="-8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="144" X="112"/>
+                            <Point X="112" Y="144"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="-6" X="10"/>
+                            <Point X="10" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-9" X="6"/>
+                                <Point X="6" Y="-9"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <EndPointGeometry>
-                            <Point Y="144" X="112"/>
+                            <Point X="112" Y="144"/>
                         </EndPointGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
         </SimpleComponent>
         <SimpleComponent Kind="PLANT" Name="after">
-            <Graph/>
+            <Graph Deterministic="false"/>
         </SimpleComponent>
     </ComponentList>
 </Module>

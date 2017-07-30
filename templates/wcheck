@@ -53,6 +53,9 @@ for F in "$@"; do
     -count)
         CHECK="StateCounter"
         ;;
+    -deadlock|-dl)
+        CHECK="DeadlockChecker"
+        ;;
     -lang)
         CHECK="LanguageInclusionChecker"
         ;;
@@ -114,7 +117,7 @@ done
 OK=1
 if [ "" = "$CHECK" ]; then
     echo "No check specified!"
-    echo "Available options are: -conf -cont -lang -loop -synth"
+    echo "Available options are: -conf -cont -count -dl -lang -loop -synth"
     OK=0
 fi
 

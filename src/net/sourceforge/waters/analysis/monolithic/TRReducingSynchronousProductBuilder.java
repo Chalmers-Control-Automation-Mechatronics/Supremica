@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -50,6 +48,8 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -90,7 +90,7 @@ public class TRReducingSynchronousProductBuilder
   {
     super.setUp();
 
-    final TRAutomatonProxy[] inputAutomata = getInputAutomata();
+    final TRAutomatonProxy[] inputAutomata = getTRAutomata();
     final int numAutomata = inputAutomata.length;
     int limit = getTransitionLimit();
     if (limit < Integer.MAX_VALUE) {
@@ -182,7 +182,7 @@ public class TRReducingSynchronousProductBuilder
   //# net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
   @Override
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException
+    throws AnalysisException
   {
     if (mStronglyLocalEvents == null) {
       super.expandState(encoded, decoded);

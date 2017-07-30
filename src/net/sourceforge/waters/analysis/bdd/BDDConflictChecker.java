@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -146,6 +146,71 @@ public class BDDConflictChecker
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * <P>Enables or disables early deadlock detection.</P>
+   * If enabled (the default), the conflict checker may stop during
+   * reachability computation if a deadlock is encountered. This is not
+   * guaranteed however, as the conflict checker may decide that the required
+   * BDDs are too large.</P>
+   * <P>If early deadlock detection is disabled, reachability computation
+   * must be completed regardless of possible deadlock states. By disabling
+   * early deadlock detection and using a transition partition that ensures
+   * breadth-first search, it can be guaranteed that computed counterexamples
+   * are of minimal length.</P>
+   * @see #setTransitionPartitioningStrategy(TransitionPartitioningStrategy)
+   *      setTransitionPartitioningStrategy()
+   */
+  public void setEarlyDeadlockEnabled(final boolean enabled)
+  {
+    mEarlyDeadlockEnabled = enabled;
+  }
+
+  /**
+   * Returns whether early deadlock detection is enabled.
+   * @see #setEarlyDeadlockEnabled(boolean) setEarlyDeadlockEnabled()
+   */
+  public boolean isEarlyDeadlockEnabled()
+  {
+    return mEarlyDeadlockEnabled;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  @Override
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    mMarking = marking;
+    mUsedMarking = null;
+  }
+
+  @Override
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    return mMarking;
+  }
+
+  @Override
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
+  {
+    mPreconditionMarking = marking;
+  }
+
+  @Override
+  public EventProxy getConfiguredPreconditionMarking()
+  {
+    return mPreconditionMarking;
+  }
+
+  @Override
+  public ConflictTraceProxy getCounterExample()
+  {
+    return (ConflictTraceProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
   //# Invocation
   @Override
   public boolean run()
@@ -160,11 +225,15 @@ public class BDDConflictChecker
       if (result.isFinished()) {
         return isSatisfied();
       }
-      createEventBDDs();
+      final BDD init = createInitialStateBDD(true);
       if (result.isFinished()) {
         return isSatisfied();
       }
-      final BDD reachable = computeReachability();
+      createTransitionBDDs();
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final BDD reachable = computeReachability(init);
       if (result.isFinished()) {
         return isSatisfied();
       }
@@ -215,40 +284,6 @@ public class BDDConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mMarking;
-  }
-
-  @Override
-  public void setConfiguredPreconditionMarking(final EventProxy marking)
-  {
-    mPreconditionMarking = marking;
-  }
-
-  @Override
-  public EventProxy getConfiguredPreconditionMarking()
-  {
-    return mPreconditionMarking;
-  }
-
-  @Override
-  public ConflictTraceProxy getCounterExample()
-  {
-    return (ConflictTraceProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
   //# Algorithm Implementation
   @Override
   public void tearDown()
@@ -261,39 +296,37 @@ public class BDDConflictChecker
   }
 
   @Override
-  EventBDD[] createEventBDDs()
+  void createTransitionBDDs(final TransitionPartitioningStrategy strategy,
+                            final EventBDD[] eventBDDs)
     throws AnalysisException
   {
-    final EventBDD[] eventBDDs = super.createEventBDDs();
-    final VerificationResult result = getAnalysisResult();
-    if (result.isFinished()) {
-      return eventBDDs;
-    }
+    super.createTransitionBDDs(strategy, eventBDDs);
+
     final EventProxy omega = getUsedMarkingProposition();
     mMarkingBDD = getMarkedStateBDD(omega);
     if (mMarkingBDD.isOne()) {
       setSatisfiedResult();
-      return eventBDDs;
+      return;
     }
     if (mPreconditionMarking != null) {
       mPreconditionBDD = getMarkedStateBDD(mPreconditionMarking);
       mPreconditionBDD.applyWith(mMarkingBDD.id(), BDDFactory.diff);
       if (mPreconditionBDD.isZero()) {
         setSatisfiedResult();
-        return eventBDDs;
+        return;
       } else if (mPreconditionBDD.isOne()) {
         mPreconditionBDD = null;
       }
     }
     if (mPreconditionBDD == null && mMarkingBDD.isZero()) {
-      final BDD init = getInitialStateBDD();
+      final BDD init = createInitialStateBDD(false);
       final ConflictTraceProxy counterexample =
         computeCounterExample(init, 0, ConflictKind.CONFLICT);
       setFailedResult(counterexample);
-      return eventBDDs;
+      return;
     }
     final int limit = getPartitioningSizeLimit();
-    if (limit > 0) {
+    if (mEarlyDeadlockEnabled && limit > 0) {
       final BDD nondeadlock = mMarkingBDD.id();
       final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
       final BDDFactory factory = getBDDFactory();
@@ -302,11 +335,11 @@ public class BDDConflictChecker
       for (final TransitionPartitionBDD part : partitioning) {
         checkAbort();
         final BDD nondeadlockPart =
-          part.getNonDeadlockBDD(automatonBDDs, factory);
+          part.getStronglyEnabledBDD(automatonBDDs, factory);
         nondeadlock.orWith(nondeadlockPart);
         if (nondeadlock.nodeCount() > limit) {
           nondeadlock.free();
-          return eventBDDs;
+          return;
         }
       }
       final BDD deadlock = nondeadlock.not();
@@ -317,7 +350,6 @@ public class BDDConflictChecker
         mDeadlockBDD = deadlock;
       }
     }
-    return eventBDDs;
   }
 
   @Override
@@ -327,7 +359,7 @@ public class BDDConflictChecker
     if (mDeadlockBDD != null) {
       final BDD bad = reached.and(mDeadlockBDD);
       if (!bad.isZero()) {
-        final int level = getDepth() - 1;
+        final int level = getDepth();
         final ConflictTraceProxy counterexample =
           computeCounterExample(bad, level, ConflictKind.DEADLOCK);
         setFailedResult(counterexample);
@@ -418,6 +450,7 @@ public class BDDConflictChecker
   private EventProxy mMarking;
   private EventProxy mUsedMarking;
   private EventProxy mPreconditionMarking;
+  private boolean mEarlyDeadlockEnabled = true;
   private BDD mMarkingBDD;
   private BDD mPreconditionBDD;
   private BDD mDeadlockBDD;

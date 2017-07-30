@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
  * Boolean command line arguments are specified on the command line by their
  * name to specify a <I>true</I> value, or by their name preceded
  * with&nbsp;&quot;n&quot; to specify a <I>false</I> value. For example
- * <I>quot;failing events&quot;</I> might be enabled by&nbsp;<CODE>-fe</CODE>
+ * <I>&quot;failing events&quot;</I> might be enabled by&nbsp;<CODE>-fe</CODE>
  * and disabled by <CODE>-nfe</CODE>. The recognised value (<I>true</I>
  * or&nbsp;<I>false</I>)is stored in the <CODE>CommandLineArgumentBoolean</CODE>
  * object for retrieval.

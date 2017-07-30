@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -374,7 +374,7 @@ public class DefaultAnalysisResult
     if (mCompileTime >= 0) {
       formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
     }
-    writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " kB");
+    writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " KiB");
     if (mTotalNumberOfEvents >= 0) {
       writer.println("Total number of events: " + mTotalNumberOfEvents);
     }

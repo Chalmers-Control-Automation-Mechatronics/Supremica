@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -37,7 +37,7 @@ import net.sourceforge.waters.model.base.WatersException;
 
 
 /**
- * The superclass of al exceptions thrown by analysis algorithms.
+ * The superclass of all exceptions thrown by analysis algorithms.
  *
  * @author Robi Malik
  */

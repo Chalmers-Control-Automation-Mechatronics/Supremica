@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2015 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -171,13 +171,12 @@ public class AutomataSynchronizerWorker
         }
         else if (mode == MODE_UPDATE)
         {
-            // Display automaton
+            // Add the automaton to the panel
             try
             {
                 if (theAutomaton != null)
                 {
-                    // -- MF -- container.add(theAutomaton);
-                    // workbench.getVisualProjectContainer().getActiveProject().addAutomaton(theAutomaton);
+					// If an automaton with the same name already exists, this silently throws away the result. Not good.
                     ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
                 }
             }

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
-
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -63,14 +63,32 @@ abstract class PartitionBDD
    * Creates an atomic partition member, representing the BDD for a single
    * event.
    */
-  PartitionBDD(final EventProxy event, final BDD bdd, final BitSet automata)
+  PartitionBDD(final EventBDD eventBDD, final BDD bdd, final BitSet automata)
   {
+    final EventProxy event = eventBDD.getEvent();
     mBDD = bdd;
     mNodeCount = -1;
     mAveragePosition = Double.NaN;
     mComponents = Collections.singletonMap(event, this);
     mAutomata = automata;
-    mNumAutomata = automata.cardinality();
+    mNumAutomata = mAutomata.cardinality();
+    mIsAtomic = true;
+  }
+
+  /**
+   * Creates a partition member by copying event and automata information
+   * from another, but using a new BDD.
+   * @param  part   Partition to take event and automata information from.
+   * @param  bdd    BDD used for the new partition.
+   */
+  PartitionBDD(final PartitionBDD part, final BDD bdd)
+  {
+    mBDD = bdd;
+    mNodeCount = -1;
+    mAveragePosition = Double.NaN;
+    mComponents = new HashMap<>(part.mComponents);
+    mAutomata = (BitSet) part.getAutomata().clone();
+    mNumAutomata = part.mNumAutomata;
     mIsAtomic = true;
   }
 
@@ -109,8 +127,8 @@ abstract class PartitionBDD
   }
 
   /**
-   * Free the BDD representing this partition, if it is an atomic partition
-   * member.
+   * Free the BDD representing this partition, unless it is an atomic
+   * partition member.
    */
   void disposeComposedBDD()
   {
@@ -137,6 +155,7 @@ abstract class PartitionBDD
 
   //#########################################################################
   //# Interface java.util.Comparable
+  @Override
   public int compareTo(final PartitionBDD part)
   {
     final double pos1 = computeAveragePosition();
@@ -202,16 +221,31 @@ abstract class PartitionBDD
     return mIsAtomic;
   }
 
-
   //#########################################################################
   //# Specific Methods Provided by Subclasses
   abstract PartitionBDD compose(final PartitionBDD part,
                                 final AutomatonBDD[] automatonBDDs,
                                 final BDDFactory factory);
 
+  /**
+   * Returns whether this BDD is a dominant literal. A BDD in a conjunctive
+   * partition is dominant if represents false, while a BDD in a disjunctive
+   * partition is dominant represents true.
+   */
+  abstract boolean isDominant();
+
 
   //#########################################################################
   //# Simplification
+  /**
+   * Attempts to replace the BDD of this partition with a smaller alternative.
+   * This method checks whether the given alternative BDD is smaller than
+   * the current BDD of this partition, and if so replaces the current BDD
+   * by the alternative. The larger of the two BDDs is destroyed (freed) by
+   * this method.
+   * @param  altBDD  The alternative BDD to replace the current BDD.
+   * @return The BDD installed after the operation.
+   */
   BDD installSmallerBDD(final BDD altBDD)
   {
     if (mBDD.equals(altBDD)) {
@@ -260,7 +294,7 @@ abstract class PartitionBDD
   //# Auxiliary Methods
   private double computeAveragePosition()
   {
-    if (mAveragePosition == Double.NaN) {
+    if (Double.isNaN(mAveragePosition)) {
       int sum = 0;
       int count = 0;
       for (final PartitionBDD part : mComponents.values()) {

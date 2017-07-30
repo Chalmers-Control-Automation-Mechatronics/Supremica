@@ -122,12 +122,14 @@ public final class AutomataIndexForm
     private AutomataIndexMap indexMap;
 
     /**
-     *@param  theAutomata The automata to be synchronized.
-     *@param  theAutomaton The synchronized automaton.
-	 *@param sups_as_plants Defines whether we are to regard supervisors as plants or not
-     *@exception  Exception Description of the Exception
+     * @param  theAutomata The automata to be synchronized.
+     * @param  theAutomaton The synchronized automaton.
+	 * @param sups_as_plants Defines whether we are to regard supervisors as plants or not
+	 * @param unobs_events_sync Determines whether unobservable non-tau events synch or not
+     * @exception  Exception Description of the Exception
      */
-    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton, final boolean sups_as_plants)
+    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton, 
+							 final boolean sups_as_plants, final boolean unobs_events_sync)
     throws Exception
     {
         this.theAutomata = theAutomata;
@@ -163,10 +165,21 @@ public final class AutomataIndexForm
         generateNextStateTransitionIndices(theAutomata, theAutomaton);
         generatePrevStatesTransitionIndices(theAutomata, theAutomaton);
 
-        generateEventsTables(theAutomaton);
+        generateEventsTables(theAutomaton, unobs_events_sync);	// Updated to allow selection of whether unobs events synch or not // MF
         generateEventToAutomatonTable(theAutomata, theAutomaton);
     }
 
+	/*
+	 * This one is here to preserve the old default where unobservable events did not sync
+	*/
+	public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton, final boolean sups_as_plants)
+    throws Exception
+	{
+		this(theAutomata, theAutomaton, sups_as_plants, false);
+	}
+	
+	/** Copy constructors **/
+	
     public AutomataIndexForm(final AutomataIndexForm indexForm)
     {
         this(indexForm, false);
@@ -646,7 +659,7 @@ public final class AutomataIndexForm
 
                 while (sortedEventIndicesIt.hasNext())
                 {
-                    final int thisIndex = sortedEventIndicesIt.next().intValue();
+                    final int thisIndex = sortedEventIndicesIt.next(); // .intValue(); // Unnecessary unboxing!
 
                     incomingEventsTable[currAutomatonIndex][currStateIndex][i++] = thisIndex;
                 }
@@ -656,7 +669,7 @@ public final class AutomataIndexForm
         }
     }
 
-    void generateEventsTables(final Automaton theAutomaton)
+    void generateEventsTables(final Automaton theAutomaton, final boolean unobs_events_sync)
     throws Exception
     {
         final Alphabet theAlphabet = theAutomaton.getAlphabet();
@@ -671,8 +684,20 @@ public final class AutomataIndexForm
 
             controllableEventsTable[i] = currEvent.isControllable();
             immediateEventsTable[i] = currEvent.isImmediate();
-            epsilonEventsTable[i] = !currEvent.isObservable();	// An event is epsilon if (and only if) it is unobservable
-        }
+			
+			/* MF - July 2017
+			 * It turns out to be unclear whether unobservable events do synchronize or not
+			 * epsilon events (aka tau events) do not synch, that is clear, but in DESUMA
+			 * unobservable events do synchronize. We need to leave this to the user to decide
+			 * whether unobservable (non-tau) events should synch, with default not to synch.
+			 * So the logic here is much more complex than initially implemented many years ago
+			**/
+			// The original line which made all unobservable events synch
+            // epsilonEventsTable[i] = !currEvent.isObservable();	// An event is epsilon if (and only if) it is unobservable
+			
+			// The new (July 2017) code that makes the synch of non-tau unobs events user settable
+			epsilonEventsTable[i] = (!currEvent.isObservable() && !unobs_events_sync) || currEvent.isTauEvent();
+		}
     }
 
     // TODO: KA

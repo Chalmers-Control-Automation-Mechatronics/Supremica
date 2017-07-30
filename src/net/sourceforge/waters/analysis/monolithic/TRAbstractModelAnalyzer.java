@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2016 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -51,6 +51,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StatusGroupTransitionIterator;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -62,8 +63,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.THashSet;
@@ -71,8 +72,13 @@ import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
- * A Java implementation of the monolithic synchronous product algorithm,
- * based on {@link ListBufferTransitionRelation} as automaton representation.
+ * <P>An abstract base class for monolithic model analysers that use
+ * {@link ListBufferTransitionRelation} as their automata representation.</P>
+ *
+ * <P>The base class supports the automatic conversion of general automata
+ * ({@link AutomatonProxy}) to transition-relation based ({@link
+ * TRAutomatonProxy}) objects when needed, and contains general support
+ * to store the synchronous product state space and expand state tuples.</P>
  *
  * @author Robi Malik
  */
@@ -249,6 +255,11 @@ public abstract class TRAbstractModelAnalyzer
     return mStateCallback;
   }
 
+  public int getDefaultConfig()
+  {
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -263,10 +274,26 @@ public abstract class TRAbstractModelAnalyzer
   //# Invocation
   @Override
   protected void setUp()
-  throws AnalysisException
+    throws AnalysisException
   {
     super.setUp();
+    // Set up input automata and state encoding
+    setUpAutomata();
+    // Set up output event encoding
+    final Map<EventProxy,EventInfo> eventInfoMap = setUpEventEncoding();
+    checkEventsInAutomta(eventInfoMap);
+    // Set up deadlock information ...
+    setUpDeadlockInfo();
+    // Add transition information to event info ...
+    final List<EventInfo> eventInfoList =
+      setUpTransitions(mTRAutomata, eventInfoMap);
+    // Sort event info and merge local events
+    postProcessEventInfo(eventInfoList);
+  }
 
+  protected void setUpAutomata()
+    throws AnalysisException
+  {
     // Set up input automata and find their sizes
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
@@ -277,16 +304,20 @@ public abstract class TRAbstractModelAnalyzer
         numAutomata++;
       }
     }
-    mInputAutomata = new TRAutomatonProxy[numAutomata];
+    mInputAutomata = new AutomatonProxy[numAutomata];
+    mTRAutomata = new TRAutomatonProxy[numAutomata];
     mDecodedDeadlockState = new int[numAutomata];
     final int[] sizes = new int[numAutomata];
     int a = 0;
     boolean gotDump = false;
     for (final AutomatonProxy aut : automata) {
+      checkAbort();
       if (translator.getComponentKind(aut) != null) {
+        mInputAutomata[a] = aut;
+        final int config = getDefaultConfig();
         final TRAutomatonProxy tr = TRAutomatonProxy.createTRAutomatonProxy
-          (aut, translator, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-        mInputAutomata[a] = tr;
+          (aut, translator, config);
+        mTRAutomata[a] = tr;
         final ListBufferTransitionRelation rel = tr.getTransitionRelation();
         int numStates = getLastReachableState(rel) + 1;
         final int dumpIndex = getAlternativeDumpState(rel, numStates);
@@ -304,6 +335,23 @@ public abstract class TRAbstractModelAnalyzer
       mDecodedDeadlockState[0] = sizes[0]++;
     }
 
+    // Set up state encoding
+    mStateTupleEncoding = new StateTupleEncoding(sizes);
+    final int numWords = mStateTupleEncoding.getNumberOfWords();
+    final int stateLimit = getNodeLimit();
+    final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
+    mStateSpace = new IntArrayBuffer(numWords, stateLimit, tableSize, -1);
+    mDecodedSource = new int[numAutomata];
+    mEncodedSource = new int[numWords];
+    mDecodedTarget = new int[numAutomata];
+    mEncodedTarget = new int[numWords];
+  }
+
+  protected Map<EventProxy,EventInfo> setUpEventEncoding()
+    throws OverflowException, AnalysisAbortException
+  {
+    final ProductDESProxy des = getModel();
+
     // Set up output event encoding
     final Collection<EventProxy> events = des.getEvents();
     final int numEvents = events.size();
@@ -317,8 +365,11 @@ public abstract class TRAbstractModelAnalyzer
     }
 
     // Add propositions to output event encoding ...
-    for (a = 0; a < numAutomata; a++) {
-      final TRAutomatonProxy aut = mInputAutomata[a];
+    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
+    final int numAutomata = mTRAutomata.length;
+    for (int a = 0; a < numAutomata; a++) {
+      checkAbort();
+      final TRAutomatonProxy aut = mTRAutomata[a];
       final EventEncoding enc = aut.getEventEncoding();
       for (int p = 0; p < enc.getNumberOfPropositions(); p++) {
         if (enc.isPropositionUsed(p)) {
@@ -335,9 +386,52 @@ public abstract class TRAbstractModelAnalyzer
           }
         }
       }
+      for (int e = EventEncoding.TAU; e < enc.getNumberOfProperEvents(); e++) {
+        if ((enc.getProperEventStatus(e) & EventStatus.STATUS_UNUSED) == 0) {
+          // For any used event: create event info if not yet present
+          final EventProxy event = enc.getProperEvent(e);
+          if (!eventInfoMap.containsKey(event)) {
+            final EventInfo info = new EventInfo(event);
+            eventInfoMap.put(event, info);
+            if (mConfiguredEventEncoding != null) {
+              final int confCode = mConfiguredEventEncoding.getEventCode(event);
+              if (confCode >= 0) {
+                // Set status from configured encoding if present
+                final byte status =
+                  mConfiguredEventEncoding.getProperEventStatus(confCode);
+                info.setStatus(status);
+                // Remember which event is in output
+                // (Note: output may be different from event if hiding)
+                final EventProxy output =
+                  mConfiguredEventEncoding.getProperEvent(confCode);
+                outputEvents.add(output);
+              }
+            }
+          }
+        }
+      }
     }
 
-    // Set up deadlock information ...
+    // Mark events unused if in configured encoding but not in output
+    if (mConfiguredEventEncoding != null) {
+      final int numConfigured =
+        mConfiguredEventEncoding.getNumberOfProperEvents();
+      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
+        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
+        if (!outputEvents.contains(event)) {
+          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
+          mOutputEventEncoding.setProperEventStatus
+            (e, status | EventStatus.STATUS_UNUSED);
+        }
+      }
+    }
+
+    return eventInfoMap;
+  }
+
+  protected void setUpDeadlockInfo()
+    throws AnalysisAbortException, OverflowException
+  {
     final int numProps = mOutputEventEncoding.getNumberOfPropositions();
     if (mPruningDeadlocks && numProps > 0) {
       boolean allPropsUsed = true;
@@ -348,9 +442,10 @@ public abstract class TRAbstractModelAnalyzer
         }
       }
       if (allPropsUsed) {
+        final int numAutomata = mTRAutomata.length;
         deadlock:
-        for (a = 0; a < numAutomata; a++) {
-          final TRAutomatonProxy aut = mInputAutomata[a];
+        for (int a = 0; a < numAutomata; a++) {
+          final TRAutomatonProxy aut = mTRAutomata[a];
           final EventEncoding enc = aut.getEventEncoding();
           final ListBufferTransitionRelation rel = aut.getTransitionRelation();
           long pattern = rel.createMarkings();
@@ -366,6 +461,7 @@ public abstract class TRAbstractModelAnalyzer
           final DeadlockInfo info = new DeadlockInfo(rel, pattern);
           final int numStates = rel.getNumberOfStates();
           for (int s = 0; s < numStates; s++) {
+            checkAbort();
             if (rel.isReachable(s) && info.isDeadlockState(s)) {
               if (mDeadlockInfo == null) {
                 mDeadlockInfo = new DeadlockInfo[numAutomata];
@@ -378,54 +474,34 @@ public abstract class TRAbstractModelAnalyzer
       }
     }
     mDeadlockState = -1;
+  }
 
-    // Add proper events to output event encoding and create event info ...
-    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
-    for (final EventProxy event : events) {
-      if (translator.getEventKind(event) != EventKind.PROPOSITION) {
-        final EventInfo info = new EventInfo(event);
-        eventInfoMap.put(event, info);
-        if (mConfiguredEventEncoding != null) {
-          final int e = mConfiguredEventEncoding.getEventCode(event);
-          if (e >= 0) {
-            final EventProxy output = mConfiguredEventEncoding.getProperEvent(e);
-            outputEvents.add(output);
-            final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-            info.setStatus(status);
-          }
-        }
-      }
-    }
-    if (mConfiguredEventEncoding != null) {
-      // Check for unused events in configured event encoding ...
-      final int numConfigured =
-        mConfiguredEventEncoding.getNumberOfProperEvents();
-      for (int e = EventEncoding.TAU; e < numConfigured; e++) {
-        final EventProxy event = mConfiguredEventEncoding.getProperEvent(e);
-        if (event != null && !outputEvents.contains(event)) {
-          final byte status = mConfiguredEventEncoding.getProperEventStatus(e);
-          mOutputEventEncoding.setProperEventStatus
-            (e, status | EventStatus.STATUS_UNUSED);
-        }
-      }
-    }
-
-    // Add transition information to event info ...
+  protected List<EventInfo> setUpTransitions
+    (final TRAutomatonProxy[] automata,
+     final Map<EventProxy,EventInfo> eventInfoMap)
+    throws OverflowException, AnalysisAbortException
+  {
+    final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy des = getModel();
+    final Collection<EventProxy> events = des.getEvents();
+    final int numAutomata = automata.length;
+    final int numEvents = events.size();
     final List<EventInfo> eventInfoList = new ArrayList<>(numEvents);
-    for (a = 0; a < numAutomata; a++) {
-      final TRAutomatonProxy aut = mInputAutomata[a];
+    for (int a = 0; a < numAutomata; a++) {
+      final TRAutomatonProxy aut = automata[a];
       final DeadlockInfo deadlockInfo =
         mDeadlockInfo == null ? null : mDeadlockInfo[a];
       final EventEncoding enc = aut.getEventEncoding();
       final int numLocalEvents = enc.getNumberOfProperEvents();
       for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
+        checkAbort();
         final byte status = enc.getProperEventStatus(local);
         if (EventStatus.isUsedEvent(status)) {
           final EventProxy event = enc.getProperEvent(local);
           if (event == null) {
             assert local == EventEncoding.TAU;
             final AutomatonEventInfo autInfo =
-              new AutomatonEventInfo(a, aut, local, deadlockInfo);
+              new AutomatonEventInfo(a, aut, local, deadlockInfo, true);
             if (!autInfo.isBlocked()) {
               final EventInfo info = new EventInfo(null);
               info.addAutomatonEventInfo(autInfo);
@@ -439,12 +515,10 @@ public abstract class TRAbstractModelAnalyzer
             final int global =
               mOutputEventEncoding.addEvent(event, translator, status);
             final EventInfo info = eventInfoMap.get(event);
-            if (info == null) {
-              throw new EventNotFoundException(des, event.getName());
-            } else if (!info.isBlocked()) {
+            if (info != null && !info.isBlocked()) {
               info.setOutputCode(global);
               final AutomatonEventInfo autInfo =
-                new AutomatonEventInfo(a, aut, local, deadlockInfo);
+                new AutomatonEventInfo(a, aut, local, deadlockInfo, true);
               info.addAutomatonEventInfo(autInfo);
             }
           }
@@ -458,13 +532,18 @@ public abstract class TRAbstractModelAnalyzer
         eventInfoList.add(info);
       }
     }
+    return eventInfoList;
+  }
 
-    // Sort event info and merge local events
+  protected void postProcessEventInfo(final List<EventInfo> eventInfoList)
+    throws AnalysisException
+  {
     Collections.sort(eventInfoList);
     mEventInfo = new ArrayList<>(eventInfoList.size());
     final List<EventInfo> group = new ArrayList<>();
     EventInfo current = null;
     for (final EventInfo info : eventInfoList) {
+      checkAbort();
       if (current == null) {
         current = info;
         group.add(info);
@@ -478,26 +557,50 @@ public abstract class TRAbstractModelAnalyzer
       }
     }
     addMergedEventInfo(group);
-
-    // Set up state encoding
-    mStateTupleEncoding = new StateTupleEncoding(sizes);
-    final int numWords = mStateTupleEncoding.getNumberOfWords();
-    final int stateLimit = getNodeLimit();
-    final int tableSize = Math.min(stateLimit, MAX_TABLE_SIZE);
-    mStateSpace = new IntArrayBuffer(numWords, stateLimit, tableSize, -1);
-    mDecodedSource = new int[numAutomata];
-    mEncodedSource = new int[numWords];
-    mDecodedTarget = new int[numAutomata];
-    mEncodedTarget = new int[numWords];
   }
+
+
+  protected List<EventInfo> setUpReverseTransitions()
+    throws AnalysisException
+  {
+    final int numAutomata = mTRAutomata.length;
+    final TRAutomatonProxy[] reversedAutomata = new TRAutomatonProxy[numAutomata];
+    for (int a = 0; a < numAutomata; a++) {
+      checkAbort();
+      final TRAutomatonProxy aut = mTRAutomata[a];
+      final EventEncoding enc = aut.getEventEncoding();
+      final EventEncoding reversedEnc = enc.clone();
+      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
+      final ListBufferTransitionRelation reversedRel =
+        new ListBufferTransitionRelation(rel, reversedEnc,
+                                         ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+      reversedRel.reverse();
+      final TRAutomatonProxy reversedAut =
+        new TRAutomatonProxy(reversedEnc, reversedRel);
+      reversedAutomata[a] = reversedAut;
+    }
+    final int numEvents = mEventInfo.size();
+    final Map<EventProxy,EventInfo> eventInfoMap = new HashMap<>(numEvents);
+    for (final EventInfo info : mEventInfo) {
+      info.reset();
+      final EventProxy event = info.getEvent();
+      eventInfoMap.put(event, info);
+    }
+    final List<EventInfo> eventInfoList =
+      setUpTransitions(reversedAutomata, eventInfoMap);
+    postProcessEventInfo(eventInfoList);
+    return eventInfoList;
+  }
+
+
 
   @Override
   protected void addStatistics()
   {
     super.addStatistics();
     final AnalysisResult result = getAnalysisResult();
-    if (mInputAutomata != null) {
-      result.setNumberOfAutomata(mInputAutomata.length);
+    if (mTRAutomata != null) {
+      result.setNumberOfAutomata(mTRAutomata.length);
     }
     if (mStateSpace != null) {
       result.setNumberOfStates(mStateSpace.size());
@@ -509,11 +612,13 @@ public abstract class TRAbstractModelAnalyzer
   {
     super.tearDown();
     mInputAutomata = null;
+    mTRAutomata = null;
     mEventInfo = null;
     mStateTupleEncoding = null;
     mStateSpace = null;
     mOutputEventEncoding = null;
     mDeadlockInfo = null;
+    mInputStateArrays = null;
     mDecodedSource = null;
     mEncodedSource = null;
     mDecodedTarget = null;
@@ -533,9 +638,49 @@ public abstract class TRAbstractModelAnalyzer
     return mOutputEventEncoding;
   }
 
-  protected TRAutomatonProxy[] getInputAutomata()
+  /**
+   * Retrieves an automaton from the input model. If the input model contains
+   * {@link TRAutomatonProxy} objects, this method returns the same objects
+   * as {@link #getTRAutomaton(int) getTRAutomaton()}, otherwise the results
+   * will be different.
+   * @param  index  The index of the automaton to be retrieved. The index
+   *                corresponds the the position in state tuples and to the
+   *                array returned by {@link #getTRAutomata()}.
+   * @return An {@link AutomatonProxy} object that is guaranteed to appear
+   *         in the input model.
+   */
+  protected AutomatonProxy getInputAutomaton(final int index)
   {
-    return mInputAutomata;
+    return mInputAutomata[index];
+  }
+
+  /**
+   * Retrieves a {@link TRAutomatonProxy} object used during analysis.
+   * If the input model contains {@link TRAutomatonProxy} objects,
+   * this method returns the same objects as {@link #getInputAutomaton(int)
+   * getInputAutomaton()}, otherwise the results will be different.
+   * @param  index  The index of the automaton to be retrieved. The index
+   *                corresponds the the position in state tuples and to the
+   *                array returned by {@link #getTRAutomata()}.
+   * @return A {@link TRAutomatonProxy} object used by the algorithms,
+   *         which may or may not appear in the input model.
+   */
+  protected TRAutomatonProxy getTRAutomaton(final int index)
+  {
+    return mTRAutomata[index];
+  }
+
+  /**
+   * Retrieves the array of {@link TRAutomatonProxy} objects used during
+   * analysis. This array is the subset of automata from the input model
+   * selected for analysis, possibly converted to {@link TRAutomatonProxy}.
+   * If the input model already contains {@link TRAutomatonProxy} objects,
+   * the array returned by this method contains the same objects as
+   * provided the input model, otherwise this is not guaranteed.
+   */
+  protected TRAutomatonProxy[] getTRAutomata()
+  {
+    return mTRAutomata;
   }
 
   protected Collection<EventInfo> getEventInfo()
@@ -568,17 +713,69 @@ public abstract class TRAbstractModelAnalyzer
     return mDeadlockState;
   }
 
-  protected void exploreStateSpace()
-    throws OverflowException
+  /**
+   * Retrieves a state from the input model.
+   * @param  autIndex    The index of the automaton to be examined. It
+   *                     corresponds the the position in state tuples and
+   *                     to the array returned by {@link #getTRAutomata()}.
+   * @param  stateIndex  The number of the state to be retrieved. It
+   *                     corresponds to the number stored in state tuples.
+   * @return A {@link StateProxy} object corresponding to the identified
+   *         state, which is guaranteed to appear in the input model.
+   */
+  protected StateProxy getInputState(final int autIndex, final int stateIndex)
   {
+    final AutomatonProxy aut = mInputAutomata[autIndex];
+    if (aut instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
+      return tr.getState(stateIndex);
+    } else {
+      if (mInputStateArrays == null) {
+        final int numAutomata = mInputAutomata.length;
+        mInputStateArrays = new StateProxy[numAutomata][];
+      }
+      StateProxy[] array = mInputStateArrays[autIndex];
+      if (array == null) {
+        final Collection<StateProxy> states = aut.getStates();
+        final int numStates = states.size();
+        array = new StateProxy[numStates];
+        mInputStateArrays[autIndex] = states.toArray(array);
+      }
+      return array[stateIndex];
+    }
+  }
+
+
+  /**
+   * Performs full state space exploration.
+   * This methods adds all initial states to the state space, and then
+   * enters a loop to calculate and record successor states. Exploration
+   * continues until all reachable states and transitions have been processed,
+   * or it can stop prematurely if the analysis result is found to have been
+   * set.
+   */
+  protected void exploreStateSpace()
+    throws AnalysisException
+  {
+    final AnalysisResult result = getAnalysisResult();
     storeInitialStates();
-    for (int current = 0; current < mStateSpace.size(); current++) {
+    for (int current = 0;
+         current < mStateSpace.size() && !result.isFinished();
+         current++) {
+      checkAbort();
       expandState(current);
     }
   }
 
+  /**
+   * Expands the given state.
+   * This method calculates all transitions originating from the given state,
+   * creating new states and storing information as needed.
+   * @param  encoded  Compressed state tuple to be expanded.
+   * @param  decoded  Decompressed version of the same state tuple.
+   */
   protected void expandState(final int[] encoded, final int[] decoded)
-    throws OverflowException
+    throws AnalysisException
   {
     for (final EventInfo event : mEventInfo) {
       if (!expandState(encoded, decoded, event)) {
@@ -587,6 +784,18 @@ public abstract class TRAbstractModelAnalyzer
     }
   }
 
+  /**
+   * Expands the transitions of the given event from the given state.
+   * This method calculates all transitions of the given event originating
+   * from the given state, creating new states and storing information as
+   * needed.
+   * @param  encoded  Compressed state tuple to be expanded.
+   * @param  decoded  Decompressed version of the same state tuple.
+   * @param  event    The event whose transitions are expanded.
+   * @return <CODE>true</CODE> to indicate that exploration should continue
+   *         after the call, <CODE>false</CODE> to indicate no further
+   *         transitions originating from this state should be processed.
+   */
   protected boolean expandState(final int[] encoded,
                                 final int[] decoded,
                                 final EventInfo event)
@@ -599,15 +808,25 @@ public abstract class TRAbstractModelAnalyzer
         if (event.isOutsideAlwaysEnabled()) {
           return false;
         }
-      } else if (mStateCallback == null) {
-        System.arraycopy(encoded, 0, mEncodedTarget, 0, encoded.length);
-        event.createSuccessorStatesEncoded(mEncodedTarget, this);
       } else {
-        System.arraycopy(decoded, 0, mDecodedTarget, 0, decoded.length);
-        event.createSuccessorStatesDecoded(mDecodedTarget, this);
+        createSuccessorStates(encoded, decoded, event);
       }
     }
     return true;
+  }
+
+  protected void createSuccessorStates(final int[] encoded,
+                                       final int[] decoded,
+                                       final EventInfo event)
+    throws OverflowException
+  {
+    if (mStateCallback == null) {
+      System.arraycopy(encoded, 0, mEncodedTarget, 0, encoded.length);
+      event.createSuccessorStatesEncoded(mEncodedTarget, this);
+    } else {
+      System.arraycopy(decoded, 0, mDecodedTarget, 0, decoded.length);
+      event.createSuccessorStatesDecoded(mDecodedTarget, this);
+    }
   }
 
   public MarkingInfo getMarkingInfo(final EventProxy prop)
@@ -630,7 +849,7 @@ public abstract class TRAbstractModelAnalyzer
     default:
       final EventInfo first = group.get(0);
       final int a = first.getLocalAutomatonIndex();
-      final TRAutomatonProxy aut = mInputAutomata[a];
+      final TRAutomatonProxy aut = mTRAutomata[a];
       final DeadlockInfo deadlockInfo =
         mDeadlockInfo == null ? null : mDeadlockInfo[a];
       final EventInfo merged = new EventInfo(group, aut, deadlockInfo);
@@ -643,8 +862,8 @@ public abstract class TRAbstractModelAnalyzer
     throws OverflowException
   {
     final TIntArrayList nondeterministicIndices = new TIntArrayList();
-    for (int a = 0; a < mInputAutomata.length; a++) {
-      final TRAutomatonProxy aut = mInputAutomata[a];
+    for (int a = 0; a < mTRAutomata.length; a++) {
+      final TRAutomatonProxy aut = mTRAutomata[a];
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       boolean found = false;
       final int numStates = rel.getNumberOfStates();
@@ -659,6 +878,9 @@ public abstract class TRAbstractModelAnalyzer
           }
         }
       }
+      if (!found) {
+        return;
+      }
     }
     storeInitialStates(nondeterministicIndices, 0);
     mNumberOfInitialStates = mStateSpace.size();
@@ -670,7 +892,7 @@ public abstract class TRAbstractModelAnalyzer
   {
     if (index < nondeterministicIndices.size()) {
       final int a = nondeterministicIndices.get(index);
-      final TRAutomatonProxy aut = mInputAutomata[a];
+      final TRAutomatonProxy aut = mTRAutomata[a];
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       final int numStates = rel.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
@@ -684,8 +906,14 @@ public abstract class TRAbstractModelAnalyzer
     }
   }
 
+  /**
+   * Expands the given state.
+   * This method calculates all transitions originating from the given state,
+   * creating new states and storing information as needed.
+   * @param  source  Number of state to be expanded.
+   */
   private void expandState(final int source)
-    throws OverflowException
+    throws AnalysisException
   {
     if (source != mDeadlockState) {
       mCurrentSource = source;
@@ -796,6 +1024,7 @@ public abstract class TRAbstractModelAnalyzer
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Static Methods
   private static int getLastReachableState
@@ -828,6 +1057,36 @@ public abstract class TRAbstractModelAnalyzer
       }
     }
     return -1;
+  }
+
+
+  //#########################################################################
+  //# Error Handling
+  /**
+   * Checks the event alphabets of all input automata to see whether all
+   * used non-proposition events have associated event information.
+   * @param  eventInfoMap  Event information map that contains an entry for
+   *                       all recognised events
+   * @throws EventNotFoundException to indicate that some input automaton
+   *                       uses an event not mapped to anything in the map.
+   */
+  private void checkEventsInAutomta(final Map<EventProxy,EventInfo> eventInfoMap)
+    throws EventNotFoundException
+  {
+    for (final TRAutomatonProxy aut : mTRAutomata) {
+      final EventEncoding enc = aut.getEventEncoding();
+      final int numLocalEvents = enc.getNumberOfProperEvents();
+      for (int local = EventEncoding.TAU; local < numLocalEvents; local++) {
+        final byte status = enc.getProperEventStatus(local);
+        if (EventStatus.isUsedEvent(status)) {
+          final EventProxy event = enc.getProperEvent(local);
+          if (event != null && !eventInfoMap.containsKey(event)) {
+            final ProductDESProxy des = getModel();
+            throw new EventNotFoundException(des, event.getName());
+          }
+        }
+      }
+    }
   }
 
 
@@ -880,9 +1139,9 @@ public abstract class TRAbstractModelAnalyzer
       if (globalP < 0) {
         mMarkingInfo = Collections.emptyList();
       } else {
-        mMarkingInfo  = new ArrayList<>(mInputAutomata.length);
+        mMarkingInfo  = new ArrayList<>(mTRAutomata.length);
         int a = 0;
-        for (final TRAutomatonProxy localAut : mInputAutomata) {
+        for (final TRAutomatonProxy localAut : mTRAutomata) {
           final EventEncoding enc = localAut.getEventEncoding();
           final int localP = enc.getEventCode(prop);
           if (localP >= 0) {
@@ -1105,6 +1364,11 @@ public abstract class TRAbstractModelAnalyzer
 
     //#######################################################################
     //# Simple Access
+    public EventProxy getEvent()
+    {
+      return mEvent;
+    }
+
     public int getOutputCode()
     {
       return mOutputCode;
@@ -1145,6 +1409,11 @@ public abstract class TRAbstractModelAnalyzer
         EventStatus.isLocalEvent(mStatus) && mDisablingAutomata.size() == 1;
     }
 
+    public boolean isGloballyAlwaysEnabled()
+    {
+      return mDisablingAutomata.isEmpty() && !mBlocked;
+    }
+
     public int getLocalAutomatonIndex()
     {
       if (mDisablingAutomata.size() == 1) {
@@ -1179,6 +1448,15 @@ public abstract class TRAbstractModelAnalyzer
 
     //#######################################################################
     //# Setup
+    private void reset()
+    {
+      mStatus = EventStatus.STATUS_NONE;
+      mBlocked = false;
+      mDisablingAutomata.clear();
+      mUpdatingAutomata.clear();
+      mUpdateSequence = null;
+    }
+
     private void setOutputCode(final int e)
     {
       mOutputCode = e;
@@ -1328,13 +1606,14 @@ public abstract class TRAbstractModelAnalyzer
     private AutomatonEventInfo(final int autIndex,
                                final TRAutomatonProxy aut,
                                final int e,
-                               final DeadlockInfo deadlockInfo)
+                               final DeadlockInfo deadlockInfo,
+                               final boolean canBlock)
     {
       mAutomatonIndex = autIndex;
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();
       mTransitionIterator = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator.resetEvent(e);
-      countTransitions(rel, deadlockInfo);
+      countTransitions(rel, deadlockInfo, canBlock);
     }
 
     private AutomatonEventInfo(final Collection<AutomatonEventInfo> parts,
@@ -1362,15 +1641,16 @@ public abstract class TRAbstractModelAnalyzer
       final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
       mTransitionIterator = new StatusGroupTransitionIterator
         (iter, provider, EventStatus.STATUS_LOCAL);
-      countTransitions(rel, deadlockInfo);
+      countTransitions(rel, deadlockInfo, true);
     }
 
     private void countTransitions(final ListBufferTransitionRelation rel,
-                                  final DeadlockInfo deadlockInfo)
+                                  final DeadlockInfo deadlockInfo,
+                                  final boolean canBlock)
     {
       mDeterministic = true;
       mSelfloopOnly = true;
-      mBlocked = true;
+      mBlocked = canBlock;
       final int numStates = rel.getNumberOfStates();
       int numReachable = 0;
       int numEnabled = 0;
@@ -1579,13 +1859,15 @@ public abstract class TRAbstractModelAnalyzer
   private StateCallback mStateCallback = null;
 
   // Data structures for state space representation
-  private TRAutomatonProxy[] mInputAutomata;
+  private AutomatonProxy[] mInputAutomata;
+  private TRAutomatonProxy[] mTRAutomata;
   private Collection<EventInfo> mEventInfo;
   private StateTupleEncoding mStateTupleEncoding;
   private IntArrayBuffer mStateSpace;
   private EventEncoding mOutputEventEncoding;
   private DeadlockInfo[] mDeadlockInfo;
   private int mNumberOfInitialStates;
+  private StateProxy[][] mInputStateArrays;
 
   // Temporary variables
   private int mCurrentSource;

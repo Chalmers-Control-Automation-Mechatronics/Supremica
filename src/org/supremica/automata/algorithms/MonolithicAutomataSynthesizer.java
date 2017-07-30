@@ -115,15 +115,31 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
 			synchronizationOptions.setRememberDisabledEvents(true);
 		}
-
+		
+		/*
+		 * The collection uc_events is to keep track of which events are originally controllable
+		 * If uc_evenst is non-empty at the end of the synthesis, this means that the
+		 * uncontrollability of those events needs to be restored
+		**/
+		// final Alphabet uc_events = new Alphabet(); // 
+		// Note! Cannot use Alphabet here, since Alphabet does not allow multiple same-labeled events
+		// A linked list will do just fine, since we only add, and then traverse once at the end (no search)
+		final java.util.List<LabeledEvent> uc_events = new java.util.LinkedList<>();
+		
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING)
 		{
 			automata = new Automata(automata);
-			// Only nonblocking? Then everything should be considered
-			// controllable! // NOT THE RIGHT WAY TO DO THIS! No fix for it now, though // MF
-			for (final Automaton automaton : automata) {
-				for (final LabeledEvent event : automaton.getAlphabet()) {
-					event.setControllable(true);
+			// Only nonblocking? Then everything should be considered controllable! 
+			// But don't forget to restore everything, see issue #38 // MF 
+			for (final Automaton automaton : automata) 
+			{
+				for (final LabeledEvent event : automaton.getAlphabet()) 
+				{
+					if(!event.isControllable())
+					{	
+						uc_events.add(event);	// Keep track that this events was uncontrollable...
+						event.setControllable(true);	// ... then set it controllable.
+					}						
 				}
 			}
 		}
@@ -201,6 +217,12 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 			}
 		}
 
+		// Restore the unontrollability of the events that may have been made 
+		// controllable for Monolithic Nonblocking (Explicit) synthesis, but
+		// were originally uncontrollable
+		for(final LabeledEvent ucev : uc_events)
+			ucev.setControllable(false);
+		
 		// Return the result
 		return retval;
 	}

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -382,6 +382,14 @@ public abstract class AbstractControlLoopCheckerTest
     runModelVerifier(group, dir, name, false);
   }
 
+  public void test_Nasty_TheVicousLoop3() throws Exception
+  {
+    final String group = "tests";
+    final String dir = "nasty";
+    final String name = "the_vicious_loop3.wmod";
+    runModelVerifier(group, dir, name, false);
+  }
+
   public void testProfisafeI3HostEFA() throws Exception
   {
     final String group = "tests";
@@ -508,7 +516,7 @@ public abstract class AbstractControlLoopCheckerTest
     final String group = "valid";
     final String dir  = "central_locking";
     final String name = "koordwsp.wdes";
-    runModelVerifier(group, dir, name, true);
+    runModelVerifier(group, dir, name, false);
   }
 
   public void testSafetydisplay() throws Exception

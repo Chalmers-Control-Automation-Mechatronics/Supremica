@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -34,17 +34,19 @@
 package net.sourceforge.waters.analysis.comp552;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -52,9 +54,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <P>A tool to check whether a controllability error trace is a correct
  * counterexample to show that a given product DES is not controllable.</P>
  *
- * <P>To use this class, it must be initialised with a
- * {@link ProductDESProxyFactory}. Afterwards, {@link
- * #checkCounterExample(ProductDESProxy,SafetyTraceProxy)
+ * <P>To use this class, an instance must be obtained from the constructor.
+ * Afterwards, {@link #checkCounterExample(ProductDESProxy,TraceProxy)
  * checkCounterExample()} can be called repeatedly. If a check fails,
  * {@link #getDiagnostics()} can be called to retrieve an explanation.</P>
  *
@@ -62,8 +63,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <CODE>ControllabilityCounterExampleChecker checker =
  *   new {@link #ControllabilityCounterExampleChecker()
  *   ControllabilityCounterExampleChecker}();</CODE><BR>
- * <CODE>if (checker.{@link
- *   #checkCounterExample(ProductDESProxy,SafetyTraceProxy)
+ * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,TraceProxy)
  *   checkCounterExample}(</CODE><I>des</I><CODE>, </CODE><I>trace</I><CODE>))
  *   {</CODE><BR>
  * <CODE>&nbsp;&nbsp;System.out.println(&quot;OK&quot;);</CODE><BR>
@@ -78,6 +78,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  */
 
 public class ControllabilityCounterExampleChecker
+  extends AbstractCounterExampleChecker
 {
 
   //#########################################################################
@@ -97,25 +98,31 @@ public class ControllabilityCounterExampleChecker
    */
   public ControllabilityCounterExampleChecker(final boolean fullDiag)
   {
-    mFullDiagnostics = fullDiag;
+    super(fullDiag);
   }
 
 
   //#########################################################################
-  //# Simple Access
+  //# Configuration
   /**
-   * Retrieves a diagnostic message that explains why the last counterexample
-   * check is not correct controllability error trace.
-   * @return  Descriptive string or <CODE>null</CODE> if the last check
-   *          has passed.
+   * Returns whether the counterexample checker computes the end state
+   * for traces that are accepted by all automata.
+   * @see #getEndState()
    */
-  public String getDiagnostics()
+  boolean getEndStateEnabled()
   {
-    if (mDiagnostics == null) {
-      return null;
-    } else {
-      return mDiagnostics.toString();
-    }
+    return mEndStateEnabled;
+  }
+
+  /**
+   * Sets whether the counterexample checker computes the end state
+   * for traces that are accepted by all automata. This option is disabled
+   * by default.
+   * @see #getEndState()
+   */
+  void setEndStateEnabled(final boolean enabled)
+  {
+    mEndStateEnabled = enabled;
   }
 
 
@@ -131,58 +138,51 @@ public class ControllabilityCounterExampleChecker
    * @throws AnalysisException to indicate a problem while attempting to
    *                   verify the counterexample.
    */
+  @Override
   public boolean checkCounterExample(final ProductDESProxy des,
-                                     final SafetyTraceProxy trace)
-  throws AnalysisException
+                                     final TraceProxy trace)
+    throws AnalysisException
   {
-    if (trace == null) {
-      reportMalformedCounterExample(trace, "is NULL");
+    if (!super.checkCounterExample(des, trace)) {
+      return false;
+    } else if (!(trace instanceof SafetyTraceProxy)) {
+      reportMalformedCounterExample(trace, "is not a SafetyTraceProxy");
       return false;
     }
-    final List<EventProxy> traceEvents = trace.getEvents();
-    final Collection<EventProxy> events = des.getEvents();
+    if (mEndStateEnabled) {
+      final int numAutomata = des.getAutomata().size();
+      mEndStateMap = new HashMap<>(numAutomata);
+    }
+    final SafetyTraceProxy safetyTrace = (SafetyTraceProxy) trace;
+    final List<EventProxy> traceEvents = safetyTrace.getEvents();
     if (traceEvents.isEmpty()) {
       reportMalformedCounterExample(trace, "does not have any event");
-    }
-    int step = 0;
-    for (final EventProxy event : traceEvents) {
-      if (event == null) {
-        reportMalformedCounterExample
-          (trace, "contains NULL event", null, step);
-        return false;
-      } else if (event.getKind() == EventKind.PROPOSITION) {
-        reportMalformedCounterExample
-          (trace, "contains proposition", event, step);
-        return false;
-      } else if (!events.contains(event)) {
-        reportMalformedCounterExample
-          (trace, "contains unknown event", event, step);
-        return false;
-      }
-      step++;
+      findEndState(des, trace);
+      return false;
     }
     final int numSteps = traceEvents.size();
     final EventProxy lastEvent = traceEvents.get(numSteps - 1);
     if (lastEvent.getKind() == EventKind.CONTROLLABLE) {
       reportMalformedCounterExample(trace, "ends with controllable event",
                                     lastEvent, -1);
+      findEndState(des, trace);
       return false;
     }
     boolean gotRejectingSpec = false;
     for (final AutomatonProxy aut : des.getAutomata()) {
-      final int steps = checkCounterExample(aut, trace);
+      final int steps = checkCounterExample(aut, safetyTrace);
       switch (aut.getKind()) {
       case PLANT:
         if (steps < numSteps) {
           reportMalformedCounterExample
-            (trace, "is rejected by plant", aut, steps);
+            (safetyTrace, "is rejected by plant", aut, steps);
           return false;
         }
         break;
       case SPEC:
         if (steps < numSteps - 1) {
           reportMalformedCounterExample
-            (trace, "is rejected too early by spec", aut, steps);
+            (safetyTrace, "is rejected too early by spec", aut, steps);
           return false;
         } else if (steps == numSteps - 1) {
           gotRejectingSpec = true;
@@ -194,92 +194,86 @@ public class ControllabilityCounterExampleChecker
     }
     if (!gotRejectingSpec) {
       reportMalformedCounterExample
-        (trace, "is accepted by all specifications");
+        (safetyTrace, "is accepted by all specifications");
       return false;
     }
     return true;
   }
 
+  /**
+   * Returns the state tuple reached after accepting the complete trace.
+   * If the last call to {@link #checkCounterExample(ProductDESProxy, TraceProxy)
+   * checkCounterExample()} has found the counterexample to be accepted by
+   * all automata in the model (in which case it is not a correct
+   * controllability counterexample), this method can be used to return the
+   * state tuple reached at the end of the trace.
+   * @return  A map that associated each automaton ({@link AutomatonProxy})
+   *          in the model with the state ({@link StateProxy}) reached at
+   *          the end of the trace, or <CODE>null</CODE>.
+   *          If the counterexample is not fully accepted by all automata,
+   *          or if end states are configured to be disabled,
+   *          then this method returns <CODE>null</CODE>.
+   * @see #setEndStateEnabled(boolean) setEndStateEnabled()
+   */
+  Map<AutomatonProxy,StateProxy> getEndState()
+  {
+    return mEndStateMap;
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  @Override
+  String getTraceLabel()
+  {
+    return "Controllability";
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
-  private int checkCounterExample(final AutomatonProxy aut,
-                                  final SafetyTraceProxy trace)
+  private void findEndState(final ProductDESProxy des, final TraceProxy trace)
   {
-    final Collection<EventProxy> events = aut.getEvents();
-    final Collection<StateProxy> states = aut.getStates();
-    final Collection<TransitionProxy> transitions = aut.getTransitions();
-    StateProxy current = null;
-    for (final StateProxy state : states) {
-      if (state.isInitial()) {
-        current = state;
-        break;
+    if (mEndStateMap != null) {
+      final Iterator<AutomatonProxy> iter = des.getAutomata().iterator();
+      while (iter.hasNext() && mEndStateMap != null) {
+        final AutomatonProxy aut = iter.next();
+        checkCounterExample(aut, trace);
       }
     }
+  }
+
+  private int checkCounterExample(final AutomatonProxy aut,
+                                  final TraceProxy trace)
+  {
+    StateProxy current = AutomatonTools.getFirstInitialState(aut);
     if (current == null) {
+      mEndStateMap = null;
       return -1;
     }
     int steps = 0;
+    final Collection<EventProxy> events = aut.getEvents();
     final List<EventProxy> traceEvents = trace.getEvents();
     for (final EventProxy event : traceEvents) {
       if (events.contains(event) && event.getKind() != EventKind.PROPOSITION) {
-        boolean found = false;
-        for (final TransitionProxy trans : transitions) {
-          if (trans.getSource() == current && trans.getEvent() == event) {
-            current = trans.getTarget();
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
+        current = AutomatonTools.getFirstSuccessorState(aut, current, event);
+        if (current == null) {
+          mEndStateMap = null;
           return steps;
         }
       }
       steps++;
     }
+    if (mEndStateMap != null) {
+      mEndStateMap.put(aut, current);
+    }
     return steps;
-  }
-
-  private void reportMalformedCounterExample(final SafetyTraceProxy trace,
-                                             final String msg)
-  {
-    reportMalformedCounterExample(trace, msg, null, -1);
-  }
-
-  private void reportMalformedCounterExample(final SafetyTraceProxy trace,
-                                             final String msg,
-                                             final NamedProxy item,
-                                             final int step)
-  {
-    mDiagnostics = new StringBuilder();
-    if (mFullDiagnostics) {
-      mDiagnostics.append("Controllability error trace ");
-      final String name = trace.getName();
-      if (name != null) {
-        mDiagnostics.append('\'');
-        mDiagnostics.append(trace.getName());
-        mDiagnostics.append("' ");
-      }
-    }
-    mDiagnostics.append(msg);
-    if (item != null) {
-      mDiagnostics.append(" '");
-      mDiagnostics.append(item.getName());
-      mDiagnostics.append('\'');
-    }
-    if (step >= 0) {
-      mDiagnostics.append(" in step ");
-      mDiagnostics.append(step + 1);
-    }
-    if (mFullDiagnostics) {
-      mDiagnostics.append('.');
-    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final boolean mFullDiagnostics;
-  private StringBuilder mDiagnostics;
+  private boolean mEndStateEnabled = false;
+  private Map<AutomatonProxy,StateProxy> mEndStateMap = null;
 
 }

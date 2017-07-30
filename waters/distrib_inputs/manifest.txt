@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Created-By: Robi Malik
+Main-Class: org.supremica.gui.ide.IDE
+Class-Path: SupremicaLib.jar 
+

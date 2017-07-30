@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,12 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.custom_hash.TObjectByteCustomHashMap;
-import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,14 +44,17 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SelfloopSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRPartition;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -81,6 +78,11 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.custom_hash.TObjectIntCustomHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -150,14 +152,18 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return mOutputName;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
   {
     super.requestAbort();
-    if (mSupervisorSimplifier != null) {
-      mSupervisorSimplifier.requestAbort();
+    if (mMinimizationChain != null) {
+      mMinimizationChain.requestAbort();
+    }
+    if (mReductionChain != null) {
+      mReductionChain.requestAbort();
     }
   }
 
@@ -165,10 +171,14 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   public void resetAbort()
   {
     super.resetAbort();
-    if (mSupervisorSimplifier != null) {
-      mSupervisorSimplifier.resetAbort();
+    if (mMinimizationChain != null) {
+      mMinimizationChain.resetAbort();
+    }
+    if (mReductionChain != null) {
+      mReductionChain.resetAbort();
     }
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
@@ -188,13 +198,31 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   @Override
   public void setSupervisorReductionEnabled(final boolean enable)
   {
-    mSupervisorReductionEnabled = enable;
+    if (enable) {
+      final SuWonhamSupervisorReductionTRSimplifier simplifier =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      simplifier.setExperimentalMode(true);
+      mSupervisorSimplifier = simplifier;
+    } else {
+      mSupervisorSimplifier = null;
+    }
   }
 
   @Override
   public boolean getSupervisorReductionEnabled()
   {
-    return mSupervisorReductionEnabled;
+    return mSupervisorSimplifier != null;
+  }
+
+  public void setSupervisorReductionSimplifier
+    (final AbstractSupervisorReductionTRSimplifier simplifier)
+  {
+    mSupervisorSimplifier = simplifier;
+  }
+
+  public AbstractSupervisorReductionTRSimplifier getSupervisorReductionSimplifier()
+  {
+    return mSupervisorSimplifier;
   }
 
   @Override
@@ -214,12 +242,24 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return mDisabledEvents;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return true;
+  }
+
+
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
   @Override
   protected void setUp() throws AnalysisException
   {
+    super.setUp();
+
     int[][][][] transitions;
     int[][][][] reverseTransitions;
     int[][] eventAutomata;
@@ -227,8 +267,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     int[][] ndTuple1;
     int[][] ndTuple2;
     int[][] ndTuple3;
-
-    super.setUp();
 
     final ProductDESProxy model = getModel();
 
@@ -341,6 +379,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
     eventAutomata = new int[mNumProperEvents][];
     reverseEventAutomata = new int[mNumProperEvents][];
+    mNumControllableEvents = 0;
     final List<AutomatonEventInfo> list =
       new ArrayList<AutomatonEventInfo>(mNumAutomata);
     final List<AutomatonEventInfo> listRvs =
@@ -348,6 +387,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = mEventEncoding.getProperEventStatus(e);
       final boolean controllable = EventStatus.isControllableEvent(status);
+      if (controllable) {
+        mNumControllableEvents++;
+      }
       for (a = 0; a < mNumAutomata; a++) {
         if (transitions[a][e] != null) {
           final int numStates = transitions[a][e].length;
@@ -408,8 +450,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final IntArrayHashingStrategy strategy = new IntArrayHashingStrategy();
     mGlobalVisited =
       new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f, -1);
-    mStatusMap =
-      new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f, (byte) 0);
     mLocalVisited = new WatersHashSet<int[]>(strategy);
     mGlobalStack = new ArrayDeque<int[]>();
     mLocalStack = new ArrayDeque<int[]>();
@@ -424,14 +464,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
     // We have sorted the events so all uncontrollables come first.
     final int numEvents = mEventEncoding.getNumberOfProperEvents();
-    int firstControllable = numEvents;
-    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-      final byte status = mEventEncoding.getProperEventStatus(e);
-      if (EventStatus.isControllableEvent(status)) {
-        firstControllable = e;
-        break;
-      }
-    }
+    final int firstControllable = numEvents - mNumControllableEvents;
     final int lastUncontrollable = firstControllable - 1;
     mCtrlInitialReachabilityExplorer =
       new CtrlInitialReachabilityExplorer(eventAutomata, transitions,
@@ -462,8 +495,39 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mFinalStateExplorer =
       new FinalStateExplorer(eventAutomata, transitions, ndTuple3,
                              EventEncoding.NONTAU, mNumProperEvents - 1);
-    mSupervisorSimplifier = new SupervisorReductionTRSimplifier();
     mDisabledEvents = new THashSet<>();
+
+    if (mSupervisorSimplifier != null) {
+      final int stateLimit = getNodeLimit();
+      final int transitionLimit = getTransitionLimit();
+      if (mSupervisorSimplifier.getStateLimit() > stateLimit) {
+        mSupervisorSimplifier.setStateLimit(stateLimit);
+      }
+      if (mSupervisorSimplifier.getTransitionLimit() > transitionLimit) {
+        mSupervisorSimplifier.setTransitionLimit(transitionLimit);
+      }
+      final int markingID = getUsedDefaultMarkingID();
+      mSupervisorSimplifier.setDefaultMarkingID(markingID);
+      if (mSupervisorSimplifier.isMinimizationIncluded()) {
+        mReductionChain = mSupervisorSimplifier;
+      } else {
+        ChainTRSimplifier chain = new ChainTRSimplifier();
+        chain.add(new SelfloopSupervisorReductionTRSimplifier());
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setEquivalence
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
+        bisimulator.setTransitionLimit(transitionLimit);
+        chain.add(bisimulator);
+        chain.setDefaultMarkingID(markingID);
+        mMinimizationChain = chain;
+        chain = new ChainTRSimplifier();
+        chain.add(mSupervisorSimplifier);
+        chain.add(new SelfloopSupervisorReductionTRSimplifier());
+        mReductionChain = chain;
+      }
+    }
   }
 
   @Override
@@ -488,7 +552,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mBackwardsUncontrollableExplorer = null;
     mReachabilityExplorer = null;
     mFinalStateExplorer = null;
-    mSupervisorSimplifier = null;
     mOriginalStates = null;
     mStateMarkings = null;
     mEventEncoding = null;
@@ -497,7 +560,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     mUnvisited = null;
     mTransitionBuffer = null;
     mTargetTuple = null;
+    mMinimizationChain = mReductionChain = null;
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -635,16 +700,19 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       final int[] tuple = new int[mNumAutomata];
       for (int i = 0; i < mNumStates; i++) {
         if (mReachableStates.get(i)) {
-          mStateMap[i] = index++;
+          mStateMap[i] = index;
+          if (i < mNumInitialStates) {
+            mTransitionRelation.setInitial(index, true);
+          }
+          // TODO The markings are set based on the input model.
+          // They can only be trusted when supervisor reduction is disabled.
           mSTEncoding.decode(mStateTuples.get(i), tuple);
           if (isMarkedState(tuple)) {
-            mTransitionRelation.setMarked(index - 1, markingID, true);
+            mTransitionRelation.setMarked(index, markingID, true);
           }
-          if (i < mNumInitialStates) {
-            mTransitionRelation.setInitial(index - 1, true);
-          }
+          index++;
         } else {
-          mStateMap[i] = mNumGoodStates;// the index of the bad state
+          mStateMap[i] = mNumGoodStates; // the index of the bad state
         }
       }
 
@@ -665,92 +733,41 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       mReachableStates = null;
 
       if (isDetailedOutputEnabled()) {
-        final int marking = getUsedDefaultMarkingID();
         ProductDESProxy des = null;
-        if (mSupervisorReductionEnabled) {
-          // Supervisor Reduction Enabled
-          final ChainTRSimplifier chain = new ChainTRSimplifier();
-          final ObservationEquivalenceTRSimplifier bisimulator =
-            new ObservationEquivalenceTRSimplifier();
-          bisimulator.setEquivalence
-            (ObservationEquivalenceTRSimplifier.Equivalence.
-             DETERMINISTIC_MINSTATE);
-          bisimulator.setTransitionLimit(getTransitionLimit());
-          chain.add(bisimulator);
-
-          mSupervisorSimplifier.setRestrictedEvent(-1);
-
-          chain.add(mSupervisorSimplifier);
-          chain.setTransitionRelation(mTransitionRelation);
-          chain.setDefaultMarkingID(marking);
-          chain.run();
-
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          if (!mSupervisorLocalizationEnabled) {
-            mTransitionRelation.removeDeadlockStateTransitions(marking);
-            mTransitionRelation.setName("supervisor");
-            des = createDESProxy(mTransitionRelation);
-          } else {
-            // (Reduction &) Localization Enabled
-            final TIntArrayList enabDisabEvents = new TIntArrayList();
-            final TIntArrayList disabEvents = new TIntArrayList();
-            final List<AutomatonProxy> autList =
-              new ArrayList<AutomatonProxy>();
-            final boolean simplified =
-              localizeSupervisor(marking, autList, enabDisabEvents,
-                                 disabEvents);
-            if (simplified) {
-              final IsomorphismChecker checker =
-                new IsomorphismChecker(getFactory(), false, false);
-              final THashSet<AutomatonProxy> removeSet =
-                new THashSet<AutomatonProxy>();
-              for (int autom = 0; autom < autList.size() - 1; autom++) {
-                for (int auto = autom + 1; auto < autList.size(); auto++) {
-                  if (checker.checkBisimulation(autList.get(autom),
-                                                autList.get(auto))) {
-                    removeSet.add(autList.get(auto));
-                  }
-                }
-              }
-              for (int a = autList.size() - 1; a >= 0; a--) {
-                if (removeSet.contains(autList.get(a))) {
-                  removeSet.remove(autList.get(a));
-                  autList.remove(a);
-                }
-              }
-            }
-            des =
-              AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                   getFactory());
-          }
-        } else if (mSupervisorLocalizationEnabled) {
-
-          // localization only ...
-          mSupervisorSimplifier.setDefaultMarkingID(marking);
-          mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
-          mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
-          final TIntArrayList enabDisabEvents = new TIntArrayList();
-          final TIntArrayList disabEvents = new TIntArrayList();
-          final List<AutomatonProxy> autList =
-            new ArrayList<AutomatonProxy>();
-          mSupervisorSimplifier.setExperimentalMode(true);
-          localizeSupervisor(marking, autList, enabDisabEvents, disabEvents);
-          mSupervisorSimplifier.setExperimentalMode(false);
-          des =
-            AutomatonTools.createProductDESProxy("localised_sup", autList,
-                                                 getFactory());
-
-        } else {
-          // Both Reduction & Localization Disabled
-          removeDumpStateTransitions(mTransitionRelation, mNumGoodStates);
+        if (mSupervisorSimplifier == null) {
+          // no supervisor reduction
+          mTransitionRelation.removeDumpStateTransitions();
           mTransitionRelation.removeProperSelfLoopEvents();
           mTransitionRelation.removeRedundantPropositions();
           des = createDESProxy(mTransitionRelation);
+        } else {
+          if (mMinimizationChain != null) {
+            mMinimizationChain.setTransitionRelation(mTransitionRelation);
+            mMinimizationChain.run();
+          }
+          if (!mSupervisorLocalizationEnabled &&
+              !mSupervisorSimplifier.isSupervisedEventRequired()) {
+            // one-step supervisor reduction
+            mSupervisorSimplifier.setSupervisedEvent(-1);
+            mReductionChain.setTransitionRelation(mTransitionRelation);
+            mReductionChain.run();
+            mTransitionRelation.removeDumpStateTransitions();
+            mTransitionRelation.removeRedundantPropositions();
+            des = createDESProxy(mTransitionRelation);
+          } else {
+            // localised supervisors, one per controllable event
+            final List<AutomatonProxy> localizedSupervisors =
+              new ArrayList<>(mNumControllableEvents);
+            collectLocalizedSupervisors(localizedSupervisors);
+            des = AutomatonTools.createProductDESProxy
+              ("localised_sup", localizedSupervisors, getFactory());
+          }
         }
         return setProxyResult(des);
       } else {
-        return true;
+        return setBooleanResult(true);
       }
+
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -767,207 +784,60 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
   }
 
-  public boolean localizeSupervisor(final int marking,
-                                    final List<AutomatonProxy> autList,
-                                    final TIntArrayList enabDisabEvents,
-                                    final TIntArrayList disabEvents)
+  public void collectLocalizedSupervisors(final List<AutomatonProxy> supervisors)
     throws AnalysisException
   {
-    mSupervisorSimplifier.setUpEventList(enabDisabEvents, disabEvents);
-    boolean simplified = true;
-    if (enabDisabEvents.size() == 0) {
-      mTransitionRelation.removeDeadlockStateTransitions(marking);
-      autList.add(mTransitionRelation.createAutomaton(getFactory(),
-                                                      mEventEncoding));
-    } else {
-      ArrayList<int[]> stateTuples = null;
-      if (!mSupervisorReductionEnabled) {
-        // copy mStateTuples into stateTuples without copying bad states
-        stateTuples = new ArrayList<int[]>();
-        for (int s = 0; s < mNumStates; s++) {
-          if (mStateMap[s] != mNumGoodStates) {
-            stateTuples.add(mStateTuples.get(s));
-          }
-        }
-        mNumGoodStates = stateTuples.size();
-        mStateTuples = null;
-      }
-
-      for (int i = 0; i < enabDisabEvents.size(); i++) {
-        final int e = enabDisabEvents.get(i);
-        if (!mSupervisorReductionEnabled) {
-          // make copies
-          List<int[]> stateTuplesCopy = new ArrayList<>(stateTuples);
-          mNumGoodStates = stateTuplesCopy.size();
-          List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
-          StateTupleEncoding stEncodingCopy = mSTEncoding;
-          final ListBufferTransitionRelation transitionRelationCopy =
-            new ListBufferTransitionRelation(
-                                             mTransitionRelation,
-                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-          automata:
-          for (int a = mAutomata.size() - 1; a >= 0; a--) {
-            final List<int[]> tuples = new ArrayList<>();
-            // create reducedEncoding
-            final List<AutomatonProxy> reducedAutomata =
-              new ArrayList<>(originalAutomata.size() - 1);
-            for (int l = 0; l < originalAutomata.size(); l++) {
-              if (l != a) {
-                final AutomatonProxy aut = originalAutomata.get(l);
-                reducedAutomata.add(aut);
-              }
-            }
-            final int[] sizes =
-              StateTupleEncoding.getAutomataSizes(reducedAutomata);
-            final StateTupleEncoding reducedEncoding =
-              new StateTupleEncoding(sizes);
-            // create statusMap
-            final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
-            final IntArrayHashingStrategy strategy =
-              new IntArrayHashingStrategy();
-            mStatusMap =
-              new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f,
-                                                  STATE_STATUS_INITIAL);
-            // check whether Ai is redundant (using loop)
-            boolean merging = false;
-            final TObjectIntCustomHashMap<int[]> newTupMap =
-              new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f,
-                                                 -1);
-            final int[] stateToClass = new int[mNumGoodStates + 1];
-            final int[] newTupEncoded =
-              new int[reducedEncoding.getNumberOfWords()];
-            int count = 0;
-            for (int s = 0; s < mNumGoodStates; s++) {
-              final int[] tup = new int[mNumAutomata];
-              final int[] encoded = stateTuplesCopy.get(s);
-              stEncodingCopy.decode(encoded, tup);
-              final int[] newTup = createReducedTuple(tup, a);
-              reducedEncoding.encode(newTup, newTupEncoded);
-              if (!newTupMap.containsKey(newTupEncoded)) {
-                stateToClass[s] = count;
-                newTupMap.put(newTupEncoded, count++);
-                tuples.add(newTupEncoded);
-              } else {
-                stateToClass[s] = newTupMap.get(newTupEncoded);
-              }
-              final TransitionIterator iter =
-                transitionRelationCopy.createSuccessorsReadOnlyIterator();
-              iter.reset(s, e);
-              if (iter.advance()) {
-                if (!transitionRelationCopy.isDeadlockState(iter
-                  .getCurrentTargetState(), marking)) {
-                  // (x1 ... xn) is enabled ...
-                  switch (mStatusMap.get(newTupEncoded)) {
-                  case STATE_STATUS_INITIAL:
-                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
-                    break;
-                  case STATE_STATUS_NEUTRAL:
-                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
-                    merging = true;
-                    break;
-                  case STATE_STATUS_ENABLED:
-                    merging = true;
-                    break;
-                  case STATE_STATUS_DISABLED:
-                    continue automata;
-                  default:
-                    throw new IllegalStateException(
-                                                    "Unsupport state status "
-                                                      + mStatusMap
-                                                        .get(newTupEncoded)
-                                                      + "!");
-                  }
-                } else {
-                  // (x1 ... xn) is disabled ...
-                  switch (mStatusMap.get(newTupEncoded)) {
-                  case STATE_STATUS_INITIAL:
-                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
-                    break;
-                  case STATE_STATUS_NEUTRAL:
-                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
-                    merging = true;
-                    break;
-                  case STATE_STATUS_ENABLED:
-                    continue automata;
-                  case STATE_STATUS_DISABLED:
-                    merging = true;
-                    break;
-                  default:
-                    throw new IllegalStateException(
-                                                    "Unsupport state status "
-                                                      + mStatusMap
-                                                        .get(newTupEncoded)
-                                                      + "!");
-                  }
-                }
-              } else {
-                // (x1 ... xn) is don't care...
-                if (mStatusMap.get(newTupEncoded) == STATE_STATUS_INITIAL) {
-                  mStatusMap.put(newTupEncoded, STATE_STATUS_NEUTRAL);
-                } else {
-                  merging = true;
-                }
-              }
-            }
-            if (merging) {
-              //update mOriginalStates
-              stateToClass[mNumGoodStates] = count;
-              final TRPartition partition =
-                new TRPartition(stateToClass, count + 1);
-              transitionRelationCopy.merge(partition);
-              stEncodingCopy = reducedEncoding;
-              stateTuplesCopy = tuples;
-              mNumGoodStates = stateTuplesCopy.size();
-              originalAutomata = reducedAutomata;
-            }
-          }
-        }
-
-        ListBufferTransitionRelation copy =
-          new ListBufferTransitionRelation(
-                                           mTransitionRelation,
-                                           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-
-        final ChainTRSimplifier chain = new ChainTRSimplifier();
-        final ObservationEquivalenceTRSimplifier bisimulator =
-          new ObservationEquivalenceTRSimplifier();
-        bisimulator.setEquivalence
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           DETERMINISTIC_MINSTATE);
-        bisimulator.setTransitionLimit(getTransitionLimit());
-        chain.add(bisimulator);
-
-        mSupervisorSimplifier.setRestrictedEvent(e);
-
-        chain.add(mSupervisorSimplifier);
-        chain.setTransitionRelation(copy);
-        chain.setDefaultMarkingID(marking);
-        simplified &= chain.run();
-
-        if (!simplified) {
-          mTransitionRelation.removeDeadlockStateTransitions(marking);
-          autList.clear();
-          autList.add(mTransitionRelation.createAutomaton(getFactory(),
-                                                          mEventEncoding));
-          break;
-        }
-        copy = mSupervisorSimplifier.getTransitionRelation();
-        copy.removeDeadlockStateTransitions(marking);
-        copy.removeProperSelfLoopEvents(marking);
+    int config = mSupervisorSimplifier.getPreferredInputConfiguration();
+    if (config == 0) {
+      config = mTransitionRelation.getConfiguration();
+    }
+    final IsomorphismChecker checker =
+      new IsomorphismChecker(getFactory(), false, false);
+    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
+      final byte status = mTransitionRelation.getProperEventStatus(e);
+      if (EventStatus.isControllableEvent(status) && isEverDisabledEvent(e)) {
+        // TODO avoid duplicate computation and duplicate supervisors if
+        // several events are enabled and disabled in exactly the same states
+        mSupervisorSimplifier.setSupervisedEvent(e);
+        final EventEncoding enc = new EventEncoding(mEventEncoding);
+        final ListBufferTransitionRelation supervisor =
+          new ListBufferTransitionRelation(mTransitionRelation, enc, config);
+        mReductionChain.setTransitionRelation(supervisor);
+        mReductionChain.run();
+        supervisor.removeDumpStateTransitions();
+        supervisor.removeRedundantPropositions();
         final EventProxy event = mEventEncoding.getProperEvent(e);
-        copy.setName("sup:" + event.getName() + "[event" + e + "]");
-        autList.add(copy.createAutomaton(getFactory(), mEventEncoding));
-        //System.out.println("sup:" + event.getName() + "(event" + e + ")_END.");
+        supervisor.setName("sup:" + event.getName());
+        AutomatonProxy aut = new TRAutomatonProxy(enc, supervisor);
+        for (final AutomatonProxy existing : supervisors) {
+          if (checker.checkBisimulation(aut, existing)) {
+            aut = null;
+            break;
+          }
+        }
+        if (aut != null) {
+          supervisors.add(aut);
+        }
       }
     }
-    return simplified;
   }
 
-  @Override
-  public boolean supportsNondeterminism()
+  public boolean isEverDisabledEvent(final int e)
   {
-    return true;
+    final int numStates = mTransitionRelation.getNumberOfStates();
+    final TransitionIterator iter = mTransitionRelation.createAnyReadOnlyIterator();
+    final int dump = mTransitionRelation.getDumpStateIndex();
+    for (int s = 0; s < numStates; s++) {
+      if (mTransitionRelation.isReachable(s)) {
+        iter.reset(s, e);
+        if (iter.advance() && iter.getCurrentTargetState() == dump) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -1037,19 +907,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
   }
 
-  private void removeDumpStateTransitions(final ListBufferTransitionRelation rel,
-                                          final int dump)
-  {
-    final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    while (iter.advance()) {
-      if (iter.getCurrentTargetState() == dump) {
-        iter.remove();
-      }
-    }
-    rel.setReachable(dump, false);
-  }
-
   private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
     throws EventNotFoundException
   {
@@ -1057,19 +914,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final AutomatonProxy aut =
       rel.createAutomaton(getFactory(), mEventEncoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
-  }
-
-  private int[] createReducedTuple(final int[] tuple, final int removeIndex)
-  {
-    final int[] newTuple = new int[tuple.length - 1];
-    for (int l = 0; l < newTuple.length; l++) {
-      if (l < removeIndex) {
-        newTuple[l] = tuple[l];
-      } else {
-        newTuple[l] = tuple[l + 1];
-      }
-    }
-    return newTuple;
   }
 
 
@@ -1505,15 +1349,317 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return msg;
   }
 
+
+
+  //########################################################################
+  //# Fanqian Qiu Experiments
+  /*
+    The following was in run():
+
+  if (mSupervisorReductionEnabled) {
+    // Supervisor Reduction Enabled
+    final ChainTRSimplifier chain = new ChainTRSimplifier();
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    bisimulator.setEquivalence
+      (ObservationEquivalenceTRSimplifier.Equivalence.
+       DETERMINISTIC_MINSTATE);
+    bisimulator.setTransitionLimit(getTransitionLimit());
+    chain.add(bisimulator);
+
+    mSupervisorSimplifier.setSupervisedEvent(-1);
+
+    chain.add(mSupervisorSimplifier);
+    chain.setTransitionRelation(mTransitionRelation);
+    chain.setDefaultMarkingID(marking);
+    chain.run();
+
+    mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
+    if (!mSupervisorLocalizationEnabled) {
+      mTransitionRelation.removeDeadlockStateTransitions(marking);
+      mTransitionRelation.setName("supervisor");
+      des = createDESProxy(mTransitionRelation);
+    } else {
+      // (Reduction &) Localization Enabled
+      final List<AutomatonProxy> autList = new ArrayList<>();
+      final boolean simplified = localizeSupervisor(marking, autList);
+      if (simplified) {
+        final IsomorphismChecker checker =
+          new IsomorphismChecker(getFactory(), false, false);
+        final Set<AutomatonProxy> removeSet = new THashSet<>();
+        for (int autom = 0; autom < autList.size() - 1; autom++) {
+          for (int auto = autom + 1; auto < autList.size(); auto++) {
+            if (checker.checkBisimulation(autList.get(autom),
+                                          autList.get(auto))) {
+              removeSet.add(autList.get(auto));
+            }
+          }
+        }
+        for (int a = autList.size() - 1; a >= 0; a--) {
+          if (removeSet.contains(autList.get(a))) {
+            removeSet.remove(autList.get(a));
+            autList.remove(a);
+          }
+        }
+      }
+      des =
+        AutomatonTools.createProductDESProxy("localised_sup", autList,
+                                             getFactory());
+    }
+  } else if (mSupervisorLocalizationEnabled) {
+
+    // localization only ...
+    mSupervisorSimplifier.setDefaultMarkingID(marking);
+    mSupervisorSimplifier.setTransitionRelation(mTransitionRelation);
+    mTransitionRelation = mSupervisorSimplifier.getTransitionRelation();
+    final List<AutomatonProxy> autList =
+      new ArrayList<AutomatonProxy>();
+    mSupervisorSimplifier.setExperimentalMode(true);
+    localizeSupervisor(marking, autList);
+    mSupervisorSimplifier.setExperimentalMode(false);
+    des =
+      AutomatonTools.createProductDESProxy("localised_sup", autList,
+                                           getFactory());
+
+  } else {
+    // Both Reduction & Localization Disabled
+    removeDumpStateTransitions(mTransitionRelation, mNumGoodStates);
+    mTransitionRelation.removeProperSelfLoopEvents();
+    mTransitionRelation.removeRedundantPropositions();
+    des = createDESProxy(mTransitionRelation);
+  }
+
+
+  public boolean localizeSupervisor(final int marking,
+                                    final List<AutomatonProxy> result)
+    throws AnalysisException
+  {
+    final TIntArrayList enabDisabEvents = new TIntArrayList();
+    final TIntArrayList disabEvents = new TIntArrayList();
+    mSupervisorSimplifier.setUpEventList(enabDisabEvents, disabEvents);
+    boolean simplified = true;
+    if (enabDisabEvents.size() == 0) {
+      mTransitionRelation.removeDeadlockStateTransitions(marking);
+      result.add(mTransitionRelation.createAutomaton(getFactory(),
+                                                      mEventEncoding));
+    } else {
+      ArrayList<int[]> stateTuples = null;
+      if (!mSupervisorReductionEnabled) {
+        // copy mStateTuples into stateTuples without copying bad states
+        stateTuples = new ArrayList<int[]>();
+        for (int s = 0; s < mNumStates; s++) {
+          if (mStateMap[s] != mNumGoodStates) {
+            stateTuples.add(mStateTuples.get(s));
+          }
+        }
+        mNumGoodStates = stateTuples.size();
+        mStateTuples = null;
+      }
+
+      for (int i = 0; i < enabDisabEvents.size(); i++) {
+        final int e = enabDisabEvents.get(i);
+        if (!mSupervisorReductionEnabled) {
+          // make copies
+          List<int[]> stateTuplesCopy = new ArrayList<>(stateTuples);
+          mNumGoodStates = stateTuplesCopy.size();
+          List<AutomatonProxy> originalAutomata = new ArrayList<>(mAutomata);
+          StateTupleEncoding stEncodingCopy = mSTEncoding;
+          final ListBufferTransitionRelation transitionRelationCopy =
+            new ListBufferTransitionRelation(mTransitionRelation,
+                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+          automata:
+          for (int a = mAutomata.size() - 1; a >= 0; a--) {
+            final List<int[]> tuples = new ArrayList<>();
+            // create reducedEncoding
+            final List<AutomatonProxy> reducedAutomata =
+              new ArrayList<>(originalAutomata.size() - 1);
+            for (int l = 0; l < originalAutomata.size(); l++) {
+              if (l != a) {
+                final AutomatonProxy aut = originalAutomata.get(l);
+                reducedAutomata.add(aut);
+              }
+            }
+            final int[] sizes =
+              StateTupleEncoding.getAutomataSizes(reducedAutomata);
+            final StateTupleEncoding reducedEncoding =
+              new StateTupleEncoding(sizes);
+            // create statusMap
+            final int tableSize = Math.min(getNodeLimit(), MAX_TABLE_SIZE);
+            final IntArrayHashingStrategy strategy =
+              new IntArrayHashingStrategy();
+            mStatusMap =
+              new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f,
+                                                  STATE_STATUS_INITIAL);
+            // check whether Ai is redundant (using loop)
+            boolean merging = false;
+            final TObjectIntCustomHashMap<int[]> newTupMap =
+              new TObjectIntCustomHashMap<int[]>(strategy, tableSize, 0.5f,
+                                                 -1);
+            final int[] stateToClass = new int[mNumGoodStates + 1];
+            final int[] newTupEncoded =
+              new int[reducedEncoding.getNumberOfWords()];
+            int count = 0;
+            for (int s = 0; s < mNumGoodStates; s++) {
+              final int[] tup = new int[mNumAutomata];
+              final int[] encoded = stateTuplesCopy.get(s);
+              stEncodingCopy.decode(encoded, tup);
+              final int[] newTup = createReducedTuple(tup, a);
+              reducedEncoding.encode(newTup, newTupEncoded);
+              if (!newTupMap.containsKey(newTupEncoded)) {
+                stateToClass[s] = count;
+                newTupMap.put(newTupEncoded, count++);
+                tuples.add(newTupEncoded);
+              } else {
+                stateToClass[s] = newTupMap.get(newTupEncoded);
+              }
+              final TransitionIterator iter =
+                transitionRelationCopy.createSuccessorsReadOnlyIterator();
+              iter.reset(s, e);
+              if (iter.advance()) {
+                if (!transitionRelationCopy.isDeadlockState(iter
+                  .getCurrentTargetState(), marking)) {
+                  // (x1 ... xn) is enabled ...
+                  switch (mStatusMap.get(newTupEncoded)) {
+                  case STATE_STATUS_INITIAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
+                    break;
+                  case STATE_STATUS_NEUTRAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_ENABLED);
+                    merging = true;
+                    break;
+                  case STATE_STATUS_ENABLED:
+                    merging = true;
+                    break;
+                  case STATE_STATUS_DISABLED:
+                    continue automata;
+                  default:
+                    throw new IllegalStateException(
+                                                    "Unsupport state status "
+                                                      + mStatusMap
+                                                        .get(newTupEncoded)
+                                                      + "!");
+                  }
+                } else {
+                  // (x1 ... xn) is disabled ...
+                  switch (mStatusMap.get(newTupEncoded)) {
+                  case STATE_STATUS_INITIAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
+                    break;
+                  case STATE_STATUS_NEUTRAL:
+                    mStatusMap.put(newTupEncoded, STATE_STATUS_DISABLED);
+                    merging = true;
+                    break;
+                  case STATE_STATUS_ENABLED:
+                    continue automata;
+                  case STATE_STATUS_DISABLED:
+                    merging = true;
+                    break;
+                  default:
+                    throw new IllegalStateException(
+                                                    "Unsupport state status "
+                                                      + mStatusMap
+                                                        .get(newTupEncoded)
+                                                      + "!");
+                  }
+                }
+              } else {
+                // (x1 ... xn) is don't care...
+                if (mStatusMap.get(newTupEncoded) == STATE_STATUS_INITIAL) {
+                  mStatusMap.put(newTupEncoded, STATE_STATUS_NEUTRAL);
+                } else {
+                  merging = true;
+                }
+              }
+            }
+            if (merging) {
+              //update mOriginalStates
+              stateToClass[mNumGoodStates] = count;
+              final TRPartition partition =
+                new TRPartition(stateToClass, count + 1);
+              transitionRelationCopy.merge(partition);
+              stEncodingCopy = reducedEncoding;
+              stateTuplesCopy = tuples;
+              mNumGoodStates = stateTuplesCopy.size();
+              originalAutomata = reducedAutomata;
+            }
+          }
+        }
+
+        ListBufferTransitionRelation copy =
+          new ListBufferTransitionRelation(mTransitionRelation,
+                                           ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
+        final ChainTRSimplifier chain = new ChainTRSimplifier();
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setEquivalence
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
+        bisimulator.setTransitionLimit(getTransitionLimit());
+        chain.add(bisimulator);
+
+        mSupervisorSimplifier.setSupervisedEvent(e);
+
+        chain.add(mSupervisorSimplifier);
+        chain.setTransitionRelation(copy);
+        chain.setDefaultMarkingID(marking);
+        simplified &= chain.run();
+
+        if (!simplified) {
+          mTransitionRelation.removeDeadlockStateTransitions(marking);
+          result.clear();
+          result.add(mTransitionRelation.createAutomaton(getFactory(),
+                                                          mEventEncoding));
+          break;
+        }
+        copy = mSupervisorSimplifier.getTransitionRelation();
+        copy.removeDeadlockStateTransitions(marking);
+        copy.removeProperSelfLoopEvents(marking);
+        final EventProxy event = mEventEncoding.getProperEvent(e);
+        copy.setName("sup:" + event.getName() + "[event" + e + "]");
+        result.add(copy.createAutomaton(getFactory(), mEventEncoding));
+        //System.out.println("sup:" + event.getName() + "(event" + e + ")_END.");
+      }
+    }
+    return simplified;
+  }
+
+  private int[] createReducedTuple(final int[] tuple, final int removeIndex)
+  {
+    final int[] newTuple = new int[tuple.length - 1];
+    for (int l = 0; l < newTuple.length; l++) {
+      if (l < removeIndex) {
+        newTuple[l] = tuple[l];
+      } else {
+        newTuple[l] = tuple[l + 1];
+      }
+    }
+    return newTuple;
+  }
+
+  private TObjectByteCustomHashMap<int[]> mStatusMap;
+    mStatusMap =
+      new TObjectByteCustomHashMap<int[]>(strategy, tableSize, 0.5f, (byte) 0);
+
+  private static final byte STATE_STATUS_INITIAL = 0;
+  private static final byte STATE_STATUS_NEUTRAL = 1;
+  private static final byte STATE_STATUS_ENABLED = 2;
+  private static final byte STATE_STATUS_DISABLED = 3;
+  */
+
+
   //#########################################################################
   //# Data Members
   private EventProxy mConfiguredMarking;
   private EventProxy mUsedMarking;
   private boolean mNonblockingSupported = true;
-  private boolean mSupervisorReductionEnabled = false;
+  private AbstractSupervisorReductionTRSimplifier mSupervisorSimplifier;
   private boolean mSupervisorLocalizationEnabled = false;
   private String mOutputName = "supervisor";
   private Collection<EventProxy> mDisabledEvents;
+
+  private TransitionRelationSimplifier mMinimizationChain;
+  private TransitionRelationSimplifier mReductionChain;
 
   private List<AutomatonProxy> mAutomata;
   private EventEncoding mEventEncoding;
@@ -1524,12 +1670,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private int mNumStates;
   private int mNumInitialStates;
   private int mNumProperEvents;
+  private int mNumControllableEvents;
 
   private StateProxy[][] mOriginalStates;
   private boolean[][] mStateMarkings;
 
   private StateTupleEncoding mSTEncoding;
-  private TObjectByteCustomHashMap<int[]> mStatusMap;
   private List<int[]> mStateTuples;
   private TObjectIntCustomHashMap<int[]> mGlobalVisited;
   private Deque<int[]> mGlobalStack;
@@ -1554,8 +1700,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private FinalStateExplorer mFinalStateExplorer;
   private ListBufferTransitionRelation mTransitionRelation;
 
-  private SupervisorReductionTRSimplifier mSupervisorSimplifier;
-
   private int mNumGoodStates;
   private BitSet mGoodStates;
   private int[] mStateMap;
@@ -1564,9 +1708,5 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   //#########################################################################
   //# Class Constants
   private static final int MAX_TABLE_SIZE = 500000;
-  private static final byte STATE_STATUS_INITIAL = 0;
-  private static final byte STATE_STATUS_NEUTRAL = 1;
-  private static final byte STATE_STATUS_ENABLED = 2;
-  private static final byte STATE_STATUS_DISABLED = 3;
 
 }

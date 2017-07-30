@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,12 +33,11 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TreeSet;
 
 import net.sf.javabdd.BDDFactory;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -68,43 +67,31 @@ class GreedyPartitioning<P extends PartitionBDD>
   void merge(final AutomatonBDD[] automatonBDDs)
     throws AnalysisAbortException
   {
-    final BDDFactory factory = getBDDFactory();
     final List<P> partitions = getFullPartition();
     final int limit = getPartitioningSizeLimit();
-    if (partitions.isEmpty()) {
+    if (partitions.size() <= 1) {
       // nothing ...
     } else if (limit == Integer.MAX_VALUE) {
-      PartitionBDD composition = null;
-      for (final P part : partitions) {
-        if (composition == null) {
-          composition = part.clone();
-        } else {
-          checkAbort();
-          final PartitionBDD next =
-            composition.compose(part, automatonBDDs, factory);
-          composition.dispose();
-          composition = next;
-        }
-      }
+      final P result = mergeAll(automatonBDDs);
       partitions.clear();
-      final P result = castBDD(composition);
       partitions.add(result);
     } else if (limit > 0) {
-      final int count = partitions.size();
-      final Collection<P> completed = new ArrayList<P>(count);
-      while (!partitions.isEmpty()) {
-        checkAbort();
-        final Iterator<P> iter = partitions.iterator();
-        final P part = iter.next();
-        iter.remove();
-        final P merged = merge(part, automatonBDDs);
-        if (merged == null) {
-          completed.add(part);
+      Collection<PartitionBDD> input = new TreeSet<>(partitions);
+      Collection<PartitionBDD> output = new TreeSet<>();
+      while (true) {
+        final boolean canDoMore = mergeOnce(input, output, automatonBDDs);
+        if (!canDoMore) {
+          break;
         }
+        final Collection<PartitionBDD> tmp = input;
+        input = output;
+        output = tmp;
       }
       partitions.clear();
-      partitions.addAll(completed);
-      Collections.sort(partitions);
+      for (final PartitionBDD part : output) {
+        final P castPart = castBDD(part);
+        partitions.add(castPart);
+      }
     }
   }
 
@@ -133,43 +120,83 @@ class GreedyPartitioning<P extends PartitionBDD>
 
   //#########################################################################
   //# Auxiliary Methods
-  private P merge(final P part, final AutomatonBDD[] automatonBDDs)
+  private P mergeAll(final AutomatonBDD[] automatonBDDs)
+    throws AnalysisAbortException
   {
     final BDDFactory factory = getBDDFactory();
     final List<P> partitions = getFullPartition();
-    final int limit = getPartitioningSizeLimit();
-    final BitSet automata0 = part.getAutomata();
-    PartitionBDD bestcomposition = null;
-    P bestcandidate = null;
-    int bestsize = Integer.MAX_VALUE;
-    for (final P candidate : partitions) {
-      final BitSet automata1 = candidate.getAutomata();
-      if (!automata0.intersects(automata1)) {
-        continue;
-      }
-      final PartitionBDD composition =
-        part.compose(candidate, automatonBDDs, factory);
-      final int size = composition.getNodeCount();
-      if (size >= bestsize || size > limit) {
+    PartitionBDD composition = null;
+    for (final P part : partitions) {
+      if (composition == null) {
+        composition = part.clone();
+      } else {
+        checkAbort();
+        final PartitionBDD next =
+          composition.compose(part, automatonBDDs, factory);
         composition.dispose();
-        continue;
+        composition = next;
       }
-      if (bestcomposition != null) {
-        bestcomposition.dispose();
-      }
-      bestcomposition = composition;
-      bestcandidate = candidate;
-      bestsize = size;
     }
-    if (bestcomposition != null) {
-      final P result = castBDD(bestcomposition);
-      partitions.remove(bestcandidate);
+    return castBDD(composition);
+  }
+
+  private boolean mergeOnce(final Collection<PartitionBDD> input,
+                            final Collection<PartitionBDD> output,
+                            final AutomatonBDD[] automatonBDDs)
+    throws AnalysisAbortException
+  {
+    final BDDFactory factory = getBDDFactory();
+    final int limit = getPartitioningSizeLimit();
+    boolean composedSome = false;
+    while (!input.isEmpty()) {
+      checkAbort();
+      final Iterator<PartitionBDD> iter = input.iterator();
+      final PartitionBDD first = iter.next();
+      final BitSet firstAutomata = first.getAutomata();
+      iter.remove();
+      PartitionBDD best = null;
+      int bestSize = Integer.MAX_VALUE;
+      PartitionBDD bestComposition = null;
+      while (iter.hasNext()) {
+        final PartitionBDD second = iter.next();
+        final BitSet secondAutomata = second.getAutomata();
+        if (!firstAutomata.intersects(secondAutomata)) {
+          continue;
+        }
+        final PartitionBDD composition =
+          first.compose(second, automatonBDDs, factory);
+        final int size = composition.getNodeCount();
+        if (size >= bestSize || size > limit) {
+          composition.dispose();
+          continue;
+        } else if (composition.isDominant()) {
+          disposAll(input);
+          disposAll(output);
+          output.clear();
+          output.add(composition);
+          return false;
+        }
+        bestComposition = composition;
+        best = second;
+        bestSize = size;
+      }
+      if (bestComposition == null) {
+        output.add(first);
+      } else {
+        input.remove(best);
+        first.disposeComposedBDD();
+        best.disposeComposedBDD();
+        input.add(bestComposition);
+        composedSome = true;
+      }
+    }
+    return composedSome && output.size() > 1;
+  }
+
+  private void disposAll(final Collection<? extends PartitionBDD> parts)
+  {
+    for (final PartitionBDD part : parts) {
       part.disposeComposedBDD();
-      bestcandidate.disposeComposedBDD();
-      partitions.add(result);
-      return result;
-    } else {
-      return null;
     }
   }
 

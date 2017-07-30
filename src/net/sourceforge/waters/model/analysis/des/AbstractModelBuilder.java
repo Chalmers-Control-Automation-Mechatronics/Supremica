@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -132,9 +132,10 @@ public abstract class AbstractModelBuilder<P extends Proxy>
    * Setting the computed object also marks the analysis run as completed and
    * sets the Boolean result.
    * @param  proxy  The computed object, or <CODE>null</CODE> to
-   *                indicate an unsuccessful computation. The Boolean analysis
-   *                result is set to <CODE>false</CODE> if and only if this
-   *                parameter is <CODE>null</CODE>.
+   *                indicate an unsuccessful computation.
+   * @return The Boolean analysis result at the end of the call.
+   *         It is set to <CODE>false</CODE> if and only if the
+   *         <CODE>proxy</CODE> parameter is <CODE>null</CODE>.
    */
   protected boolean setProxyResult(final P proxy)
   {

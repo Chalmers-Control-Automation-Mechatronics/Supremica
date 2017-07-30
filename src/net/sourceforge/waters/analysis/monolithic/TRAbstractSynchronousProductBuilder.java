@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -57,6 +55,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.log4j.Logger;
+
+import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -134,6 +134,16 @@ public abstract class TRAbstractSynchronousProductBuilder
   public boolean getCountingStates()
   {
     return mCountingStates;
+  }
+
+  @Override
+  public int getDefaultConfig()
+  {
+    int config = super.getDefaultConfig();
+    if (mCountingStates) {
+      config |= ListBufferTransitionRelation.CONFIG_COUNT_LONG;
+    }
+    return config;
   }
 
 
@@ -383,7 +393,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       // Handle the state count.
       final StateTupleEncoding tupleEnc = getStateTupleEncoding();
       if (mCountingStates) {
-        final TRAutomatonProxy[] components = getInputAutomata();
+        final TRAutomatonProxy[] components = getTRAutomata();
         final int numComponents = components.length;
         final int[] encoded = new int[stateSpace.getArraySize()];
         final int[] decoded = new int[numComponents];

@@ -1,6 +1,6 @@
 //# This may look like C code, but it really is -*- C++ -*-
 //###########################################################################
-//# Copyright (C) 2004-2015 Robi Malik
+//# Copyright (C) 2004-2017 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -43,7 +43,9 @@
 #endif
 
 #include <stdint.h>
+
 #include "waters/base/LinkedRecordList.h"
+#include "waters/base/WordSize.h"
 
 
 namespace jni {
@@ -160,7 +162,7 @@ private:
   static const uint32_t FLAG_TAKEN = 0x00000002;
 
   static const int PROBABILITY_1 = 0x40000000;
-  static const float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
+  STATIC_FLOATCONST float PROBABILITY_ADJUST = 1.0f / PROBABILITY_1;
 
   static const TransitionRecordAccessorForSearch theControllableSearchAccessor;
   static const TransitionRecordAccessorForSearch
