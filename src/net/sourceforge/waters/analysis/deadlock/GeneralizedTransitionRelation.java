@@ -448,6 +448,12 @@ public class GeneralizedTransitionRelation
     return mEvents[event];
   }
 
+  public void setEvent(final EventProxy event, final int pos)
+  {
+    mEvents[pos]=event;
+  }
+
+
   public int getEventInt(final EventProxy event)
   {
     return mEventToInt.get(event);
@@ -855,6 +861,14 @@ public class GeneralizedTransitionRelation
     /*if (!hasPredecessors(t)) {
       removeAllOutgoing(t);
     }*/
+  }
+
+
+// To replace event with another one ..
+  public void replaceTransition(final int s,final int t ,final int oldEvent, final int newEvent)
+  {
+    mSuccessors[s][oldEvent] = mSuccessors[s][newEvent];
+    mPredecessors[t][oldEvent]=  mPredecessors[t][newEvent];
   }
 
   public void removeAllUnreachable()

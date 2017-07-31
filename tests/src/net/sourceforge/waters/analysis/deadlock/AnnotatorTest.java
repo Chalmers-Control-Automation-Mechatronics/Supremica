@@ -106,7 +106,7 @@ public class AnnotatorTest
    * {supremica}/logs/results/analysis/op/{classname} as a .des file
    * (for text viewing) and as a .wmod file (to load into the IDE).</P>
    */
-  public void test_annotate_01() throws Exception
+ public void test_annotate_01() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "annotation", "annotate_01.wmod");
@@ -120,12 +120,12 @@ public class AnnotatorTest
     runTransitionRelationSimplifier(des);
   }
 
-  /*public void test_annotate_03() throws Exception
+  public void test_annotate_03() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "annotation", "annotate_03.wmod");
     runTransitionRelationSimplifier(des);
-  }*/
+  }
 
   public void test_annotate_04() throws Exception
   {
@@ -163,6 +163,15 @@ public class AnnotatorTest
   }
 
 
+
+  public void test_hiding_01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_01.wmod");
+    runHidingSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -180,6 +189,22 @@ public class AnnotatorTest
 
   }
 
+
+  protected void runHidingSimplifier(final ProductDESProxy des)
+    throws Exception
+  {
+
+    getLogger().info("Checking " + des.getName() + " ...");
+    final AutomatonProxy before = findAutomaton(des, BEFORE);
+    // calculate annotated form
+    final GeneralizedTransitionRelation tr = annotateHiding(before, des);
+    // calculate unannotated form
+    //final AutomatonProxy expected = findAutomaton(des, AFTER);
+    final AutomatonProxy unannotated = unannotate(tr, des);
+    checkResult(des, unannotated);
+    getLogger().info("Done " + des.getName());
+
+  }
 
   //#########################################################################
   //# Auxiliary Methods
@@ -214,7 +239,7 @@ public class AnnotatorTest
 
  public GeneralizedTransitionRelation annotate(final AutomatonProxy aut){
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
-    final Annotator annotatedAutomaton= new Annotator(tr);
+    final Annotator annotatedAutomaton= new Annotator(tr, -1);
     annotatedAutomaton.run();
     return tr;
   }
@@ -225,6 +250,19 @@ public class AnnotatorTest
     final AutomatonProxy aut = ua.run(getProductDESProxyFactory(), des);
     return aut;
   }
+
+// hide and annotate
+  public GeneralizedTransitionRelation annotateHiding(final AutomatonProxy aut,
+                                                      final ProductDESProxy des){
+
+    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
+    final LocalEventHider hider= new LocalEventHider(tr);
+    final int tau_index =hider.run(des);
+    final Annotator annotatedAutomaton= new Annotator(tr, tau_index);
+    annotatedAutomaton.run();
+    return tr;
+  }
+
 
 
   //#########################################################################

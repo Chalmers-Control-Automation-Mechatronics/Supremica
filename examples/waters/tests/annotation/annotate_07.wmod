@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="annotate_07" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
     <EventDeclList>
-        <EventDecl Kind="PROPOSITION" Name="initial">
-            <ColorGeometry>
-                <Color Blue="255" Green="51" Red="0"/>
-            </ColorGeometry>
-        </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="PROPOSITION" Name="ann:"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a">
@@ -60,6 +55,9 @@
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:"/>
+                        </EventList>
                         <PointGeometry>
                             <Point X="320" Y="208"/>
                         </PointGeometry>
