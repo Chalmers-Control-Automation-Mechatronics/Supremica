@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.
   AbstractStandardConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class BDDStandardConflictCheckerTest
@@ -64,10 +64,13 @@ public class BDDStandardConflictCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ConflictChecker
     createModelVerifier(final ProductDESProxyFactory factory)
   {
-    return new BDDConflictChecker(factory);
+    final BDDConflictChecker checker = new BDDConflictChecker(factory);
+    checker.setShortCounterExampleRequested(false);
+    return checker;
   }
 
 }

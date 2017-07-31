@@ -535,12 +535,13 @@ public abstract class BDDModelVerifier
 
   BDD createInitialStateBDD(final AutomatonBDD autBDD)
   {
-    final BDD autinit = autBDD.createInitialStateBDD(mBDDFactory);
-    if (autinit.isZero()) {
+    final BDD bdd = autBDD.createInitialStateBDD(mBDDFactory);
+    if (bdd.isZero()) {
       setSatisfiedResult();
       return null;
     } else {
-      return autinit;
+      mIsFullyDeterministic &= autBDD.isDeterministic(null);
+      return bdd;
     }
   }
 
