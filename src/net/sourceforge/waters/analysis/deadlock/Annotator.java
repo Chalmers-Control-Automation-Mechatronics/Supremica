@@ -35,9 +35,6 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
-
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -48,9 +45,8 @@ import gnu.trove.set.hash.TIntHashSet;
 
 public class Annotator
 {
-  private final TransitionRelation mTransitionRelation;
-  private final int mTau;
-
+  private final GeneralizedTransitionRelation mTransitionRelation;
+  //private final int mTau;
   public static int ANNOTATIONS_ADDED = 0;
   public static int ANNOTATIONS_REMOVED_SUBSET = 0;
   public static int STATES_REMOVED = 0;
@@ -75,29 +71,28 @@ public class Annotator
             " TIME = " + TIME;
   }
 
-  public Annotator(final TransitionRelation transitionrelation)
+  public Annotator(final GeneralizedTransitionRelation transitionrelation, final int tau)
   {
     mTransitionRelation = transitionrelation;
-    mTau = 0;
+  //  mTau=tau;
   }
 
   public void run()
   {
     TIME -= System.currentTimeMillis();
    // mTransitionRelation.removeAllSelfLoops(mTau);
-   // mTransitionRelation.removeAllAnnotations(mTau);
+    //mTransitionRelation.removeAllAnnotations(mTau);
     STATES_REMOVED -= mTransitionRelation.unreachableStates();
-    final TIntHashSet tausremoved = new TIntHashSet();
+    //final TIntHashSet tausremoved = new TIntHashSet();
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
-      final TIntHashSet taus = mTransitionRelation.getSuccessors(s, mTau);
+    /* final TIntHashSet taus = mTransitionRelation.getSuccessors(s, mTau);
       if (taus == null || taus.isEmpty()) {
         continue;
-      }
-      //System.out.println("taus: + " + Arrays.toString(taus.toArray()));
-      final TIntIterator it = taus.iterator();
-      ANNOTATIONS_REMOVED_SUBSET += mTransitionRelation.getAnnotations2(s).size();
-      Set<TIntHashSet> anns = new THashSet<TIntHashSet>(mTransitionRelation.getAnnotations2(s));
-      while (it.hasNext()) {
+      }*/
+     // final TIntIterator it = taus.iterator();
+      //ANNOTATIONS_REMOVED_SUBSET += mTransitionRelation.getAnnotations2(s).size();
+      final Set<TIntHashSet> anns = new THashSet<TIntHashSet>(mTransitionRelation.getAnnotations2(s));
+    /*  while (it.hasNext()) {
         ANNOTATIONS_ADDED++;
         final int target = it.next();
         tausremoved.add(target);
@@ -109,9 +104,9 @@ public class Annotator
 
         mTransitionRelation.addAllSuccessors(target, s);
         ANNOTATIONS_REMOVED_SUBSET += mTransitionRelation.getAnnotations2(target).size();
-        anns = TransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
+        anns = GeneralizedTransitionRelation.subsets(mTransitionRelation.getAnnotations2(target),
                                            anns);
-      }
+      }*/
 
       ANNOTATIONS_REMOVED_SUBSET -= anns.size();
       if (!anns.isEmpty()) {

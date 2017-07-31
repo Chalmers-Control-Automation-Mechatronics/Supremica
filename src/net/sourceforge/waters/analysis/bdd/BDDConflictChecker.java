@@ -146,75 +146,6 @@ public class BDDConflictChecker
 
 
   //#########################################################################
-  //# Invocation
-  @Override
-  public boolean run()
-    throws AnalysisException
-  {
-    getLogger().debug("BDDConflictChecker.run(): " +
-                      getModel().getName() + " ...");
-    try {
-      setUp();
-      createAutomatonBDDs();
-      final VerificationResult result = getAnalysisResult();
-      if (result.isFinished()) {
-        return isSatisfied();
-      }
-      createEventBDDs();
-      if (result.isFinished()) {
-        return isSatisfied();
-      }
-      final BDD reachable = computeReachability();
-      if (result.isFinished()) {
-        return isSatisfied();
-      }
-      if (mDeadlockBDD != null) {
-        mDeadlockBDD.free();
-        mDeadlockBDD = null;
-      }
-      if (mPreconditionBDD != null) {
-        mPreconditionBDD.andWith(reachable.id());
-      }
-      final BDD coreachable = computeCoreachability(mMarkingBDD, reachable);
-      mMarkingBDD = null;
-      if (result.isFinished()) {
-        return isSatisfied();
-      }
-      final BDD pre =
-        mPreconditionBDD == null ? reachable.id() : mPreconditionBDD;
-      mPreconditionBDD = null;
-      reachable.free();
-      final BDD bad = pre.andWith(coreachable.not());
-      if (bad.isZero()) {
-        return setSatisfiedResult();
-      } else {
-        coreachable.free();
-        final ConflictTraceProxy counterexample =
-          computeCounterExample(bad, ConflictKind.LIVELOCK);
-        return setFailedResult(counterexample);
-      }
-    } catch (final AnalysisException exception) {
-      throw setExceptionResult(exception);
-    } catch (final OutOfMemoryError error) {
-      System.gc();
-      final OverflowException overflow = new OverflowException(error);
-      throw setExceptionResult(overflow);
-    } catch (final WatersRuntimeException exception) {
-      if (exception.getCause() instanceof AnalysisException) {
-        final AnalysisException cause = (AnalysisException) exception.getCause();
-        throw setExceptionResult(cause);
-      } else {
-        throw exception;
-      }
-    } finally {
-      tearDown();
-      getLogger().debug("BDDConflictChecker.run(): " +
-                        getModel().getName() + " done.");
-    }
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   @Override
   public void setConfiguredDefaultMarking(final EventProxy marking)
@@ -249,6 +180,86 @@ public class BDDConflictChecker
 
 
   //#########################################################################
+  //# Invocation
+  @Override
+  public boolean run()
+    throws AnalysisException
+  {
+    getLogger().debug("BDDConflictChecker.run(): " +
+                      getModel().getName() + " ...");
+    try {
+      setUp();
+      createAutomatonBDDs();
+      final VerificationResult result = getAnalysisResult();
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final EventBDD[] eventBDDs = createTransitionBDDs();
+      final boolean earlyDeadlockEnabled = isEarlyDeadlockEnabled();
+      BDD init = createInitialStateBDD(earlyDeadlockEnabled);
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final BDD reachable = computeReachability(init);
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      if (mBadStatesBDD != null) {
+        mBadStatesBDD.free();
+        mBadStatesBDD = null;
+      }
+      if (mPreconditionBDD != null) {
+        mPreconditionBDD.andWith(reachable.id());
+      }
+      final BDD coreachable = computeCoreachability(mMarkingBDD, reachable);
+      mMarkingBDD = null;
+      if (result.isFinished()) {
+        return isSatisfied();
+      }
+      final BDD pre =
+        mPreconditionBDD == null ? reachable.id() : mPreconditionBDD;
+      mPreconditionBDD = null;
+      reachable.free();
+      mBadStatesBDD = pre.andWith(coreachable.not());
+      if (mBadStatesBDD.isZero()) {
+        return setSatisfiedResult();
+      } else if (earlyDeadlockEnabled) {
+        coreachable.free();
+        mConflictKind = ConflictKind.LIVELOCK;
+        final ConflictTraceProxy counterExample =
+          computeCounterExample(mBadStatesBDD);
+        return setFailedResult(counterExample);
+      } else {
+        coreachable.free();
+        mConflictKind = ConflictKind.CONFLICT;
+        super.createTransitionBDDs(TransitionPartitioningStrategy.GREEDY,
+                                   eventBDDs);
+        init = createInitialStateBDD(true);
+        computeReachability(init);
+        return false;
+      }
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final OverflowException overflow = new OverflowException(error);
+      throw setExceptionResult(overflow);
+    } catch (final WatersRuntimeException exception) {
+      if (exception.getCause() instanceof AnalysisException) {
+        final AnalysisException cause = (AnalysisException) exception.getCause();
+        throw setExceptionResult(cause);
+      } else {
+        throw exception;
+      }
+    } finally {
+      tearDown();
+      getLogger().debug("BDDConflictChecker.run(): " +
+                        getModel().getName() + " done.");
+    }
+  }
+
+
+  //#########################################################################
   //# Algorithm Implementation
   @Override
   public void tearDown()
@@ -257,44 +268,43 @@ public class BDDConflictChecker
     mUsedMarking = null;
     mMarkingBDD = null;
     mPreconditionBDD = null;
-    mDeadlockBDD = null;
+    mBadStatesBDD = null;
   }
 
   @Override
-  EventBDD[] createEventBDDs()
+  void createTransitionBDDs(final TransitionPartitioningStrategy strategy,
+                            final EventBDD[] eventBDDs)
     throws AnalysisException
   {
-    final EventBDD[] eventBDDs = super.createEventBDDs();
-    final VerificationResult result = getAnalysisResult();
-    if (result.isFinished()) {
-      return eventBDDs;
-    }
+    super.createTransitionBDDs(strategy, eventBDDs);
+
     final EventProxy omega = getUsedMarkingProposition();
     mMarkingBDD = getMarkedStateBDD(omega);
     if (mMarkingBDD.isOne()) {
       setSatisfiedResult();
-      return eventBDDs;
+      return;
     }
     if (mPreconditionMarking != null) {
       mPreconditionBDD = getMarkedStateBDD(mPreconditionMarking);
       mPreconditionBDD.applyWith(mMarkingBDD.id(), BDDFactory.diff);
       if (mPreconditionBDD.isZero()) {
         setSatisfiedResult();
-        return eventBDDs;
+        return;
       } else if (mPreconditionBDD.isOne()) {
         mPreconditionBDD = null;
       }
     }
     if (mPreconditionBDD == null && mMarkingBDD.isZero()) {
-      final BDD init = getInitialStateBDD();
+      mConflictKind = ConflictKind.CONFLICT;
+      final BDD init = createInitialStateBDD(true);
       final ConflictTraceProxy counterexample =
-        computeCounterExample(init, 0, ConflictKind.CONFLICT);
+        computeCounterExample(init, 0);
       setFailedResult(counterexample);
-      return eventBDDs;
+      return;
     }
     final int limit = getPartitioningSizeLimit();
-    if (limit > 0) {
-      final BDD nondeadlock = mMarkingBDD.id();
+    if (isEarlyDeadlockEnabled() && limit > 0) {
+      final BDD nonDeadlock = mMarkingBDD.id();
       final AutomatonBDD[] automatonBDDs = getAutomatonBDDs();
       final BDDFactory factory = getBDDFactory();
       final List<TransitionPartitionBDD> partitioning =
@@ -303,34 +313,34 @@ public class BDDConflictChecker
         checkAbort();
         final BDD nondeadlockPart =
           part.getStronglyEnabledBDD(automatonBDDs, factory);
-        nondeadlock.orWith(nondeadlockPart);
-        if (nondeadlock.nodeCount() > limit) {
-          nondeadlock.free();
-          return eventBDDs;
+        nonDeadlock.orWith(nondeadlockPart);
+        if (nonDeadlock.nodeCount() > limit) {
+          nonDeadlock.free();
+          return;
         }
       }
-      final BDD deadlock = nondeadlock.not();
+      final BDD deadlock = nonDeadlock.not();
       if (mPreconditionBDD != null) {
         deadlock.andWith(mPreconditionBDD.id());
       }
       if (!deadlock.isZero()) {
-        mDeadlockBDD = deadlock;
+        mConflictKind = ConflictKind.DEADLOCK;
+        mBadStatesBDD = deadlock;
       }
     }
-    return eventBDDs;
   }
 
   @Override
   boolean containsBadState(final BDD reached)
     throws AnalysisAbortException, OverflowException
   {
-    if (mDeadlockBDD != null) {
-      final BDD bad = reached.and(mDeadlockBDD);
+    if (mBadStatesBDD != null) {
+      final BDD bad = reached.and(mBadStatesBDD);
       if (!bad.isZero()) {
-        final int level = getDepth() - 1;
-        final ConflictTraceProxy counterexample =
-          computeCounterExample(bad, level, ConflictKind.DEADLOCK);
-        setFailedResult(counterexample);
+        final int level = getDepth();
+        final ConflictTraceProxy counterExample =
+          computeCounterExample(bad, level);
+        setFailedResult(counterExample);
         return true;
       }
     }
@@ -353,6 +363,21 @@ public class BDDConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Returns whether early deadlock detection is enabled during the initial
+   * reachability search. This is used to decide whether a BDD representing
+   * deadlock states should be constructed and checked against after every
+   * step. The method can only be called after the transition partitioning
+   * has been constructed, because the decision also depends on whether the
+   * search is BFS or not.
+   */
+  private boolean isEarlyDeadlockEnabled()
+  {
+    return
+      getTransitionPartitioning().isStrictBFS() ||
+      !isShortCounterExampleRequested();
+  }
+
   /**
    * Gets the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
@@ -377,39 +402,37 @@ public class BDDConflictChecker
   }
 
   private ConflictTraceProxy computeCounterExample(final BDD bad,
-                                                   final int index,
-                                                   final ConflictKind kind)
+                                                   final int index)
     throws AnalysisAbortException, OverflowException
   {
     if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad, index);
-      return createCounterExample(trace, kind);
+      return createCounterExample(trace);
     } else {
       return null;
     }
   }
 
-  private ConflictTraceProxy computeCounterExample(final BDD bad,
-                                                   final ConflictKind kind)
+  private ConflictTraceProxy computeCounterExample(final BDD bad)
     throws AnalysisAbortException, OverflowException
   {
     if (isDetailedOutputEnabled()) {
       final List<TraceStepProxy> trace = computeTrace(bad);
-      return createCounterExample(trace, kind);
+      return createCounterExample(trace);
     } else {
       return null;
     }
   }
 
   private ConflictTraceProxy createCounterExample
-    (final List<TraceStepProxy> trace, final ConflictKind kind)
+    (final List<TraceStepProxy> trace)
   {
     final ProductDESProxyFactory desfactory = getFactory();
     final ProductDESProxy des = getModel();
     final String name = AbstractConflictChecker.getTraceName(des);
     final List<AutomatonProxy> automata = getAutomata();
     return desfactory.createConflictTraceProxy
-      (name, null, null, des, automata, trace, kind);
+      (name, null, null, des, automata, trace, mConflictKind);
   }
 
 
@@ -420,6 +443,7 @@ public class BDDConflictChecker
   private EventProxy mPreconditionMarking;
   private BDD mMarkingBDD;
   private BDD mPreconditionBDD;
-  private BDD mDeadlockBDD;
+  private ConflictKind mConflictKind = ConflictKind.CONFLICT;
+  private BDD mBadStatesBDD;
 
 }

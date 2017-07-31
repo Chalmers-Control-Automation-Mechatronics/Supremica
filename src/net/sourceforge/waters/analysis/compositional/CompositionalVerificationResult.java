@@ -33,9 +33,14 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.io.PrintWriter;
+import java.util.Formatter;
+
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -69,6 +74,23 @@ public class CompositionalVerificationResult
   public CompositionalVerificationResult(final Class<?> clazz)
   {
     super(clazz);
+    mCounterExampleTime = -1L;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  /**
+   * Gets the time taken for counterexample computation, in milliseconds.
+   */
+  public long getCounterExampleTime()
+  {
+    return mCounterExampleTime;
+  }
+
+  public void setCounterExampleTime(final long time)
+  {
+    mCounterExampleTime = time;
   }
 
 
@@ -131,11 +153,74 @@ public class CompositionalVerificationResult
       final VerificationResult result = (VerificationResult) other;
       mCounterExample = result.getCounterExample();
     }
+    if (other instanceof CompositionalVerificationResult) {
+      final CompositionalVerificationResult result =
+        (CompositionalVerificationResult) other;
+      mCounterExampleTime = mergeAdd(mCounterExampleTime,
+                                     result.mCounterExampleTime);
+    }
+  }
+
+
+  //#########################################################################
+  //# Printing
+  @Override
+  public void print(final PrintWriter writer)
+  {
+    super.print(writer);
+    if (mCounterExample != null) {
+      writer.println("--------------------------------------------------");
+      final int len = mCounterExample.getEvents().size();
+      writer.println("Counterexample length: " + len);
+      if (mCounterExampleTime >= 0) {
+        @SuppressWarnings("resource")
+        final Formatter formatter = new Formatter(writer);
+        formatter.format("Counterexample computation time: %.3fs\n",
+                         0.001f * mCounterExampleTime);
+      }
+    }
+  }
+
+  @Override
+  public void printCSVHorizontal(final PrintWriter writer)
+  {
+    super.printCSVHorizontal(writer);
+    writer.print(',');
+    if (mCounterExample != null) {
+      final int len = mCounterExample.getEvents().size();
+      writer.print(len);
+    }
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(',');
+      if (mCounterExample == null) {
+        writer.print("NONCONFLICTING");
+      } else if (mCounterExample instanceof ConflictTraceProxy) {
+        final ConflictTraceProxy conflictTrace =
+          (ConflictTraceProxy) mCounterExample;
+        writer.print(conflictTrace.getKind());
+      }
+    }
+    writer.print(',');
+    if (mCounterExampleTime >= 0) {
+      writer.print(mCounterExampleTime);
+    }
+  }
+
+  @Override
+  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadings(writer);
+    writer.print(",CounterLength");
+    if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
+      writer.print(",ConflictKind");
+    }
+    writer.print(",CounterTime");
   }
 
 
   //#########################################################################
   //# Data Members
   private TraceProxy mCounterExample;
+  private long mCounterExampleTime;
 
 }

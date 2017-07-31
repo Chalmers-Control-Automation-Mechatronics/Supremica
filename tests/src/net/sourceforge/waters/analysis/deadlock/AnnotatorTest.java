@@ -35,7 +35,6 @@ package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -107,11 +106,69 @@ public class AnnotatorTest
    * {supremica}/logs/results/analysis/op/{classname} as a .des file
    * (for text viewing) and as a .wmod file (to load into the IDE).</P>
    */
-  public void test_annotate_01() throws Exception
+ public void test_annotate_01() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "annotation", "annotate_01.wmod");
     runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_03.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_07() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_annotate_08() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_08.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
+
+  public void test_hiding_01() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_01.wmod");
+    runHidingSimplifier(des);
   }
 
 
@@ -120,16 +177,34 @@ public class AnnotatorTest
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
     throws Exception
   {
+
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final TransitionRelation tr = annotate(before);
+    final GeneralizedTransitionRelation tr = annotate(before);
     // calculate unannotated form
-    final AutomatonProxy unannotated = unannotate(tr);
+    final AutomatonProxy unannotated = unannotate(tr, des);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
+
   }
 
+
+  protected void runHidingSimplifier(final ProductDESProxy des)
+    throws Exception
+  {
+
+    getLogger().info("Checking " + des.getName() + " ...");
+    final AutomatonProxy before = findAutomaton(des, BEFORE);
+    // calculate annotated form
+    final GeneralizedTransitionRelation tr = annotateHiding(before, des);
+    // calculate unannotated form
+    //final AutomatonProxy expected = findAutomaton(des, AFTER);
+    final AutomatonProxy unannotated = unannotate(tr, des);
+    checkResult(des, unannotated);
+    getLogger().info("Done " + des.getName());
+
+  }
 
   //#########################################################################
   //# Auxiliary Methods
@@ -160,20 +235,34 @@ public class AnnotatorTest
     }
   }
 
-  public TransitionRelation annotate(final AutomatonProxy aut)
-  {
-    final TransitionRelation tr = new TransitionRelation(aut, null);
-    final Annotator annotatedAutomaton = new Annotator(tr);
+
+
+ public GeneralizedTransitionRelation annotate(final AutomatonProxy aut){
+    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
+    final Annotator annotatedAutomaton= new Annotator(tr, -1);
     annotatedAutomaton.run();
     return tr;
   }
 
-  public AutomatonProxy unannotate(final TransitionRelation tr)
-  {
-    final UnAnnotator ua = new UnAnnotator(tr);
-    final AutomatonProxy aut = ua.run(getProductDESProxyFactory());
+  public AutomatonProxy unannotate(final GeneralizedTransitionRelation tr, final ProductDESProxy des){
+    final UnAnnotator ua = new UnAnnotator(tr, null);
+   // final UnAnnotator ua = new UnAnnotator(tr);
+    final AutomatonProxy aut = ua.run(getProductDESProxyFactory(), des);
     return aut;
   }
+
+// hide and annotate
+  public GeneralizedTransitionRelation annotateHiding(final AutomatonProxy aut,
+                                                      final ProductDESProxy des){
+
+    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut, null);
+    final LocalEventHider hider= new LocalEventHider(tr);
+    final int tau_index =hider.run(des);
+    final Annotator annotatedAutomaton= new Annotator(tr, tau_index);
+    annotatedAutomaton.run();
+    return tr;
+  }
+
 
 
   //#########################################################################

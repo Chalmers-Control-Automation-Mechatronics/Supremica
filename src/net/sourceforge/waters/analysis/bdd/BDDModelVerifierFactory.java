@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
-import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -178,13 +178,13 @@ public class BDDModelVerifierFactory
   //#########################################################################
   //# Inner Class CommandLineArgumentDynamic
   private static class CommandLineArgumentDynamic
-    extends CommandLineArgumentFlag
+    extends CommandLineArgumentBoolean
   {
     //#######################################################################
     //# Constructor
     private CommandLineArgumentDynamic()
     {
-      super("-dynamic", "Enable dynamic variable reordering");
+      super("-dynamic", "Enable or disable dynamic variable reordering");
     }
 
     //#######################################################################
@@ -194,8 +194,8 @@ public class BDDModelVerifierFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
-      final boolean enable = getValue();
-      bddVerifier.setReorderingEnabled(enable);
+      final boolean enabled = getValue();
+      bddVerifier.setReorderingEnabled(enabled);
     }
   }
 

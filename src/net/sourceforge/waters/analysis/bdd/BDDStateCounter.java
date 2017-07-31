@@ -95,9 +95,12 @@ public class BDDStateCounter
     try {
       setUp();
       createAutomatonBDDs();
-      createEventBDDs();
-      final BDD reachable = computeReachability();
-      reachable.free();
+      final BDD init = createInitialStateBDD(false);
+      if (init != null) {
+        createTransitionBDDs();
+        final BDD reachable = computeReachability(init);
+        reachable.free();
+      }
       return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);

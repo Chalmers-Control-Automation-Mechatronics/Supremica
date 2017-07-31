@@ -62,7 +62,6 @@
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <EventList>
-                            <SimpleIdentifier Name="ann:a:b:c"/>
                             <SimpleIdentifier Name="ann:"/>
                         </EventList>
                         <PointGeometry>

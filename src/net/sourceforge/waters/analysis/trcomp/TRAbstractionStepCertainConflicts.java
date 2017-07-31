@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -136,9 +137,10 @@ class TRAbstractionStepCertainConflicts
                           final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    final TRCompositionalConflictChecker checker =
+    final long start = System.currentTimeMillis();
+    final TRCompositionalConflictChecker conflictChecker =
       (TRCompositionalConflictChecker) analyzer;
-    final TraceExpander expander = new TraceExpander(checker);
+    final TraceExpander expander = new TraceExpander(conflictChecker);
     expander.pruneTrace(trace);
     trace.replaceAutomaton(this, mPredecessor);
     int level = expander.getLevelOfEndState(trace);
@@ -176,6 +178,9 @@ class TRAbstractionStepCertainConflicts
         trace.append(extension, numSteps);
       }
     }
+    final long stop = System.currentTimeMillis();
+    final int count = expander.getNumberOfLanguageInclusionChecks();
+    conflictChecker.recordCCLanguageInclusionChecks(count, stop - start);
   }
 
 
@@ -212,6 +217,14 @@ class TRAbstractionStepCertainConflicts
         (PROPERTY_NAME, ComponentKind.PROPERTY, propertyEnc, 1, config);
       rel.setInitial(0, true);
       mPropertyAutomaton = new TRAutomatonProxy(propertyEnc, rel);
+      mNumberOfLanguageInclusionChecks = 0;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private int getNumberOfLanguageInclusionChecks()
+    {
+      return mNumberOfLanguageInclusionChecks;
     }
 
     //#######################################################################
@@ -313,7 +326,12 @@ class TRAbstractionStepCertainConflicts
     {
       final ProductDESProxy des = createLanguageInclusionModel();
       mLanguageInclusionChecker.setModel(des);
-      if (mLanguageInclusionChecker.run()) {
+      mLanguageInclusionChecker.run();
+      final VerificationResult result =
+        mLanguageInclusionChecker.getAnalysisResult();
+      mNumberOfLanguageInclusionChecks++;
+      // TODO mConflictChecker.recordCCLanguageInclusionCheck(result);
+      if (result.isSatisfied()) {
         return null;
       } else {
         final TRTraceProxy trace =
@@ -380,6 +398,7 @@ class TRAbstractionStepCertainConflicts
     private List<LanguageInclusionAutomaton> mLanguageInclusionAutomata;
     private LanguageInclusionAutomaton mCertainConflictsAutomaton;
     private int mMaxLevel;
+    private int mNumberOfLanguageInclusionChecks;
   }
 
 

@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
  * Boolean command line arguments are specified on the command line by their
  * name to specify a <I>true</I> value, or by their name preceded
  * with&nbsp;&quot;n&quot; to specify a <I>false</I> value. For example
- * <I>quot;failing events&quot;</I> might be enabled by&nbsp;<CODE>-fe</CODE>
+ * <I>&quot;failing events&quot;</I> might be enabled by&nbsp;<CODE>-fe</CODE>
  * and disabled by <CODE>-nfe</CODE>. The recognised value (<I>true</I>
  * or&nbsp;<I>false</I>)is stored in the <CODE>CommandLineArgumentBoolean</CODE>
  * object for retrieval.

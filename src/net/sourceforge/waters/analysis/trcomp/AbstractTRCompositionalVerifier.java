@@ -88,7 +88,19 @@ public abstract class AbstractTRCompositionalVerifier
 
 
   //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.des.ModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
@@ -147,6 +159,7 @@ public abstract class AbstractTRCompositionalVerifier
     super.setUp();
     final ModelVerifier mono = getMonolithicVerifier();
     mono.setCounterExampleEnabled(isCounterExampleEnabled());
+    mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
   }
 
 
@@ -175,10 +188,11 @@ public abstract class AbstractTRCompositionalVerifier
   @Override
   protected TRTraceProxy computeCounterExample() throws AnalysisException
   {
-    final VerificationResult result = getAnalysisResult();
+    final CompositionalVerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
       final Logger logger = getLogger();
       logger.debug("Starting trace expansion ...");
+      final long start = System.currentTimeMillis();
       getSpecialEventsListener().setEnabled(true);
       final ProductDESProxy des = getModel();
       final TRTraceProxy trace = createEmptyTrace(des);
@@ -195,7 +209,9 @@ public abstract class AbstractTRCompositionalVerifier
         }
         iter.remove();
       }
+      final long stop = System.currentTimeMillis();
       result.setCounterExample(trace);
+      result.setCounterExampleTime(stop -start);
       return trace;
     } else {
       return null;
@@ -205,6 +221,7 @@ public abstract class AbstractTRCompositionalVerifier
 
   //#########################################################################
   //# Data Members
-  private boolean mTraceCheckingEnabled;
+  private boolean mShortCounterExampleRequested = false;
+  private boolean mTraceCheckingEnabled = false;
 
 }

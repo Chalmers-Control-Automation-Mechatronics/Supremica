@@ -33,10 +33,6 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -44,6 +40,10 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 public class RemoveImpossibleTransitions
@@ -53,7 +53,7 @@ public class RemoveImpossibleTransitions
   public static int ENACTED = 0;
   public static int TIME = 0;
 
-  public RemoveImpossibleTransitions(EventProxy marking)
+  public RemoveImpossibleTransitions(final EventProxy marking)
   {
     mMarking = marking;
     mEventsCantHappen = new THashMap<AutomatonProxy, Map<EventProxy, Tuple>>();
@@ -65,14 +65,14 @@ public class RemoveImpossibleTransitions
     TIME = 0;
   }
 
-  private Map<EventProxy, Set<Set<EventProxy>>> findEventsWhichAreImpossibleAfter(EventProxy event)
+  private Map<EventProxy, Set<Set<EventProxy>>> findEventsWhichAreImpossibleAfter(final EventProxy event)
   {
-    Map<EventProxy, Set<Set<EventProxy>>> eventRequires =
+    final Map<EventProxy, Set<Set<EventProxy>>> eventRequires =
       new THashMap<EventProxy, Set<Set<EventProxy>>>();
-    for (AutomatonProxy aut : mEventsCantHappen.keySet()) {
-      Tuple tup = mEventsCantHappen.get(aut).get(event);
+    for (final AutomatonProxy aut : mEventsCantHappen.keySet()) {
+      final Tuple tup = mEventsCantHappen.get(aut).get(event);
       if (tup == null) {continue;}
-      for (EventProxy e : tup.mImpossible) {
+      for (final EventProxy e : tup.mImpossible) {
         Set<Set<EventProxy>> requires = eventRequires.get(e);
         if (requires == null) {
           requires = new THashSet<Set<EventProxy>>();
@@ -84,16 +84,16 @@ public class RemoveImpossibleTransitions
     return eventRequires;
   }
 
-  public Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> 
-    findEventsWhichAreImpossibleAfter(Set<EventProxy> events)
+  public Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>>
+    findEventsWhichAreImpossibleAfter(final Set<EventProxy> events)
   {
-    Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> eventRequires =
+    final Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> eventRequires =
       new THashMap<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>>();
-    for (EventProxy e : events) {
-      Map<EventProxy, Set<Set<EventProxy>>> map = findEventsWhichAreImpossibleAfter(e);
-      for (EventProxy e2 : map.keySet()) {
-        Set<Set<EventProxy>> required = map.get(e2);
-        Iterator<Set<EventProxy>> it = required.iterator();
+    for (final EventProxy e : events) {
+      final Map<EventProxy, Set<Set<EventProxy>>> map = findEventsWhichAreImpossibleAfter(e);
+      for (final EventProxy e2 : map.keySet()) {
+        final Set<Set<EventProxy>> required = map.get(e2);
+        final Iterator<Set<EventProxy>> it = required.iterator();
         while(it.hasNext()) {
           if (!events.containsAll(it.next())) {it.remove();}
         }
@@ -114,52 +114,55 @@ public class RemoveImpossibleTransitions
     final Set<EventProxy> mLeaves;
     final Set<EventProxy> mImpossible;
 
-    public Tuple(Set<EventProxy> leaves, Set<EventProxy> impossible)
+    public Tuple(final Set<EventProxy> leaves, final Set<EventProxy> impossible)
     {
       mLeaves = leaves;
       mImpossible = impossible;
     }
 
+    @Override
     public String toString()
     {
       return mLeaves.toString() + mImpossible.toString();
     }
   }
 
-  public void removeAutomata(Collection<AutomatonProxy> automata)
+  public void removeAutomata(final Collection<AutomatonProxy> automata)
   {
-    for (AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : automata) {
       mEventsCantHappen.remove(aut);
     }
   }
 
-  public void addAutomata(Collection<AutomatonProxy> automata)
+  public void addAutomata(final Collection<AutomatonProxy> automata)
   {
-    for (AutomatonProxy aut : automata) {
+    for (final AutomatonProxy aut : automata) {
       findEventsCantHappen(aut);
     }
   }
 
-  private void findEventsCantHappen(AutomatonProxy automaton)
+  @SuppressWarnings("unlikely-arg-type")
+  private void findEventsCantHappen(final AutomatonProxy automaton)
   {
-    TransitionRelation tr = new TransitionRelation(automaton, mMarking);
-    Map<EventProxy, Tuple> map = new THashMap<EventProxy, Tuple>();
-    for (EventProxy e : automaton.getEvents()) {
+    final TransitionRelation tr = new TransitionRelation(automaton, mMarking);
+    final Map<EventProxy, Tuple> map = new THashMap<EventProxy, Tuple>();
+    for (final EventProxy e : automaton.getEvents()) {
       map.put(e, new Tuple(new THashSet<EventProxy>(), new THashSet<EventProxy>(automaton.getEvents())));
     }
     for (int s = 0; s < tr.numberOfStates(); s++) {
       for (int e = 0; e < tr.numberOfEvents(); e++) {
-        TIntHashSet preds = tr.getPredecessors(s, e);
+        final TIntHashSet preds = tr.getPredecessors(s, e);
         if (preds == null || preds.isEmpty()) {continue;}
-        EventProxy event = tr.getEvent(e);
-        Tuple tup = map.get(event);
+        final EventProxy event = tr.getEvent(e);
+        final Tuple tup = map.get(event);
         if (tup == null) {continue;}
         for (int se = 0; se < tr.numberOfEvents(); se++) {
-          TIntHashSet succs = tr.getSuccessors(s, se);
+          final TIntHashSet succs = tr.getSuccessors(s, se);
           if (succs == null || succs.isEmpty()) {continue;}
-          EventProxy sevent = tr.getEvent(se);
+          final EventProxy sevent = tr.getEvent(se);
           tup.mImpossible.remove(sevent);
           if (tup.mImpossible.isEmpty()) {
+            // BUG Removing int from event map ???
             map.remove(e); break;
           }
           // is self looped
@@ -175,34 +178,34 @@ public class RemoveImpossibleTransitions
 
   public static String stats()
   {
-    return "RemoveImpossibleTransitions: ENACTED = " + ENACTED + 
+    return "RemoveImpossibleTransitions: ENACTED = " + ENACTED +
            " TIME = " + TIME;
   }
 
-  public void run(TransitionRelation tr)
+  public void run(final TransitionRelation tr)
   {
     TIME -= System.currentTimeMillis();
-    Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> eventmap =
+    final Map<EventProxy, Map<EventProxy, Set<Set<EventProxy>>>> eventmap =
       findEventsWhichAreImpossibleAfter(tr.getEvents());
     boolean changed = true;
     while (changed) {
       changed = false;
       for (int s = 0; s < tr.numberOfStates(); s++) {
         if (tr.isInitial(s)) {continue;}
-        TIntHashSet active = tr.getActiveEvents(s);
-        int[] arr = active.toArray();
+        final TIntHashSet active = tr.getActiveEvents(s);
+        final int[] arr = active.toArray();
         ACTIVE:
         for (int i = 0; i < arr.length; i++) {
-          EventProxy event = tr.getEvent(arr[i]);
+          final EventProxy event = tr.getEvent(arr[i]);
           if (event.equals(mMarking)) {continue;} //TODO make it so it removes marking
-          Map<EventProxy, Set<Set<EventProxy>>> tups = eventmap.get(event);
+          final Map<EventProxy, Set<Set<EventProxy>>> tups = eventmap.get(event);
           if (tups == null || tups.isEmpty()) {continue;}
-          Set<EventProxy> selflooped = new THashSet<EventProxy>();
-          Set<EventProxy> incoming = new THashSet<EventProxy>();
+          final Set<EventProxy> selflooped = new THashSet<EventProxy>();
+          final Set<EventProxy> incoming = new THashSet<EventProxy>();
           for (int e = 0; e < tr.numberOfEvents(); e++) {
-            TIntHashSet preds = tr.getPredecessors(s, e);
+            final TIntHashSet preds = tr.getPredecessors(s, e);
             if (preds == null || preds.isEmpty()) {continue;}
-            EventProxy eventpred = tr.getEvent(e);
+            final EventProxy eventpred = tr.getEvent(e);
             if (preds.contains(s)) {
               selflooped.add(eventpred);
               if (preds.size() == 1) {continue;}
@@ -213,12 +216,12 @@ public class RemoveImpossibleTransitions
             incoming.add(eventpred);
           }
           INCOMING:
-          for (EventProxy e : incoming) {
-            Set<Set<EventProxy>> required = tups.get(e);
+          for (final EventProxy e : incoming) {
+            final Set<Set<EventProxy>> required = tups.get(e);
             REQUIRED:
-            for (Set<EventProxy> req : required) {
+            for (final Set<EventProxy> req : required) {
               //if (!tr.getEvents().containsAll(required)) {continue;}
-              for (EventProxy self : selflooped) {
+              for (final EventProxy self : selflooped) {
                 if (req.contains(self)) {continue REQUIRED;}
               }
               // has no selfloops for this requires, next event

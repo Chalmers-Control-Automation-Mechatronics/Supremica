@@ -45,6 +45,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -254,7 +255,19 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
   @Override
   public boolean isSatisfied()
   {
@@ -323,6 +336,23 @@ public abstract class AbstractCompositionalModelVerifier
   //#########################################################################
   //# Hooks
   @Override
+  protected ModelVerifier getCurrentMonolithicAnalyzer()
+  {
+    return (ModelVerifier) super.getCurrentMonolithicAnalyzer();
+  }
+
+  @Override
+  protected void setupMonolithicAnalyzer()
+    throws EventNotFoundException
+  {
+    super.setupMonolithicAnalyzer();
+    final ModelVerifier mono = getCurrentMonolithicAnalyzer();
+    if (mono != null) {
+      mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
+    }
+  }
+
+  @Override
   protected boolean isPermissibleCandidate(final List<AutomatonProxy> automata)
   {
     return
@@ -360,7 +390,7 @@ public abstract class AbstractCompositionalModelVerifier
       final ProductDESProxy des = createProductDESProxy(automata);
       reportMonolithicAnalysis(des);
       final ModelVerifier monolithicVerifier =
-        (ModelVerifier) getCurrentMonolithicAnalyzer();
+        getCurrentMonolithicAnalyzer();
       monolithicVerifier.setModel(des);
       monolithicVerifier.run();
       // Do not clean up before run, keep data just in case of overflow ...
@@ -565,6 +595,7 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Data Members
+  private boolean mShortCounterExampleRequested = false;
   private boolean mTraceCheckingEnabled = false;
 
   private List<AbstractionStep> mAbstractionSteps;

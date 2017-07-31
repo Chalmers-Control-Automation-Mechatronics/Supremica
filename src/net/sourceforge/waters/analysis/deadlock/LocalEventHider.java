@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2015 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,64 +31,61 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular;
+package net.sourceforge.waters.analysis.deadlock;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
-import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
-public class CollectionDeterministic
+
+public class LocalEventHider
 {
+  private final GeneralizedTransitionRelation mTransitionRelation;
+  private final String TAU=":tau";
 
-public CollectionDeterministic(final int initialSize)
-{
-  mDetStates = new HashMap<DeterministicState, DeterministicState>(initialSize);
-}
-
-public boolean insert(final DeterministicState d, final int name){
-  if(!mDetStates.containsKey(d))
+  public LocalEventHider(final GeneralizedTransitionRelation transitionrelation)
   {
-    d.setProxy(name);
-    mDetStates.put(d, d);
-    return true;
+    mTransitionRelation = transitionrelation;
   }
-  return false;
-}
 
-public void remove(final DeterministicState d){
-  mDetStates.remove(d);
-}
-
-public boolean member(final DeterministicState d){
- return mDetStates.containsKey(d);
-}
-
-public int getName(final DeterministicState d){
-  return mDetStates.get(d).getName();
-}
-
-public Collection<StateProxy> getAllStateProxy(){
-  final ArrayList<StateProxy> result = new ArrayList<StateProxy>();
-  for(final DeterministicState state : mDetStates.values()){
-    result.add(state.getProxy());
+  public int run(final ProductDESProxy des)
+  {
+      final EventProxy tauEvent = getTau(des);
+      final EventProxy localEventsToHide = getEventToHide(des);
+//      final Set<EventProxy> localEventsToHide = getEventToHide(des);
+     // for(final EventProxy lc: localEventsToHide) {
+      final int e_index = mTransitionRelation.getEventInt(localEventsToHide);
+      mTransitionRelation.setEvent(tauEvent, e_index);
+     // }
+      return e_index;
   }
-  return result;
-}
 
-public StateProxy getStateProxy(final DeterministicState d){
-  if(mDetStates.containsKey(d)){
-    return mDetStates.get(d).getProxy();
+
+  //#########################################################################
+  //# Auxiliary Methods
+
+  private EventProxy getTau(final ProductDESProxy des) {
+
+    final Set<EventProxy> desEvents = des.getEvents();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getName().equals(TAU)) {
+          return ep;
+      }
+    }
+    return null;
   }
-  return null;
 
-}
+  private EventProxy getEventToHide(final ProductDESProxy des) {
+    final Set<EventProxy> desEvents = des.getEvents();
+    //final Set<EventProxy> localEvents = new THashSet<EventProxy>();
 
-public int getSize(){
-  return mDetStates.size();
-}
+    for (final EventProxy ep : desEvents) {
+      if (ep.getKind().toString().equals("CONTROLLABLE")&& !ep.isObservable()) {
+          return ep;
+      }
+    }
+    return null;
+  }
 
-  private final Map<DeterministicState, DeterministicState> mDetStates;
 }

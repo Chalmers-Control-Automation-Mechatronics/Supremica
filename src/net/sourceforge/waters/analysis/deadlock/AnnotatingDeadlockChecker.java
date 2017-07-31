@@ -33,15 +33,9 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
-import java.util.Iterator;
-import java.util.Set;
-
-import net.sourceforge.waters.analysis.annotation.TransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -98,16 +92,16 @@ public class AnnotatingDeadlockChecker
       setUp();
       // TODO
       // Annotate all automata
-      final EventProxy marked = null;
+   /*   final EventProxy marked = null;
       final Set<AutomatonProxy> autset = getModel().getAutomata();
 
       for (final Iterator<AutomatonProxy> it = autset.iterator(); it.hasNext(); ) {
               final AutomatonProxy aut = it.next();
-              final TransitionRelation tr = new TransitionRelation(aut,marked);
+              final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(aut,marked);
               @SuppressWarnings("unused")
-              final Annotator annotatedAutomaton= new Annotator(tr);
+            //  final Annotator annotatedAutomaton= new Annotator(tr);
         }
-      return setSatisfiedResult();
+    */  return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
@@ -133,18 +127,7 @@ public class AnnotatingDeadlockChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  public TransitionRelation annotate(final AutomatonProxy aut){
-    final TransitionRelation tr = new TransitionRelation(aut, null);
-    final Annotator annotatedAutomaton= new Annotator(tr);
-    annotatedAutomaton.run();
-    return tr;
-  }
 
-  public AutomatonProxy unannotate(final TransitionRelation tr){
-    final UnAnnotator ua = new UnAnnotator(tr);
-    final AutomatonProxy aut = ua.run(getFactory());
-    return aut;
-  }
 
   //#########################################################################
   //# Data Members
