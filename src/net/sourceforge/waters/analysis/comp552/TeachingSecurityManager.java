@@ -194,7 +194,7 @@ class TeachingSecurityManager extends SecurityManager
               !isAllowedLibrary(name)) {
             super.checkPermission(perm);
           }
-        } else if (action.equals("write") || actions.equals("delete")) {
+        } else if (action.equals("write") || action.equals("delete")) {
           if (!isAccessible(name, mWriteableDirectories)) {
             super.checkPermission(perm);
           }

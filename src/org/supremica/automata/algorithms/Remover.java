@@ -6,27 +6,26 @@
 package org.supremica.automata.algorithms;
 
 import java.util.function.Predicate;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
-import org.supremica.automata.StateSet;
-import org.supremica.automata.algorithms.SearchStates.StateIterator;
 import org.supremica.gui.VisualProject;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 /**
- *
- * @author Fabian
+ * @author Martin Fabian
  */
 public class Remover
 {
 	private static final Logger logger = LoggerFactory.createLogger(Forbidder.class);
 	private final int[] selected_rows;
 	private final SearchStates search_states;
-	private final VisualProject the_project;
+	@SuppressWarnings("unused")
+    private final VisualProject the_project;
 	private final Automata selected_automata;
-	
+
 	public Remover(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project)
     {
 		this.selected_automata = automata;
@@ -34,7 +33,7 @@ public class Remover
         this.search_states = ss;
         this.the_project = project;
 	}
-	
+
 	public boolean remove()
 	{
        // For each global state...
@@ -60,7 +59,7 @@ public class Remover
 		}
 		return true;
 	}
-	
+
 	private void removeTransitions(final int automaton_index, final int state_index)
 	{
         // Get automaton -- just for sanity check
@@ -70,7 +69,7 @@ public class Remover
         // This should have a corresponding state in automaton
 		assert automaton.getStateWithName(state.getName()) != null : "Cannot find state " + state.getName() + " in automaton " + automaton.getName();
 		logger.debug("Found state " + state.getName() + " in automaton " + automaton.getName());
-		
+
 		state.removeOutgoingArcs();	// This may leave inaccessible states, should purge
 	}
 }
