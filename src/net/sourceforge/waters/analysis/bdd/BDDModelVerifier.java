@@ -1049,11 +1049,13 @@ public abstract class BDDModelVerifier
   //# Statistics
   private void recordStateCount(final BDD bdd)
   {
-    final BDDStateCountRecursion counter =
-      new BDDStateCountRecursion(mBDDFactory, mAutomatonBDDbyVarIndex);
-    final double count = counter.count(bdd);
     final VerificationResult result = getAnalysisResult();
-    result.setNumberOfStates(count);
+    if (result.getTotalNumberOfStates() < 0.0) {
+      final BDDStateCountRecursion counter =
+        new BDDStateCountRecursion(mBDDFactory, mAutomatonBDDbyVarIndex);
+      final double count = counter.count(bdd);
+      result.setNumberOfStates(count);
+    }
   }
 
 
