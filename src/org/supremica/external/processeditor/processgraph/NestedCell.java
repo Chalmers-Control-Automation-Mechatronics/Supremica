@@ -147,6 +147,7 @@ public class NestedCell
     /**
      * This method has intentionally been left empty.
      */
+    @Override
     public void remove(final GraphCell c) {
     }
     /**
@@ -163,6 +164,7 @@ public class NestedCell
      *
      * @return the copy
      */
+    @Override
     protected NestedCell clone() {
     	return new NestedCell(Converter.clone(getFunction()));
     }
@@ -171,12 +173,14 @@ public class NestedCell
      *
      * @return the copy
      */
+    @Override
     public NestedCell copy() {
     	return clone();
     }
     /**
      * Removes this cell from its graph container.
      */
+    @Override
     public void delete() {
     	if(nestedCellListener != null) {
     		nestedCellListener.elementDelete(getFunction());
@@ -189,6 +193,7 @@ public class NestedCell
      *
      * @param o the object to paste
      */
+    @Override
     public void paste(final Object o) {
 	if(nestedCellListener != null) {
 	    if(o instanceof NestedCell) {
@@ -201,6 +206,7 @@ public class NestedCell
     /**
      * Creates a outer relation around this cell.
      */
+    @Override
     public void createOuterRelation() {
     	//DEBUG
     	//System.out.println("NestedCell.createOuterRelation()");
@@ -217,6 +223,7 @@ public class NestedCell
     /**
      * If there is any, removes the outer relation around this cell.
      */
+    @Override
     public void removeOuterRelation() {
     	//DEBUG
     	//System.out.println("NestedCell.removeOuterRelation()");
@@ -231,6 +238,7 @@ public class NestedCell
      *
      * @param element object that will replace this outer relation
      */
+    @Override
     public void removeOuterRelation(final Object element) {
     	if(getActivityRelationGroup() != null &&
     	   getActivityRelationGroup().size() == 1)
@@ -246,6 +254,7 @@ public class NestedCell
      * the <code>downPack()</code> method to its body which is
      * a nested graph.
      */
+    @Override
     public void downPack() {
     	pack();
     	cells.downPack();
@@ -258,6 +267,7 @@ public class NestedCell
      * mehtod and aftwerwards recursively go down in the hierarchy by calling
      * the <code>upPack()</code> method to its cell listener.
      */
+    @Override
     public void upPack() {
     	pack();
     	if(cellListener != null) {
@@ -267,6 +277,7 @@ public class NestedCell
     /**
      * Removes selection from this cell's graph container.
      */
+    @Override
     public void removeSelection() {
     	//DEBUG
     	//System.out.println("NestedCell.removeSelection()");
@@ -306,6 +317,7 @@ public class NestedCell
      *
      * @param list the concerned list
      */
+    @Override
     public void setList(final JList<AttributePanel> list) {
     	if(nestedCellListener != null) {
     		nestedCellListener.setList(list);
@@ -314,6 +326,7 @@ public class NestedCell
     /**
      * Sets the color of the attribute types.
      */
+    @Override
     public void setAttributeTypeColor() {
 	//DEBUG
 	//System.out.println("NestedCell.setAttributeTypeColor()");
@@ -331,6 +344,7 @@ public class NestedCell
      * @param o the object to give unique operation name
      * @return the object with unique operation name
      */
+    @Override
     public Object setUniqueNames(final Object o) {
 	//DEBUG
 	//System.out.println("NestedCell.setUniqueNames()");
@@ -415,6 +429,7 @@ public class NestedCell
      * @param dx the distance to move this cell along the <i>x</i> axis
      * @param dy the distnace to move this cell along the <i>y</i> axis
      */
+    @Override
     public void translatePos(final int dx, final int dy) {
 	//DEBUG
 	//System.out.println(this+".NestedCell.translatePos()");
@@ -429,6 +444,7 @@ public class NestedCell
      *
      * @param element the object to be deleted
      */
+    @Override
     public void elementDelete(final Object element) {
 	if(getActivityRelationGroup() != null) {
 	    getActivityRelationGroup().remove(element);
@@ -445,6 +461,7 @@ public class NestedCell
      * @param oldElement the object where to insert the added object next to
      * @param newElement the object to be added
      */
+    @Override
     public void elementAdd(final Object oldElement, final Object newElement) {
     	if(getActivityRelationGroup() != null) {
     		final int index = getActivityRelationGroup().indexOf(oldElement);
@@ -460,6 +477,7 @@ public class NestedCell
      * @param oldElement the object that is to be replaced
      * @param newElement the object that is to replace the old object.
      */
+    @Override
     public void elementReplace(final Object oldElement, final Object newElement) {
     	//DEBUG
     	//System.out.print("NestedCell.elementReplace(Object old, Object new): ");
@@ -478,6 +496,7 @@ public class NestedCell
      *
      * @param newElement the object that is to replace the complex function
      */
+    @Override
     public void elementReplace(final Object newElement) {
 	//DEBUG
 	//System.out.println("NestedCell.elementReplace(Object new): ");
@@ -496,6 +515,7 @@ public class NestedCell
      *
      * @param newElement the object to pasted
      */
+    @Override
     public void elementPaste(final Object newElement) {
 	/**
 	try {
@@ -530,6 +550,7 @@ public class NestedCell
      * Rebuilds the contents of this nested cell, based on this nested cell's
      * complex function.
      */
+    @Override
     public void rebuild() {
 	//DEBUG
 	//System.out.println("NestedCell.rebuild()");
@@ -543,11 +564,6 @@ public class NestedCell
 	    cells = new NestedGraph();
 	    if(getRelation() != null) {
 		try {
-		    if(getRelation().getType().equals("Sequence")) {
-		    }else if(getRelation().getType().equals("Alternative")) {
-		    }else if(getRelation().getType().equals("Parallel")) {
-		    }else if(getRelation().getType().equals("Arbitrary")) {
-		    }
 		    build();
 		}catch(final Exception ex) {
 		    if(ex instanceof NullPointerException) {
@@ -651,7 +667,7 @@ public class NestedCell
 	}else {
 	    operationCell = new OperationCell("");
 	}
-	((OperationCell)operationCell).addNestedCellListener(this);
+	operationCell.addNestedCellListener(this);
 	cell.insert(operationCell);
 	operationCell.setPos(new Point(NestedGraph.marginX, NestedGraph.marginY));
 	final OperationEdge upperEdge = new OperationEdge(this,
@@ -682,9 +698,9 @@ public class NestedCell
 	    final Object o = func.next();
 	    GraphCell newCell = null;
 	    if(o instanceof Activity) {
-		newCell = new NestedCell((Activity)o);
+		newCell = new NestedCell(o);
 	    }else if(o instanceof Relation) {
-		newCell = new NestedCell((Relation)o);
+		newCell = new NestedCell(o);
 	    }
 	    if(newCell != null) {
 		((NestedCell)newCell).addNestedCellListener(this);
@@ -761,9 +777,9 @@ public class NestedCell
 	    final Object o = func.next();
 	    GraphCell newCell = null;
 	    if(o instanceof Activity) {
-		newCell = new NestedCell((Activity)o);
+		newCell = new NestedCell(o);
 	    }else if(o instanceof Relation) {
-		newCell = new NestedCell((Relation)o);
+		newCell = new NestedCell(o);
 	    }
 	    if(newCell != null) {
 		((NestedCell)newCell).addNestedCellListener(this);
@@ -835,9 +851,9 @@ public class NestedCell
 	    final Object o = func.next();
 	    GraphCell newCell = null;
 	    if(o instanceof Activity) {
-		newCell = new NestedCell((Activity)o);
+		newCell = new NestedCell(o);
 	    }else if(o instanceof Relation) {
-		newCell = new NestedCell((Relation)o);
+		newCell = new NestedCell(o);
 	    }
 	    if(newCell != null) {
 		((NestedCell)newCell).addNestedCellListener(this);
@@ -912,9 +928,9 @@ public class NestedCell
 	    final Object o = func.next();
 	    GraphCell newCell = null;
 	    if(o instanceof Activity) {
-		newCell = new NestedCell((Activity)o);
+		newCell = new NestedCell(o);
 	    }else if(o instanceof Relation) {
-		newCell = new NestedCell((Relation)o);
+		newCell = new NestedCell(o);
 	    }
 	    if(newCell != null) {
 		((NestedCell)newCell).addNestedCellListener(this);
@@ -1007,6 +1023,7 @@ public class NestedCell
      *
      * @return the array including all cells
      */
+    @Override
     public CellEvent[] getCells() {
 	CellEvent[] mySubcells;
 	if(compressed) {
@@ -1025,6 +1042,7 @@ public class NestedCell
      * This method has intentionally left empty and
      * overrides its parent's method.
      */
+    @Override
     public void mouseClicked(final MouseEvent e) {}
     /**
      * Invoked when the mouse enters this cell.
@@ -1032,6 +1050,7 @@ public class NestedCell
      * This method has intentionally left empty and
      * overrides its parent's method.
      */
+    @Override
     public void mouseEntered(final MouseEvent e) {}
     /**
      * Invoked when the mouse exits this cell.
@@ -1039,10 +1058,12 @@ public class NestedCell
      * This method has intentionally left empty and
      * overrides its parent's method.
      */
+    @Override
     public void mouseExited(final MouseEvent e) {}
     /**
      * Invoked when a mouse button has been pressed on this cell.
      */
+    @Override
     public void mousePressed(final MouseEvent e) {
 	//DEBUG
 	//System.out.println("NestedCell.mousePressed(): this.getSize(): "+this.getSize());
@@ -1055,6 +1076,7 @@ public class NestedCell
      * If the mouse button has clicked twice this nested cell will be
      * compressed or decompressed.
      */
+    @Override
     public void mouseReleased(final MouseEvent e) {
 	//DEBUG
 	//System.out.println(this+".NestedCell.mouseReleased()");
@@ -1101,6 +1123,7 @@ public class NestedCell
      * <p>
      * Forward this event to its cell listener.
      */
+    @Override
     public void cellPressed(final CellEvent cEvent) {
 	if(cellListener != null) {
 	    cEvent.translatePos(getLocation().x, getLocation().y);
@@ -1112,6 +1135,7 @@ public class NestedCell
      * <p>
      * Forward this event to its cell listener.
      */
+    @Override
     public void cellReleased(final CellEvent cEvent) {
 	//DEBUG
 	//System.out.println(this+".NestedCell.cellReleased()");
@@ -1126,6 +1150,7 @@ public class NestedCell
      * <p>
      * Forward this event to its cell listener.
      */
+    @Override
     public void cellDragged(final CellEvent cEvent) {
 	if(cellListener != null) {
 	    cEvent.translatePos(getLocation().x, getLocation().y);
@@ -1137,6 +1162,7 @@ public class NestedCell
      * <p>
      * Forward this event to its cell listener.
      */
+    @Override
     public void cellMove(final CellEvent cEvent) {
 	//DEBUG
 	//System.out.println("NestedCell.cellMove()");
