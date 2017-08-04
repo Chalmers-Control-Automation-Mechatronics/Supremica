@@ -179,15 +179,23 @@ public class Converter {
     public static String convertRelationToString(final Relation relation) {
     	String str = "";
     	try {
-    		String operand = "";
-    		if(relation.getType().equals("Sequence")) {
-    			operand = String.valueOf('\u2192');
-    		}else if(relation.getType().equals("Alternative")) {
-    			operand = "+";
-    		}else if(relation.getType().equals("Parallel")) {
-    			operand = "||";
-    		}else if(relation.getType().equals("Arbitrary")) {
-    			operand = String.valueOf('\u2295');
+    		final String operand;
+    		switch (relation.getType()) {
+    		case SEQUENCE:
+              operand = String.valueOf('\u2192');
+              break;
+    		case ALTERNATIVE:
+              operand = "+";
+              break;
+    		case PARALLEL:
+    		  operand = "||";
+    		  break;
+    		case ARBITRARY:
+    		  operand = String.valueOf('\u2295');
+    		  break;
+    		default:
+    		  operand = "";
+    		  break;
     		}
 
     		final List<?> actRelGroup = relation.getActivityRelationGroup();
@@ -246,7 +254,7 @@ public class Converter {
     			}
     		}else {
     			final RelationType type = getType(algebraic);
-    			if(type == null || type.equals("")) {
+    			if (type == null) {
     				Activity newActivity = null;
 
     				try {
@@ -942,7 +950,7 @@ public class Converter {
 		}
 	    }else if(o instanceof Activity) {
 		try {
-		    if(((Properties)((Activity)o).getProperties()).isUnextended()) {
+		    if(((Activity)o).getProperties().isUnextended()) {
 			extendedCount[1]++;
 		    }else {
 			extendedCount[0]++;
@@ -965,42 +973,55 @@ public class Converter {
 		return getPredecessors(((ROP)o).getRelation());
 	    }catch(final Exception ex) {}
 	}else if(o instanceof Relation) {
-	    try {
-		if(((Relation)o).getActivityRelationGroup().size() > 0) {
-		    if(((Relation)o).getType().equals("Sequence")) {
-			final Object next = ((Relation)o).getActivityRelationGroup().get(0);
-			final String[] subPred = getPredecessors(next);
-			returnStatement = subPred;
-		    }else if(((Relation)o).getType().equals("Alternative")) {
-			final Iterator<?> iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			while(iterator.hasNext()) {
-			    final Object next = iterator.next();
-			    try {
-				final String[] subPred = getPredecessors(next);
-				returnStatement = mergeStringArray(returnStatement, subPred);
-			    }catch(final Exception ex) {}
-			}
-		    }else if(((Relation)o).getType().equals("Parallel")) {
-			final Iterator<?> iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			while(iterator.hasNext()) {
-			    final Object next = iterator.next();
-			    try {
-				final String[] subPred = getPredecessors(next);
-				returnStatement = mergeStringArray(returnStatement, subPred);
-			    }catch(final Exception ex) {}
-			}
-		    }else if(((Relation)o).getType().equals("Arbitrary")) {
-			final Iterator<?> iterator = ((Relation)o).getActivityRelationGroup().iterator();
-			while(iterator.hasNext()) {
-			    final Object next = iterator.next();
-			    try {
-				final String[] subPred = getPredecessors(next);
-				returnStatement = mergeStringArray(returnStatement, subPred);
-			    }catch(final Exception ex) {}
-			}
-		    }
-		}
-	    }catch(final Exception ex) {}
+	  try {
+	    final Relation rel = (Relation) o;
+        if (rel.getActivityRelationGroup().size() > 0) {
+          Iterator<?> iterator;
+          switch (rel.getType()) {
+          case SEQUENCE:
+            {
+              final Object next = rel.getActivityRelationGroup().get(0);
+              final String[] subPred = getPredecessors(next);
+              returnStatement = subPred;
+            }
+            break;
+          case ALTERNATIVE:
+            iterator = rel.getActivityRelationGroup().iterator();
+            while (iterator.hasNext()) {
+              final Object next = iterator.next();
+              try {
+                final String[] subPred = getPredecessors(next);
+                returnStatement = mergeStringArray(returnStatement, subPred);
+              } catch (final Exception ex) {
+              }
+            }
+            break;
+          case PARALLEL:
+            iterator = rel.getActivityRelationGroup().iterator();
+            while (iterator.hasNext()) {
+              final Object next = iterator.next();
+              try {
+                final String[] subPred = getPredecessors(next);
+                returnStatement = mergeStringArray(returnStatement, subPred);
+              } catch (final Exception ex) {
+              }
+            }
+            break;
+          case ARBITRARY:
+            iterator = rel.getActivityRelationGroup().iterator();
+            while (iterator.hasNext()) {
+              final Object next = iterator.next();
+              try {
+                final String[] subPred = getPredecessors(next);
+                returnStatement = mergeStringArray(returnStatement, subPred);
+              } catch (final Exception ex) {
+              }
+            }
+            break;
+          }
+        }
+      } catch (final Exception ex) {
+      }
 	}else if(o instanceof Activity) {
 	    try {
 		final Iterator<?> iterator = ((Activity)o).getPrecondition().getPredecessor().iterator();
