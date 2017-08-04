@@ -48,6 +48,7 @@ import net.sourceforge.waters.analysis.annotation.AnnotatedMemStateProxy;
 import net.sourceforge.waters.analysis.annotation.AnnotationEvent;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -72,39 +73,41 @@ public class GeneralizedTransitionRelation
   private final EventProxy[] mEvents;
   private final Set<TIntHashSet>[] mAnnotations;
   private final TObjectIntHashMap<EventProxy> mEventToInt;
+  private final TObjectIntHashMap<StateProxy> mStateToInt;
+  private final List<StateProxy> mStateProxyList;
   private final EventProxy mMarkedEvent;
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
 
   private final String ACCEPTING_PROP= ":accepting";
+  private final String TAU=":tau";
 
-  public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy marked)
+  public GeneralizedTransitionRelation(final ProductDESProxy des, final net.sourceforge.waters.model.des.AutomatonProxy aut)
   {
-    this(aut, marked, aut.getEvents());
+    this(des,aut, aut.getEvents());
   }
 
   @SuppressWarnings("unchecked")
-  public GeneralizedTransitionRelation(final AutomatonProxy aut, final EventProxy marked,
+  public GeneralizedTransitionRelation(final ProductDESProxy des, final AutomatonProxy aut,
                             Set<EventProxy> eventsall)
   {
+
+    mMarkedEvent = null;    // No need for this ..; to avoid compile errors.
+
     eventsall = new TreeSet<EventProxy>(eventsall);
     eventsall.addAll(aut.getEvents());
     final Set<EventProxy> allselflooped = new THashSet<EventProxy>(eventsall);
     allselflooped.removeAll(aut.getEvents());
-    allselflooped.remove(marked);
     mName = aut.getName();
-    mMarkedEvent = marked;
-    final EventProxy[] events = new EventProxy[aut.getEvents().size()];
-    mEvents = eventsall.toArray(events);
-    Arrays.sort(events);
+    mEvents= shiftAutEvents(eventsall, des); // adds tau event in first pos.
     final TObjectIntHashMap<EventProxy> eventToInt =
         new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
       eventToInt.put(mEvents[i], i);
     }
     mEventToInt = eventToInt;
-    final TObjectIntHashMap<StateProxy> stateToInt =
-        new TObjectIntHashMap<StateProxy>();
+    mStateToInt = new TObjectIntHashMap<StateProxy>();
+
     int numstates = 0;
     mSuccessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
     mPredecessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
@@ -112,35 +115,25 @@ public class GeneralizedTransitionRelation
     mAnnotations = new Set[aut.getStates().size()];
     mMarked = new boolean[aut.getStates().size()];
     mIsInitial = new boolean[aut.getStates().size()];
-    final List<StateProxy> sortedstates = new ArrayList<StateProxy>(aut.getStates());
-    Collections.sort(sortedstates);
-    for (final StateProxy s : sortedstates) {
-      stateToInt.put(s, numstates);
-      if (s.getPropositions().contains(marked) || !aut.getEvents().contains(marked)) {
+    mStateProxyList = new ArrayList<StateProxy>(aut.getStates());
+    Collections.sort(mStateProxyList);
+    for (final StateProxy s : mStateProxyList) {
+      mStateToInt.put(s, numstates);
+    /*  if (s.getPropositions().contains(marked) || !aut.getEvents().contains(marked)) {
         markState(numstates, true);
-      }
+      }*/
       if (s.isInitial()) {
         makeInitialState(numstates, true);
       }
-      final Set<Set<EventProxy>> anns = getAnnotations(s.getPropositions());
-      // System.out.println("build annotation:" + anns);
-      if (anns != null) {
-        final Set<TIntHashSet> annints = new HashSet<TIntHashSet>(anns.size());
-        for (final Set<EventProxy> ann : anns) {
-          final TIntHashSet annint = new TIntHashSet(ann.size());
-          for (final EventProxy event : ann) {
-            annint.add(eventToInt.get(event));
-          }
-          annints.add(annint);
-        }
-        mAnnotations[numstates] = annints;
-      }
-      // TODO work out annotations
+/*
+      if (!getPrevAnnotations(s.getPropositions()).isEmpty())
+        mAnnotations[numstates] = getPrevAnnotations(s.getPropositions());*/
+
       numstates++;
     }
     for (final TransitionProxy tran : aut.getTransitions()) {
-      final int s = stateToInt.get(tran.getSource());
-      final int t = stateToInt.get(tran.getTarget());
+      final int s = mStateToInt.get(tran.getSource());
+      final int t = mStateToInt.get(tran.getTarget());
       final int e = eventToInt.get(tran.getEvent());
       final TIntHashSet succ = getFromArray(s, e, mSuccessors);
       succ.add(t);
@@ -195,6 +188,7 @@ public class GeneralizedTransitionRelation
      */
   }
 
+  @SuppressWarnings("unused")
   private static Set<Set<EventProxy>> getAnnotations(final Collection<EventProxy> props)
   {
     final Iterator<EventProxy> it = props.iterator();
@@ -466,7 +460,6 @@ public class GeneralizedTransitionRelation
     for (int i = 0; i < mEvents.length; i++) {
       // ignore :accepting prop
       if (mEvents[i] != null && !mEvents[i].getName().equals(ACCEPTING_PROP)) {
-        System.out.println(mEvents[i].getName());
         events.add(mEvents[i]);
       }
     }
@@ -864,13 +857,6 @@ public class GeneralizedTransitionRelation
   }
 
 
-// To replace event with another one ..
-  public void replaceTransition(final int s,final int t ,final int oldEvent, final int newEvent)
-  {
-    mSuccessors[s][oldEvent] = mSuccessors[s][newEvent];
-    mPredecessors[t][oldEvent]=  mPredecessors[t][newEvent];
-  }
-
   public void removeAllUnreachable()
   {
     final TIntHashSet tobecheckedset = new TIntHashSet();
@@ -1191,5 +1177,97 @@ public class GeneralizedTransitionRelation
       num++;
     }
     return num;
+  }
+
+  public EventProxy getTau(final ProductDESProxy des) {
+
+    final Set<EventProxy> desEvents = des.getEvents();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getName().equals(TAU)) {
+          return ep;
+      }
+    }
+    return null;
+  }
+
+  public Boolean isTau(final EventProxy event) {
+    return event.getName().equals(TAU);
+  }
+
+
+  public EventProxy[] shiftAutEvents(final Set<EventProxy> eventSet,
+                                     final ProductDESProxy des)
+  {
+    final List<EventProxy> eventslist = new ArrayList<EventProxy>();
+    if(getTau(des) != null)
+      eventslist.add(getTau(des));
+    for (final EventProxy ep : eventSet) {
+      if (!isTau(ep) && !ep.getName().equals(ACCEPTING_PROP)) {
+        //eventsArr[pos] = ep;
+        eventslist.add(ep);
+      }
+    }
+    return eventslist.toArray(new EventProxy[eventslist.size()]);
+  }
+
+  private Set<TIntHashSet> getPrevAnnotations(final Collection<EventProxy> props)
+  {
+    final Set<TIntHashSet> annints = new HashSet<TIntHashSet>();
+    final Iterator<EventProxy> it = props.iterator();
+    while (it.hasNext()) {
+      final TIntHashSet annint = new TIntHashSet();
+      final EventProxy e = it.next();
+      if (!e.getName().equals(ACCEPTING_PROP)) {
+        final String[] tokens = e.getName().split(":");
+        int propLength = tokens.length - 1;
+        for (int i = 0; i < mEvents.length && propLength > 0; i++) {
+          if (Arrays.asList(tokens).contains(mEvents[i].getName())
+              && mEvents[i].getKind() != EventKind.PROPOSITION) {
+            annint.add(mEventToInt.get(mEvents[i]));
+            propLength--;
+          }
+        }
+        annints.add(annint);
+      }
+    }
+    return annints;
+  }
+
+  public void annotateWithActiveEvents() {
+    final Annotator annotatedAutomaton= new Annotator(this);
+    annotatedAutomaton.run();
+  }
+
+  public AutomatonProxy unannotate(final ProductDESProxy des, final ProductDESProxyFactory factory){
+    final UnAnnotator ua = new UnAnnotator(this);
+    final AutomatonProxy aut = ua.run(factory, des);
+    return aut;
+  }
+
+  public void annotateWithProps() {
+    for(final StateProxy s : mStateProxyList) {
+      getPrevAnnotations(s.getPropositions());
+    }
+  }
+
+  // Setters
+  public void setSuccessors(final int succ, final int oldEvent, final int newEvent) {
+    //TODO check if values within the length limit
+    mSuccessors[succ][oldEvent]= mSuccessors[succ][newEvent];
+  }
+
+  public void setPredecessors(final int pred, final int oldEvent, final int newEvent) {
+    //TODO check if values within the length limit
+    mPredecessors[pred][oldEvent]= mPredecessors[pred][newEvent];
+  }
+
+  public void setActiveEvents(final int oldEvent, final int newEvent) {
+    //TODO check if values within the length limit
+    mActiveEvents[oldEvent]= mActiveEvents[newEvent];
+  }
+
+  // Getters
+  public List<StateProxy> getStateProxyList(){
+    return mStateProxyList;
   }
 }

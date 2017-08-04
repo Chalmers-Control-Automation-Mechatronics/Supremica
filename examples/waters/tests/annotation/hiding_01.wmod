@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="hiding_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="hiding_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a">
             <ColorGeometry>
-                <Color Red="51" Green="255" Blue="51"/>
+                <Color Blue="51" Green="255" Red="51"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:b">
             <ColorGeometry>
-                <Color Red="255" Green="51" Blue="51"/>
+                <Color Blue="51" Green="51" Red="255"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
@@ -72,9 +72,6 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:b"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="128" Y="64"/>
                         </PointGeometry>

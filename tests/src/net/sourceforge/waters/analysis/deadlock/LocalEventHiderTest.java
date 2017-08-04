@@ -49,17 +49,17 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
  * @author Hani al-Bahri, Robi Malik
  */
 
-public class AnnotatorTest
+public class LocalEventHiderTest
   extends AbstractAnalysisTest
 {
 
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
-  public AnnotatorTest()
+  public LocalEventHiderTest()
   {
   }
 
-  public AnnotatorTest(final String name)
+  public LocalEventHiderTest(final String name)
   {
     super(name);
   }
@@ -106,62 +106,12 @@ public class AnnotatorTest
    * {supremica}/logs/results/analysis/op/{classname} as a .des file
    * (for text viewing) and as a .wmod file (to load into the IDE).</P>
    */
- public void test_annotate_01() throws Exception
+  public void test_hiding_01() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_01.wmod");
+      getCompiledDES("tests", "annotation", "hiding_01.wmod");
     runTransitionRelationSimplifier(des);
   }
-
-  public void test_annotate_02() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_02.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_03() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_03.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_04() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_04.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_05() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_05.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_06() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_06.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_07() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_07.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
-  public void test_annotate_08() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotate_08.wmod");
-    runTransitionRelationSimplifier(des);
-  }
-
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -172,9 +122,9 @@ public class AnnotatorTest
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
-    tr.annotateWithActiveEvents();
+    tr.annotateWithProps();
     // calculate unannotated form
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
+    final AutomatonProxy unannotated = null;
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
 

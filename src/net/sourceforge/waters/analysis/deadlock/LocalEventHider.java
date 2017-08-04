@@ -37,55 +37,52 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
 public class LocalEventHider
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
-  private final String TAU=":tau";
+  private final int TAU=0;
 
   public LocalEventHider(final GeneralizedTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
   }
 
-  public int run(final ProductDESProxy des)
+  public void run(final ProductDESProxy des)
   {
-      final EventProxy tauEvent = getTau(des);
-      final EventProxy localEventsToHide = getEventToHide(des);
-//      final Set<EventProxy> localEventsToHide = getEventToHide(des);
-     // for(final EventProxy lc: localEventsToHide) {
-      final int e_index = mTransitionRelation.getEventInt(localEventsToHide);
-      mTransitionRelation.setEvent(tauEvent, e_index);
-     // }
-      return e_index;
+    for(int s=0; s< mTransitionRelation.numberOfStates(); s++) {
+
+      for (final EventProxy ep : getEventsToHide(des)) {
+        final int epIndex = mTransitionRelation.getEventInt(ep);
+        final TIntHashSet succs = mTransitionRelation.getSuccessors(s, epIndex);
+        if(succs ==null) {
+          return;
+        }
+        mTransitionRelation.setSuccessors(s, epIndex, TAU);
+      }
+    }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
 
-  private EventProxy getTau(final ProductDESProxy des) {
+  private Set<EventProxy> getEventsToHide(final ProductDESProxy des) {
+    final Set<EventProxy> events = mTransitionRelation.getEvents();
+    final Set<EventProxy> localEvents = new THashSet<EventProxy>();
 
-    final Set<EventProxy> desEvents = des.getEvents();
-    for (final EventProxy ep : desEvents) {
-      if (ep.getName().equals(TAU)) {
-          return ep;
+    for (final EventProxy ep : events) {
+      // we need not equal to tau and not observable ? instead !
+      if (ep.getKind() == EventKind.CONTROLLABLE && !ep.isObservable()) {
+        localEvents.add(ep);
       }
     }
-    return null;
-  }
-
-  private EventProxy getEventToHide(final ProductDESProxy des) {
-    final Set<EventProxy> desEvents = des.getEvents();
-    //final Set<EventProxy> localEvents = new THashSet<EventProxy>();
-
-    for (final EventProxy ep : desEvents) {
-      if (ep.getKind().toString().equals("CONTROLLABLE")&& !ep.isObservable()) {
-          return ep;
-      }
-    }
-    return null;
+    return localEvents;
   }
 
 }

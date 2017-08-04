@@ -71,10 +71,9 @@ public class Annotator
             " TIME = " + TIME;
   }
 
-  public Annotator(final GeneralizedTransitionRelation transitionrelation, final int tau)
+  public Annotator(final GeneralizedTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
-  //  mTau=tau;
   }
 
   public void run()
