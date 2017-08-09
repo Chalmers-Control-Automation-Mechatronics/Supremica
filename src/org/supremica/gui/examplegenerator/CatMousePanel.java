@@ -50,39 +50,45 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.CatMouse;
 
-class CatMousePanel extends JPanel implements TestCase, ActionListener {
+class CatMousePanel extends JPanel implements TestCase, ActionListener 
+{
 	private static final long serialVersionUID = 1L;
-	IntegerField int_num = new IntegerField("1", 6);
-	IntegerField int_step_cats = new IntegerField("0", 6);
-	IntegerField int_numberOfInstances = new IntegerField("1", 6);
-	JCheckBox multiple = new JCheckBox("Multiple instances", false);
-	JPanel num_users;
-	JPanel steps;
-	Box theBox;
-	JPanel numberOfInstances;
-	Util util = new Util();
-	private static Logger logger = LoggerFactory
+	protected final IntegerField int_num = new IntegerField("1", 6);
+	protected final IntegerField int_step_cats = new IntegerField("0", 6);
+	protected final IntegerField int_numberOfInstances = new IntegerField("1", 6);
+	protected final JCheckBox multiple = new JCheckBox("Multiple instances", false);
+	protected final JCheckBox selfloops = new JCheckBox("Use forbidden self-loops", false);
+	protected final JPanel num_users;
+	private final JPanel steps;
+	protected final Box theBox;
+	protected final JPanel numberOfInstances;
+	// private final Util util = new Util();
+	private static final Logger logger = LoggerFactory
 			.createLogger(CatMousePanel.class);
 
-	public CatMousePanel() {
+	public CatMousePanel() 
+	{
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
 
 		num_users = new JPanel();
-		num_users.add(new JLabel("Number of cats (or mice): "),
+		num_users.add(new JLabel("Number of cats (and mice): "),
 				BorderLayout.NORTH);
 		num_users.add(int_num, BorderLayout.NORTH);
 
-		JPanel multiplePanel = new JPanel();
+		final JPanel multiplePanel = new JPanel();
+		multiplePanel.add(selfloops);
 		multiplePanel.add(multiple);
+		
+		selfloops.setToolTipText("Use forbidden self-loops instead of room specs");
 
 		multiple.addActionListener(this);
-
+		
 		steps = new JPanel();
 		steps
 				.add(
 						new JLabel(
-								"step (increasement of number of cats (or mice) for each instance): "),
+								"step (increasement of number of cats (and mice) for each instance): "),
 						BorderLayout.NORTH);
 		steps.add(int_step_cats, BorderLayout.SOUTH);
 		int_step_cats.setEnabled(false);
@@ -92,7 +98,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener {
 				BorderLayout.NORTH);
 		numberOfInstances.add(int_numberOfInstances, BorderLayout.SOUTH);
 		int_numberOfInstances.setEnabled(false);
-
+		
 		theBox = Box.createVerticalBox();
 		theBox.add(num_users);
 		theBox.add(multiplePanel);
@@ -101,24 +107,43 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener {
 		add(theBox, BorderLayout.NORTH);
 	}
 
+	@Override
 	public void synthesizeSupervisor(IDE ide) throws Exception {
 		// TODO: implement this one
 		logger.warn("Not implemented");
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		if (multiple.isSelected()) {
+	@Override
+	public void actionPerformed(ActionEvent e) 
+	{
+		if (multiple.isSelected()) 
+		{
 			int_step_cats.setEnabled(true);
 			int_numberOfInstances.setEnabled(true);
-		} else {
+		} 
+		else 
+		{
 			int_step_cats.setEnabled(false);
 			int_numberOfInstances.setEnabled(false);
 		}
 	}
 
-	public Project generateAutomata() throws Exception {
-		CatMouse cm = new CatMouse(int_num.get());
-
+	@Override
+	public Project generateAutomata() throws Exception 
+	{
+		final CatMouse cm = new CatMouse(int_num.get(), selfloops.isSelected());
 		return cm.getProject();
+	}
+	
+	// For debug only
+	public static void main(final String[] args)
+	{
+		final CatMousePanel cmp = new CatMousePanel();
+		javax.swing.JOptionPane.showMessageDialog(null, cmp, "CatMousePanel.java", javax.swing.JOptionPane.PLAIN_MESSAGE);
+		System.out.println("Number of cats (and mice): " + cmp.int_num.get());
+		System.out.println("Use forbidden self-loops: " + (cmp.selfloops.isSelected() ? "true" : "false"));
+		System.out.println("Multiple instances: " + (cmp.multiple.isSelected() ? "true" : "false"));
+		System.out.println("Step increment of number of cats (and mice): " + cmp.int_step_cats.get());
+		System.out.println("Number of instances: " + cmp.int_numberOfInstances.get());
 	}
 }

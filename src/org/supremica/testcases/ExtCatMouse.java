@@ -21,10 +21,8 @@ import org.supremica.automata.Project;
 class Level extends Room
 {
 //    private static Logger logger = LoggerFactory.createLogger(ExtCatMouse.class);
-    Automata level;;
+    private final Automata level;
     final String LEVEL_NAME = "L";
-    int numor = new CatMouse().number_of_rooms;
-    int id;
     
     public Level()
     {
@@ -34,29 +32,26 @@ class Level extends Room
     public Level(int id, int num, int num_levels) throws Exception
     {
        this();
-       
        this.id = id;
      
-        Room room;
-        for (int i = 0; i < numor; ++i)
-        {
-            room = new Room(i,num);
-            Automaton roomAuto = room.build(room.getAutomaton(), id,num_levels);
-
-            level.addAutomaton(roomAuto);
-        }
+       for (int i = 0; i < CatMouse.NUMBER_OF_ROOMS; ++i)
+       {
+           final Room room = new Room(i,num);
+           final Automaton roomAuto = room.build(room.getAutomaton(), id,num_levels);
+           level.addAutomaton(roomAuto);
+       }
     }
     
     public Automata buildLevel()
-    throws Exception
+		throws Exception
     {
-        Automata sm = new Automata(level);
-        Automaton[] r = new Automaton[numor];
+        final Automata sm = new Automata(level);
+        final Automaton[] r = new Automaton[CatMouse.NUMBER_OF_ROOMS];
         
-        for(int i=0;i<numor;i++)
+        for(int i = 0; i < CatMouse.NUMBER_OF_ROOMS; i++)
         {
             r[i] = sm.getAutomatonAt(i);
-            sm.renameAutomaton(r[i],LEVEL_NAME+id+NAME_SEP+r[i].getName());
+            sm.renameAutomaton(r[i], LEVEL_NAME + id + NAME_SEP + r[i].getName());
         }
         
         return sm;
@@ -68,15 +63,21 @@ class Level extends Room
     }
 }
 
-public class ExtCatMouse{
+public class ExtCatMouse
+{    
+    final Project project = new Project("Extended Cat Mouse");
+    final Automata theAutomata = new Automata();
+    final int number_of_levels, number_of_cats;
     
-    Project project = new Project("Extended Cat Mouse");
-    Automata theAutomata = new Automata();
-    int number_of_levels, number_of_cats;
+    final int MODEL_ID = 4;
     
-    int MODEL_ID = 4;
-    
-    public ExtCatMouse(int num, int num_levels)
+	public ExtCatMouse(final int num, final int num_levels)
+		throws Exception
+	{
+		this(num, num_levels, false);
+	}
+	
+    public ExtCatMouse(int num, int num_levels, final boolean use_selfloops)
         throws Exception
     {
         // Add comment
@@ -87,9 +88,10 @@ public class ExtCatMouse{
        
         if(MODEL_ID == 1)
         {
-            for (int i = 0; i < num; ++i){
-                Automaton catAutomaton = new Cat(i,num_levels).getCat();
-                Automaton mouseAutomaton = new Mouse(i,num_levels).getMouse();
+            for (int i = 0; i < num; ++i)
+			{
+                final Automaton catAutomaton = new Cat(i,num_levels).getCat();
+                final Automaton mouseAutomaton = new Mouse(i,num_levels).getMouse();
                 project.addAutomaton(catAutomaton);
                 project.addAutomaton(mouseAutomaton);
 
@@ -97,7 +99,7 @@ public class ExtCatMouse{
                 theAutomata.addAutomaton(mouseAutomaton);
             }
 
-            Level[] levels = new Level[num_levels];
+            final Level[] levels = new Level[num_levels];
             Automata l;
 
             for (int i = 0; i < num_levels; i++)
@@ -105,10 +107,9 @@ public class ExtCatMouse{
                 levels[i] = new Level(i,num,num_levels);
 
                 l = levels[i].buildLevel();
-                for(int j=0;j<l.nbrOfAutomata();j++)
+                for(int j = 0; j < l.nbrOfAutomata(); j++)
                 {
-                    Automaton a = l.getAutomatonAt(j);
-
+                    final Automaton a = l.getAutomatonAt(j);
                     project.addAutomaton(a);
                     theAutomata.addAutomaton(a);
                 }
@@ -118,9 +119,9 @@ public class ExtCatMouse{
         //THE NEW MODEL
         else if(MODEL_ID == 2)
         {
-            CatBuffer[][] cb = new CatBuffer[num_levels][5];
-            MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
-            RoomSpec[][] spec = new RoomSpec[num_levels][5];
+            final CatBuffer[][] cb = new CatBuffer[num_levels][5];
+            final MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
+            final RoomSpec[][] spec = new RoomSpec[num_levels][5];
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)
@@ -141,8 +142,8 @@ public class ExtCatMouse{
         }
         else if(MODEL_ID == 3)
         {
-            ExtCatBuffer[][] ecb = new ExtCatBuffer[num_levels][5];
-            ExtMouseBuffer[][] emb = new ExtMouseBuffer[num_levels][5];
+            final ExtCatBuffer[][] ecb = new ExtCatBuffer[num_levels][5];
+            final ExtMouseBuffer[][] emb = new ExtMouseBuffer[num_levels][5];
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)
@@ -161,9 +162,9 @@ public class ExtCatMouse{
         }
         else if(MODEL_ID == 4)
         {
-            CatBuffer[][] cb = new CatBuffer[num_levels][5];
-            MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
-            ExtRoomSpec[][] spec = new ExtRoomSpec[num_levels][5];
+            final CatBuffer[][] cb = new CatBuffer[num_levels][5];
+            final MouseBuffer[][] mb = new MouseBuffer[num_levels][5];
+            final ExtRoomSpec[][] spec = new ExtRoomSpec[num_levels][5];
             for (int i = 0; i < num_levels; ++i)
             {
                 for (int j = 0; j < 5; ++j)
@@ -188,5 +189,22 @@ public class ExtCatMouse{
     {
         return project;
     }
-    
+	// For debugging only
+	public static void main(String[] args)
+	{
+		try
+		{
+			final ExtCatMouse cm = new ExtCatMouse(1, 1, true);
+			System.out.println(cm.project.toString());
+			for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
+			{
+				final Automaton aut = cm.project.getAutomatonAt(i);
+				System.out.println(aut.toDebugString());
+			}
+		}
+		catch(final Exception excp)
+		{
+			excp.printStackTrace();
+		}
+	}    
 }
