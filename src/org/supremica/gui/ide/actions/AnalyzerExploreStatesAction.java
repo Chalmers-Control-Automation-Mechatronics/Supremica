@@ -56,7 +56,7 @@ import org.supremica.log.LoggerFactory;
 public class AnalyzerExploreStatesAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -77,6 +77,7 @@ public class AnalyzerExploreStatesAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/media/Play16.gif")));
     }
 
+	@Override
     public void actionPerformed(ActionEvent e)
     {
         doAction();
@@ -85,6 +86,7 @@ public class AnalyzerExploreStatesAction
     /**
      * The code that is run when the action is invoked.
      */
+	@Override
     public void doAction()
     {
        // Retrieve the selected automata and make a sanity check

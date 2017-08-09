@@ -535,12 +535,13 @@ public abstract class BDDModelVerifier
 
   BDD createInitialStateBDD(final AutomatonBDD autBDD)
   {
-    final BDD autinit = autBDD.createInitialStateBDD(mBDDFactory);
-    if (autinit.isZero()) {
+    final BDD bdd = autBDD.createInitialStateBDD(mBDDFactory);
+    if (bdd.isZero()) {
       setSatisfiedResult();
       return null;
     } else {
-      return autinit;
+      mIsFullyDeterministic &= autBDD.isDeterministic(null);
+      return bdd;
     }
   }
 
@@ -1048,11 +1049,13 @@ public abstract class BDDModelVerifier
   //# Statistics
   private void recordStateCount(final BDD bdd)
   {
-    final BDDStateCountRecursion counter =
-      new BDDStateCountRecursion(mBDDFactory, mAutomatonBDDbyVarIndex);
-    final double count = counter.count(bdd);
     final VerificationResult result = getAnalysisResult();
-    result.setNumberOfStates(count);
+    if (result.getTotalNumberOfStates() < 0.0) {
+      final BDDStateCountRecursion counter =
+        new BDDStateCountRecursion(mBDDFactory, mAutomatonBDDbyVarIndex);
+      final double count = counter.count(bdd);
+      result.setNumberOfStates(count);
+    }
   }
 
 

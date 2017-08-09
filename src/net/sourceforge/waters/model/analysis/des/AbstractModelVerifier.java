@@ -73,7 +73,19 @@ public abstract class AbstractModelVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
   @Override
   public boolean isSatisfied()
   {
@@ -148,5 +160,10 @@ public abstract class AbstractModelVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mShortCounterExampleRequested = false;
 
 }

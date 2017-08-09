@@ -84,7 +84,9 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 /**
- * This class is responsible for the "exploreStates"-window.
+ * This class is responsible for the "exploreStates"-window. But only for single automaton
+ * For multiple selected automata, see the org.supremica.gui.automataExplorer package
+ * Note! We should really make AutomatonExplorer handle also single automata // MF
  */
 public class AutomatonExplorer
     extends JFrame
@@ -92,7 +94,7 @@ public class AutomatonExplorer
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
+	private static final Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
     private final Automaton theAutomaton;
     private final BorderLayout layout = new BorderLayout();
     private final JPanel contentPane;
@@ -284,7 +286,7 @@ class StateViewer
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(StateViewer.class);
+	private static final Logger logger = LoggerFactory.createLogger(StateViewer.class);
     private final Automaton theAutomaton;
     private State currState;
     private final EventList forwardEvents;
@@ -512,18 +514,43 @@ class EventList
             @Override
             public void mouseClicked(final MouseEvent e)
             {
-                if (e.getClickCount() == 2)
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
                 {
                     final int index = theList.locationToIndex(e.getPoint());
 
                     if (index >= 0)
                     {
                         final State newState = eventsList.getStateAt(index);
-
                         updateStateViewer(newState);
                     }
                 }
             }
+			@Override
+			public void mousePressed(final MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+				{
+					final int index = theList.locationToIndex(e.getPoint());
+
+                    if (index >= 0)
+                    {
+                        theList.setSelectedIndex(index);
+                    }
+				}
+			}
+			@Override
+			public void mouseReleased(final MouseEvent e)
+			{
+				if(e.isPopupTrigger())
+				{
+					final int index = theList.locationToIndex(e.getPoint());
+
+                    if (index >= 0)
+                    {
+                        theList.setSelectedIndex(index);
+                    }
+				}				
+			}
         });
     }
 
@@ -569,7 +596,7 @@ class EventListModel
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(EventListModel.class);
+	private static final Logger logger = LoggerFactory.createLogger(EventListModel.class);
     private State currState;
     //private ArrayList currArcs = new ArrayList();
 
@@ -711,7 +738,7 @@ class EventListModel
                 currState = currArc.getFromState();
             }
 
-            responseString.append(" [state name: " + currState.getName() + "]");
+            responseString.append(" [state name: ").append(currState.getName()).append("]");
         }
 
         if (terminateFont)

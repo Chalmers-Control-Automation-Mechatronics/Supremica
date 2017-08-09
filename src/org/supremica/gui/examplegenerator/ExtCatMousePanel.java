@@ -67,25 +67,28 @@ import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.ExtCatMouse;
 
 class ExtCatMousePanel extends CatMousePanel implements TestCase,
-		ActionListener {
+		ActionListener 
+{
 	private static final long serialVersionUID = 1L;
-	IntegerField int_num_levels = new IntegerField("1", 6);
-	IntegerField int_step_levels = new IntegerField("0", 6);
-	IntegerField int_N = new IntegerField("0", 6);
-	IntegerField int_K = new IntegerField("0", 6);
-	JCheckBox chooseSynthesisAlgorithmManually = new JCheckBox(
+	private final Util util = new Util();
+	private final IntegerField int_num_levels = new IntegerField("1", 6);
+	private final IntegerField int_step_levels = new IntegerField("0", 6);
+	private final IntegerField int_N = new IntegerField("0", 6);
+	private final IntegerField int_K = new IntegerField("0", 6);
+	private final JCheckBox chooseSynthesisAlgorithmManually = new JCheckBox(
 			"Choose synthesis algorithm manually (deafult is BDD)", false);
-	JCheckBox all_cases = new JCheckBox(
+	private final JCheckBox all_cases = new JCheckBox(
 			"Compute all cases for n in interval (1,N) and k in interval (1,K)",
 			false);
 
 	JPanel traversing_algorithms;
-	JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
-	JRadioButton verticalButton = new JRadioButton("Vertical traversing");
+	private final JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
+	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
 	private static Logger logger = LoggerFactory
 			.createLogger(ExtCatMousePanel.class);
 
-	public ExtCatMousePanel() {
+	public ExtCatMousePanel() 
+	{
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
 		num_users
@@ -99,6 +102,12 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		stepsL.add(int_step_levels, BorderLayout.SOUTH);
 		int_step_levels.setEnabled(false);
 
+		// I don't really know ho wto handle forbidden selfloops in thsi case
+		// All that is generate is a bunch of Room elements as plant components
+		selfloops.setSelected(false);
+		selfloops.setEnabled(false);
+		selfloops.setToolTipText("Forbidden selfloops are not applicable to this example");
+		
 		all_cases.addActionListener(this);
 
 		final JPanel NK = new JPanel();
@@ -137,7 +146,8 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	}
 
 	@Override
-  public void actionPerformed(final ActionEvent e) {
+	public void actionPerformed(final ActionEvent e) 
+	{
 		if (multiple.isSelected()) {
 			int_step_cats.setEnabled(true);
 			int_step_levels.setEnabled(true);
@@ -163,7 +173,8 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 
 	// This function will be called when "Synthesize" button is pressed
 	@Override
-  public void synthesizeSupervisor(final IDE ide) throws Exception {
+	public void synthesizeSupervisor(final IDE ide) throws Exception 
+	{
 		int number_of_cats = int_num.get();
 		int number_of_levels = int_num_levels.get();
 		final int number_of_instances = int_numberOfInstances.get();
@@ -300,8 +311,21 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	}
 
 	@Override
-  public Project generateAutomata() throws Exception {
+	public Project generateAutomata() throws Exception 
+	{
 		final ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
 		return cm.getProject();
+	}
+  
+  // Debugging only!
+  	public static void main(final String[] args)
+	{
+		final ExtCatMousePanel cmp = new ExtCatMousePanel();
+		javax.swing.JOptionPane.showMessageDialog(null, cmp, "CatMousePanel.java", javax.swing.JOptionPane.PLAIN_MESSAGE);
+		System.out.println("Number of cats (and mice): " + cmp.int_num.get());
+		System.out.println("Use forbidden self-loops: " + (cmp.selfloops.isSelected() ? "true" : "false"));
+		System.out.println("Multiple instances: " + (cmp.multiple.isSelected() ? "true" : "false"));
+		System.out.println("Step increment of number of cats (and mice): " + cmp.int_step_cats.get());
+		System.out.println("Number of instances: " + cmp.int_numberOfInstances.get());
 	}
 }

@@ -81,6 +81,7 @@ public class ResourceCell
     /**
      * Rebuilds the contents of this cell's graph container.
      */
+    @Override
     public void rebuild() {
     	//DEBUG
     	//System.out.println("ResourceCell.rebuild()");
@@ -110,6 +111,7 @@ public class ResourceCell
      * Builds the contents of this nested cell, based on this resource cell
      * ROP object.
      */
+    @Override
     public void build() {
     	//DEBUG
     	//System.out.println(this+".NestedCell.build()");
@@ -118,12 +120,7 @@ public class ResourceCell
     	//This call was removed 2007-05-24
     	//buildCompressedCell();
     	//??????????????????????????????????
-    	String type = "";
-    	if(getROP().getType().equals("COP")) {
-    		type = "COP";
-    	}else if(getROP().getType().equals("ROP")) {
-    		type = "DOP";
-    	}
+        final String type = getROP().getType().toString();
     	initCell = new Initiator(getROP().getMachine(),
 				 	type,
 				 	getROP().getId());
@@ -142,7 +139,7 @@ public class ResourceCell
     	cells.insert(new OperationEdge(initCell, endCell));
     }
     /**
-     * Builds the contents of this resource cell, based on this resoruce cell
+     * Builds the contents of this resource cell, based on this resource cell
      * ROP object.
      */
     protected void buildBody() {
@@ -230,6 +227,7 @@ public class ResourceCell
      * <p>
      * Forward this event to its graph container.
      */
+    @Override
     public void cellPressed(final CellEvent cEvent) {
 	if(selectedList != null) {
 	    selectedList.clearSelection();
@@ -242,6 +240,7 @@ public class ResourceCell
      *
      * @param list the concerned list
      */
+    @Override
     public void setList(final JList<AttributePanel> list) {
 	if(selectedList != null) {
 	    if(!selectedList.equals(list)) {
@@ -287,6 +286,7 @@ public class ResourceCell
     /**
      * Sets the color of the attribute types.
      */
+    @Override
     public void setAttributeTypeColor() {
 	if(functionCell != null) {
 	    final CellEvent[] opCells = functionCell.getCells();
@@ -372,6 +372,7 @@ public class ResourceCell
      * @param o the object to give unique operation name
      * @return the object with unique operation name
      */
+    @Override
     public Object setUniqueNames(final Object o) {
 	//DEBUG
 	//System.out.println("ResourceCell.setUniqueNames()");
@@ -383,6 +384,7 @@ public class ResourceCell
      *
      * @return the copy
      */
+    @Override
     protected  NestedCell clone() {
 	if(getROP() != null) {
 	    return new ResourceCell((ROP)Converter.clone(getFunction()));
@@ -395,12 +397,14 @@ public class ResourceCell
      *
      * @return the copy
      */
+    @Override
     public NestedCell copy() {
 	return clone();
     }
     /**
      * Creates a outer relation around the body of this resource cell.
      */
+    @Override
     public void createOuterRelation() {
 	//DEBUG
 	//System.out.println("ResourceCell.createOuterRelation()");
@@ -420,6 +424,7 @@ public class ResourceCell
      * If there is any, removes the outer relation around this resorce
      * cell body.
      */
+    @Override
     public void removeOuterRelation() {
 	//DEBUG
 	//System.out.println("ResourceCell.removeOuterRelation()");
@@ -440,6 +445,7 @@ public class ResourceCell
      * @param oldElement the object where to insert the added object next to
      * @param newElement the object to be added
      */
+    @Override
     public void elementAdd(final Object oldElement, final Object newElement) {
 	if(getROP() != null) {
 	    try {
@@ -457,6 +463,7 @@ public class ResourceCell
      *
      * @param element the object to be deleted
      */
+    @Override
     public void elementDelete(final Object element) {
 	//DEBUG
 	//System.out.println("ResourceCell.elementDelete()");
@@ -503,18 +510,21 @@ public class ResourceCell
      * @param oldElement the object that is to be replaced
      * @param newElement the object that is to replace the old object.
      */
+    @Override
     public void elementReplace(final Object oldElement, final Object newElement) {
 	newBody(newElement);
     }
     /**
      * Pastes the object to this resource cell's body.
      */
+    @Override
     public void paste(final Object o) {
 	newBody(o);
     }
     /**
      * Invoked when a mouse button has been released on this cell.
      */
+    @Override
     public void mouseReleased(final MouseEvent e) {
 	upPack();
 	cellListener.cellReleased(new CellEvent(this, e));

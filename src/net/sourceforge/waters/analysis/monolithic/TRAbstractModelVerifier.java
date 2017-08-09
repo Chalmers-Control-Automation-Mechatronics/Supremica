@@ -72,6 +72,18 @@ public abstract class TRAbstractModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
   @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
+  @Override
   public boolean isSatisfied()
   {
     final VerificationResult result = getAnalysisResult();
@@ -162,5 +174,6 @@ public abstract class TRAbstractModelVerifier
 
   //#########################################################################
   //# Data Members
+  private boolean mShortCounterExampleRequested;
 
 }

@@ -5,9 +5,9 @@
  * self-loops. Takes Automata and a set of global states
  * and generates a unique forbidden event for each state,
  * and self-loops the states of the respective automata
- * with the forbidden event. The automata are first copied
- * as plants, saturated with uc-events, and then treated as
- * the other plants.
+ * with the forbidden event. Only handles plant components,
+ * any specs must first be plantified by the user. There is
+ * also an option to use a dump state, instead of self-loop.
  */
 
 package org.supremica.automata.algorithms;
@@ -25,10 +25,11 @@ import org.supremica.log.LoggerFactory;
 
 public class Forbidder
 {
-    private static Logger logger = LoggerFactory.createLogger(Forbidder.class);
+    private static final Logger logger = LoggerFactory.createLogger(Forbidder.class);
 
-    private static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
-    private static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
+	// These are public since they are used elsewhere (org.supremica.testcases.CatMouse, for instance)
+    public static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
+    public static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
 
     private Automaton[] the_automata;
     private final int[] selected_indices;
@@ -38,7 +39,15 @@ public class Forbidder
     private int num_automata;
 	private boolean use_dump = false; // default is to use self-loop and not dump state
 
-    public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project, final boolean use_dump)
+	/**
+	 *
+	 * @param automata The set of automata among which the "selects" indices select
+	 * @param selects Holds the indices of the selected automata
+	 * @param ss The SearchStates object that hold the local events
+	 * @param project The VisualProject that we are to put the generated automata back to
+	 * @param use_dump Boolean that decides whether to use dump-state (when true) or self-loops (when false)
+	 */
+	public Forbidder(final Automata automata, final int[] selects, final SearchStates ss, final VisualProject project, final boolean use_dump)
     {
         this.selected_indices = selects;
         this.search_states = ss;
@@ -190,7 +199,7 @@ public class Forbidder
      * Rename all copies
      **//* As of May 2013, we only handle forbiding plant states. Plantify any spec first.
 	 * Reason is that to plantify correctly, you need to have the correct plant alphabet
-	 * So, you need to select all teh plants, plus teh specs for plantify to work
+	 * So, you need to select all the plants, plus the specs for plantify to work
 	 * But then... you do not really want all those extra plant states if you are only to forbid spec states
 	 * So. Plantify the specs firs with the relevant plant alphabet, then you do state forbidding
     private void fiddleAutomata()
@@ -226,7 +235,7 @@ public class Forbidder
     {
         // Get automaton
         final Automaton automaton = the_automata[a];
-        // Add the event - beware, adding an existig event throws exception
+        // Add the event - beware, adding an existing event throws exception
         if(automaton.getAlphabet().contains(x_event) == false)
         {
             automaton.getAlphabet().addEvent(x_event);
@@ -260,6 +269,7 @@ public class Forbidder
 
     /**
      * Make a spec with a single marked state, and only this forbidden event in its alphabet
+	 * Here we make one spec for each x-event, but we could really make a single spec with all x-events. Should we? 
      **/
     private Automaton makeSpec(final ForbiddenEvent x_event)
     {

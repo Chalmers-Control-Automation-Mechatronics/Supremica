@@ -47,6 +47,7 @@ import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
@@ -98,6 +99,7 @@ public abstract class AbstractModelAnalyzerFactory
     addArgument(new NoOutputArgument());
     addArgument(new PreMarkingArgument());
     addArgument(new PropertyArgument());
+    addArgument(new ShortCounterExampleArgument());
     addArgument(new TransitionLimitArgument());
   }
 
@@ -602,6 +604,36 @@ public abstract class AbstractModelAnalyzerFactory
     {
       if (analyzer instanceof LanguageInclusionChecker) {
         super.dump(stream, analyzer);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class ShortCounterExampleArgument
+  private static class ShortCounterExampleArgument
+    extends CommandLineArgumentBoolean
+  {
+    //#######################################################################
+    //# Constructor
+    private ShortCounterExampleArgument()
+    {
+      super("-mince", "Request short counterexample (or not)");
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof ModelVerifier) {
+        final ModelVerifier verifier = (ModelVerifier) analyzer;
+        final boolean req = getValue();
+        verifier.setShortCounterExampleRequested(req);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for verification!");
       }
     }
   }

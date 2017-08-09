@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2015 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,46 +31,58 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.bdd;
+package net.sourceforge.waters.analysis.deadlock;
 
-import net.sourceforge.waters.model.analysis.
-  AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import java.util.Set;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
 
-public class BDDStandardConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public class LocalEventHider
 {
+  private final GeneralizedTransitionRelation mTransitionRelation;
+  private final int TAU=0;
 
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  public LocalEventHider(final GeneralizedTransitionRelation transitionrelation)
   {
-    final TestSuite testSuite =
-      new TestSuite(BDDStandardConflictCheckerTest.class);
-    return testSuite;
+    mTransitionRelation = transitionrelation;
   }
 
-  public static void main(final String[] args)
+  public void run(final ProductDESProxy des)
   {
-    junit.textui.TestRunner.run(suite());
+    for(int s=0; s< mTransitionRelation.numberOfStates(); s++) {
+
+      for (final EventProxy ep : getEventsToHide(des)) {
+        final int epIndex = mTransitionRelation.getEventInt(ep);
+        final TIntHashSet succs = mTransitionRelation.getSuccessors(s, epIndex);
+        if(succs ==null) {
+          return;
+        }
+        mTransitionRelation.setSuccessors(s, epIndex, TAU);
+      }
+    }
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  @Override
-  protected ConflictChecker
-    createModelVerifier(final ProductDESProxyFactory factory)
-  {
-    final BDDConflictChecker checker = new BDDConflictChecker(factory);
-    checker.setShortCounterExampleRequested(false);
-    return checker;
+  //# Auxiliary Methods
+
+  private Set<EventProxy> getEventsToHide(final ProductDESProxy des) {
+    final Set<EventProxy> events = mTransitionRelation.getEvents();
+    final Set<EventProxy> localEvents = new THashSet<EventProxy>();
+
+    for (final EventProxy ep : events) {
+      // we need not equal to tau and not observable ? instead !
+      if (ep.getKind() == EventKind.CONTROLLABLE && !ep.isObservable()) {
+        localEvents.add(ep);
+      }
+    }
+    return localEvents;
   }
 
 }

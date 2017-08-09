@@ -83,7 +83,6 @@ public class BDDModelVerifierFactory
     addArgument(new CommandLineArgumentPartitioningStrategy());
     addArgument(new CommandLineArgumentPartitioningSizeLimit());
     addArgument(new CommandLineArgumentDynamic());
-    addArgument(new CommandLineArgumentEarlyDeadlock());
   }
 
 
@@ -197,36 +196,6 @@ public class BDDModelVerifierFactory
       final BDDModelVerifier bddVerifier = (BDDModelVerifier) analyzer;
       final boolean enabled = getValue();
       bddVerifier.setReorderingEnabled(enabled);
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class CommandLineArgumentEarlyDeadlock
-  private static class CommandLineArgumentEarlyDeadlock
-    extends CommandLineArgumentBoolean
-  {
-    //#######################################################################
-    //# Constructor
-    private CommandLineArgumentEarlyDeadlock()
-    {
-      super("-edl", "Enable or disable early deadlock detection");
-    }
-
-    //#######################################################################
-    //# Overrides for
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object analyzer)
-    {
-      if (analyzer instanceof BDDConflictChecker) {
-        final BDDConflictChecker bddVerifier = (BDDConflictChecker) analyzer;
-        final boolean enabled = getValue();
-        bddVerifier.setEarlyDeadlockEnabled(enabled);
-      } else {
-        fail("Command line option " + getName() +
-             " is only supported for conflict check!");
-      }
     }
   }
 

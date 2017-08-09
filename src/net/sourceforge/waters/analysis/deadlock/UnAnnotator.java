@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TIntArrayList;
@@ -61,8 +62,7 @@ public class UnAnnotator
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
 
-  public UnAnnotator(final GeneralizedTransitionRelation transitionrelation,
-                     final EventProxy marked)
+  public UnAnnotator(final GeneralizedTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
   }
@@ -74,7 +74,7 @@ public class UnAnnotator
     final Set<EventProxy> desEvents = des.getEvents();
     final Set<EventProxy> desProps = new HashSet<EventProxy>();
     for (final EventProxy ep : desEvents) {
-      if (ep.getKind().toString().equals("PROPOSITION")) {
+      if (ep.getKind()==EventKind.PROPOSITION) {
         desProps.add(ep);
       }
     }
@@ -122,8 +122,12 @@ public class UnAnnotator
 
       // get props for this state
       final Set<EventProxy> stateProp = new HashSet<EventProxy>();
-      final Set<TIntHashSet> annotations =
+       final Set<TIntHashSet> annotations =
         mTransitionRelation.getAnnotation(s);
+    /*  if (annotations == null) {
+      //  continue;
+        annotations = new HashSet<TIntHashSet>();
+     }*/
       for (final TIntHashSet ann : annotations) {
         for (final EventProxy ep : desProps) {
           final String[] tokens = ep.getName().split(":");

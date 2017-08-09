@@ -48,18 +48,18 @@ public class AutomataStateDisplayer
 	private static final long serialVersionUID = 1L;
 	
 	@SuppressWarnings("unused")
-	private AutomataStateViewer stateViewer;
+	private final AutomataStateViewer stateViewer;
     @SuppressWarnings("unused")
-	private Automata theAutomata;
-    private JCheckBox isInitialBox = new JCheckBox("initial");
-    private JCheckBox isAcceptingBox = new JCheckBox("accepting");
-    private JCheckBox isForbiddenBox = new JCheckBox("forbidden");
-    private JLabel stateCost = new JLabel();
-    private JLabel stateId = new JLabel();
-    private JLabel stateName = new JLabel();
-    private AutomataSynchronizerHelper helper;
+	private final Automata theAutomata;
+    private final JCheckBox isInitialBox = new JCheckBox("initial");
+    private final JCheckBox isAcceptingBox = new JCheckBox("accepting");
+    private final JCheckBox isForbiddenBox = new JCheckBox("forbidden");
+    private final JLabel stateCost = new JLabel();
+    private final JLabel stateId = new JLabel();
+    private final JLabel stateName = new JLabel();
+    private final AutomataSynchronizerHelper helper;
 
-    public AutomataStateDisplayer(AutomataStateViewer stateViewer, AutomataSynchronizerHelper helper)
+    public AutomataStateDisplayer(final AutomataStateViewer stateViewer, final AutomataSynchronizerHelper helper)
     {
         setLayout(new BorderLayout());
 
@@ -67,11 +67,11 @@ public class AutomataStateDisplayer
         this.theAutomata = helper.getAutomata();
         this.helper = helper;
 
-        JLabel header = new JLabel("Current composite state");
+        final JLabel header = new JLabel("Current composite state");
 
         add(header, BorderLayout.NORTH);
 
-        Box statusBox = new Box(BoxLayout.Y_AXIS);
+        final Box statusBox = new Box(BoxLayout.Y_AXIS);
 
         isInitialBox.setEnabled(false);
         isInitialBox.setBackground(Color.white);
@@ -86,12 +86,10 @@ public class AutomataStateDisplayer
         statusBox.add(stateId);
         statusBox.add(stateName);
 
-        JScrollPane boxScroller = new JScrollPane(statusBox);
-
+        final JScrollPane boxScroller = new JScrollPane(statusBox);
         add(boxScroller, BorderLayout.CENTER);
 
-        JViewport vp = boxScroller.getViewport();
-
+        final JViewport vp = boxScroller.getViewport();
         vp.setBackground(Color.white);
     }
 
@@ -106,12 +104,12 @@ public class AutomataStateDisplayer
         isAcceptingBox.setSelected(AutomataIndexFormHelper.isAccepting(currState));
         isForbiddenBox.setSelected(AutomataIndexFormHelper.isForbidden(currState));
 
-        StringBuilder stateNameBuffer = new StringBuilder();
-        stateNameBuffer.append(helper.getIndexMap().getStateAt(0,currState[0]).getName());
-        for (int i=1; i<helper.getAutomata().size(); i++)
+        final StringBuilder stateNameBuffer = new StringBuilder();
+        stateNameBuffer.append(helper.getIndexMap().getStateAt(0, currState[0]).getName());
+        for (int i = 1; i < helper.getAutomata().size(); i++)
         {
             stateNameBuffer.append(Config.GENERAL_STATE_SEPARATOR.get());
-            stateNameBuffer.append(helper.getIndexMap().getStateAt(i,currState[i]).getName());
+            stateNameBuffer.append(helper.getIndexMap().getStateAt(i, currState[i]).getName());
         }
         stateName.setText(stateNameBuffer.toString());
     }

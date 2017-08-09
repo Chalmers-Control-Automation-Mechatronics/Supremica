@@ -57,6 +57,7 @@ import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.algorithms.Forbidder;
+import org.supremica.automata.algorithms.Remover;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -75,7 +76,7 @@ class PresentStatesTableModel
 
 	private static Vector<String> formColumnNameVector(final Automata a)
 	{
-		final Vector<String> v = new Vector<String>();
+		final Vector<String> v = new Vector<>();
 
 		for (int i = 0; i < a.size(); ++i)
 		{
@@ -96,14 +97,14 @@ class PresentStatesTableModel
 
 	// col indexes an automaton, row a state
 	@Override
-  public Object getValueAt(final int row, final int col)
+	public Object getValueAt(final int row, final int col)
 	{
 		return ss.getState(col, row).getName();
 	}
 
 	// None of the cells are editable (DefaultTableMode return true! AbstractTableModel does not!!)
 	@Override
-  public boolean isCellEditable(final int rowIndex, final int columnIndex)
+	public boolean isCellEditable(final int rowIndex, final int columnIndex)
 	{
 		return false;
 	}
@@ -113,7 +114,6 @@ class PresentStatesTableModel
 interface SelectionListener    // should this be a utility class?
 {
 	void emptySelection();
-
 	void nonEmptySelection();
 }
 
@@ -122,7 +122,7 @@ class PresentStatesTable
 	extends JTable
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
+	private static final Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
 	private SelectionListener listener;
 	private final VisualProject theVisualProject;
 	private final SearchStates searchStates;
@@ -139,7 +139,7 @@ class PresentStatesTable
 		addMouseListener(new MouseAdapter()
 		{
 			@Override
-      public void mousePressed(final MouseEvent e)
+			public void mousePressed(final MouseEvent e)
 			{
 				final int currRow = rowAtPoint(new Point(e.getX(), e.getY()));
 
@@ -209,7 +209,7 @@ class PresentStatesTable
 	}
 
 	@Override
-  public void valueChanged(final ListSelectionEvent e)
+	public void valueChanged(final ListSelectionEvent e)
 	{
 		super.valueChanged(e);
 
@@ -232,14 +232,14 @@ class PresentStatesFrame
 	implements SelectionListener    // listens to selection events, en/disables the RouteButton, ForbidButton
 {
 	private static final long serialVersionUID = 1L;
-
-	private static Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
+	private static final Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
 
 	private final SearchStates search_states;
 	private final Automata automata;
 	private final VisualProject theVisualProject;
 	private final PresentStatesTable table;
-	private final ForbidButton forbid_button;
+	private final ForbidButton forbid_button;	// This duplicates code from FindStates.java
+	private final RemoveButton remove_button;	// as above
 //      private RouteButton route_button;
 
 	@SuppressWarnings("unused")
@@ -248,12 +248,12 @@ class PresentStatesFrame
 		logger.debug(s);
 	}
 
-	private class FineButton
+	private class CloseButton
 		extends JButton
 	{
 		private static final long serialVersionUID = 1L;
 
-		public FineButton()
+		public CloseButton()
 		{
 			super("Close");
 
@@ -261,7 +261,7 @@ class PresentStatesFrame
 			addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
@@ -271,11 +271,36 @@ class PresentStatesFrame
 		void action(final ActionEvent e)
 		{
 
-			// debug("FineButton disposing");
+			// debug("CloseButton disposing");
 			dispose();
 		}
 	}
 
+	private class RemoveButton extends JButton
+	{
+		private static final long serialVersionUID = 1L;
+		
+		public RemoveButton()
+		{
+			super("Remove");
+			setToolTipText("Remove outgoing transitions from selected states");
+			addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(final ActionEvent e)
+				{
+					action(e);
+				}
+			});			
+		}
+		void action(final ActionEvent e)
+		{
+			final Remover remover = new Remover(automata, table.getSelectedRows(), search_states, theVisualProject);
+			remover.remove();
+			dispose();
+		}
+	}
+	
 	private class ForbidButton
 		extends JButton
 	{
@@ -285,14 +310,14 @@ class PresentStatesFrame
 		public ForbidButton(final boolean use_dump)
 		{
 			super("Forbid");
-			setToolTipText("Forbid selected states"); // if none selected, should forbid all?
+			setToolTipText("Modularly forbid selected states"); // if none selected, should forbid all?
 			setEnabled(false);
 			this.use_dump = use_dump;
 
 			addActionListener(new ActionListener()
 			{
 				@Override
-        public void actionPerformed(final ActionEvent e)
+				public void actionPerformed(final ActionEvent e)
 				{
 					action(e);
 				}
@@ -351,8 +376,7 @@ class PresentStatesFrame
 			}
 			**/
 			@SuppressWarnings("unused")
-      final
-			Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject, use_dump);
+			final Forbidder forbidder = new Forbidder(automata, table.getSelectedRows(), search_states, theVisualProject, use_dump);
 		}
 	}
 /*
@@ -393,9 +417,12 @@ class PresentStatesFrame
 		final JPanel panel = new JPanel();
 
 		// panel.add(new JLabel(ss.numberFound() + " states found"));
-		panel.add(Utility.setDefaultButton(this, new FineButton()));
+		panel.add(Utility.setDefaultButton(this, new CloseButton()));
 		panel.add(forbid_button);
 //              panel.add(route_button);
+		panel.add(remove_button = new RemoveButton());
+		remove_button.setEnabled(false);
+		
 		final Container contentPane = getContentPane();
 
 		contentPane.add(new WhiteScrollPane(table), BorderLayout.CENTER);
@@ -404,18 +431,20 @@ class PresentStatesFrame
 
 	// SelectionListener interface implementation
 	@Override
-  public void emptySelection()
+	public void emptySelection()
 	{
 		forbid_button.setEnabled(false);
 //              route_button.setEnabled(false);
+		remove_button.setEnabled(false);
 	}
 
 	@Override
-  public void nonEmptySelection()
+	public void nonEmptySelection()
 	{
 		forbid_button.setEnabled(true);
 		// Utility.setDefaultButton(this, route_button);
 //              route_button.setEnabled(false); // enable when implemented
+		remove_button.setEnabled(true);
 	}
 }
 
@@ -453,12 +482,12 @@ class UserInterruptFrame
 public class PresentStates
 	extends Presenter
 {
-	private JFrame frame = null;
-	private SearchStates searchs = null;
-	private Automata automata = null;
-	private boolean dispose_frame = false;
+	private JFrame frame;
+	private final SearchStates searchs;
+	private final Automata automata;
+	private boolean dispose_frame;
 	private final VisualProject theVisualProject;
-	private boolean use_dump = false;
+	private final boolean use_dump;
 
 	public PresentStates(final JFrame frame, final SearchStates ss, final Automata a, final VisualProject theVisualProject, final boolean use_dump)
 	{
@@ -474,7 +503,7 @@ public class PresentStates
 	}
 
 	@Override
-  public void taskFinished()
+	public void taskFinished()
 	{
 		if (searchs.numberFound() > 0)
 		{
@@ -490,7 +519,7 @@ public class PresentStates
 	}
 
 	@Override
-  public void taskStopped()
+	public void taskStopped()
 	{
 		frame = new UserInterruptFrame();
 		dispose_frame = true;

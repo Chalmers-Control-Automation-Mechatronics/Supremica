@@ -88,7 +88,19 @@ public abstract class AbstractTRCompositionalVerifier
 
 
   //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.des.ModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
+  @Override
+  public void setShortCounterExampleRequested(final boolean req)
+  {
+    mShortCounterExampleRequested = req;
+  }
+
+  @Override
+  public boolean isShortCounterExampleRequested()
+  {
+    return mShortCounterExampleRequested;
+  }
+
   @Override
   public void setCounterExampleEnabled(final boolean enable)
   {
@@ -147,6 +159,7 @@ public abstract class AbstractTRCompositionalVerifier
     super.setUp();
     final ModelVerifier mono = getMonolithicVerifier();
     mono.setCounterExampleEnabled(isCounterExampleEnabled());
+    mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
   }
 
 
@@ -208,6 +221,7 @@ public abstract class AbstractTRCompositionalVerifier
 
   //#########################################################################
   //# Data Members
-  private boolean mTraceCheckingEnabled;
+  private boolean mShortCounterExampleRequested = false;
+  private boolean mTraceCheckingEnabled = false;
 
 }

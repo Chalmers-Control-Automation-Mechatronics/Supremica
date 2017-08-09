@@ -50,12 +50,13 @@
 package org.supremica.automata.algorithms;
 
 import java.util.*;
+import java.util.function.Predicate;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 
 public class AutomatonPurge
 {
-	private Automaton theAutomaton;
+	private final Automaton theAutomaton;
 
 	public AutomatonPurge(Automaton theAutomaton)
 	{
@@ -64,13 +65,19 @@ public class AutomatonPurge
 
 	public void execute()
 	{
+		final Predicate<State> defaultPred = currState -> ((currState.getCost() == State.MAX_COST) || currState.isForbidden());
+		execute(defaultPred);
+	}
+	
+	public void execute(final Predicate<State> pred)
+	{
 		LinkedList<State> stateList = new LinkedList<State>();
 		
 		for (Iterator<?> stateIt = theAutomaton.stateIterator(); stateIt.hasNext(); )
 		{
 			State currState = (State) stateIt.next();
 
-			if ((currState.getCost() == State.MAX_COST) || currState.isForbidden())
+			if (pred.test(currState))
 			{
 				stateList.addLast(currState);
 			}
