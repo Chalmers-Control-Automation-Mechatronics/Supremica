@@ -1054,18 +1054,50 @@ public class CatMouse
 	{
 		try
 		{
-			final CatMouse cm = new CatMouse(1, true);
-			System.out.println(cm.project.toString());
-			for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
-			{
-				final Automaton aut = cm.project.getAutomatonAt(i);
-				System.out.println(aut.toDebugString());
-			}
+//			final CatMouse cm = new CatMouse(1, true);
+//			System.out.println(cm.project.toString());
+//			for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
+//			{
+//				final Automaton aut = cm.project.getAutomatonAt(i);
+//				System.out.println(aut.toDebugString());
+//			}
+			testForbidderForbidStates();
+
 		}
 		catch(final Exception excp)
 		{
 			excp.printStackTrace();
 		}
+	}
+	
+	private static void testForbidderForbidStates()
+		throws Exception
+	{
+		final Automaton cat = new Cat().build(1);
+		final Automaton mouse = new Mouse().build(1);
+		final Automaton animals[] = new Automaton[2];
+		animals[0] = cat;
+		animals[1] = mouse;
+
+		State[][] stateset = new State[NUMBER_OF_ROOMS][animals.length];
+
+		for(int r = 0; r < NUMBER_OF_ROOMS; r++)
+		{
+			// Find in each component the states that should have forbidden self-loops
+			final String c_room = "c" + r;
+			final String m_room = "m" + r;
+			final State c_state = cat.getStateWithName(c_room);	
+			final State m_state = mouse.getStateWithName(m_room);
+
+			stateset[r][0] = c_state;
+			stateset[r][1] = m_state;
+		}
+
+		final Automaton x_spec = Forbidder.forbidStates(animals, stateset, Forbidder.FORBIDDEN_EVENT_PREFIX, true);
+		
+		System.out.println(cat.toDebugString());
+		System.out.println(mouse.toDebugString());
+		System.out.println(x_spec.toDebugString());
 	}
 }
 

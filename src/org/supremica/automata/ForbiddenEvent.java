@@ -36,6 +36,7 @@ public class ForbiddenEvent
 		super(event_proxy);
 	}
 	
+	@Override
 	public boolean isForbidden()
 	{
 		return true;
