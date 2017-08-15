@@ -1,10 +1,14 @@
 /*
  * CatMouse.java
- *
  * Created on February 29, 2008, 1:07 PM
  *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * Cat & Mouse exmaple of Wonham, except we allow several cats and mice
+ * As of August 2017, there is also teh option to have the forbidden states
+ * expressed by uc self-loops (see also org.supremica.automata.algorithms.Forbidder.java)
+ *
+ * Note: This code depends on stuff from ExtCatMouse.java, which in turn relies 
+ * on this code. THat is why some class components are protected instead of private.
+ * Such cross-dependency is a big mess and should of course not exist! // MF
  */
 
 package org.supremica.testcases;
@@ -20,7 +24,8 @@ import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
-
+import org.supremica.automata.algorithms.Forbidder;
+import org.supremica.automata.ForbiddenEvent;
 
 /**
  *
@@ -30,13 +35,13 @@ import org.supremica.automata.State;
 // Builds a Cat automaton
 class Cat
 {
-    public final String CAT_NAME = "Cat";
-    public final String CAT_ID = "c";
+    private final String CAT_NAME = "Cat";
+    private final String CAT_ID = "c";
 
-    final static int number_of_states = 5;
-    static State[][] states;
+    private final static int NUMBER_OF_STATES = 5;
+    private static State[][] states;
 
-    final static int number_of_events = 7;
+    final static int NUMBER_OF_EVENTS = 7;
     static LabeledEvent[] events;
 
 
@@ -50,17 +55,15 @@ class Cat
 
     static boolean inited = false;
 
-    int i;
-
     public Cat()
     throws Exception
     {
-        events = new LabeledEvent[number_of_events];
-        states = new State[1][number_of_states];
-        for(i=0; i<number_of_states;i++)
+        events = new LabeledEvent[NUMBER_OF_EVENTS];
+        states = new State[1][NUMBER_OF_STATES];
+        for(int i = 0; i < NUMBER_OF_STATES; i++)
             states[0][i] = new State(CAT_ID+i);
 
-        for(i=0; i<number_of_events;i++)
+        for(int i = 0; i < NUMBER_OF_EVENTS; i++)
             events[i] = new LabeledEvent(CAT_ID+i);
 
         //indices into events
@@ -94,7 +97,7 @@ class Cat
             cat.addState(states[0][i]);
         }
 
-        for(i=0; i<(events.length-1);i++)
+        for(int i = 0; i < (events.length-1);i++)
             events[i].setControllable(true);
         events[(events.length-1)].setControllable(false);
 
@@ -118,23 +121,23 @@ class Cat
     public Cat(final int id, final int num_levels)
     throws Exception
     {
-         events = new LabeledEvent[number_of_events];
-        states = new State[1][number_of_states];
+         events = new LabeledEvent[NUMBER_OF_EVENTS];
+        states = new State[1][NUMBER_OF_STATES];
 
         cat = new Automaton(CAT_NAME+NAME_SEP+id);
         cat.setType(AutomatonType.PLANT);
 
         final String LABEL_LEVEL = new Level().LEVEL_NAME;
 
-        states = new State[num_levels][number_of_states];
+        states = new State[num_levels][NUMBER_OF_STATES];
 
         final int INIT_LEVEL = 0;
         final int INIT_ROOM = 2;
 
-        for(i=0; i<number_of_events;i++)
+        for(int i = 0; i < NUMBER_OF_EVENTS; i++)
         {
             events[i] = new LabeledEvent(CAT_ID + id + LABEL_SEP + i);
-            if(i!=(number_of_events-1))
+            if(i!=(NUMBER_OF_EVENTS-1))
                 events[i].setControllable(true);
             else
                 events[i].setControllable(false);
@@ -142,9 +145,9 @@ class Cat
             cat.getAlphabet().addEvent(events[i]);
         }
 
-        for(int in_level=0; in_level<num_levels;in_level++)
+        for(int in_level = 0; in_level < num_levels; in_level++)
         {
-            for(int j=0;j<number_of_states;j++)
+            for(int j=0;j<NUMBER_OF_STATES;j++)
             {
                 states[in_level][j] = new State(LABEL_LEVEL+in_level+"_"+CAT_ID+j);
 
@@ -168,11 +171,11 @@ class Cat
 
         }
 
-        for(int in_level=0; in_level<num_levels;in_level++)
+        for(int in_level = 0; in_level < num_levels; in_level++)
         {
-            final int ROOM_ID = in_level%(new CatMouse().number_of_rooms);
+            final int ROOM_ID = in_level%(CatMouse.NUMBER_OF_ROOMS);
 
-            if((in_level+1)<num_levels)
+            if((in_level+1) < num_levels)
             {
                 final LabeledEvent lec = new LabeledEvent("c"+id+"_"+LABEL_LEVEL+in_level+LABEL_LEVEL+(in_level+1));
 
@@ -287,7 +290,7 @@ class Mouse
     static boolean inited = false;
 
     int length;
-    int i;
+    // int i;
 
     public Mouse()
     throws Exception
@@ -295,14 +298,14 @@ class Mouse
         states = new State[1][number_of_states];
         events = new LabeledEvent[number_of_events];
         event_indices = new int[number_of_events];
-        for(i=0; i<number_of_states;i++)
+        for(int i = 0; i < number_of_states; i++)
             states[0][i] = new State(MOUSE_ID+i);
 
-        for(i=0; i<number_of_events;i++)
+        for(int i = 0; i < number_of_events; i++)
             events[i] = new LabeledEvent(MOUSE_ID+i);
 
         //indices into events
-        for(i=0; i<number_of_events;i++)
+        for(int i = 0; i < number_of_events; i++)
             event_indices[i] = i;
 
 /*        if (inited)
@@ -331,7 +334,7 @@ class Mouse
             mouse.addState(states[0][i]);
         }
 
-        for(i=0; i<number_of_events;i++)
+        for(int i = 0; i < number_of_events; i++)
             events[i].setControllable(true);
 
         for (int i = 0; i < events.length; ++i)
@@ -366,7 +369,7 @@ class Mouse
         final int INIT_LEVEL = num_levels-1;
         final int INIT_ROOM = 4;
 
-        for(i=0; i<number_of_events;i++)
+        for(int i =0 ; i < number_of_events; i++)
         {
             events[i] = new LabeledEvent(MOUSE_ID + id + LABEL_SEP + i);
             if(i!=(number_of_events-1))
@@ -401,7 +404,7 @@ class Mouse
 
         for(int in_level=0; in_level<num_levels;in_level++)
         {
-            final int ROOM_ID = in_level%(new CatMouse().number_of_rooms);
+            final int ROOM_ID = in_level%(CatMouse.NUMBER_OF_ROOMS);
 
             if((in_level+1)<num_levels)
             {
@@ -491,8 +494,7 @@ interface RoomBuilder
 }
 
 // Builds a room automaton
-class Room
-    implements RoomBuilder
+class Room implements RoomBuilder
 {
     public final String ROOM_NAME = "Room";
     public final String ROOM_ID = "r";
@@ -822,6 +824,7 @@ class Room
         sm.replaceState(st_old, st_new);
     }
 
+	@Override
     public Automaton build(final Automaton thisRoom, final int in_level, final int num_levels)
     throws Exception
     {
@@ -835,7 +838,7 @@ class Room
          would give an exception while drawing the automata. This is because some of the names for events and states
          created in the Room class will be modified which is apparently not accpeted by 'waters'.
         */
-        if(in_level>=0)
+        if(in_level >= 0)
         {
             final String LABEL_LEVEL = new Level().LEVEL_NAME;
             for(int j=0;j<sm.nbrOfStates();j++)
@@ -846,7 +849,7 @@ class Room
             }
 
 
-            if((in_level%(new CatMouse().number_of_rooms))== id )
+            if((in_level%(CatMouse.NUMBER_OF_ROOMS))== id )
             {
                 if((in_level+1)<num_levels && num_cats > 1)
                 {
@@ -940,38 +943,161 @@ class Room
 
 public class CatMouse
 {
-    Project project = new Project("Cat & Mouse");
-    public final int number_of_rooms = 5;
-
+    private final Project project = new Project("Cat & Mouse");
+    final static int NUMBER_OF_ROOMS = 5;
+	private final static String X_SPEC_NAME = "x:SpecC&M";
+		
     // These are helpers for counting modulo num philos/forks
     // Note that we adjust for 0's, indices are from 1 to modulo
 
-    public CatMouse(){}
-
-    public CatMouse(final int num)
-        throws Exception
-    {
-        // Add comment
-        project.setComment("The cat and mouse problem. The cat and mouse must never be in the same room. This is specified 'locally', by the five specifications for the different rooms. Since this is a static specification, this can also be expressed 'globally' as a set of forbidden states in the composed plant model, 'cat||mouse'.");
-        final Cat cat = new Cat();
-        final Mouse mouse = new Mouse();
-        for (int i = 0; i < num; ++i){
-            project.addAutomaton(cat.build(i));
-            project.addAutomaton(mouse.build(i));
+	public CatMouse(final int num)
+		throws Exception
+	{
+		this(num, false); // Build the model with the Room specs (instead of self-looped forbidden states)
+	}
+	
+	public CatMouse(final int num, final boolean use_selfloops)
+		throws Exception
+	{
+        project.setComment("The cat and mouse problem. The cat and mouse must never be in the same room. " +
+			"This is specified 'locally', by the five specifications for the different rooms. " +
+			"Since this is a static specification, this can also be expressed 'globally' " +
+			"as a set of forbidden states in the composed plant model. " +
+			"This is done in a 'modular' way when the 'Use self-loops' option is checked.");
+		
+		final Automaton cats[] = new Automaton[num]; // These are really only needed when we use forbidden self-loops
+		final Automaton mice[] = new Automaton[num];
+		
+        final Cat cat_builder = new Cat();
+        final Mouse mouse_builder = new Mouse();
+		
+        for (int i = 0; i < num; ++i)
+		{
+			cats[i] = cat_builder.build(i);
+			mice[i] = mouse_builder.build(i);
+			
+            project.addAutomaton(cats[i]);
+            project.addAutomaton(mice[i]);
         }
-
-        Room room;
-        for (int i = 0; i < number_of_rooms; ++i)
-        {
-            room = new Room(i,num);
-            project.addAutomaton(room.build(room.getAutomaton(), -1,-1));
-        }
-
+		
+		// The Room specs are only neede when not using self-loops to express forbidden states
+		if(!use_selfloops)
+		{
+			for (int i = 0; i < NUMBER_OF_ROOMS; ++i)
+			{
+				final Room room = new Room(i,num);
+				project.addAutomaton(room.build(room.getAutomaton(), -1,-1));
+			}
+		}
+		else // Use self-loops to express the forbidden states -- see also org.supremica.automata.algorithms.Forbidder
+		{
+			// Generate uniquely-named uc-events
+			// Add selfloops on the correct combinations
+			// Generate the forbidden state x_spec.
+			
+			// Generate the single state x_spec, and below add the events to it as a blocked event
+			final Automaton x_spec = new Automaton(X_SPEC_NAME);
+			x_spec.setType(AutomatonType.SPECIFICATION);
+			final State init_state = new State("x0");
+			init_state.setInitial(true);
+			init_state.setAccepting(true);
+			x_spec.addState(init_state);
+						
+			final Alphabet x_alpha = x_spec.getAlphabet();	// Holds the x-events
+			
+			// Note that the states need to be pair-wise forbidden, for each cat it cannot be allowed in the same room as any mouse
+			for(int c = 0; c < cats.length; c++)
+			{
+				for(int m = 0; m < mice.length; m++)
+				{
+					for(int r = 0; r < NUMBER_OF_ROOMS; r++)
+					{
+						final Automaton cat = cats[c];
+						final Automaton mouse = mice[m];
+						
+						// Find in each component the states that should have forbidden self-loops
+						final String m_room = "m" + r;
+						final String c_room = "c" + r;
+						final State m_state = mouse.getStateWithName(m_room);
+						final State c_state = cat.getStateWithName(c_room);
+						
+						// Create and add the forbidden events - needs to be done before adding the self-loops
+						final StringBuffer x_event_label = new StringBuffer(Forbidder.FORBIDDEN_EVENT_PREFIX);
+						x_event_label.append('c').append(c).append('m').append(m).append('r').append(r);
+						final LabeledEvent x_event = new ForbiddenEvent(x_event_label.toString());
+						x_event.setControllable(false);
+						cat.getAlphabet().addEvent(x_event);
+						mouse.getAlphabet().addEvent(x_event);
+						
+						// Create and add the self-loops
+						final Arc m_arc = new Arc(m_state, m_state, x_event);
+						final Arc c_arc = new Arc(c_state, c_state, x_event);
+						mouse.addArc(m_arc);
+						cat.addArc(c_arc);
+						
+						// Add the event to the x_spec as a blocked event (meaning, no arcs)
+						x_alpha.addEvent(x_event);
+					}
+				}
+			}
+			project.addAutomaton(x_spec);
+		}
     }
-
-    public Project getProject()
+	
+	public Project getProject()
     {
         return project;
     }
+	
+	// For debugging only
+	public static void main(String[] args)
+	{
+		try
+		{
+//			final CatMouse cm = new CatMouse(1, true);
+//			System.out.println(cm.project.toString());
+//			for(int i = 0; i < cm.project.nbrOfAutomata(); i++)
+//			{
+//				final Automaton aut = cm.project.getAutomatonAt(i);
+//				System.out.println(aut.toDebugString());
+//			}
+			testForbidderForbidStates();
+
+		}
+		catch(final Exception excp)
+		{
+			excp.printStackTrace();
+		}
+	}
+	
+	private static void testForbidderForbidStates()
+		throws Exception
+	{
+		final Automaton cat = new Cat().build(1);
+		final Automaton mouse = new Mouse().build(1);
+		final Automaton animals[] = new Automaton[2];
+		animals[0] = cat;
+		animals[1] = mouse;
+
+		State[][] stateset = new State[NUMBER_OF_ROOMS][animals.length];
+
+		for(int r = 0; r < NUMBER_OF_ROOMS; r++)
+		{
+			// Find in each component the states that should have forbidden self-loops
+			final String c_room = "c" + r;
+			final String m_room = "m" + r;
+			final State c_state = cat.getStateWithName(c_room);	
+			final State m_state = mouse.getStateWithName(m_room);
+
+			stateset[r][0] = c_state;
+			stateset[r][1] = m_state;
+		}
+
+		final Automaton x_spec = Forbidder.forbidStates(animals, stateset, Forbidder.FORBIDDEN_EVENT_PREFIX, true);
+		
+		System.out.println(cat.toDebugString());
+		System.out.println(mouse.toDebugString());
+		System.out.println(x_spec.toDebugString());
+	}
 }
 
