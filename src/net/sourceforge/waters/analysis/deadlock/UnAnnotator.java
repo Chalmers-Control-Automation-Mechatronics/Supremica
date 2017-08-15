@@ -122,12 +122,12 @@ public class UnAnnotator
 
       // get props for this state
       final Set<EventProxy> stateProp = new HashSet<EventProxy>();
-       final Set<TIntHashSet> annotations =
+       Set<TIntHashSet> annotations =
         mTransitionRelation.getAnnotation(s);
-    /*  if (annotations == null) {
+      if (annotations == null) {
       //  continue;
         annotations = new HashSet<TIntHashSet>();
-     }*/
+     }
       for (final TIntHashSet ann : annotations) {
         for (final EventProxy ep : desProps) {
           final String[] tokens = ep.getName().split(":");

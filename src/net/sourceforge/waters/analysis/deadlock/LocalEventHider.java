@@ -33,20 +33,22 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 
 public class LocalEventHider
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
-  private final int TAU=0;
+  private final int TAU_INDEX = 0;
 
   public LocalEventHider(final GeneralizedTransitionRelation transitionrelation)
   {
@@ -55,34 +57,57 @@ public class LocalEventHider
 
   public void run(final ProductDESProxy des)
   {
-    for(int s=0; s< mTransitionRelation.numberOfStates(); s++) {
+    //mTransitionRelation.clear(mTransitionRelation.getPredecessorsArr());
+    //mTransitionRelation.clear(mTransitionRelation.getSuccessorsArr());
+    //mTransitionRelation.clearAllActive(mTransitionRelation.getAllActiveEvents());
 
-      for (final EventProxy ep : getEventsToHide(des)) {
-        final int epIndex = mTransitionRelation.getEventInt(ep);
-        final TIntHashSet succs = mTransitionRelation.getSuccessors(s, epIndex);
-        if(succs ==null) {
-          return;
-        }
-        mTransitionRelation.setSuccessors(s, epIndex, TAU);
-      }
-    }
+    for (final TransitionProxy tran : mTransitionRelation.getTransitionProxyCollection()) {
+    final int s = mTransitionRelation.getStateToInt().get(tran.getSource());
+    final int t = mTransitionRelation.getStateToInt().get(tran.getTarget());
+    final int e = mTransitionRelation.getEventToInt().get(tran.getEvent());
+    final TIntHashSet succ = mTransitionRelation.getFromSuccessors(s, e);
+    succ.add(t);
+    final TIntHashSet pred = mTransitionRelation.getFromPredecessors(t, e);
+    pred.add(s);
+    final TIntHashSet active = mTransitionRelation.getFromActiveEvents(s);
+    // check ...; replce with tau
+    if(!getEventsToHide(des).contains(e))
+      active.add(e);
+    else
+      active.add(TAU_INDEX);
   }
 
+  }
 
   //#########################################################################
   //# Auxiliary Methods
 
-  private Set<EventProxy> getEventsToHide(final ProductDESProxy des) {
+  private List<Integer> getEventsToHide(final ProductDESProxy des)
+  {
     final Set<EventProxy> events = mTransitionRelation.getEvents();
-    final Set<EventProxy> localEvents = new THashSet<EventProxy>();
+   // final Set<EventProxy> localEvents = new THashSet<EventProxy>();
+    final List<Integer> localEvents = new ArrayList<Integer>();
 
     for (final EventProxy ep : events) {
       // we need not equal to tau and not observable ? instead !
       if (ep.getKind() == EventKind.CONTROLLABLE && !ep.isObservable()) {
-        localEvents.add(ep);
+        final int index = mTransitionRelation.eventToInt(ep);
+        localEvents.add(index);
       }
     }
     return localEvents;
   }
+
+/*  for (final TransitionProxy tran : aut.getTransitions()) {
+    final int s = mStateToInt.get(tran.getSource());
+    final int t = mStateToInt.get(tran.getTarget());
+    final int e = eventToInt.get(tran.getEvent());
+    final TIntHashSet succ = getFromArray(s, e, mSuccessors);
+    succ.add(t);
+    final TIntHashSet pred = getFromArray(t, e, mPredecessors);
+    pred.add(s);
+    final TIntHashSet active = getFromArray(s, mActiveEvents);
+    active.add(e);
+  }*/
 
 }

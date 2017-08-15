@@ -78,6 +78,7 @@ public class GeneralizedTransitionRelation
   private final EventProxy mMarkedEvent;
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
+  private final Collection<TransitionProxy> mTransitionProxyCollection;
 
   private final String ACCEPTING_PROP= ":accepting";
   private final String TAU=":tau";
@@ -109,6 +110,7 @@ public class GeneralizedTransitionRelation
     mStateToInt = new TObjectIntHashMap<StateProxy>();
 
     int numstates = 0;
+    mTransitionProxyCollection = aut.getTransitions();
     mSuccessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
     mPredecessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
     mActiveEvents = new TIntHashSet[aut.getStates().size()];
@@ -1246,28 +1248,106 @@ public class GeneralizedTransitionRelation
 
   public void annotateWithProps() {
     for(final StateProxy s : mStateProxyList) {
-      getPrevAnnotations(s.getPropositions());
+      final int index = mStateToInt.get(s);
+      mAnnotations[index] = getPrevAnnotations(s.getPropositions());
     }
   }
 
   // Setters
-  public void setSuccessors(final int succ, final int oldEvent, final int newEvent) {
+  public void replaceSuccessorEventWith(final int succ, final int oldEvent, final int newEvent) {
     //TODO check if values within the length limit
     mSuccessors[succ][oldEvent]= mSuccessors[succ][newEvent];
   }
 
-  public void setPredecessors(final int pred, final int oldEvent, final int newEvent) {
+  public void replacePredecessorEventWith(final int pred, final int oldEvent, final int newEvent) {
     //TODO check if values within the length limit
     mPredecessors[pred][oldEvent]= mPredecessors[pred][newEvent];
   }
 
-  public void setActiveEvents(final int oldEvent, final int newEvent) {
+  public void replaceActiveEventWith(final int oldEvent, final int newEvent) {
     //TODO check if values within the length limit
     mActiveEvents[oldEvent]= mActiveEvents[newEvent];
   }
 
+  public void removeFromEvents(final int pos) {
+    mEvents[pos]= null;
+  }
   // Getters
   public List<StateProxy> getStateProxyList(){
     return mStateProxyList;
   }
+
+  public Collection<TransitionProxy> getTransitionProxyCollection(){
+    return mTransitionProxyCollection;
+  }
+
+ public void clear(final TIntHashSet[][] array) {
+   for (int i=0; i<array.length; i++) {
+     array[i]=null;
+   }
+ }
+
+ public void clearAllActive(final TIntHashSet[] array) {
+   for (int i=0; i<array.length; i++) {
+     array[i]=null;
+   }
+ }
+
+ public TIntHashSet[][] getPredecessorsArr()
+ {
+   return mPredecessors;
+ }
+
+ public TIntHashSet[][] getSuccessorsArr()
+ {
+   return mSuccessors;
+ }
+
+ public TIntHashSet[] getAllActiveEvents()
+ {
+   return mActiveEvents;
+ }
+
+ public  TObjectIntHashMap<StateProxy> getStateToInt()
+ {
+   return mStateToInt;
+ }
+
+ public  TObjectIntHashMap<EventProxy> getEventToInt()
+ {
+   return mEventToInt;
+ }
+
+ public TIntHashSet getFromPredecessors(final int i, final int j)
+ {
+   TIntHashSet intset = mPredecessors[i][j];
+   if (intset == null) {
+     intset = new TIntHashSet();
+     mPredecessors[i][j] = intset;
+   }
+   return intset;
+ }
+
+ public TIntHashSet getFromSuccessors(final int i, final int j)
+ {
+   TIntHashSet intset = mSuccessors[i][j];
+   if (intset == null) {
+     intset = new TIntHashSet();
+     mSuccessors[i][j] = intset;
+   }
+   return intset;
+}
+
+
+ public TIntHashSet getFromActiveEvents(final int i)
+ {
+   TIntHashSet intset = mActiveEvents[i];
+   if (intset == null) {
+     intset = new TIntHashSet();
+     mActiveEvents[i] = intset;
+   }
+   return intset;
+ }
+
+
 }
