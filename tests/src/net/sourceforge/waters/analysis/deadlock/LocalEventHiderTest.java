@@ -109,7 +109,56 @@ public class LocalEventHiderTest
   public void test_hiding_01() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "annotation", "annotateWithProps_01.wmod");
+      getCompiledDES("tests", "annotation", "hiding_01.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_03.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_07() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_08() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_08.wmod");
     runTransitionRelationSimplifier(des);
   }
 
@@ -123,9 +172,10 @@ public class LocalEventHiderTest
     // calculate annotated form
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
     tr.annotateWithProps();
-  //  final LocalEventHider hider = new LocalEventHider(tr);
-//    hider.run(des);
+    final LocalEventHider hider = new LocalEventHider(tr);
+    hider.run(des);
     // calculate unannotated form
+    //final AutomatonProxy expected = findAutomaton(des,AFTER);
     final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());

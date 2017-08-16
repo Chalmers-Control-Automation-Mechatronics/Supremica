@@ -39,7 +39,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.set.hash.TIntHashSet;
@@ -61,7 +60,7 @@ public class LocalEventHider
     //mTransitionRelation.clear(mTransitionRelation.getSuccessorsArr());
     //mTransitionRelation.clearAllActive(mTransitionRelation.getAllActiveEvents());
 
-    for (final TransitionProxy tran : mTransitionRelation.getTransitionProxyCollection()) {
+   /* for (final TransitionProxy tran : mTransitionRelation.getTransitionProxyCollection()) {
     final int s = mTransitionRelation.getStateToInt().get(tran.getSource());
     final int t = mTransitionRelation.getStateToInt().get(tran.getTarget());
     final int e = mTransitionRelation.getEventToInt().get(tran.getEvent());
@@ -70,19 +69,50 @@ public class LocalEventHider
     final TIntHashSet pred = mTransitionRelation.getFromPredecessors(t, e);
     pred.add(s);
     final TIntHashSet active = mTransitionRelation.getFromActiveEvents(s);
+    active.clear();
     // check ...; replce with tau
     if(!getEventsToHide(des).contains(e))
       active.add(e);
     else
       active.add(TAU_INDEX);
-  }
+  }*/
+    final Integer[] events = getEventsToHide(des);
+    for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      for (int e = 0; e < events.length; e++) {
+//        TIntHashSet succs = mTransitionRelation.getSuccessors(s, events[e]);
+        TIntHashSet succs = mTransitionRelation.getFromArray(s, events[e], mTransitionRelation.getSuccessorsArr());
 
+        if (succs == null) {
+          continue;
+        }
+
+        final int[] array = succs.toArray();
+        succs.clear();
+        succs =  mTransitionRelation.getFromArray(s, TAU_INDEX, mTransitionRelation.getSuccessorsArr());
+        for (int ti = 0; ti < array.length; ti++) {
+          final int t = array[ti];
+          succs.add(t);
+          TIntHashSet preds = mTransitionRelation.getFromArray(t, events[e], mTransitionRelation.getPredecessorsArr());
+          preds.clear();
+          preds =  mTransitionRelation.getFromArray(t, TAU_INDEX, mTransitionRelation.getPredecessorsArr());
+          preds.add(s);
+        }
+
+      }
+    }
+
+    // remove all annotaions
+    for(int i=0; i<events.length; i++) {
+      mTransitionRelation.removeAllAnnotations(events[i]);
+      mTransitionRelation.removePropWithEvent(events[i]);
+      mTransitionRelation.removeEvent(events[i]);
+    }
   }
 
   //#########################################################################
   //# Auxiliary Methods
 
-  private List<Integer> getEventsToHide(final ProductDESProxy des)
+  private Integer[] getEventsToHide(final ProductDESProxy des)
   {
     final Set<EventProxy> events = mTransitionRelation.getEvents();
    // final Set<EventProxy> localEvents = new THashSet<EventProxy>();
@@ -95,7 +125,7 @@ public class LocalEventHider
         localEvents.add(index);
       }
     }
-    return localEvents;
+    return localEvents.toArray(new Integer[localEvents.size()]);
   }
 
 /*  for (final TransitionProxy tran : aut.getTransitions()) {

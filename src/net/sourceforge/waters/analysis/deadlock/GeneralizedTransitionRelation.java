@@ -79,7 +79,7 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final Collection<TransitionProxy> mTransitionProxyCollection;
-
+  private final ProductDESProxy mDes;
   private final String ACCEPTING_PROP= ":accepting";
   private final String TAU=":tau";
 
@@ -92,7 +92,7 @@ public class GeneralizedTransitionRelation
   public GeneralizedTransitionRelation(final ProductDESProxy des, final AutomatonProxy aut,
                             Set<EventProxy> eventsall)
   {
-
+    mDes=des;
     mMarkedEvent = null;    // No need for this ..; to avoid compile errors.
 
     eventsall = new TreeSet<EventProxy>(eventsall);
@@ -714,7 +714,7 @@ public class GeneralizedTransitionRelation
     mAnnotations[to] = tann;
   }
 
-  private TIntHashSet getFromArray(final int i, final TIntHashSet[] array)
+  public TIntHashSet getFromArray(final int i, final TIntHashSet[] array)
   {
     TIntHashSet intset = array[i];
     if (intset == null) {
@@ -724,7 +724,7 @@ public class GeneralizedTransitionRelation
     return intset;
   }
 
-  private TIntHashSet getFromArray(final int i, final int j, final TIntHashSet[][] array)
+  public TIntHashSet getFromArray(final int i, final int j, final TIntHashSet[][] array)
   {
     TIntHashSet intset = array[i][j];
     if (intset == null) {
@@ -1349,5 +1349,64 @@ public class GeneralizedTransitionRelation
    return intset;
  }
 
+ public void removePropWithEvent(final int index) {
+   final EventProxy event = this.getEvent(index);
+   for (final EventProxy ep : mEvents) {
+     if(ep ==null)
+       continue;
+     if (ep.getKind()==EventKind.PROPOSITION) {
+       final String[] tokens = ep.getName().split(":");
+       if (Arrays.asList(tokens).contains(event.getName())) {
+         if(tokens.length > 2)
+           replaceProp (tokens, event.getName(), ep);
+        else
+         this.removeEvent(this.eventToInt(ep));
+       }
+     }
+   }
+
+ }
+
+ private void replaceProp(final String[] tokens, final String eventName, final EventProxy ep) {
+     final List<String> copy = new ArrayList<String>();
+   for(int i=1; i< tokens.length; i++) {
+     if(!tokens[i].equals(eventName)) {
+       copy.add(tokens[i]);
+     }
+   }
+   if(getProp(copy)==null) {
+     this.removeEvent(this.eventToInt(ep));
+   }
+   else {
+     mEvents[this.eventToInt(ep)] = getProp(copy);
+   }
+ }
+
+  private EventProxy getProp(final List<String> copy)
+  {
+    for (final EventProxy ep : mDes.getEvents()) {
+      if (ep.getKind() == EventKind.PROPOSITION) {
+        final String[] tokens = ep.getName().split(":");
+        if (tokens.length == copy.size() + 1) {
+          boolean match = true;
+          for (int i = 0; i < copy.size(); i++) {
+            if (!Arrays.asList(tokens).contains(copy.get(i))) {
+              match = false;
+            }
+          }
+          if (match) {
+            return ep;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+public void removeEventFromAllAnnotations(final int event) {
+    for (int state=0; state<this.numberOfStates(); state++) {
+    this.removeEventFromAnnotations(event, state);
+  }
+}
 
 }
