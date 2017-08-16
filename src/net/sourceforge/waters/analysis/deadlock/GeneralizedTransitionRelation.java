@@ -63,7 +63,6 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
-import junit.framework.Assert;
 
 public class GeneralizedTransitionRelation
 {
@@ -1418,7 +1417,7 @@ public class GeneralizedTransitionRelation
   //# Debugging
   /**
    * Checks whether the predecessor and successor hash maps are consistent
-   * with each other, and produces an assertion failure if this is not the
+   * with each other, and produces an assertion error if this is not the
    * case.
    */
   void checkIntegrity()
@@ -1433,8 +1432,8 @@ public class GeneralizedTransitionRelation
             final int t = iter.next();
             final TIntHashSet preds = getPredecessors(t, e);
             if (preds == null || !preds.contains(s)) {
-              Assert.fail("Transition " + s + " -" + e + "-> " + t +
-                          " appears in successors but not in predecessors.");
+              assert false : "Transition " + s + " -" + e + "-> " + t +
+                             " appears in successors but not in predecessors.";
             }
           }
         }
@@ -1451,8 +1450,8 @@ public class GeneralizedTransitionRelation
             final int s = iter.next();
             final TIntHashSet succs = getSuccessors(s, e);
             if (succs == null || !succs.contains(t)) {
-              Assert.fail("Transition " + s + " -" + e + "-> " + t +
-                          " appears in predecessors but not in successors.");
+              assert false : "Transition " + s + " -" + e + "-> " + t +
+                             " appears in predecessors but not in successors.";
             }
           }
         }
