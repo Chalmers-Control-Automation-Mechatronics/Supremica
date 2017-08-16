@@ -66,9 +66,9 @@ import org.supremica.properties.Config;
  *
  * <P>
  * The backup graph panel can manage two copies of a graph ({@link GraphProxy})
- * to be displayed and edited. The <I>primary graph</I> is monitored subject
+ * to be displayed and edited. The <I>primary graph</I> is a monitored subject
  * ({@link GraphSubject}) that can be edited in a controlled way. The backup
- * graph panel creates a <I>secondary graph</I> as a copy the primary graph
+ * graph panel creates a <I>secondary graph</I> as a copy of the primary graph
  * when a major modification is initiated, such as running the spring embedder
  * ({@link SpringEmbedder}) or a drag operation. During such operations, the
  * secondary graph can be updated frequently; but only when the operation
@@ -106,16 +106,19 @@ public class BackupGraphPanel
 
   //#########################################################################
   //# Simple Access
+  @Override
   public ModuleSubject getModule()
   {
     return (ModuleSubject) super.getModule();
   }
 
+  @Override
   public GraphSubject getGraph()
   {
     return (GraphSubject) super.getGraph();
   }
 
+  @Override
   public GraphProxy getDrawnGraph()
   {
     if (mSecondaryGraph != null) {
@@ -125,6 +128,7 @@ public class BackupGraphPanel
     }
   }
 
+  @Override
   public SubjectShapeProducer getShapeProducer()
   {
     if (mSecondaryGraph != null) {
@@ -143,6 +147,7 @@ public class BackupGraphPanel
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
+  @Override
   public void embedderChanged(final EmbedderEvent event)
   {
     if (event.getType() == EmbedderEvent.EmbedderEventType.EMBEDDER_STOP) {
@@ -318,11 +323,13 @@ public class BackupGraphPanel
 
     //#######################################################################
     //# Interface net.sourceforge.waters.subject.base.ModelObserver
+    @Override
     public void modelChanged(final ModelChangeEvent event)
     {
       graphChanged(event);
     }
 
+    @Override
     public int getModelObserverPriority()
     {
       return ModelObserver.RENDERING_PRIORITY;

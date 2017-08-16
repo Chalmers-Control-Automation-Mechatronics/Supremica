@@ -972,9 +972,9 @@ public class GraphEditorPanel
     }
   }
 
-  @Override
-  protected Dimension calculatePreferredSize()
+  private Dimension calculatePreferredSize()
   {
+    // TODO Does not work with negative lower bounds for x and y.
     final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
     final int width = (int) Math.ceil(area.getWidth());
     final int height = (int) Math.ceil(area.getHeight());

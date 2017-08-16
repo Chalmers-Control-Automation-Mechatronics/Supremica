@@ -34,7 +34,6 @@
 package net.sourceforge.waters.gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -205,19 +204,6 @@ public class GraphPanel
     final Renderer renderer =
       new Renderer(getDrawnGraph(), getDrawnObjects(), getShapeProducer());
     renderer.renderGraph((Graphics2D) g);
-  }
-
-  /**
-   * Calculates a dimension indicating the size of all objects currently
-   * displayed by the shape producer.
-   */
-  protected Dimension calculatePreferredSize()
-  {
-    final Rectangle2D area =
-      getShapeProducer().getMinimumBoundingRectangle();
-    final int width = (int) Math.ceil(area.getWidth());
-    final int height = (int) Math.ceil(area.getHeight());
-    return new Dimension(width, height);
   }
 
   /**
