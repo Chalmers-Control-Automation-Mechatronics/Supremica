@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="hiding_06" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<Module Name="hiding_06" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a:b">
             <ColorGeometry>
-                <Color Blue="0" Green="0" Red="204"/>
+                <Color Red="204" Green="0" Blue="0"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:b">
             <ColorGeometry>
-                <Color Blue="51" Green="255" Red="153"/>
+                <Color Red="153" Green="255" Blue="51"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:"/>
@@ -25,7 +25,7 @@
                             <SimpleIdentifier Name="ann:a:b"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="224" Y="96"/>
+                            <Point X="208" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -47,10 +47,10 @@
                             <SimpleIdentifier Name="ann:"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="272" Y="192"/>
+                            <Point X="256" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
+                            <Point X="-9" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -58,11 +58,17 @@
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-5" Y="10"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="S0" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-10" Y="7"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>
@@ -72,11 +78,8 @@
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:b"/>
-                        </EventList>
                         <PointGeometry>
-                            <Point X="224" Y="96"/>
+                            <Point X="208" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -98,7 +101,7 @@
                             <SimpleIdentifier Name="ann:"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="272" Y="192"/>
+                            <Point X="256" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -110,13 +113,16 @@
                         <LabelBlock>
                             <SimpleIdentifier Name=":tau"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="0" Y="9"/>
+                                <Point X="-44" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="S0" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="17" Y="-7"/>
+                            </LabelGeometry>
                         </LabelBlock>
                     </Edge>
                 </EdgeList>

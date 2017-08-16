@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="hiding_08" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<Module Name="hiding_08" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a">
             <ColorGeometry>
-                <Color Blue="153" Green="0" Red="102"/>
+                <Color Red="102" Green="0" Blue="153"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:b">
             <ColorGeometry>
-                <Color Blue="153" Green="51" Red="255"/>
+                <Color Red="255" Green="51" Blue="153"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:">
             <ColorGeometry>
-                <Color Blue="51" Green="255" Red="102"/>
+                <Color Red="102" Green="255" Blue="51"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
@@ -77,7 +77,6 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
-                            <SimpleIdentifier Name="ann:a"/>
                             <SimpleIdentifier Name="ann:b"/>
                         </EventList>
                         <PointGeometry>

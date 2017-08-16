@@ -162,6 +162,14 @@ public class LocalEventHiderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_hiding_09() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_09.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -172,8 +180,13 @@ public class LocalEventHiderTest
     // calculate annotated form
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
     tr.annotateWithProps();
+    tr.checkIntegrity();
     final LocalEventHider hider = new LocalEventHider(tr);
+    // LocalEventHider should take as argument a list of local events. This
+    // cannot in general be a ProductDESProxy, the local events will change
+    // during the deadlock check. ~~~Robi
     hider.run(des);
+    tr.checkIntegrity();
     // calculate unannotated form
     //final AutomatonProxy expected = findAutomaton(des,AFTER);
     final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());

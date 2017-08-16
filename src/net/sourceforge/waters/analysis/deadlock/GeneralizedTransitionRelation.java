@@ -52,15 +52,18 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.THashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
+import junit.framework.Assert;
 
 public class GeneralizedTransitionRelation
 {
@@ -80,7 +83,7 @@ public class GeneralizedTransitionRelation
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final Collection<TransitionProxy> mTransitionProxyCollection;
   private final ProductDESProxy mDes;
-  private final String ACCEPTING_PROP= ":accepting";
+
   private final String TAU=":tau";
 
   public GeneralizedTransitionRelation(final ProductDESProxy des, final net.sourceforge.waters.model.des.AutomatonProxy aut)
@@ -461,7 +464,8 @@ public class GeneralizedTransitionRelation
     final Set<EventProxy> events = new THashSet<EventProxy>();
     for (int i = 0; i < mEvents.length; i++) {
       // ignore :accepting prop
-      if (mEvents[i] != null && !mEvents[i].getName().equals(ACCEPTING_PROP)) {
+      if (mEvents[i] != null &&
+          !mEvents[i].getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         events.add(mEvents[i]);
       }
     }
@@ -1204,7 +1208,7 @@ public class GeneralizedTransitionRelation
     if(getTau(des) != null)
       eventslist.add(getTau(des));
     for (final EventProxy ep : eventSet) {
-      if (!isTau(ep) && !ep.getName().equals(ACCEPTING_PROP)) {
+      if (!isTau(ep) && !ep.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         //eventsArr[pos] = ep;
         eventslist.add(ep);
       }
@@ -1219,7 +1223,7 @@ public class GeneralizedTransitionRelation
     while (it.hasNext()) {
       final TIntHashSet annint = new TIntHashSet();
       final EventProxy e = it.next();
-      if (!e.getName().equals(ACCEPTING_PROP)) {
+      if (!e.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         final String[] tokens = e.getName().split(":");
         int propLength = tokens.length - 1;
         for (int i = 0; i < mEvents.length && propLength > 0; i++) {
@@ -1403,10 +1407,61 @@ public class GeneralizedTransitionRelation
     return null;
   }
 
-public void removeEventFromAllAnnotations(final int event) {
+  public void removeEventFromAllAnnotations(final int event) {
     for (int state=0; state<this.numberOfStates(); state++) {
-    this.removeEventFromAnnotations(event, state);
+      this.removeEventFromAnnotations(event, state);
+    }
   }
-}
+
+
+  //########################################################################
+  //# Debugging
+  /**
+   * Checks whether the predecessor and successor hash maps are consistent
+   * with each other, and produces an assertion failure if this is not the
+   * case.
+   */
+  void checkIntegrity()
+  {
+    // 1. Every transition in predecessors should also appear in successors
+    for (int s = 0; s < mSuccessors.length; s++) {
+      for (int e = 0; e < mEvents.length; e++) {
+        final TIntHashSet succs = getSuccessors(s, e);
+        if (succs != null && !succs.isEmpty()) {
+          final TIntIterator iter = succs.iterator();
+          while (iter.hasNext()) {
+            final int t = iter.next();
+            final TIntHashSet preds = getPredecessors(t, e);
+            if (preds == null || !preds.contains(s)) {
+              Assert.fail("Transition " + s + " -" + e + "-> " + t +
+                          " appears in successors but not in predecessors.");
+            }
+          }
+        }
+      }
+    }
+
+    // 2. Every transition in predecessors should also appear in successors
+    for (int t = 0; t < mPredecessors.length; t++) {
+      for (int e = 0; e < mEvents.length; e++) {
+        final TIntHashSet preds = getPredecessors(t, e);
+        if (preds != null && !preds.isEmpty()) {
+          final TIntIterator iter = preds.iterator();
+          while (iter.hasNext()) {
+            final int s = iter.next();
+            final TIntHashSet succs = getSuccessors(s, e);
+            if (succs == null || !succs.contains(t)) {
+              Assert.fail("Transition " + s + " -" + e + "-> " + t +
+                          " appears in predecessors but not in successors.");
+            }
+          }
+        }
+      }
+    }
+
+    // 3. Are we still using active events (mActiveEvents)?
+    // If yes, they should also be checked here;
+    // If no, better remove the instance variable.
+  }
 
 }

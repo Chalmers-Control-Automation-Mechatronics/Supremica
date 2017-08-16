@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="hiding_05" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<Module Name="hiding_05" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
         <EventDecl Kind="PROPOSITION" Name="ann:a">
             <ColorGeometry>
-                <Color Blue="255" Green="102" Red="51"/>
+                <Color Red="51" Green="102" Blue="255"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:b">
             <ColorGeometry>
-                <Color Blue="0" Green="255" Red="153"/>
+                <Color Red="153" Green="255" Blue="0"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name="ann:c">
             <ColorGeometry>
-                <Color Blue="153" Green="153" Red="255"/>
+                <Color Red="255" Green="153" Blue="153"/>
             </ColorGeometry>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="after">
+        <SimpleComponent Kind="PLANT" Name="before">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -73,7 +73,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="before">
+        <SimpleComponent Kind="PLANT" Name="after">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">

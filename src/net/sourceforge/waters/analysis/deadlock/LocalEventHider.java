@@ -33,14 +33,13 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
 
 
@@ -76,7 +75,7 @@ public class LocalEventHider
     else
       active.add(TAU_INDEX);
   }*/
-    final Integer[] events = getEventsToHide(des);
+    final int[] events = getEventsToHide(des);
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
       for (int e = 0; e < events.length; e++) {
 //        TIntHashSet succs = mTransitionRelation.getSuccessors(s, events[e]);
@@ -112,12 +111,10 @@ public class LocalEventHider
   //#########################################################################
   //# Auxiliary Methods
 
-  private Integer[] getEventsToHide(final ProductDESProxy des)
+  private int[] getEventsToHide(final ProductDESProxy des)
   {
     final Set<EventProxy> events = mTransitionRelation.getEvents();
-   // final Set<EventProxy> localEvents = new THashSet<EventProxy>();
-    final List<Integer> localEvents = new ArrayList<Integer>();
-
+    final TIntArrayList localEvents = new TIntArrayList(events.size());
     for (final EventProxy ep : events) {
       // we need not equal to tau and not observable ? instead !
       if (ep.getKind() == EventKind.CONTROLLABLE && !ep.isObservable()) {
@@ -125,7 +122,7 @@ public class LocalEventHider
         localEvents.add(index);
       }
     }
-    return localEvents.toArray(new Integer[localEvents.size()]);
+    return localEvents.toArray();
   }
 
 /*  for (final TransitionProxy tran : aut.getTransitions()) {

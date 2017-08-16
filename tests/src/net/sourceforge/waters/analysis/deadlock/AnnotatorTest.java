@@ -173,6 +173,7 @@ public class AnnotatorTest
     // calculate annotated form
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
     tr.annotateWithActiveEvents();
+    tr.checkIntegrity();
     // calculate unannotated form
     final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
     checkResult(des, unannotated);
