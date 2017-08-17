@@ -1116,7 +1116,7 @@ public class CatMouse
 		final int NUM_CATS = num;
 		final int NUM_MICE = num;
 		final int NUM_ANIMALS = NUM_CATS + NUM_MICE;
-		final Automaton animals[] = new Automaton[NUM_ANIMALS];	// First haf of this array holds the cats, second half the mice
+		final Automaton animals[] = new Automaton[NUM_ANIMALS];	// First half of this array holds the cats, second half the mice
 		
 		State[][] stateset = new State[NUMBER_OF_ROOMS * NUM_CATS * NUM_MICE][NUM_ANIMALS];
 		
