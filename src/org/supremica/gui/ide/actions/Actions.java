@@ -190,7 +190,6 @@ public class Actions extends WatersActionManager
     // Analyzer experimental
     public IDEAction analyzerExperimentAction = new AnalyzerExperimentAction(mIDEActions);
     public IDEAction analyzerPredictSizeAction = new AnalyzerPredictSizeAction(mIDEActions);
-    public IDEAction analyzerCountReachableAction = new AnalyzerCountReachableAction(mIDEActions);
     public IDEAction analyzerScheduleAction = new AnalyzerScheduleAction(mIDEActions);
     public IDEAction analyzerSatAction = new AnalyzerSatAction(mIDEActions);
     public IDEAction analyzerSMVAction = new AnalyzerSMVAction(mIDEActions);

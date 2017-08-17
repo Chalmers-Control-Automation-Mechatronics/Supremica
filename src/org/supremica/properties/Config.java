@@ -285,7 +285,7 @@ public final class Config
     public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
     public static final ObjectProperty<String> SYNC_AUTOMATON_NAME_SEPARATOR = new ObjectProperty<String>(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
 	public static final BooleanProperty SYNC_UNOBS_EVENTS_SYNC = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncUnobsEventsSync", false, "Unobservable (non-tau) events synchronize");
-	
+
     // ALGORITHMS_VERIFICATION
     public static final ObjectProperty<VerificationType> VERIFY_VERIFICATION_TYPE = new ObjectProperty<VerificationType>(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());
     public static final ObjectProperty<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE  = new ObjectProperty<VerificationAlgorithm>(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", VerificationAlgorithm.MODULAR, "Default verificaton algorithm", VerificationAlgorithm.values());
@@ -314,7 +314,6 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "independentHeuristic", true, "Apply the independent heuristic");
     public static final BooleanProperty SYNTHESIS_SAVE_IDD_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveIDDInFile", true, "Save the guard-event pairs as an IDD in a file");
     public static final BooleanProperty SYNTHESIS_REACHABILITY = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "reachability", false, "Remove the unreachable states");
-    public static final BooleanProperty SYNTHESIS_PEAKBDD = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "peakBDD", false, "Compute and print peak BDD");
     public static final BooleanProperty SYNTHESIS_OPTIMIZATION = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "optimization", false, "Compute the global optimal time");
 	public static final BooleanProperty SYNTHESIS_SUP_AS_PLANT = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSupsAsPlants", false, "Consider supervisors as plants");
 
@@ -339,46 +338,36 @@ public final class Config
     // MF: This one below is purely experimental, remove in production code
     public static final BooleanProperty MINIMIZATION_USE_TAUEVENT_MAP = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationUseTaueventMap", true, "Use TauEvent map");
 
-    // ALGORITHMS_BDD2
-    // New BDD implementation using JavaBDD library
-    public static final ObjectProperty<BDDLibraryType> BDD2_BDDLIBRARY = new ObjectProperty<BDDLibraryType>(PropertyType.ALGORITHMS_BDD2, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
-    public static final IntegerProperty BDD2_INITIALNODETABLESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "initialNodeTableSize", 1000000, "Initial node table size");
-    public static final IntegerProperty BDD2_CACHESIZE = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "cacheSize", 100000, "Operation cache size");
-    public static final IntegerProperty BDD2_MAXINCREASENODES = new IntegerProperty(PropertyType.ALGORITHMS_BDD2, "maxIncreaseNodes", 2500000, "Set maximum number of nodes by which to increase node table after a garbage collection.");
-    public static final DoubleProperty BDD2_INCREASEFACTOR = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "increaseFactor", 2.0, "Set factor by which to increase node table after a garbage collection.", false, 0.0);
-    public static final DoubleProperty BDD2_CACHERATIO = new DoubleProperty(PropertyType.ALGORITHMS_BDD2, "cacheRatio", 10.0, "Sets the cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
-    public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING = new ObjectProperty<BDDPartitioningType>(PropertyType.ALGORITHMS_BDD2, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
-
     // ALGORITHMS_BDD
+    // New BDD implementation using JavaBDD library
+    // -- the following where formerly under algorithms.bdd2
+    public static final ObjectProperty<BDDLibraryType> BDD2_BDDLIBRARY =
+      new ObjectProperty<BDDLibraryType>(PropertyType.ALGORITHMS_BDD, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
+    public static final IntegerProperty BDD2_INITIALNODETABLESIZE =
+      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "initialNodeTableSize", 1000000, "Initial node table size");
+    public static final IntegerProperty BDD2_CACHESIZE =
+      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "cacheSize", 100000, "Operation cache size");
+    public static final IntegerProperty BDD2_MAXINCREASENODES =
+      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "maxIncreaseNodes", 2500000, "Maximum number of nodes by which to increase node table after garbage collection");
+    public static final DoubleProperty BDD2_INCREASEFACTOR =
+      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "increaseFactor", 2.0, "Factor by which to increase node table after garbage collection", false, 0.0);
+    public static final DoubleProperty BDD2_CACHERATIO =
+      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "cacheRatio", 10.0, "Cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
+    public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING =
+      new ObjectProperty<BDDPartitioningType>(PropertyType.ALGORITHMS_BDD, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
+
+    // -- the following where formerly under algorithms.bdd
     // Most of these are ugly integers in BDD.Options... but they have String representations here.
-    public static final ObjectProperty<String> BDD_ALGORITHM = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAlgorithm", Options.REACH_ALGO_NAMES[Options.algo_family], "Algorithm", Options.REACH_ALGO_NAMES);
-    public static final ObjectProperty<String> BDD_SHOW_GROW = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddShowGrowth", Options.SHOW_GROW_NAMES[Options.show_grow], "Show growth", Options.SHOW_GROW_NAMES);
-    public static final ObjectProperty<String> BDD_COUNT_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddCountAlgorithm", Options.COUNT_ALGO_NAMES[Options.count_algo], "Count algorithm", Options.COUNT_ALGO_NAMES);
-    public static final ObjectProperty<String> BDD_LI_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddLanguageInclusionAlgorithm", Options.INCLUSION_ALGORITHM_NAMES[Options.inclusion_algorithm], "Inclusion algorithm", Options.INCLUSION_ALGORITHM_NAMES);
-    public static final ObjectProperty<String> BDD_ORDER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], "Automata ordering algorithm", Options.ORDERING_ALGORITHM_NAMES);
-    public static final ObjectProperty<String> BDD_ORDERING_FORCE_COST = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddOrderingForceCost", Options.FORCE_TYPE_NAMES[Options.ordering_force_cost], "Ordering force cost", Options.FORCE_TYPE_NAMES);
-    public static final ObjectProperty<String> BDD_AS_HEURISTIC = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataSelectionHeuristics", Options.AS_HEURISTIC_NAMES[Options.as_heuristics], "Automata selection heuristics", Options.AS_HEURISTIC_NAMES);
-    public static final ObjectProperty<String> BDD_FRONTIER_TYPE = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddFrontierType", Options.FRONTIER_STRATEGY_NAMES[Options.frontier_strategy], "Frontier strategy", Options.FRONTIER_STRATEGY_NAMES);
-    public static final ObjectProperty<String> BDD_H1 = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddH1", Options.ES_HEURISTIC_NAMES[Options.es_heuristics], "ES Heuristics", Options.ES_HEURISTIC_NAMES);
-    public static final ObjectProperty<String> BDD_H2 = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddH2", Options.NDAS_HEURISTIC_NAMES[Options.ndas_heuristics], "NDAS Heuristics", Options.NDAS_HEURISTIC_NAMES);
-    public static final ObjectProperty<String> BDD_DSSI_HEURISTIC = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddDelayedStarSelection", Options.DSSI_HEURISTIC_NAMES[Options.dssi_heuristics], "DSSI heuristics", Options.DSSI_HEURISTIC_NAMES);
-    public static final ObjectProperty<String> BDD_ENCODING_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddStateEncodingAlgorithm", Options.ENCODING_NAMES[Options.encoding_algorithm], "Encoding algorithm", Options.ENCODING_NAMES);
-    public static final ObjectProperty<String> BDD_SUP_REACHABILITY = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddSupReachability", Options.SUP_REACHABILITY_NAMES[Options.sup_reachability_type], "Supervisor Reachability Type", Options.SUP_REACHABILITY_NAMES);
-    public static final ObjectProperty<String> BDD_DISJ_OPTIMIZER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddDisjOptimizerAlgo", Options.DISJ_OPTIMIZER_NAMES[Options.disj_optimizer_algo], "Disjunctive optimizer algorithm", Options.DISJ_OPTIMIZER_NAMES);
-    public static final ObjectProperty<String> BDD_TRANSITION_OPTIMIZER_ALGO = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddTransitionOptimizerAlgo", Options.TRANSITION_OPTIMIZER_NAMES[Options.transition_optimizer_algo], "Transition optimizer algorithm", Options.TRANSITION_OPTIMIZER_NAMES);
-    public static final IntegerProperty BDD_PARTITION_MAX = new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", Options.max_partition_size, "Max Partition Size");
-    public static final BooleanProperty BDD_SIZE_WATCH = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSizeWatch", Options.size_watch, "Size watch");
-    public static final BooleanProperty BDD_ALTER_PCG = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddAlterPCG", Options.user_alters_PCG, "Alter PCG");
-    public static final BooleanProperty BDD_DEBUG_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", Options.debug_on, "Debug on");
-    public static final BooleanProperty BDD_UC_OPTIMISTIC = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddUCOptimistic", Options.uc_optimistic, "uc optimistic");
-    public static final BooleanProperty BDD_NB_OPTIMISTIC = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddNBOptimistic", Options.nb_optimistic, "nb optimistic");
-    public static final BooleanProperty BDD_LOCAL_SATURATION = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLocalSaturation", Options.local_saturation, "Local saturation");
-    public static final BooleanProperty BDD_TRACE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddTraceOn", Options.trace_on, "Trace on");
-    public static final BooleanProperty BDD_PROFILE_ON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profiling");
-    public static final BooleanProperty BDD_INTERLEAVED_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddInterleavedVariables", Options.interleaved_variables, "Interleaved or seperated variable orders");
-    public static final BooleanProperty BDD_LEVEL_GRAPHS = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddLevelGraphs", Options.show_level_graph, "Shows the fillness of the workset sent to H1");
-    public static final ObjectProperty<String> BDD_LIB_PATH  = new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddLibPath", Options.extraLibPath, "Extra Library path");
-    public static final BooleanProperty BDD_SYNTHESIS_EXTRACT_AUTOMATON = new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddSynthesisExtractAutomaton", false, "Build automaton after BDD synthesis");
+    public static final ObjectProperty<String> BDD_ORDER_ALGO =
+      new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], "Automata ordering algorithm", Options.ORDERING_ALGORITHM_NAMES);
+    public static final IntegerProperty BDD_PARTITION_MAX =
+      new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 10000, "Max partition size");
+    public static final BooleanProperty SYNTHESIS_PEAKBDD =
+      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "peakBDD", false, "Compute and print peak BDD");
+    public static final BooleanProperty BDD_DEBUG_ON =
+      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddDebugOn", Options.debug_on, "Debug on");
+    public static final BooleanProperty BDD_PROFILE_ON =
+      new BooleanProperty(PropertyType.ALGORITHMS_BDD, "bddProfileOn", Options.profile_on, "Profiling");
 
     // ALGORITHMS_HMI
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
