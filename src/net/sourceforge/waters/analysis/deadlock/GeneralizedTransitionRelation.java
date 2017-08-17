@@ -81,10 +81,8 @@ public class GeneralizedTransitionRelation
   private final EventProxy mMarkedEvent;
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
-  private final Collection<TransitionProxy> mTransitionProxyCollection;
-  private final ProductDESProxy mDes;
-
   private final String TAU=":tau";
+  private final int TAU_INDEX=0;
 
   public GeneralizedTransitionRelation(final ProductDESProxy des, final net.sourceforge.waters.model.des.AutomatonProxy aut)
   {
@@ -95,7 +93,6 @@ public class GeneralizedTransitionRelation
   public GeneralizedTransitionRelation(final ProductDESProxy des, final AutomatonProxy aut,
                             Set<EventProxy> eventsall)
   {
-    mDes=des;
     mMarkedEvent = null;    // No need for this ..; to avoid compile errors.
 
     eventsall = new TreeSet<EventProxy>(eventsall);
@@ -113,7 +110,6 @@ public class GeneralizedTransitionRelation
     mStateToInt = new TObjectIntHashMap<StateProxy>();
 
     int numstates = 0;
-    mTransitionProxyCollection = aut.getTransitions();
     mSuccessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
     mPredecessors = new TIntHashSet[aut.getStates().size()][mEvents.length];
     mActiveEvents = new TIntHashSet[aut.getStates().size()];
@@ -1189,7 +1185,7 @@ public class GeneralizedTransitionRelation
 
     final Set<EventProxy> desEvents = des.getEvents();
     for (final EventProxy ep : desEvents) {
-      if (ep.getName().equals(TAU)) {
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
           return ep;
       }
     }
@@ -1257,46 +1253,6 @@ public class GeneralizedTransitionRelation
     }
   }
 
-  // Setters
-  public void replaceSuccessorEventWith(final int succ, final int oldEvent, final int newEvent) {
-    //TODO check if values within the length limit
-    mSuccessors[succ][oldEvent]= mSuccessors[succ][newEvent];
-  }
-
-  public void replacePredecessorEventWith(final int pred, final int oldEvent, final int newEvent) {
-    //TODO check if values within the length limit
-    mPredecessors[pred][oldEvent]= mPredecessors[pred][newEvent];
-  }
-
-  public void replaceActiveEventWith(final int oldEvent, final int newEvent) {
-    //TODO check if values within the length limit
-    mActiveEvents[oldEvent]= mActiveEvents[newEvent];
-  }
-
-  public void removeFromEvents(final int pos) {
-    mEvents[pos]= null;
-  }
-  // Getters
-  public List<StateProxy> getStateProxyList(){
-    return mStateProxyList;
-  }
-
-  public Collection<TransitionProxy> getTransitionProxyCollection(){
-    return mTransitionProxyCollection;
-  }
-
- public void clear(final TIntHashSet[][] array) {
-   for (int i=0; i<array.length; i++) {
-     array[i]=null;
-   }
- }
-
- public void clearAllActive(final TIntHashSet[] array) {
-   for (int i=0; i<array.length; i++) {
-     array[i]=null;
-   }
- }
-
  public TIntHashSet[][] getPredecessorsArr()
  {
    return mPredecessors;
@@ -1322,37 +1278,6 @@ public class GeneralizedTransitionRelation
    return mEventToInt;
  }
 
- public TIntHashSet getFromPredecessors(final int i, final int j)
- {
-   TIntHashSet intset = mPredecessors[i][j];
-   if (intset == null) {
-     intset = new TIntHashSet();
-     mPredecessors[i][j] = intset;
-   }
-   return intset;
- }
-
- public TIntHashSet getFromSuccessors(final int i, final int j)
- {
-   TIntHashSet intset = mSuccessors[i][j];
-   if (intset == null) {
-     intset = new TIntHashSet();
-     mSuccessors[i][j] = intset;
-   }
-   return intset;
-}
-
-
- public TIntHashSet getFromActiveEvents(final int i)
- {
-   TIntHashSet intset = mActiveEvents[i];
-   if (intset == null) {
-     intset = new TIntHashSet();
-     mActiveEvents[i] = intset;
-   }
-   return intset;
- }
-
  public void removePropWithEvent(final int index) {
    final EventProxy event = this.getEvent(index);
    for (final EventProxy ep : mEvents) {
@@ -1361,57 +1286,43 @@ public class GeneralizedTransitionRelation
      if (ep.getKind()==EventKind.PROPOSITION) {
        final String[] tokens = ep.getName().split(":");
        if (Arrays.asList(tokens).contains(event.getName())) {
-         if(tokens.length > 2)
-           replaceProp (tokens, event.getName(), ep);
-        else
          this.removeEvent(this.eventToInt(ep));
        }
      }
    }
-
  }
 
- private void replaceProp(final String[] tokens, final String eventName, final EventProxy ep) {
-     final List<String> copy = new ArrayList<String>();
-   for(int i=1; i< tokens.length; i++) {
-     if(!tokens[i].equals(eventName)) {
-       copy.add(tokens[i]);
-     }
-   }
-   if(getProp(copy)==null) {
-     this.removeEvent(this.eventToInt(ep));
-   }
-   else {
-     mEvents[this.eventToInt(ep)] = getProp(copy);
-   }
- }
 
-  private EventProxy getProp(final List<String> copy)
-  {
-    for (final EventProxy ep : mDes.getEvents()) {
-      if (ep.getKind() == EventKind.PROPOSITION) {
-        final String[] tokens = ep.getName().split(":");
-        if (tokens.length == copy.size() + 1) {
-          boolean match = true;
-          for (int i = 0; i < copy.size(); i++) {
-            if (!Arrays.asList(tokens).contains(copy.get(i))) {
-              match = false;
-            }
+ public void supressTauLoopTrans()
+ {
+    for (int s = 0; s < mSuccessors.length; s++) {
+      final TIntArrayList selfloops = new TIntArrayList();
+      if (!hasPredecessors(s)) {
+        continue;
+      }
+      for (int e = 0; e < mEvents.length; e++) {
+        if (mEvents[e] == null
+            || mEvents[e].getKind() == EventKind.PROPOSITION) {
+          continue;
+        }
+
+        final TIntHashSet succs = mSuccessors[s][e];
+        if (succs == null || succs.isEmpty()) {
+          continue;
+        }
+        if (succs.contains(s)) {
+          if(selfloops.contains(TAU_INDEX)) {
+            // remove tau transition
+            this.removeTransition(s, TAU_INDEX, s);
+            break;
           }
-          if (match) {
-            return ep;
+          else {
+            selfloops.add(e);
           }
         }
       }
     }
-    return null;
-  }
-
-  public void removeEventFromAllAnnotations(final int event) {
-    for (int state=0; state<this.numberOfStates(); state++) {
-      this.removeEventFromAnnotations(event, state);
-    }
-  }
+ }
 
 
   //########################################################################
@@ -1423,7 +1334,7 @@ public class GeneralizedTransitionRelation
    */
   void checkIntegrity()
   {
-    // 1. Every transition in predecessors should also appear in successors
+    // 1. Every transition in successors should also appear in predecessors
     for (int s = 0; s < mSuccessors.length; s++) {
       for (int e = 0; e < mEvents.length; e++) {
         final TIntHashSet succs = getSuccessors(s, e);

@@ -34,15 +34,19 @@
 package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -185,7 +189,8 @@ public class LocalEventHiderTest
     // LocalEventHider should take as argument a list of local events. This
     // cannot in general be a ProductDESProxy, the local events will change
     // during the deadlock check. ~~~Robi
-    hider.run(des);
+    // LocalEventHider has been changed . ~~~Hani
+    hider.run(getEventsToHide(des, tr));
     tr.checkIntegrity();
     // calculate unannotated form
     //final AutomatonProxy expected = findAutomaton(des,AFTER);
@@ -225,6 +230,19 @@ public class LocalEventHiderTest
     }
   }
 
+  private int[] getEventsToHide(final ProductDESProxy des, final GeneralizedTransitionRelation tr)
+  {
+    final Set<EventProxy> events = tr.getEvents();
+    final TIntArrayList localEvents = new TIntArrayList(events.size());
+    for (final EventProxy ep : events) {
+      if (!ep.getName().equals(TAU) && !ep.isObservable()) {
+        final int index = tr.eventToInt(ep);
+        localEvents.add(index);
+      }
+    }
+    return localEvents.toArray();
+  }
+
   //#########################################################################
   //# To be Provided by Subclasses
 
@@ -249,7 +267,7 @@ public class LocalEventHiderTest
 
   //#########################################################################
   //# Class Constants
-  protected static final String TAU = "tau";
+  protected static final String TAU = ":tau";
 
   protected static final String BEFORE = "before";
   protected static final String AFTER = "after";
