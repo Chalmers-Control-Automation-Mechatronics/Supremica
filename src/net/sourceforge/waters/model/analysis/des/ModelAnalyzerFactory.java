@@ -101,15 +101,6 @@ public interface ModelAnalyzerFactory
     (ProductDESProxyFactory factory)
     throws AnalysisConfigurationException;
 
- //************************ Hani ***************************
-  /**
-   * Creates a deadlock checker.
-   */
-  /*public DeadlockChecker createDeadlockChecker
-    (ProductDESProxyFactory factory)
-    throws AnalysisConfigurationException;*/
-
-  //************** The END *************************************
 
   //#########################################################################
   //# Command Line Arguments
@@ -137,5 +128,14 @@ public interface ModelAnalyzerFactory
    * called, the model analyser's input model is available.
    */
   public void postConfigure(ModelAnalyzer analyzer) throws AnalysisException;
+
+
+  //#########################################################################
+  //# Supremica Options
+  /**
+   * Configures a BDD model verifier from Supremica options, if these
+   * are available.
+   */
+  public void configureFromOptions(ModelAnalyzer analyzer);
 
 }

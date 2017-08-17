@@ -9,6 +9,7 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
+import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
@@ -19,7 +20,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
-import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.properties.Config;
 
@@ -71,16 +71,16 @@ public class BDDExtendedManager extends BDDAbstractManager {
     public int maxNbrNodes = 0;
 
     public BDDExtendedManager() {
-        this(BDDLibraryType.fromDescription(Config.BDD2_BDDLIBRARY.getAsString()));
+        this(Config.BDD2_BDDLIBRARY.get());
     }
 
-    public BDDExtendedManager(final BDDLibraryType bddpackage) {
+    public BDDExtendedManager(final BDDPackage bddpackage) {
         this(bddpackage, Config.BDD2_INITIALNODETABLESIZE.get(), Config.BDD2_CACHESIZE.get());
     }
 
-    public BDDExtendedManager(final BDDLibraryType bddpackage, final int nodenum, final int cachesize) {
+    public BDDExtendedManager(final BDDPackage bddpackage, final int nodenum, final int cachesize) {
         if (factory == null) {
-            factory = BDDFactory.init(bddpackage.getLibraryname(), nodenum, cachesize);
+            factory = BDDFactory.init(bddpackage.getBDDPackageName(), nodenum, cachesize);
             factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
             factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
             factory.setCacheRatio(Config.BDD2_CACHERATIO.get());

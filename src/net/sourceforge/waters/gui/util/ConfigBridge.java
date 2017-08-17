@@ -31,53 +31,29 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.bdd;
+package net.sourceforge.waters.gui.util;
+
+
+import net.sourceforge.waters.analysis.bdd.BDDModelVerifier;
+
+import org.supremica.properties.Config;
 
 
 /**
+ * A helper class to access Supremica options from Waters code.
+ * This class contains static methods to configure model analysers,
+ * which can be called through reflection to avoid compile-time dependency
+ * on Supremica licensed code.
+ *
  * @author Robi Malik
  */
 
-public enum BDDPackage
+public class ConfigBridge
 {
-
-  //#########################################################################
-  //# Enumeration
-  BUDDY(true),
-  CUDD(true),
-  //CAL(false),
-  //J(false),
-  JAVA(false);
-  //JDD(false),
-  //TEST(false),
-  //TYPED(false);
-
-
-  //#########################################################################
-  //# Constructor
-  private BDDPackage(final boolean reorder)
+  public static void configureModelAnalyzer(final BDDModelVerifier verifier)
   {
-    mName = toString().toLowerCase();
-    mIsReorderingSupported = reorder;
+    verifier.setBDDPackage(Config.BDD2_BDDLIBRARY.get());
+    verifier.setInitialSize(Config.BDD2_INITIALNODETABLESIZE.get());
+    verifier.setPartitioningSizeLimit(Config.BDD_PARTITION_MAX.get());
   }
-
-
-  //#########################################################################
-  //# Simple Access
-  public String getBDDPackageName()
-  {
-    return mName;
-  }
-
-  public boolean isReorderingSupported()
-  {
-    return mIsReorderingSupported;
-  }
-
-
-  //#########################################################################
-  //# Simple Access
-  private final String mName;
-  private final boolean mIsReorderingSupported;
-
 }

@@ -228,6 +228,14 @@ public abstract class AbstractModelAnalyzerFactory
 
 
   //#########################################################################
+  //# Supremica Options
+  @Override
+  public void configureFromOptions(final ModelAnalyzer analyzer)
+  {
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private AnalysisConfigurationException createUnsupportedOperationException
     (final String opname)

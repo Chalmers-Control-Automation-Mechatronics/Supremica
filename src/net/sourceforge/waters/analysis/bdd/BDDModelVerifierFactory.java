@@ -33,10 +33,15 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -121,6 +126,34 @@ public class BDDModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new BDDStateCounter(factory);
+  }
+
+
+  //#########################################################################
+  //# Supremica Options
+  /**
+   * Configures a BDD model verifier from Supremica options, if these
+   * are available. This method uses reflection to avoid compile-time
+   * dependency on Supremica licensed code.
+   */
+  @Override
+  public void configureFromOptions(final ModelAnalyzer analyzer)
+  {
+    if (analyzer instanceof BDDModelVerifier) {
+      final ClassLoader loader = getClass().getClassLoader();
+      try {
+        final Class<?> clazz = loader.loadClass(CONFIG_BRIDGE);
+        final Method method =
+          clazz.getMethod("configureModelAnalyzer", BDDModelVerifier.class);
+        method.invoke(null, analyzer);
+      } catch (final ClassNotFoundException exception) {
+        // Can't access Config --- use default settings
+      } catch (NoSuchMethodException |
+        InvocationTargetException |
+        IllegalAccessException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
   }
 
 
@@ -274,5 +307,11 @@ public class BDDModelVerifierFactory
       bddVerifier.setPartitioningSizeLimit(limit);
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String CONFIG_BRIDGE =
+    "net.sourceforge.waters.gui.util.ConfigBridge";
 
 }

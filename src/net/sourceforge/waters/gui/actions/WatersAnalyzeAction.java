@@ -163,10 +163,12 @@ public abstract class WatersAnalyzeAction
   ModelVerifier getModelVerifier()
   {
     try {
-      final ProductDESProxyFactory desfactory =
+      final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
-      final ModelAnalyzerFactory vfactory = getModelVerifierFactory();
-      return getModelVerifier(vfactory, desfactory);
+      final ModelAnalyzerFactory vFactory = getModelVerifierFactory();
+      final ModelVerifier verifier = getModelVerifier(vFactory, desFactory);
+      vFactory.configureFromOptions(verifier);
+      return verifier;
     } catch (final NoClassDefFoundError |
                    ClassNotFoundException |
                    UnsupportedOperationException |

@@ -59,9 +59,9 @@ package org.supremica.properties;
 
 import java.awt.Color;
 
+import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
-import org.supremica.automata.BDD.BDDLibraryType;
 import org.supremica.automata.BDD.BDDPartitioningType;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
@@ -341,8 +341,9 @@ public final class Config
     // ALGORITHMS_BDD
     // New BDD implementation using JavaBDD library
     // -- the following where formerly under algorithms.bdd2
-    public static final ObjectProperty<BDDLibraryType> BDD2_BDDLIBRARY =
-      new ObjectProperty<BDDLibraryType>(PropertyType.ALGORITHMS_BDD, "libraryName", BDDLibraryType.JAVA, "Binary Decision Diagram Library", BDDLibraryType.values());
+    public static final ObjectProperty<BDDPackage> BDD2_BDDLIBRARY =
+      new ObjectProperty<BDDPackage>(PropertyType.ALGORITHMS_BDD, "libraryName",
+        BDDPackage.JAVA, "BDD Library", BDDPackage.values());
     public static final IntegerProperty BDD2_INITIALNODETABLESIZE =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "initialNodeTableSize", 1000000, "Initial node table size");
     public static final IntegerProperty BDD2_CACHESIZE =
