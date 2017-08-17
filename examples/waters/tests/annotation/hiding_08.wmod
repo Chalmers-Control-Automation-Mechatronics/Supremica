@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="hiding_08" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A test for hiding of a selfloop in a generalised transition relation where there is no other event on the selfloop transiton.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
@@ -27,7 +28,6 @@
                     <SimpleNode Initial="true" Name="S0">
                         <EventList>
                             <SimpleIdentifier Name="ann:a"/>
-                            <SimpleIdentifier Name="ann:b"/>
                         </EventList>
                         <PointGeometry>
                             <Point X="208" Y="64"/>
@@ -60,7 +60,6 @@
                     <Edge Source="S0" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
-                            <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="16" Y="-6"/>
                             </LabelGeometry>
@@ -76,9 +75,6 @@
             <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
-                        <EventList>
-                            <SimpleIdentifier Name="ann:b"/>
-                        </EventList>
                         <PointGeometry>
                             <Point X="208" Y="64"/>
                         </PointGeometry>
@@ -103,17 +99,6 @@
                         <LabelBlock>
                             <SimpleIdentifier Name=":tau"/>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="S0" Target="S0">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="16" Y="-6"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="257" Y="38"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

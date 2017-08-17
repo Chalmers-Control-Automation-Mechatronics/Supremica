@@ -173,6 +173,13 @@ public class LocalEventHiderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_hiding_10() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_10.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -182,22 +189,18 @@ public class LocalEventHiderTest
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
+    final GeneralizedTransitionRelation tr =
+      new GeneralizedTransitionRelation(des, before);
     tr.annotateWithProps();
     tr.checkIntegrity();
     final LocalEventHider hider = new LocalEventHider(tr);
-    // LocalEventHider should take as argument a list of local events. This
-    // cannot in general be a ProductDESProxy, the local events will change
-    // during the deadlock check. ~~~Robi
-    // LocalEventHider has been changed . ~~~Hani
     hider.run(getEventsToHide(des, tr));
     tr.checkIntegrity();
     // calculate unannotated form
-    //final AutomatonProxy expected = findAutomaton(des,AFTER);
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
+    final AutomatonProxy unannotated =
+      tr.unannotate(des, getProductDESProxyFactory());
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
-
   }
 
 
@@ -214,7 +217,7 @@ public class LocalEventHiderTest
     } else {
       final String name = des.getName();
       final String basename = appendSuffixes(name, mBindings);
-      final String comment = "Test output after annotation and unannotation";
+      final String comment = "Test output from LocalEventHider";
 //      final String comment =
 //        "Test output from " +
 //        ProxyTools.getShortClassName(mSimplifier) + '.';
@@ -243,6 +246,7 @@ public class LocalEventHiderTest
     return localEvents.toArray();
   }
 
+
   //#########################################################################
   //# To be Provided by Subclasses
 
@@ -264,6 +268,7 @@ public class LocalEventHiderTest
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
+
 
   //#########################################################################
   //# Class Constants
