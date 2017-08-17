@@ -171,7 +171,7 @@ public class AnnotatorTest
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
+    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(before, null);
     tr.annotateWithActiveEvents();
     tr.checkIntegrity();
     // calculate unannotated form

@@ -45,6 +45,7 @@ import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -190,7 +191,7 @@ public class LocalEventHiderTest
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
     final GeneralizedTransitionRelation tr =
-      new GeneralizedTransitionRelation(des, before);
+      new GeneralizedTransitionRelation(before, getTau(des));
     tr.annotateWithProps();
     tr.checkIntegrity();
     final LocalEventHider hider = new LocalEventHider(tr);
@@ -246,6 +247,16 @@ public class LocalEventHiderTest
     return localEvents.toArray();
   }
 
+  public EventProxy getTau(final ProductDESProxy des) {
+
+    final Set<EventProxy> desEvents = des.getEvents();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
+          return ep;
+      }
+    }
+    return null;
+  }
 
   //#########################################################################
   //# To be Provided by Subclasses

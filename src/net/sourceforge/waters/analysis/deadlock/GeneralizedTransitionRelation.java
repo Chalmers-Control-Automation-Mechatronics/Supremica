@@ -81,16 +81,16 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final String TAU=":tau";
-  private final int TAU_INDEX=0;
+ // private final int TAU_INDEX=0;
 
-  public GeneralizedTransitionRelation(final ProductDESProxy des, final net.sourceforge.waters.model.des.AutomatonProxy aut)
+  public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
   {
-    this(des,aut, aut.getEvents());
+    this(aut, aut.getEvents(), tau);
   }
 
   @SuppressWarnings("unchecked")
-  public GeneralizedTransitionRelation(final ProductDESProxy des, final AutomatonProxy aut,
-                            Set<EventProxy> eventsall)
+  public GeneralizedTransitionRelation(final AutomatonProxy aut,
+                            Set<EventProxy> eventsall, final EventProxy tau)
   {
     mMarkedEvent = null;    // No need for this ..; to avoid compile errors.
 
@@ -99,7 +99,7 @@ public class GeneralizedTransitionRelation
     final Set<EventProxy> allselflooped = new THashSet<EventProxy>(eventsall);
     allselflooped.removeAll(aut.getEvents());
     mName = aut.getName();
-    mEvents= shiftAutEvents(eventsall, des); // adds tau event in first pos.
+    mEvents= shiftAutEvents(eventsall, tau); // adds tau event in first pos.
     final TObjectIntHashMap<EventProxy> eventToInt =
         new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
@@ -1197,11 +1197,11 @@ public class GeneralizedTransitionRelation
 
 
   public EventProxy[] shiftAutEvents(final Set<EventProxy> eventSet,
-                                     final ProductDESProxy des)
+                                     final EventProxy tau)
   {
     final List<EventProxy> eventslist = new ArrayList<EventProxy>();
-    if(getTau(des) != null)
-      eventslist.add(getTau(des));
+    if(tau != null)
+      eventslist.add(tau);
     for (final EventProxy ep : eventSet) {
       if (!isTau(ep) && !ep.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         //eventsArr[pos] = ep;
@@ -1292,7 +1292,7 @@ public class GeneralizedTransitionRelation
  }
 
 
- public void supressTauLoopTrans()
+/* public void supressTauLoopTrans()
  {
     for (int s = 0; s < mSuccessors.length; s++) {
       final TIntArrayList selfloops = new TIntArrayList();
@@ -1321,7 +1321,7 @@ public class GeneralizedTransitionRelation
         }
       }
     }
- }
+ }*/
 
 
   //########################################################################

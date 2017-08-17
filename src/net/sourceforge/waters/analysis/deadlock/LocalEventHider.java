@@ -63,11 +63,13 @@ public class LocalEventHider
         succs =  mTransitionRelation.getFromArray(s, TAU_INDEX, mTransitionRelation.getSuccessorsArr());
         for (int ti = 0; ti < array.length; ti++) {
           final int t = array[ti];
+          if(t != s) {
           succs.add(t);
           TIntHashSet preds = mTransitionRelation.getFromArray(t, events[e], mTransitionRelation.getPredecessorsArr());
           preds.clear();
           preds =  mTransitionRelation.getFromArray(t, TAU_INDEX, mTransitionRelation.getPredecessorsArr());
           preds.add(s);
+          }
         }
 
       }
@@ -81,7 +83,7 @@ public class LocalEventHider
     }
 
     // suppress tau loop ..
-    mTransitionRelation.supressTauLoopTrans();
+    //mTransitionRelation.supressTauLoopTrans();
 
   }
 
