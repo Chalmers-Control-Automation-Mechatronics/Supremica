@@ -6,7 +6,7 @@
  * As of August 2017, there is also teh option to have the forbidden states
  * expressed by uc self-loops (see also org.supremica.automata.algorithms.Forbidder.java)
  *
- * Note: This code depends on stuff from ExtCatMouse.java, which in turn relies 
+ * Note: This code depends on stuff from ExtCatMouse.java, which in turn relies
  * on this code. THat is why some class components are protected instead of private.
  * Such cross-dependency is a big mess and should of course not exist! // MF
  */
@@ -21,11 +21,11 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
+import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
 import org.supremica.automata.algorithms.Forbidder;
-import org.supremica.automata.ForbiddenEvent;
 
 /**
  *
@@ -193,7 +193,7 @@ class Cat
                 final Iterator<State> iter_state = treeset.descendingIterator();
                 while(iter_state.hasNext())
                 {
-                    thisState = (State)iter_state.next();
+                    thisState = iter_state.next();
                     final String state_name = thisState.getName();
                     level_index = Integer.parseInt(state_name.substring(1,state_name.indexOf("_")));
                     room_index = Integer.parseInt(state_name.substring(state_name.indexOf(CAT_ID)+1));
@@ -424,7 +424,7 @@ class Mouse
                 final Iterator<State> iter_state = treeset.descendingIterator();
                 while(iter_state.hasNext())
                 {
-                    thisState = (State)iter_state.next();
+                    thisState = iter_state.next();
                     final String state_name = thisState.getName();
                     level_index = Integer.parseInt(state_name.substring(1,state_name.indexOf("_")));
                     room_index = Integer.parseInt(state_name.substring(state_name.indexOf(MOUSE_ID)+1));
@@ -946,7 +946,7 @@ public class CatMouse
     private final Project project = new Project("Cat & Mouse");
     final static int NUMBER_OF_ROOMS = 5;
 	private final static String X_SPEC_NAME = "x:SpecC&M";
-		
+
     // These are helpers for counting modulo num philos/forks
     // Note that we adjust for 0's, indices are from 1 to modulo
 
@@ -955,7 +955,7 @@ public class CatMouse
 	{
 		this(num, false); // Build the model with the Room specs (instead of self-looped forbidden states)
 	}
-	
+
 	public CatMouse(final int num, final boolean use_selfloops)
 		throws Exception
 	{
@@ -964,22 +964,22 @@ public class CatMouse
 			"Since this is a static specification, this can also be expressed 'globally' " +
 			"as a set of forbidden states in the composed plant model. " +
 			"This is done in a 'modular' way when the 'Use self-loops' option is checked.");
-		
+
 		final Automaton cats[] = new Automaton[num]; // These are really only needed when we use forbidden self-loops
 		final Automaton mice[] = new Automaton[num];
-		
+
         final Cat cat_builder = new Cat();
         final Mouse mouse_builder = new Mouse();
-		
+
         for (int i = 0; i < num; ++i)
 		{
 			cats[i] = cat_builder.build(i);
 			mice[i] = mouse_builder.build(i);
-			
+
             project.addAutomaton(cats[i]);
             project.addAutomaton(mice[i]);
         }
-		
+
 		// The Room specs are only neede when not using self-loops to express forbidden states
 		if(!use_selfloops)
 		{
@@ -994,7 +994,7 @@ public class CatMouse
 			// Generate uniquely-named uc-events
 			// Add selfloops on the correct combinations
 			// Generate the forbidden state x_spec.
-			
+
 			// Generate the single state x_spec, and below add the events to it as a blocked event
 			final Automaton x_spec = new Automaton(X_SPEC_NAME);
 			x_spec.setType(AutomatonType.SPECIFICATION);
@@ -1002,9 +1002,9 @@ public class CatMouse
 			init_state.setInitial(true);
 			init_state.setAccepting(true);
 			x_spec.addState(init_state);
-						
+
 			final Alphabet x_alpha = x_spec.getAlphabet();	// Holds the x-events
-			
+
 			// Note that the states need to be pair-wise forbidden, for each cat it cannot be allowed in the same room as any mouse
 			for(int c = 0; c < cats.length; c++)
 			{
@@ -1014,13 +1014,13 @@ public class CatMouse
 					{
 						final Automaton cat = cats[c];
 						final Automaton mouse = mice[m];
-						
+
 						// Find in each component the states that should have forbidden self-loops
 						final String m_room = "m" + r;
 						final String c_room = "c" + r;
 						final State m_state = mouse.getStateWithName(m_room);
 						final State c_state = cat.getStateWithName(c_room);
-						
+
 						// Create and add the forbidden events - needs to be done before adding the self-loops
 						final StringBuffer x_event_label = new StringBuffer(Forbidder.FORBIDDEN_EVENT_PREFIX);
 						x_event_label.append('c').append(c).append('m').append(m).append('r').append(r);
@@ -1028,13 +1028,13 @@ public class CatMouse
 						x_event.setControllable(false);
 						cat.getAlphabet().addEvent(x_event);
 						mouse.getAlphabet().addEvent(x_event);
-						
+
 						// Create and add the self-loops
 						final Arc m_arc = new Arc(m_state, m_state, x_event);
 						final Arc c_arc = new Arc(c_state, c_state, x_event);
 						mouse.addArc(m_arc);
 						cat.addArc(c_arc);
-						
+
 						// Add the event to the x_spec as a blocked event (meaning, no arcs)
 						x_alpha.addEvent(x_event);
 					}
@@ -1043,14 +1043,14 @@ public class CatMouse
 			project.addAutomaton(x_spec);
 		}
     }
-	
+
 	public Project getProject()
     {
         return project;
     }
-	
+
 	// For debugging only
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		try
 		{
@@ -1062,8 +1062,9 @@ public class CatMouse
 			excp.printStackTrace();
 		}
 	}
-	
-	private static void testCatMouse()
+
+	@SuppressWarnings("unused")
+    private static void testCatMouse()
 		throws Exception
 	{
 		final CatMouse cm = new CatMouse(1, true);
@@ -1072,70 +1073,71 @@ public class CatMouse
 		{
 			final Automaton aut = cm.project.getAutomatonAt(i);
 			System.out.println(aut.toDebugString());
-		}		
+		}
 	}
-	
+
 	// This part tests the static function forbidStates() of org.supremica.automata.algorithms.Forbidder
 	// Here the simple case of only a single cat and a single mouse...
 	private static void testForbidderForbidStates()
 		throws Exception
 	{
-		final Automaton animals[] = new Automaton[2];	
+		final Automaton animals[] = new Automaton[2];
 		final Automaton cat = new Cat().build(1);
 		final Automaton mouse = new Mouse().build(1);
 		animals[0] = cat;
 		animals[1] = mouse;
 
-		State[][] stateset = new State[NUMBER_OF_ROOMS][animals.length];
+		final State[][] stateset = new State[NUMBER_OF_ROOMS][animals.length];
 
 		for(int r = 0; r < NUMBER_OF_ROOMS; r++)
 		{
 			// Find in each component the states that should have forbidden self-loops
 			final String c_room = "c" + r;
 			final String m_room = "m" + r;
-			final State c_state = cat.getStateWithName(c_room);	
+			final State c_state = cat.getStateWithName(c_room);
 			final State m_state = mouse.getStateWithName(m_room);
 
 			stateset[r][0] = c_state;
 			stateset[r][1] = m_state;
 		}
-	
+
 		final Automaton x_spec = Forbidder.forbidStates(animals, stateset, Forbidder.FORBIDDEN_EVENT_PREFIX, true);
-		
+
 		System.out.println(cat.toDebugString());
 		System.out.println(mouse.toDebugString());
 		System.out.println(x_spec.toDebugString());
 	}
-	
+
 	// Here the more complex case of num number of cats and mice
-	private static void testForbidderForbidStates(final int num)
+	@SuppressWarnings("unused")
+    private static void testForbidderForbidStates(final int num)
 		throws Exception
 	{
 		assert num >= 1 : "Can only handle positive number of cats and mice";
-		
+
 		final int NUM_CATS = num;
 		final int NUM_MICE = num;
 		final int NUM_ANIMALS = NUM_CATS + NUM_MICE;
 		final Automaton animals[] = new Automaton[NUM_ANIMALS];	// First half of this array holds the cats, second half the mice
-		
-		State[][] stateset = new State[NUMBER_OF_ROOMS * NUM_CATS * NUM_MICE][NUM_ANIMALS];
-		
+
+		final State[][] stateset = new State[NUMBER_OF_ROOMS * NUM_CATS * NUM_MICE][NUM_ANIMALS];
+
 		for(int c = 0; c < NUM_CATS; c++)
 		{
 			final Automaton cat = new Cat().build(c);
 			animals[c] = cat;
-				
+
 			for(int m = 0; m < NUM_MICE; m++)
 			{
 				final Automaton mouse = new Mouse().build(m);
 				animals[NUM_CATS + m] = mouse;
-				
+
 				for(int r = 0; r < NUMBER_OF_ROOMS; r++)
 				{
 					// Find in each component the states that should have forbidden self-loops
 					final String c_room = "c" + r;
 					final String m_room = "m" + r;
-					final State c_state = cat.getStateWithName(c_room);	
+					final State c_state = cat.getStateWithName(c_room);
 					final State m_state = mouse.getStateWithName(m_room);
 
 					// This is not fully worked out yet, but at least it compiles :-)
@@ -1143,8 +1145,8 @@ public class CatMouse
 					// stateset[zzz][vvv] = m_state;
 				}
 			}
-			
-		}		
+
+		}
 	}
 }
 
