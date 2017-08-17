@@ -298,7 +298,6 @@ public class VerificationDialog implements ActionListener
         addSelectable(VerificationAlgorithm.MODULAR);
         addSelectable(VerificationAlgorithm.COMPOSITIONAL);
         addSelectable(VerificationAlgorithm.COMBINED);
-        addSelectable(VerificationAlgorithm.BDD);
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.isTrue()
             && vtype == VerificationType.CONTROLLABILITY) {
           addSelectable(VerificationAlgorithm.SAT);
@@ -309,7 +308,6 @@ public class VerificationDialog implements ActionListener
         addSelectable(VerificationAlgorithm.MONOLITHICBDD);
         addSelectable(VerificationAlgorithm.COMPOSITIONAL);
         addSelectable(VerificationAlgorithm.COMBINED);
-        addSelectable(VerificationAlgorithm.BDD);
         break;
       case CONTROLLABILITYNONBLOCKING:
         addSelectable(VerificationAlgorithm.COMPOSITIONAL);

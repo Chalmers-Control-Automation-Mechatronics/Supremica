@@ -647,11 +647,11 @@ class ExtPhilosPanel
         {
             final SynthesizerDialog synthesizerDialog = new SynthesizerDialog(ide.getFrame(), 2*number_of_phils, synthesizerOptions);
             synthesizerDialog.setVisible(true);
-        }
-        else
-        {
-            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
-            synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
+        } else {
+            synthesizerOptions.setSynthesisType
+              (SynthesisType.NONBLOCKING_CONTROLLABLE);
+            synthesizerOptions.setSynthesisAlgorithm
+              (SynthesisAlgorithm.MONOLITHIC_WATERS);
             synthesizerOptions.setPurge(true);
             synthesizerOptions.setMaximallyPermissive(true);
             synthesizerOptions.setMaximallyPermissiveIncremental(true);
@@ -720,33 +720,17 @@ class ExtPhilosPanel
             }
             else
             {
-                synthesizer = new AutomataSynthesizer(dp.getAutomata(), SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
-
-                if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
-                {
-                    synthesizer.execute();
-
-                    final BigDecimal time = synthesizer.getTimeSeconds();
-                    result_text += " "+time+"\t";
-                    result_text += " \t";
-
-                    final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
-                    result_text +=" "+nbrOfStates+"\t";
-
-                    final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
-                    result_text +=" "+nbrOfNodes;
-                }
-                else
-                {
-                    final Automaton supervisor = synthesizer.execute().getFirstAutomaton();
-
-                    final BigDecimal time = synthesizer.getTimeSeconds();
-                    result_text += " "+time+"\t";
-                    result_text += " \t";
-
-                    final int nbrOfStates = supervisor.getStateSet().size();
-                    result_text +=" "+nbrOfStates;
-                }
+              synthesizer =
+                new AutomataSynthesizer(dp.getAutomata(),
+                                        SynchronizationOptions.getDefaultSynthesisOptions(),
+                                        synthesizerOptions);
+              final Automaton supervisor =
+                synthesizer.execute().getFirstAutomaton();
+              final BigDecimal time = synthesizer.getTimeSeconds();
+              result_text += " " + time + "\t";
+              result_text += " \t";
+              final int nbrOfStates = supervisor.getStateSet().size();
+              result_text += " " + nbrOfStates;
             }
 
             System.err.println("Finished. ");
@@ -963,9 +947,10 @@ class ExtCatMousePanel
         }
         else
         {
-            //Default is BDD
-            synthesizerOptions.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
-            synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
+            synthesizerOptions.setSynthesisType
+              (SynthesisType.NONBLOCKING_CONTROLLABLE);
+            synthesizerOptions.setSynthesisAlgorithm
+              (SynthesisAlgorithm.MONOLITHIC_WATERS);
             synthesizerOptions.setPurge(true);
             synthesizerOptions.setMaximallyPermissive(true);
             synthesizerOptions.setMaximallyPermissiveIncremental(true);
@@ -1039,33 +1024,17 @@ class ExtCatMousePanel
             }
             else
             {
-                synthesizer = new AutomataSynthesizer(ecm.getAutomata(), SynchronizationOptions.getDefaultSynthesisOptions(), synthesizerOptions);
-
-                if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
-                {
-                    synthesizer.execute();
-
-                    final BigDecimal time = synthesizer.getTimeSeconds();
-                    result_text += " "+time+"\t";
-                    result_text += " \t";
-
-                    final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
-                    result_text +=" "+nbrOfStates+"\t";
-
-                    final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
-                    result_text +=" "+nbrOfNodes;
-                }
-                else
-                {
-                    final Automaton supervisor = synthesizer.execute().getFirstAutomaton();
-
-                    final BigDecimal time = synthesizer.getTimeSeconds();
-                    result_text += " "+time+"\t";
-                    result_text += " \t";
-
-                    final int nbrOfStates = supervisor.getStateSet().size();
-                    result_text +=" "+nbrOfStates;
-                }
+                synthesizer =
+                  new AutomataSynthesizer(ecm.getAutomata(),
+                                          SynchronizationOptions.getDefaultSynthesisOptions(),
+                                          synthesizerOptions);
+                final Automaton supervisor =
+                  synthesizer.execute().getFirstAutomaton();
+                final BigDecimal time = synthesizer.getTimeSeconds();
+                result_text += " "+time+"\t";
+                result_text += " \t";
+                final int nbrOfStates = supervisor.getStateSet().size();
+                result_text +=" "+nbrOfStates;
             }
 
             System.err.println("Finished. ");

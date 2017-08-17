@@ -88,15 +88,12 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.gui.ActionMan;
 import org.supremica.gui.AutomataVerificationWorker;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.SupremicaException;
-import org.supremica.util.BDD.Options;
 
 
 /**
@@ -271,10 +268,6 @@ public class AutomataVerifier
           {
             return compositionalControllabilityVerification();
           }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-          {
-            return BDDControllabilityVerification(theAutomata);
-          }
           else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.SAT)
           {
             return true; // Alexey add a call to your code here
@@ -307,10 +300,6 @@ public class AutomataVerifier
           else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
           {
             return monolithicBDDNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-          {
-            return BDDNonblockingVerification();
           }
           else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
               verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
@@ -1262,132 +1251,6 @@ public class AutomataVerifier
     }
 
     /**
-     * Answers YES/NO to the language inclusion problem
-     *
-     * @see org.supremica.util.BDD.BDDAutomata
-     * @see AutomataBDDVerifier
-     */
-    @SuppressWarnings("unused")
-	private boolean BDDLanguageInclusionVerification()
-    	throws Exception
-    {
-        final Automata unselected = ActionMan.getGui().getUnselectedAutomata();
-
-        // we already know the answer: L(P) = \Sigma^*
-        if (unselected.size() < 1)
-        {
-            return true;
-        }
-
-        final Automata selected = new Automata(theAutomata, true);    /* <-- MUST BE SHALLOW COPY ... */
-
-        selected.removeAutomata(unselected);    /* .. OR THIS REMOVE WONT WORK !!! */
-
-        boolean ret = false;
-        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
-
-        switch (Options.inclusion_algorithm)
-        {
-
-            case Options.INCLUSION_ALGO_MONOLITHIC :
-                final AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected);
-
-                ret = abf.passLanguageInclusion();
-
-                abf.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_MODULAR :
-                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected);
-
-                ret = mli.passLanguageInclusion();
-
-                mli.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_INCREMENTAL :
-                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected);
-
-                ret = ili.passLanguageInclusion();
-
-                ili.cleanup();
-                break;
-
-            default :
-                throw new SupremicaException("Unknown BDD/language containment algorithm!");
-        }
-
-        if (Options.profile_on)
-        {
-            timer.report("total execution time", true);
-        }
-
-        Options.out.flush();
-
-        return ret;
-    }
-
-    /**
-     * Answers YES/NO to the controllability problem
-     *
-     * @return  true if the system is controllable
-     * @see org.supremica.util.BDD.BDDAutomata
-     * @see AutomataBDDVerifier
-     */
-    private boolean BDDControllabilityVerification(final Automata theAutomata)
-    throws Exception
-    {
-        boolean ret;
-
-        // why compute when we already know the answer: L(P) = \Sigma^*  ?
-        if (theAutomata.hasNoPlants())
-        {
-            return true;
-        }
-
-        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
-
-        switch (Options.inclusion_algorithm)
-        {
-            case Options.INCLUSION_ALGO_MONOLITHIC :
-                final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
-
-                ret = abf.isControllable();
-
-                abf.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_MODULAR :
-                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata);
-
-                ret = mli.isControllable();
-
-                mli.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_INCREMENTAL :
-                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata);
-
-                ret = ili.isControllable();
-
-                ili.cleanup();
-                break;
-
-            default :
-                throw new SupremicaException("Unknown BDD/language containment algorithm!");
-        }
-
-        if (Options.profile_on)
-        {
-            timer.report("total execution time", true);
-        }
-
-        Options.out.flush();
-
-        return ret;
-    }
-
-    /**
      * Answers YES/NO to the NONBLOCKING problem
      *
      *@return  true if the system is nonblocking
@@ -1402,29 +1265,6 @@ public class AutomataVerifier
         logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
         bddVerifier.done();
         return isNonblocking;
-    }
-
-    /**
-     * Answers YES/NO to the NONBLOCKING problem
-     *
-     *@return  true if the system is nonblocking
-     *@see org.supremica.util.BDD.BDDAutomata
-     *@see AutomataBDDVerifier
-     */
-    private boolean BDDNonblockingVerification()
-    throws Exception
-    {
-
-        // timer.start();
-        final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
-        final boolean ret = abf.isNonblocking();
-
-        abf.cleanup();
-
-        // timer.stop();
-        Options.out.flush();
-
-        return ret;
     }
 
     /**

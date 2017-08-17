@@ -33,56 +33,59 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
-import java.util.Set;
-
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 
 public class LocalEventHider
 {
   private final GeneralizedTransitionRelation mTransitionRelation;
-  private final int TAU=0;
+  private final int TAU_INDEX = 0;
 
   public LocalEventHider(final GeneralizedTransitionRelation transitionrelation)
   {
     mTransitionRelation = transitionrelation;
   }
 
-  public void run(final ProductDESProxy des)
+  public void run(final int[] events)
   {
-    for(int s=0; s< mTransitionRelation.numberOfStates(); s++) {
+    //final int[] events = getEventsToHide(des);
+    for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      for (int e = 0; e < events.length; e++) {
+//        TIntHashSet succs = mTransitionRelation.getSuccessors(s, events[e]);
+        TIntHashSet succs = mTransitionRelation.getFromArray(s, events[e], mTransitionRelation.getSuccessorsArr());
 
-      for (final EventProxy ep : getEventsToHide(des)) {
-        final int epIndex = mTransitionRelation.getEventInt(ep);
-        final TIntHashSet succs = mTransitionRelation.getSuccessors(s, epIndex);
-        if(succs ==null) {
-          return;
+        if (succs == null) {
+          continue;
         }
-        mTransitionRelation.setSuccessors(s, epIndex, TAU);
+
+        final int[] array = succs.toArray();
+        succs.clear();
+        succs =  mTransitionRelation.getFromArray(s, TAU_INDEX, mTransitionRelation.getSuccessorsArr());
+        for (int ti = 0; ti < array.length; ti++) {
+          final int t = array[ti];
+          succs.add(t);
+          TIntHashSet preds = mTransitionRelation.getFromArray(t, events[e], mTransitionRelation.getPredecessorsArr());
+          preds.clear();
+          preds =  mTransitionRelation.getFromArray(t, TAU_INDEX, mTransitionRelation.getPredecessorsArr());
+          preds.add(s);
+        }
+
       }
     }
-  }
 
+    // remove all annotaions
+    for(int i=0; i<events.length; i++) {
+      mTransitionRelation.removeAllAnnotations(events[i]);
+      mTransitionRelation.removePropWithEvent(events[i]);
+      mTransitionRelation.removeEvent(events[i]);
+    }
+
+    // suppress tau loop ..
+    mTransitionRelation.supressTauLoopTrans();
+
+  }
 
   //#########################################################################
   //# Auxiliary Methods
-
-  private Set<EventProxy> getEventsToHide(final ProductDESProxy des) {
-    final Set<EventProxy> events = mTransitionRelation.getEvents();
-    final Set<EventProxy> localEvents = new THashSet<EventProxy>();
-
-    for (final EventProxy ep : events) {
-      // we need not equal to tau and not observable ? instead !
-      if (ep.getKind() == EventKind.CONTROLLABLE && !ep.isObservable()) {
-        localEvents.add(ep);
-      }
-    }
-    return localEvents;
-  }
 
 }

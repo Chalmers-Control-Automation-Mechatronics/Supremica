@@ -73,14 +73,14 @@ public enum PropertyType
     ALGORITHMS_SYNTHESIS,
     ALGORITHMS_MINIMIZATION,
     ALGORITHMS_BDD,
-    ALGORITHMS_BDD2,    
     ALGORITHMS_HMI,
     MISC;
-    
+
     /**
      * Override of toString-method, transforms identifier into lowercase and uses
      * "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
      */
+    @Override
     public String toString()
     {
         return super.toString().toLowerCase().replace('_','.');
