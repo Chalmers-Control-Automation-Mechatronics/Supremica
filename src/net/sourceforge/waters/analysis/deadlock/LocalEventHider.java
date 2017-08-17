@@ -75,7 +75,7 @@ public class LocalEventHider
       }
     }
 
-    // remove all annotaions
+    // remove all annotations
     for(int i=0; i<events.length; i++) {
       mTransitionRelation.removeAllAnnotations(events[i]);
       mTransitionRelation.removePropWithEvent(events[i]);
