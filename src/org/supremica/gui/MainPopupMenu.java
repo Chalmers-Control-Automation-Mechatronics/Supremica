@@ -475,39 +475,6 @@ class MainPopupMenu
                     ActionMan.evoCompPredictSize();
                 }
             });
-
-            // BDD crap, sorry for the compressed lines... /Arash
-            JMenuItem miR, miCR;
-
-            expMenu.addSeparator();
-            expMenu.add(miR = new JMenuItem("BDD/Reachability"));
-            miR.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.DoBDDReachability();
-                }
-            });
-            expMenu.add(miCR = new JMenuItem("BDD/CoReachability"));
-            miCR.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.DoBDDCoReachability();
-                }
-            });
-                        /*
-                        expMenu.add(miXXX = new JMenuItem("BDD/UnderConstructionAlgo"));
-                        miXXX.addActionListener(new ActionListener()
-                                {
-                                        public void actionPerformed(ActionEvent e)
-                                        {
-                                                ActionMan.DoBDDUnderConstruction();
-                                        }
-                        });
-                         */
             expMenu.addSeparator();
         }
 

@@ -280,7 +280,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 		} else {
 			synthesizerOptions
 					.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
-			synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
+			synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.MONOLITHIC_WATERS);
 			synthesizerOptions.setPurge(true);
 			synthesizerOptions.setMaximallyPermissive(true);
 			synthesizerOptions.setMaximallyPermissiveIncremental(true);
@@ -356,33 +356,17 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 				final Automaton supervisor = asw.getSupervisor();
 				result_text += " " + supervisor.nbrOfStates();
 			} else {
-				synthesizer = new AutomataSynthesizer(dp.getAutomata(),
-						SynchronizationOptions.getDefaultSynthesisOptions(),
-						synthesizerOptions);
-
-				if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) {
-					synthesizer.execute();
-
-					final BigDecimal time = synthesizer.getTimeSeconds();
-					result_text += " " + time + "\t";
-					result_text += " \t";
-
-					final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
-					result_text += " " + nbrOfStates + "\t";
-
-					final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
-					result_text += " " + nbrOfNodes;
-				} else {
-					final Automaton supervisor = synthesizer.execute()
-							.getFirstAutomaton();
-
-					final BigDecimal time = synthesizer.getTimeSeconds();
-					result_text += " " + time + "\t";
-					result_text += " \t";
-
-					final int nbrOfStates = supervisor.getStateSet().size();
-					result_text += " " + nbrOfStates;
-				}
+			  synthesizer =
+			    new AutomataSynthesizer(dp.getAutomata(),
+			                            SynchronizationOptions.getDefaultSynthesisOptions(),
+			                            synthesizerOptions);
+			  final Automaton supervisor =
+			    synthesizer.execute().getFirstAutomaton();
+			  final BigDecimal time = synthesizer.getTimeSeconds();
+			  result_text += " " + time + "\t";
+			  result_text += " \t";
+			  final int nbrOfStates = supervisor.getStateSet().size();
+			  result_text += " " + nbrOfStates;
 			}
 
 			System.err.println("Finished. ");

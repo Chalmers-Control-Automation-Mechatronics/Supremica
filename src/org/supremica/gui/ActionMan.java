@@ -3569,21 +3569,6 @@ public class ActionMan
     ///////////////
 
     // BDD developer stuff: these are disabled if org.supremica.util.BDD.Options.dev_mode == false
-    public static void DoBDDReachability()
-    {
-        org.supremica.util.BDD.test.DeveloperTest.DoReachability(gui.getSelectedAutomata());
-    }
-
-    public static void DoBDDCoReachability()
-    {
-        org.supremica.util.BDD.test.DeveloperTest.DoCoReachability(gui.getSelectedAutomata());
-    }
-
-    public static void DoBDDUnderConstruction()
-    {
-        org.supremica.util.BDD.test.DeveloperTest.DoUnderConstruction(gui.getSelectedAutomata());
-    }
-
     /**
      * Mark (select) automata in the dependency group of the selected automata.
      */

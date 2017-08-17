@@ -10,14 +10,14 @@ public class QuickSort
 	// ----[ bubble-sort, when quick-sort is an overkill ]---------------------------------------------
 
 	/** bubble sort for list of Objects */
-	public static void bubble_sort(double [] weights, Object [] data, int len) {
+	public static void bubble_sort(final double [] weights, final Object [] data, final int len) {
 		for (int i = len; --i >= 0; ) {
 		boolean flipped = false;
 			for (int j = 0; j<i; j++) {
 				if( weights[j+1] < weights[j]) {
 					// SWAP
-					Object tmp1 = data[j]; data[j] = data[j+1]; data[j+1] = tmp1;
-					double tmp2 = weights[j]; weights[j] = weights[j+1]; weights[j+1] = tmp2;
+					final Object tmp1 = data[j]; data[j] = data[j+1]; data[j+1] = tmp1;
+					final double tmp2 = weights[j]; weights[j] = weights[j+1]; weights[j+1] = tmp2;
 					flipped = true;
 				}
 			}
@@ -27,66 +27,6 @@ public class QuickSort
 	}
 
 
-	// ----[ quicksort for WeightedObject ]-----------------------------------------------
-
-	/** helper function to quicksort (quicksort partition) */
-	private static int partition(WeightedObject[] list, int p, int r)
-	{
-		double x = list[r].weight();
-		int i = p - 1;
-		WeightedObject tmp;
-
-		for (int j = p; j < r; j++)
-		{
-			if (list[j].weight() <= x)
-			{
-				i++;
-
-				// SWAP I <-> J
-				tmp = list[i];
-				list[i] = list[j];
-				list[j] = tmp;
-			}
-		}
-
-		// SWAP I+1 <-> r
-		i++;
-
-		tmp = list[i];
-		list[i] = list[r];
-		list[r] = tmp;
-
-		return i;
-	}
-
-	/** worker function for sort (quick sort function) */
-	private static void quicksort(WeightedObject[] list, int p, int r)
-	{
-		if (p < r)
-		{
-			int q = partition(list, p, r);
-
-			quicksort(list, p, q - 1);
-			quicksort(list, q + 1, r);
-		}
-	}
-
-	/**
-	 * quicksort.
-	 * @param reverse reverse the sort
-	 */
-	public static void sort(WeightedObject[] v, boolean reverse)
-	{
-		int size = v.length;
-
-		quicksort(v, 0, size - 1);
-
-		if (reverse)
-		{
-			Util.reverse(v, size);
-		}
-	}
-
 	// ----[ quicksort for array types ]---------------------------------------------
 	private static int[] array_;
 	private static double[] cost_;
@@ -95,7 +35,7 @@ public class QuickSort
 	 * quicksor of arrays + costs
 	 * @param reverse reverse the sort
 	 */
-	public static void sort(int[] array, double[] cost, int size, boolean reverse)
+	public static void sort(final int[] array, final double[] cost, final int size, final boolean reverse)
 	{
 		array_ = array;
 		cost_ = cost;
@@ -110,7 +50,7 @@ public class QuickSort
 	}
 
 	/** more useless junk...  */
-	private static void swap_(int a, int b)
+	private static void swap_(final int a, final int b)
 	{
 		double tmp1;
 		int tmp2;
@@ -124,9 +64,9 @@ public class QuickSort
 	}
 
 	/** helper function to quicksort (quicksort partition) */
-	private static int partition_(int p, int r)
+	private static int partition_(final int p, final int r)
 	{
-		double x = cost_[r];
+		final double x = cost_[r];
 		int i = p - 1;
 
 		for (int j = p; j < r; j++)
@@ -147,11 +87,11 @@ public class QuickSort
 	}
 
 	/** worker function for sort (quick sort function) */
-	private static void quicksort_(int p, int r)
+	private static void quicksort_(final int p, final int r)
 	{
 		if (p < r)
 		{
-			int q = partition_(p, r);
+			final int q = partition_(p, r);
 
 			quicksort_(p, q - 1);
 			quicksort_(q + 1, r);
@@ -165,7 +105,7 @@ public class QuickSort
 	 * quicksor of arrays of Objects + costs
 	 * @param reverse reverse the sort
 	 */
-	public static void sort(Object[] array, double[] cost, int size, boolean reverse)
+	public static void sort(final Object[] array, final double[] cost, final int size, final boolean reverse)
 	{
 
 
@@ -189,7 +129,7 @@ public class QuickSort
 		}
 	}
 
-	private static void oswap_(int a, int b)
+	private static void oswap_(final int a, final int b)
 	{
 		double tmp1;
 		Object tmp2;
@@ -203,9 +143,9 @@ public class QuickSort
 	}
 
 	/** helper function to quicksort (quicksort partition) */
-	private static int opartition_(int p, int r)
+	private static int opartition_(final int p, final int r)
 	{
-		double x = cost_[r];
+		final double x = cost_[r];
 		int i = p - 1;
 
 		for (int j = p; j < r; j++)
@@ -226,11 +166,11 @@ public class QuickSort
 	}
 
 	/** worker function for sort (quick sort function) */
-	private static void oquicksort_(int p, int r)
+	private static void oquicksort_(final int p, final int r)
 	{
 		if (p < r)
 		{
-			int q = opartition_(p, r);
+			final int q = opartition_(p, r);
 
 			oquicksort_(p, q - 1);
 			oquicksort_(q + 1, r);

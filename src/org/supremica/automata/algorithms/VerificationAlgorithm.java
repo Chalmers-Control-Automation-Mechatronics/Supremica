@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.util.BDD.JDDLoader;
-
 /**
  * Different kinds of algorithms for verification.
  */
@@ -62,12 +60,6 @@ public enum VerificationAlgorithm
   SAT("Satisfiability"),
   COMPOSITIONAL("Compositional"),
   COMBINED("Compositional + BDD"),
-  BDD("BDD") {
-    @Override
-    public boolean isLoadable() {
-      return JDDLoader.canLoadJDD();
-    }
-  },
   BBSD("BBSD");
   //IDD("IDD");
 
