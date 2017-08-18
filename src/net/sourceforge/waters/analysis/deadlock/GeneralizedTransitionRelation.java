@@ -81,7 +81,7 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final String TAU=":tau";
- // private final int TAU_INDEX=0;
+  private final int TAU_INDEX=0;
 
   public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
   {
@@ -1292,7 +1292,7 @@ public class GeneralizedTransitionRelation
  }
 
 
-/* public void supressTauLoopTrans()
+ public void supressTauLoopTrans()
  {
     for (int s = 0; s < mSuccessors.length; s++) {
       final TIntArrayList selfloops = new TIntArrayList();
@@ -1321,8 +1321,12 @@ public class GeneralizedTransitionRelation
         }
       }
     }
- }*/
+ }
 
+ public void setSuccessorToNull(final int s, final int e)
+ {
+    mSuccessors[s][e]=null;
+ }
 
   //########################################################################
   //# Debugging

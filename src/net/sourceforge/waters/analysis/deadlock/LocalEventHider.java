@@ -59,14 +59,20 @@ public class LocalEventHider
         }
 
         final int[] array = succs.toArray();
-        succs.clear();
+        //succs.clear();
+        succs = null;
+        final TIntHashSet active = mTransitionRelation.getFromArray(s, mTransitionRelation.getAllActiveEvents());
+        active.remove(e);
         succs =  mTransitionRelation.getFromArray(s, TAU_INDEX, mTransitionRelation.getSuccessorsArr());
         for (int ti = 0; ti < array.length; ti++) {
           final int t = array[ti];
-          if(t != s) {
-          succs.add(t);
           TIntHashSet preds = mTransitionRelation.getFromArray(t, events[e], mTransitionRelation.getPredecessorsArr());
-          preds.clear();
+          preds.remove(s);
+          if(preds.isEmpty()) {
+            preds = null;
+          }
+         if(t != s) {
+          succs.add(t);
           preds =  mTransitionRelation.getFromArray(t, TAU_INDEX, mTransitionRelation.getPredecessorsArr());
           preds.add(s);
           }

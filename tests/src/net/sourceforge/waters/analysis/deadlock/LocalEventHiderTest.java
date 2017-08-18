@@ -181,6 +181,26 @@ public class LocalEventHiderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_hiding_11() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_11.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+/*  public void test_hiding_12() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_12.wmod");
+    runTransitionRelationSimplifier(des);
+  }*/
+
+  public void test_hiding_13() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_13.wmod");
+    runTransitionRelationSimplifier(des);
+  }
 
   //#########################################################################
   //# Instantiating and Checking Modules
