@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
@@ -60,8 +61,8 @@ class QuadraticEdgeProxyShape
     mStart = GeometryTools.getRadialStartPoint(edge, mControl, radius);
     mEnd = GeometryTools.getRadialEndPoint(edge, mControl, radius);
     mCurve = new QuadCurve2D.Double(mStart.getX(), mStart.getY(),
-				    mControl.getX(), mControl.getY(),
-				    mEnd.getX(), mEnd.getY());
+                                    mControl.getX(), mControl.getY(),
+                                    mEnd.getX(), mEnd.getY());
     mArrowTip = calculateInnerArrowTipPosition();
     createHandles();
   }
@@ -69,23 +70,25 @@ class QuadraticEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public Rectangle2D getBounds2D()
   {
     return GeometryTools.getQuadraticBoundingBox(mStart, mControl, mEnd);
   }
 
-  public boolean isClicked(final int x, final int y)
+  @Override
+  public boolean isClicked(final Point point)
   {
-    if (getClickedHandle(x, y) != null) {
+    if (getClickedHandle(point) != null) {
       return true;
-    } else if (!isInClickBounds(x, y)) {
+    } else if (!isInClickBounds(point)) {
       return false;
     } else {
       final Rectangle rect =
-	new Rectangle(x - CLICK_TOLERANCE, y - CLICK_TOLERANCE,
-		      2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
+        new Rectangle(point.x - CLICK_TOLERANCE, point.y - CLICK_TOLERANCE,
+                      2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
       if (!mCurve.intersects(rect) || mCurve.contains(rect)) {
-	return false;
+        return false;
       }
       final Line2D base = new Line2D.Double(mStart, mEnd);
       return !base.intersects(rect);
@@ -95,21 +98,25 @@ class QuadraticEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.EdgeProxyShape
+  @Override
   Shape getCurve()
   {
     return mCurve;
   }
 
+  @Override
   Point2D getStartPoint()
   {
     return mStart;
   }
 
+  @Override
   Point2D getEndPoint()
   {
     return mEnd;
   }
 
+  @Override
   Point2D getTurningPoint()
   {
     final double x =
@@ -119,11 +126,13 @@ class QuadraticEdgeProxyShape
     return new Point2D.Double(x, y);
   }
 
+  @Override
   Point2D getInnerArrowTipPoint()
   {
     return mArrowTip;
   }
 
+  @Override
   Point2D getEndDirection()
   {
     return GeometryTools.getNormalizedDirection(mControl, mEnd);

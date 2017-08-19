@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Point;
 import java.awt.Shape;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -76,40 +77,46 @@ class StraightEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
-  public boolean isClicked(final int x, final int y)
+  @Override
+  public boolean isClicked(final Point point)
   {
-    if (getClickedHandle(x, y) != null) {
+    if (getClickedHandle(point) != null) {
       return true;
-    } else if (!isInClickBounds(x, y)) {
+    } else if (!isInClickBounds(point)) {
       return false;
     } else {
-      return mLine.ptLineDistSq(x, y) <= EdgeProxyShape.CLICK_TOLERANCE_SQ;
+      return mLine.ptLineDistSq(point) <= EdgeProxyShape.CLICK_TOLERANCE_SQ;
     }
   }
 
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.EdgeProxyShape
+  @Override
   Shape getCurve()
   {
     return mLine;
   }
 
+  @Override
   Point2D getStartPoint()
   {
     return mStart;
   }
 
+  @Override
   Point2D getEndPoint()
   {
     return mEnd;
   }
 
+  @Override
   Point2D getTurningPoint()
   {
     return getMidPoint();
   }
 
+  @Override
   Point2D getInnerArrowTipPoint()
   {
     return mArrowTip;

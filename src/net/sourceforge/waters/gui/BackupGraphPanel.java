@@ -172,6 +172,7 @@ public class BackupGraphPanel
 
   protected void graphChanged(final ModelChangeEvent event)
   {
+    clearTransform();
     repaint();
   }
 

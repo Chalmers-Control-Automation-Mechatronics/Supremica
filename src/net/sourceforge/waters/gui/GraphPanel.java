@@ -36,6 +36,10 @@ package net.sourceforge.waters.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -49,6 +53,7 @@ import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.Renderer;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -126,6 +131,49 @@ public class GraphPanel
 
 
   //#########################################################################
+  //# Coordinate Transformation
+  protected AffineTransform getTransform()
+  {
+    if (mTransform == null) {
+      mTransform = createTransform();
+    }
+    return mTransform;
+  }
+
+  protected AffineTransform createTransform()
+  {
+    return new AffineTransform(); // identity matrix
+  }
+
+  protected AffineTransform getInverseTransform()
+  {
+    if (mInverseTransform == null) {
+      try {
+        final AffineTransform transform = getTransform();
+        mInverseTransform = transform.createInverse();
+      } catch (final NoninvertibleTransformException exception) {
+        throw new WatersRuntimeException(exception);
+      }
+    }
+    return mInverseTransform;
+  }
+
+  protected Point applyInverseTransform(final Point point)
+  {
+    final AffineTransform inverse = getInverseTransform();
+    final Point2D tranformed = inverse.transform(point, null);
+    final int x = (int) Math.round(tranformed.getX());
+    final int y = (int) Math.round(tranformed.getY());
+    return new Point(x, y);
+  }
+
+  protected void clearTransform()
+  {
+    mTransform = mInverseTransform = null;
+  }
+
+
+  //#########################################################################
   //# Repaint Support
   public void registerSupremicaPropertyChangeListeners()
   {
@@ -198,17 +246,21 @@ public class GraphPanel
    * Called when painting.
    */
   @Override
-  protected void paintComponent(final Graphics g)
+  protected void paintComponent(final Graphics graphics)
   {
-    paintGrid(g);
+    paintGrid(graphics);
+    final Graphics2D g2d = (Graphics2D) graphics;
+    final AffineTransform old = g2d.getTransform();
+    final AffineTransform transform = getTransform();
+    final AffineTransform copy = new AffineTransform(old);
+    copy.concatenate(transform);
+    g2d.setTransform(copy);
     final Renderer renderer =
       new Renderer(getDrawnGraph(), getDrawnObjects(), getShapeProducer());
-    renderer.renderGraph((Graphics2D) g);
+    renderer.renderGraph((Graphics2D) graphics);
+    g2d.setTransform(old);
   }
 
-  /**
-   * Implementation of the Printable interface.
-   */
   @Override
   public int print(final Graphics g, final PageFormat pageFormat, final int page)
   {
@@ -280,11 +332,11 @@ public class GraphPanel
   /** Different status values for objects being dragged. */
   public enum DragOverStatus
   {
-    /** Is not being draggedOver. */
+    /** Is not being dragged over. */
     NOTDRAG,
-    /** Is being draggedOver and can drop held object. */
+    /** Is being dragged over and can drop held object. */
     CANDROP,
-    /** Is being draggedOver but can't drop held object. */
+    /** Is being dragged over but cannot drop held object. */
     CANTDROP;
   }
 
@@ -295,6 +347,8 @@ public class GraphPanel
   private final ModuleProxy mModule;
   private final ModuleContext mModuleContext;
   private ProxyShapeProducer mShapeProducer;
+  private AffineTransform mTransform = null;
+  private AffineTransform mInverseTransform = null;
 
 
   //#########################################################################

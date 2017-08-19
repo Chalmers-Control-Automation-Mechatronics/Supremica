@@ -183,6 +183,7 @@ public class GraphEditorPanel
   extends BackupGraphPanel
   implements SelectionOwner, Observer, FocusListener
 {
+
   //#########################################################################
   //# Constructors
   public GraphEditorPanel(final GraphSubject graph,
@@ -204,7 +205,7 @@ public class GraphEditorPanel
     mPopupFactory =
       manager == null ? null : new GraphPopupFactory(manager, root);
     setFocusable(true);
-    addKeyListener(new KeySpy());
+    addKeyListener(new KeyHandler());
     updateTool();
     ensureGeometryExists();
     mHasGroupNodes = GraphTools.updateGroupNodeHierarchy(graph);
@@ -1448,19 +1449,12 @@ public class GraphEditorPanel
      final Point point,
      final Collection<Proxy> collection)
   {
-    if (item == null || getHighlightPriority(item) < 0) {
-      return;
+    if (item != null && getHighlightPriority(item) >= 0) {
+      final ProxyShape shape = getShapeProducer().getShape(item);
+      if (shape != null && shape.isClicked(point)) {
+        collection.add(item);
+      }
     }
-    final ProxyShape shape = getShapeProducer().getShape(item);
-    if (shape == null) {
-      return;
-    }
-    final int x = point.x;
-    final int y = point.y;
-    if (!shape.isClicked(x, y)) {
-      return;
-    }
-    collection.add(item);
   }
 
   private int getHighlightPriority(final Proxy item)
@@ -1481,15 +1475,13 @@ public class GraphEditorPanel
   private Handle getClickedHandle(final ProxySubject item, final Point point)
   {
     if (isSelected(item)) {
-      final int x = point.x;
-      final int y = point.y;
       final boolean handlesAreShown = getShapeProducer().getRenderingContext()
             .getRenderingInformation(item).showHandles();
       if (!handlesAreShown) {
         return null;
       }
       final ProxyShape shape = getShapeProducer().getShape(item);
-      return shape.getClickedHandle(x, y);
+      return shape.getClickedHandle(point);
     } else {
       return null;
     }
@@ -1515,13 +1507,15 @@ public class GraphEditorPanel
     } else if (item instanceof LabelBlockSubject &&
                (!ifSelected || isSelected(item))) {
       final LabelBlockSubject block = (LabelBlockSubject) item;
-      final Point point = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       final ProxySubject label =
         getLabelToBeSelected(block.getEventIdentifierListModifiable(), point);
       return label == null ? item : label;
     } else if (item instanceof GuardActionBlockSubject && !ifSelected) {
       final GuardActionBlockSubject block = (GuardActionBlockSubject) item;
-      final Point point = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       final List<SimpleExpressionProxy> guards =
         ProxyShapeProducer.getDisplayedGuards(block);
       ProxySubject label = getLabelToBeSelected(guards, point);
@@ -1850,7 +1844,8 @@ public class GraphEditorPanel
     {
       if (mInternalDragAction != null &&
           mInternalDragAction instanceof InternalDragActionDND) {
-        final Point point = event.getPoint();
+        final Point mousePosition = event.getPoint();
+        final Point point = applyInverseTransform(mousePosition);
         mInternalDragAction.cancelDrag(point);
         mInternalDragAction = null;
         repaint();
@@ -1952,8 +1947,8 @@ public class GraphEditorPanel
       if (canBeSelected(item)) {
         if (event.isShiftDown() || event.isControlDown()) {
           if (!isSelected(item)) {
-            if (item instanceof IdentifierSubject
-                || item instanceof ForeachSubject) {
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject) {
               if (!list.isEmpty()) {
                 if (event.isShiftDown()) {
                   addRangeToSelection(item);
@@ -1970,8 +1965,8 @@ public class GraphEditorPanel
               mItem = null;
             }
           } else {
-            if (item instanceof IdentifierSubject
-                || item instanceof ForeachSubject) {
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject) {
               if (!list.isEmpty() && event.isShiftDown()) {
                 addRangeToSelection(item);
                 mItem = null;
@@ -1980,8 +1975,8 @@ public class GraphEditorPanel
           }
         } else {
           if (!isSelected(item)) {
-            if (!(item instanceof IdentifierSubject)
-                && !(item instanceof ForeachSubject)) {
+            if (!(item instanceof IdentifierSubject) &&
+                !(item instanceof ForeachSubject)) {
               replaceSelection(item);
             }
           }
@@ -1995,7 +1990,8 @@ public class GraphEditorPanel
           clearSelection();
         }
       }
-      mStartPoint = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      mStartPoint = applyInverseTransform(mousePosition);
       mPopupFactory.maybeShowPopup(GraphEditorPanel.this, event,
                                    mFocusedObject);
     }
@@ -2093,7 +2089,8 @@ public class GraphEditorPanel
       mPopupFactory.maybeShowPopup
         (GraphEditorPanel.this, event, mFocusedObject);
       if (mInternalDragAction != null) {
-        final Point point = event.getPoint();
+        final Point mousePosition = event.getPoint();
+        final Point point = applyInverseTransform(mousePosition);
         mInternalDragAction.commitDrag(point);
         mInternalDragAction = null;
         fireSelectionChanged();
@@ -2109,7 +2106,8 @@ public class GraphEditorPanel
     @Override
     public void mouseDragged(final MouseEvent event)
     {
-      final Point point = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       updateHighlighting(point);
       if (mInternalDragAction != null) {
         mInternalDragAction.continueDrag(event);
@@ -2120,7 +2118,8 @@ public class GraphEditorPanel
     public void mouseEntered(final MouseEvent event)
     {
       abortExternalDrag(event);
-      final Point point = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       updateHighlighting(point);
     }
 
@@ -2129,7 +2128,8 @@ public class GraphEditorPanel
     {
       if (mInternalDragAction != null) {
         abortExternalDrag(event);
-        final Point point = event.getPoint();
+        final Point mousePosition = event.getPoint();
+        final Point point = applyInverseTransform(mousePosition);
         updateHighlighting(point);
       } else {
         updateHighlighting(null);
@@ -2143,7 +2143,8 @@ public class GraphEditorPanel
     public void mouseMoved(final MouseEvent event)
     {
       abortExternalDrag(event);
-      final Point point = event.getPoint();
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       updateHighlighting(point);
     }
 
@@ -2329,12 +2330,10 @@ public class GraphEditorPanel
         final ProxyShapeProducer shaper = getShapeProducer();
         final Point snapped = findGrid(mCurrentPoint);
         if (!snapped.equals(mCurrentPoint)) {
-          final int x = snapped.x;
-          final int y = snapped.y;
           for (final NodeSubject node : getGraph().getNodesModifiable()) {
             if (node instanceof SimpleNodeSubject) {
               final ProxyShape shape = shaper.getShape(node);
-              if (shape.isClicked(x, y)) {
+              if (shape.isClicked(snapped)) {
                 mCurrentPoint = snapped;
                 super.updateHighlighting();
                 return;
@@ -2355,7 +2354,8 @@ public class GraphEditorPanel
       if (event.getButton() == MouseEvent.BUTTON1) {
         if (event.getClickCount() == 1 && mFocusedObject == null) {
           // Create node.
-          final Point point = event.getPoint();
+          final Point mousePosition = event.getPoint();
+          final Point point = applyInverseTransform(mousePosition);
           final Point snapped;
           if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
             snapped = findGrid(point);
@@ -2391,14 +2391,16 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
+            new InternalDragActionSelect(getStartPoint(),
+                                         event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject subject = getDraggableItem(event, true);
           if (mFocusedObject == subject || !isSelected(subject)) {
             final Handle handle = getClickedHandle(subject, getStartPoint());
             if (handle == null) {
               mInternalDragAction =
-                new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
+                new InternalDragActionMove(getStartPoint(),
+                                           event.isShiftDown() || event.isControlDown());
             } else {
               if(handle.getType() == HandleType.INITIAL){
                 mInternalDragAction =
@@ -2470,7 +2472,9 @@ public class GraphEditorPanel
         } else {
           final Handle handle = getClickedHandle(mFocusedObject, getStartPoint());
           if (handle == null) {
-            mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
+            mInternalDragAction =
+              new InternalDragActionMove(getStartPoint(),
+                                         event.isShiftDown() || event.isControlDown());
           } else {
             mInternalDragAction =
               new InternalDragActionResizeGroupNode(handle, getStartPoint());
@@ -2549,19 +2553,24 @@ public class GraphEditorPanel
       if (mInternalDragAction == null) {
         if (mFocusedObject == null) {
           mInternalDragAction =
-            new InternalDragActionSelect(getStartPoint(), event.isShiftDown() || event.isControlDown());
+            new InternalDragActionSelect(getStartPoint(),
+                                         event.isShiftDown() || event.isControlDown());
         } else {
           final ProxySubject item = getDraggableItem(event, true);
           if (mFocusedObject == item || !isSelected(item)){
             final Handle handle = getClickedHandle(item, getStartPoint());
             if (handle == null && canBeSelected(item)){
-              mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
+              mInternalDragAction =
+                new InternalDragActionMove(getStartPoint(),
+                                           event.isShiftDown() || event.isControlDown());
             } else if (item instanceof NodeSubject) {
               // Clicking on node or nodegroup --- create edge.
               mInternalDragAction = new InternalDragActionEdge(getStartPoint());
             } else if (item instanceof EdgeSubject) {
               if (handle == null) {
-                mInternalDragAction = new InternalDragActionMove(getStartPoint(), event.isShiftDown() || event.isControlDown());
+                mInternalDragAction =
+                  new InternalDragActionMove(getStartPoint(),
+                                             event.isShiftDown() || event.isControlDown());
               } else {
                 mInternalDragAction =
                   new InternalDragActionEdge(handle, getStartPoint());
@@ -2724,7 +2733,9 @@ public class GraphEditorPanel
     {
       mShiftDown = event.isShiftDown();
       mControlDown = event.isControlDown();
-      return continueDrag(event.getPoint());
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
+      return continueDrag(point);
     }
 
     public boolean isControlDown(){
@@ -2737,10 +2748,11 @@ public class GraphEditorPanel
 
 
     /**
-     * Completes this internal dragging operation. This method is overriden
+     * Completes this internal dragging operation. This method is overridden
      * to create and executes the appropriate command to reflect all the
-     * changed made during the frag operation. Subclasses must call the
+     * changed made during the drag operation. Subclasses must call the
      * superclass method also.
+     * @param  point  The mouse position in graph coordinates.
      */
     void commitDrag(final Point point)
     {
@@ -2751,6 +2763,7 @@ public class GraphEditorPanel
      * only clicked rather than dragged the mouse. Sometimes the selection
      * needs to be updated in such a case. Subclasses must call the
      * superclass method also.
+     * @param  point  The mouse position in graph coordinates.
      */
     void cancelDrag(final Point point)
     {
@@ -3071,13 +3084,15 @@ public class GraphEditorPanel
       }
     }
 
-    private Point nextPoint(final Point start, final Point current){
+    private Point nextPoint(final Point start, final Point current)
+    {
       final int dx = (int) (current.getX() - start.x);
       final int dy = (int) (current.getY() - start.y);
       return new Point(dx, dy);
     }
 
-    private Point nextSnappedPoint(final Point start, final Point current){
+    private Point nextSnappedPoint(final Point start, final Point current)
+    {
       final double rx = mSnapPoint.getX();
       final double ry = mSnapPoint.getY();
       final int ix = start.x;
@@ -3191,7 +3206,9 @@ public class GraphEditorPanel
     @Override
     boolean continueDrag(final MouseEvent event)
     {
-      final boolean draggedNow = super.continueDrag(event.getPoint());
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
+      final boolean draggedNow = super.continueDrag(point);
       if (draggedNow) {
         if (event.isShiftDown() || event.isControlDown()) {
           getTransferHandler().exportAsDrag(GraphEditorPanel.this, event,
@@ -3207,7 +3224,8 @@ public class GraphEditorPanel
     @SuppressWarnings("unchecked")
     boolean canImport(final TransferSupport support)
     {
-      final Point point = support.getDropLocation().getDropPoint();
+      final Point mousePosition = support.getDropLocation().getDropPoint();
+      final Point point = applyInverseTransform(mousePosition);
       super.continueDrag(point);
       mController.updateHighlighting(point);
       final Transferable transferable = support.getTransferable();
@@ -3289,8 +3307,10 @@ public class GraphEditorPanel
       return mExternalDragStatus == DragOverStatus.CANDROP;
     }
 
-    boolean importData(final TransferSupport support){
-      final Point point = support.getDropLocation().getDropPoint();
+    boolean importData(final TransferSupport support)
+    {
+      final Point mousePosition = support.getDropLocation().getDropPoint();
+      final Point point = applyInverseTransform(mousePosition);
       commitDrag(point);
       boolean finished = false;
       try {
@@ -4016,24 +4036,21 @@ public class GraphEditorPanel
       //make sure the arrows follow clockwise unless they go in same direction
       if(p1.getX() == p2.getX() && p1.getY() > p2.getY()){
         newX = -newX;
-      }
-      else if(p1.getY() == p2.getY() && p1.getX() < p2.getX()){
+      } else if (p1.getY() == p2.getY() && p1.getX() < p2.getX()){
         newY = -newY;
-      }
-      else if(p1.getX() < p2.getX()){
+      } else if (p1.getX() < p2.getX()){
         if(p1.getY() > p2.getY()){
           newX = -newX;
         }
         newY = -newY;
-      }
-      else if(p1.getX() > p2.getX() && p1.getY() > p2.getY()){
+      } else if (p1.getX() > p2.getX() && p1.getY() > p2.getY()){
         newX = -newX;
       }
-      if(sameDirection){
-        if(p1.getY() != p2.getY()){
+      if (sameDirection) {
+        if (p1.getY() != p2.getY()){
           newX = -newX;
         }
-        if(p1.getX() != p2.getX()){
+        if (p1.getX() != p2.getX()){
           newY = -newY;
         }
       }
@@ -4411,8 +4428,8 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Inner Class KeySpy
-  private class KeySpy extends KeyAdapter
+  //# Inner Class KeyHandler
+  private class KeyHandler extends KeyAdapter
   {
 
     @Override
@@ -4497,9 +4514,9 @@ public class GraphEditorPanel
           e.consume();
           getUndoInterface().executeCommand(move);
         }
-      }
-      else if(keyCode == KeyEvent.VK_SHIFT || keyCode == KeyEvent.VK_CONTROL){
-        if(mInternalDragAction != null){
+      } else if (keyCode == KeyEvent.VK_SHIFT ||
+                 keyCode == KeyEvent.VK_CONTROL) {
+        if (mInternalDragAction != null) {
           mInternalDragAction.modifiersChanged(keyCode, true);
         }
       }
@@ -5215,7 +5232,7 @@ public class GraphEditorPanel
         return isContainingAll(block) ? null : block;
       } else {
         final ModuleContext context = getModuleContext();
-        if(context.canDropOnEdge(mTransferData)){
+        if (context.canDropOnEdge(mTransferData)) {
           return block;
         }
         return null;
@@ -5307,7 +5324,7 @@ public class GraphEditorPanel
   }
 
 
-//#########################################################################
+  //#########################################################################
   //# Inner Class GraphEditorPanelTransferHandler
   private class GraphEditorPanelTransferHandler extends TransferHandler
   {
@@ -5338,13 +5355,14 @@ public class GraphEditorPanel
     @Override
     public boolean canImport(final TransferSupport support)
     {
-      if(!(mInternalDragAction instanceof InternalDragActionDND)){
-        mInternalDragAction =
-          new InternalDragActionDND(support.getDropLocation().getDropPoint());
+      if (!(mInternalDragAction instanceof InternalDragActionDND)) {
+        final Point mousePosition = support.getDropLocation().getDropPoint();
+        final Point point = applyInverseTransform(mousePosition);
+        mInternalDragAction = new InternalDragActionDND(point);
       }
-      final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
-
-      if(support.getDropAction() == MOVE && !isTrackedFocusOwner()){
+      final InternalDragActionDND dragAction =
+        (InternalDragActionDND) mInternalDragAction;
+      if (support.getDropAction() == MOVE && !isTrackedFocusOwner()) {
         support.setDropAction(COPY);
       }
 
@@ -5354,18 +5372,22 @@ public class GraphEditorPanel
     @Override
     public boolean importData(final TransferSupport support)
     {
-      if(!(mInternalDragAction instanceof InternalDragActionDND)){
-        mInternalDragAction =
-          new InternalDragActionDND(support.getDropLocation().getDropPoint());
+      if (!(mInternalDragAction instanceof InternalDragActionDND)) {
+        final Point mousePosition = support.getDropLocation().getDropPoint();
+        final Point point = applyInverseTransform(mousePosition);
+        mInternalDragAction = new InternalDragActionDND(point);
       }
-      final InternalDragActionDND dragAction = (InternalDragActionDND)mInternalDragAction;
+      final InternalDragActionDND dragAction =
+        (InternalDragActionDND) mInternalDragAction;
       return dragAction.importData(support);
     }
 
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 3039120453305316710L;
   }
 
+
+  //#########################################################################
+  //# Inner Class Selection
   private class Selection{
 
     public Selection(){
@@ -5556,9 +5578,10 @@ public class GraphEditorPanel
   private Command mLastCommand = null;
   Point2D mDisplacement = null;
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -5441237464454813450L;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

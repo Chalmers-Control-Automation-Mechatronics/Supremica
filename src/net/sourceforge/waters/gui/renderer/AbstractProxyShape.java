@@ -34,65 +34,66 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.util.Collections;
+import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
-import java.util.List;
-import java.util.Collections;
+
 
 public abstract class AbstractProxyShape
-    extends AbstractRendererShape
-    implements ProxyShape
+  extends AbstractRendererShape
+  implements ProxyShape
 {
-    private final Proxy mProxy;
+  private final Proxy mProxy;
 
-    protected AbstractProxyShape(Proxy proxy)
-    {
-        mProxy = proxy;        
-    }
+  protected AbstractProxyShape(final Proxy proxy)
+  {
+    mProxy = proxy;
+  }
 
-    public void draw(Graphics2D g, RenderingInformation status)
-    {
-        super.draw(g, status);
-        if (status.showHandles())
-        {
-            for (RendererShape handle : getHandles())
-            {
-                handle.draw(g, status);
-            }
-        }
+  @Override
+  public void draw(final Graphics2D g, final RenderingInformation status)
+  {
+    super.draw(g, status);
+    if (status.showHandles()) {
+      for (final RendererShape handle : getHandles()) {
+        handle.draw(g, status);
+      }
     }
+  }
 
-    public Proxy getProxy()
-    {
-        return mProxy;
-    }
+  @Override
+  public Proxy getProxy()
+  {
+    return mProxy;
+  }
 
-    public List<Handle> getHandles()
-    {
-        return Collections.emptyList();
-    }
+  @Override
+  public List<Handle> getHandles()
+  {
+    return Collections.emptyList();
+  }
 
-    public boolean isClicked(int x, int y)
-    {
-        for (Handle h : getHandles())
-        {
-            if (h.isClicked(x, y))
-            {
-                return true;
-            }
-        }
-        return super.isClicked(x, y);
+  @Override
+  public boolean isClicked(final Point point)
+  {
+    for (final Handle h : getHandles()) {
+      if (h.isClicked(point)) {
+        return true;
+      }
     }
+    return super.isClicked(point);
+  }
 
-    public Handle getClickedHandle(int x, int y)
-    {
-        for (Handle handle : getHandles())
-        {
-            if (handle.isClicked(x, y))
-            {
-                return handle;
-            }
-        }
-        return null;
+  public Handle getClickedHandle(final Point point)
+  {
+    for (final Handle handle : getHandles()) {
+      if (handle.isClicked(point)) {
+        return handle;
+      }
     }
+    return null;
+  }
+
 }

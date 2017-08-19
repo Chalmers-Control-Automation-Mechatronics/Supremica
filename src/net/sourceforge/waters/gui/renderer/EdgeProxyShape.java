@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
@@ -94,6 +95,7 @@ abstract class EdgeProxyShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public Shape getShape()
   {
     if (mShape == null) {
@@ -109,6 +111,7 @@ abstract class EdgeProxyShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
+  @Override
   public List<Handle> getHandles()
   {
     return mHandles;
@@ -117,6 +120,7 @@ abstract class EdgeProxyShape
 
   //#########################################################################
   //# Drawing
+  @Override
   public void draw(final Graphics2D g2d, final RenderingInformation status)
   {
     super.draw(g2d, status);
@@ -220,7 +224,7 @@ abstract class EdgeProxyShape
     mHandles.add(handle);
   }
 
-  boolean isInClickBounds(final int x, final int y)
+  boolean isInClickBounds(final Point point)
   {
     if (mClickBounds == null) {
       final Shape shape = getShape();
@@ -230,6 +234,8 @@ abstract class EdgeProxyShape
       mClickBounds.width += 2 * CLICK_TOLERANCE;
       mClickBounds.height += 2 * CLICK_TOLERANCE;
     }
+    final int x = point.x;
+    final int y = point.y;
     return
       x >= mClickBounds.x && x <= mClickBounds.x + mClickBounds.width &&
       y >= mClickBounds.y && y <= mClickBounds.y + mClickBounds.height;

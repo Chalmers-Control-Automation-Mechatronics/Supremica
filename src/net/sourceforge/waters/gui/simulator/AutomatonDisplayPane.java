@@ -36,7 +36,6 @@ package net.sourceforge.waters.gui.simulator;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -44,8 +43,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -90,7 +87,6 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.subject.base.AbstractSubject;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -127,7 +123,6 @@ public class AutomatonDisplayPane
     mContainer = container;
     mToolTipVisitor = new GraphToolTipVisitor();
     mFocusedItem = null;
-    mTransform = mInverseTransform = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
     final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
@@ -195,7 +190,7 @@ public class AutomatonDisplayPane
     if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
       mParent.storeReferenceFrame();
       mParent.adjustSize();
-      mTransform = mInverseTransform = null;
+      clearTransform();
       final Rectangle2D newBounds = AutomatonDisplayPane.this.getMinimumBoundingRectangle();
       this.setPreferredSize(new Dimension((int)newBounds.getWidth(), (int)newBounds.getHeight()));
       mParent.resize(); // Set the size to the initial size, so that the 'Resize Automata' event cannot
@@ -255,32 +250,6 @@ public class AutomatonDisplayPane
     return status != null && !status.isActive();
   }
 
-
-  //#########################################################################
-  //# Repainting
-  @Override
-  public void paint(final Graphics g)
-  {
-    g.setColor(getBackground());
-    g.fillRect(0, 0, getWidth(), getHeight());
-    final Graphics2D g2d = (Graphics2D) g;
-    final AffineTransform old = g2d.getTransform();
-    final AffineTransform transform = createTransform();
-    final AffineTransform copy = new AffineTransform(old);
-    copy.concatenate(transform);
-    g2d.setTransform(copy);
-    super.paint(g2d);
-    g2d.setTransform(old);
-  }
-
-  @Override
-  protected void paintGrid(final Graphics g)
-  {
-  }
-
-
-  //#########################################################################
-  //# Repaint Support
   @Override
   public void close()
   {
@@ -290,45 +259,34 @@ public class AutomatonDisplayPane
     super.close();
   }
 
+
+  //#########################################################################
+  //# Painting and Transforming
   @Override
-  protected void graphChanged(final ModelChangeEvent event)
+  protected void paintGrid(final Graphics graphics)
   {
-    super.graphChanged(event);
-    mTransform = mInverseTransform = null;
+    graphics.setColor(getBackground());
+    graphics.fillRect(0, 0, getWidth(), getHeight());
+  }
+
+  @Override
+  protected AffineTransform createTransform()
+  {
+    final ProxyShapeProducer producer = getShapeProducer();
+    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
+    final Dimension panelSize = getSize();
+    final double scaleX = panelSize.getWidth() / imageRect.getWidth();
+    final double scaleY = panelSize.getHeight() / imageRect.getHeight();
+    final double min = Math.min(scaleX, scaleY);
+    final AffineTransform transform = new AffineTransform();
+    transform.scale(min, min);
+    transform.translate(-imageRect.getX(), -imageRect.getY());
+    return transform;
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private AffineTransform createTransform()
-  {
-    if (mTransform == null) {
-      final ProxyShapeProducer producer = getShapeProducer();
-      final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
-      final Dimension panelSize = getSize();
-      final double scaleX = panelSize.getWidth() / imageRect.getWidth();
-      final double scaleY = panelSize.getHeight() / imageRect.getHeight();
-      final double min = Math.min(scaleX, scaleY);
-      mTransform = new AffineTransform();
-      mTransform.scale(min, min);
-      mTransform.translate(-imageRect.getX(), -imageRect.getY());
-    }
-    return mTransform;
-  }
-
-  private AffineTransform createInverseTransform()
-  {
-    if (mInverseTransform == null) {
-      try {
-        final AffineTransform transform = createTransform();
-        mInverseTransform = transform.createInverse();
-      } catch (final NoninvertibleTransformException exception) {
-        throw new WatersRuntimeException(exception);
-      }
-    }
-    return mInverseTransform;
-  }
-
   /**
    * Tries to find an item for highlighting under the mouse cursor.
    * This method searches the graph for an item ({@link EdgeProxy} or
@@ -341,19 +299,15 @@ public class AutomatonDisplayPane
    */
   private Proxy getClickedItem(final MouseEvent event)
   {
-    if (!isEmbedderRunning())
-    {
-      final AffineTransform inverse = createInverseTransform();
-      final Point location = event.getPoint();
-      final Point2D orig = inverse.transform(location, null);
-      final int x = (int) Math.round(orig.getX());
-      final int y = (int) Math.round(orig.getY());
+    if (!isEmbedderRunning()) {
+      final Point mousePosition = event.getPoint();
+      final Point point = applyInverseTransform(mousePosition);
       final GraphProxy graph = getGraph();
       final ProxyShapeProducer producer = getShapeProducer();
       // Nodes have precedence over labels
       for (final NodeProxy node : graph.getNodes()) {
         final ProxyShape shape = producer.getShape(node);
-        if (shape.isClicked(x, y))
+        if (shape.isClicked(point))
         {
           return node;
         }
@@ -362,14 +316,14 @@ public class AutomatonDisplayPane
       for (final EdgeProxy edge : graph.getEdges()) {
         for (final Proxy proxy : edge.getLabelBlock().getEventIdentifierList()) {
           final ProxyShape shape = producer.getShape(proxy);
-          if (shape.isClicked(x, y)) {
+          if (shape.isClicked(point)) {
             return proxy;
           }
         }
       }
       for (final EdgeProxy edge : graph.getEdges()) {
         final ProxyShape shape = producer.getShape(edge);
-        if (shape.isClicked(x, y)) {
+        if (shape.isClicked(point)) {
           return edge;
         }
       }
@@ -380,7 +334,7 @@ public class AutomatonDisplayPane
           final SimpleNodeProxy sNode = (SimpleNodeProxy)node;
           final LabelGeometryProxy label = sNode.getLabelGeometry();
           final ProxyShape shape = producer.getShape(label);
-          if (shape.isClicked(x, y))
+          if (shape.isClicked(point))
             return node;
         }
       }
@@ -583,7 +537,7 @@ public class AutomatonDisplayPane
     @Override
     public void componentResized(final ComponentEvent event)
     {
-      mTransform = mInverseTransform = null;
+      clearTransform();
     }
   }
 
@@ -911,10 +865,9 @@ public class AutomatonDisplayPane
   private final GraphToolTipVisitor mToolTipVisitor;
   private final SupremicaPropertyChangeListener mBackgroundListener;
 
-  private AffineTransform mTransform;
-  private AffineTransform mInverseTransform;
   private Proxy mFocusedItem;
   private Map<Proxy,RenderingStatus> mRenderingStatusMap;
+
 
   //#########################################################################
   //# Class Constants
