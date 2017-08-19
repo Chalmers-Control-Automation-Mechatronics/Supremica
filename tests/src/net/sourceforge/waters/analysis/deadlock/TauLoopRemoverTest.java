@@ -127,6 +127,13 @@ public class TauLoopRemoverTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_tauLoopRemover_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules

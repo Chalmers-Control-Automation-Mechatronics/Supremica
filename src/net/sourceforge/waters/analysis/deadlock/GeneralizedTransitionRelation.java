@@ -1326,14 +1326,20 @@ public class GeneralizedTransitionRelation
   //########################################################################
   //# Debugging
   /**
-   * Checks whether the predecessor and successor hash maps are consistent
-   * with each other, and produces an assertion error if this is not the
-   * case.
+   * Checks whether the predecessor and successor hash maps and active events
+   * sets are consistent with each other, and produces an assertion error if
+   * this is not the case.
    */
   void checkIntegrity()
   {
-    // 1. Every transition in successors should also appear in predecessors
-    for (int s = 0; s < mSuccessors.length; s++) {
+    // Has this class no facility to determine the number of states? ~~~Robi
+    final int numberOfStates =
+      Math.max(mSuccessors.length, mPredecessors.length);
+
+    // 1a. Every transition in successors should also appear in predecessors
+    // 1b. Every transition in successors should appear in active events
+    for (int s = 0; s < numberOfStates; s++) {
+      final TIntHashSet active = getActiveEvents(s);
       for (int e = 0; e < mEvents.length; e++) {
         final TIntHashSet succs = getSuccessors(s, e);
         if (succs != null && !succs.isEmpty()) {
@@ -1345,13 +1351,17 @@ public class GeneralizedTransitionRelation
               assert false : "Transition " + s + " -" + e + "-> " + t +
                              " appears in successors but not in predecessors.";
             }
+            if (active == null || !active.contains(e)) {
+              assert false : "Transition " + s + " -" + e + "-> " + t +
+                             " appears in successors but not in active events.";
+            }
           }
         }
       }
     }
 
     // 2. Every transition in predecessors should also appear in successors
-    for (int t = 0; t < mPredecessors.length; t++) {
+    for (int t = 0; t < numberOfStates; t++) {
       for (int e = 0; e < mEvents.length; e++) {
         final TIntHashSet preds = getPredecessors(t, e);
         if (preds != null && !preds.isEmpty()) {
@@ -1368,10 +1378,21 @@ public class GeneralizedTransitionRelation
       }
     }
 
-    // 3. Are we still using active events (mActiveEvents)?
-    // If yes, they should also be checked here;
-    // If no, better remove the instance variable.
-    //** Not sure how to do this ..!~~Hani
+    // 3. Every event marked as active has a transition
+    for (int s = 0; s < numberOfStates; s++) {
+      final TIntHashSet active = getActiveEvents(s);
+      if (active != null) {
+        final TIntIterator iter = active.iterator();
+        while (iter.hasNext()) {
+          final int e = iter.next();
+          final TIntHashSet succs = getSuccessors(s, e);
+          if (succs == null || succs.isEmpty()) {
+            assert false : "Event " + e + " is active in state " + s +
+                           ", but there is no such transition.";
+          }
+        }
+      }
+    }
   }
 
 }
