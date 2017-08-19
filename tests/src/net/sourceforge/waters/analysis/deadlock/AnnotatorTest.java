@@ -175,7 +175,7 @@ public class AnnotatorTest
     tr.annotateWithActiveEvents();
     tr.checkIntegrity();
     // calculate unannotated form
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
+    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
 

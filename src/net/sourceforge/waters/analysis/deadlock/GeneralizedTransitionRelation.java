@@ -81,7 +81,7 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final String TAU=":tau";
-  private final int TAU_INDEX=0;
+  //private final int TAU_INDEX=0;
 
   public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
   {
@@ -1239,9 +1239,9 @@ public class GeneralizedTransitionRelation
     annotatedAutomaton.run();
   }
 
-  public AutomatonProxy unannotate(final ProductDESProxy des, final ProductDESProxyFactory factory){
+  public AutomatonProxy unannotate(final ProductDESProxy des, final ProductDESProxyFactory factory, final EventProxy[] eventsToHide){
     final UnAnnotator ua = new UnAnnotator(this);
-    final AutomatonProxy aut = ua.run(factory, des);
+    final AutomatonProxy aut = ua.run(factory, des, eventsToHide);
     return aut;
   }
 
@@ -1277,7 +1277,7 @@ public class GeneralizedTransitionRelation
    return mEventToInt;
  }
 
- public void removePropWithEvent(final int index) {
+/* public void removePropWithEvent(final int index) {
    final EventProxy event = this.getEvent(index);
    for (final EventProxy ep : mEvents) {
      if(ep ==null)
@@ -1289,9 +1289,9 @@ public class GeneralizedTransitionRelation
        }
      }
    }
- }
+ }*/
 
-
+/*
  public void supressTauLoopTrans()
  {
     for (int s = 0; s < mSuccessors.length; s++) {
@@ -1322,12 +1322,7 @@ public class GeneralizedTransitionRelation
       }
     }
  }
-
- public void setSuccessorToNull(final int s, final int e)
- {
-    mSuccessors[s][e]=null;
- }
-
+*/
   //########################################################################
   //# Debugging
   /**
@@ -1376,6 +1371,7 @@ public class GeneralizedTransitionRelation
     // 3. Are we still using active events (mActiveEvents)?
     // If yes, they should also be checked here;
     // If no, better remove the instance variable.
+    //** Not sure how to do this ..!~~Hani
   }
 
 }

@@ -84,12 +84,8 @@ public class LocalEventHider
     // remove all annotations
     for(int i=0; i<events.length; i++) {
       mTransitionRelation.removeAllAnnotations(events[i]);
-      mTransitionRelation.removePropWithEvent(events[i]);
       mTransitionRelation.removeEvent(events[i]);
     }
-
-    // suppress tau loop ..
-    //mTransitionRelation.supressTauLoopTrans();
 
   }
 

@@ -143,7 +143,7 @@ public class AnnotatorWithPropsTest
     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(before, null);
     tr.annotateWithProps();
     tr.checkIntegrity();
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory());
+    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
 

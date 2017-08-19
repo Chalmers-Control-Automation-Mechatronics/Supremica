@@ -68,8 +68,10 @@ public class UnAnnotator
   }
 
   public AutomatonProxy run(final ProductDESProxyFactory factory,
-                            final ProductDESProxy des)
+                            final ProductDESProxy des, final EventProxy[] eventsToHide)
   {
+    if(eventsToHide !=null)
+    removePropWithEvent(eventsToHide);
 
     final Set<EventProxy> desEvents = des.getEvents();
     final Set<EventProxy> desProps = new HashSet<EventProxy>();
@@ -209,4 +211,25 @@ public class UnAnnotator
 
     return aut;
   }
+
+
+  public void removePropWithEvent(final EventProxy[] events) {
+    //final EventProxy event = this.getEvent(index);
+    for (int i=0; i<events.length; i++){
+    final EventProxy event = events[i];
+    if(event == null)
+      continue;
+    for (final EventProxy ep : mTransitionRelation.getEvents()) {
+      if(ep ==null)
+        continue;
+      if (ep.getKind()==EventKind.PROPOSITION) {
+        final String[] tokens = ep.getName().split(":");
+        if (Arrays.asList(tokens).contains(event.getName())) {
+          mTransitionRelation.removeEvent(mTransitionRelation.eventToInt(ep));
+        }
+      }
+    }
+    }
+  }
+
 }

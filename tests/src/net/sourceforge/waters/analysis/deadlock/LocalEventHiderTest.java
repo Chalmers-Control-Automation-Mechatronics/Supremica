@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -77,6 +78,7 @@ public class LocalEventHiderTest
     // mSimplifier = createTransitionRelationSimplifier();
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
     mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
+    eventsToHide = new ArrayList<EventProxy>();
   }
 
   @Override
@@ -188,12 +190,12 @@ public class LocalEventHiderTest
     runTransitionRelationSimplifier(des);
   }
 
-/*  public void test_hiding_12() throws Exception
+  public void test_hiding_12() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "annotation", "hiding_12.wmod");
     runTransitionRelationSimplifier(des);
-  }*/
+  }
 
   public void test_hiding_13() throws Exception
   {
@@ -219,7 +221,7 @@ public class LocalEventHiderTest
     tr.checkIntegrity();
     // calculate unannotated form
     final AutomatonProxy unannotated =
-      tr.unannotate(des, getProductDESProxyFactory());
+      tr.unannotate(des, getProductDESProxyFactory(), eventsToHide.toArray(new EventProxy[eventsToHide.size()]));
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
   }
@@ -262,6 +264,7 @@ public class LocalEventHiderTest
       if (!ep.getName().equals(TAU) && !ep.isObservable()) {
         final int index = tr.eventToInt(ep);
         localEvents.add(index);
+        eventsToHide.add(ep);
       }
     }
     return localEvents.toArray();
@@ -299,12 +302,12 @@ public class LocalEventHiderTest
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
+  private static  List<EventProxy> eventsToHide;
 
 
   //#########################################################################
   //# Class Constants
   protected static final String TAU = ":tau";
-
   protected static final String BEFORE = "before";
   protected static final String AFTER = "after";
 
