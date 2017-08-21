@@ -189,7 +189,7 @@ public class AboutPanel
     }
     builder.append("Maximum available memory: ");
     builder.append(Runtime.getRuntime().maxMemory() / 0x100000L);
-    builder.append(" MB</P>");
+    builder.append(" MiB</P>");
     builder.append("</BODY></HTML>");
 
     final Reader reader = new StringReader(builder.toString());
