@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui;
 
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -50,6 +51,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -70,6 +72,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
@@ -771,8 +774,8 @@ public class GraphEditorPanel
       // shape producer does not support them :-(
       final Set<Proxy> scrollable = new THashSet<Proxy>();
       for (Proxy proxy : list) {
-        if (proxy instanceof IdentifierSubject
-            || proxy instanceof ForeachSubject) {
+        if (proxy instanceof IdentifierSubject ||
+            proxy instanceof ForeachSubject) {
           final Subject subject = (Subject) proxy;
           final ProxySubject parent =
             (ProxySubject) SubjectTools.getAncestor(subject,
@@ -781,21 +784,30 @@ public class GraphEditorPanel
           proxy = parent;
         }
         final Proxy copy = getCopy(proxy);
-        if(copy == null){
+        if (copy == null) {
           scrollable.add(proxy);
-        }
-        else{
+        } else {
           scrollable.add(copy);
         }
       }
       final Rectangle2D bounds =
         getShapeProducer().getMinimumBoundingRectangle(scrollable);
-      final int x = (int) Math.floor(bounds.getX());
-      final int width =
-        (int) Math.ceil(bounds.getX() + bounds.getWidth()) - x;
-      final int y = (int) Math.floor(bounds.getY());
-      final int height =
-        (int) Math.ceil(bounds.getY() + bounds.getHeight()) - y;
+      final AffineTransform transform = getTransform();
+      final Point2D p1 = new Point2D.Double(bounds.getX(), bounds.getY());
+      final Point2D p2 = transform.transform(p1, null);
+      final int x = (int) Math.floor(p2.getX());
+      final int y = (int) Math.floor(p2.getY());
+      p1.setLocation(bounds.getMaxX(), bounds.getMaxY());
+      transform.transform(p1, p2);
+      int width = (int) Math.ceil(p2.getX()) - x;
+      int height = (int) Math.ceil(p2.getY()) - y;
+      final Container parent = getParent();
+      if (parent != null && parent instanceof JViewport) {
+        // reduce the displayed area to viewport size,
+        // otherwise Java scrolls to bottom-right rather than top-left
+        width = Math.min(width, parent.getWidth());
+        height = Math.min(height, parent.getHeight());
+      }
       final Rectangle rect = new Rectangle(x, y, width, height);
       scrollRectToVisible(rect);
     }
@@ -951,38 +963,98 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Repainting
+  //# Repainting and Resizing
   @Override
   protected void paintComponent(final Graphics graphics)
   {
-    super.paintComponent(graphics);
-    if (mInternalDragAction == null) {
+    if (mCurrentBounds == null || mInternalDragAction == null) {
       adjustSize();
     }
+    super.paintComponent(graphics);
   }
 
-  protected void adjustSize()
+  @Override
+  protected AffineTransform createTransform()
   {
-    if (mSizeMayHaveChanged) {
-      mSizeMayHaveChanged = false;
-      final Dimension dim = calculatePreferredSize();
-      if (!dim.equals(getPreferredSize())) {
-        setPreferredSize(dim);
-        revalidate();
+    final AffineTransform transform = new AffineTransform();
+    transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
+    return transform;
+  }
+
+  /**
+   * Recalculates the canvas size. This method is called during redraw or
+   * when graph change has been detected. It calculates the graph bounds
+   * and estimates a suitable size for the canvas. If necessary, the canvas
+   * is resized by changing the preferred size and revalidating. In addition,
+   * if the graph grows or shrinks to the top or left, the viewport position
+   * (i.e. scrollbars) is adjusted, so that only the scrollbars change but
+   * the graph does not move. Nevertheless, scrolling may still occur when
+   * triggered by {@link #scrollToVisible(List) scrollToVisible()}.
+   */
+  private void adjustSize()
+  {
+    if (!mSizeMayHaveChanged) {
+      return;
+    }
+    mSizeMayHaveChanged = false;
+
+    // 1. Find the area covered by the graph plus margins
+    final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
+    Rectangle bounds;
+    if (area.isEmpty()) {
+      bounds = new Rectangle(0, 0, 0, 0);
+    } else {
+      final int x0 = grid *
+        Math.floorDiv((int) area.getX() - LOWER_MARGIN, grid);
+      final int x1 = grid *
+        Math.floorDiv((int) area.getMaxX() + UPPER_MARGIN + grid - 1, grid);
+      final int y0 = grid *
+        Math.floorDiv((int) area.getY() - LOWER_MARGIN, grid);
+      final int y1 = grid *
+        Math.floorDiv((int) area.getMaxY() + UPPER_MARGIN + grid - 1, grid);
+      bounds = new Rectangle(x0, y0, x1 - x0, y1 - y0);
+    }
+
+    // 2. Include the top-left corner of the viewport in the area
+    final Container parent = getParent();
+    final Point viewPosition;
+    if (parent == null || !(parent instanceof JViewport)) {
+      viewPosition = null;
+    } else if (mCurrentBounds == null) {
+      viewPosition = new Point(0, 0);
+    } else {
+      final JViewport viewport = (JViewport) parent;
+      viewPosition = viewport.getViewPosition();
+      viewPosition.x += mCurrentBounds.x;
+      viewPosition.y += mCurrentBounds.y;
+      bounds.add(viewPosition);
+      // If the top-left corner is not (0,0), also include to top-right
+      // and/or bottom-left. to stop Swing from scrolling the graph
+      if (viewPosition.x > bounds.x) {
+        bounds.add(viewPosition.x + viewport.getWidth(), viewPosition.y);
+      }
+      if (viewPosition.y > bounds.y) {
+        bounds.add(viewPosition.x, viewPosition.y + viewport.getHeight());
       }
     }
-  }
 
-  private Dimension calculatePreferredSize()
-  {
-    // TODO Does not work with negative lower bounds for x and y.
-    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
-    final int width = (int) Math.ceil(area.getWidth());
-    final int height = (int) Math.ceil(area.getHeight());
-    final int extra = Config.GUI_EDITOR_GRID_SIZE.get() * 10;
-    final int x = width + extra;
-    final int y = height + extra;
-    return new Dimension(x, y);
+    // 3. If the bounds have changed, set the preferred size and view position
+    if (mCurrentBounds != null && mCurrentBounds.equals(bounds)) {
+      return;
+    }
+    final Dimension preferredSize = bounds.getSize();
+    setPreferredSize(preferredSize);
+    if (mCurrentBounds != null && viewPosition != null &&
+        (bounds.x != mCurrentBounds.x || bounds.y != mCurrentBounds.y)) {
+      final JViewport viewport = (JViewport) parent;
+      viewPosition.x -= bounds.x;
+      viewPosition.y -= bounds.y;
+      viewport.setViewPosition(viewPosition);
+    }
+    clearTransform();
+    mCurrentBounds = bounds;
+    revalidate();
   }
 
 
@@ -3122,12 +3194,8 @@ public class GraphEditorPanel
           y = 0;
         }
       }
-      //if the item is dragged to where it originally was then don't commit
-      if (x == 0 && y == 0) {
-        mShouldCommit = false;
-      } else {
-        mShouldCommit = true;
-      }
+      // if the item is dragged to where it originally was then don't commit
+      mShouldCommit = x != 0 || y != 0;
       mMoveVisitor.moveAll(x, y, directional && edgeMove, getDragStart());
     }
 
@@ -3164,10 +3232,14 @@ public class GraphEditorPanel
     @Override
     void commitSecondaryGraph()
     {
-      if(mShouldCommit){
+      if (mShouldCommit) {
         super.commitSecondaryGraph();
+        adjustSize();
+        final List<ProxySubject> movedObjects =
+          new ArrayList<>(mMoveVisitor.mMovedObjects);
+        scrollToVisible(movedObjects);
       }
-       mMoveVisitor = null;
+      mMoveVisitor = null;
     }
 
     @Override
@@ -5202,8 +5274,6 @@ public class GraphEditorPanel
       return null;
     }
 
-     //TODO maybe need to change the point of this visitor ??
-
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
@@ -5554,7 +5624,18 @@ public class GraphEditorPanel
    * accurately whether the hierarchy needs updating again.
    */
   private boolean mHasGroupNodes;
-  private boolean mSizeMayHaveChanged;
+  /**
+   * The current bounding box of the displayed area. The bounds indicate the
+   * area to be covered by the canvas in graph coordinates. The bounds cover
+   * all graphical objects plus margins. The bounds may be larger than the
+   * panel/viewport because scrollbars are used.
+   */
+  private Rectangle mCurrentBounds = null;
+  /**
+   * A flag indicating the the bounds ({@link #mCurrentBounds}) may have
+   * changed and need to be recalculated.
+   */
+  private boolean mSizeMayHaveChanged = true;
 
   private ToolController mController;
   private ToolController mSelectController;
@@ -5567,7 +5648,8 @@ public class GraphEditorPanel
 
   private final EventDeclListModelObserver mEventDeclListModelObserver =
     new EventDeclListModelObserver();
-  SelectableAncestorVisitor mSelectableAncestorVisitor = new SelectableAncestorVisitor();
+  private final SelectableAncestorVisitor mSelectableAncestorVisitor =
+    new SelectableAncestorVisitor();
   private Selection mSelection = new Selection();
 
   private final IdentifierPasteVisitor mIdentifierPasteVisitor =
@@ -5576,12 +5658,15 @@ public class GraphEditorPanel
   private List<Observer> mObservers;
 
   private Command mLastCommand = null;
-  Point2D mDisplacement = null;
+  private Point2D mDisplacement = null;
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -5441237464454813450L;
+
+  private static final int LOWER_MARGIN = 32;
+  private static final int UPPER_MARGIN = 128;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }
