@@ -56,4 +56,13 @@ public class ConfigBridge
     verifier.setInitialSize(Config.BDD2_INITIALNODETABLESIZE.get());
     verifier.setPartitioningSizeLimit(Config.BDD_PARTITION_MAX.get());
   }
+
+  public static int getGridSize()
+  {
+    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
+      return Config.GUI_EDITOR_GRID_SIZE.get();
+    } else {
+      return 1;
+    }
+  }
 }

@@ -202,27 +202,25 @@ public class GraphPanel
 
   //##########################################################################
   //# Repainting
-  protected void paintGrid(final Graphics g)
+  protected void paintGrid(final Graphics graphics)
   {
-    final Color background = Config.GUI_EDITOR_BACKGROUND_COLOR.get();
-    g.setColor(background);
-    g.fillRect(0, 0, getWidth(), getHeight());
-    g.setColor(EditorColor.GRIDCOLOR);
-
-    // Draw grid iff showGrid is true
-    if (Config.GUI_EDITOR_SHOW_GRID.get())
-    {
-      final int x = -(int)getLocation().getX();
-      final int y = -(int)getLocation().getY();
-
-      for (int i = 0; i < getWidth(); i += Config.GUI_EDITOR_GRID_SIZE.get())
-      {
-        g.drawLine(i, y, i, getHeight());
+    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
+      graphics.setColor(EditorColor.GRIDCOLOR);
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+      final AffineTransform inverse = getInverseTransform();
+      final Point pt = new Point(0, 0);
+      final Point2D result = inverse.transform(pt, null);
+      final int x0 = Math.floorDiv((int) Math.floor(result.getX()), grid) * grid;
+      final int y0 = Math.floorDiv((int) Math.floor(result.getY()), grid) * grid;
+      pt.setLocation(getWidth(), getHeight());
+      inverse.transform(pt, result);
+      final int x1 = (int) Math.ceil(result.getX());
+      final int y1 = (int) Math.ceil(result.getY());
+      for (int x = x0; x <= x1; x += grid) {
+        graphics.drawLine(x, y0, x, y1);
       }
-
-      for (int i = 0; i < getHeight(); i += Config.GUI_EDITOR_GRID_SIZE.get())
-      {
-        g.drawLine(x, i, getWidth(), i);
+      for (int y = y0; y <= y1; y += grid) {
+        graphics.drawLine(x0, y, x1, y);
       }
     }
   }
@@ -248,16 +246,19 @@ public class GraphPanel
   @Override
   protected void paintComponent(final Graphics graphics)
   {
-    paintGrid(graphics);
+    final Color background = Config.GUI_EDITOR_BACKGROUND_COLOR.get();
+    graphics.setColor(background);
+    graphics.fillRect(0, 0, getWidth(), getHeight());
     final Graphics2D g2d = (Graphics2D) graphics;
     final AffineTransform old = g2d.getTransform();
     final AffineTransform transform = getTransform();
     final AffineTransform copy = new AffineTransform(old);
     copy.concatenate(transform);
     g2d.setTransform(copy);
+    paintGrid(graphics);
     final Renderer renderer =
       new Renderer(getDrawnGraph(), getDrawnObjects(), getShapeProducer());
-    renderer.renderGraph((Graphics2D) graphics);
+    renderer.renderGraph(g2d);
     g2d.setTransform(old);
   }
 

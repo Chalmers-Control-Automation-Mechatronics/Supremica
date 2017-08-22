@@ -111,6 +111,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
+import net.sourceforge.waters.gui.util.ConfigBridge;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -213,7 +214,7 @@ public class GraphEditorPanel
     ensureGeometryExists();
     mHasGroupNodes = GraphTools.updateGroupNodeHierarchy(graph);
     mNeedsHierarchyUpdate = false;
-    mSizeMayHaveChanged = true;
+    mBoundsMayHaveChanged = true;
     registerGraphObserver();
     registerSupremicaPropertyChangeListeners();
     addFocusListener(this);
@@ -302,6 +303,7 @@ public class GraphEditorPanel
   public void registerSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_SHOW_GRID.addPropertyChangeListener(this);
     Config.GUI_EDITOR_GRID_SIZE.addPropertyChangeListener(this);
   }
 
@@ -309,6 +311,7 @@ public class GraphEditorPanel
   public void unregisterSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_SHOW_GRID.removePropertyChangeListener(this);
     Config.GUI_EDITOR_GRID_SIZE.removePropertyChangeListener(this);
   }
 
@@ -795,12 +798,14 @@ public class GraphEditorPanel
       final AffineTransform transform = getTransform();
       final Point2D p1 = new Point2D.Double(bounds.getX(), bounds.getY());
       final Point2D p2 = transform.transform(p1, null);
-      final int x = (int) Math.floor(p2.getX());
-      final int y = (int) Math.floor(p2.getY());
+      final int x0 = (int) p2.getX();
+      final int y0 = (int) p2.getY();
       p1.setLocation(bounds.getMaxX(), bounds.getMaxY());
       transform.transform(p1, p2);
-      int width = (int) Math.ceil(p2.getX()) - x;
-      int height = (int) Math.ceil(p2.getY()) - y;
+      final int x1 = (int) Math.ceil((int) p2.getX());
+      final int y1 = (int) Math.ceil((int) p2.getY());
+      int width = x1 - x0;
+      int height = y1 - y0;
       final Container parent = getParent();
       if (parent != null && parent instanceof JViewport) {
         // reduce the displayed area to viewport size,
@@ -808,7 +813,7 @@ public class GraphEditorPanel
         width = Math.min(width, parent.getWidth());
         height = Math.min(height, parent.getHeight());
       }
-      final Rectangle rect = new Rectangle(x, y, width, height);
+      final Rectangle rect = new Rectangle(x0, y0, width, height);
       scrollRectToVisible(rect);
     }
   }
@@ -937,7 +942,7 @@ public class GraphEditorPanel
     updateOverlap();
     mController.updateHighlighting();
     super.graphChanged(event);
-    mSizeMayHaveChanged = true;
+    mBoundsMayHaveChanged = true;
   }
 
 
@@ -978,6 +983,7 @@ public class GraphEditorPanel
   {
     final AffineTransform transform = new AffineTransform();
     transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
+    transform.scale(ZOOM_SCALE, ZOOM_SCALE);
     return transform;
   }
 
@@ -993,49 +999,46 @@ public class GraphEditorPanel
    */
   private void adjustSize()
   {
-    if (!mSizeMayHaveChanged) {
+    if (!mBoundsMayHaveChanged) {
       return;
     }
-    mSizeMayHaveChanged = false;
+    mBoundsMayHaveChanged = false;
 
     // 1. Find the area covered by the graph plus margins
-    final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
-    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
-    Rectangle bounds;
-    if (area.isEmpty()) {
-      bounds = new Rectangle(0, 0, 0, 0);
-    } else {
-      final int x0 = grid *
-        Math.floorDiv((int) area.getX() - LOWER_MARGIN, grid);
-      final int x1 = grid *
-        Math.floorDiv((int) area.getMaxX() + UPPER_MARGIN + grid - 1, grid);
-      final int y0 = grid *
-        Math.floorDiv((int) area.getY() - LOWER_MARGIN, grid);
-      final int y1 = grid *
-        Math.floorDiv((int) area.getMaxY() + UPPER_MARGIN + grid - 1, grid);
-      bounds = new Rectangle(x0, y0, x1 - x0, y1 - y0);
+    final Rectangle2D area2D = getShapeProducer().getMinimumBoundingRectangle();
+    final Rectangle bounds = area2D.getBounds();
+    if (!bounds.isEmpty()) {
+      final int grid = ConfigBridge.getGridSize();
+      final double gz = grid * ZOOM_SCALE;
+      final int x0 = (int) (gz *
+        Math.floorDiv(bounds.x - LOWER_MARGIN, grid));
+      final int x1 = (int) Math.ceil(gz *
+        Math.floorDiv((int) bounds.getMaxX() + grid - 1 + UPPER_MARGIN, grid));
+      final int y0 = (int) (gz *
+        Math.floorDiv(bounds.y - LOWER_MARGIN, grid));
+      final int y1 = (int) Math.ceil(gz *
+        Math.floorDiv((int) bounds.getMaxY() + grid - 1 + UPPER_MARGIN, grid));
+      bounds.setBounds(x0, y0, x1 - x0, y1 - y0);
     }
 
     // 2. Include the top-left corner of the viewport in the area
     final Container parent = getParent();
-    final Point viewPosition;
-    if (parent == null || !(parent instanceof JViewport)) {
-      viewPosition = null;
-    } else if (mCurrentBounds == null) {
-      viewPosition = new Point(0, 0);
-    } else {
+    final boolean useViewport =
+      mCurrentBounds != null && parent != null && parent instanceof JViewport;
+    if (useViewport) {
       final JViewport viewport = (JViewport) parent;
-      viewPosition = viewport.getViewPosition();
+      final Point viewPosition = viewport.getViewPosition();
       viewPosition.x += mCurrentBounds.x;
       viewPosition.y += mCurrentBounds.y;
       bounds.add(viewPosition);
-      // If the top-left corner is not (0,0), also include to top-right
+      // If the top-left corner is not (0,0), also include the top-right
       // and/or bottom-left. to stop Swing from scrolling the graph
+      final Rectangle view = viewport.getViewRect();
       if (viewPosition.x > bounds.x) {
-        bounds.add(viewPosition.x + viewport.getWidth(), viewPosition.y);
+        bounds.add(viewPosition.x + view.getWidth() + 32, viewPosition.y);
       }
       if (viewPosition.y > bounds.y) {
-        bounds.add(viewPosition.x, viewPosition.y + viewport.getHeight());
+        bounds.add(viewPosition.x, viewPosition.y + view.getHeight());
       }
     }
 
@@ -1045,16 +1048,17 @@ public class GraphEditorPanel
     }
     final Dimension preferredSize = bounds.getSize();
     setPreferredSize(preferredSize);
-    if (mCurrentBounds != null && viewPosition != null &&
+    revalidate();
+    if (useViewport &&
         (bounds.x != mCurrentBounds.x || bounds.y != mCurrentBounds.y)) {
       final JViewport viewport = (JViewport) parent;
-      viewPosition.x -= bounds.x;
-      viewPosition.y -= bounds.y;
+      final Point viewPosition = viewport.getViewPosition();
+      viewPosition.x += mCurrentBounds.x - bounds.x;
+      viewPosition.y += mCurrentBounds.y - bounds.y;
       viewport.setViewPosition(viewPosition);
     }
     clearTransform();
     mCurrentBounds = bounds;
-    revalidate();
   }
 
 
@@ -1420,17 +1424,34 @@ public class GraphEditorPanel
    */
   private int findGrid(final double x)
   {
-    final int gridSize = Config.GUI_EDITOR_GRID_SIZE.get();
-    return gridSize * (int) Math.round(x / gridSize);
+    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+      return grid * (int) Math.round(x / grid);
+    } else {
+      return (int) Math.round(x);
+    }
+  }
+
+  /**
+   * Returns the closest coordinate (works for both x and y) lying on the grid.
+   */
+  private int findGrid(final int x)
+  {
+    if (Config.GUI_EDITOR_SHOW_GRID.get()) {
+      final int grid = Config.GUI_EDITOR_GRID_SIZE.get();
+      return grid * (int) Math.round((double) x / (double) grid);
+    } else {
+      return x;
+    }
   }
 
   /**
    * Finds the closest point to p lying on the grid.
    */
-  private Point findGrid(final Point2D point)
+  private Point findGrid(final Point point)
   {
-    final int x = findGrid(point.getX());
-    final int y = findGrid(point.getY());
+    final int x = findGrid(point.x);
+    final int y = findGrid(point.y);
     return new Point(x, y);
   }
 
@@ -3091,7 +3112,8 @@ public class GraphEditorPanel
       }
       mShouldCommit = true;
       Point2D snap = null;
-      if (Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
+      if (Config.GUI_EDITOR_SHOW_GRID.get() &&
+          Config.GUI_EDITOR_NODES_SNAP_TO_GRID.get()) {
         // Move operation snaps to grid when a node is moved.
         for (final ProxySubject item : getCurrentSelection()) {
           if (item instanceof SimpleNodeSubject) {
@@ -4101,7 +4123,7 @@ public class GraphEditorPanel
       final double dx = Math.abs(p2.getX() - p1.getX());
       final double dy = Math.abs(p2.getY() - p1.getY());
       final double perp = Math.pow(dx*dx + dy*dy, 0.5);
-      final int gridSize = Config.GUI_EDITOR_GRID_SIZE.get();
+      final int gridSize = ConfigBridge.getGridSize();
       double newX = (dy / perp) * gridSize;
       double newY = (dx / perp) * gridSize;
 
@@ -5632,10 +5654,10 @@ public class GraphEditorPanel
    */
   private Rectangle mCurrentBounds = null;
   /**
-   * A flag indicating the the bounds ({@link #mCurrentBounds}) may have
+   * A flag indicating that the bounds ({@link #mCurrentBounds}) may have
    * changed and need to be recalculated.
    */
-  private boolean mSizeMayHaveChanged = true;
+  private boolean mBoundsMayHaveChanged = true;
 
   private ToolController mController;
   private ToolController mSelectController;
@@ -5667,6 +5689,8 @@ public class GraphEditorPanel
 
   private static final int LOWER_MARGIN = 32;
   private static final int UPPER_MARGIN = 128;
+  /// Zoom factor---not constant for long ...
+  private static final double ZOOM_SCALE = 1.0;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

@@ -265,8 +265,6 @@ public class AutomatonDisplayPane
   @Override
   protected void paintGrid(final Graphics graphics)
   {
-    graphics.setColor(getBackground());
-    graphics.fillRect(0, 0, getWidth(), getHeight());
   }
 
   @Override
