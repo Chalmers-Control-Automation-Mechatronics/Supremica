@@ -178,7 +178,6 @@ public class AnnotatorTest
     final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
-
   }
 
 

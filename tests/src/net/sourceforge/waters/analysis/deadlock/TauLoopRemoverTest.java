@@ -34,15 +34,18 @@
 package net.sourceforge.waters.analysis.deadlock;
 
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -52,7 +55,6 @@ import net.sourceforge.waters.model.module.ParameterBindingProxy;
 public class TauLoopRemoverTest
   extends AbstractAnalysisTest
 {
-
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
   public TauLoopRemoverTest()
@@ -141,11 +143,16 @@ public class TauLoopRemoverTest
     throws Exception
   {
     getLogger().info("Checking " + des.getName() + " ...");
-    @SuppressWarnings("unused")
+
     final AutomatonProxy before = findAutomaton(des, BEFORE);
 
-    final AutomatonProxy after = null;
-    checkResult(des, after);
+     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(before, getTau(des));
+     tr.removeTauLoop();
+  //  tr.checkIntegrity();
+    // calculate unannotated form
+   // final AutomatonProxy expected = findAutomaton(des, AFTER);
+    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
+    checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
   }
 
@@ -177,6 +184,17 @@ public class TauLoopRemoverTest
         mIsomorphismChecker.checkIsomorphism(result, expected);
       }
     }
+  }
+
+  public EventProxy getTau(final ProductDESProxy des) {
+
+    final Set<EventProxy> desEvents = des.getEvents();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
+          return ep;
+      }
+    }
+    return null;
   }
 
 

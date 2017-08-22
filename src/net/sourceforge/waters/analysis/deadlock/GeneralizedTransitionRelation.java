@@ -1277,6 +1277,11 @@ public class GeneralizedTransitionRelation
    return mEventToInt;
  }
 
+ public void removeTauLoop() {
+   final TauLoopRemover remover = new TauLoopRemover(this);
+   remover.run();
+ }
+
 /* public void removePropWithEvent(final int index) {
    final EventProxy event = this.getEvent(index);
    for (final EventProxy ep : mEvents) {
