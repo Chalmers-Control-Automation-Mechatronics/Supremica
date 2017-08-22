@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tauLoopRemover_02" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<Module Name="tauLoopRemover_02" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
-        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="tau"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
         <EventDecl Kind="PROPOSITION" Name="ann:">
             <ColorGeometry>
-                <Color Blue="51" Green="51" Red="255"/>
+                <Color Red="255" Green="51" Blue="51"/>
             </ColorGeometry>
         </EventDecl>
     </EventDeclList>
@@ -59,7 +59,7 @@
                 <EdgeList>
                     <Edge Source="S1" Target="S0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name=":tau"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-21" Y="0"/>
                             </LabelGeometry>
@@ -76,7 +76,7 @@
                     </Edge>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="tau"/>
+                            <SimpleIdentifier Name=":tau"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="3" Y="-18"/>
                             </LabelGeometry>
