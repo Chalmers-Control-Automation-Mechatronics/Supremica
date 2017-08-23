@@ -804,15 +804,11 @@ public class GraphEditorPanel
       transform.transform(p1, p2);
       final int x1 = (int) Math.ceil((int) p2.getX());
       final int y1 = (int) Math.ceil((int) p2.getY());
-      int width = x1 - x0;
-      int height = y1 - y0;
-      final Container parent = getParent();
-      if (parent != null && parent instanceof JViewport) {
-        // reduce the displayed area to viewport size,
-        // otherwise Java scrolls to bottom-right rather than top-left
-        width = Math.min(width, parent.getWidth());
-        height = Math.min(height, parent.getHeight());
-      }
+      // reduce the displayed area to viewport size,
+      // otherwise Java scrolls to bottom-right rather than top-left
+      final Rectangle view = getVisibleRect();
+      final int width = Math.min(x1 - x0, view.width);
+      final int height = Math.min(y1 - y0, view.height);
       final Rectangle rect = new Rectangle(x0, y0, width, height);
       scrollRectToVisible(rect);
     }
@@ -1023,22 +1019,20 @@ public class GraphEditorPanel
 
     // 2. Include the top-left corner of the viewport in the area
     final Container parent = getParent();
-    final boolean useViewport =
+    final boolean useViewPort =
       mCurrentBounds != null && parent != null && parent instanceof JViewport;
-    if (useViewport) {
-      final JViewport viewport = (JViewport) parent;
-      final Point viewPosition = viewport.getViewPosition();
-      viewPosition.x += mCurrentBounds.x;
-      viewPosition.y += mCurrentBounds.y;
-      bounds.add(viewPosition);
+    if (useViewPort) {
+      final Rectangle view = getVisibleRect();
+      final int x = view.x + mCurrentBounds.x;
+      final int y = view.y + mCurrentBounds.y;
+      bounds.add(x, y);
       // If the top-left corner is not (0,0), also include the top-right
       // and/or bottom-left. to stop Swing from scrolling the graph
-      final Rectangle view = viewport.getViewRect();
-      if (viewPosition.x > bounds.x) {
-        bounds.add(viewPosition.x + view.getWidth() + 32, viewPosition.y);
+      if (x > bounds.x) {
+        bounds.add(x + view.width, y);
       }
-      if (viewPosition.y > bounds.y) {
-        bounds.add(viewPosition.x, viewPosition.y + view.getHeight());
+      if (y > bounds.y) {
+        bounds.add(x, y + view.height);
       }
     }
 
@@ -1049,7 +1043,7 @@ public class GraphEditorPanel
     final Dimension preferredSize = bounds.getSize();
     setPreferredSize(preferredSize);
     revalidate();
-    if (useViewport &&
+    if (useViewPort &&
         (bounds.x != mCurrentBounds.x || bounds.y != mCurrentBounds.y)) {
       final JViewport viewport = (JViewport) parent;
       final Point viewPosition = viewport.getViewPosition();
@@ -2466,7 +2460,7 @@ public class GraphEditorPanel
         } else if (event.getClickCount() == 2 && mFocusedObject != null) {
           if (mFocusedObject instanceof LabelGeometrySubject) {
             final SimpleNodeSubject node =
-            (SimpleNodeSubject) mFocusedObject.getParent();
+              (SimpleNodeSubject) mFocusedObject.getParent();
             editStateName(node);
           } else if (mFocusedObject instanceof SimpleNodeSubject) {
             final SimpleNodeSubject node = (SimpleNodeSubject)mFocusedObject;
@@ -4864,19 +4858,22 @@ public class GraphEditorPanel
       final LabelGeometrySubject geo = node.getLabelGeometry();
       final Point2D pgeo = node.getPointGeometry().getPoint();
       final Point2D lgeo = geo.getOffset();
-      final Rectangle rect = GraphEditorPanel.this.getVisibleRect();
-      int x = (int) Math.round(pgeo.getX() + lgeo.getX());
-      final int y = (int) Math.round(pgeo.getY() + lgeo.getY());
+      pgeo.setLocation(pgeo.getX() + lgeo.getX(), pgeo.getY() + lgeo.getY());
+      final AffineTransform transform = getTransform();
+      final Point2D pos2d = transform.transform(pgeo, null);
+      final Rectangle view = GraphEditorPanel.this.getVisibleRect();
+      int x = (int) Math.round(pos2d.getX());
+      final int y = (int) Math.round(pos2d.getY());
       int width = STATE_INPUT_WIDTH;
-      final int height = getPreferredSize().height;
-      if (width > rect.width) {
-        width = rect.width;
+      if (width > view.width) {
+        width = view.width;
       }
-      final int xmax = rect.x + rect.width;
+      final int xmax = view.x + view.width;
       if (x + width > xmax) {
         x = xmax - width;
       }
       final Point pos = new Point(x, y);
+      final int height = getPreferredSize().height;
       final Dimension size = new Dimension(width, height);
       setLocation(pos);
       setSize(size);
