@@ -1282,52 +1282,31 @@ public class GeneralizedTransitionRelation
    remover.run();
  }
 
-/* public void removePropWithEvent(final int index) {
-   final EventProxy event = this.getEvent(index);
-   for (final EventProxy ep : mEvents) {
-     if(ep ==null)
-       continue;
-     if (ep.getKind()==EventKind.PROPOSITION) {
-       final String[] tokens = ep.getName().split(":");
-       if (Arrays.asList(tokens).contains(event.getName())) {
-         this.removeEvent(this.eventToInt(ep));
+ /*
+  * For now, only check if Tau is needed ..
+  */
+ public void removeUnnecessaryEvents() {
+   for(int e=0; e< this.numberOfEvents(); e++) {
+     //final int e = mTransitionRelation.eventToInt(event);
+     boolean isNeeded = false;
+     for(int s=0; s< this.numberOfStates(); s++) {
+       final TIntHashSet succs = this.getSuccessors(s, e);
+       if (succs != null) {
+         isNeeded = true;
        }
      }
+     if(!isNeeded) {
+       this.removeEvent(e);
+     }
    }
- }*/
-
-/*
- public void supressTauLoopTrans()
- {
-    for (int s = 0; s < mSuccessors.length; s++) {
-      final TIntArrayList selfloops = new TIntArrayList();
-      if (!hasPredecessors(s)) {
-        continue;
-      }
-      for (int e = 0; e < mEvents.length; e++) {
-        if (mEvents[e] == null
-            || mEvents[e].getKind() == EventKind.PROPOSITION) {
-          continue;
-        }
-
-        final TIntHashSet succs = mSuccessors[s][e];
-        if (succs == null || succs.isEmpty()) {
-          continue;
-        }
-        if (succs.contains(s)) {
-          if(selfloops.contains(TAU_INDEX)) {
-            // remove tau transition
-            this.removeTransition(s, TAU_INDEX, s);
-            break;
-          }
-          else {
-            selfloops.add(e);
-          }
-        }
-      }
-    }
  }
-*/
+
+
+ public void removeUnnecessaryStates() {
+   //final TIntHashSet[] annint = mSuccessors[0];
+   //mSuccessors.
+
+ }
   //########################################################################
   //# Debugging
   /**
