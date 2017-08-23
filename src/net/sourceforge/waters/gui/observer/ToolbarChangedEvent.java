@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.observer;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
+import org.supremica.gui.ide.IDEToolBar;
 
 
 /**
@@ -52,27 +52,29 @@ public class ToolbarChangedEvent
 
   //#########################################################################
   //# Constructors
-  public ToolbarChangedEvent(final ControlledToolbar source,
-                             final ControlledToolbar.Tool tool)
+  public ToolbarChangedEvent(final IDEToolBar source,
+                             final IDEToolBar.Tool tool)
   {
     super(source);
     mTool = tool;
   }
 
-	
+
   //#########################################################################
   //# Simple Access
-  public ControlledToolbar getSource()
+  @Override
+  public IDEToolBar getSource()
   {
-    return (ControlledToolbar) super.getSource();
+    return (IDEToolBar) super.getSource();
   }
 
+  @Override
   public EditorChangedEvent.Kind getKind()
   {
     return EditorChangedEvent.Kind.TOOL_SWITCH;
   }
 
-  public ControlledToolbar.Tool getTool()
+  public IDEToolBar.Tool getTool()
   {
     return mTool;
   }
@@ -80,7 +82,7 @@ public class ToolbarChangedEvent
 
   //#########################################################################
   //# Data Members
-  private final ControlledToolbar.Tool mTool;
+  private final IDEToolBar.Tool mTool;
 
 
   //#########################################################################

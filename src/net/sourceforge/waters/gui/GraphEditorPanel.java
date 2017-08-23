@@ -90,6 +90,7 @@ import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
 import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputParser;
+import net.sourceforge.waters.gui.editor.ZoomSelector;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -168,6 +169,7 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.IDEToolBar;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 
@@ -194,7 +196,7 @@ public class GraphEditorPanel
                           final ModuleSubject module,
                           final ModuleContainer moduleContainer,
                           final EditorWindowInterface root,
-                          final ControlledToolbar toolbar,
+                          final IDEToolBar toolbar,
                           final WatersPopupActionManager manager)
     throws GeometryAbsentException
   {
@@ -930,19 +932,6 @@ public class GraphEditorPanel
 
 
   //#########################################################################
-  //# Repaint Support
-  @Override
-  protected void graphChanged(final ModelChangeEvent event)
-  {
-    checkGroupNodeHierarchyUpdate(event);
-    updateOverlap();
-    mController.updateHighlighting();
-    super.graphChanged(event);
-    mBoundsMayHaveChanged = true;
-  }
-
-
-  //#########################################################################
   //# Interface java.awt.event.FocusListener
   @Override
   public void focusGained(final FocusEvent event)
@@ -964,7 +953,53 @@ public class GraphEditorPanel
 
 
   //#########################################################################
+  //# Repaint Support
+  @Override
+  protected void graphChanged(final ModelChangeEvent event)
+  {
+    checkGroupNodeHierarchyUpdate(event);
+    updateOverlap();
+    mController.updateHighlighting();
+    super.graphChanged(event);
+    mBoundsMayHaveChanged = true;
+  }
+
+
+  //#########################################################################
   //# Repainting and Resizing
+  public double getZoomFactor()
+  {
+    return mZoomFactor;
+  }
+
+  public double getZoomFactorToFit()
+  {
+    final Rectangle2D area = getShapeProducer().getMinimumBoundingRectangle();
+    if (area.isEmpty()) {
+      return 1.0;
+    } else {
+      final int x = (int) Math.floor(area.getX());
+      final int grid = ConfigBridge.getGridSize();
+      final int x0 = Math.floorDiv(x - LOWER_MARGIN, grid) * grid;
+      final double width = area.getWidth() + 2.0 * (area.getX() - x0);
+      final int y = (int) Math.floor(area.getY());
+      final int y0 = Math.floorDiv(y - LOWER_MARGIN, grid) * grid;
+      final double height = area.getHeight() + 2.0 * (area.getY() - y0);
+      final Rectangle view = getVisibleRect();
+      return Math.min(view.width / width, view.height / height);
+    }
+  }
+
+  public void setZoomFactor(final double zoom)
+  {
+    if (mZoomFactor != zoom) {
+      mZoomFactor = zoom;
+      mBoundsMayHaveChanged = true;
+      mCurrentBounds = null;
+      repaint();
+    }
+  }
+
   @Override
   protected void paintComponent(final Graphics graphics)
   {
@@ -979,7 +1014,7 @@ public class GraphEditorPanel
   {
     final AffineTransform transform = new AffineTransform();
     transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
-    transform.scale(ZOOM_SCALE, ZOOM_SCALE);
+    transform.scale(mZoomFactor, mZoomFactor);
     return transform;
   }
 
@@ -1005,7 +1040,7 @@ public class GraphEditorPanel
     final Rectangle bounds = area2D.getBounds();
     if (!bounds.isEmpty()) {
       final int grid = ConfigBridge.getGridSize();
-      final double gz = grid * ZOOM_SCALE;
+      final double gz = grid * mZoomFactor;
       final int x0 = (int) (gz *
         Math.floorDiv(bounds.x - LOWER_MARGIN, grid));
       final int x1 = (int) Math.ceil(gz *
@@ -5593,7 +5628,14 @@ public class GraphEditorPanel
   //# Data Members
   private final EditorWindowInterface mRoot;
   private final ModuleContainer mModuleContainer;
-  private final ControlledToolbar mToolbar;
+  private final IDEToolBar mToolbar;
+
+  /**
+   * The current zoom factor for scaling the graph. This is the value set
+   * from the drop box in the toolbar ({@link ZoomSelector}), which may
+   * need further correction.
+   */
+  private double mZoomFactor = 1.0;
 
   /**
    * Set of items not to be drawn, because they are being dragged and
@@ -5686,8 +5728,6 @@ public class GraphEditorPanel
 
   private static final int LOWER_MARGIN = 32;
   private static final int UPPER_MARGIN = 128;
-  /// Zoom factor---not constant for long ...
-  private static final double ZOOM_SCALE = 1.0;
   private static final int STATE_INPUT_WIDTH = 128;
 
 }

@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.IDEToolBar;
 
 
 public class ToolGroupNodeAction
@@ -48,12 +48,12 @@ public class ToolGroupNodeAction
   public ToolGroupNodeAction(final IDE ide)
   {
     super(ide, "Group nodes", "Create group nodes",
-          IconLoader.ICON_TOOL_GROUP_NODE, ControlledToolbar.Tool.GROUPNODE);
+          IconLoader.ICON_TOOL_GROUP_NODE, IDEToolBar.Tool.GROUPNODE);
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -432313434562470245L;
 
 }

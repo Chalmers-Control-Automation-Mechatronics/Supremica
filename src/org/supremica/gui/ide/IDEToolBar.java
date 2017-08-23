@@ -46,7 +46,6 @@ import javax.swing.JButton;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
@@ -67,8 +66,10 @@ import net.sourceforge.waters.gui.actions.ToolNodeAction;
 import net.sourceforge.waters.gui.actions.ToolSelectAction;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
+import net.sourceforge.waters.gui.editor.ZoomSelector;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.ToolbarChangedEvent;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 
@@ -76,6 +77,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
+import org.supremica.properties.Config;
 
 
 /**
@@ -100,7 +102,7 @@ import org.supremica.gui.ide.actions.SaveAction;
 
 public class IDEToolBar
   extends JToolBar
-  implements ControlledToolbar, Observer
+  implements Observer, Subject
 {
 
   //#########################################################################
@@ -109,7 +111,7 @@ public class IDEToolBar
   {
     mIDE = ide;
     mObservers = new LinkedList<Observer>();
-    mTool = ControlledToolbar.Tool.SELECT;
+    mTool = Tool.SELECT;
     setRollover(true);
     setFloatable(false);
     final Actions actions = mIDE.getActions();
@@ -123,6 +125,7 @@ public class IDEToolBar
                        group, false);
     mEdgeToolButton =
       createToolButton(actions.getAction(ToolEdgeAction.class), group, false);
+    mZoomSelector = new ZoomSelector(mIDE);
     createButtons();
     mIDE.attach(this);
   }
@@ -133,8 +136,7 @@ public class IDEToolBar
   /**
    * Gets the current graph drawing tool.
    */
-  @Override
-  public ControlledToolbar.Tool getTool()
+  public Tool getTool()
   {
     return mTool;
   }
@@ -144,7 +146,7 @@ public class IDEToolBar
    * will be sent to all registered listeners on this toolbar and the
    * {@link IDE}.
    */
-  public void setTool(final ControlledToolbar.Tool tool)
+  public void setTool(final Tool tool)
   {
     if (tool != mTool) {
       mTool = tool;
@@ -243,6 +245,8 @@ public class IDEToolBar
         add(mNodeToolButton);
         add(mGroupNodeToolButton);
         add(mEdgeToolButton);
+        addSeparator();
+        add(mZoomSelector);
       } else if (panel instanceof SimulatorPanel) {
         addSeparator();
         addAction(actions.getAction(SimulationResetAction.class));
@@ -251,7 +255,7 @@ public class IDEToolBar
         addAction(actions.getAction(SimulationStepAction.class));
         addAction(actions.getAction(SimulationReplayStepAction.class));
         addAction(actions.getAction(SimulationJumpToEndAction.class));
-        if(org.supremica.properties.Config.INCLUDE_FLEXFACT.isTrue()){
+        if (Config.INCLUDE_FLEXFACT.isTrue()) {
           addAction(actions.getAction(SimulationAutoStepAction.class));
         }
       }
@@ -277,6 +281,17 @@ public class IDEToolBar
 
 
   //#########################################################################
+  //# Inner Enumeration Tool
+  public enum Tool
+  {
+    SELECT,
+    NODE,
+    GROUPNODE,
+    EDGE;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final IDE mIDE;
   private final List<Observer> mObservers;
@@ -285,8 +300,9 @@ public class IDEToolBar
   private final JToggleButton mNodeToolButton;
   private final JToggleButton mGroupNodeToolButton;
   private final JToggleButton mEdgeToolButton;
+  private final ZoomSelector mZoomSelector;
 
-  private ControlledToolbar.Tool mTool;
+  private Tool mTool;
 
 
   //#########################################################################

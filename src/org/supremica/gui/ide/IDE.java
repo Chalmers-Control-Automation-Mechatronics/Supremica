@@ -311,14 +311,17 @@ public class IDE
   @Override
   public EditorWindowInterface getActiveEditorWindowInterface()
   {
-    return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
+    final DocumentContainer active = getActiveDocumentContainer();
+    if (active == null) {
+      return null;
+    } else {
+      return active.getEditorPanel().getActiveEditorWindowInterface();
+    }
   }
-
 
   public Project getActiveProject()
   {
-    final DocumentContainer active =
-      mDocumentContainerManager.getActiveContainer();
+    final DocumentContainer active = getActiveDocumentContainer();
     return active.getAnalyzerPanel().getVisualProject();
   }
 

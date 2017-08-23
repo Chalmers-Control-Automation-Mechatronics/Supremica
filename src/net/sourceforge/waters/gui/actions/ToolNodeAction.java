@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
 import net.sourceforge.waters.gui.util.IconLoader;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.IDEToolBar;
 
 
 public class ToolNodeAction
@@ -48,12 +48,12 @@ public class ToolNodeAction
   public ToolNodeAction(final IDE ide)
   {
     super(ide, "Nodes", "Create simple nodes", IconLoader.ICON_TOOL_NODE,
-          ControlledToolbar.Tool.NODE);
+          IDEToolBar.Tool.NODE);
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -7751415425665830292L;
 
 }
