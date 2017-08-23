@@ -119,6 +119,7 @@ public class GeneralizedTransitionRelation
     Collections.sort(mStateProxyList);
     for (final StateProxy s : mStateProxyList) {
       mStateToInt.put(s, numstates);
+
     /*  if (s.getPropositions().contains(marked) || !aut.getEvents().contains(marked)) {
         markState(numstates, true);
       }*/
@@ -1302,11 +1303,15 @@ public class GeneralizedTransitionRelation
  }
 
 
- public void removeUnnecessaryStates() {
-   //final TIntHashSet[] annint = mSuccessors[0];
-   //mSuccessors.
-
- }
+  public void removeUnnecessaryStates()
+  {
+    for (int s = 0; s < this.numberOfStates(); s++) {
+      if (!this.hasPredecessors(s)) {
+        // TODO: remove state ..
+        mStateToInt.remove(s);
+      }
+    }
+  }
   //########################################################################
   //# Debugging
   /**

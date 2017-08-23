@@ -71,7 +71,7 @@ public class TauLoopRemover
     mTransitionRelation.removeAllSelfLoops(mTau);
     mTransitionRelation.removeAllAnnotations(mTau);
     mTransitionRelation.removeAllUnreachable();
-    //mTransitionRelation.removeUnnecessaryStates();
+    mTransitionRelation.removeUnnecessaryStates();
     TIME += System.currentTimeMillis();
   }
 
