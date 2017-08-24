@@ -111,7 +111,7 @@ public class TauLoopRemoverTest extends AbstractAnalysisTest
    *
    * <P>
    * After running the test, any automaton created by the rule is saved in
-   * {supremica}/logs/results/analysis/op/{classname} as a .des file (for text
+   * {supremica}/logs/results/analysis/deadlock/{classname} as a .des file (for text
    * viewing) and as a .wmod file (to load into the IDE).
    * </P>
    */
@@ -155,6 +155,15 @@ public class TauLoopRemoverTest extends AbstractAnalysisTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_tauLoopRemover_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -189,7 +198,7 @@ public class TauLoopRemoverTest extends AbstractAnalysisTest
     } else {
       final String name = des.getName();
       final String basename = appendSuffixes(name, mBindings);
-      final String comment = "Test output from LocalEventHider";
+      final String comment = "Test output from TauLoopRemover";
       //      final String comment =
       //        "Test output from " +
       //        ProxyTools.getShortClassName(mSimplifier) + '.';
