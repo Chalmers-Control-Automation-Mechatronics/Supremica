@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -237,7 +238,7 @@ public class GraphEditorPanel
    * Creates an immutable controlled surface.
    */
   public GraphEditorPanel(final GraphSubject graph,
-                           final ModuleSubject module)
+                          final ModuleSubject module)
     throws GeometryAbsentException
   {
     this(graph, module, null, null, null, null);
@@ -606,7 +607,7 @@ public class GraphEditorPanel
           (ListSubject<AbstractSubject>) subject.getParent();
         eventlists.put(eventlist, true);
       }
-      else if(subject.getParent().getParent() instanceof ForeachSubject){
+      else if (subject.getParent().getParent() instanceof ForeachSubject){
         final ForeachSubject foreach = (ForeachSubject)subject.getParent().getParent();
         final ListSubject<AbstractSubject> eventlist =
           foreach.getBodyModifiable();
@@ -631,7 +632,7 @@ public class GraphEditorPanel
     } else {
       // Not deleting event labels: then delete everything except node labels
       // First find any edges to be deleted ...
-    final Set<Proxy> lookup = new THashSet<Proxy>(items);
+      final Set<Proxy> lookup = new THashSet<Proxy>(items);
       for (final EdgeSubject edge : graph.getEdgesModifiable()) {
         if (lookup.contains(edge) ||
             lookup.contains(edge.getSource()) ||
@@ -2524,13 +2525,12 @@ public class GraphEditorPanel
                 new InternalDragActionMove(getStartPoint(),
                                            event.isShiftDown() || event.isControlDown());
             } else {
-              if(handle.getType() == HandleType.INITIAL){
+              if (handle.getType() == HandleType.INITIAL) {
                 mInternalDragAction =
                   new InternalDragActionInitial(getStartPoint());
-              }
-              else{
+              } else {
                 mInternalDragAction =
-                new InternalDragActionSelect(getStartPoint());
+                  new InternalDragActionSelect(getStartPoint());
               }
             }
           }
@@ -4851,8 +4851,16 @@ public class GraphEditorPanel
       return false;
     }
 
-  private class PositionComparator implements Comparator<ProxySubject>{
 
+    private MoveVisitor mMoveVisitor;
+    private PositionComparator mComparator;
+  }
+
+
+  //#########################################################################
+  //# Inner Class PositionComparator
+  private class PositionComparator implements Comparator<ProxySubject>
+  {
     @Override
     public int compare(final ProxySubject proxy1, final ProxySubject proxy2)
     {
@@ -4861,28 +4869,26 @@ public class GraphEditorPanel
       final double ypos2 = prod.getShape(proxy2).getBounds2D().getY();
       if (ypos1 < ypos2) {
         return -1;
-      }
-      else if (ypos1 > ypos2) {
+      } else if (ypos1 > ypos2) {
         return 1;
+      } else {
+        return 0;
       }
-      return 0;
     }
   }
-
-    private MoveVisitor mMoveVisitor;
-    private PositionComparator mComparator;
-  }
-
-
 
 
   //#########################################################################
   //# Inner Class StateNameInputCell
+  /**
+   * A text field to rename states. This text field appears when the user
+   * double clicks a state name. It allows the user to edit the old name and
+   * change the state name to the new value by pressing &lt;ENTER&gt;.
+   */
   private class StateNameInputCell
     extends SimpleExpressionCell
     implements FocusListener
   {
-
     //#######################################################################
     //# Constructor
     private StateNameInputCell(final SimpleNodeSubject node,
@@ -4890,6 +4896,13 @@ public class GraphEditorPanel
     {
       super(ident, new StateNameInputParser(ident));
       mNode = node;
+      final float zoom = Math.max((float) mZoomFactor, 1.0f);
+      if (zoom > 1.0f) {
+        final Font font = getFont();
+        final float newSize = zoom * font.getSize2D();
+        final Font newFont = font.deriveFont(newSize);
+        setFont(newFont);
+      }
       final LabelGeometrySubject geo = node.getLabelGeometry();
       final Point2D pgeo = node.getPointGeometry().getPoint();
       final Point2D lgeo = geo.getOffset();
@@ -4899,7 +4912,7 @@ public class GraphEditorPanel
       final Rectangle view = GraphEditorPanel.this.getVisibleRect();
       int x = (int) Math.round(pos2d.getX());
       final int y = (int) Math.round(pos2d.getY());
-      int width = STATE_INPUT_WIDTH;
+      int width = Math.round(zoom * STATE_INPUT_WIDTH);
       if (width > view.width) {
         width = view.width;
       }
@@ -5005,7 +5018,7 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1949718690010680463L;
   }
 
 
@@ -5038,7 +5051,6 @@ public class GraphEditorPanel
       }
       return ident;
     }
-
   }
 
 
@@ -5047,7 +5059,8 @@ public class GraphEditorPanel
   private class SelectableAncestorVisitor
     extends DefaultModuleProxyVisitor
   {
-
+    //#######################################################################
+    //# Invocation
     private ProxySubject getSelectableAncestor(final Proxy proxy)
     {
       try {
@@ -5060,7 +5073,6 @@ public class GraphEditorPanel
         throw exception.getRuntimeException();
       }
     }
-
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.ProxyVisitor
@@ -5158,7 +5170,6 @@ public class GraphEditorPanel
   private class IdentifierPasteVisitor
     extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private boolean canPaste(final Proxy focussed,
@@ -5512,19 +5523,26 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Inner Class Selection
-  private class Selection{
-
-    public Selection(){
+  private class Selection
+  {
+    //#######################################################################
+    //# Constructors
+    public Selection()
+    {
       mSelList = new LinkedList<ProxySubject>();
       mSelSet = new THashSet<ProxySubject>();
     }
 
-    public Selection(final List<? extends Proxy> items){
+    public Selection(final List<? extends Proxy> items)
+    {
       this();
       add(items);
     }
 
-    private boolean addToSet(final ProxySubject subject){
+    //#######################################################################
+    //# Collection Access
+    private boolean addToSet(final ProxySubject subject)
+    {
       if (mSelSet.add(subject)) {
         mSelList.add(subject);
         return true;
@@ -5532,9 +5550,11 @@ public class GraphEditorPanel
       return false;
     }
 
-    private boolean add(final ProxySubject subject, final boolean addChildren){
+    private boolean add(final ProxySubject subject, final boolean addChildren)
+    {
       boolean change = false;
-      final LabelBlockSubject block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
+      final LabelBlockSubject block =
+        SubjectTools.getAncestor(subject, LabelBlockSubject.class);
       if (block != null) {
         change |= addToSet(block);
         if (subject instanceof IdentifierSubject) {
@@ -5546,19 +5566,19 @@ public class GraphEditorPanel
             change |= addChildren(foreach);
           }
         }
-      }
-      else{
+      } else {
         change |= addToSet(subject);
       }
       return change;
     }
 
-    private boolean add(final List<? extends Proxy> items){
+    private boolean add(final List<? extends Proxy> items)
+    {
       boolean change = false;
       for (final Proxy proxy : items) {
         final ProxySubject subject = (ProxySubject)proxy;
-          change |= add(subject, true);
-        }
+        change |= add(subject, true);
+      }
       return change;
     }
 
@@ -5567,7 +5587,7 @@ public class GraphEditorPanel
       final ListSubject<AbstractSubject> list = foreach.getBodyModifiable();
       boolean change = false;
       for (final ProxySubject p : list) {
-          change |= addToSet(p);
+        change |= addToSet(p);
         if (p instanceof ForeachSubject) {
           change |= addChildren((ForeachSubject) p);
         }
@@ -5575,18 +5595,19 @@ public class GraphEditorPanel
       return change;
     }
 
-    private void clear(){
+    private void clear()
+    {
        mSelList.clear();
        mSelSet.clear();
     }
-
 
     public List<ProxySubject> getCurrentSelection()
     {
       return new ArrayList<ProxySubject>(mSelList);
     }
 
-    private boolean isEmpty(){
+    private boolean isEmpty()
+    {
       return mSelList.isEmpty();
     }
 
@@ -5595,7 +5616,8 @@ public class GraphEditorPanel
       return mSelSet.contains(proxy);
     }
 
-    private boolean remove(final ProxySubject subject){
+    private boolean remove(final ProxySubject subject)
+    {
       if (mSelSet.remove(subject)) {
         mSelList.remove(subject);
         return true;
@@ -5603,7 +5625,8 @@ public class GraphEditorPanel
       return false;
     }
 
-    private boolean remove(final List<? extends Proxy> items){
+    private boolean remove(final List<? extends Proxy> items)
+    {
       boolean change = false;
       for (final Proxy proxy : items) {
         final ProxySubject subject = (ProxySubject) proxy;
@@ -5612,16 +5635,16 @@ public class GraphEditorPanel
       return change;
     }
 
-
-    public int size(){
+    public int size()
+    {
       return mSelList.size();
     }
 
-
+    //#######################################################################
+    //# Data Members
     private final List<ProxySubject> mSelList;
     private final Set<ProxySubject> mSelSet;
   }
-
 
 
   //#########################################################################

@@ -53,10 +53,17 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.IDEToolBar;
 
 
 /**
- * TODO
+ * The zoom selection combo box in the main toolbar.
+ * The zoom selector appears in the toolbar ({@link IDEToolBar}) when a graph
+ * is being edited. It allows the user to select a zoom factor from a set
+ * of predefined values or enter a percentage into the text field. When
+ * the selection changes, the selected value is applied to scale the displayed
+ * graph. The zoom factor is remember separately for each graph, and the zoom
+ * selector is updated when switching graphs.
  *
  * @author Robi Malik
  */
@@ -151,6 +158,8 @@ public class ZoomSelector
         setSelectedItem(option);
         addItemListener(this);
       }
+      break;
+    default:
       break;
     }
   }
@@ -254,6 +263,8 @@ public class ZoomSelector
       final double value = getValue();
       final ZoomOption option = new FixedZoomOption(value);
       setSelectedItem(option);
+      // This sets a fixed zoom factor to update the displayed percentage
+      // in the zoom selector in addition to scaling the graph.
     }
 
     //#######################################################################
@@ -268,6 +279,10 @@ public class ZoomSelector
 
   //#########################################################################
   //# Inner Class PercentDocumentFilter
+  /**
+   * A document filter for the zoom selection text entry. It restricts
+   * text entry to digits possibly followed by a percent sign,
+   */
   private static class PercentDocumentFilter extends DocumentFilter
   {
     //#######################################################################
@@ -316,6 +331,11 @@ public class ZoomSelector
 
   //#########################################################################
   //# Inner Class SelectAllMouseListener
+  /**
+   * A mouse listener to select all text when the zoom selector's text
+   * box is clicked. This allows the user to type in digits without
+   * having to erase the previous value.
+   */
   private static class SelectAllMouseListener
     extends MouseAdapter
     implements Runnable
