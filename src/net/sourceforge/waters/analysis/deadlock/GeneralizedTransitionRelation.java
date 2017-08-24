@@ -1302,16 +1302,6 @@ public class GeneralizedTransitionRelation
    }
  }
 
-
-  public void removeUnnecessaryStates()
-  {
-    for (int s = 0; s < this.numberOfStates(); s++) {
-      if (!this.hasPredecessors(s)) {
-        // TODO: remove state ..
-        mStateToInt.remove(s);
-      }
-    }
-  }
   //########################################################################
   //# Debugging
   /**

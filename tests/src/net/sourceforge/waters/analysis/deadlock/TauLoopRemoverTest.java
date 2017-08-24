@@ -52,8 +52,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * @author Hani al-Bahri, Robi Malik
  */
 
-public class TauLoopRemoverTest
-  extends AbstractAnalysisTest
+public class TauLoopRemoverTest extends AbstractAnalysisTest
 {
   //#########################################################################
   //# Overrides for base class junit.framework.TestCase
@@ -86,63 +85,75 @@ public class TauLoopRemoverTest
     super.tearDown();
   }
 
-
   //#########################################################################
   //# Test Cases
   /**
-   * <P>Tests the model in file {supremica}/examples/waters/tests/deadlock_abstraction/
-   * tauLoopRemover_01.wmod.</P>
+   * <P>
+   * Tests the model in file
+   * {supremica}/examples/waters/tests/deadlock_abstraction/
+   * tauLoopRemover_01.wmod.
+   * </P>
    *
-   * <P>All test modules contain up to two automata, named "before" and "after".
+   * <P>
+   * All test modules contain up to two automata, named "before" and "after".
    * The automaton named "before" is required to be present, and defines the
-   * input automaton for the abstraction rule. The automaton "after" defines the
-   * expected result of abstraction. It may be missing, in which case the
-   * abstraction should have no effect and return the unchanged input automaton
-   * (the test expects the same object, not an identical copy).</P>
+   * input automaton for the abstraction rule. The automaton "after" defines
+   * the expected result of abstraction. It may be missing, in which case the
+   * abstraction should have no effect and return the unchanged input
+   * automaton (the test expects the same object, not an identical copy).
+   * </P>
    *
-   * <P>The names of critical events are expected to be "tau", ":alpha", and
-   * ":accepting", respectively. In addition, a state called ":dump" is set
-   * to be the dump state of the input transition relation.</P>
+   * <P>
+   * The names of critical events are expected to be "tau", ":alpha", and
+   * ":accepting", respectively. In addition, a state called ":dump" is set to
+   * be the dump state of the input transition relation.
+   * </P>
    *
-   * <P>After running the test, any automaton created by the rule is saved in
-   * {supremica}/logs/results/analysis/op/{classname} as a .des file
-   * (for text viewing) and as a .wmod file (to load into the IDE).</P>
+   * <P>
+   * After running the test, any automaton created by the rule is saved in
+   * {supremica}/logs/results/analysis/op/{classname} as a .des file (for text
+   * viewing) and as a .wmod file (to load into the IDE).
+   * </P>
    */
   public void test_tauLoopRemover_01() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_01.wmod");
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_01.wmod");
     runTransitionRelationSimplifier(des);
   }
 
   public void test_tauLoopRemover_02() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_02.wmod");
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_02.wmod");
     runTransitionRelationSimplifier(des);
   }
 
   public void test_tauLoopRemover_03() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_03.wmod");
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_03.wmod");
     runTransitionRelationSimplifier(des);
   }
 
   public void test_tauLoopRemover_04() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_04.wmod");
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_04.wmod");
     runTransitionRelationSimplifier(des);
   }
 
   public void test_tauLoopRemover_05() throws Exception
   {
     final ProductDESProxy des =
-      getCompiledDES("tests", "deadlock_abstraction", "tauLoopRemover_05.wmod");
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "tauLoopRemover_05.wmod");
     runTransitionRelationSimplifier(des);
   }
-
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -153,61 +164,61 @@ public class TauLoopRemoverTest
 
     final AutomatonProxy before = findAutomaton(des, BEFORE);
 
-     final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(before, getTau(des));
-     tr.removeTauLoop();
-  //  tr.checkIntegrity();
+    final GeneralizedTransitionRelation tr =
+      new GeneralizedTransitionRelation(before, getTau(des));
+    tr.annotateWithProps();
+    tr.removeTauLoop();
+    tr.checkIntegrity();
     // calculate unannotated form
-   // final AutomatonProxy expected = findAutomaton(des, AFTER);
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
+    final AutomatonProxy unannotated =
+      tr.unannotate(des, getProductDESProxyFactory(), null);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
   private void checkResult(final ProductDESProxy des,
                            final AutomatonProxy result)
-  throws Exception
+    throws Exception
   {
     final AutomatonProxy expected = getAutomaton(des, AFTER);
     if (result == null) {
-      assertNull("Simplifier reports no change, " +
-                 "but the input can be simplified!", expected);
+      assertNull("Simplifier reports no change, "
+                 + "but the input can be simplified!", expected);
     } else {
       final String name = des.getName();
       final String basename = appendSuffixes(name, mBindings);
       final String comment = "Test output from LocalEventHider";
-//      final String comment =
-//        "Test output from " +
-//        ProxyTools.getShortClassName(mSimplifier) + '.';
+      //      final String comment =
+      //        "Test output from " +
+      //        ProxyTools.getShortClassName(mSimplifier) + '.';
       saveAutomaton(result, basename, comment);
       mIntegrityChecker.check(result, des);
       if (expected == null) {
-        assertNull("Test expects no change, " +
-                   "but the simplifier reports some change!",
-                   result);
+        assertNull("Test expects no change, "
+                   + "but the simplifier reports some change!", result);
       } else {
         mIsomorphismChecker.checkIsomorphism(result, expected);
       }
     }
   }
 
-  public EventProxy getTau(final ProductDESProxy des) {
+  public EventProxy getTau(final ProductDESProxy des)
+  {
 
     final Set<EventProxy> desEvents = des.getEvents();
     for (final EventProxy ep : desEvents) {
-      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
-          return ep;
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE
+          && !ep.isObservable()) {
+        return ep;
       }
     }
     return null;
   }
 
-
   //#########################################################################
   //# To be Provided by Subclasses
-
 
   //#########################################################################
   //# Overrides for Abstract Base Class
@@ -219,14 +230,12 @@ public class TauLoopRemoverTest
     compiler.setOptimizationEnabled(false);
   }
 
-
   //#########################################################################
   //# Data Members
   // private TransitionRelationSimplifier mSimplifier;
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
-
 
   //#########################################################################
   //# Class Constants
