@@ -162,6 +162,13 @@ public class AnnotatorTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_annotate_09() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "annotate_09.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
 
   //#########################################################################
   //# Instantiating and Checking Modules
@@ -171,11 +178,13 @@ public class AnnotatorTest
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(before, null);
+    final GeneralizedTransitionRelation tr =
+      new GeneralizedTransitionRelation(before, null);
     tr.annotateWithActiveEvents();
     tr.checkIntegrity();
     // calculate unannotated form
-    final AutomatonProxy unannotated = tr.unannotate(des, getProductDESProxyFactory(), null);
+    final AutomatonProxy unannotated =
+      tr.unannotate(des, getProductDESProxyFactory(), null);
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
   }
