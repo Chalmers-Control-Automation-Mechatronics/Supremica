@@ -81,7 +81,7 @@ public class GeneralizedTransitionRelation
   private final String mName;
   private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
   private final String TAU=":tau";
-  //private final int TAU_INDEX=0;
+  private final int TAU_INDEX=0;
 
   public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
   {
@@ -1286,18 +1286,19 @@ public class GeneralizedTransitionRelation
  /*
   * For now, only check if Tau is needed ..
   */
- public void removeUnnecessaryEvents() {
-   for(int e=0; e< this.numberOfEvents(); e++) {
+ public void removeUnnecessaryTauEvents() {
+ //  for(int e=0; e< this.numberOfEvents(); e++) {
      //final int e = mTransitionRelation.eventToInt(event);
+   if(this.numberOfEvents() > 0) {
      boolean isNeeded = false;
      for(int s=0; s< this.numberOfStates(); s++) {
-       final TIntHashSet succs = this.getSuccessors(s, e);
+       final TIntHashSet succs = this.getSuccessors(s, TAU_INDEX);
        if (succs != null) {
          isNeeded = true;
        }
      }
      if(!isNeeded) {
-       this.removeEvent(e);
+       this.removeEvent(TAU_INDEX);
      }
    }
  }
