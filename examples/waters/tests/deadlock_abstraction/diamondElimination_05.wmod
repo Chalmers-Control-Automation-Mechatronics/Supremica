@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <Module Name="diamondElimination_05" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>A test of diamon elimination. Sate 0 gets combined with its tau-successor 1 (resulting in 01). The a-transitions from states 0 and 1 lead to states 2 and 3, which form the roots for two further states. State 2 has a tau-successor 3 (resulting in 23), which state 3 has no successors and results in a separate state 3. The entry point 2 and resulting state 23 is used two more times when exploring the transitions labelled b and c.</ns2:Comment>
+    <ns2:Comment>A test of diamon elimination. Sate 0 gets combined with its tau-successor 1 (resulting in 01). The a-transitions from states 0 and 1 lead to states 2 and 3, which form the roots for two further states. However 3 is not tau-minimal, and only remains reachable as the b-successor of state 2.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
@@ -61,6 +61,7 @@
                     <Edge Source="S2" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name=":tau"/>
+                            <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-25" Y="-26"/>
                             </LabelGeometry>
@@ -76,17 +77,6 @@
                                 <Point X="12" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
-                    </Edge>
-                    <Edge Source="S2" Target="S2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-10"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="244" Y="158"/>
-                        </SplineGeometry>
                     </Edge>
                     <Edge Source="S3" Target="S2">
                         <LabelBlock>
@@ -123,19 +113,11 @@
                             <Point X="144" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-9" Y="9"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S01" Target="S3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="144" Y="112"/>
-                        </StartPointGeometry>
-                    </Edge>
                     <Edge Source="S01" Target="S23">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
@@ -146,22 +128,36 @@
                     </Edge>
                     <Edge Source="S23" Target="S23">
                         <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-23" Y="-10"/>
+                                <Point X="4" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="244" Y="158"/>
                         </SplineGeometry>
                     </Edge>
+                    <Edge Source="S23" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="179" Y="195"/>
+                        </SplineGeometry>
+                    </Edge>
                     <Edge Source="S3" Target="S23">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="1" Y="2"/>
+                                <Point X="-14" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="157" Y="173"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

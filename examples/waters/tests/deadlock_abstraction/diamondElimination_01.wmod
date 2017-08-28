@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <Module Name="diamondElimination_01" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>A basic test of diamon elimination. Sate 0 gets combined with its tau-successor 1 (resulting in 01). The a-transitions from states 0 and 1 lead to states 2 and 3, which form the roots for two further states. State 2 has a tau-successor 3 (resulting in 23), which state 3 has no successors and results in a separate state 3. Although the resulting states 23 and 3 are bisimilar, they will not be merged by the diamon elimination algorithm.</ns2:Comment>
+    <ns2:Comment>A basic test of diamon elimination. Sate 0 gets combined with its tau-successor 1 (resulting in 01). The a-transitions from states 0 and 1 lead to states 2 and 3, which form the roots for two further states. However 3 is not tau-minimal, hence only one furthe state is generated.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
@@ -91,24 +91,8 @@
                             <Point X="-7" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
-                    <SimpleNode Name="S3">
-                        <PointGeometry>
-                            <Point X="144" Y="208"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="-9" Y="9"/>
-                        </LabelGeometry>
-                    </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Source="S01" Target="S3">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                        </LabelBlock>
-                        <StartPointGeometry>
-                            <Point X="144" Y="112"/>
-                        </StartPointGeometry>
-                    </Edge>
                     <Edge Source="S01" Target="S23">
                         <LabelBlock>
                             <SimpleIdentifier Name="a"/>
