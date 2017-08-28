@@ -111,7 +111,7 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
    *
    * <P>
    * After running the test, any automaton created by the rule is saved in
-   * {supremica}/logs/results/analysis/op/{classname} as a .des file (for text
+   * {supremica}/logs/results/analysis/deadlock/{classname} as a .des file (for text
    * viewing) and as a .wmod file (to load into the IDE).
    * </P>
    */
@@ -146,6 +146,24 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
                      "diamondElimination_04.wmod");
     runTransitionRelationSimplifier(des);
   }
+
+  public void test_diamondElimination_05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_diamondElimination_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -169,6 +187,7 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
     getLogger().info("Done " + des.getName());
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   private void checkResult(final ProductDESProxy des,
@@ -182,7 +201,7 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
     } else {
       final String name = des.getName();
       final String basename = appendSuffixes(name, mBindings);
-      final String comment = "Test output from LocalEventHider";
+      final String comment = "Test output from DiamondEliminator";
       //      final String comment =
       //        "Test output from " +
       //        ProxyTools.getShortClassName(mSimplifier) + '.';
@@ -210,8 +229,10 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
     return null;
   }
 
+
   //#########################################################################
   //# To be Provided by Subclasses
+
 
   //#########################################################################
   //# Overrides for Abstract Base Class

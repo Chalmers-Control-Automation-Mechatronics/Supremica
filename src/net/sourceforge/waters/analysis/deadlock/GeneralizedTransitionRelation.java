@@ -1333,13 +1333,9 @@ public class GeneralizedTransitionRelation
    */
   void checkIntegrity()
   {
-    // Has this class no facility to determine the number of states? ~~~Robi
-    final int numberOfStates =
-      Math.max(mSuccessors.length, mPredecessors.length);
-
     // 1a. Every transition in successors should also appear in predecessors
     // 1b. Every transition in successors should appear in active events
-    for (int s = 0; s < numberOfStates; s++) {
+    for (int s = 0; s < numberOfStates(); s++) {
       final TIntHashSet active = getActiveEvents(s);
       for (int e = 0; e < mEvents.length; e++) {
         final TIntHashSet succs = getSuccessors(s, e);
@@ -1362,7 +1358,7 @@ public class GeneralizedTransitionRelation
     }
 
     // 2. Every transition in predecessors should also appear in successors
-    for (int t = 0; t < numberOfStates; t++) {
+    for (int t = 0; t < numberOfStates(); t++) {
       for (int e = 0; e < mEvents.length; e++) {
         final TIntHashSet preds = getPredecessors(t, e);
         if (preds != null && !preds.isEmpty()) {
@@ -1380,7 +1376,7 @@ public class GeneralizedTransitionRelation
     }
 
     // 3. Every event marked as active has a transition
-    for (int s = 0; s < numberOfStates; s++) {
+    for (int s = 0; s < numberOfStates(); s++) {
       final TIntHashSet active = getActiveEvents(s);
       if (active != null) {
         final TIntIterator iter = active.iterator();
