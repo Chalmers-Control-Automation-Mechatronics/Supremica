@@ -91,7 +91,7 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
    * <P>
    * Tests the model in file
    * {supremica}/examples/waters/tests/deadlock_abstraction/
-   * tauLoopRemover_01.wmod.
+   * diamondElimination_01.wmod.
    * </P>
    *
    * <P>
@@ -123,7 +123,29 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_diamondElimination_02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
 
+  public void test_diamondElimination_03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_03.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_diamondElimination_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -133,11 +155,12 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
 
     final AutomatonProxy before = findAutomaton(des, BEFORE);
 
-    final GeneralizedTransitionRelation tr =
+     GeneralizedTransitionRelation tr =
       new GeneralizedTransitionRelation(before, getTau(des));
     tr.annotateWithProps();
     // TODO simplify using diamond Elimination ..
-
+    final DiamondEliminator dE = new DiamondEliminator(tr);
+    tr = dE.run();
     tr.checkIntegrity();
     // calculate unannotated form
     final AutomatonProxy unannotated =

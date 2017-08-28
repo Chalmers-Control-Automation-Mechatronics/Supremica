@@ -83,6 +83,26 @@ public class GeneralizedTransitionRelation
   private final String TAU=":tau";
   private final int TAU_INDEX=0;
 
+
+  @SuppressWarnings("unchecked")
+  public GeneralizedTransitionRelation(final GeneralizedTransitionRelation gtr)
+  {
+    mSuccessors = new TIntHashSet[gtr.numberOfStates()][gtr.numberOfEvents()];
+    mPredecessors = new TIntHashSet[gtr.numberOfStates()][gtr.numberOfEvents()];
+    mActiveEvents = new TIntHashSet[gtr.numberOfStates()];
+    mAnnotations = new Set[gtr.numberOfStates()];
+    mMarked = null; // to avoid compile errors
+    mIsInitial = gtr.mIsInitial;
+    mAnnToEvent = null; // to avoid compile errors
+    mEvents = gtr.mEvents;
+    mEventToInt = gtr.mEventToInt;
+    mStateToInt = gtr.mStateToInt;
+    mStateProxyList = gtr.mStateProxyList;
+    mName = gtr.mName;
+    mMarkedEvent =null; // to avoid compile errors
+  }
+
+
   public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
   {
     this(aut, aut.getEvents(), tau);
@@ -149,7 +169,7 @@ public class GeneralizedTransitionRelation
         addTransition(s, e, s);
       }
     }
-    mAnnToEvent = new THashMap<Set<TIntHashSet>, EventProxy>();
+    mAnnToEvent = new THashMap<Set<TIntHashSet>, EventProxy>();          // to void compile errors
   }
 
   public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)
@@ -1284,7 +1304,7 @@ public class GeneralizedTransitionRelation
  }
 
  /*
-  * For now, only check if Tau is needed ..
+  * check if Tau is needed ..
   */
  public void removeUnnecessaryTauEvents() {
  //  for(int e=0; e< this.numberOfEvents(); e++) {
@@ -1302,6 +1322,7 @@ public class GeneralizedTransitionRelation
      }
    }
  }
+
 
   //########################################################################
   //# Debugging

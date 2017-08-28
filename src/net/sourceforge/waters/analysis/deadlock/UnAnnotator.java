@@ -70,10 +70,10 @@ public class UnAnnotator
   public AutomatonProxy run(final ProductDESProxyFactory factory,
                             final ProductDESProxy des, final EventProxy[] eventsToHide)
   {
+    mTransitionRelation.removeUnnecessaryTauEvents();
 
-    if(eventsToHide ==null) {
-      mTransitionRelation.removeUnnecessaryTauEvents();
-    }else
+
+    if(eventsToHide !=null)
     removePropWithEvent(eventsToHide);
 
     final Set<EventProxy> desEvents = des.getEvents();
