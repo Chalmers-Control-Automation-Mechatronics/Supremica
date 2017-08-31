@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.hash.TIntHashSet;
 
@@ -42,7 +45,7 @@ public class DiamondEliminator
   private final GeneralizedTransitionRelation mTransitionRelation;
   private final TIntHashSet[] mStatesReachableUnderTau;
   private final TIntHashSet[] mVisibleEvents;
-  private final TIntHashSet[][] mStatesReachableUnderActiveEvents;
+  private final TIntHashSet[][] mStatesReachableUnderVisibleEvents;
   private final TIntHashSet[][] mtauMin;
   private final int TAU_INDEX = 0;
 
@@ -51,7 +54,7 @@ public class DiamondEliminator
     mTransitionRelation = transitionrelation;
     mStatesReachableUnderTau =
       new TIntHashSet[transitionrelation.numberOfStates()];
-    mStatesReachableUnderActiveEvents = new TIntHashSet[transitionrelation
+    mStatesReachableUnderVisibleEvents = new TIntHashSet[transitionrelation
       .numberOfStates()][transitionrelation.numberOfEvents()];
     mtauMin = new TIntHashSet[transitionrelation
       .numberOfStates()][transitionrelation.numberOfEvents()];
@@ -60,14 +63,16 @@ public class DiamondEliminator
 
   public GeneralizedTransitionRelation run()
   {
-    final GeneralizedTransitionRelation gtr =
+     GeneralizedTransitionRelation gtr =
       new GeneralizedTransitionRelation(this.mTransitionRelation);
 
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
       final TIntHashSet taussuccs =
         this.mTransitionRelation.getSuccessors(s, TAU_INDEX);
-      if (taussuccs == null)
+      if (taussuccs == null) {
+        gtr = this.specialState(s, gtr);
         continue;
+      }
       final TIntHashSet taus = this.mTransitionRelation
         .getFromArray(s, this.mStatesReachableUnderTau);
       taus.add(s);
@@ -83,8 +88,10 @@ public class DiamondEliminator
       final TIntIterator iter = taus.iterator();
       while (iter.hasNext()) {
         final int t = iter.next();
-        //TODO ignore propositions
         for (int e = 1; e < this.mTransitionRelation.numberOfEvents(); e++) {
+          final EventProxy eProxy = this.mTransitionRelation.getEvent(e);
+          if (eProxy.getKind() == EventKind.PROPOSITION)
+            continue;
           final TIntHashSet activeSuccs =
             this.mTransitionRelation.getSuccessors(t, e);
           if (activeSuccs == null)
@@ -98,7 +105,7 @@ public class DiamondEliminator
       while (vIter.hasNext()) {
         final int event = vIter.next();
         final TIntHashSet eNode = this.mTransitionRelation
-          .getFromArray(s, event, this.mStatesReachableUnderActiveEvents);
+          .getFromArray(s, event, this.mStatesReachableUnderVisibleEvents);
         final TIntIterator nIter = taus.iterator();
         while (nIter.hasNext()) {
           final int n = nIter.next();
@@ -119,10 +126,14 @@ public class DiamondEliminator
         final TIntIterator eNodeIter = eNode.iterator();
         while (eNodeIter.hasNext()) {
           final int n = eNodeIter.next();
+          if(eNode.size() == 1) {
+            tauMinNodes.add(n);
+          }else {
           final TIntHashSet nodes =
             this.mTransitionRelation.getPredecessors(n, this.TAU_INDEX);
           if (nodes == null)
             tauMinNodes.add(n);
+          }
         }
 
         // add transition from N to N' in gtr ..
@@ -139,4 +150,31 @@ public class DiamondEliminator
   //#########################################################################
   //# Auxiliary Methods
 
+  public GeneralizedTransitionRelation specialState(final int state, final GeneralizedTransitionRelation gtr) {
+    boolean isReachable = false;
+    for (int e = 1; e < gtr.numberOfEvents(); e++) {
+      final TIntHashSet preds = gtr.getPredecessors(state, e);
+      if(preds != null) {
+         isReachable = true;
+         break;
+      }
+    }
+
+    if(isReachable) {
+      for (int e = 1; e < this.mTransitionRelation.numberOfEvents(); e++) {
+        final TIntHashSet succs =
+        this.mTransitionRelation.getSuccessors(state, e);
+        if (succs == null)
+          continue;
+
+        final int[] nodesArr = succs.toArray();
+        for (int ti = 0; ti < nodesArr.length; ti++) {
+          final int t = nodesArr[ti];
+          gtr.addTransition(state, e, t);
+        }
+      }
+    }
+
+    return gtr;
+  }
 }
