@@ -64,6 +64,7 @@ import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
+
 public class GeneralizedTransitionRelation
 {
   //note make certain
@@ -79,16 +80,16 @@ public class GeneralizedTransitionRelation
   private final List<StateProxy> mStateProxyList;
   private final EventProxy mMarkedEvent;
   private final String mName;
-  private final Map<Set<TIntHashSet>, EventProxy> mAnnToEvent;
-  private final String TAU=":tau";
-  private final int TAU_INDEX=0;
-
+  private final Map<Set<TIntHashSet>,EventProxy> mAnnToEvent;
+  private final String TAU = ":tau";
+  private final int TAU_INDEX = 0;
 
   @SuppressWarnings("unchecked")
   public GeneralizedTransitionRelation(final GeneralizedTransitionRelation gtr)
   {
     mSuccessors = new TIntHashSet[gtr.numberOfStates()][gtr.numberOfEvents()];
-    mPredecessors = new TIntHashSet[gtr.numberOfStates()][gtr.numberOfEvents()];
+    mPredecessors =
+      new TIntHashSet[gtr.numberOfStates()][gtr.numberOfEvents()];
     mActiveEvents = new TIntHashSet[gtr.numberOfStates()];
     mAnnotations = new Set[gtr.numberOfStates()];
     mMarked = null; // to avoid compile errors
@@ -99,29 +100,30 @@ public class GeneralizedTransitionRelation
     mStateToInt = gtr.mStateToInt;
     mStateProxyList = gtr.mStateProxyList;
     mName = gtr.mName;
-    mMarkedEvent =null; // to avoid compile errors
+    mMarkedEvent = null; // to avoid compile errors
   }
 
-
-  public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut, final EventProxy tau)
+  public GeneralizedTransitionRelation(final net.sourceforge.waters.model.des.AutomatonProxy aut,
+                                       final EventProxy tau)
   {
     this(aut, aut.getEvents(), tau);
   }
 
   @SuppressWarnings("unchecked")
   public GeneralizedTransitionRelation(final AutomatonProxy aut,
-                            Set<EventProxy> eventsall, final EventProxy tau)
+                                       Set<EventProxy> eventsall,
+                                       final EventProxy tau)
   {
-    mMarkedEvent = null;    // No need for this ..; to avoid compile errors.
+    mMarkedEvent = null; // No need for this ..; to avoid compile errors.
 
     eventsall = new TreeSet<EventProxy>(eventsall);
     eventsall.addAll(aut.getEvents());
     final Set<EventProxy> allselflooped = new THashSet<EventProxy>(eventsall);
     allselflooped.removeAll(aut.getEvents());
     mName = aut.getName();
-    mEvents= shiftAutEvents(eventsall, tau); // adds tau event in first pos.
+    mEvents = shiftAutEvents(eventsall, tau); // adds tau event in first pos.
     final TObjectIntHashMap<EventProxy> eventToInt =
-        new TObjectIntHashMap<EventProxy>(mEvents.length);
+      new TObjectIntHashMap<EventProxy>(mEvents.length);
     for (int i = 0; i < mEvents.length; i++) {
       eventToInt.put(mEvents[i], i);
     }
@@ -140,15 +142,17 @@ public class GeneralizedTransitionRelation
     for (final StateProxy s : mStateProxyList) {
       mStateToInt.put(s, numstates);
 
-    /*  if (s.getPropositions().contains(marked) || !aut.getEvents().contains(marked)) {
-        markState(numstates, true);
-      }*/
+      /*
+       * if (s.getPropositions().contains(marked) ||
+       * !aut.getEvents().contains(marked)) { markState(numstates, true); }
+       */
       if (s.isInitial()) {
         makeInitialState(numstates, true);
       }
-/*
-      if (!getPrevAnnotations(s.getPropositions()).isEmpty())
-        mAnnotations[numstates] = getPrevAnnotations(s.getPropositions());*/
+      /*
+       * if (!getPrevAnnotations(s.getPropositions()).isEmpty())
+       * mAnnotations[numstates] = getPrevAnnotations(s.getPropositions());
+       */
 
       numstates++;
     }
@@ -169,16 +173,18 @@ public class GeneralizedTransitionRelation
         addTransition(s, e, s);
       }
     }
-    mAnnToEvent = new THashMap<Set<TIntHashSet>, EventProxy>();          // to void compile errors
+    mAnnToEvent = new THashMap<Set<TIntHashSet>,EventProxy>(); // to void compile errors
   }
 
   public void setMarkingToStatesWithOutgoing(final Collection<EventProxy> events)
   {
     final int[] evs = new int[events.size()];
     int i = 0;
-    for (final EventProxy e : events) {evs[i] = mEventToInt.get(e); i++;}
-    STATES:
-    for (int s = 0; s < mSuccessors.length; s++) {
+    for (final EventProxy e : events) {
+      evs[i] = mEventToInt.get(e);
+      i++;
+    }
+    STATES: for (int s = 0; s < mSuccessors.length; s++) {
       markState(s, false);
       for (i = 0; i < evs.length; i++) {
         final int e = evs[i];
@@ -195,14 +201,15 @@ public class GeneralizedTransitionRelation
     return mAnnotations[state];
   }
 
-  public void setAnnotation(final int state, final Set<TIntHashSet> annotation)
+  public void setAnnotation(final int state,
+                            final Set<TIntHashSet> annotation)
   {
     mAnnotations[state] = annotation;
     // System.out.println("annotation size:" + annotation.size());
     /*
      * for (TIntHashSet hash : annotation) { int[] array = hash.toArray(); for
-     * (int i = 0; i < array.length; i++) { int e = array[i]; TIntHashSet succ =
-     * mSuccessors[state][e]; if (mEvents[e] == mMarkedEvent) { if
+     * (int i = 0; i < array.length; i++) { int e = array[i]; TIntHashSet succ
+     * = mSuccessors[state][e]; if (mEvents[e] == mMarkedEvent) { if
      * (!mMarked[state]) { System.out.println("should be marked");
      * System.exit(1); } continue; } if (succ == null || succ.isEmpty()) {
      * System.out.println("should have outgoing"); System.exit(1); } } }
@@ -216,7 +223,7 @@ public class GeneralizedTransitionRelation
     while (it.hasNext()) {
       final EventProxy e = it.next();
       if (e instanceof AnnotationEvent) {
-        final AnnotationEvent a = (AnnotationEvent)e;
+        final AnnotationEvent a = (AnnotationEvent) e;
         return a.getAnnotations();
       }
     }
@@ -225,7 +232,9 @@ public class GeneralizedTransitionRelation
 
   public EventProxy getAnnotationEvent(final Set<TIntHashSet> annotations)
   {
-    if (annotations == null || annotations.isEmpty()) {return null;}
+    if (annotations == null || annotations.isEmpty()) {
+      return null;
+    }
     EventProxy event = mAnnToEvent.get(annotations);
     if (event == null) {
       final Set<Set<EventProxy>> res = new THashSet<Set<EventProxy>>();
@@ -233,9 +242,10 @@ public class GeneralizedTransitionRelation
         final Set<EventProxy> set = new THashSet<EventProxy>();
         ann.forEach(new TIntProcedure() {
           @Override
-          public boolean execute(final int e) {
+          public boolean execute(final int e)
+          {
             final EventProxy event = mEvents[e];
-            assert(event != null);
+            assert (event != null);
             set.add(event);
             return true;
           }
@@ -261,16 +271,17 @@ public class GeneralizedTransitionRelation
 
   public AutomatonProxy getAutomaton(final ProductDESProxyFactory factory)
   {
-    final Collection<TransitionProxy> trans = new ArrayList<TransitionProxy>();
+    final Collection<TransitionProxy> trans =
+      new ArrayList<TransitionProxy>();
     final List<StateProxy> states = new ArrayList<StateProxy>();
     final Collection<EventProxy> events = new ArrayList<EventProxy>();
     for (int s = 0; s < mAnnotations.length; s++) {
       final Set<EventProxy> props = new THashSet<EventProxy>();
       final Set<TIntHashSet> anns = getAnnotations2(s); //mAnnotations[s];
-      /*if (anns != null) {
-        anns.remove(getActiveEvents(s));
-        if (anns.isEmpty()) {anns = null;}
-      }*/
+      /*
+       * if (anns != null) { anns.remove(getActiveEvents(s)); if
+       * (anns.isEmpty()) {anns = null;} }
+       */
       final EventProxy annotation = getAnnotationEvent(anns);
       if (annotation != null) {
         props.add(annotation);
@@ -299,7 +310,8 @@ public class GeneralizedTransitionRelation
         }
         succs.forEach(new TIntProcedure() {
           @Override
-          public boolean execute(final int succ) {
+          public boolean execute(final int succ)
+          {
             final StateProxy target = states.get(succ);
             trans.add(factory.createTransitionProxy(source, event, target));
             return true;
@@ -312,7 +324,8 @@ public class GeneralizedTransitionRelation
         events.add(mEvents[e]);
       }
     }
-    final List<StateProxy> tempstates = new ArrayList<StateProxy>();;
+    final List<StateProxy> tempstates = new ArrayList<StateProxy>();
+    ;
     for (int s = 0; s < states.size(); s++) {
       if (hasPredecessors(s)) {
         tempstates.add(states.get(s));
@@ -354,8 +367,8 @@ public class GeneralizedTransitionRelation
   {
     /*
      * if (mActiveEvents[state] != null) { int[] array =
-     * mActiveEvents[state].toArray(); for (int i = 0; i < array.length; i++) {
-     * int event = array[i]; if (mEvents[event] == mMarkedEvent) { if
+     * mActiveEvents[state].toArray(); for (int i = 0; i < array.length; i++)
+     * { int event = array[i]; if (mEvents[event] == mMarkedEvent) { if
      * (!mMarked[state]) { System.out.println("should be marked");
      * System.exit(2); } continue; } TIntHashSet succs =
      * mSuccessors[state][event]; if (succs == null || succs.isEmpty()) {
@@ -369,7 +382,7 @@ public class GeneralizedTransitionRelation
           ae.add(e);
         }
       } else if (mSuccessors[state][e] != null
-          && !mSuccessors[state][e].isEmpty()) {
+                 && !mSuccessors[state][e].isEmpty()) {
         ae.add(e);
       }
     }
@@ -391,7 +404,9 @@ public class GeneralizedTransitionRelation
 
   public void removeSharedSuccessors(final int has, final int remove)
   {
-    if (isMarked(has)) {markState(remove, false);}
+    if (isMarked(has)) {
+      markState(remove, false);
+    }
     for (int e = 0; e < mSuccessors[has].length; e++) {
       final TIntHashSet hassuccs = mSuccessors[has][e];
       if (hassuccs == null) {
@@ -406,18 +421,29 @@ public class GeneralizedTransitionRelation
 
   public boolean isSubsetOutgoing(final int sub, final int sup)
   {
-    if (isMarked(sub) && !isMarked(sup)) {return false;}
+    if (isMarked(sub) && !isMarked(sup)) {
+      return false;
+    }
     for (int e = 0; e < mSuccessors[sub].length; e++) {
       final TIntHashSet subsuccs = mSuccessors[sub][e];
-      if (subsuccs == null || subsuccs.isEmpty()) {continue;}
-      if (mSuccessors[sup][e] == null) {return false;}
+      if (subsuccs == null || subsuccs.isEmpty()) {
+        continue;
+      }
+      if (mSuccessors[sup][e] == null) {
+        return false;
+      }
       final int[] succs = subsuccs.toArray();
       for (int i = 0; i < succs.length; i++) {
         final int suc = succs[i];
         if (suc != sub) {
-          if (!mSuccessors[sup][e].contains(suc)) {return false;}
+          if (!mSuccessors[sup][e].contains(suc)) {
+            return false;
+          }
         } else {
-          if (!mSuccessors[sup][e].contains(suc) && !mSuccessors[sup][e].contains(sup)) {return false;}
+          if (!mSuccessors[sup][e].contains(suc)
+              && !mSuccessors[sup][e].contains(sup)) {
+            return false;
+          }
         }
       }
     }
@@ -426,10 +452,14 @@ public class GeneralizedTransitionRelation
 
   public void removeSharedPredeccessors(final int has, final int remove)
   {
-    if (isInitial(has)) {makeInitialState(remove, false);}
+    if (isInitial(has)) {
+      makeInitialState(remove, false);
+    }
     for (int e = 0; e < mPredecessors[has].length; e++) {
       final TIntHashSet haspreds = mPredecessors[has][e];
-      if (haspreds == null) {continue;}
+      if (haspreds == null) {
+        continue;
+      }
       final int[] preds = haspreds.toArray();
       for (int i = 0; i < preds.length; i++) {
         removeTransition(preds[i], e, remove);
@@ -465,23 +495,21 @@ public class GeneralizedTransitionRelation
 
   public void setEvent(final EventProxy event, final int pos)
   {
-    mEvents[pos]=event;
+    mEvents[pos] = event;
   }
-
 
   public int getEventInt(final EventProxy event)
   {
     return mEventToInt.get(event);
   }
 
-
   public Set<EventProxy> getEvents()
   {
     final Set<EventProxy> events = new THashSet<EventProxy>();
     for (int i = 0; i < mEvents.length; i++) {
       // ignore :accepting prop
-      if (mEvents[i] != null &&
-          !mEvents[i].getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+      if (mEvents[i] != null && !mEvents[i].getName()
+        .equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         events.add(mEvents[i]);
       }
     }
@@ -569,7 +597,7 @@ public class GeneralizedTransitionRelation
       mEvents[next] = null;
     }
     mEvents[f] =
-        factory.createEventProxy("tau:" + mName, EventKind.UNCONTROLLABLE);
+      factory.createEventProxy("tau:" + mName, EventKind.UNCONTROLLABLE);
     return f;
   }
 
@@ -597,8 +625,7 @@ public class GeneralizedTransitionRelation
                                          final Set<TIntHashSet> to)
   {
     final Set<TIntHashSet> tobeadded = new THashSet<TIntHashSet>();
-    outside:
-    for (final TIntHashSet ann : from) {
+    outside: for (final TIntHashSet ann : from) {
       boolean subset = false;
       final Iterator<TIntHashSet> it = to.iterator();
       while (it.hasNext()) {
@@ -637,7 +664,9 @@ public class GeneralizedTransitionRelation
       for (int e = 0; e < mPredecessors[state].length; e++) {
         final TIntHashSet preds = mPredecessors[state][e];
         if (preds != null && !preds.isEmpty()) {
-          if (!preds.contains(state) || preds.size() > 1) {return true;}
+          if (!preds.contains(state) || preds.size() > 1) {
+            return true;
+          }
         }
       }
     }
@@ -671,7 +700,9 @@ public class GeneralizedTransitionRelation
   {
     Set<TIntHashSet> anns = mAnnotations[state];
     //System.out.println(anns);
-    if (anns == null) {return false;}
+    if (anns == null) {
+      return false;
+    }
     anns = new THashSet<TIntHashSet>(anns);
     final Set<TIntHashSet> remmed = new THashSet<TIntHashSet>();
     final Iterator<TIntHashSet> it = anns.iterator();
@@ -680,9 +711,11 @@ public class GeneralizedTransitionRelation
       if (ann.remove(event)) {
         if (ann.isEmpty()) {
           mAnnotations[state] = new THashSet<TIntHashSet>();
-          mAnnotations[state].add(ann); return true;
+          mAnnotations[state].add(ann);
+          return true;
         }
-        it.remove(); remmed.add(ann);
+        it.remove();
+        remmed.add(ann);
       }
     }
     for (final TIntHashSet ann : remmed) {
@@ -706,13 +739,12 @@ public class GeneralizedTransitionRelation
       tann = new THashSet<TIntHashSet>(1);
       tann.add(getActiveEvents(to));
     }
-    /*System.out.println(from + "," + to);
-    for (TIntHashSet ann : fann) {
-      System.out.println("fann: " + Arrays.toString(ann.toArray()));
-    }
-    for (TIntHashSet ann : tann) {
-      System.out.println("tann: " + Arrays.toString(ann.toArray()));
-    }*/
+    /*
+     * System.out.println(from + "," + to); for (TIntHashSet ann : fann) {
+     * System.out.println("fann: " + Arrays.toString(ann.toArray())); } for
+     * (TIntHashSet ann : tann) { System.out.println("tann: " +
+     * Arrays.toString(ann.toArray())); }
+     */
     tann = subsets(fann, tann);
     mAnnotations[from] = null;
     mAnnotations[to] = tann;
@@ -744,7 +776,8 @@ public class GeneralizedTransitionRelation
     return intset;
   }
 
-  public TIntHashSet getFromArray(final int i, final int j, final TIntHashSet[][] array)
+  public TIntHashSet getFromArray(final int i, final int j,
+                                  final TIntHashSet[][] array)
   {
     TIntHashSet intset = array[i][j];
     if (intset == null) {
@@ -873,18 +906,19 @@ public class GeneralizedTransitionRelation
     if (pred.isEmpty()) {
       mPredecessors[t][e] = null;
     }
-    /*if (!hasPredecessors(t)) {
-      removeAllOutgoing(t);
-    }*/
+    /*
+     * if (!hasPredecessors(t)) { removeAllOutgoing(t); }
+     */
   }
-
 
   public void removeAllUnreachable()
   {
     final TIntHashSet tobecheckedset = new TIntHashSet();
     final TIntArrayList tobechecked = new TIntArrayList();
     for (int s = 0; s < numberOfStates(); s++) {
-      if (tobecheckedset.add(s)) {tobechecked.add(s);}
+      if (tobecheckedset.add(s)) {
+        tobechecked.add(s);
+      }
     }
     while (!tobechecked.isEmpty()) {
       final int state = tobechecked.removeAt(tobechecked.size() - 1);
@@ -892,7 +926,9 @@ public class GeneralizedTransitionRelation
         final int[] succs = removeAllOutgoing(state).toArray();
         for (int i = 0; i < succs.length; i++) {
           final int succ = succs[i];
-          if (tobecheckedset.add(succ)) {tobechecked.add(succ);}
+          if (tobecheckedset.add(succ)) {
+            tobechecked.add(succ);
+          }
         }
       }
       tobecheckedset.remove(state);
@@ -904,7 +940,7 @@ public class GeneralizedTransitionRelation
     markState(s, false);
     mAnnotations[s] = null;
     final TIntHashSet succsset = new TIntHashSet();
-    for (int e = 0;  e < mSuccessors[s].length; e++) {
+    for (int e = 0; e < mSuccessors[s].length; e++) {
       final TIntHashSet succs = mSuccessors[s][e];
       if (succs == null) {
         continue;
@@ -922,9 +958,11 @@ public class GeneralizedTransitionRelation
   public void removeAllIncoming(final int s)
   {
     makeInitialState(s, false);
-    for (int e = 0;  e < mPredecessors[s].length; e++) {
+    for (int e = 0; e < mPredecessors[s].length; e++) {
       final TIntHashSet preds = mPredecessors[s][e];
-      if (preds == null) {continue;}
+      if (preds == null) {
+        continue;
+      }
       final int[] arpreds = preds.toArray();
       for (int i = 0; i < arpreds.length; i++) {
         final int pred = arpreds[i];
@@ -974,9 +1012,10 @@ public class GeneralizedTransitionRelation
   public Collection<EventProxy> getAllSelfLoops()
   {
     final Collection<EventProxy> selfs = new ArrayList<EventProxy>();
-    SELFLOOPS:
-    for (int e = 0; e < mEvents.length; e++) {
-      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)) {continue;}
+    SELFLOOPS: for (int e = 0; e < mEvents.length; e++) {
+      if (mEvents[e] == null || mEvents[e].equals(mMarkedEvent)) {
+        continue;
+      }
       for (int s = 0; s < mSuccessors.length; s++) {
         if (!hasPredecessors(s)) {
           continue;
@@ -997,9 +1036,10 @@ public class GeneralizedTransitionRelation
   public Collection<EventProxy> getAllwaysEnabled()
   {
     final Collection<EventProxy> selfs = new ArrayList<EventProxy>();
-    ENABLED:
-    for (int e = 0; e < mEvents.length; e++) {
-      if (mEvents[e] == null) {continue;}
+    ENABLED: for (int e = 0; e < mEvents.length; e++) {
+      if (mEvents[e] == null) {
+        continue;
+      }
       for (int s = 0; s < mSuccessors.length; s++) {
         if (!hasPredecessors(s)) {
           continue;
@@ -1019,8 +1059,9 @@ public class GeneralizedTransitionRelation
 
   public Set<TIntHashSet> getAnnotations2(final int state)
   {
-    return mAnnotations[state] == null ? Collections
-        .singleton(getActiveEvents(state)) : mAnnotations[state];
+    return mAnnotations[state] == null
+      ? Collections.singleton(getActiveEvents(state))
+      : mAnnotations[state];
   }
 
   public void makeObservationEquivalent(final int tau)
@@ -1034,57 +1075,55 @@ public class GeneralizedTransitionRelation
       mAnnotations[s] = null;
       saturatesigma(s, tau);
     }
-    /*for (int s = 0; s < numberOfStates(); s++) {
-      mAnnotations[s] = null;
-      addAllPossibleSuccessors(s, tau);
-    }*/
-    /*for (int s = 0; s < numberOfStates(); s++) {
-      TIntHashSet tausucc = mSuccessors[s][tau];
-      if (tausucc == null) {continue;}
-      int[] tausuccarray = tausucc.toArray();
-      for (int i = 0; i < tausuccarray.length; i++) {
-        int succ = tausuccarray[i];
-        removeTransition(s, tau, succ);
-      }
-    }*/
-    /*for (int s = 0; s < numberOfStates(); s++) {
-      int tausize = 0;
-      while (true) {
-        TIntHashSet taus = getSuccessors(s, tau);
-        if (taus == null) {break;}
-        if (taus.size() == tausize) {break;}
-        tausize = taus.size();
-        int[] tausarray = taus.toArray();
-        for (int i = 0; i < tausarray.length; i++) {
-          int tausucc = tausarray[i];
-          if (tausucc != s) {
-            addAllPredeccessors(s, tausucc);
-            addAllSuccessors(tausucc, s);
-          }
-          //removeTransition(s, tau, tausucc);
-        }
-      }
-    }*/
+    /*
+     * for (int s = 0; s < numberOfStates(); s++) { mAnnotations[s] = null;
+     * addAllPossibleSuccessors(s, tau); }
+     */
+    /*
+     * for (int s = 0; s < numberOfStates(); s++) { TIntHashSet tausucc =
+     * mSuccessors[s][tau]; if (tausucc == null) {continue;} int[]
+     * tausuccarray = tausucc.toArray(); for (int i = 0; i <
+     * tausuccarray.length; i++) { int succ = tausuccarray[i];
+     * removeTransition(s, tau, succ); } }
+     */
+    /*
+     * for (int s = 0; s < numberOfStates(); s++) { int tausize = 0; while
+     * (true) { TIntHashSet taus = getSuccessors(s, tau); if (taus == null)
+     * {break;} if (taus.size() == tausize) {break;} tausize = taus.size();
+     * int[] tausarray = taus.toArray(); for (int i = 0; i < tausarray.length;
+     * i++) { int tausucc = tausarray[i]; if (tausucc != s) {
+     * addAllPredeccessors(s, tausucc); addAllSuccessors(tausucc, s); }
+     * //removeTransition(s, tau, tausucc); } } }
+     */
   }
 
   public void addAllTauReachable(final TIntHashSet[][] transitionRelation,
-                                 final int tau, final int state, final int sourcestate,
-                                 final boolean succbool, final TIntHashSet set)
+                                 final int tau, final int state,
+                                 final int sourcestate,
+                                 final boolean succbool,
+                                 final TIntHashSet set)
   {
     //if (set.contains(state)) {return;}
     set.add(state);
     final TIntHashSet tausuccs = transitionRelation[state][tau];
-    if (tausuccs == null) {return;}
+    if (tausuccs == null) {
+      return;
+    }
     final int[] tauarray = tausuccs.toArray();
     for (int i = 0; i < tauarray.length; i++) {
       final int succ = tauarray[i];
-      if (succ == state) {continue;}
-      addAllTauReachable(transitionRelation, tau, succ, sourcestate, succbool, set);
+      if (succ == state) {
+        continue;
+      }
+      addAllTauReachable(transitionRelation, tau, succ, sourcestate, succbool,
+                         set);
     }
     for (int e = 0; e < numberOfEvents(); e++) {
       //if (e != tau) {continue;}
       final TIntHashSet succs = transitionRelation[state][e];
-      if (succs == null) {continue;}
+      if (succs == null) {
+        continue;
+      }
       final int[] succsarray = succs.toArray();
       for (int i = 0; i < succsarray.length; i++) {
         final int succ = succsarray[i];
@@ -1099,34 +1138,43 @@ public class GeneralizedTransitionRelation
       if (isMarked(state)) {
         markState(sourcestate, true);
       }
-    }/* else {
-      if (isInitial(state)) {
-        makeInitialState(sourcestate, true);
-      }
-    }*/
+    } /*
+       * else { if (isInitial(state)) { makeInitialState(sourcestate, true); }
+       * }
+       */
   }
 
-  public void removeAnnotations(final int state, final Set<TIntHashSet> remanns)
+  public void removeAnnotations(final int state,
+                                final Set<TIntHashSet> remanns)
   {
     mAnnotations[state].removeAll(remanns);
-    if (mAnnotations[state].isEmpty()) {mAnnotations[state] = null;}
+    if (mAnnotations[state].isEmpty()) {
+      mAnnotations[state] = null;
+    }
   }
 
   public void saturatetaus(final int state, final int tau)
   {
     final TIntHashSet taureachable = new TIntHashSet();
     final TIntArrayList tobevisited = new TIntArrayList();
-    taureachable.add(state); tobevisited.add(state);
+    taureachable.add(state);
+    tobevisited.add(state);
     while (!tobevisited.isEmpty()) {
       final int visit = tobevisited.removeAt(tobevisited.size() - 1);
       addTransition(state, tau, visit);
       final TIntHashSet taus = getSuccessors(visit, tau);
-      if (taus == null) {continue;}
+      if (taus == null) {
+        continue;
+      }
       final int[] tausarr = taus.toArray();
       for (int i = 0; i < tausarr.length; i++) {
         final int tausucc = tausarr[i];
-        if (isInitial(state)) {makeInitialState(tausucc, true);}
-        if (taureachable.add(tausucc)) {tobevisited.add(tausucc);}
+        if (isInitial(state)) {
+          makeInitialState(tausucc, true);
+        }
+        if (taureachable.add(tausucc)) {
+          tobevisited.add(tausucc);
+        }
       }
     }
   }
@@ -1142,15 +1190,23 @@ public class GeneralizedTransitionRelation
       }
     }
     for (int e = 0; e < numberOfEvents(); e++) {
-      if (e == tau) {continue;}
-      if (isMarkingEvent(e)) {continue;}
+      if (e == tau) {
+        continue;
+      }
+      if (isMarkingEvent(e)) {
+        continue;
+      }
       final TIntHashSet succs = getSuccessors(state, e);
-      if (succs == null) {continue;}
+      if (succs == null) {
+        continue;
+      }
       final int[] succsarr = succs.toArray();
       for (int i = 0; i < succsarr.length; i++) {
         final int succ = succsarr[i];
         final TIntHashSet tausuccs = getSuccessors(succ, tau);
-        if (tausuccs == null)  {continue;}
+        if (tausuccs == null) {
+          continue;
+        }
         final int[] tausuccsarr = tausuccs.toArray();
         for (int ti = 0; ti < tausuccsarr.length; ti++) {
           final int tausucc = tausuccsarr[ti];
@@ -1167,12 +1223,12 @@ public class GeneralizedTransitionRelation
     addTransition(s, tau, s);
   }
 
-
   public void printstuff()
   {
     System.out.println("marking: " + mEventToInt.get(mMarkedEvent));
     for (int s = 0; s < mPredecessors.length; s++) {
-      System.out.print(s + ": " + Arrays.toString(getActiveEvents(s).toArray()));
+      System.out
+        .print(s + ": " + Arrays.toString(getActiveEvents(s).toArray()));
       System.out.print("ANNS:" + getAnnotations2(s).size());
       System.out.println();
       for (final TIntHashSet ann : getAnnotations2(s)) {
@@ -1201,30 +1257,33 @@ public class GeneralizedTransitionRelation
     return num;
   }
 
-  public EventProxy getTau(final ProductDESProxy des) {
+  public EventProxy getTau(final ProductDESProxy des)
+  {
 
     final Set<EventProxy> desEvents = des.getEvents();
     for (final EventProxy ep : desEvents) {
-      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
-          return ep;
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE
+          && !ep.isObservable()) {
+        return ep;
       }
     }
     return null;
   }
 
-  public Boolean isTau(final EventProxy event) {
+  public Boolean isTau(final EventProxy event)
+  {
     return event.getName().equals(TAU);
   }
-
 
   public EventProxy[] shiftAutEvents(final Set<EventProxy> eventSet,
                                      final EventProxy tau)
   {
     final List<EventProxy> eventslist = new ArrayList<EventProxy>();
-    if(tau != null)
+    if (tau != null)
       eventslist.add(tau);
     for (final EventProxy ep : eventSet) {
-      if (!isTau(ep) && !ep.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+      if (!isTau(ep)
+          && !ep.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
         //eventsArr[pos] = ep;
         eventslist.add(ep);
       }
@@ -1255,74 +1314,80 @@ public class GeneralizedTransitionRelation
     return annints;
   }
 
-  public void annotateWithActiveEvents() {
-    final Annotator annotatedAutomaton= new Annotator(this);
+  public void annotateWithActiveEvents()
+  {
+    final Annotator annotatedAutomaton = new Annotator(this);
     annotatedAutomaton.run();
   }
 
-  public AutomatonProxy unannotate(final ProductDESProxy des, final ProductDESProxyFactory factory, final EventProxy[] eventsToHide){
+  public AutomatonProxy unannotate(final ProductDESProxy des,
+                                   final ProductDESProxyFactory factory,
+                                   final EventProxy[] eventsToHide)
+  {
     final UnAnnotator ua = new UnAnnotator(this);
     final AutomatonProxy aut = ua.run(factory, des, eventsToHide);
     return aut;
   }
 
-  public void annotateWithProps() {
-    for(final StateProxy s : mStateProxyList) {
+  public void annotateWithProps()
+  {
+    for (final StateProxy s : mStateProxyList) {
       final int index = mStateToInt.get(s);
       mAnnotations[index] = getPrevAnnotations(s.getPropositions());
     }
   }
 
- public TIntHashSet[][] getPredecessorsArr()
- {
-   return mPredecessors;
- }
+  public TIntHashSet[][] getPredecessorsArr()
+  {
+    return mPredecessors;
+  }
 
- public TIntHashSet[][] getSuccessorsArr()
- {
-   return mSuccessors;
- }
+  public TIntHashSet[][] getSuccessorsArr()
+  {
+    return mSuccessors;
+  }
 
- public TIntHashSet[] getAllActiveEvents()
- {
-   return mActiveEvents;
- }
+  public TIntHashSet[] getAllActiveEvents()
+  {
+    return mActiveEvents;
+  }
 
- public  TObjectIntHashMap<StateProxy> getStateToInt()
- {
-   return mStateToInt;
- }
+  public TObjectIntHashMap<StateProxy> getStateToInt()
+  {
+    return mStateToInt;
+  }
 
- public  TObjectIntHashMap<EventProxy> getEventToInt()
- {
-   return mEventToInt;
- }
+  public TObjectIntHashMap<EventProxy> getEventToInt()
+  {
+    return mEventToInt;
+  }
 
- public void removeTauLoop() {
-   final TauLoopRemover remover = new TauLoopRemover(this);
-   remover.run();
- }
+  public void removeTauLoop()
+  {
+    final TauLoopRemover remover = new TauLoopRemover(this);
+    remover.run();
+  }
 
- /*
-  * check if Tau is needed ..
-  */
- public void removeUnnecessaryTauEvents() {
- //  for(int e=0; e< this.numberOfEvents(); e++) {
-     //final int e = mTransitionRelation.eventToInt(event);
-   if(this.numberOfEvents() > 0) {
-     boolean isNeeded = false;
-     for(int s=0; s< this.numberOfStates(); s++) {
-       final TIntHashSet succs = this.getSuccessors(s, TAU_INDEX);
-       if (succs != null) {
-         isNeeded = true;
-       }
-     }
-     if(!isNeeded) {
-       this.removeEvent(TAU_INDEX);
-     }
-   }
- }
-
+  /*
+   * check if Tau is needed ..
+   */
+  public void removeUnnecessaryTauEvents()
+  {
+    //  for(int e=0; e< this.numberOfEvents(); e++) {
+    //final int e = mTransitionRelation.eventToInt(event);
+    if (this.numberOfEvents() > 0) {
+      boolean isNeeded = false;
+      for (int s = 0; s < this.numberOfStates(); s++) {
+        final TIntHashSet succs = this.getSuccessors(s, TAU_INDEX);
+        if (succs != null) {
+          isNeeded = true;
+        }
+      }
+      if (!isNeeded) {
+        this.removeEvent(TAU_INDEX);
+      }
+    }
+  }
 
   //########################################################################
   //# Debugging
@@ -1345,12 +1410,12 @@ public class GeneralizedTransitionRelation
             final int t = iter.next();
             final TIntHashSet preds = getPredecessors(t, e);
             if (preds == null || !preds.contains(s)) {
-              assert false : "Transition " + s + " -" + e + "-> " + t +
-                             " appears in successors but not in predecessors.";
+              assert false : "Transition " + s + " -" + e + "-> " + t
+                             + " appears in successors but not in predecessors.";
             }
             if (active == null || !active.contains(e)) {
-              assert false : "Transition " + s + " -" + e + "-> " + t +
-                             " appears in successors but not in active events.";
+              assert false : "Transition " + s + " -" + e + "-> " + t
+                             + " appears in successors but not in active events.";
             }
           }
         }
@@ -1367,8 +1432,8 @@ public class GeneralizedTransitionRelation
             final int s = iter.next();
             final TIntHashSet succs = getSuccessors(s, e);
             if (succs == null || !succs.contains(t)) {
-              assert false : "Transition " + s + " -" + e + "-> " + t +
-                             " appears in predecessors but not in successors.";
+              assert false : "Transition " + s + " -" + e + "-> " + t
+                             + " appears in predecessors but not in successors.";
             }
           }
         }
@@ -1384,8 +1449,8 @@ public class GeneralizedTransitionRelation
           final int e = iter.next();
           final TIntHashSet succs = getSuccessors(s, e);
           if (succs == null || succs.isEmpty()) {
-            assert false : "Event " + e + " is active in state " + s +
-                           ", but there is no such transition.";
+            assert false : "Event " + e + " is active in state " + s
+                           + ", but there is no such transition.";
           }
         }
       }

@@ -73,14 +73,15 @@ public class DiamondEliminator
         gtr = this.specialState(s, gtr);
         continue;
       }
-      final TIntHashSet taus = this.mTransitionRelation
+       TIntHashSet taus = this.mTransitionRelation
         .getFromArray(s, this.mStatesReachableUnderTau);
       taus.add(s);
-      final int[] taussuccsArr = taussuccs.toArray();
+      taus=exploreTauReachableStates(s, taus);
+     /* final int[] taussuccsArr = taussuccs.toArray();
       for (int ti = 0; ti < taussuccsArr.length; ti++) {
         final int t = taussuccsArr[ti];
         taus.add(t);
-      }
+      }*/
 
       //----get visible events (i.e. set of V(N) )
       final TIntHashSet visible =
@@ -177,4 +178,21 @@ public class DiamondEliminator
 
     return gtr;
   }
+
+  public  final TIntHashSet exploreTauReachableStates(final int state, final TIntHashSet taus) {
+    final TIntHashSet taussuccs = this.mTransitionRelation.getSuccessors(state, TAU_INDEX);
+     if(taussuccs==null) {
+       return taus;
+     }
+     else {
+       final int[] taussuccsArr = taussuccs.toArray();
+       for (int ti = 0; ti < taussuccsArr.length; ti++) {
+         final int t = taussuccsArr[ti];
+         taus.add(t);
+         exploreTauReachableStates(t, taus);
+       }
+     }
+     return taus;
+  }
+
 }
