@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="diamondElimination_07" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="diamondElimination_07" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test of diamon elimination. State 0 has a-successors 0, 2, and 4, of which 2 and 4 are minimal.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
@@ -166,11 +166,11 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-15" Y="-16"/>
+                                <Point X="4" Y="-2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="179" Y="195"/>
+                            <Point X="176" Y="193"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S0" Target="S2">
@@ -230,11 +230,11 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="0"/>
+                                <Point X="3" Y="-8"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="159" Y="173"/>
+                            <Point X="164" Y="175"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

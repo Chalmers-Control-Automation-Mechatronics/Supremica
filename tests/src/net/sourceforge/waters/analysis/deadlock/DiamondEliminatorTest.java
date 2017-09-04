@@ -179,6 +179,23 @@ public class DiamondEliminatorTest extends AbstractAnalysisTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_diamondElimination_09() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_09.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_diamondElimination_10() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "deadlock_abstraction",
+                     "diamondElimination_10.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
