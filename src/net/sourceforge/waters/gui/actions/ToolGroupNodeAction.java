@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
@@ -48,7 +48,7 @@ public class ToolGroupNodeAction
   public ToolGroupNodeAction(final IDE ide)
   {
     super(ide, "Group nodes", "Create group nodes",
-          IconLoader.ICON_TOOL_GROUP_NODE, IDEToolBar.Tool.GROUPNODE);
+          IconAndFontLoader.ICON_TOOL_GROUP_NODE, IDEToolBar.Tool.GROUPNODE);
   }
 
 

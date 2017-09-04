@@ -67,7 +67,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -176,13 +176,13 @@ public class SimpleComponentEditorDialog
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
     mPlantButton =
-      new IconRadioButton("Plant", IconLoader.ICON_PLANT, mKindGroup);
+      new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT, mKindGroup);
     mPropertyButton =
-      new IconRadioButton("Property", IconLoader.ICON_PROPERTY, mKindGroup);
+      new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY, mKindGroup);
     mSpecButton =
-      new IconRadioButton("Specification", IconLoader.ICON_SPEC, mKindGroup);
+      new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC, mKindGroup);
     mSupervisorButton =
-      new IconRadioButton("Supervisor", IconLoader.ICON_SUPERVISOR,
+      new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
                           mKindGroup);
     switch (template.getKind()) {
     case PLANT:

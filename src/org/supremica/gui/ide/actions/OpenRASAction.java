@@ -42,7 +42,7 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
@@ -63,7 +63,7 @@ public class OpenRASAction extends net.sourceforge.waters.gui.actions.IDEAction 
         super(ide);
         putValue(Action.NAME, "Open RAS ...");
         putValue(Action.SHORT_DESCRIPTION, "Open/import a RAS module");
-        putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_OPEN);
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPEN);
     }
 
     // # Interface java.awt.event.ActionListener

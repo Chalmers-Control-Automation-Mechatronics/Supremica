@@ -56,7 +56,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.border.BevelBorder;
 
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 
 public class EventChooserDialog extends JDialog
@@ -109,7 +109,7 @@ public class EventChooserDialog extends JDialog
     buttonPanel.add(cancelButton);
     panel.add(buttonPanel, BorderLayout.SOUTH);
     final JLabel topLabel = new JLabel("Select the Event you wish to fire");
-    topLabel.setIcon(IconLoader.ICON_EVENT);
+    topLabel.setIcon(IconAndFontLoader.ICON_EVENT);
     panel.add(topLabel, BorderLayout.NORTH);
     this.add(panel);
     this.setLocation(DEFAULT_STARTING_LOCATION);

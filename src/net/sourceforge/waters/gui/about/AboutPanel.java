@@ -58,6 +58,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import net.sourceforge.waters.config.Version;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.supremica.gui.ide.IDEReportInterface;
@@ -97,7 +98,7 @@ public class AboutPanel
   @Override
   public void hyperlinkUpdate(final HyperlinkEvent event)
   {
-    if(event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
       final Element element = event.getSourceElement();
       final Document doc = element.getDocument();
       final int start = element.getStartOffset();
@@ -136,7 +137,10 @@ public class AboutPanel
   {
     final Version version = Version.getInstance();
     final StringBuilder builder = new StringBuilder();
-    builder.append("<HTML><BODY STYLE=\"font-size: 10px; font-family: serif;\">");
+    builder.append("<HTML><BODY STYLE=\"font-size: ");
+    final int fontSize = Math.round(9.5f * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+    builder.append(fontSize);
+    builder.append("px; font-family: serif;\">");
     builder.append("<H1 STYLE=\"text-align: center; color: #00008d; font-style: italic;\">");
     builder.append(version.getTitle());
     builder.append("</H1>");

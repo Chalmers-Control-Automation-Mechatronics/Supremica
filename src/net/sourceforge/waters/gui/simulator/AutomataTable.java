@@ -49,7 +49,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
@@ -65,7 +65,7 @@ class AutomataTable extends JTable
     mSimulation = sim;
     mDesktop = desktop;
     final int height =
-      Math.max(AUTOMATA_TABLE_MINHEIGHT, IconLoader.getWatersIconHeight());
+      Math.max(AUTOMATA_TABLE_MINHEIGHT, IconAndFontLoader.getWatersIconHeight());
     setRowHeight(height);
     final TableCellRenderer textrenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textrenderer);

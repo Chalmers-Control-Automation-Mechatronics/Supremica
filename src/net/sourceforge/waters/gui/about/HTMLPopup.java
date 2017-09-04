@@ -46,6 +46,8 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
 
 /**
  * A dialog window that can display arbitrary HTML contents.
@@ -66,9 +68,11 @@ public class HTMLPopup
   {
     super(owner, title);
     setBackground(Color.WHITE);
+    final int scaledWidth =
+      Math.round(TEXT_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     final int screenWidth = (int) screenSize.getWidth();
-    final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
+    final int textWidth = Math.min(scaledWidth, screenWidth);
     mPanel = new JEditorPane();
     mPanel.setEditable(false);
     mPanel.setSize(textWidth, Integer.MAX_VALUE);
@@ -87,10 +91,12 @@ public class HTMLPopup
   {
     mPanel.removePropertyChangeListener(this);
     final JScrollPane scroll = new JScrollPane(mPanel);
+    final int scaledWidth =
+      Math.round(TEXT_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     final int screenWidth = (int) screenSize.getWidth();
     final int screenHeight = (int) screenSize.getHeight();
-    final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
+    final int textWidth = Math.min(scaledWidth, screenWidth);
     final int textHeight =
       Math.min(mPanel.getPreferredSize().height, screenHeight * 7 / 8);
     final Dimension size = new Dimension(textWidth, textHeight);

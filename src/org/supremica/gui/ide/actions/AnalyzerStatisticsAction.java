@@ -40,7 +40,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
@@ -68,7 +68,7 @@ public class AnalyzerStatisticsAction
         putValue(Action.SHORT_DESCRIPTION, "Statistics");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, IconLoader.ICON_CONSOLE_INFO);
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_CONSOLE_INFO);
     }
 
     @Override

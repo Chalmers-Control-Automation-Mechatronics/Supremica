@@ -39,7 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -64,7 +64,7 @@ public class InsertConstantAliasAction
     super(ide);
     putValue(Action.NAME, "New Named Constant ...");
     putValue(Action.SHORT_DESCRIPTION, "Add a constant definition to the module");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_CONSTANT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_CONSTANT);
   }
 
 

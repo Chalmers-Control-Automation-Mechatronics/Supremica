@@ -33,24 +33,115 @@
 
 package net.sourceforge.waters.gui.util;
 
+import java.awt.Font;
 import java.awt.Image;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.LookAndFeel;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import org.supremica.properties.Config;
 
 
-public class IconLoader
+/**
+ * <P>A static reference point to all icons and fonts used in the GUI.</P>
+ *
+ * <P>The icon loader is initialised by calling {@link #initialize()} when the
+ * IDE is started. It first sets= the look-and-feel according to the
+ * configuration setting {@link Config#GENERAL_LOOKANDFEEL}. After that,
+ * it tries to guess the appropriate size from the look-and-feels defaults
+ * and the scale factor provided by the icon set as specified by
+ * {@link Config#GUI_EDITOR_ICONSET}. In addition, icons are loaded statically
+ * when this class is first used, also following {@link
+ * Config#GUI_EDITOR_ICONSET}.</P>
+ *
+ * <P>After initialisation, fonts and icons can be accessed through the public
+ * static variables defined in this class.</P>
+ *
+ * <P><STRONG>BUG:</STRONG> The font scaling procedure is platform and
+ * look-and-feel dependent. It has only been tested for the default (Metal)
+ * and Windows look-and-feel.</P>
+ *
+ * @author Robi Malik
+ */
+
+public class IconAndFontLoader
 {
 
   //#########################################################################
-  //# Public Static Class Methods
+  //# Initialisation
+  public static void initialize()
+  {
+    // 1. Set look and feel
+    final LookAndFeelOption lookAndFeel = Config.GENERAL_LOOKANDFEEL.get();
+    lookAndFeel.setLookAndFeel();
+
+    // 2. Scale fonts
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    GLOBAL_SCALE_FACTOR = iconSet.getGlobalScaleFactor();
+    if (GLOBAL_SCALE_FACTOR != 1.0f) {
+      final LookAndFeel laf = UIManager.getLookAndFeel();
+      if (laf instanceof MetalLookAndFeel) {
+        final Font normalBase = MetalLookAndFeel.getUserTextFont();
+        FONT_NORMAL = normalBase.deriveFont(GLOBAL_SCALE_FACTOR * normalBase.getSize2D());
+        final Font titleBase = MetalLookAndFeel.getWindowTitleFont();
+        FONT_TITLE = titleBase.deriveFont(GLOBAL_SCALE_FACTOR * titleBase.getSize2D());
+        final Font acceleratorBase = MetalLookAndFeel.getSubTextFont();
+        FONT_SMALL = acceleratorBase.deriveFont(GLOBAL_SCALE_FACTOR *
+                                                 acceleratorBase.getSize2D());
+        final int size = normalBase.getSize();
+        final Font serif = new Font(Font.SERIF, Font.PLAIN, size);
+        FONT_SERIF = serif.deriveFont(Font.PLAIN, GLOBAL_SCALE_FACTOR * size);
+      } else {
+        final float scaledSize = 10.0f * GLOBAL_SCALE_FACTOR;
+        final Font sans = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
+        FONT_NORMAL = sans.deriveFont(Font.PLAIN, scaledSize);
+        FONT_TITLE = sans.deriveFont(Font.BOLD, scaledSize);
+        FONT_SMALL = sans.deriveFont(Font.PLAIN, 0.9f * scaledSize);
+        final Font serif = new Font(Font.SERIF, Font.PLAIN, 10);
+        FONT_SERIF = serif.deriveFont(Font.PLAIN, scaledSize);
+      }
+      final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
+      final FontUIResource titleRes = new FontUIResource(FONT_TITLE);
+      final FontUIResource acceleratorRes = new FontUIResource(FONT_SMALL);
+      final UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+      for (final Map.Entry<Object,Object> entry : defaults.entrySet()) {
+        final Object key = entry.getKey();
+        final String name = key.toString();
+        final Object value = entry.getValue();
+        if (value instanceof FontUIResource) {
+          final FontUIResource res = (FontUIResource) value;
+          final float size = GLOBAL_SCALE_FACTOR * res.getSize2D();
+          final Font newFont = res.deriveFont(size);
+          final FontUIResource newRes = new FontUIResource(newFont);
+          entry.setValue(newRes);
+        } else if (name.endsWith(".font")) {
+          entry.setValue(normalRes);
+        } else if (name.endsWith(".titleFont")) {
+          entry.setValue(titleRes);
+        } else if (name.endsWith(".acceleratorFont")) {
+          entry.setValue(acceleratorRes);
+        } else if (name.endsWith("Font")) {
+          entry.setValue(normalRes);
+        }
+      }
+    }
+  }
+
+
+
+  //#########################################################################
+  //# Public Methods to Load Icons and Fonts
   public static int getWatersIconHeight()
   {
     return ICON_PLANT.getIconHeight();
@@ -66,15 +157,21 @@ public class IconLoader
   //# Private Static Class Methods
   private static ImageIcon getWatersIcon(final String name)
   {
-    final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
-    return getWatersIcon(subdir, name);
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    return getWatersIcon(iconSet, name);
   }
 
-  private static ImageIcon getWatersIcon(final String subdir,
+  private static ImageIcon getWatersIcon(final IconSet iconSet,
                                          final String name)
   {
-    final Class<?> cls = IconLoader.class;
-    final String prefix = "/icons/" + subdir + "/" + name;
+    return getWatersIcon(iconSet.getName(), name);
+  }
+
+  private static ImageIcon getWatersIcon(final String subDir,
+                                         final String name)
+  {
+    final Class<?> cls = IconAndFontLoader.class;
+    final String prefix = "/icons/" + subDir + "/" + name;
     final URL pngResource = cls.getResource(prefix + ".png");
     if (pngResource != null) {
       return new ImageIcon(pngResource);
@@ -88,7 +185,7 @@ public class IconLoader
 
   private static ImageIcon getSupremicaIcon(final String name)
   {
-    final Class<?> cls = IconLoader.class;
+    final Class<?> cls = IconAndFontLoader.class;
     final String resourcename = "/icons/" + name + ".gif";
     final URL resource = cls.getResource(resourcename);
     return new ImageIcon(resource);
@@ -96,18 +193,18 @@ public class IconLoader
 
   private static List<ImageIcon> getIconList(final String name)
   {
-    final String subdir = Config.GUI_EDITOR_ICONSET.getAsString();
-    if (Character.isDigit(subdir.charAt(0))) {
+    final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
+    if (iconSet.isScalable()) {
       final List<ImageIcon> icons = new LinkedList<ImageIcon>();
-      for (final String choice : Config.GUI_EDITOR_ICONSET.getLegalValues()) {
-        if (Character.isDigit(choice.charAt(0))) {
+      for (final IconSet choice : IconSet.values()) {
+        if (choice.isScalable()) {
           final ImageIcon icon = getWatersIcon(choice, name);
           icons.add(icon);
         }
       }
       return icons;
     } else {
-      final ImageIcon icon = getWatersIcon(subdir, name);
+      final ImageIcon icon = getWatersIcon(iconSet, name);
       return Collections.singletonList(icon);
     }
   }
@@ -134,8 +231,24 @@ public class IconLoader
   }
 
 
+  //########################################################################
+  //# Debugging
+  static void dumpUIDefaults()
+  {
+    final LookAndFeel laf = UIManager.getLookAndFeel();
+    System.out.println("Look&feel: " + laf.getName());
+    final UIDefaults defaults = UIManager.getLookAndFeelDefaults();
+    for (final Map.Entry<Object,Object> entry : defaults.entrySet()) {
+      final String name = entry.getKey().toString();
+      final Object value = entry.getValue();
+      final String isFont = value instanceof Font ? " (Font)" : "";
+      System.out.println(name + ": " + value.getClass().getName() + isFont);
+    }
+  }
+
+
   //#########################################################################
-  //# Class Constants
+  //# Private Constants
   private static final String NAME_APPLICATION = "application";
   private static final String NAME_BINDING = "binding";
   private static final String NAME_CONSOLE_DEBUG = "debug";
@@ -212,13 +325,17 @@ public class IconLoader
 
 
   //#########################################################################
-  //# Class Constants
+  //# Public Icons
   // Editor
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
-  public static final ImageIcon ICON_CONSOLE_DEBUG = getWatersIcon(NAME_CONSOLE_DEBUG);
-  public static final ImageIcon ICON_CONSOLE_ERROR = getWatersIcon(NAME_CONSOLE_ERROR);
-  public static final ImageIcon ICON_CONSOLE_INFO = getWatersIcon(NAME_CONSOLE_INFO);
-  public static final ImageIcon ICON_CONSOLE_WARNING = getWatersIcon(NAME_CONSOLE_WARNING);
+  public static final ImageIcon ICON_CONSOLE_DEBUG =
+    getWatersIcon(NAME_CONSOLE_DEBUG);
+  public static final ImageIcon ICON_CONSOLE_ERROR =
+    getWatersIcon(NAME_CONSOLE_ERROR);
+  public static final ImageIcon ICON_CONSOLE_INFO =
+    getWatersIcon(NAME_CONSOLE_INFO);
+  public static final ImageIcon ICON_CONSOLE_WARNING =
+    getWatersIcon(NAME_CONSOLE_WARNING);
   public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE);
@@ -247,7 +364,8 @@ public class IconLoader
   public static final ImageIcon ICON_PLANT = getWatersIcon(NAME_PLANT);
   public static final ImageIcon ICON_PLANT_ERROR = getWatersIcon(NAME_PLANT_ERROR);
   public static final ImageIcon ICON_PROPERTY = getWatersIcon(NAME_PROPERTY);
-  public static final ImageIcon ICON_PROPERTY_ERROR = getWatersIcon(NAME_PROPERTY_ERROR);
+  public static final ImageIcon ICON_PROPERTY_ERROR =
+    getWatersIcon(NAME_PROPERTY_ERROR);
   public static final ImageIcon ICON_SPEC = getWatersIcon(NAME_SPEC);
   public static final ImageIcon ICON_SPEC_ERROR = getWatersIcon(NAME_SPEC_ERROR);
   public static final ImageIcon ICON_SUPERVISOR = getWatersIcon(NAME_SUPERVISOR);
@@ -324,5 +442,15 @@ public class IconLoader
   public static final List<ImageIcon> ICONLIST_SPEC = getIconList(NAME_SPEC);
   public static final List<ImageIcon> ICONLIST_SUPERVISOR =
     getIconList(NAME_SUPERVISOR);
+
+
+  //#########################################################################
+  //# Public Fonts
+  public static float GLOBAL_SCALE_FACTOR;
+
+  public static Font FONT_NORMAL;
+  public static Font FONT_TITLE;
+  public static Font FONT_SERIF;
+  public static Font FONT_SMALL;
 
 }

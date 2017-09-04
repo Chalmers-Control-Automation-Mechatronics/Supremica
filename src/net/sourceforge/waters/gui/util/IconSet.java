@@ -31,77 +31,70 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+package net.sourceforge.waters.gui.util;
 
-import javax.swing.Action;
-import javax.swing.KeyStroke;
-
-import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-
-import org.supremica.gui.ide.IDE;
-
-public class SimulationReplayStepAction
-  extends WatersSimulationAction
-  implements SimulationObserver
+public enum IconSet
 {
+  //#########################################################################
+  //# Enumeration Constants
+  WATERS_16("16x16", IconSet.REFERENCE_SIZE),
+  WATERS_20("20x20", 20),
+  WATERS_24("24x24", 24),
+  SUPREMICA("supremica", IconSet.REFERENCE_SIZE);
+
 
   //#########################################################################
   //# Constructor
-  SimulationReplayStepAction(final IDE ide)
+  private IconSet(final String name, final int size)
   {
-    super(ide);
-    putValue(Action.NAME, "Replay Step");
-    putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
-    putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-    updateEnabledStatus();
+    mName = name;
+    mSize = size;
+    mScalable = Character.isDigit(name.charAt(0));
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
+  //# Simple Access
+  public String getName()
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel != null) {
-      final Simulation sim = panel.getSimulation();
-      sim.replayStep();
-    }
+    return mName;
+  }
+
+  public int getSize()
+  {
+    return mSize;
+  }
+
+  public float getGlobalScaleFactor()
+  {
+    return (float) mSize / (float) REFERENCE_SIZE;
+  }
+
+  public boolean isScalable()
+  {
+    return mScalable;
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
+  //# Overrides for java.lang.Object
   @Override
-  void updateEnabledStatus()
+  public String toString()
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel == null) {
-      setEnabled(false);
-      return;
-    }
-    final Simulation sim = panel.getSimulation();
-    if (sim.getCurrentTime() < sim.getHistorySize() - 1) {
-      setEnabled(true);
-      return;
-    }
-    final TraceProxy trace = sim.getTrace();
-    setEnabled(trace != null && trace instanceof LoopTraceProxy);
+    return mName;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private String mName;
+  private int mSize;
+  private boolean mScalable;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final int REFERENCE_SIZE = 16;
 
 }

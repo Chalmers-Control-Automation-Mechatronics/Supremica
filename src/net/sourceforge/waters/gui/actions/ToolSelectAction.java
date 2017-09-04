@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
@@ -47,7 +47,7 @@ public class ToolSelectAction
   //# Constructors
   public ToolSelectAction(final IDE ide)
   {
-    super(ide, "Select", "Select", IconLoader.ICON_TOOL_SELECT,
+    super(ide, "Select", "Select", IconAndFontLoader.ICON_TOOL_SELECT,
           IDEToolBar.Tool.SELECT);
   }
 

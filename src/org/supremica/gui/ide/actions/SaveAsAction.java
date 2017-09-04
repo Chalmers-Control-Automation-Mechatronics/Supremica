@@ -40,7 +40,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
@@ -57,7 +57,7 @@ public class SaveAsAction extends AbstractSaveAction
     putValue(Action.NAME, "Save As ...");
     putValue(Action.SHORT_DESCRIPTION, "Save the module using a new name");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_SAVE_AS);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_SAVE_AS);
   }
 
   //#########################################################################

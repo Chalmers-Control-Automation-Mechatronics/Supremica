@@ -114,6 +114,7 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.ConfigBridge;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -204,11 +205,13 @@ public class GraphEditorPanel
     super(graph, module, root.getModuleWindowInterface().getModuleContext());
     mRoot = root;
     mModuleContainer = moduleContainer;
+    mToolbar = toolbar;
+    mZoomFactor = 1.0;
+    mAdjustedZoomFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
     mRenderingContext = new EditorRenderingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, mRenderingContext);
     setShapeProducer(producer);
-    mToolbar = toolbar;
     mPopupFactory =
       manager == null ? null : new GraphPopupFactory(manager, root);
     setFocusable(true);
@@ -306,6 +309,7 @@ public class GraphEditorPanel
   public void registerSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_ICONSET.addPropertyChangeListener(this);
     Config.GUI_EDITOR_SHOW_GRID.addPropertyChangeListener(this);
     Config.GUI_EDITOR_GRID_SIZE.addPropertyChangeListener(this);
   }
@@ -314,6 +318,7 @@ public class GraphEditorPanel
   public void unregisterSupremicaPropertyChangeListeners()
   {
     super.registerSupremicaPropertyChangeListeners();
+    Config.GUI_EDITOR_ICONSET.removePropertyChangeListener(this);
     Config.GUI_EDITOR_SHOW_GRID.removePropertyChangeListener(this);
     Config.GUI_EDITOR_GRID_SIZE.removePropertyChangeListener(this);
   }
@@ -995,6 +1000,7 @@ public class GraphEditorPanel
   {
     if (mZoomFactor != zoom) {
       mZoomFactor = zoom;
+      mAdjustedZoomFactor = zoom * IconAndFontLoader.GLOBAL_SCALE_FACTOR;
       mBoundsMayHaveChanged = true;
       mCurrentBounds = null;
       repaint();
@@ -1015,7 +1021,7 @@ public class GraphEditorPanel
   {
     final AffineTransform transform = new AffineTransform();
     transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
-    transform.scale(mZoomFactor, mZoomFactor);
+    transform.scale(mAdjustedZoomFactor, mAdjustedZoomFactor);
     return transform;
   }
 
@@ -5658,7 +5664,14 @@ public class GraphEditorPanel
    * from the drop box in the toolbar ({@link ZoomSelector}), which may
    * need further correction.
    */
-  private double mZoomFactor = 1.0;
+  private double mZoomFactor;
+  /**
+   * The adjusted zoom factor for scaling the graph. This is the value of
+   * {@link #mZoomFactor} multiplied by the scale factor from the configured
+   * icon set {@link Config#GUI_EDITOR_ICONSET}, which is the value used for
+   * scaling the graph.
+   */
+  private double mAdjustedZoomFactor;
 
   /**
    * Set of items not to be drawn, because they are being dragged and

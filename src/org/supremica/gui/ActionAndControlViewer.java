@@ -52,7 +52,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Project;
 
@@ -100,7 +100,7 @@ public class ActionAndControlViewer
 		}
 
 		setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
 		initMenubar();
 		contentPane.add(thePanel, BorderLayout.CENTER);

@@ -40,7 +40,7 @@ import javax.swing.Action;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.GraphEventPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -67,7 +67,7 @@ public class InsertEventLabelAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_L);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_INSERT, 0));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_EVENT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_EVENT);
   }
 
 

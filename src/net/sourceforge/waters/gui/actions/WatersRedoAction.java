@@ -41,7 +41,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -60,7 +60,7 @@ public class WatersRedoAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_R);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_REDO);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_REDO);
   }
 
 

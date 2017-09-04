@@ -40,7 +40,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.Plantifier;
@@ -70,7 +70,7 @@ public class AnalyzerPlantifyAction
         setAnalyzerActiveRequired(true);
         putValue(Action.NAME, "Plantify");
         putValue(Action.SHORT_DESCRIPTION, "Turns specifications and supervisors into plants");
-        putValue(Action.SMALL_ICON, IconLoader.ICON_PLANT);
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_PLANT);
     }
 
     @Override

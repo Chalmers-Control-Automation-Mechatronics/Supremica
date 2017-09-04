@@ -66,6 +66,7 @@ import net.sourceforge.waters.gui.renderer.RenderingInformation;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -135,14 +136,15 @@ public class AutomatonDisplayPane
     setShapeProducer(producer);
     final int width;
     final int height;
+    final float scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
     if (ensureGeometryExists()) {
       // Spring embedder is running, guessing window size ...
-      final int numstates = aut.getStates().size();
-      width = height = 128 + 32 * numstates;
+      final int numStates = aut.getStates().size();
+      width = height = Math.round(scaleFactor * (128 + 32 * numStates));
     } else {
       final Rectangle2D imageRect = this.getMinimumBoundingRectangle();
-      width = (int) Math.ceil(imageRect.getWidth());
-      height = (int) Math.ceil(imageRect.getHeight());
+      width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
+      height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
     }
     setPreferredSize(new Dimension(width, height));
     mBackgroundListener =

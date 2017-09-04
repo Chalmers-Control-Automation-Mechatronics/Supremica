@@ -39,7 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -57,7 +57,7 @@ public class SimulationAutoStepAction
     super(ide);
     putValue(Action.NAME, "AutoStep");
     putValue(Action.SHORT_DESCRIPTION, "Execute events automatically");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_AUTOSTEP);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_AUTOSTEP);
     updateEnabledStatus();
   }
 

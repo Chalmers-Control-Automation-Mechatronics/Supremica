@@ -39,7 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.InstanceEditorDialog;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -64,7 +64,7 @@ public class InsertInstanceAction
     super(ide);
     putValue(Action.NAME, "New Instance ...");
     putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_INSTANCE);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_INSTANCE);
   }
 
 

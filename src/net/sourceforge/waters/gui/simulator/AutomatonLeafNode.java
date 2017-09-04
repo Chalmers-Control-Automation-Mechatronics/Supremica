@@ -39,7 +39,7 @@ import javax.swing.Icon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -97,7 +97,7 @@ public class AutomatonLeafNode extends DefaultMutableTreeNode
     if (info == null) {
       return null;
     } else if (info.getSourceObject() instanceof VariableComponentProxy) {
-      return IconLoader.ICON_VARIABLE;
+      return IconAndFontLoader.ICON_VARIABLE;
     } else {
       final ComponentKind kind = aut.getKind();
       return ModuleContext.getComponentKindIcon(kind);

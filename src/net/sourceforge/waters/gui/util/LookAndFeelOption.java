@@ -31,77 +31,81 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+package net.sourceforge.waters.gui.util;
 
-import javax.swing.Action;
-import javax.swing.KeyStroke;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 
-import org.supremica.gui.ide.IDE;
-
-public class SimulationReplayStepAction
-  extends WatersSimulationAction
-  implements SimulationObserver
+public enum LookAndFeelOption
 {
+  //#########################################################################
+  //# Enumeration Constants
+  DEFAULT("Default") {
+    @Override
+    public String getLookAndFeelClassName()
+    {
+      return UIManager.getCrossPlatformLookAndFeelClassName();
+    }
+  },
+  SYSTEM("System") {
+    @Override
+    public String getLookAndFeelClassName()
+    {
+      return UIManager.getSystemLookAndFeelClassName();
+    }
+  };
+
 
   //#########################################################################
   //# Constructor
-  SimulationReplayStepAction(final IDE ide)
+  private LookAndFeelOption(final String name)
   {
-    super(ide);
-    putValue(Action.NAME, "Replay Step");
-    putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
-    putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-    updateEnabledStatus();
+    mName = name;
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Simple Access
+  public String getName()
+  {
+    return mName;
+  }
+
+  public abstract String getLookAndFeelClassName();
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
   @Override
-  public void actionPerformed(final ActionEvent event)
+  public String toString()
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel != null) {
-      final Simulation sim = panel.getSimulation();
-      sim.replayStep();
+    return mName;
+  }
+
+
+  //#########################################################################
+  //# Setting the Look & Feel
+  public void setLookAndFeel()
+  {
+    try {
+      final String className = getLookAndFeelClassName();
+      UIManager.setLookAndFeel(className);
+    } catch (final ClassNotFoundException |
+                   InstantiationException |
+                   IllegalAccessException |
+                   UnsupportedLookAndFeelException exception) {
+      System.err.println("Could not set requested look & feel (" + this +
+                         " - " + ProxyTools.getShortClassName(exception) +
+                         ") continuing with default.");
     }
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  @Override
-  void updateEnabledStatus()
-  {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel == null) {
-      setEnabled(false);
-      return;
-    }
-    final Simulation sim = panel.getSimulation();
-    if (sim.getCurrentTime() < sim.getHistorySize() - 1) {
-      setEnabled(true);
-      return;
-    }
-    final TraceProxy trace = sim.getTrace();
-    setEnabled(trace != null && trace instanceof LoopTraceProxy);
-  }
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
+  //# Data Members
+  private String mName;
 
 }

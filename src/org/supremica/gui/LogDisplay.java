@@ -70,7 +70,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Layout;
@@ -93,7 +93,6 @@ public class LogDisplay
 
     public static LogDisplay getInstance()
     {
-        InterfaceManager.getInstance();
         if (theLogDisplay == null)
         {
             theLogDisplay = new LogDisplay();
@@ -201,12 +200,12 @@ public class LogDisplay
     private void createIcons()
     {
         mIconMap = new HashMap<Level,ImageIcon>(8);
-        mIconMap.put(Level.FATAL, IconLoader.ICON_CONSOLE_ERROR);
-        mIconMap.put(Level.ERROR, IconLoader.ICON_CONSOLE_ERROR);
-        mIconMap.put(Level.WARN, IconLoader.ICON_CONSOLE_WARNING);
-        mIconMap.put(SupremicaLevel.VERBOSE, IconLoader.ICON_CONSOLE_INFO);
-        mIconMap.put(Level.INFO, IconLoader.ICON_CONSOLE_INFO);
-        mIconMap.put(Level.DEBUG, IconLoader.ICON_CONSOLE_DEBUG);
+        mIconMap.put(Level.FATAL, IconAndFontLoader.ICON_CONSOLE_ERROR);
+        mIconMap.put(Level.ERROR, IconAndFontLoader.ICON_CONSOLE_ERROR);
+        mIconMap.put(Level.WARN, IconAndFontLoader.ICON_CONSOLE_WARNING);
+        mIconMap.put(SupremicaLevel.VERBOSE, IconAndFontLoader.ICON_CONSOLE_INFO);
+        mIconMap.put(Level.INFO, IconAndFontLoader.ICON_CONSOLE_INFO);
+        mIconMap.put(Level.DEBUG, IconAndFontLoader.ICON_CONSOLE_DEBUG);
         mIconMap.put(Level.ALL, null);
         mIconMap.put(Level.OFF, null);
     }

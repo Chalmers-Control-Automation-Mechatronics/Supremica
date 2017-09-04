@@ -60,6 +60,8 @@ package org.supremica.properties;
 import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.gui.util.IconSet;
+import net.sourceforge.waters.gui.util.LookAndFeelOption;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
 import org.supremica.automata.BDD.BDDPartitioningType;
@@ -126,18 +128,10 @@ public final class Config
     public static final BooleanProperty DOT_AUTOMATIC_UPDATE = new BooleanProperty(PropertyType.GUI_DOT, "dotAutomaticUpdate", true, "Do automatic update of the layout");
 
     // GENERAL
-    /**
-     * Possible values for look and feel
-     * System: All platforms
-     * Metal: All platforms   (javax.swing.plaf.metal.MetalLookAndFeel)
-     * Motif: All platforms   (com.sun.java.swing.plaf.motif.MotifLookAndFeel)
-     * com.sun.java.swing.plaf.windows.WindowsLookAndFeel : Windows only
-     * javax.swing.plaf.mac.MacLookAndFeel : Mac only
-     * GTK
-     */
-    private static enum LOOKANDFEEL_LEGALVALUES {System, Metal, Motif, Windows, Mac, GTK};
-    //private static final Object[] LOOKANDFEEL_LEGALVALUES2 = UIManager.getInstalledLookAndFeels(); // Won't work
-    public static final ObjectProperty<LOOKANDFEEL_LEGALVALUES> GENERAL_LOOKANDFEEL  = new ObjectProperty<LOOKANDFEEL_LEGALVALUES>(PropertyType.GENERAL, "generalLookAndFeel", LOOKANDFEEL_LEGALVALUES.System, "Look and feel (requires restart)", LOOKANDFEEL_LEGALVALUES.values());
+    public static final ObjectProperty<LookAndFeelOption> GENERAL_LOOKANDFEEL =
+      new ObjectProperty<>(PropertyType.GENERAL, "javaLookAndFeel",
+                           LookAndFeelOption.DEFAULT, "Java Look&Feel",
+                           LookAndFeelOption.values());
     public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
@@ -198,10 +192,11 @@ public final class Config
               "Include RAS support");
 
     // GUI_EDITOR
-    public static final ObjectProperty<String> GUI_EDITOR_ICONSET =
-      new ObjectProperty<String>(PropertyType.GUI_EDITOR, "iconSet", "supremica",
-                                 "Icon set (requires restart)",
-                                 new String[] {"supremica", "16x16", "20x20", "24x24"});
+    public static final ObjectProperty<IconSet> GUI_EDITOR_ICONSET =
+      new ObjectProperty<>(PropertyType.GUI_EDITOR, "iconSet",
+                           IconSet.WATERS_16,
+                           "Icon set and font scaling (requires restart)",
+                           IconSet.values());
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");

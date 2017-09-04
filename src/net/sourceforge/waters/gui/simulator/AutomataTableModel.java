@@ -41,7 +41,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
@@ -199,7 +199,7 @@ class AutomataTableModel
       for (final AutomatonProxy aut : automata) {
         final List<Object> row = new ArrayList<Object>();
         if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
-          row.add(IconLoader.ICON_VARIABLE);
+          row.add(IconAndFontLoader.ICON_VARIABLE);
         else
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
         row.add(aut.getName());

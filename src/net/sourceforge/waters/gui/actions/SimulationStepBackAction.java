@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -57,7 +57,7 @@ public class SimulationStepBackAction
     super(ide);
     putValue(Action.NAME, "Step Back");
     putValue(Action.SHORT_DESCRIPTION, "Travel back through the trace");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_BACK);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_BACK);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
     updateEnabledStatus();

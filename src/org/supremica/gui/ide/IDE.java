@@ -59,6 +59,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -66,7 +67,6 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.supremica.automata.Project;
 import org.supremica.comm.xmlrpc.Server;
-import org.supremica.gui.InterfaceManager;
 import org.supremica.gui.SupremicaLoggerFactory;
 import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;
@@ -363,16 +363,14 @@ public class IDE
   public static void main(final String args[])
     throws Exception
   {
-    // Process command line arguments
+    // Process command line arguments and load configuration
     final List<File> files = ProcessCommandLineArguments.process(args);
-
     // Initialise logging
     SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
     LOGGER = SupremicaLoggerFactory.createLogger(IDE.class);
-
-    // Now start the gui...
-    InterfaceManager.getInstance().initLookAndFeel();
-    //WatersDragSourceListener.setup();
+    // Initialise look & feel, load fonts and icons
+    IconAndFontLoader.initialize();
+    // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
     final boolean showVersion =
       hasFiles || Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue();
@@ -383,7 +381,6 @@ public class IDE
     } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue()) {
       ide.openEmptyDocument();
     }
-
     // Show!
     ide.setVisible(true);
   }

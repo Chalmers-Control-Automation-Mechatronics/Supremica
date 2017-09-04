@@ -55,7 +55,7 @@ import java.util.TreeSet;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
@@ -87,7 +87,7 @@ public class Animator
         super("Supremica Animator - " + detail);
 
         contentPane = (JPanel) getContentPane();
-        final java.util.List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final java.util.List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         contentPane.setLayout(new GridBagLayout());
 

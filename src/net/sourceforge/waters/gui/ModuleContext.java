@@ -48,7 +48,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import net.sourceforge.waters.gui.language.ProxyNamer;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -246,7 +246,7 @@ public class ModuleContext
       final boolean error = hasErrorIcon(ident);
       return getEventDeclIcon(decl, error);
     } else {
-      return IconLoader.ICON_EVENT;
+      return IconAndFontLoader.ICON_EVENT;
     }
   }
 
@@ -267,7 +267,7 @@ public class ModuleContext
       return getEventDeclIcon(decl, false);
     } else if (ident instanceof SimpleIdentifierProxy
                && name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-      return IconLoader.ICON_FORBIDDEN;
+      return IconAndFontLoader.ICON_FORBIDDEN;
     } else {
       return PropositionIcon.getDefaultMarkedIcon();
     }
@@ -575,27 +575,27 @@ public class ModuleContext
     switch (kind) {
     case PLANT:
       if (error) {
-        return IconLoader.ICON_PLANT_ERROR;
+        return IconAndFontLoader.ICON_PLANT_ERROR;
       } else {
-        return IconLoader.ICON_PLANT;
+        return IconAndFontLoader.ICON_PLANT;
       }
     case PROPERTY:
       if (error) {
-        return IconLoader.ICON_PROPERTY_ERROR;
+        return IconAndFontLoader.ICON_PROPERTY_ERROR;
       } else {
-        return IconLoader.ICON_PROPERTY;
+        return IconAndFontLoader.ICON_PROPERTY;
       }
     case SPEC:
       if (error) {
-        return IconLoader.ICON_SPEC_ERROR;
+        return IconAndFontLoader.ICON_SPEC_ERROR;
       } else {
-        return IconLoader.ICON_SPEC;
+        return IconAndFontLoader.ICON_SPEC;
       }
     case SUPERVISOR:
       if (error) {
-        return IconLoader.ICON_SUPERVISOR_ERROR;
+        return IconAndFontLoader.ICON_SUPERVISOR_ERROR;
       } else {
-        return IconLoader.ICON_SUPERVISOR;
+        return IconAndFontLoader.ICON_SUPERVISOR;
       }
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
@@ -615,13 +615,13 @@ public class ModuleContext
   {
     switch (kind) {
     case PLANT:
-      return IconLoader.ICONLIST_PLANT;
+      return IconAndFontLoader.ICONLIST_PLANT;
     case PROPERTY:
-      return IconLoader.ICONLIST_PROPERTY;
+      return IconAndFontLoader.ICONLIST_PROPERTY;
     case SPEC:
-      return IconLoader.ICONLIST_SPEC;
+      return IconAndFontLoader.ICONLIST_SPEC;
     case SUPERVISOR:
-      return IconLoader.ICONLIST_SUPERVISOR;
+      return IconAndFontLoader.ICONLIST_SUPERVISOR;
     default:
       throw new IllegalArgumentException("Unknown component kind: " + kind
                                          + "!");
@@ -642,22 +642,22 @@ public class ModuleContext
     case CONTROLLABLE:
       if (observable) {
         if (error) {
-          return IconLoader.ICON_CONTROLLABLE_OBSERVABLE_ERROR;
+          return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE_ERROR;
         } else {
-          return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
+          return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE;
         }
       } else {
-        return IconLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+        return IconAndFontLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
       }
     case UNCONTROLLABLE:
       if (observable) {
         if (error) {
-          return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE_ERROR;
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE_ERROR;
         } else {
-          return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
         }
       } else {
-        return IconLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
+        return IconAndFontLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
       }
     case PROPOSITION:
       return PropositionIcon.getDefaultMarkedIcon();
@@ -735,7 +735,7 @@ public class ModuleContext
         final Color color = geo.getColorSet().iterator().next();
         return PropositionIcon.getIcon(color);
       } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
-        return IconLoader.ICON_FORBIDDEN;
+        return IconAndFontLoader.ICON_FORBIDDEN;
       } else {
         return PropositionIcon.getDefaultMarkedIcon();
       }
@@ -1204,16 +1204,16 @@ public class ModuleContext
     @Override
     public Icon visitConstantAliasProxy(final ConstantAliasProxy var)
     {
-      return IconLoader.ICON_CONSTANT;
+      return IconAndFontLoader.ICON_CONSTANT;
     }
 
     @Override
     public Icon visitEventAliasProxy(final EventAliasProxy var)
     {
       if (hasErrorIcon(var)) {
-        return IconLoader.ICON_EVENT_ALIAS_ERROR;
+        return IconAndFontLoader.ICON_EVENT_ALIAS_ERROR;
       } else {
-        return IconLoader.ICON_EVENT_ALIAS;
+        return IconAndFontLoader.ICON_EVENT_ALIAS;
       }
     }
 
@@ -1228,9 +1228,9 @@ public class ModuleContext
     public Icon visitForeachProxy(final ForeachProxy foreach)
     {
       if (hasErrorIcon(foreach)) {
-        return IconLoader.ICON_FOREACH_ERROR;
+        return IconAndFontLoader.ICON_FOREACH_ERROR;
       } else {
-        return IconLoader.ICON_FOREACH;
+        return IconAndFontLoader.ICON_FOREACH;
       }
     }
 
@@ -1243,13 +1243,13 @@ public class ModuleContext
     @Override
     public Icon visitInstanceProxy(final InstanceProxy inst)
     {
-      return IconLoader.ICON_INSTANCE;
+      return IconAndFontLoader.ICON_INSTANCE;
     }
 
     @Override
     public Icon visitParameterBindingProxy(final ParameterBindingProxy binding)
     {
-      return IconLoader.ICON_BINDING;
+      return IconAndFontLoader.ICON_BINDING;
     }
 
     @Override
@@ -1263,7 +1263,7 @@ public class ModuleContext
     @Override
     public Icon visitVariableComponentProxy(final VariableComponentProxy var)
     {
-      return IconLoader.ICON_VARIABLE;
+      return IconAndFontLoader.ICON_VARIABLE;
     }
   }
 

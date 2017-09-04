@@ -35,7 +35,7 @@ package net.sourceforge.waters.gui.simulator;
 
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 /**
  * An enumeration representing the different status values an automaton
@@ -51,7 +51,7 @@ public enum AutomatonStatus
    * Status to indicate a property automaton that has been disabled,
    * either by the user or because of a failure in an earlier step.
    */
-  DISABLED(IconLoader.ICON_TABLE_DISABLED_PROPERTY, "has been disabled"),
+  DISABLED(IconAndFontLoader.ICON_TABLE_DISABLED_PROPERTY, "has been disabled"),
   /**
    * Status to indicate that the state of an automaton is unchanged
    * from the previous step, with the current event not contained in
@@ -63,25 +63,25 @@ public enum AutomatonStatus
    * from the previous step, with the current event being an explicit
    * selfloop on that state.
    */
-  SELFLOOPED(IconLoader.ICON_TABLE_ENABLED_AUTOMATON,
+  SELFLOOPED(IconAndFontLoader.ICON_TABLE_ENABLED_AUTOMATON,
              "contains a selfloop that has just been fired"),
   /**
    * Status to indicate that the state of the automaton is correctly
    * changed from the previous step.
    */
-  OK(IconLoader.ICON_TABLE_ENABLED_AUTOMATON,
+  OK(IconAndFontLoader.ICON_TABLE_ENABLED_AUTOMATON,
      "contains a transition that has just been fired"),
   /**
    * Status to indicate an invalid successor state in a property automaton.
    * The language inclusion check fails in this step.
    */
-  WARNING(IconLoader.ICON_TABLE_WARNING_PROPERTY,
+  WARNING(IconAndFontLoader.ICON_TABLE_WARNING_PROPERTY,
           "contains a language inclusion problem"),
   /**
    * Status to indicate an invalid successor state in a specification with
    * an uncontrollable event. The controllability check fails in this step.
    */
-  ERROR(IconLoader.ICON_TABLE_ERROR_AUTOMATON,
+  ERROR(IconAndFontLoader.ICON_TABLE_ERROR_AUTOMATON,
         "contains a controllability problem");
 
 

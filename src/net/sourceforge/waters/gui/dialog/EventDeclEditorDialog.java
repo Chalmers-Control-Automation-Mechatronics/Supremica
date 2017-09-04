@@ -92,7 +92,7 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.PropositionIcon;
@@ -241,11 +241,11 @@ public class EventDeclEditorDialog
       mKindGroup = new ButtonGroup();
       mControllableButton =
         new IconRadioButton("Controllable",
-                            IconLoader.ICON_CONTROLLABLE_OBSERVABLE,
+                            IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE,
                             mKindGroup);
       mUncontrollableButton =
         new IconRadioButton("Uncontrollable",
-                            IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
+                            IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
                             mKindGroup);
       mPropositionButton =
         new IconRadioButton("Proposition", PropositionIcon.getDefaultMarkedIcon(),

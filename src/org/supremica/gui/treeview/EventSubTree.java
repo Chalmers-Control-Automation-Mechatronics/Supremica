@@ -37,7 +37,7 @@ package org.supremica.gui.treeview;
 
 import javax.swing.Icon;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.LabeledEvent;
 
@@ -96,15 +96,15 @@ public class EventSubTree
       final LabeledEvent event = (LabeledEvent) userObject;
       if (event.isControllable()) {
         if (event.isObservable()) {
-          return IconLoader.ICON_CONTROLLABLE_OBSERVABLE;
+          return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE;
         } else {
-          return IconLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+          return IconAndFontLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
         }
       } else {
         if (event.isObservable()) {
-          return IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
         } else {
-          return IconLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
         }
       }
     }

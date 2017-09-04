@@ -41,7 +41,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -54,7 +54,7 @@ public class SimulationJumpToEndAction extends WatersSimulationAction
     super(ide);
     putValue(Action.NAME, "Jump To End");
     putValue(Action.SHORT_DESCRIPTION, "Set the simulation to the final state");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_END);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_TO_END);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
     updateEnabledStatus();

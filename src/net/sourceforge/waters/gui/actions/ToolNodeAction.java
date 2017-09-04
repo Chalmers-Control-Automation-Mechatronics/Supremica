@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
@@ -47,7 +47,7 @@ public class ToolNodeAction
   //# Constructors
   public ToolNodeAction(final IDE ide)
   {
-    super(ide, "Nodes", "Create simple nodes", IconLoader.ICON_TOOL_NODE,
+    super(ide, "Nodes", "Create simple nodes", IconAndFontLoader.ICON_TOOL_NODE,
           IDEToolBar.Tool.NODE);
   }
 

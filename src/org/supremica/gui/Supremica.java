@@ -70,7 +70,7 @@ import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.about.AboutPopup;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -354,7 +354,7 @@ public class Supremica
 
     public void initialize()
     {
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         setVisible(true);
         splitPaneVertical.setDividerLocation(0.7);

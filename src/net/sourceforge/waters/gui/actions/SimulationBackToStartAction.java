@@ -41,7 +41,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -54,7 +54,7 @@ public class SimulationBackToStartAction extends WatersSimulationAction
     super(ide);
     putValue(Action.NAME, "Jump To Start");
     putValue(Action.SHORT_DESCRIPTION, "Return the simulation to the initial state");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_TO_START);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_TO_START);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
     updateEnabledStatus();

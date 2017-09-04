@@ -39,7 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.about.AboutPanel;
 import net.sourceforge.waters.gui.about.AboutPopup;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -62,7 +62,7 @@ public class IDEAboutAction extends IDEAction
     super(ide);
     putValue(Action.NAME, "About ...");
     putValue(Action.SHORT_DESCRIPTION, "Display version information");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_ABOUT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_ABOUT);
   }
 
 

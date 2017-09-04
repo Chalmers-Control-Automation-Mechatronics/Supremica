@@ -69,7 +69,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -153,7 +153,7 @@ public class AutomatonExplorer
 
     public void initialize()
     {
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         stateViewer.initialize();
     }

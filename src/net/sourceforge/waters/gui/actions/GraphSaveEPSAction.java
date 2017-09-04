@@ -46,7 +46,7 @@ import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
 import net.sourceforge.waters.gui.renderer.PrintRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -69,7 +69,7 @@ public class GraphSaveEPSAction
     putValue(Action.SHORT_DESCRIPTION,
              "Save the currently viewed automaton in an " +
              "Encapsulated Postscript (EPS) file");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PRINT_EPS);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_PRINT_EPS);
   }
 
 

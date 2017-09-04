@@ -84,7 +84,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -159,7 +159,7 @@ public abstract class ModuleTree
     }
     setShowsRootHandles(true);
     setAutoscrolls(true);
-    setRowHeight(IconLoader.getWatersIconHeight());
+    setRowHeight(IconAndFontLoader.getWatersIconHeight());
     // Don't expand/collapse on double-click, never collapse the root.
     setToggleClickCount(0);
     manager.installCutCopyPasteActions(this);
