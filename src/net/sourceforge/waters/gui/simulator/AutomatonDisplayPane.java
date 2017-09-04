@@ -142,7 +142,7 @@ public class AutomatonDisplayPane
       final int numStates = aut.getStates().size();
       width = height = Math.round(scaleFactor * (128 + 32 * numStates));
     } else {
-      final Rectangle2D imageRect = this.getMinimumBoundingRectangle();
+      final Rectangle2D imageRect = getMinimumBoundingRectangle();
       width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
       height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
     }

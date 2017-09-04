@@ -192,6 +192,7 @@ public class IDEToolBar
     switch (event.getKind()) {
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
+    case SUBPANEL_SWITCH:
       removeAll();
       createButtons();
       revalidate();
@@ -240,13 +241,16 @@ public class IDEToolBar
         addAction(actions.getAction(InsertEventDeclAction.class));
         addAction(actions.getAction(InsertSimpleComponentAction.class));
         addAction(actions.getAction(InsertVariableAction.class));
-        addSeparator();
-        add(mSelectToolButton);
-        add(mNodeToolButton);
-        add(mGroupNodeToolButton);
-        add(mEdgeToolButton);
-        addSeparator();
-        add(mZoomSelector);
+        final EditorPanel editorPanel = (EditorPanel) panel;
+        if (editorPanel.getActiveEditorWindowInterface() != null) {
+          addSeparator();
+          add(mSelectToolButton);
+          add(mNodeToolButton);
+          add(mGroupNodeToolButton);
+          add(mEdgeToolButton);
+          addSeparator();
+          add(mZoomSelector);
+        }
       } else if (panel instanceof SimulatorPanel) {
         addSeparator();
         addAction(actions.getAction(SimulationResetAction.class));
