@@ -175,11 +175,10 @@ public class DiamondEliminator
         }
       }
     }
-
     return gtr;
   }
 
-  public  final TIntHashSet exploreTauReachableStates(final int state, final TIntHashSet taus) {
+  public final TIntHashSet exploreTauReachableStates(final int state, final TIntHashSet taus) {
     final TIntHashSet taussuccs = this.mTransitionRelation.getSuccessors(state, TAU_INDEX);
      if(taussuccs==null) {
        return taus;
@@ -194,5 +193,7 @@ public class DiamondEliminator
      }
      return taus;
   }
+
+
 
 }
