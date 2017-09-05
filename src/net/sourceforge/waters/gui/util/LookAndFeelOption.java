@@ -39,6 +39,15 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import net.sourceforge.waters.model.base.ProxyTools;
 
+/**
+ * Enumeration of possible values for the Look&amp;Feel option.
+ * The user can select between the default platform-independent look&amp;feel
+ * (Metal) or the system look&amp;feel, which tries to mimic the operating
+ * system. Please note the system look&amp;feel under Linux is GTK, which
+ * displays tree selections poorly and is not recommended for use.
+ *
+ * @author Robi Malik
+ */
 public enum LookAndFeelOption
 {
   //#########################################################################
