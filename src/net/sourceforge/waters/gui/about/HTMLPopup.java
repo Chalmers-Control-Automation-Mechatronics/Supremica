@@ -91,13 +91,13 @@ public class HTMLPopup
     panel.setSize(textWidth, Integer.MAX_VALUE);
     final int screenHeight = (int) screenSize.getHeight();
     final int textHeight = panel.getPreferredSize().height;
-    final int panelHeight = Math.min(screenHeight * 3 / 4, textHeight);
-    final Dimension scrollSize = new Dimension(textWidth, panelHeight);
+    final int scrollHeight = Math.min(screenHeight * 7 / 8, textHeight);
+    final Dimension scrollSize = new Dimension(textWidth, scrollHeight);
     panel.setPreferredSize(scrollSize);
     final JScrollPane scroll = new JScrollPane(panel);
     add(scroll);
     pack();
-    setLocationRelativeTo(getOwner());
+    setLocationRelativeTo(owner);
     setVisible(true);
   }
 
@@ -133,7 +133,7 @@ public class HTMLPopup
     final HTMLDocument doc = (HTMLDocument) htmlKit.createDefaultDocument();
     try {
       htmlKit.read(reader, doc, 0);
-    } catch (IOException | BadLocationException exception) {
+    } catch (final BadLocationException exception) {
       throw new WatersRuntimeException(exception);
     }
     final MutableAttributeSet attribs = new SimpleAttributeSet();
@@ -150,6 +150,5 @@ public class HTMLPopup
   private static final int BUFFER_SIZE = 1024;
 
   private static final long serialVersionUID = -5901475634903492023L;
-
 
 }
