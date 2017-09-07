@@ -3358,12 +3358,14 @@ public class GraphEditorPanel
       super.continueDrag(point);
       mController.updateHighlighting(point);
       final Transferable transferable = support.getTransferable();
-      try {
-        mDraggedList = (List<ProxySubject>) transferable
-            .getTransferData(WatersDataFlavor.IDENTIFIER);
-      } catch (final UnsupportedFlavorException exception) {
+      if (!transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+        mExternalDragStatus = DragOverStatus.CANTDROP;
         return false;
-      } catch (final IOException exception) {
+      }
+      try {
+        mDraggedList = (List<ProxySubject>)
+          transferable.getTransferData(WatersDataFlavor.IDENTIFIER);
+      } catch (final UnsupportedFlavorException | IOException exception) {
         throw new WatersRuntimeException(exception);
       }
       final EventListExpressionSubject elist =
@@ -3377,14 +3379,13 @@ public class GraphEditorPanel
             getShapeProducer().getShape(elist).getShape().getBounds();
           mX = bounds.getMinX();
           final double x2 = bounds.getMaxX();
-          if(mFocusedObject instanceof EdgeProxy){
+          if (mFocusedObject instanceof EdgeProxy) {
             mY = 0;
             mX = 0;
             mDropIndex = -1;
             mRect = null;
             mDropList = elist.getEventIdentifierListModifiable();
-          }
-          else if (elist == mFocusedObject) {
+          } else if (elist == mFocusedObject) {
             mY = bounds.getMinY();
             mDropIndex = 0;
             mDropList = elist.getEventIdentifierListModifiable();
@@ -3410,10 +3411,9 @@ public class GraphEditorPanel
             mY = bounds.getMaxY();
             mDropIndex = -1;
           }
-          if(mY == 0 || mX == 0){
+          if (mY == 0 || mX == 0) {
             line = null;
-          }
-          else{
+          } else {
             line = new Line2D.Double(mX, mY, x2, mY);
           }
         } else if (elist instanceof PlainEventListSubject) {

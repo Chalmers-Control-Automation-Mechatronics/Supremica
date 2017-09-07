@@ -44,12 +44,14 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -163,6 +165,21 @@ class IdentifierDataFlavor extends ModuleDataFlavor
       final ModuleProxyCloner cloner = mFactory.getCloner();
       final Proxy cloned = cloner.getClone(ident);
       mExportList.add(cloned);
+      return null;
+    }
+
+    @Override
+    public Object visitParameterBindingProxy(final ParameterBindingProxy param)
+      throws VisitorException
+    {
+      final ExpressionProxy expr = param.getExpression();
+      return expr.acceptVisitor(this);
+    }
+
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      // Quietly ignore expressions that are not identifiers
       return null;
     }
 

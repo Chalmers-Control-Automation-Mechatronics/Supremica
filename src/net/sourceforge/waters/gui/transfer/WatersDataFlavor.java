@@ -71,9 +71,8 @@ import gnu.trove.set.hash.THashSet;
  * instances of this class or its subclasses, and they control the behaviour
  * of the transferables.</P>
  *
- * <P>Transferables are created by the {@link
- * #createTransferable(Collection) createTransferable()} methods.
- * Given a list of {@link Proxy} objects, this method creates a
+ * <P>Given a list of {@link Proxy} objects, the {@link
+ * #createTransferable(Collection) createTransferable()} method creates a
  * transferable in the following steps:</P>
  * <OL>
  * <LI>The input list is reduced to ensure that the transferable does
@@ -155,9 +154,9 @@ public abstract class WatersDataFlavor extends DataFlavor
    *                The data will be duplicated and copies will be stored
    *                in the transferable.
    * @param  supportsIdentifier Whether or not the created transferable
-   *                should support the identifier data flavor
+   *                should support the identifier data flavour
    *                {@link WatersDataFlavor#IDENTIFIER}. Most transferables
-   *                support this flavor, but it can be suppressed by setting
+   *                support this flavour, but it can be suppressed by setting
    *                this parameter to <CODE>false</CODE>.
    * @return An instance of {@link ProxyTransferable} containing the data.
    * @throws IllegalArgumentException to indicate that no suitable

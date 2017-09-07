@@ -388,8 +388,7 @@ public class GraphEventPanel
   public boolean canPaste(final Transferable transferable)
   {
     try {
-      if (transferable
-        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         @SuppressWarnings("unchecked")
         final List<Proxy> data =
           (List<Proxy>) transferable

@@ -49,6 +49,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -305,7 +306,19 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
   public List<WatersDataFlavor> visitParameterBindingProxy
     (final ParameterBindingProxy binding)
   {
-    return LIST_PARAMETER_BINDING;
+    final ExpressionProxy expr = binding.getExpression();
+    if (expr instanceof IdentifierProxy) {
+      return LIST_PARAMETER_BINDING_WITH_IDENTS;
+    } else if (expr instanceof EventListExpressionProxy) {
+      final EventListExpressionProxy elist = (EventListExpressionProxy) expr;
+      if (elist.getEventIdentifierList().isEmpty()) {
+        return LIST_PARAMETER_BINDING;
+      } else {
+        return LIST_PARAMETER_BINDING_WITH_IDENTS;
+      }
+    } else {
+      return LIST_PARAMETER_BINDING;
+    }
   }
 
 
@@ -372,5 +385,8 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
                                          WatersDataFlavor.GRAPH});
   private static final List<WatersDataFlavor> LIST_PARAMETER_BINDING =
     Collections.singletonList(WatersDataFlavor.PARAMETER_BINDING);
+  private static final List<WatersDataFlavor> LIST_PARAMETER_BINDING_WITH_IDENTS =
+    Arrays.asList(new WatersDataFlavor[]{WatersDataFlavor.PARAMETER_BINDING,
+                                         WatersDataFlavor.IDENTIFIER});
 
 }

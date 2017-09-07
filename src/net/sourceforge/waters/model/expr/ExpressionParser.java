@@ -169,8 +169,8 @@ public class ExpressionParser {
   {
     final SimpleExpressionProxy expr = parse(input, Operator.TYPE_NAME);
     if (!(expr instanceof IdentifierProxy)) {
-      System.err.println("ERROR: ExpressionParser fails to recognise " +
-                         input + " as a non-identifier!");
+      throw new ParseException("The expression '" + input +
+                               "' is not an identifier!", 0);
     }
     return (IdentifierProxy) expr;
   }
