@@ -40,6 +40,7 @@ import javax.swing.InputVerifier;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
@@ -202,10 +203,9 @@ public class SimpleExpressionCell
    */
   public boolean shouldYieldFocus()
   {
-    if(isEnabled()){
+    if (isEnabled()) {
       return mVerifier.shouldYieldFocus(this);
-    }
-    else{
+    } else {
       return true;
     }
   }
@@ -293,6 +293,28 @@ public class SimpleExpressionCell
     }
   }
 
+  /**
+   * Requests the keyboard focus for this cell and displays an error message.
+   * This message is typically called when an external commit attempt has
+   * detected an error at a higher level. It requests to set the focus to the
+   * cell to allow the user to make corrections and afterwards displays the
+   * given message in the cell's error display.
+   */
+  public void requestFocusWithErrorMessage(final String msg)
+  {
+    requestFocusInWindow();
+    if (mErrorDisplay != null) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          mErrorDisplay.displayError(msg);
+        }
+      });
+    }
+  }
+
+
 
   //#########################################################################
   //# Inner Class DefaultInputParser
@@ -312,12 +334,14 @@ public class SimpleExpressionCell
 
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    @Override
     public SimpleExpressionProxy parse(final String text)
       throws ParseException
     {
       return mParser.parse(text, mTypeMask);
     }
 
+    @Override
     public DocumentFilter getDocumentFilter()
     {
       return mDocumentFilter;
@@ -347,6 +371,7 @@ public class SimpleExpressionCell
 
     //#######################################################################
     //# Overrides for class javax.swing.text.DefaultFormatter
+    @Override
     public Object stringToValue(final String text)
       throws java.text.ParseException
     {
@@ -376,6 +401,7 @@ public class SimpleExpressionCell
       }
     }
 
+    @Override
     public String valueToString(final Object value)
     {
       if (value == null) {
@@ -385,6 +411,7 @@ public class SimpleExpressionCell
       }
     }
 
+    @Override
     protected DocumentFilter getDocumentFilter()
     {
       return mParser.getDocumentFilter();
@@ -404,6 +431,7 @@ public class SimpleExpressionCell
 
     //#######################################################################
     //# Overrides for class javax.swing.InputVerifier
+    @Override
     public boolean verify(final JComponent input)
     {
       try {
@@ -418,6 +446,7 @@ public class SimpleExpressionCell
       }
     }
 
+    @Override
     public boolean shouldYieldFocus(final JComponent input)
     {
       final SimpleExpressionCell textfield = (SimpleExpressionCell) input;

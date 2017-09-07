@@ -76,6 +76,8 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**
+ * The dialog to create or edit named constants.
+ *
  * @author Carly Hona
  */
 
@@ -115,7 +117,7 @@ public class ConstantAliasEditorDialog
   //# Access to Created Item
   /**
    * Gets the Waters subject edited by this dialog.
-   * @return A reference to the foreach component being edited by this dialog.
+   * @return A reference to the named constant being edited by this dialog.
    */
   public ConstantAliasSubject getEditedItem()
   {
@@ -163,31 +165,38 @@ public class ConstantAliasEditorDialog
     final SimpleIdentifierInputParser nameparser =
       new SimpleIdentifierInputParser(ident, parser);
     mNameInput = new SimpleExpressionCell(ident, nameparser);
+    mNameInput.setAllowNull(true);
     mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter the name");
+    mNameInput.setToolTipText("Name of constant or parameter");
     mExpressionLabel = new JLabel("Expression:");
     final SimpleExpressionProxy oldexp =
       mAlias == null ? null : (SimpleExpressionProxy)template.getExpression();
     mExpressionInput =
       new SimpleExpressionCell(oldexp, Operator.TYPE_ANY, parser);
+    mExpressionInput.setAllowNull(true);
     mExpressionInput.addActionListener(commithandler);
-    mExpressionInput.setToolTipText("Enter the expression");
+    mExpressionInput.setToolTipText
+      ("Formula for value of constant or default value of parameter");
 
     final ScopeKind scope = template.getScope();
-    mHasParameterCheckBox = new JCheckBox("Parameter");
-    mHasParameterCheckBox.setRequestFocusEnabled(false);
-    mHasParameterCheckBox.setSelected(scope != ScopeKind.LOCAL);
-    mHasParameterCheckBox.addActionListener(new ActionListener() {
+    mIsParameterCheckBox = new JCheckBox("Parameter");
+    mIsParameterCheckBox.setRequestFocusEnabled(false);
+    mIsParameterCheckBox.setSelected(scope != ScopeKind.LOCAL);
+    mIsParameterCheckBox.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent event)
         {
           updateRequiredEnabled();
         }
       });
+    mIsParameterCheckBox.setToolTipText
+      ("Check to make this constant a parameter");
 
     mIsRequiredCheckBox = new JCheckBox("Required");
     mIsRequiredCheckBox.setRequestFocusEnabled(false);
     mIsRequiredCheckBox.setSelected(scope != ScopeKind.OPTIONAL_PARAMETER);
+    mIsRequiredCheckBox.setToolTipText
+      ("Check to declare this parameter as required");
     updateRequiredEnabled();
 
     // Error panel ...
@@ -267,8 +276,8 @@ public class ConstantAliasEditorDialog
 
     constraints.gridy++;
     constraints.weightx = 0.0;
-    mainlayout.setConstraints(mHasParameterCheckBox, constraints);
-    mMainPanel.add(mHasParameterCheckBox);
+    mainlayout.setConstraints(mIsParameterCheckBox, constraints);
+    mMainPanel.add(mIsParameterCheckBox);
 
     constraints.gridy++;
     mainlayout.setConstraints(mIsRequiredCheckBox, constraints);
@@ -308,8 +317,10 @@ public class ConstantAliasEditorDialog
   {
     if (isInputLocked()) {
       // nothing
-    } else if (!mExpressionInput.shouldYieldFocus()) {
-      mExpressionInput.requestFocusInWindow();
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter a name.");
+    } else if (mExpressionInput.getValue() == null) {
+      mExpressionInput.requestFocusWithErrorMessage("Please enter an expression.");
     } else {
       final SimpleExpressionSubject exp0 =
         (SimpleExpressionSubject) mExpressionInput.getValue();
@@ -317,7 +328,7 @@ public class ConstantAliasEditorDialog
       final SelectionOwner panel = mRoot.getConstantAliasesPanel();
 
       final ScopeKind scope;
-      if (!mHasParameterCheckBox.isSelected()) {
+      if (!mIsParameterCheckBox.isSelected()) {
         scope = ScopeKind.LOCAL;
       } else if (mIsRequiredCheckBox.isSelected()) {
         scope = ScopeKind.REQUIRED_PARAMETER;
@@ -382,7 +393,6 @@ public class ConstantAliasEditorDialog
       mExpressionInput.isFocusOwner() && !mExpressionInput.shouldYieldFocus();
   }
 
-
   private SimpleExpressionSubject makeUnique
     (final SimpleExpressionSubject subject)
   {
@@ -400,7 +410,7 @@ public class ConstantAliasEditorDialog
    */
   private void updateRequiredEnabled()
   {
-    final boolean enable = mHasParameterCheckBox.isSelected();
+    final boolean enable = mIsParameterCheckBox.isSelected();
     mIsRequiredCheckBox.setEnabled(enable);
   }
 
@@ -415,7 +425,7 @@ public class ConstantAliasEditorDialog
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
   private JLabel mExpressionLabel;
-  private JCheckBox mHasParameterCheckBox;
+  private JCheckBox mIsParameterCheckBox;
   private JCheckBox mIsRequiredCheckBox;
   private SimpleExpressionCell mExpressionInput;
 
@@ -441,12 +451,15 @@ public class ConstantAliasEditorDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -5504088517320502068L;
+
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final ConstantAliasSubject TEMPLATE =
-    new ConstantAliasSubject(new SimpleIdentifierSubject(""), new SimpleIdentifierSubject(""));
+    new ConstantAliasSubject(new SimpleIdentifierSubject(""),
+                             new SimpleIdentifierSubject(""));
   private static final Transferable TRANSFERABLE =
     WatersDataFlavor.createTransferable(TEMPLATE);
+
   private static Dimension MIN_SIZE = new Dimension(333, 213);
   private static Dimension MAX_SIZE = new Dimension(433, 213);
 }
