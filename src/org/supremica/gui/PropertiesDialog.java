@@ -523,12 +523,9 @@ extends JDialog
       if (!mProperty.isImmutable()) {
         if (mComboBox != null) {
           final Object selected = mComboBox.getSelectedItem();
-          if (selected != null &&
-              mProperty.getObjectClass().isAssignableFrom(selected.getClass())) {
-            @SuppressWarnings("unchecked")
-            final T value = (T) selected;
-            mProperty.setValue(value);
-          }
+          @SuppressWarnings("unchecked")
+          final T value = (T) selected;
+          mProperty.setValue(value);
         } else if (mTextField != null) {
           mProperty.set(mTextField.getText());
         }

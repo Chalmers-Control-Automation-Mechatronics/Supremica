@@ -142,10 +142,8 @@ public final class Config
     // GENERAL
     public static final ObjectProperty<LookAndFeelOption> GENERAL_LOOKANDFEEL =
       new ObjectProperty<>(PropertyType.GENERAL, "javaLookAndFeel",
-                           LookAndFeelOption.DEFAULT,
-                           "Java Look&Feel (requires restart)",
-                           LookAndFeelOption.values(),
-                           LookAndFeelOption.class, false);
+                           LookAndFeelOption.DEFAULT, LookAndFeelOption.class,
+                           "Java Look&Feel (requires restart)");
     public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
@@ -208,16 +206,16 @@ public final class Config
     // GUI_EDITOR
     public static final ObjectProperty<IconSet> GUI_EDITOR_ICONSET =
       new ObjectProperty<>(PropertyType.GUI_EDITOR, "iconSet",
-                           IconSet.WATERS_16,
-                           "Icon set and font scaling (requires restart)",
-                           IconSet.values());
+                           IconSet.WATERS_16, IconSet.class,
+                           "Icon set and font scaling (requires restart)");
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");
     public static final ObjectProperty<LAYOUT_MODE_LEGALVALUES> GUI_EDITOR_LAYOUT_MODE =
-      new ObjectProperty<LAYOUT_MODE_LEGALVALUES>(PropertyType.GUI_EDITOR, "layoutMode",
-                         LAYOUT_MODE_LEGALVALUES.Default, "Layout mode",
-                         LAYOUT_MODE_LEGALVALUES.values());
+      new ObjectProperty<>(PropertyType.GUI_EDITOR, "layoutMode",
+                           LAYOUT_MODE_LEGALVALUES.Default,
+                           LAYOUT_MODE_LEGALVALUES.class,
+                           "Layout mode");
     public static final BooleanProperty GUI_EDITOR_DEFAULT_EMPTY_MODULE =
       new BooleanProperty(PropertyType.GUI_EDITOR, "defaultEmptyModule",
                           true, "Open with an empty module");
@@ -246,10 +244,10 @@ public final class Config
 
     // GUI_ANALYZER
     public static final ObjectProperty<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
-      new ObjectProperty<ModelAnalyzerFactoryLoader>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
-                         ModelAnalyzerFactoryLoader.Monolithic,
-                         "Model verifier factory used by Editor's Verify menu",
-                         ModelAnalyzerFactoryLoader.values());
+      new ObjectProperty<>(PropertyType.GUI_ANALYZER, "guiAnalyzerUsedFactory",
+                           ModelAnalyzerFactoryLoader.Monolithic,
+                           ModelAnalyzerFactoryLoader.class,
+                           "Model verifier factory used by Editor's Verify menu");
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
                           true, "Include Seamless Synthesis");
@@ -296,8 +294,18 @@ public final class Config
 	public static final BooleanProperty SYNC_UNOBS_EVENTS_SYNC = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncUnobsEventsSync", false, "Unobservable (non-tau) events synchronize");
 
     // ALGORITHMS_VERIFICATION
-    public static final ObjectProperty<VerificationType> VERIFY_VERIFICATION_TYPE = new ObjectProperty<VerificationType>(PropertyType.ALGORITHMS_VERIFICATION, "verifyVerificationType", VerificationType.CONTROLLABILITY, "Default verificaton type", VerificationType.values());
-    public static final ObjectProperty<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE  = new ObjectProperty<VerificationAlgorithm>(PropertyType.ALGORITHMS_VERIFICATION, "verifyAlgorithmType", VerificationAlgorithm.MODULAR, "Default verificaton algorithm", VerificationAlgorithm.values());
+    public static final ObjectProperty<VerificationType> VERIFY_VERIFICATION_TYPE =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_VERIFICATION,
+                           "verifyVerificationType",
+                           VerificationType.CONTROLLABILITY,
+                           VerificationType.class,
+                           "Default verificaton type");
+    public static final ObjectProperty<VerificationAlgorithm> VERIFY_ALGORITHM_TYPE =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_VERIFICATION,
+                           "verifyAlgorithmType",
+                           VerificationAlgorithm.MODULAR,
+                           VerificationAlgorithm.class,
+                           "Default verificaton algorithm");
     public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyExclusionStateLimit", 1000, "Exclusion state limit", false, 1);
     public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyReachabilityStateLimit", 1000, "Reachability state limit", false, 1);
     public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");
@@ -306,8 +314,18 @@ public final class Config
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
 
     // ALGORITHMS_SYNTHESIS
-    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE = new ObjectProperty<SynthesisType>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSynthesisType", SynthesisType.NONBLOCKING_CONTROLLABLE, "Default synthesis type", SynthesisType.values());
-    public static final ObjectProperty<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE  = new ObjectProperty<SynthesisAlgorithm>(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisAlgorithmType", SynthesisAlgorithm.MONOLITHIC, "Default synthesis algorithm", SynthesisAlgorithm.values());
+    public static final ObjectProperty<SynthesisType> SYNTHESIS_SYNTHESIS_TYPE =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_SYNTHESIS,
+                           "synthesisSynthesisType",
+                           SynthesisType.NONBLOCKING_CONTROLLABLE,
+                           SynthesisType.class,
+                           "Default synthesis type");
+    public static final ObjectProperty<SynthesisAlgorithm> SYNTHESIS_ALGORITHM_TYPE =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_SYNTHESIS,
+                           "synthesisAlgorithmType",
+                           SynthesisAlgorithm.MONOLITHIC,
+                           SynthesisAlgorithm.class,
+                           "Default synthesis algorithm");
     public static final BooleanProperty SYNTHESIS_PURGE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisPurge", true, "Remove forbidden states after synthesis"); // MF changed to true here
 	public static final BooleanProperty SYNTHESIS_RENAME = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisRename", false, "Rename states to generic names (q0, q1, ...)");	// MF
     public static final BooleanProperty SYNTHESIS_OPTIMIZE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisOptimize", false, "Try to remove supervisors that are not necessary");
@@ -327,20 +345,39 @@ public final class Config
 	public static final BooleanProperty SYNTHESIS_SUP_AS_PLANT = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisSupsAsPlants", false, "Consider supervisors as plants");
 
     // ALGORITHMS_MINIMIZATION
-    public static final ObjectProperty<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION = new ObjectProperty<EquivalenceRelation>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationEquivalenceRelation", EquivalenceRelation.LANGUAGEEQUIVALENCE, "Default equivalence relation", EquivalenceRelation.values());
+    public static final ObjectProperty<EquivalenceRelation> MINIMIZATION_EQUIVALENCE_RELATION =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
+                           "minimizationEquivalenceRelation",
+                           EquivalenceRelation.LANGUAGEEQUIVALENCE,
+                           EquivalenceRelation.class,
+                           "Default equivalence relation");
     public static final BooleanProperty MINIMIZATION_ALSO_MINIMIZE_TRANSITIONS = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationAlsoMinimizeTransitions", true, "Minimize the number of transitions");
     public static final BooleanProperty MINIMIZATION_KEEP_ORIGINAL = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationKeepOriginal", true, "Keep original");
     public static final BooleanProperty MINIMIZATION_IGNORE_MARKING = new BooleanProperty(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationIgnoreMarking", false, "Ignore marking");
-    public static final ObjectProperty<MinimizationStrategy> MINIMIZATION_STRATEGY = new ObjectProperty<MinimizationStrategy>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationStrategy", MinimizationStrategy.FewestTransitionsFirst, "Minimization strategy", MinimizationStrategy.values());
-    public static final ObjectProperty<MinimizationHeuristic> MINIMIZATION_HEURISTIC = new ObjectProperty<MinimizationHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION, "minimizationHeuristic", MinimizationHeuristic.MostLocal, "Minimization heuristics", MinimizationHeuristic.values());
+    public static final ObjectProperty<MinimizationStrategy> MINIMIZATION_STRATEGY =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
+                           "minimizationStrategy",
+                           MinimizationStrategy.FewestTransitionsFirst,
+                           MinimizationStrategy.class,
+                           "Minimization strategy");
+    public static final ObjectProperty<MinimizationHeuristic> MINIMIZATION_HEURISTIC =
+      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
+                           "minimizationHeuristic",
+                           MinimizationHeuristic.MostLocal,
+                           MinimizationHeuristic.class,
+                           "Minimization heuristics");
     public static final ObjectProperty<MinimizationPreselectingHeuristic> MINIMIZATION_PRESELECTINGHEURISTIC =
-      new ObjectProperty<MinimizationPreselectingHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION,
-        "minimizationPreselecting", MinimizationPreselectingHeuristic.AtLeastOneLocalEvent,
-        "Minimization Preselecting Heuristics", MinimizationPreselectingHeuristic.values());
+      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
+                           "minimizationPreselecting",
+                           MinimizationPreselectingHeuristic.AtLeastOneLocalEvent,
+                           MinimizationPreselectingHeuristic.class,
+                           "Minimization Preselecting Heuristics");
     public static final ObjectProperty<MinimizationSelectingHeuristic> MINIMIZATION_SELECTINGHEURISTIC =
-      new ObjectProperty<MinimizationSelectingHeuristic>(PropertyType.ALGORITHMS_MINIMIZATION,
-        "minimizationSelectingHeuristic", MinimizationSelectingHeuristic.MinimumActualStates,
-        "Minimization Selecting Heuristics", MinimizationSelectingHeuristic.values());
+      new ObjectProperty<>(PropertyType.ALGORITHMS_MINIMIZATION,
+                           "minimizationSelectingHeuristic",
+                           MinimizationSelectingHeuristic.MinimumActualStates,
+                           MinimizationSelectingHeuristic.class,
+                           "Minimization Selecting Heuristics");
     public static final ObjectProperty<String> MINIMIZATION_SILENT_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentEventName", "tau", "Silent event name");
     public static final ObjectProperty<String> MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentControllableEventName", "tau_c", "Silent controllable event name");
     public static final ObjectProperty<String> MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME = new ObjectProperty<String>(PropertyType.ALGORITHMS_MINIMIZATION, "generalSilentUnontrollableEventName", "tau_u", "Silent uncontrollable event name");
@@ -351,8 +388,8 @@ public final class Config
     // New BDD implementation using JavaBDD library
     // -- the following where formerly under algorithms.bdd2
     public static final ObjectProperty<BDDPackage> BDD2_BDDLIBRARY =
-      new ObjectProperty<BDDPackage>(PropertyType.ALGORITHMS_BDD, "libraryName",
-        BDDPackage.JAVA, "BDD Library", BDDPackage.values());
+      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD, "libraryName",
+                           BDDPackage.JAVA, BDDPackage.class, "BDD Library");
     public static final IntegerProperty BDD2_INITIALNODETABLESIZE =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "initialNodeTableSize", 1000000, "Initial node table size");
     public static final IntegerProperty BDD2_CACHESIZE =
@@ -364,12 +401,19 @@ public final class Config
     public static final DoubleProperty BDD2_CACHERATIO =
       new DoubleProperty(PropertyType.ALGORITHMS_BDD, "cacheRatio", 10.0, "Cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
     public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING =
-      new ObjectProperty<BDDPartitioningType>(PropertyType.ALGORITHMS_BDD, "partitioning", BDDPartitioningType.MONOLITHIC, "BDD transition partitioning", BDDPartitioningType.values());
+      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD, "partitioning",
+                           BDDPartitioningType.MONOLITHIC,
+                           BDDPartitioningType.class,
+                           "BDD transition partitioning");
 
     // -- the following where formerly under algorithms.bdd
     // Most of these are ugly integers in BDD.Options... but they have String representations here.
     public static final ObjectProperty<String> BDD_ORDER_ALGO =
-      new ObjectProperty<String>(PropertyType.ALGORITHMS_BDD, "bddAutomataOrderingAlgorithm", Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm], "Automata ordering algorithm", Options.ORDERING_ALGORITHM_NAMES);
+      new ObjectProperty<>(PropertyType.ALGORITHMS_BDD,
+                           "bddAutomataOrderingAlgorithm",
+                           Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm],
+                           Options.ORDERING_ALGORITHM_NAMES,
+                           String.class, "Automata ordering algorithm", false);
     public static final IntegerProperty BDD_PARTITION_MAX =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 10000, "Max partition size");
     public static final BooleanProperty SYNTHESIS_PEAKBDD =

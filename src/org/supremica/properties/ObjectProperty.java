@@ -9,27 +9,70 @@
 
 package org.supremica.properties;
 
+import net.sourceforge.waters.model.base.ProxyTools;
+
+/**
+ * <P>A property of object type.</P>
+ *
+ * <P>This class is used to represent properties of string or enumeration type.
+ * It supports type checking and comparison of values against a fixed list
+ * of allowed possibilities.</P>
+ *
+ * @author Knut &Aring;kesson, Hugo Flordal, Robi Malik
+ */
+
 public class ObjectProperty<T> extends Property
 {
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a mutable object property without legal values.
+   * This constructor creates a property without legal values and using
+   * the object type of the default value.
+   * @param type    The property category.
+   * @param key     The name of the property.
+   * @param value   The default value of the property.
+   * @param comment A textual description of the property.
+   */
   public ObjectProperty(final PropertyType type, final String key,
                         final T value, final String comment)
   {
-    this(type, key, value, comment, null);
+    this(type, key, value, null, value.getClass(), comment, false);
   }
 
+  /**
+   * Creates a mutable object property for an enumeration type.
+   * @param type    The property category.
+   * @param key     The name of the property.
+   * @param value   The default value of the property.
+   * @param clazz   The class of object values, which must be an enumeration
+   *                type. The legal values are queried from this class.
+   * @param comment A textual description of the property.
+   */
   public ObjectProperty(final PropertyType type, final String key,
-                        final T value, final String comment,
-                        final T[] legalValues)
+                        final T value, final Class<T> clazz,
+                        final String comment)
   {
-    this(type, key, value, comment, legalValues, value.getClass(), false);
+    this(type, key, value, clazz.getEnumConstants(), clazz, comment, false);
   }
 
+  /**
+   * Creates an object property by specifying all attributes.
+   * @param type        The property category.
+   * @param key         The name of the property.
+   * @param value       The default value of the property.
+   * @param legalValues An array containing the allowed values for the property.
+   * @param clazz       The class of object values.
+   * @param comment     A textual description of the property.
+   * @param immutable   A flag, indicating whether the property value can be
+   *                    changed by the user. Immutable (<CODE>true</CODE>)
+   *                    means that it cannot be changed, and calling the
+   *                    methods to change it will result in an exception.
+   */
   public ObjectProperty(final PropertyType type, final String key,
-                        final T value, final String comment,
-                        final T[] legalValues, final Class<?> clazz,
+                        final T value, final T[] legalValues,
+                        final Class<?> clazz, final String comment,
                         final boolean immutable)
   {
     super(type, key, comment, immutable);
@@ -85,40 +128,34 @@ public class ObjectProperty<T> extends Property
     }
   }
 
-  public boolean isValid(final T value)
+  public boolean isValid(final Object value)
   {
     if (value == null) {
-      throw new IllegalArgumentException
-        ("null property values are not allowed!");
-    }
-    if (mLegalValues == null) {
-      return true;
-    }
-    for (int i = 0; i < mLegalValues.length; i++) {
-      if (value.equals(mLegalValues[i])) {
-        return true;
+      return false;
+    } else if (mLegalValues == null) {
+      return mObjectClass.isAssignableFrom(value.getClass());
+    } else {
+      for (final T legal : mLegalValues) {
+        if (value.equals(legal)) {
+          return true;
+        }
       }
+      return false;
     }
-    return false;
   }
 
-  public void checkValid(final T value)
+  public void checkValid(final Object value)
   {
     if (!isValid(value)) {
       throw new IllegalArgumentException
         ("Assigning illegal value to property " + getFullKey() + ": " +
-         value + "!");
+         ProxyTools.toString(value) + "!");
     }
   }
 
   public T[] getLegalValues()
   {
     return mLegalValues;
-  }
-
-  public Class<?> getObjectClass()
-  {
-    return mObjectClass;
   }
 
 
