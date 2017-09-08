@@ -47,8 +47,11 @@ import org.supremica.log.Logger;
 import org.supremica.log.LoggerFactory;
 
 /**
- * A new action
+ * The action to start simulation with Flexfact.
+ *
+ * @author Logan Heyblom
  */
+
 public class ToolsFlexfactAction
     extends IDEAction
 {

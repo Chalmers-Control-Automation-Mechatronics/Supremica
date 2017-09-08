@@ -53,7 +53,6 @@ import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.InsertEventDeclAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
-import net.sourceforge.waters.gui.actions.SimulationAutoStepAction;
 import net.sourceforge.waters.gui.actions.SimulationBackToStartAction;
 import net.sourceforge.waters.gui.actions.SimulationJumpToEndAction;
 import net.sourceforge.waters.gui.actions.SimulationReplayStepAction;
@@ -77,7 +76,6 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.SaveAction;
-import org.supremica.properties.Config;
 
 
 /**
@@ -259,9 +257,7 @@ public class IDEToolBar
         addAction(actions.getAction(SimulationStepAction.class));
         addAction(actions.getAction(SimulationReplayStepAction.class));
         addAction(actions.getAction(SimulationJumpToEndAction.class));
-        if (Config.INCLUDE_FLEXFACT.isTrue()) {
-          addAction(actions.getAction(SimulationAutoStepAction.class));
-        }
+        // addAction(actions.getAction(SimulationAutoStepAction.class));
       }
     }
   }

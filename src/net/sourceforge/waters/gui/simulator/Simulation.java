@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.simulator;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,8 +53,6 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.SimulationAutoStepAction;
-import net.sourceforge.waters.gui.flexfact.LocalServer;
-import net.sourceforge.waters.gui.flexfact.LocalSocket;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.PropositionIcon;
@@ -85,7 +81,8 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
+
+import gnu.trove.set.hash.THashSet;
 
 
 public class Simulation implements ModelObserver, Observer
@@ -308,31 +305,6 @@ public class Simulation implements ModelObserver, Observer
   {
 
     final SimulatorState nextState = step.getNextSimulatorState();
-    if(Config.INCLUDE_FLEXFACT.isTrue()) {
-      String event = nextState.getEvent().getName();
-      if(event.length() >= 4){
-        int ind = event.lastIndexOf("_east");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+5, "+").toString();
-        }
-        ind = event.lastIndexOf("_west");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+5, "-").toString();
-        }
-        ind = event.lastIndexOf("_south");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+6, "+").toString();
-        }
-        ind = event.lastIndexOf("_north");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+6, "-").toString();
-        }
-        if(LocalServer.events.contains(event))
-        {
-          LocalSocket.SendEvent(event);
-        }
-      }
-    }
     removeFutureSteps();
     addNewSimulatorState(nextState);
     mCurrentTime++;
@@ -355,43 +327,33 @@ public class Simulation implements ModelObserver, Observer
     final int numEvents = getEnabledSteps().size();
 
     // Get controllable events from current possible events.
+    final List<SimulatorStep> steps = getEnabledSteps();
     final List<SimulatorStep> possibleControllableEvents = new ArrayList<SimulatorStep>();
-    for(final SimulatorStep s : getEnabledSteps()){
-      if(s.getEvent().getKind() == EventKind.CONTROLLABLE)
+    for(final SimulatorStep s : steps){
+      if (s.getEvent().getKind() == EventKind.CONTROLLABLE) {
         possibleControllableEvents.add(s);
+      }
     }
     // If there's at least one controllable event
     if (!possibleControllableEvents.isEmpty()){
       final Random rand = new Random();
-
       //Get random controllable event. If list is size of 1, get the first element.
       final SimulatorStep c = possibleControllableEvents.get(possibleControllableEvents.size() == 1 ? 0 : rand.nextInt(possibleControllableEvents.size()));
-      if(Config.INCLUDE_FLEXFACT.isTrue()){
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
-            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c))
-             step(c);
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          try {
+            Thread.sleep(1000);
+          } catch (final InterruptedException exception) {
+            exception.printStackTrace();
           }
-        });
-      }
-      else{
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
-            try {
-              Thread.sleep(1000);
-            } catch (final InterruptedException exception) {
-              exception.printStackTrace();
-            }
-            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c)){
-             step(c);
-            }
+          final List<SimulatorStep> steps = getEnabledSteps();
+          if (steps.size() == numEvents && steps.contains(c)){
+            step(c);
           }
-        });
-      }
+        }
+      });
     }
   }
 
@@ -402,6 +364,7 @@ public class Simulation implements ModelObserver, Observer
   {
     moveSafely(false);
   }
+
   /**
    * Moves the simulation state forward one step, without changing the trace.
    * If the trace is a loopTrace, if that trace hasn't been invalidated by the

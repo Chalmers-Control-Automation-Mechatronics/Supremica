@@ -281,7 +281,6 @@ public final class Config
     public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
     public static final IntegerProperty SIMULATION_CYCLE_TIME = new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime", 100, "Simulator Cycle time (ms)", false, 0);
-    public static final BooleanProperty INCLUDE_FLEXFACT = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeFlexfact", false, "Include Flexfact");
 
 
     // ALGORITHMS_SYNCHRONIZATION
