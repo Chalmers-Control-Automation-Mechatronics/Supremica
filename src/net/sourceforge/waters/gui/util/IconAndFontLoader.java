@@ -99,19 +99,14 @@ public class IconAndFontLoader
         final Font acceleratorBase = MetalLookAndFeel.getSubTextFont();
         FONT_SMALL = acceleratorBase.deriveFont(GLOBAL_SCALE_FACTOR *
                                                  acceleratorBase.getSize2D());
-        final int size = normalBase.getSize();
-        final Font serif = new Font(Font.SERIF, Font.PLAIN, size);
-        FONT_SERIF = serif.deriveFont(Font.PLAIN, GLOBAL_SCALE_FACTOR * size);
       } else {
         final float scaledSize = 12.0f * GLOBAL_SCALE_FACTOR;
         final Font sans = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
         FONT_NORMAL = sans.deriveFont(Font.PLAIN, scaledSize);
         FONT_TITLE = sans.deriveFont(Font.BOLD, scaledSize);
         FONT_SMALL = sans.deriveFont(Font.PLAIN, 0.9f * scaledSize);
-        final Font serif = new Font(Font.SERIF, Font.PLAIN, 10);
-        FONT_SERIF = serif.deriveFont(Font.PLAIN, scaledSize);
       }
-      HTML_FONT_SIZE = 0.95f * FONT_NORMAL.getSize2D();
+      HTML_FONT_SIZE = 0.85f * FONT_NORMAL.getSize2D();
       final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
       final FontUIResource titleRes = new FontUIResource(FONT_TITLE);
       final FontUIResource acceleratorRes = new FontUIResource(FONT_SMALL);
@@ -460,7 +455,6 @@ public class IconAndFontLoader
 
   public static Font FONT_NORMAL;
   public static Font FONT_TITLE;
-  public static Font FONT_SERIF;
   public static Font FONT_SMALL;
 
 }
