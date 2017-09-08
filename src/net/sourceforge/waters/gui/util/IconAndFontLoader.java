@@ -89,22 +89,13 @@ public class IconAndFontLoader
     // 2. Scale fonts
     final IconSet iconSet = Config.GUI_EDITOR_ICONSET.get();
     GLOBAL_SCALE_FACTOR = iconSet.getGlobalScaleFactor();
-    final LookAndFeel laf = UIManager.getLookAndFeel();
-    if (laf instanceof MetalLookAndFeel) {
-      final Font normalBase = MetalLookAndFeel.getUserTextFont();
-      FONT_NORMAL = normalBase.deriveFont(GLOBAL_SCALE_FACTOR * normalBase.getSize2D());
-      final Font titleBase = MetalLookAndFeel.getWindowTitleFont();
-      FONT_TITLE = titleBase.deriveFont(GLOBAL_SCALE_FACTOR * titleBase.getSize2D());
-      final Font acceleratorBase = MetalLookAndFeel.getSubTextFont();
-      FONT_SMALL = acceleratorBase.deriveFont(GLOBAL_SCALE_FACTOR *
-                                              acceleratorBase.getSize2D());
-    } else {
-      final float scaledSize = 12.0f * GLOBAL_SCALE_FACTOR;
-      final Font sans = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
-      FONT_NORMAL = sans.deriveFont(Font.PLAIN, scaledSize);
-      FONT_TITLE = sans.deriveFont(Font.BOLD, scaledSize);
-      FONT_SMALL = sans.deriveFont(Font.PLAIN, 0.9f * scaledSize);
-    }
+    final Font normalBase = MetalLookAndFeel.getUserTextFont();
+    FONT_NORMAL = normalBase.deriveFont(GLOBAL_SCALE_FACTOR * normalBase.getSize2D());
+    final Font titleBase = MetalLookAndFeel.getWindowTitleFont();
+    FONT_TITLE = titleBase.deriveFont(GLOBAL_SCALE_FACTOR * titleBase.getSize2D());
+    final Font acceleratorBase = MetalLookAndFeel.getSubTextFont();
+    FONT_SMALL = acceleratorBase.deriveFont(GLOBAL_SCALE_FACTOR *
+                                            acceleratorBase.getSize2D());
     HTML_FONT_SIZE = 0.85f * FONT_NORMAL.getSize2D();
     if (GLOBAL_SCALE_FACTOR != 1.0f) {
       final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
