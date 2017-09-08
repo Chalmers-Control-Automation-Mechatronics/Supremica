@@ -524,7 +524,7 @@ extends JDialog
         if (mComboBox != null) {
           final Object selected = mComboBox.getSelectedItem();
           if (selected != null &&
-            mProperty.getObjectClass().isAssignableFrom(selected.getClass())) {
+              mProperty.getObjectClass().isAssignableFrom(selected.getClass())) {
             @SuppressWarnings("unchecked")
             final T value = (T) selected;
             mProperty.setValue(value);

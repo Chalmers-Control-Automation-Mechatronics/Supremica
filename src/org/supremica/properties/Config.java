@@ -78,12 +78,24 @@ import org.supremica.util.BDD.Options;
 
 
 /**
- * <STRONG>Configurable Options</STRONG>
- * <p>
- * All of these are automatically added to a GUI for editing.
- * <p>
- * The current configuration is saved in the file SupremicaProperties.cfg
- * which per default is loaded on startup.
+ * <P>Configurable Options.</P>
+ *
+ * <P>All static variables declared in this class are automatically
+ * registered by their constructors for loading, saving, and editing.
+ * They are initialised on startup of the IDE by reading a properties file
+ * whose name is specified with the <CODE>-p</CODE> on the command line.
+ * Without the option, the properties are initialised to their hard-coded
+ * default values. When the properties dialog is opened, it allows the user
+ * to change all registered properties, and they are automatically saved to
+ * the properties file (if set) when they dialog is closed.</P>
+ *
+ * <P>The default for the properties file is <CODE>.supremica</CODE> in the
+ * Supremica source directory, when launched from Eclipse. When launched
+ * from the Waters startuo scripts, it is <CODE>.waters</CODE> in the user's
+ * home directory for Linux or <CODE>waters.properties</CODE> in the user's
+ * home directory for Windows.</P>
+ *
+ * @author Knut &Aring;kesson
  */
 public final class Config
 {
@@ -130,8 +142,10 @@ public final class Config
     // GENERAL
     public static final ObjectProperty<LookAndFeelOption> GENERAL_LOOKANDFEEL =
       new ObjectProperty<>(PropertyType.GENERAL, "javaLookAndFeel",
-                           LookAndFeelOption.DEFAULT, "Java Look&Feel",
-                           LookAndFeelOption.values());
+                           LookAndFeelOption.DEFAULT,
+                           "Java Look&Feel (requires restart)",
+                           LookAndFeelOption.values(),
+                           LookAndFeelOption.class, false);
     public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");

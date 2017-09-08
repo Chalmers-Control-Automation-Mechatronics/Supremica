@@ -24,16 +24,18 @@ public class ObjectProperty<T> extends Property
                         final T value, final String comment,
                         final T[] legalValues)
   {
-    this(type, key, value, comment, legalValues, false);
+    this(type, key, value, comment, legalValues, value.getClass(), false);
   }
 
   public ObjectProperty(final PropertyType type, final String key,
                         final T value, final String comment,
-                        final T[] legalValues, final boolean immutable)
+                        final T[] legalValues, final Class<?> clazz,
+                        final boolean immutable)
   {
     super(type, key, comment, immutable);
     mDefaultValue = mValue = value;
     mLegalValues = legalValues;
+    mObjectClass = clazz;
   }
 
 
@@ -116,7 +118,7 @@ public class ObjectProperty<T> extends Property
 
   public Class<?> getObjectClass()
   {
-    return mDefaultValue.getClass();
+    return mObjectClass;
   }
 
 
@@ -224,6 +226,7 @@ public class ObjectProperty<T> extends Property
   //# Data Members
   private final T mDefaultValue;
   private final T[] mLegalValues;
+  private Class<?> mObjectClass;
   private T mValue;
 
 }

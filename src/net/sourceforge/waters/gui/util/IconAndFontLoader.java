@@ -103,7 +103,7 @@ public class IconAndFontLoader
         final Font serif = new Font(Font.SERIF, Font.PLAIN, size);
         FONT_SERIF = serif.deriveFont(Font.PLAIN, GLOBAL_SCALE_FACTOR * size);
       } else {
-        final float scaledSize = 10.0f * GLOBAL_SCALE_FACTOR;
+        final float scaledSize = 12.0f * GLOBAL_SCALE_FACTOR;
         final Font sans = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
         FONT_NORMAL = sans.deriveFont(Font.PLAIN, scaledSize);
         FONT_TITLE = sans.deriveFont(Font.BOLD, scaledSize);
@@ -111,6 +111,7 @@ public class IconAndFontLoader
         final Font serif = new Font(Font.SERIF, Font.PLAIN, 10);
         FONT_SERIF = serif.deriveFont(Font.PLAIN, scaledSize);
       }
+      HTML_FONT_SIZE = 0.95f * FONT_NORMAL.getSize2D();
       final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
       final FontUIResource titleRes = new FontUIResource(FONT_TITLE);
       final FontUIResource acceleratorRes = new FontUIResource(FONT_SMALL);
@@ -133,6 +134,8 @@ public class IconAndFontLoader
           entry.setValue(acceleratorRes);
         } else if (name.endsWith("Font")) {
           entry.setValue(normalRes);
+        } else if (name.equals("Application.useSystemFontSettings")) {
+          entry.setValue(false);
         }
       }
     }
@@ -241,8 +244,14 @@ public class IconAndFontLoader
     for (final Map.Entry<Object,Object> entry : defaults.entrySet()) {
       final String name = entry.getKey().toString();
       final Object value = entry.getValue();
-      final String isFont = value instanceof Font ? " (Font)" : "";
-      System.out.println(name + ": " + value.getClass().getName() + isFont);
+      System.out.print(name + ": " + value.getClass().getName());
+      if (value instanceof Font) {
+        System.out.println(" (Font)");
+      } else if (value instanceof Boolean) {
+        System.out.println(" (" + value + ")");
+      } else {
+        System.out.println();
+      }
     }
   }
 
@@ -447,6 +456,7 @@ public class IconAndFontLoader
   //#########################################################################
   //# Public Fonts
   public static float GLOBAL_SCALE_FACTOR;
+  public static float HTML_FONT_SIZE;
 
   public static Font FONT_NORMAL;
   public static Font FONT_TITLE;

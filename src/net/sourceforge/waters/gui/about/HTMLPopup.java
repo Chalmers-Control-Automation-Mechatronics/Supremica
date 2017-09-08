@@ -109,8 +109,7 @@ public class HTMLPopup
   {
     final StringBuilder builder = new StringBuilder();
     builder.append("<HTML><BODY STYLE=\"font-size: ");
-    final int fontSize = Math.round(9.5f * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
-    builder.append(fontSize);
+    builder.append(IconAndFontLoader.HTML_FONT_SIZE);
     builder.append("px; font-family: serif;\">");
     final InputStream stream = url.openStream();
     try {
