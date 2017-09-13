@@ -229,7 +229,7 @@ public class DocumentContainerManager
     } else if (mAllContainers.contains(container)) {
       mRecentList.remove(container);
       mRecentList.add(0, container);
-      fireContainerSwitch();
+      fireContainerSwitch(active);
     } else {
       throw new IllegalArgumentException
         ("DocumentContainer to be activated not found!");
@@ -422,12 +422,13 @@ public class DocumentContainerManager
 
   public void addContainer(final DocumentContainer container)
   {
+    final DocumentContainer previous = getActiveContainer();
     final DocumentProxy doc = container.getDocument();
     final URI uri = doc.getLocation();
     mAllContainers.add(container);
     mURIContainerMap.put(uri, container);
     mRecentList.add(0, container);
-    fireContainerSwitch();
+    fireContainerSwitch(previous);
   }
 
   private void closeContainer(final DocumentContainer container)
@@ -439,7 +440,7 @@ public class DocumentContainerManager
     mRecentList.remove(container);
     mDocumentManager.remove(uri);
     container.close();
-    fireContainerSwitch();
+    fireContainerSwitch(null);
   }
 
 
@@ -510,7 +511,7 @@ public class DocumentContainerManager
       if (!uri.equals(olduri)) {
         mURIContainerMap.remove(olduri);
         mURIContainerMap.put(uri, container);
-        fireContainerSwitch();
+        fireContainerSwitch(container);
       }
     } catch (final WatersMarshalException exception) {
       showIOError(exception, maycancel);
@@ -778,12 +779,18 @@ public class DocumentContainerManager
 
   //#########################################################################
   //# Auxiliary Methods --- Notifications
-  private void fireContainerSwitch()
+  private void fireContainerSwitch(final DocumentContainer previous)
   {
     final DocumentContainer container = getActiveContainer();
+    if (previous != null && previous != container) {
+      previous.deactivate();
+    }
     final ContainerSwitchEvent event =
       new ContainerSwitchEvent(this, container);
     fireEditorChangedEvent(event);
+    if (container != previous) {
+      container.activate();
+    }
   }
 
   private void firePendingSave(final DocumentContainer container)

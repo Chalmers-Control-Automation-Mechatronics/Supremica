@@ -60,6 +60,7 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SubPanelSwitchEvent;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -76,338 +77,352 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * It consists of a split pane, with events or components lists in
  * tabs on the left side, and the graph editor panel on the right side.
  *
- * @author Knut &Aring;kesson
+ * @author Knut &Aring;kesson, Robi Malik
  */
 
 public class EditorPanel
-    extends MainPanel
-    implements ModuleWindowInterface, ChangeListener, Subject, SupremicaPropertyChangeListener
+  extends MainPanel
+  implements ModuleWindowInterface, ChangeListener,
+             Subject, SupremicaPropertyChangeListener
 {
 
+  //#########################################################################
+  //# Constructor
+  public EditorPanel(final ModuleContainer moduleContainer,
+                     final String name)
+  {
+    super(name);
+    mModuleContainer = moduleContainer;
+    mTabMap = new HashMap<SelectionOwner,Tab>();
+
+    mTabbedPane = new JTabbedPane();
+    mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
+    mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
+    mTabbedPane.addChangeListener(this);
+    setLeftComponent(mTabbedPane);
+
+    final IDE ide = mModuleContainer.getIDE();
+    final WatersPopupActionManager manager = ide.getPopupActionManager();
+
+    final AliasesPanel aliasesPanel =
+      new AliasesPanel(mModuleContainer, manager);
+    mAliasesTab = new Tab("Definitions", aliasesPanel);
+    if (Config.INCLUDE_INSTANTION.get()) {
+      mAliasesTab.addToTabbedPane();
+    }
+    mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
+    mTabMap.put(aliasesPanel.getEventAliasesPanel(), mAliasesTab);
+    final EventDeclListView eventsPanel =
+      new EventDeclListView(this, manager);
+    mEventsTab = new Tab("Events", eventsPanel);
+    mEventsTab.addToTabbedPane();
+    mTabMap.put(eventsPanel, mEventsTab);
+    final ComponentsTree compPanel = new ComponentsTree(mModuleContainer, manager);
+    mComponentsTab = new Tab("Components", compPanel);
+    mComponentsTab.addToTabbedPane();
+    mComponentsTab.activate();
+    mTabMap.put(compPanel, mComponentsTab);
+    mLastFocusOwner = compPanel;
+
+    mCommentPanel = new CommentPanel(moduleContainer);
+    setRightComponent(mCommentPanel);
+    Config.INCLUDE_INSTANTION.addPropertyChangeListener(this);
+  }
+
+
+  //#########################################################################
+  //# Focus Switching
+  @Override
+  void activate()
+  {
+    FocusTracker.requestFocusFor(mLastFocusOwner);
+  }
+
+  @Override
+  void deactivate()
+  {
+    final IDE ide = mModuleContainer.getIDE();
+    final FocusTracker tracker = ide.getFocusTracker();
+    final Object focusOwner = tracker.getLastWatersSelectionOwner();
+    if (focusOwner instanceof Component) {
+      mLastFocusOwner = (Component) focusOwner;
+    }
+  }
+
+  public void close()
+  {
+    for (final SelectionOwner panel : mTabMap.keySet()) {
+      panel.close();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
+  @Override
+  public UndoInterface getUndoInterface()
+  {
+    return mModuleContainer;
+  }
+
+  @Override
+  public ModuleSubject getModuleSubject()
+  {
+    return mModuleContainer.getModule();
+  }
+
+  @Override
+  public ModuleContext getModuleContext()
+  {
+    return mModuleContainer.getModuleContext();
+  }
+
+  @Override
+  public ExpressionParser getExpressionParser()
+  {
+    return mModuleContainer.getExpressionParser();
+  }
+
+  @Override
+  public IDE getRootWindow()
+  {
+    return (IDE) getTopLevelAncestor();
+  }
+
+  @Override
+  public SelectionOwner getComponentsPanel()
+  {
+    return (SelectionOwner) mComponentsTab.getPanel();
+  }
+
+  @Override
+  public SelectionOwner getEventsPanel()
+  {
+    return (SelectionOwner) mEventsTab.getPanel();
+  }
+
+  @Override
+  public SelectionOwner getConstantAliasesPanel()
+  {
+    final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+    return panel.getConstantAliasesPanel();
+  }
+
+  @Override
+  public SelectionOwner getEventAliasesPanel()
+  {
+    final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
+    return panel.getEventAliasesPanel();
+  }
+
+  @Override
+  public SelectionOwner getInstancePanel()
+  {
+    return (SelectionOwner) mComponentsTab.getPanel();
+  }
+
+  @Override
+  public void showComponents()
+  {
+    mComponentsTab.activate();
+  }
+
+  @Override
+  public void showEvents()
+  {
+    mEventsTab.activate();
+  }
+
+  @Override
+  public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+    throws GeometryAbsentException
+  {
+    final ComponentEditorPanel panel =
+      mModuleContainer.createComponentEditorPanel(comp);
+    setRightComponent(panel);
+    return panel;
+  }
+
+  @Override
+  public EditorWindowInterface getEditorWindowInterface
+  (final SimpleComponentSubject comp)
+  {
+    return mModuleContainer.getComponentEditorPanel(comp);
+  }
+
+  @Override
+  public ComponentEditorPanel getActiveEditorWindowInterface()
+  {
+    if (getRightComponent() instanceof EditorWindowInterface) {
+      return (ComponentEditorPanel) getRightComponent();
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public void showComment()
+  {
+    setRightComponent(mCommentPanel);
+  }
+
+  @Override
+  public void showPanel(final SelectionOwner panel)
+  {
+    final Tab tab = mTabMap.get(panel);
+    if (tab != null) {
+      tab.activate();
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface javax.swing.event.ChangeListener
+  @Override
+  public void stateChanged(final ChangeEvent event)
+  {
+    // Why is the focus not transfered automatically when clicking tabs?
+    final JScrollPane scroll =
+      (JScrollPane) mTabbedPane.getSelectedComponent();
+    final Component panel = scroll.getViewport().getView();
+    panel.requestFocusInWindow();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
+  public void attach(final Observer o)
+  {
+    mObservers.add(o);
+  }
+
+  @Override
+  public void detach(final Observer o)
+  {
+    mObservers.remove(o);
+  }
+
+  @Override
+  public void fireEditorChangedEvent(final EditorChangedEvent event)
+  {
+    // Just in case they try to register or deregister observers
+    // in response to the update ...
+    final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
+    for (final Observer observer : copy) {
+      observer.update(event);
+    }
+    mModuleContainer.fireEditorChangedEvent(event);
+  }
+
+
+  @Override
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
+  {
+    if (Config.INCLUDE_INSTANTION.get()) {
+      mAliasesTab.addToTabbedPane(0);
+    } else {
+      mAliasesTab.removeFromTabbedPane();
+    }
+  }
+
+  //#########################################################################
+  //#
+  @Override
+  protected boolean setRightComponent(final JComponent newComponent)
+  {
+    if (super.setRightComponent(newComponent)) {
+      final EditorChangedEvent event = new SubPanelSwitchEvent(this);
+      fireEditorChangedEvent(event);
+
+      // Update enablement of actions dependent on the right component
+      // (component editor panel) --- to be deprecated ...
+      if (newComponent instanceof ComponentEditorPanel) {
+        getActions().editorPrintAction.setEnabled(true);
+      } else {
+        getActions().editorPrintAction.setEnabled(false);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private Actions getActions()
+  {
+    return mModuleContainer.getIDE().getActions();
+  }
+
+
+  //#########################################################################
+  //# Inner Class Tab
+  private class Tab
+  {
     //#######################################################################
     //# Constructor
-    public EditorPanel(final ModuleContainer moduleContainer,
-                       final String name)
+    private Tab(final String name, final JComponent panel)
     {
-        super(name);
-        mModuleContainer = moduleContainer;
-        mTabMap = new HashMap<SelectionOwner,Tab>();
-
-        mTabbedPane = new JTabbedPane();
-        mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-        mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-        mTabbedPane.addChangeListener(this);
-        setLeftComponent(mTabbedPane);
-
-		final IDE ide = mModuleContainer.getIDE();
-        final WatersPopupActionManager manager = ide.getPopupActionManager();
-
-        final AliasesPanel aliasesPanel =
-          new AliasesPanel(mModuleContainer, manager);
-        mAliasesTab = new Tab("Definitions", aliasesPanel);
-        if (Config.INCLUDE_INSTANTION.get()) {
-          mAliasesTab.addToTabbedPane();
-        }
-        mTabMap.put(aliasesPanel.getConstantAliasesPanel(), mAliasesTab);
-        mTabMap.put(aliasesPanel.getEventAliasesPanel(), mAliasesTab);
-        final EventDeclListView eventsPanel =
-            new EventDeclListView(this, manager);
-        mEventsTab = new Tab("Events", eventsPanel);
-        mEventsTab.addToTabbedPane();
-        mTabMap.put(eventsPanel, mEventsTab);
-        final ComponentsTree compPanel = new ComponentsTree(mModuleContainer, manager);
-        mComponentsTab = new Tab("Components", compPanel);
-        mComponentsTab.addToTabbedPane();
-        mComponentsTab.activate();
-        mTabMap.put(compPanel, mComponentsTab);
-
-        mCommentPanel = new CommentPanel(moduleContainer);
-        setRightComponent(mCommentPanel);
-        Config.INCLUDE_INSTANTION.addPropertyChangeListener(this);
+      mPanel = panel;
+      mScrollPane = new JScrollPane(panel);
+      mScrollPane.setName(name);
+      mScrollPane.setPreferredSize
+      (IDEDimensions.leftEditorPreferredSize);
+      mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     }
-
-
-    //######################################################################
-    //# Clean Up
-    public void close()
-    {
-        for (final SelectionOwner panel : mTabMap.keySet()) {
-            panel.close();
-        }
-    }
-
-
-    //######################################################################
-    //# Interface net.sourceforge.waters.gui.ModuleWindowInterface
-    @Override
-    public UndoInterface getUndoInterface()
-    {
-        return mModuleContainer;
-    }
-
-    @Override
-    public ModuleSubject getModuleSubject()
-    {
-        return mModuleContainer.getModule();
-    }
-
-    @Override
-    public ModuleContext getModuleContext()
-    {
-        return mModuleContainer.getModuleContext();
-    }
-
-    @Override
-    public ExpressionParser getExpressionParser()
-    {
-        return mModuleContainer.getExpressionParser();
-    }
-
-    @Override
-    public IDE getRootWindow()
-    {
-        return (IDE) getTopLevelAncestor();
-    }
-
-    @Override
-    public SelectionOwner getComponentsPanel()
-    {
-        return (SelectionOwner) mComponentsTab.getPanel();
-    }
-
-    @Override
-    public SelectionOwner getEventsPanel()
-    {
-        return (SelectionOwner) mEventsTab.getPanel();
-    }
-
-    @Override
-    public SelectionOwner getConstantAliasesPanel()
-    {
-      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
-      return panel.getConstantAliasesPanel();
-    }
-
-    @Override
-    public SelectionOwner getEventAliasesPanel()
-    {
-      final AliasesPanel panel = (AliasesPanel) mAliasesTab.getPanel();
-      return panel.getEventAliasesPanel();
-    }
-
-    @Override
-    public SelectionOwner getInstancePanel()
-    {
-      // TODO Auto-generated method stub
-      return (SelectionOwner) mComponentsTab.getPanel();
-    }
-
-    @Override
-    public void showComponents()
-    {
-        mComponentsTab.activate();
-    }
-
-    @Override
-    public void showEvents()
-    {
-        mEventsTab.activate();
-    }
-
-    @Override
-    public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
-    throws GeometryAbsentException
-    {
-      final ComponentEditorPanel panel =
-        mModuleContainer.createComponentEditorPanel(comp);
-      setRightComponent(panel);
-      return panel;
-    }
-
-    @Override
-    public EditorWindowInterface getEditorWindowInterface
-        (final SimpleComponentSubject comp)
-    {
-        return mModuleContainer.getComponentEditorPanel(comp);
-    }
-
-    @Override
-    public ComponentEditorPanel getActiveEditorWindowInterface()
-    {
-        if (getRightComponent() instanceof EditorWindowInterface) {
-            return (ComponentEditorPanel) getRightComponent();
-        } else {
-            return null;
-        }
-    }
-
-    @Override
-    public void showComment()
-    {
-        setRightComponent(mCommentPanel);
-    }
-
-    @Override
-    public void showPanel(final SelectionOwner panel)
-    {
-        final Tab tab = mTabMap.get(panel);
-        if (tab != null) {
-            tab.activate();
-        }
-    }
-
 
     //#######################################################################
-    //# Interface javax.swing.event.ChangeListener
-    @Override
-    public void stateChanged(final ChangeEvent event)
+    //# Simple Access
+    private JComponent getPanel()
     {
-        // Why is the focus not transfered automatically when clicking tabs?
-        final JScrollPane scroll =
-            (JScrollPane) mTabbedPane.getSelectedComponent();
-        final Component panel = scroll.getViewport().getView();
-        panel.requestFocusInWindow();
+      return mPanel;
     }
 
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.observer.Subject
-    @Override
-    public void attach(final Observer o)
+    private void activate()
     {
-        mObservers.add(o);
+      mTabbedPane.setSelectedComponent(mScrollPane);
+      FocusTracker.requestFocusFor(mPanel);
     }
 
-    @Override
-    public void detach(final Observer o)
-    {
-        mObservers.remove(o);
+    private void addToTabbedPane(){
+      mTabbedPane.add(mScrollPane);
     }
 
-    @Override
-    public void fireEditorChangedEvent(final EditorChangedEvent event)
-    {
-        // Just in case they try to register or deregister observers
-        // in response to the update ...
-        final Collection<Observer> copy = new LinkedList<Observer>(mObservers);
-        for (final Observer observer : copy) {
-            observer.update(event);
-        }
-        mModuleContainer.fireEditorChangedEvent(event);
+    private void addToTabbedPane(final int index){
+      mTabbedPane.add(mScrollPane, index);
     }
 
-
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      if (Config.INCLUDE_INSTANTION.get()) {
-        mAliasesTab.addToTabbedPane(0);
-      }
-      else{
-        mAliasesTab.removeFromTabbedPane();
-      }
+    private void removeFromTabbedPane(){
+      mTabbedPane.remove(mScrollPane);
     }
-
-    //######################################################################
-    //#
-    @Override
-    protected boolean setRightComponent(final JComponent newComponent)
-    {
-        if (super.setRightComponent(newComponent)) {
-            final EditorChangedEvent event = new SubPanelSwitchEvent(this);
-            fireEditorChangedEvent(event);
-
-            // Update enablement of actions dependent on the right component
-            // (component editor panel) --- to be deprecated ...
-            if (newComponent instanceof ComponentEditorPanel) {
-                getActions().editorPrintAction.setEnabled(true);
-            } else {
-                getActions().editorPrintAction.setEnabled(false);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private Actions getActions()
-    {
-        return mModuleContainer.getIDE().getActions();
-    }
-
-
-    //#######################################################################
-    //# Inner Class Tab
-    private class Tab
-    {
-
-        //###################################################################
-        //# Constructor
-        private Tab(final String name, final JComponent panel)
-        {
-            mPanel = panel;
-            mScrollPane = new JScrollPane(panel);
-            mScrollPane.setName(name);
-            mScrollPane.setPreferredSize
-                (IDEDimensions.leftEditorPreferredSize);
-            mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
-        }
-
-        //###################################################################
-        //# Simple Access
-        private JComponent getPanel()
-        {
-            return mPanel;
-        }
-
-        private void activate()
-        {
-            mTabbedPane.setSelectedComponent(mScrollPane);
-            mPanel.requestFocusInWindow();
-        }
-
-        private void addToTabbedPane(){
-          mTabbedPane.add(mScrollPane);
-        }
-
-        private void addToTabbedPane(final int index){
-          mTabbedPane.add(mScrollPane, index);
-        }
-
-        private void removeFromTabbedPane(){
-          mTabbedPane.remove(mScrollPane);
-        }
-
-        //###################################################################
-        //# Data Members
-        private final JComponent mPanel;
-        private final JScrollPane mScrollPane;
-
-    }
-
 
     //#######################################################################
     //# Data Members
-    private final ModuleContainer mModuleContainer;
-    private final Map<SelectionOwner,Tab> mTabMap;
-
-    private final JTabbedPane mTabbedPane;
-    private final Tab mComponentsTab;
-    private final Tab mEventsTab;
-    private final Tab mAliasesTab;
-    private final CommentPanel mCommentPanel;
-
-    private final Collection<Observer> mObservers = new LinkedList<Observer>();
+    private final JComponent mPanel;
+    private final JScrollPane mScrollPane;
+  }
 
 
-    //#########################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
+  //#########################################################################
+  //# Data Members
+  private final ModuleContainer mModuleContainer;
+  private final Map<SelectionOwner,Tab> mTabMap;
+
+  private final JTabbedPane mTabbedPane;
+  private final Tab mComponentsTab;
+  private final Tab mEventsTab;
+  private final Tab mAliasesTab;
+  private final CommentPanel mCommentPanel;
+
+  private final Collection<Observer> mObservers = new LinkedList<>();
+
+  private Component mLastFocusOwner = null;
 
 
-
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 7673179485024676170L;
 
 }

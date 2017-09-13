@@ -146,6 +146,24 @@ public class ModuleContainer
   }
 
   @Override
+  void activate()
+  {
+    final MainPanel panel = getActivePanel();
+    if (panel != null) {
+      panel.activate();
+    }
+  }
+
+  @Override
+  void deactivate()
+  {
+    final MainPanel panel = getActivePanel();
+    if (panel != null) {
+      panel.deactivate();
+    }
+  }
+
+  @Override
   public void close()
   {
     mEditorPanel.close();
@@ -173,9 +191,9 @@ public class ModuleContainer
   }
 
   @Override
-  public Component getActivePanel()
+  public MainPanel getActivePanel()
   {
-    return mTabPanel.getSelectedComponent();
+    return (MainPanel) mTabPanel.getSelectedComponent();
   }
 
   @Override
@@ -395,7 +413,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.UndoInterface
   @Override
   public void executeCommand(final Command c)
@@ -483,7 +501,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Compilation
   public void compile(final CompilationObserver observer)
   {
@@ -517,7 +535,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Auxiliary Methods
   private void fireUndoRedoEvent()
   {
@@ -533,7 +551,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Inner Class SimulatorPropertyChangeListener
   private class SimulatorPropertyChangeListener
       implements SupremicaPropertyChangeListener
@@ -551,7 +569,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Inner Class UpdateGraphPanelVisitor
   /**
    * This visitor is used to make sure an automaton is no longer visible in
@@ -609,6 +627,7 @@ public class ModuleContainer
     }
   }
 
+
   //#########################################################################
   //# Inner Class CompilingTabbedPane
   private class CompilingTabbedPane
@@ -620,7 +639,9 @@ public class ModuleContainer
     @Override
     public void setSelectedIndex(final int index)
     {
-      if (index == -1) {
+      if (index == getSelectedIndex()) {
+        // nothing
+      } else if (index == -1) {
         setSelectedIndexImpl(index);
       } else {
         mSelected = getComponent(index);
@@ -634,9 +655,11 @@ public class ModuleContainer
 
     private void setSelectedIndexImpl(final int index)
     {
+      deactivate();
       super.setSelectedIndex(index);
-      final EditorChangedEvent eevent = new MainPanelSwitchEvent(this);
-      fireEditorChangedEvent(eevent);
+      final EditorChangedEvent event = new MainPanelSwitchEvent(this);
+      fireEditorChangedEvent(event);
+      activate();
     }
 
     //#######################################################################
@@ -673,7 +696,7 @@ public class ModuleContainer
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Data Members
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
@@ -701,7 +724,7 @@ public class ModuleContainer
   private final Collection<Observer> mObservers = new LinkedList<Observer>();
 
 
-  //#######################################################################
+  //#########################################################################
   //# Class Constants
   static final String TYPE_STRING = "Waters module";
 
