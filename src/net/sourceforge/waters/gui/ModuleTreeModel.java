@@ -286,8 +286,8 @@ class ModuleTreeModel
    * in a tree. This method checks the types of objects and their parents to
    * determine whether an object is to be displayed in some tree view. For an
    * ancestor to be found, a contiguous sequence of parents associated to the
-   * tree must be found. Since graphs (
-   * {@link net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are
+   * tree must be found. Since graphs
+   * ({@link net.sourceforge.waters.model.module.GraphProxy GraphProxy}) are
    * not associated with any tree, their children will not have any ancestor
    * in a tree.
    *
@@ -454,19 +454,22 @@ class ModuleTreeModel
     }
 
     @Override
-    public ListSubject<? extends ProxySubject> visitParameterBindingProxy(final ParameterBindingProxy binding)
+    public ListSubject<? extends ProxySubject> visitParameterBindingProxy
+      (final ParameterBindingProxy binding)
     {
-      final ParameterBindingSubject para = (ParameterBindingSubject)binding;
-      if(para.getExpression() instanceof EventListExpressionSubject){
-        final EventListExpressionSubject list = (EventListExpressionSubject) para.getExpression();
-         return list.getEventIdentifierListModifiable();
+      if (binding.getExpression() instanceof EventListExpressionSubject) {
+        final EventListExpressionSubject list =
+          (EventListExpressionSubject) binding.getExpression();
+        return list.getEventIdentifierListModifiable();
       }
       return null;
     }
 
     @Override
-    public ListSubject<? extends ProxySubject> visitSimpleNodeProxy(final SimpleNodeProxy simple){
-      final SimpleNodeSubject node = (SimpleNodeSubject)simple;
+    public ListSubject<? extends ProxySubject> visitSimpleNodeProxy
+      (final SimpleNodeProxy simple)
+    {
+      final SimpleNodeSubject node = (SimpleNodeSubject) simple;
       return node.getPropositions().getEventIdentifierListModifiable();
     }
   }
@@ -474,17 +477,27 @@ class ModuleTreeModel
 
   //#########################################################################
   //# Tree visibility
+  /**
+   * Returns whether the given subject appears in this module tree.
+   * This method tests whether the given subject is contained in
+   * the tree's root list or its children. In addition, the root node
+   * ({@link ModuleProxy}) is contained in any module tree.
+   */
   private boolean isInTree(final Subject subject)
   {
-    if (subject instanceof Proxy && mChildrenGetterVisitor.getChildren((Proxy) subject) != null) {
-      return true; // internal node
+    final Subject parent = subject.getParent();
+    if (parent == null) {
+      return subject instanceof ModuleProxy;
+    } else if (parent instanceof CollectionSubject<?>) {
+      final Subject nonEventListAncestor = getNonEventListAncestor(subject);
+      if (nonEventListAncestor instanceof ModuleProxy) {
+        return parent == mRootList;
+      } else {
+        return isInTree(nonEventListAncestor);
+      }
+    } else {
+      return false;
     }
-    final Subject nonEventListAncestor = getNonEventListAncestor(subject);
-    if (subject.getParent() instanceof CollectionSubject<?>
-        && isInTree(nonEventListAncestor)) {
-      return true; // leaf node
-    }
-    return false;
   }
 
   private ProxySubject getNonEventListAncestor(final Subject subject)

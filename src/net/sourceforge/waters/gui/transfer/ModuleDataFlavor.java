@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.transfer;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -62,7 +63,8 @@ public class ModuleDataFlavor extends WatersDataFlavor
   //#########################################################################
   //# Importing and Exporting Data
   @Override
-  List<Proxy> createExportData(final Collection<? extends Proxy> data)
+  List<Proxy> createExportData(final Collection<? extends Proxy> data,
+                               final ModuleContext context)
   {
     final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
     return cloner.getClonedList(data);

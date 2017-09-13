@@ -58,6 +58,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
@@ -131,16 +132,19 @@ public class EventDeclListView
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.transfer.SelectionOwner
+  @Override
   public UndoInterface getUndoInterface(final Action action)
   {
     return mRoot.getUndoInterface();
   }
 
+  @Override
   public boolean hasNonEmptySelection()
   {
     return !isSelectionEmpty();
   }
 
+  @Override
   public boolean canSelectMore()
   {
     final int size = mModel.getSize();
@@ -159,12 +163,14 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public boolean isSelected(final Proxy proxy)
   {
     final int index = mModel.indexOf(proxy);
     return isSelectedIndex(index);
   }
 
+  @Override
   public List<EventDeclSubject> getCurrentSelection()
   {
     final List<EventDeclSubject> result = new LinkedList<EventDeclSubject>();
@@ -175,6 +181,7 @@ public class EventDeclListView
     return result;
   }
 
+  @Override
   public List<EventDeclSubject> getAllSelectableItems()
   {
     final int size = mModel.getSize();
@@ -187,6 +194,7 @@ public class EventDeclListView
     return result;
   }
 
+  @Override
   public EventDeclSubject getSelectionAnchor()
   {
     final int size = mModel.getSize();
@@ -198,11 +206,13 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void clearSelection(final boolean propagate)
   {
     clearSelection();
   }
 
+  @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
     if (item instanceof EventDeclSubject && mModel.contains(item)) {
@@ -212,12 +222,14 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void replaceSelection(final List<? extends Proxy> items)
   {
     clearSelection();
     addToSelection(items);
   }
 
+  @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
     int remaining = items.size();
@@ -257,6 +269,7 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     int remaining = items.size();
@@ -296,11 +309,13 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public boolean canPaste(final Transferable transferable)
   {
     return transferable.isDataFlavorSupported(WatersDataFlavor.EVENT_DECL);
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
@@ -326,11 +341,13 @@ public class EventDeclListView
     return result;
   }
 
+  @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
     return !items.isEmpty();
   }
 
+  @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
     @SuppressWarnings("unchecked")
@@ -338,16 +355,19 @@ public class EventDeclListView
     return mDeleteVisitor.getDeletionVictims(decls, "delete");
   }
 
+  @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
     mDeleteVisitor.insertItems(inserts);
   }
 
+  @Override
   public void deleteItems(final List<InsertInfo> deletes)
   {
     mDeleteVisitor.deleteItems(deletes);
   }
 
+  @Override
   public void scrollToVisible(final List<? extends Proxy> list)
   {
     if (!list.isEmpty()) {
@@ -369,6 +389,7 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void activate()
   {
     if (!isFocusOwner()) {
@@ -377,6 +398,7 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void close()
   {
     mModel.dispose();
@@ -385,6 +407,7 @@ public class EventDeclListView
 
   //#######################################################################
   //# Interface net.sourceforge.waters.gui.observer.Subject
+  @Override
   public void attach(final Observer observer)
   {
     if (mObservers == null) {
@@ -393,6 +416,7 @@ public class EventDeclListView
     mObservers.add(observer);
   }
 
+  @Override
   public void detach(final Observer observer)
   {
     mObservers.remove(observer);
@@ -401,6 +425,7 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
     if (mObservers != null) {
@@ -416,6 +441,7 @@ public class EventDeclListView
 
   //#########################################################################
   //# Interface java.awt.event.FocusListener
+  @Override
   public void focusGained(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -423,6 +449,7 @@ public class EventDeclListView
     }
   }
 
+  @Override
   public void focusLost(final FocusEvent event)
   {
     if (!event.isTemporary()) {
@@ -432,10 +459,12 @@ public class EventDeclListView
 
   //#########################################################################
   //# Interface javax.swing.event.ListSelectionListener
+  @Override
   public void valueChanged(final ListSelectionEvent event)
   {
     // Why can't the new selection be read immediately ???
     SwingUtilities.invokeLater(new Runnable() {
+        @Override
         public void run() {
           fireSelectionChanged();
         }
@@ -516,6 +545,7 @@ public class EventDeclListView
   {
     //#######################################################################
     //# Interface java.awt.MouseListener
+    @Override
     public void mouseClicked(final MouseEvent event)
     {
       if (event.getButton() == MouseEvent.BUTTON1 &&
@@ -529,12 +559,14 @@ public class EventDeclListView
       }
     }
 
+    @Override
     public void mousePressed(final MouseEvent event)
     {
       requestFocusInWindow();
       maybeShowPopup(event);
     }
 
+    @Override
     public void mouseReleased(final MouseEvent event)
     {
       maybeShowPopup(event);

@@ -39,8 +39,9 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 
 /**
  * A position record for subjects inserted or deleted in a list.
- * This is an example of the information typically stored as <I>insert
- * position</I> in a {@link InsertInfo} object.
+ * It contains a reference to a list and an index in that list.
+ * This information is stored as <I>insert position</I> in a
+ * {@link InsertInfo} object.
  *
  * @author Robi Malik
  */
@@ -50,7 +51,7 @@ public class ListInsertPosition {
   //#########################################################################
   //# Constructor
   public ListInsertPosition(final ListSubject<? extends ProxySubject> list,
-			    final int pos)
+                            final int pos)
   {
     mList = list;
     mPosition = pos;

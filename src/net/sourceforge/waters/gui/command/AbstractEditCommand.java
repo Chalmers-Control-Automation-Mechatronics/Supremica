@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.command;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -49,6 +47,8 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -143,6 +143,7 @@ public abstract class AbstractEditCommand
     return mUpdatesSelection;
   }
 
+  @Override
   public void setUpdatesSelection(final boolean updatesSelection)
   {
     mUpdatesSelection = updatesSelection;
@@ -156,11 +157,13 @@ public abstract class AbstractEditCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public String getName()
   {
     return mName != null ? mName : getClass().getName();
   }
 
+  @Override
   public boolean isSignificant()
   {
     return true;
@@ -172,8 +175,8 @@ public abstract class AbstractEditCommand
   List<ProxySubject> getSelectionAfterInsert(final List<InsertInfo> inserts)
   {
     final int size = inserts.size();
-    final Set<Proxy> set = new THashSet<Proxy>(size);
-    final List<ProxySubject> result = new ArrayList<ProxySubject>(size);
+    final Set<Proxy> set = new THashSet<>(size);
+    final List<ProxySubject> result = new ArrayList<>(size);
     boolean newLabelBlock = true;
     LabelBlockSubject block = null;
     for (final InsertInfo insert : inserts) {

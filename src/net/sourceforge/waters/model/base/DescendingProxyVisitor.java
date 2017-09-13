@@ -43,9 +43,22 @@ package net.sourceforge.waters.model.base;
  * immediate superclass and afterwards visit all children of their argument.
  * In all cases, <CODE>null</CODE> is returned.</P>
  *
+ * <P>Differently from the {@link DefaultProxyVisitor}, the base method
+ * {@link #visitProxy(Proxy) visitProxy()} quietly returns without doing
+ * anything; it does not throw an exception.</P>
+
  * @author Robi Malik
  */
 
 abstract public class DescendingProxyVisitor extends DefaultProxyVisitor {
+
+  //#########################################################################
+  //# Visitor Methods
+  @Override
+  public Object visitProxy(final Proxy proxy)
+    throws VisitorException
+  {
+    return null;
+  }
 
 }

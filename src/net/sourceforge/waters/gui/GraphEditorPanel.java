@@ -1019,6 +1019,7 @@ public class GraphEditorPanel
   @Override
   protected AffineTransform createTransform()
   {
+    adjustSize();
     final AffineTransform transform = new AffineTransform();
     transform.translate(-mCurrentBounds.x, -mCurrentBounds.y);
     transform.scale(mAdjustedZoomFactor, mAdjustedZoomFactor);

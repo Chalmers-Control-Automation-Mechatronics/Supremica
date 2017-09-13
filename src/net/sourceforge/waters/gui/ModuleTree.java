@@ -50,7 +50,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,6 +89,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventAliasProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -106,11 +106,13 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.EventAliasSubject;
+import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.EventListExpressionSubject;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.IdentifiedSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.InstanceSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
@@ -118,6 +120,8 @@ import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -174,9 +178,10 @@ public abstract class ModuleTree
     ToolTipManager.sharedInstance().registerComponent(this);
   }
 
+
   //#########################################################################
   //# Simple Access
-  public ModuleTreeModel getAliasTreeModel()
+  public ModuleTreeModel getModuleTreeModel()
   {
     return (ModuleTreeModel) getModel();
   }
@@ -196,8 +201,9 @@ public abstract class ModuleTree
     return mModuleContainer.getIDE().getFocusTracker();
   }
 
-  private boolean isSourceOfDrag(){
-    return getFocusTracker().getWatersSelectionOwner() == ModuleTree.this;
+  private boolean isSourceOfDrag()
+  {
+    return getFocusTracker().getWatersSelectionOwner() == this;
   }
 
 
@@ -330,7 +336,7 @@ public abstract class ModuleTree
   @Override
   public boolean isSelected(final Proxy proxy)
   {
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     final ProxySubject subject = (ProxySubject) proxy;
     final TreePath path = model.createPath(subject);
     return isPathSelected(path);
@@ -380,7 +386,7 @@ public abstract class ModuleTree
   @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     if (item == model.getRoot()) {
       return null;
     } else {
@@ -404,7 +410,7 @@ public abstract class ModuleTree
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       final TreePath path = model.createPath(subject);
@@ -415,7 +421,7 @@ public abstract class ModuleTree
   @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
       final TreePath path = model.createPath(subject);
@@ -484,8 +490,8 @@ public abstract class ModuleTree
   @SuppressWarnings("unchecked")
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    final ModuleTreeModel model = getAliasTreeModel();
-    final Set<Proxy> set = new HashSet<Proxy>(items);
+    final ModuleTreeModel model = getModuleTreeModel();
+    final Set<Proxy> set = new THashSet<>(items);
     final List<InsertInfo> result = new LinkedList<InsertInfo>();
     outer: for (final Proxy proxy : items) {
       final ProxySubject subject = (ProxySubject) proxy;
@@ -512,14 +518,14 @@ public abstract class ModuleTree
   public void insertItems(final List<InsertInfo> inserts)
   {
     for (final InsertInfo insert : inserts) {
-      final ProxySubject victim = (ProxySubject) insert.getProxy();
+      final ProxySubject item = (ProxySubject) insert.getProxy();
       final ListInsertPosition inspos =
         (ListInsertPosition) insert.getInsertPosition();
       @SuppressWarnings("unchecked")
       final List<ProxySubject> list = (List<ProxySubject>) inspos.getList();
       final int pos = inspos.getPosition();
-      list.add(pos, victim);
-      expand(victim);
+      list.add(pos, item);
+      expand(item);
     }
   }
 
@@ -544,7 +550,7 @@ public abstract class ModuleTree
     if (list.isEmpty()) {
       return;
     }
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     final Iterator<? extends Proxy> iter = list.iterator();
     final Proxy next = iter.next();
     final ProxySubject first;
@@ -566,8 +572,7 @@ public abstract class ModuleTree
       final int y = lastrect.y + lastrect.height;
       rect.height = y - rect.y;
     }
-   // if(rect != null)
-      scrollRectToVisible(rect);
+    scrollRectToVisible(rect);
   }
 
   @Override
@@ -582,7 +587,7 @@ public abstract class ModuleTree
   @Override
   public void close()
   {
-    final ModuleTreeModel model = getAliasTreeModel();
+    final ModuleTreeModel model = getModuleTreeModel();
     model.close();
     ToolTipManager.sharedInstance().unregisterComponent(this);
   }
@@ -693,25 +698,39 @@ public abstract class ModuleTree
                                         final Proxy dropTarget, int index)
     throws IOException, UnsupportedFlavorException
   {
-    final List<InsertInfo> result = new ArrayList<InsertInfo>(index);
     final List<Proxy> transferData =
-      mListVisitor.getListOfAcceptedItems(dropTarget,
-                                                      transferable, flavor);
+      mListVisitor.getListOfAcceptedItems(dropTarget, transferable, flavor);
     final ModuleProxyCloner cloner =
       ModuleSubjectFactory.getCloningInstance();
-    Set<String> names;
-    names = new HashSet<String>(transferData.size());
+    final ModuleSubject module = mModuleContainer.getModule();
+    final ListSubject<EventDeclSubject> edeclList =
+      module.getEventDeclListModifiable();
+    int edeclPos = edeclList.size();
+    final Set<String> names = new THashSet<>(transferData.size());
+    final List<InsertInfo> result = new ArrayList<>(transferData.size());
     for (final Proxy proxy : transferData) {
-      final Proxy cloned = cloner.getClone(proxy);
-      if (cloned instanceof IdentifiedSubject && list == getRootList()) {
-        final IdentifiedSubject sub = (IdentifiedSubject) cloned;
-        final IdentifierSubject newId =
-          mModuleContext.getPastedName(sub, names);
-        sub.setIdentifier(newId);
+      if (proxy instanceof EventDeclProxy) {
+        // Special treatment for event declarations pasted with an automaton
+        final EventDeclProxy decl = (EventDeclProxy) proxy;
+        if (mModuleContext.getEventDecl(decl.getName()) == null) {
+          final Proxy cloned = cloner.getClone(decl);
+          final ListInsertPosition inspos =
+            new ListInsertPosition(edeclList, edeclPos++);
+          final InsertInfo info = new InsertInfo(cloned, inspos);
+          result.add(info);
+        }
+      } else {
+        final Proxy cloned = cloner.getClone(proxy);
+        if (cloned instanceof IdentifiedSubject && list == getRootList()) {
+          final IdentifiedSubject sub = (IdentifiedSubject) cloned;
+          final IdentifierSubject newId =
+            mModuleContext.getPastedName(sub, names);
+          sub.setIdentifier(newId);
+        }
+        final ListInsertPosition inspos = new ListInsertPosition(list, index++);
+        final InsertInfo info = new InsertInfo(cloned, inspos);
+        result.add(info);
       }
-      final ListInsertPosition inspos = new ListInsertPosition(list, index++);
-      final InsertInfo info = new InsertInfo(cloned, inspos);
-      result.add(info);
     }
     return result;
   }
@@ -1247,10 +1266,8 @@ public abstract class ModuleTree
               return false;
             }
           }
-        } catch (final UnsupportedFlavorException exception) {
-          throw new VisitorException(exception);
-        } catch (final IOException exception) {
-          throw new VisitorException(exception);
+        } catch (final UnsupportedFlavorException | IOException exception) {
+          throw wrap(exception);
         }
       }
       return true;

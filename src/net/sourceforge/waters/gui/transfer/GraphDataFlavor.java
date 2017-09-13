@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.transfer;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -54,6 +53,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
+
+import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -78,7 +79,8 @@ public class GraphDataFlavor extends ModuleDataFlavor
   //#########################################################################
   //# Importing and Exporting Data
   @Override
-  List<Proxy> createExportData(final Collection<? extends Proxy> data)
+  List<Proxy> createExportData(final Collection<? extends Proxy> data,
+                               final ModuleContext context)
   {
     final Proxy graph = VISITOR.createGraph(data);
     return Collections.singletonList(graph);

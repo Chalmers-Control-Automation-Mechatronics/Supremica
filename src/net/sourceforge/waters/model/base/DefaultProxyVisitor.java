@@ -42,7 +42,14 @@ import java.util.Collection;
  * <P>This is an adapter class to make it more convenient to implement
  * visitors that do not explicitly implement all the visit methods.
  * All the visit methods in this adapter class do nothing or call the visit
- * method for the immediate superclass of their argument.</P>
+ * method for the immediate superclass of their argument. All these calls
+ * eventually trigger the base method {@link #visitProxy(Proxy) visitProxy()},
+ * which throws an {@link UnsupportedOperationException}.</P>
+ *
+ * <P>A useful visitor is implemented by extending this class and overriding
+ * some of the visit methods. As an alternative, consider extending from
+ * {@link DescendingProxyVisitor}, whose visit methods includes calls to
+ * all referenced proxies of the argument.</P>
  *
  * @author Robi Malik
  */
@@ -51,6 +58,7 @@ abstract public class DefaultProxyVisitor implements ProxyVisitor {
 
   //#########################################################################
   //# Visitor Methods
+  @Override
   public Object visitProxy(final Proxy proxy)
     throws VisitorException
   {
@@ -63,18 +71,21 @@ abstract public class DefaultProxyVisitor implements ProxyVisitor {
     throw new UnsupportedOperationException(buffer.toString());
   }
 
+  @Override
   public Object visitGeometryProxy(final GeometryProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitNamedProxy(final NamedProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitDocumentProxy(final DocumentProxy proxy)
     throws VisitorException
   {

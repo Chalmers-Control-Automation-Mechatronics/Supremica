@@ -46,6 +46,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.observer.ClipboardChangedEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -101,8 +102,9 @@ public class IDECopyAction
     if (watersOwner != null) {
       final List<? extends Proxy> selection =
         watersOwner.getCurrentSelection();
+      final ModuleContext context = getActiveModuleContext();
       final Transferable transferable =
-        WatersDataFlavor.createTransferable(selection);
+        WatersDataFlavor.createTransferable(selection, context, true);
       final Clipboard clipboard =
         Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(transferable, this);
