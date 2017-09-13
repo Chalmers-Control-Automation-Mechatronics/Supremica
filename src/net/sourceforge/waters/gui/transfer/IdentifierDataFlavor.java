@@ -77,11 +77,106 @@ class IdentifierDataFlavor extends ModuleDataFlavor
 
   //#########################################################################
   //# Importing and Exporting Data
+  /**
+   * Returns whether the given data can produce a non-empty transferable
+   * with the identifier data flavour. This is the case if at least one
+   * of the elements is or contains a foreach block or an item that can be
+   * converted to an identifier.
+   */
+  boolean supports(final Collection<? extends Proxy> data)
+  {
+    return mSearchVisitor.containsIdentifier(data);
+  }
+
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data,
                                final ModuleProxyFactory factory)
   {
-    return mVisitor.convert(data, factory);
+    return mConversionVisitor.convert(data, factory);
+  }
+
+
+  //#########################################################################
+  //# Inner Class SearchVisitor
+  private static class SearchVisitor extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private boolean containsIdentifier(final Collection<? extends Proxy> data)
+    {
+      try {
+        return processList(data);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    private Boolean processList(final Collection<? extends Proxy> list)
+      throws VisitorException
+    {
+      for (final Proxy proxy : list) {
+        final Boolean found = (Boolean) proxy.acceptVisitor(this);
+        if (found) {
+          return found;
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitEdgeProxy(final EdgeProxy edge)
+      throws VisitorException
+    {
+      final LabelBlockProxy block = edge.getLabelBlock();
+      if (block == null) {
+        return false;
+      } else {
+        return block.acceptVisitor(this);
+      }
+    }
+
+    @Override
+    public Object visitEventListExpressionProxy
+      (final EventListExpressionProxy elist)
+    throws VisitorException
+    {
+      final List<Proxy> list = elist.getEventIdentifierList();
+      return processList(list);
+    }
+
+    @Override
+    public Boolean visitForeachProxy(final ForeachProxy foreach)
+    {
+      return true;
+    }
+
+    @Override
+    public Boolean visitIdentifiedProxy(final IdentifiedProxy proxy)
+    {
+      return true;
+    }
+
+    @Override
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      return true;
+    }
+
+    @Override
+    public Object visitParameterBindingProxy(final ParameterBindingProxy param)
+      throws VisitorException
+    {
+      final ExpressionProxy expr = param.getExpression();
+      return expr.acceptVisitor(this);
+    }
+
+    @Override
+    public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return false;
+    }
   }
 
 
@@ -89,7 +184,6 @@ class IdentifierDataFlavor extends ModuleDataFlavor
   //# Inner Class ConversionVisitor
   private static class ConversionVisitor extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private List<Proxy> convert(final Collection<? extends Proxy> data,
@@ -107,7 +201,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     throws VisitorException
@@ -188,10 +282,10 @@ class IdentifierDataFlavor extends ModuleDataFlavor
     //# net.sourceforge.waters.model.base.AbstractModuleProxyVisitor
     @Override
     public Object visitCollection(final Collection<? extends Proxy> collection)
-    throws VisitorException
+      throws VisitorException
     {
       final int size = collection.size();
-      mExportList = new ArrayList<Proxy>(size);
+      mExportList = new ArrayList<>(size);
       return super.visitCollection(collection);
     }
 
@@ -204,6 +298,7 @@ class IdentifierDataFlavor extends ModuleDataFlavor
 
   //#########################################################################
   //# Class Constants
-  private final ConversionVisitor mVisitor = new ConversionVisitor();
+  private final SearchVisitor mSearchVisitor = new SearchVisitor();
+  private final ConversionVisitor mConversionVisitor = new ConversionVisitor();
 
 }

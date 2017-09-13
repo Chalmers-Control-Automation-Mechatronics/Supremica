@@ -174,15 +174,20 @@ public abstract class WatersDataFlavor extends DataFlavor
   public static ProxyTransferable createTransferable
     (Collection<? extends Proxy> data,
      final ModuleContext context,
-     final boolean supportsIdentifier)
+     boolean supportsIdentifier)
   {
     data = getReducedData(data);
     final DataFlavorVisitor visitor = DataFlavorVisitor.getInstance();
     final List<WatersDataFlavor> flavors =
       visitor.getTransferDataFlavors(data);
     int count = flavors.size() + 1;
-    if (!supportsIdentifier && flavors.contains(WatersDataFlavor.IDENTIFIER)) {
-      count--;
+    if (flavors.contains(WatersDataFlavor.IDENTIFIER)) {
+      if (!supportsIdentifier) {
+        count--;
+      } else if (!WatersDataFlavor.IDENTIFIER.supports(data)) {
+        supportsIdentifier = false;
+        count--;
+      }
     }
     final DataFlavor[] flavorsArray = new DataFlavor[count];
     int index = 0;
@@ -393,7 +398,7 @@ public abstract class WatersDataFlavor extends DataFlavor
    * list of objects of type {@link IdentifierProxy} or {@link
    * net.sourceforge.waters.model.module.ForeachProxy}
    */
-  public static final WatersDataFlavor IDENTIFIER =
+  public static final IdentifierDataFlavor IDENTIFIER =
     new IdentifierDataFlavor();
 
   /**
