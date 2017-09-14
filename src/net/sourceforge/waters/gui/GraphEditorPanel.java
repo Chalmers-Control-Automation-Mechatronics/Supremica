@@ -1262,7 +1262,7 @@ public class GraphEditorPanel
    */
   private void addToSelection(final ProxySubject item)
   {
-    if(mSelection.add(item, true)){
+    if (mSelection.add(item, true)) {
       fireSelectionChanged();
     }
   }
@@ -2363,8 +2363,7 @@ public class GraphEditorPanel
         } else if (mFocusedObject instanceof GuardActionBlockSubject) {
           final EdgeSubject edge = (EdgeSubject) mFocusedObject.getParent();
           EdgeEditorDialog.showDialog(edge, mRoot);
-        }
-        else if (mFocusedObject instanceof NodeSubject) {
+        } else if (mFocusedObject instanceof NodeSubject) {
           final NodeSubject node = (NodeSubject) mFocusedObject;
           NodeEditorDialog.showDialog(mModuleContainer, GraphEditorPanel.this, node);
         }
@@ -5576,6 +5575,9 @@ public class GraphEditorPanel
       } else {
         change |= addToSet(subject);
       }
+      if (change) {
+        includeParentsOfLabelGeometry();
+      }
       return change;
     }
 
@@ -5583,7 +5585,7 @@ public class GraphEditorPanel
     {
       boolean change = false;
       for (final Proxy proxy : items) {
-        final ProxySubject subject = (ProxySubject)proxy;
+        final ProxySubject subject = (ProxySubject) proxy;
         change |= add(subject, true);
       }
       return change;
@@ -5613,6 +5615,29 @@ public class GraphEditorPanel
       return new ArrayList<ProxySubject>(mSelList);
     }
 
+    private void includeParentsOfLabelGeometry()
+    {
+      if (size() > 1) {
+        List<SimpleNodeSubject> nodes = null;
+        for (final ProxySubject item : mSelList) {
+          if (item instanceof LabelGeometrySubject) {
+            final SimpleNodeSubject node =
+              (SimpleNodeSubject) item.getParent();
+            if (!contains(node)) {
+              if (nodes == null) {
+                nodes = new LinkedList<>();
+              }
+              nodes.add(node);
+            }
+          }
+        }
+        if (nodes != null) {
+          mSelSet.addAll(nodes);
+          mSelList.addAll(nodes);
+        }
+      }
+    }
+
     private boolean isEmpty()
     {
       return mSelList.isEmpty();
@@ -5627,9 +5652,11 @@ public class GraphEditorPanel
     {
       if (mSelSet.remove(subject)) {
         mSelList.remove(subject);
+        removeLabelGeometryOfRemovedNode(subject);
         return true;
+      } else {
+        return false;
       }
-      return false;
     }
 
     private boolean remove(final List<? extends Proxy> items)
@@ -5640,6 +5667,15 @@ public class GraphEditorPanel
         change |= remove(subject);
       }
       return change;
+    }
+
+    private void removeLabelGeometryOfRemovedNode(final ProxySubject subject)
+    {
+      if (subject instanceof SimpleNodeSubject && size() > 1) {
+        final SimpleNodeSubject node = (SimpleNodeSubject) subject;
+        final LabelGeometrySubject geo = node.getLabelGeometry();
+        remove(geo);
+      }
     }
 
     public int size()
