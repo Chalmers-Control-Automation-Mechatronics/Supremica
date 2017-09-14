@@ -131,7 +131,7 @@ public class IconAndFontLoader
 
   //#########################################################################
   //# Public Methods to Load Icons and Fonts
-  public static int getWatersIconHeight()
+  public static int getWatersIconSize()
   {
     return ICON_PLANT.getIconHeight();
   }

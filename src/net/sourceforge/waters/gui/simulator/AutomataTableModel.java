@@ -54,8 +54,8 @@ class AutomataTableModel
   implements SimulationObserver, InternalFrameObserver
 {
 
-  // #########################################################################
-  // # Constructor
+  //#########################################################################
+  //# Constructor
   AutomataTableModel(final Simulation sim, final AutomatonDesktopPane desktop)
   {
     super(sim);
@@ -65,8 +65,8 @@ class AutomataTableModel
   }
 
 
-  // #########################################################################
-  // # Simple Access
+  //#########################################################################
+  //# Simple Access
   /**
    * Gets the automaton represented by the index-th row of the sorted table.
    * @param  index   The index of the row of the table.
@@ -81,10 +81,10 @@ class AutomataTableModel
 
   int getIndex(final AutomatonProxy aut)
   {
-    for (int looper = 0; looper < this.getRowCount(); looper++)
-    {
-      if (((String)mRawData.get(looper).get(1)).compareTo(aut.getName()) == 0)
+    for (int looper = 0; looper < this.getRowCount(); looper++) {
+      if (((String) mRawData.get(looper).get(1)).compareTo(aut.getName()) == 0) {
         return looper;
+      }
     }
     return -1;
   }
@@ -95,8 +95,8 @@ class AutomataTableModel
   }
 
 
-  // #########################################################################
-  // # Interface javax.swing.table.TableModel
+  //#########################################################################
+  //# Interface javax.swing.table.TableModel
   @Override
   public int getColumnCount()
   {
@@ -154,8 +154,9 @@ class AutomataTableModel
     }
   }
 
-  // ##########################################################################
-  // # Interface net.sourceforge.waters.gui.simulator.SimulationObserver
+
+  //##########################################################################
+  //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
   @Override
   public void simulationChanged(final SimulationChangeEvent event)
   {
@@ -198,10 +199,12 @@ class AutomataTableModel
         getSimulation().getOrderedAutomata();
       for (final AutomatonProxy aut : automata) {
         final List<Object> row = new ArrayList<Object>();
-        if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() == VariableComponentSubject.class)
+        if (container.getSourceInfoMap().get(aut).getSourceObject().getClass() ==
+            VariableComponentSubject.class) {
           row.add(IconAndFontLoader.ICON_VARIABLE);
-        else
+        } else {
           row.add(ModuleContext.getComponentKindIcon(aut.getKind()));
+        }
         row.add(aut.getName());
         row.add(getSimulation().getAutomatonActivityIcon(aut));
         final StateProxy state = getSimulation().getCurrentState(aut);
@@ -216,19 +219,20 @@ class AutomataTableModel
       }
       Collections.sort(output, mComparator);
       mRawData = output;
-    } else
-    {
+    } else {
       mRawData = new ArrayList<List<Object>>();
     }
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   private List<List<Object>> mRawData;
   private final AutomatonTableComparator mComparator;
 
 
-  // #########################################################################
-  // # Class Constants
-  private static final long serialVersionUID = 1L;
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 470265246231865258L;
+
 }

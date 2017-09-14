@@ -163,7 +163,7 @@ public abstract class ModuleTree
     }
     setShowsRootHandles(true);
     setAutoscrolls(true);
-    setRowHeight(IconAndFontLoader.getWatersIconHeight());
+    setRowHeight(IconAndFontLoader.getWatersIconSize());
     // Don't expand/collapse on double-click, never collapse the root.
     setToggleClickCount(0);
     manager.installCutCopyPasteActions(this);

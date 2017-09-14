@@ -92,7 +92,7 @@ public class EventJTree
       (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     final int height =
-      Math.max(MIN_ROW_HEIGHT, IconAndFontLoader.getWatersIconHeight());
+      Math.max(MIN_ROW_HEIGHT, IconAndFontLoader.getWatersIconSize());
     setRowHeight(height);
     setShowsRootHandles(true);
     setAutoscrolls(true);
