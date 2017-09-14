@@ -104,7 +104,6 @@ public final class Config
     //   GENERAL_LOG
     //   GENERAL_FILE
     //   GENERAL_COMM
-    //   GENERAL_COMM_XMLRPC
     //   GENERAL_SOFTPLC
     //   GUI
     //   GUI_EDITOR
@@ -119,12 +118,6 @@ public final class Config
     //   ALGORITHMS_BDD
     //   ALGORITHMS_HMI
     //   MISC
-
-    // GENERAL_COMM_XMLRPC
-    public static final BooleanProperty XML_RPC_ACTIVE = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcActive", false, "XML-RPC Active");
-    public static final IntegerProperty XML_RPC_PORT = new IntegerProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcPort", 9112, "XML-RPC Port", false, 0);
-    public static final ObjectProperty<String> XML_RPC_FILTER = new ObjectProperty<String>(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcFilter", "127.0.0.1", "XML-RPC Filter");
-    public static final BooleanProperty XML_RPC_DEBUG = new BooleanProperty(PropertyType.GENERAL_COMM_XMLRPC, "xmlRpcDebug", false, "XML-RPC Debug");
 
     // GUI_DOT
     public static final BooleanProperty DOT_USE = new BooleanProperty(PropertyType.GUI_DOT, "dotUse", true, "Use Dot");

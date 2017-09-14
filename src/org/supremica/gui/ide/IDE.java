@@ -66,7 +66,6 @@ import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.supremica.automata.Project;
-import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.SupremicaLoggerFactory;
 import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;
@@ -156,16 +155,6 @@ public class IDE
            Runtime.getRuntime().freeMemory()/MB + "/" +
            Runtime.getRuntime().totalMemory()/MB + "/" +
            Runtime.getRuntime().maxMemory()/MB + " MB");
-    }
-    // Initialise XML_RPC
-    if (Config.XML_RPC_ACTIVE.isTrue()) {
-      try {
-        new Server(this, Config.XML_RPC_PORT.get());
-        info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
-      } catch (final Exception exception) {
-        warn("Another server already running on port " +
-             Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
-      }
     }
   }
 
@@ -520,7 +509,6 @@ public class IDE
   static
   {
     Locale.setDefault(Locale.ENGLISH);
-    Config.XML_RPC_ACTIVE.set(false);
     Config.DOT_USE.set(true);
     Config.LOG_TO_CONSOLE.set(false); // why?
     Config.LOG_TO_GUI.set(true);

@@ -77,7 +77,6 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.automata.IO.ProjectBuildFromXML;
-import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.help.ContentHelp;
 import org.supremica.gui.ide.IDEReportInterface;
 import org.supremica.log.Logger;
@@ -108,8 +107,6 @@ public class Supremica
     @SuppressWarnings("unused")
 	private MenuHandler menuHandler;
     private JSplitPane splitPaneVertical;
-    @SuppressWarnings("unused")
-	private Server xmlRpcServer = null;
     private ContentHelp help = null;
     @SuppressWarnings("unused")
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
@@ -136,27 +133,6 @@ public class Supremica
         // theVisualProjectContainer.addListener(this);
 
         logger.info("Supremica version: " + Version.getInstance().toString());
-
-        if (Config.XML_RPC_ACTIVE.isTrue())
-        {
-            boolean serverStarted = true;
-
-            try
-            {
-                xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
-            }
-            catch (final Exception e)
-            {
-                serverStarted = false;
-
-                logger.warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
-            }
-
-            if (serverStarted)
-            {
-                logger.info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
-            }
-        }
 
         layout = new BorderLayout();
         fullTableModel = getActiveProject().getFullTableModel();

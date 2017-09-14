@@ -60,7 +60,6 @@ public enum PropertyType
     GENERAL_LOG,
     GENERAL_FILE,
     GENERAL_COMM,
-    GENERAL_COMM_XMLRPC,
     GENERAL_SOFTPLC,
     GUI,
     GUI_EDITOR,
