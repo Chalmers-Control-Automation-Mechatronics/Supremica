@@ -165,13 +165,16 @@ public class IntegerProperty
         return mTick;
     }
 
-    public void set(final int value)
+    public boolean set(final int value)
     {
       if (mValue != value) {
         checkValid(value);
         final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
+        return true;
+      } else {
+        return false;
       }
     }
 

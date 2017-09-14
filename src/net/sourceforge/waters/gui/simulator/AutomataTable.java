@@ -64,24 +64,26 @@ class AutomataTable extends JTable
     super(new AutomataTableModel(sim, desktop));
     mSimulation = sim;
     mDesktop = desktop;
-    final int height =
-      Math.max(AUTOMATA_TABLE_MINHEIGHT, IconAndFontLoader.getWatersIconHeight());
-    setRowHeight(height);
+    final int iconHeight = IconAndFontLoader.getWatersIconHeight() + 3;
+    setRowHeight(iconHeight);
     final TableCellRenderer textrenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textrenderer);
     final TableCellRenderer iconrenderer = new IconCellRenderer();
     setDefaultRenderer(ImageIcon.class, iconrenderer);
     setDefaultRenderer(Icon.class, iconrenderer);
-    final TableColumnModel colmodel = getColumnModel();
-    if (colmodel.getColumnCount() != 0) {
-      colmodel.getColumn(0).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(0).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(1).setPreferredWidth(BROAD_WIDTH);
-      colmodel.getColumn(2).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(2).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(3).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(3).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(4).setPreferredWidth(BROAD_WIDTH);
+    final TableColumnModel colModel = getColumnModel();
+    if (colModel.getColumnCount() != 0) {
+      final double scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
+      final int narrowWidth = (int) Math.ceil(NARROW_WIDTH * scaleFactor);
+      final int broadWidth = (int) Math.ceil(BROAD_WIDTH * scaleFactor);
+      colModel.getColumn(0).setPreferredWidth(iconHeight);
+      colModel.getColumn(0).setMaxWidth(iconHeight);
+      colModel.getColumn(1).setPreferredWidth(broadWidth);
+      colModel.getColumn(2).setPreferredWidth(narrowWidth);
+      colModel.getColumn(2).setMaxWidth(narrowWidth);
+      colModel.getColumn(3).setPreferredWidth(narrowWidth);
+      colModel.getColumn(3).setMaxWidth(narrowWidth);
+      colModel.getColumn(4).setPreferredWidth(broadWidth);
     }
     addMouseListener(new AutomatonMouseListener());
     getTableHeader().setReorderingAllowed(false);
@@ -90,7 +92,7 @@ class AutomataTable extends JTable
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
     mPopupFactory = new SimulatorPopupFactory(sim);
-    this.addMouseMotionListener(new MouseMotionListener(){
+    this.addMouseMotionListener(new MouseMotionListener() {
       @Override
       public void mouseDragged(final MouseEvent e)
       {
@@ -260,11 +262,9 @@ class AutomataTable extends JTable
   //# Class Constants
   private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
 
-  private static final int AUTOMATA_TABLE_MINHEIGHT = 20;
-
   // Arbitrary value: Any value will work,
   // but this is close to the 'normal' value
-  private static final int DUMMY_WIDTH = 245;
+  private static final int DUMMY_WIDTH = 280;
   private static final int NARROW_WIDTH = DUMMY_WIDTH / 10;
   private static final int BROAD_WIDTH = 35 * DUMMY_WIDTH / 100;
 

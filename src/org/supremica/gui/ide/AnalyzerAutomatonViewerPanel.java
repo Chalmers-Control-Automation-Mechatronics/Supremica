@@ -37,11 +37,11 @@ package org.supremica.gui.ide;
 
 import java.awt.Dimension;
 
-import org.supremica.gui.WhiteScrollPane;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.gui.DotBuilder;
 import org.supremica.gui.DotBuilderGraphObserver;
-import org.supremica.automata.IO.AutomatonToDot;
-import org.supremica.automata.Automaton;
+import org.supremica.gui.WhiteScrollPane;
 
 import att.grappa.Graph;
 import att.grappa.GrappaPanel;
@@ -52,25 +52,25 @@ class AnalyzerAutomatonViewerPanel
 {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-    private Automaton theAutomaton;
+    private final String name;
+    private final Automaton theAutomaton;
     private GrappaPanel viewerPanel = null;
 
-    AnalyzerAutomatonViewerPanel(String name, Automaton theAutomaton)
+    AnalyzerAutomatonViewerPanel(final String name, final Automaton theAutomaton)
     {
         this.name = name;
         this.theAutomaton = theAutomaton;
-        setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
-        setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         build();
     }
 
+    @Override
     public String getName()
     {
         return name;
     }
 
-    public void setPreferredSize(Dimension dimension)
+    @Override
+    public void setPreferredSize(final Dimension dimension)
     {
         super.setPreferredSize(dimension);
         if (viewerPanel != null)
@@ -79,7 +79,8 @@ class AnalyzerAutomatonViewerPanel
         }
     }
 
-    public void setMinimumSize(Dimension dimension)
+    @Override
+    public void setMinimumSize(final Dimension dimension)
     {
         super.setMinimumSize(dimension);
         if (viewerPanel != null)
@@ -93,7 +94,8 @@ class AnalyzerAutomatonViewerPanel
         DotBuilder.getDotBuilder(null, this, new AutomatonToDot(theAutomaton), "");
     }
 
-    public void setGraph(Graph theGraph)
+    @Override
+    public void setGraph(final Graph theGraph)
     {
         viewerPanel = new GrappaPanel(theGraph);
         viewerPanel.setScaleToFit(false);

@@ -47,7 +47,6 @@ import javax.swing.table.JTableHeader;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 import org.supremica.gui.WhiteScrollPane;
-import org.supremica.gui.ide.IDEDimensions;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -66,8 +65,6 @@ public class SimulatorPanel
     mModuleContainer = moduleContainer;
     setupDesktop();
     mTabbedPane = new JTabbedPane();
-    mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-    mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     setupAutomata();
     setupEvents();
     setupTrace();
@@ -93,8 +90,6 @@ public class SimulatorPanel
   private void setupDesktop()
   {
     mDesktop = new AutomatonDesktopPane(mModuleContainer, mSimulation);
-    mDesktop.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
-    mDesktop.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
     setRightComponent(mDesktop);
   }
   public AutomatonDesktopPane getDesktop()
@@ -111,6 +106,7 @@ public class SimulatorPanel
     final JPanel buttonPanel = new JPanel();
     mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
     final WhiteScrollPane pane = new WhiteScrollPane(mAutomataTable);
+    pane.setPreferredSize(mAutomataTable.getPreferredSize());
     mTabbedPane.addTab("Automata", pane);
   }
 

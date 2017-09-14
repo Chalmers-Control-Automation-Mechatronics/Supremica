@@ -36,6 +36,10 @@
 package org.supremica.gui.ide;
 
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -97,8 +101,6 @@ public class EditorPanel
     mTabMap = new HashMap<SelectionOwner,Tab>();
 
     mTabbedPane = new JTabbedPane();
-    mTabbedPane.setPreferredSize(IDEDimensions.leftEditorPreferredSize);
-    mTabbedPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     mTabbedPane.addChangeListener(this);
     setLeftComponent(mTabbedPane);
 
@@ -123,6 +125,7 @@ public class EditorPanel
     mComponentsTab.addToTabbedPane();
     mComponentsTab.activate();
     mTabMap.put(compPanel, mComponentsTab);
+    estimateMinimumWidth(mTabbedPane, 1.2f);
     mLastFocusOwner = compPanel;
 
     mCommentPanel = new CommentPanel(moduleContainer);
@@ -330,7 +333,7 @@ public class EditorPanel
   }
 
   //#########################################################################
-  //#
+  //# Overrides for org.supremica.gui.ide.MainPanel
   @Override
   protected boolean setRightComponent(final JComponent newComponent)
   {
@@ -359,6 +362,25 @@ public class EditorPanel
     return mModuleContainer.getIDE().getActions();
   }
 
+  private void estimateMinimumWidth(final JTabbedPane tabbedPane,
+                                      final float scale)
+  {
+    final StringBuilder builder = new StringBuilder("  ");
+    for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+      final Component tab = tabbedPane.getComponentAt(i);
+      builder.append(tab.getName());
+      builder.append("  ");
+    }
+    final BufferedImage img =
+      new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D g2d = img.createGraphics();
+    final FontMetrics fm = g2d.getFontMetrics(tabbedPane.getFont());
+    final int width = fm.stringWidth(builder.toString());
+    g2d.dispose();
+    final Dimension size = new Dimension((int) Math.ceil(width * scale), 0);
+    tabbedPane.setMinimumSize(size);
+  }
+
 
   //#########################################################################
   //# Inner Class Tab
@@ -371,9 +393,6 @@ public class EditorPanel
       mPanel = panel;
       mScrollPane = new JScrollPane(panel);
       mScrollPane.setName(name);
-      mScrollPane.setPreferredSize
-      (IDEDimensions.leftEditorPreferredSize);
-      mScrollPane.setMinimumSize(IDEDimensions.leftEditorMinimumSize);
     }
 
     //#######################################################################
@@ -389,15 +408,18 @@ public class EditorPanel
       FocusTracker.requestFocusFor(mPanel);
     }
 
-    private void addToTabbedPane(){
+    private void addToTabbedPane()
+    {
       mTabbedPane.add(mScrollPane);
     }
 
-    private void addToTabbedPane(final int index){
+    private void addToTabbedPane(final int index)
+    {
       mTabbedPane.add(mScrollPane, index);
     }
 
-    private void removeFromTabbedPane(){
+    private void removeFromTabbedPane()
+    {
       mTabbedPane.remove(mScrollPane);
     }
 

@@ -35,7 +35,6 @@
 
 package org.supremica.gui.ide;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -68,9 +67,6 @@ public abstract class MainPanel extends JPanel
   {
     mName = name;
 
-    setPreferredSize(IDEDimensions.mainPanelPreferredSize);
-    setMinimumSize(IDEDimensions.mainPanelMinimumSize);
-
     final GridBagLayout gridbag = new GridBagLayout();
     setLayout(gridbag);
     final GridBagConstraints constraints = new GridBagConstraints();
@@ -83,14 +79,11 @@ public abstract class MainPanel extends JPanel
     mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false);
     mSplitPane.setOneTouchExpandable(false);
     mSplitPane.setOneTouchExpandable(false);
-    mSplitPane.setDividerLocation(0.2);
     mSplitPane.setResizeWeight(0.0);
     gridbag.setConstraints(mSplitPane, constraints);
     add(mSplitPane);
 
     mEmptyRightPanel = new WhiteScrollPane();
-    mEmptyRightPanel.setPreferredSize(IDEDimensions.rightEmptyPreferredSize);
-    mEmptyRightPanel.setMinimumSize(IDEDimensions.rightEmptyMinimumSize);
   }
 
 
@@ -104,29 +97,21 @@ public abstract class MainPanel extends JPanel
 
   protected void setLeftComponent(final JComponent newComponent)
   {
-    mSplitPane.setLeftComponent(newComponent);
+    if (newComponent != mSplitPane.getLeftComponent()) {
+      final int dividerLocation = mSplitPane.getDividerLocation();
+      mSplitPane.setLeftComponent(newComponent);
+      mSplitPane.setDividerLocation(dividerLocation);
+    }
   }
 
-  protected boolean setRightComponent(final JComponent newComponent)
+  protected boolean setRightComponent(JComponent newComponent)
   {
-    final JComponent oldComponent = getRightComponent();
-    if (oldComponent != newComponent) {
-      final JScrollPane emptyRightPanel = getEmptyRightPanel();
+    if (newComponent != getRightComponent()) {
       final int dividerLocation = mSplitPane.getDividerLocation();
-      Dimension oldSize = emptyRightPanel.getSize();
-
-      if (oldComponent != null) {
-        mSplitPane.remove(oldComponent);
-        oldSize = oldComponent.getSize();
+      if (newComponent == null) {
+        newComponent = getEmptyRightPanel();
       }
-
-      if (newComponent == null || newComponent == getEmptyRightPanel()) {
-        emptyRightPanel.setPreferredSize(oldSize);
-        mSplitPane.setRightComponent(emptyRightPanel);
-      } else {
-        newComponent.setPreferredSize(oldSize);
-        mSplitPane.setRightComponent(newComponent);
-      }
+      mSplitPane.setRightComponent(newComponent);
       mSplitPane.setDividerLocation(dividerLocation);
       validate();
       return true;

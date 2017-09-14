@@ -35,32 +35,41 @@
 
 package org.supremica.gui.ide;
 
+import java.awt.Dimension;
+
 import org.supremica.gui.LogDisplay;
 import org.supremica.gui.WhiteScrollPane;
 
 
-class LogPanel
-    extends WhiteScrollPane
+/**
+ * The log panel at the bottom of the IDE. This is a scroll pane displaying a
+ * {@link LogDisplay}. Its only functionality is to calculate a preferred and
+ * minimum size from its font.
+ *
+ * @author Knut &Aring;kesson, Robi Malik
+ */
+
+class LogPanel extends WhiteScrollPane
 {
-    private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
-	private IDE ide;
-    private String title;
+  //#########################################################################
+  //# Constructor
+  LogPanel()
+  {
+    super(LogDisplay.getInstance().getComponentWithoutScrollPane());
+    final int lineHeight = getFont().getSize();
+    final Dimension minimum = new Dimension(0, MINIMUM_LINES * lineHeight);
+    setMinimumSize(minimum);
+    final Dimension preferred = new Dimension(0, PREFERRED_LINES * lineHeight);
+    setPreferredSize(preferred);
+  }
 
-    LogPanel(IDE ide, String title)
-    {
-        super(LogDisplay.getInstance().getComponentWithoutScrollPane());
-        this.ide = ide;
-        this.title = title;
-        setPreferredSize(IDEDimensions.loggerPreferredSize);
-        setMinimumSize(IDEDimensions.loggerMinimumSize);
-        updateUI();
-    }
 
-    public String getTitle()
-    {
-        return title;
-    }
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 6710717785707492460L;
+
+  private static final int MINIMUM_LINES = 1;
+  private static final int PREFERRED_LINES = 3;
 
 }

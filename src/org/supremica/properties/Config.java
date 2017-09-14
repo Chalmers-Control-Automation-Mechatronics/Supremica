@@ -179,6 +179,19 @@ public final class Config
     public static final ObjectProperty<String> SOFTPLC_INTERFACES = new ObjectProperty<String>(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
 
     // GUI
+    public static IntegerProperty GUI_IDE_WIDTH =
+      new IntegerProperty(PropertyType.GUI, "ideFrameWidth",
+                          1024, "Width at which IDE opens", false, 0);
+    public static IntegerProperty GUI_IDE_HEIGHT =
+      new IntegerProperty(PropertyType.GUI, "ideFrameHeight",
+                          768, "Height at which IDE opens", false, 0);
+    public static IntegerProperty GUI_IDE_XPOS =
+      new IntegerProperty(PropertyType.GUI, "ideFrameX",
+                          0, "X position at which IDE opens", false, 0);
+    public static IntegerProperty GUI_IDE_YPOS =
+      new IntegerProperty(PropertyType.GUI, "ideFrameY",
+                          0, "Y position at which IDE opens", false, 0);
+
     public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
     public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
     public static final BooleanProperty INCLUDE_SOCEDITOR = new BooleanProperty(PropertyType.GUI, "includeSOCEditor", true, "Include SOC editor");

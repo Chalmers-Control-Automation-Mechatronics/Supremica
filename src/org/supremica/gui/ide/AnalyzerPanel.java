@@ -67,19 +67,14 @@ public class AnalyzerPanel
 
     private final DocumentContainer mDocumentContainer;
     private final VisualProject mVisualProject = new VisualProject();
-	
+
     public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
-        setPreferredSize(IDEDimensions.mainPanelPreferredSize);
-        setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
         mDocumentContainer = moduleContainer;
 
         automataPanel = new AnalyzerAutomataPanel(this, moduleContainer);
-        automataPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
-        automataPanel.setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-
         automatonViewerPanel = getEmptyRightPanel();
 		setLeftComponent(automataPanel);
 		setRightComponent(automatonViewerPanel);

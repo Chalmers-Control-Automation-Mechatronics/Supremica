@@ -35,6 +35,7 @@
 
 package org.supremica.gui.ide;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -82,15 +83,17 @@ public class AnalyzerAutomataPanel
     public static int TABLE_EVENTS_COLUMN = 3;
     public static int TABLE_TRANSITIONS_COLUMN = 4;
 
+    private static final float PREFERRED_WIDTH = 0.4f;
+
     AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
     {
-        this.analyzerPanel = analyzerPanel;
-        this.moduleContainer = moduleContainer;
-
-        setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
-        setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-        initialize();
-        //validate();
+      this.analyzerPanel = analyzerPanel;
+      this.moduleContainer = moduleContainer;
+      initialize();
+      final int width =
+        Math.round(PREFERRED_WIDTH * Config.GUI_IDE_WIDTH.get());
+      final Dimension size = new Dimension(width, 0);
+      setPreferredSize(size);
     }
 
     private void initialize()

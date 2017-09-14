@@ -76,195 +76,250 @@ import org.supremica.util.BDD.Options;
 
 
 /**
- * Properties for Supremica.
- * All properties are added in the Config class.
+ * Properties for Supremica. All properties are added in the Config class.
  *
  * @author Knut &Aring;kesson
  */
 
 public final class SupremicaProperties
 {
-    private SupremicaProperties()
-    {
-    }
+  private SupremicaProperties()
+  {
+  }
 
-    public static String getProperties()
-    {
-        final StringBuilder sb = new StringBuilder();
-        for (final Property property : Property.getAllProperties())
-		{
-            sb.append("# ").append(property.getComment()).append("\n");
-            sb.append(property.toString()).append("\n\n");
+  public static String getProperties()
+  {
+    final StringBuilder sb = new StringBuilder();
+    for (final Property property : Property.getAllProperties()) {
+      sb.append("# ").append(property.getComment()).append("\n");
+      sb.append(property.toString()).append("\n\n");
+    }
+    return sb.toString();
+
+  }
+
+  public static void loadProperties(final File theFile)
+    throws FileNotFoundException, IOException
+  {
+    propertyFile = theFile; // this is the file we load properties from, it should also be the one to save to
+    updateProperties(propertyFile);
+  }
+
+  /**
+   * Load properties from file.
+   */
+  private static void updateProperties(final File propertyFile)
+    throws FileNotFoundException, IOException
+  {
+    final Properties propertiesFromFile = buildProperties(propertyFile);
+    for (final Enumeration<?> e = propertiesFromFile.keys(); e
+      .hasMoreElements();) {
+      final String newKey = (String) e.nextElement();
+      final String newValue = propertiesFromFile.getProperty(newKey);
+
+      final Property orgProperty = Property.getProperty(newKey);
+      if (orgProperty == null) {
+        System.err.println("Unknown property: " + newKey);
+      } else {
+        try {
+          orgProperty.set(newValue);
+        } catch (final IllegalArgumentException ex) {
+          System.err.println("Invalid argument to key: " + newKey);
         }
-        return sb.toString();
-
+      }
     }
 
-    public static void loadProperties(final File theFile)
-        throws FileNotFoundException, IOException
-    {
-        propertyFile = theFile;	// this is the file we load properties from, it should also be the one to save to
-        updateProperties(propertyFile);
-    }
+    // Update values in BDD.Options based on the current Config.
+    updateBDDOptions(false);
+  }
 
-    /**
-     * Load properties from file.
-     */
-    private static void updateProperties(final File propertyFile)
+  /**
+   * Saves all properties to the configuration file after two seconds, unless
+   * this method is called again before. If the method is called before two
+   * seconds have elapsed, the save is delayed for two seconds again. This is
+   * used to avoid frequent file access when properties are changed rapidly,
+   * e.g., while resizing a window.
+   */
+  public static void savePropertiesLater()
+  {
+    if (propertyFile != null) {
+      if (mSaverThread == null) {
+        mSaverThread = new SaverThread();
+        mSaverThread.start();
+      } else {
+        mSaverThread.waitLonger();
+      }
+    }
+  }
+
+  public static void saveProperties() throws IOException
+  {
+    SupremicaProperties.saveProperties(false);
+  }
+
+  public static void saveProperties(final boolean saveAll) throws IOException
+  {
+    if (propertyFile != null) {
+      saveProperties(propertyFile, saveAll);
+    } else {
+      System.err
+        .println("No configuration file to write to, was not specified (by -p) on startup");
+    }
+  }
+
+  /**
+   * Save the property list to the configuration file.
+   *
+   * @param propertyFile
+   *          is the name of the config file
+   * @param saveAll
+   *          if this is true all mutable properties are saved to file
+   *          otherwise only those properties that values different from the
+   *          default value is saved.
+   */
+  private static void saveProperties(final File propertyFile,
+                                     final boolean saveAll)
     throws FileNotFoundException, IOException
-    {
-        final Properties propertiesFromFile = buildProperties(propertyFile);
-        for (final Enumeration<?> e = propertiesFromFile.keys(); e.hasMoreElements(); )
-        {
-            final String newKey = (String)e.nextElement();
-            final String newValue = propertiesFromFile.getProperty(newKey);
+  {
+    // Update config from the current values in BDD.Options
+    // (WHY!!? IT SHOULD BE THE OTHER WAY AROUND OR THEY ARE LOST?! /hguo)
+    //updateBDDOptions(true);    // first sync from BDD options
+    updateBDDOptions(false); // Send the new Config values to BDD.Options
 
-            final Property orgProperty = Property.getProperty(newKey);
-            if (orgProperty == null)
-            {
-                System.err.println("Unknown property: " + newKey);
-            }
-            else
-            {
-                try
-                {
-                    orgProperty.set(newValue);
-                }
-                catch (final IllegalArgumentException ex)
-                {
-                    System.err.println("Invalid argument to key: " + newKey);
-                }
-            }
+    try (final OutputStream os = new FileOutputStream(propertyFile)) {
+      final BufferedWriter writer =
+        new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
+      writer.write("# Supremica configuration file\n");
+      writer.write("# Created: " + new Date().toString() + "\n\n");
+
+      for (final Property property : Property.getAllProperties()) {
+        if (saveAll || property.currentValueDifferentFromDefaultValue()) {
+          writer.append("# " + property.getComment() + "\n");
+          writer.append(property.getPropertyType() + "." + property.getKey()
+                        + " " + property.valueToEscapedString() + "\n\n");
         }
+      }
 
-        // Update values in BDD.Options based on the current Config.
-        updateBDDOptions(false);
+      writer.flush();
     }
+  }
 
-    public static void saveProperties()
+  private static Properties buildProperties(final File theFile)
     throws FileNotFoundException, IOException
-    {
-        SupremicaProperties.saveProperties(false);
-    }
+  {
+    final FileInputStream theStream = new FileInputStream(theFile);
+    return buildProperties(new BufferedInputStream(theStream));
+  }
 
-
-    public static void saveProperties(final boolean saveAll)
-    throws FileNotFoundException, IOException
-    {
-        if (propertyFile != null)
-        {
-            saveProperties(propertyFile, saveAll);
-        }
-        else
-        {
-            System.err.println("No configuration file to write to, was not specified (by -p) on startup");
-        }
-    }
-
-    /**
-     * Save the property list to the configuration file.
-     *
-     * @param propertyFile is the name of the config file
-     * @param saveAll if this is true all mutable properties are saved to file
-     * otherwise only those properties that values different from the default value is saved.
-     */
-    private static void saveProperties(final File propertyFile, final boolean saveAll)
-    throws FileNotFoundException, IOException
-    {
-        // Update config from the current values in BDD.Options
-        // (WHY!!? IT SHOULD BE THE OTHER WAY AROUND OR THEY ARE LOST?! /hguo)
-        //updateBDDOptions(true);    // first sync from BDD options
-        updateBDDOptions(false);    // Send the new Config values to BDD.Options
-
-		try (final OutputStream os = new FileOutputStream(propertyFile))
-		{
-			final BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "8859_1"));
-			writer.write("# Supremica configuration file\n");
-			writer.write("# Created: " + new Date().toString() + "\n\n");
-
-			for (final Property property : Property.getAllProperties())
-			{
-				if (saveAll ||
-					property.currentValueDifferentFromDefaultValue())
-				{
-					writer.append("# " + property.getComment() + "\n");
-					writer.append(property.getPropertyType() + "." +
-						property.getKey() + " " +
-						property.valueToEscapedString() + "\n\n");
-				}
-			}
-
-			writer.flush();
-		}
-    }
-
-    private static Properties buildProperties(final File theFile)
-    throws FileNotFoundException, IOException
-    {
-        final FileInputStream theStream = new FileInputStream(theFile);
-        return buildProperties(new BufferedInputStream(theStream));
-    }
-
-    private static Properties buildProperties(final InputStream inStream)
+  private static Properties buildProperties(final InputStream inStream)
     throws IOException
+  {
+    final Properties newProperties = new Properties();
+    newProperties.load(inStream);
+    return newProperties;
+  }
+
+  /*
+   * The problem is that we got two copies of BDD Options. This will make sure
+   * they are both updated
+   *
+   * TO DO: Rewrite the Option code in the BDD Package to support the new
+   * style property handling.
+   */
+  public static void updateBDDOptions(final boolean from_Options)
+  {
+    if (from_Options) {
+      // Options -> Config
+      Config.BDD_ORDER_ALGO
+        .set(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
+      Config.BDD_DEBUG_ON.set(Options.debug_on);
+      Config.BDD_PROFILE_ON.set(Options.profile_on);
+    } else {
+      // Config -> Options
+      Options.ordering_algorithm = indexOf(Config.BDD_ORDER_ALGO.get(),
+                                           Options.ORDERING_ALGORITHM_NAMES);
+      Options.debug_on = Config.BDD_DEBUG_ON.get();
+      Options.profile_on = Config.BDD_PROFILE_ON.get();
+    }
+  }
+
+  /**
+   * Returns the index of object in objects. For the BDD options.
+   */
+  private static int indexOf(final Object object, final Object[] objects)
+  {
+    for (int i = 0; i < objects.length; i++) {
+      if (object.equals(objects[i]))
+        return i;
+    }
+    return -1;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SaverThread
+  private static class SaverThread extends Thread
+  {
+    //#######################################################################
+    //# Constructor
+    private SaverThread()
     {
-        final Properties newProperties = new Properties();
-        newProperties.load(inStream);
-        return newProperties;
+      waitLonger();
     }
 
-    /*
-     * The problem is that we got two copies of BDD Options.
-     * This will make sure they are both updated
-     *
-     * TO DO: Rewrite the Option code in the BDD Package to
-     * support the new style property handling.
-     */
-    public static void updateBDDOptions(final boolean from_Options)
+    //#######################################################################
+    //# Invocation
+    private void waitLonger()
     {
-        if (from_Options)
-        {
-            // Options -> Config
-            Config.BDD_ORDER_ALGO.set(Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm]);
-            Config.BDD_DEBUG_ON.set(Options.debug_on);
-            Config.BDD_PROFILE_ON.set(Options.profile_on);
+      mSaveTime = System.currentTimeMillis() + SAVE_DELAY;
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Runnable
+    @Override
+    public void run()
+    {
+      long current = System.currentTimeMillis();
+      while (current < mSaveTime) {
+        try {
+          Thread.sleep(mSaveTime - current);
+          current = System.currentTimeMillis();
+        } catch (final InterruptedException exception) {
+          break;
         }
-        else
-        {
-            // Config -> Options
-            Options.ordering_algorithm = indexOf(Config.BDD_ORDER_ALGO.get(), Options.ORDERING_ALGORITHM_NAMES);
-            Options.debug_on = Config.BDD_DEBUG_ON.get();
-            Options.profile_on = Config.BDD_PROFILE_ON.get();
-        }
+      }
+      mSaverThread = null;
+      try {
+        saveProperties(false);
+      } catch (final IOException exception) {
+        // Could not save --- never mind ...
+      }
     }
 
-    /**
-     * Returns the index of object in objects. For the BDD options.
-     */
-    private static int indexOf(final Object object, final Object[] objects)
-    {
-        for (int i = 0; i < objects.length; i++)
-        {
-            if (object.equals(objects[i]))
-                return i;
-        }
-        return -1;
-    }
+    //#######################################################################
+    //# Data Members
+    private long mSaveTime;
+  }
 
-    private final static SupremicaProperties supremicaProperties;
-    @SuppressWarnings("unused")
-	private final static Config config = Config.getInstance();
-    private static File propertyFile = null;	// Set by loadProperties
 
-    static
-    {
-        supremicaProperties = new SupremicaProperties();
-        // Update values in BDD.Options based on Config.
-        updateBDDOptions(false);
-    }
+  //#########################################################################
+  //# Static Variables
+  private static File propertyFile = null; // Set by loadProperties
+  private static SaverThread mSaverThread;
 
-    public static void main(final String[] args)
-    {
-        System.out.println(supremicaProperties.toString());
-    }
+
+  //#########################################################################
+  //# Class Constants
+  private static final long SAVE_DELAY = 2000;
+  @SuppressWarnings("unused")
+  private final static Config CONFIG = Config.getInstance();
+
+
+  //#########################################################################
+  //# Static Initialiser
+  static {
+    // Update values in BDD.Options based on Config.
+    updateBDDOptions(false);
+  }
+
 }

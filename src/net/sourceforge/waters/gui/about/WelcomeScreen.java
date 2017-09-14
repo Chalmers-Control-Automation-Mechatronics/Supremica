@@ -122,6 +122,7 @@ public class WelcomeScreen
     removeAll();
     createContents();
     revalidate();
+    repaint();
   }
 
   @Override
@@ -153,6 +154,7 @@ public class WelcomeScreen
     removeAll();
     createContents();
     revalidate();
+    repaint();
   }
 
 
@@ -164,8 +166,9 @@ public class WelcomeScreen
     mAboutPanel = new AboutPanel(mIDE);
     final Border border = new AboutBoxBorder();
     mAboutPanel.setBorder(border);
-    final int scaledWidth =
-      Math.round(TEXT_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+    final float maxWidth = IconAndFontLoader.GLOBAL_SCALE_FACTOR * MAX_WIDTH;
+    final float relativeWidth = RELATIVE_WIDTH* mIDE.getWidth();
+    final int scaledWidth = Math.round(Math.min(maxWidth, relativeWidth));
     mAboutPanel.setSize(scaledWidth, Integer.MAX_VALUE);
     final int textHeight = mAboutPanel.getPreferredSize().height;
     final Dimension size = new Dimension(scaledWidth, textHeight);
@@ -272,8 +275,9 @@ public class WelcomeScreen
   //#########################################################################
   //# Class Constants
   private static final int VERTICAL_SPACE = 24;
-  private static final int TEXT_WIDTH = 512;
   private static final int BORDER_WIDTH = 6;
+  private static final int MAX_WIDTH = 720;
+  private static final float RELATIVE_WIDTH = 0.625f;
 
   private static final ImageIcon LOGO_SUPREMICA =
     IconAndFontLoader.loadImage("greeter", "supremica");

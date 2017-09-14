@@ -37,7 +37,11 @@ package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.LinkedList;
@@ -67,12 +71,12 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 
 import org.supremica.automata.Project;
 import org.supremica.gui.SupremicaLoggerFactory;
-import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.log.Logger;
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ProcessCommandLineArguments;
 import org.xml.sax.SAXException;
 
@@ -88,8 +92,8 @@ import org.xml.sax.SAXException;
  */
 
 public class IDE
-    extends JFrame
-    implements IDEActionInterface, Observer, Subject
+  extends JFrame
+  implements IDEActionInterface, Observer, Subject, ComponentListener
 {
 
   //#########################################################################
@@ -118,7 +122,13 @@ public class IDE
     mModuleNameObserver = new ModuleNameObserver();
 
     // Create GUI
-    Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
+    final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.get(),
+                                         Config.GUI_IDE_HEIGHT.get());
+    setPreferredSize(size);
+    setLocation(Config.GUI_IDE_XPOS.get(), Config.GUI_IDE_YPOS.get());
+    final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
+    setIconImages(images);
+
     final BorderLayout layout = new BorderLayout();
     final JPanel contents = (JPanel) getContentPane();
     contents.setLayout(layout);
@@ -127,15 +137,15 @@ public class IDE
     mToolBar = new IDEToolBar(this);
     contents.add(mToolBar, BorderLayout.NORTH);
     mWelcomeScreen = new WelcomeScreen(this);
-    mWelcomeScreen.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
-    mLogPanel = new LogPanel(this, "Logger");
+    mLogPanel = new LogPanel();
     mSplitPaneVertical =
       new JSplitPane(JSplitPane.VERTICAL_SPLIT, mWelcomeScreen, mLogPanel);
     mSplitPaneVertical.setContinuousLayout(false);
     mSplitPaneVertical.setOneTouchExpandable(false);
-    mSplitPaneVertical.setDividerLocation(0.8);
     mSplitPaneVertical.setResizeWeight(1.0);
     contents.add(mSplitPaneVertical, BorderLayout.CENTER);
+    pack();
+    mSplitPaneVertical.setDividerLocation(0.9);
 
     final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
     mFileChooser = new JFileChooser(startdir);
@@ -143,6 +153,7 @@ public class IDE
     // Initialise document managers
     mDocumentContainerManager = new DocumentContainerManager(this);
     attach(this);
+    addComponentListener(this);
     updateWindowTitle();
 
     if (showVersion) {
@@ -238,12 +249,14 @@ public class IDE
     case CONTAINER_SWITCH:
       final DocumentContainer container =
         mDocumentContainerManager.getActiveContainer();
+      final int dividerLocation = mSplitPaneVertical.getDividerLocation();
       if (container == null) {
         mSplitPaneVertical.setTopComponent(mWelcomeScreen);
       } else {
         final Component panel = container.getPanel();
         mSplitPaneVertical.setTopComponent(panel);
       }
+      mSplitPaneVertical.setDividerLocation(dividerLocation);
       mModuleNameObserver.setModule(container);
       updateWindowTitle();
       break;
@@ -277,10 +290,42 @@ public class IDE
     // Just in case they try to register or unregister observers
     // in response to the update ...
     final List<Observer> copy = new LinkedList<Observer>(mObservers);
-    for (final Observer observer : copy)
-    {
+    for (final Observer observer : copy) {
       observer.update(event);
     }
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ComponentListener
+  @Override
+  public void componentResized(final ComponentEvent event)
+  {
+    final boolean changedWidth = Config.GUI_IDE_WIDTH.set(getWidth());
+    final boolean changedHeight = Config.GUI_IDE_HEIGHT.set(getHeight());
+    if (changedWidth || changedHeight) {
+      SupremicaProperties.savePropertiesLater();
+    }
+  }
+
+  @Override
+  public void componentMoved(final ComponentEvent event)
+  {
+    final boolean changedX = Config.GUI_IDE_XPOS.set(getX());
+    final boolean changedY = Config.GUI_IDE_YPOS.set(getY());
+    if (changedX || changedY) {
+      SupremicaProperties.savePropertiesLater();
+    }
+  }
+
+  @Override
+  public void componentShown(final ComponentEvent event)
+  {
+  }
+
+  @Override
+  public void componentHidden(final ComponentEvent event)
+  {
   }
 
 
@@ -504,13 +549,10 @@ public class IDE
 
   //#########################################################################
   //# Static Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -3896438636773221026L;
 
-  static
-  {
+  static {
     Locale.setDefault(Locale.ENGLISH);
-    Config.DOT_USE.set(true);
-    Config.LOG_TO_CONSOLE.set(false); // why?
-    Config.LOG_TO_GUI.set(true);
   }
+
 }
