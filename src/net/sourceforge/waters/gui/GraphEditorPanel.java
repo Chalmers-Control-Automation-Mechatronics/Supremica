@@ -268,12 +268,13 @@ public class GraphEditorPanel
    */
   public Point getPastePosition()
   {
-    final Point point;
+    Point point;
     if (mCurrentPoint == null) {
       final Rectangle rect = getVisibleRect();
       final int x = rect.x + (rect.width >> 1);
       final int y = rect.y + (rect.height >> 1);
       point = new Point(x, y);
+      point = applyInverseTransform(point);
     } else {
       point = mCurrentPoint;
     }
