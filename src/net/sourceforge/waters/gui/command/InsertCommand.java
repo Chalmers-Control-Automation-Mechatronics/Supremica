@@ -158,19 +158,23 @@ public class InsertCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public void execute()
   {
     final SelectionOwner panel = getPanel();
     panel.insertItems(mInserts);
     if (getUpdatesSelection()) {
-      showAutomaton();
+      final boolean shown = showAutomaton();
       final List<ProxySubject> selection = getSelectionAfterInsert(mInserts);
       panel.replaceSelection(selection);
       panel.scrollToVisible(selection);
-      panel.activate();
+      if (!shown) {
+        panel.activate();
+      }
     }
   }
 
+  @Override
   public void undo()
   {
     final List<Proxy> selection;
@@ -224,23 +228,24 @@ public class InsertCommand
    * <LI>The command is executed for the first time (no redo).</LI>
    * <LI>The list of inserted items contains a single automaton.</LI>
    * </UL>
+   * @return <CODE>true</CODE> if an automaton has been displayed.
    */
-  private void showAutomaton()
+  private boolean showAutomaton()
   {
     if (mRoot == null || mHasBeenExecuted) {
-      return;
+      return false;
     }
     mHasBeenExecuted = true;
     if (mInserts.size() != 1) {
-      return;
+      return false;
     }
     final InsertInfo info = mInserts.get(0);
     if (!(info.getProxy() instanceof SimpleComponentProxy)) {
-      return;
+      return false;
     }
     final Object inspos = info.getInsertPosition();
     if (!(inspos instanceof ListInsertPosition)) {
-      return;
+      return false;
     }
     try {
       final ListInsertPosition linspos = (ListInsertPosition) inspos;
@@ -249,6 +254,7 @@ public class InsertCommand
       final SimpleComponentSubject subject =
         (SimpleComponentSubject) list.get(pos);
       mRoot.showEditor(subject);
+      return true;
     } catch (final GeometryAbsentException exception) {
       throw new WatersRuntimeException(exception);
     }

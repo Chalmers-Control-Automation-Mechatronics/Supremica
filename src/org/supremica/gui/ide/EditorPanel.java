@@ -51,6 +51,7 @@ import net.sourceforge.waters.gui.AliasesPanel;
 import net.sourceforge.waters.gui.ComponentsTree;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.EventDeclListView;
+import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -240,6 +241,8 @@ public class EditorPanel
     final ComponentEditorPanel panel =
       mModuleContainer.createComponentEditorPanel(comp);
     setRightComponent(panel);
+    final GraphEditorPanel surface = panel.getGraphEditorPanel();
+    FocusTracker.requestFocusFor(surface);
     return panel;
   }
 
