@@ -122,7 +122,9 @@ public final class Config
     // GUI_DOT
     public static final BooleanProperty DOT_USE = new BooleanProperty(PropertyType.GUI_DOT, "dotUse", true, "Use Dot");
     public static final ObjectProperty<String> DOT_EXECUTE_COMMAND = new ObjectProperty<String>(PropertyType.GUI_DOT, "dotExecuteCommand", "dot", "Dot command");
-    public static final IntegerProperty DOT_MAX_NBR_OF_STATES = new IntegerProperty(PropertyType.GUI_DOT, "dotMaxNbrOfStatesWithoutWarning", 100, "Max number of states without warning", false, 0);
+    public static final IntegerProperty DOT_MAX_NBR_OF_STATES =
+      new IntegerProperty(PropertyType.GUI_DOT, "dotMaxNbrOfStatesWithoutWarning",
+                          100, "Max number of states without warning", true, 0);
     public static final BooleanProperty DOT_LEFT_TO_RIGHT = new BooleanProperty(PropertyType.GUI_DOT, "dotLeftToRight", false, "Layout from left to right, otherwise from top to bottom");
     public static final BooleanProperty DOT_WITH_STATE_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotWithStateLabels", true, "Draw state names");
     public static final BooleanProperty DOT_WITH_EVENT_LABELS = new BooleanProperty(PropertyType.GUI_DOT, "dotWithEventLabels", true, "Draw event labels");
@@ -171,7 +173,9 @@ public final class Config
 
     // GENERAL_SOFTPLC
     public static final BooleanProperty INCLUDE_SOFTPLC = new BooleanProperty(PropertyType.GENERAL_SOFTPLC, "includeSoftPLC", false, "Include soft PLC");
-    public static final IntegerProperty SOFTPLC_CYCLE_TIME = new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40, "SoftPLC Cycle time (ms)", false, 1);
+    public static final IntegerProperty SOFTPLC_CYCLE_TIME =
+      new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40,
+                          "SoftPLC Cycle time (ms)", true, 1);
     public static final ObjectProperty<String> SOFTPLC_INTERFACES = new ObjectProperty<String>(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
 
     // GUI
@@ -217,13 +221,13 @@ public final class Config
                           true, "Show grid");
     public static final IntegerProperty GUI_EDITOR_GRID_SIZE =
       new IntegerProperty(PropertyType.GUI_EDITOR, "gridSize",
-                          16, "Grid size", false, 4, 64, 4);
+                          16, "Grid size", true, 4, 64, 4);
     public static final BooleanProperty GUI_EDITOR_NODES_SNAP_TO_GRID =
       new BooleanProperty(PropertyType.GUI_EDITOR, "nodesSnapToGrid",
                           true, "Nodes snap to grid");
     public static final IntegerProperty GUI_EDITOR_NODE_RADIUS =
       new IntegerProperty(PropertyType.GUI_EDITOR, "nodeRadius", 6,
-                          "Node size", false, 4, 32, 1);
+                          "Node size", true, 4, 32, 1);
     public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE =
       new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode",
                           true, "Control points move with node");
@@ -233,7 +237,7 @@ public final class Config
     public static enum LAYOUT_MODE_LEGALVALUES { Default, ChalmersIDES }
     public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT =
       new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout",
-                          10000, "Maximum layout time", false, 0);
+                          10000, "Maximum layout time", true, 0);
 
     // GUI_ANALYZER
     public static final ObjectProperty<ModelAnalyzerFactoryLoader> GUI_ANALYZER_USED_FACTORY =
@@ -273,15 +277,23 @@ public final class Config
                           true, "Include Waters Simulator");
     public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
-    public static final IntegerProperty SIMULATION_CYCLE_TIME = new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime", 100, "Simulator Cycle time (ms)", false, 0);
+    public static final IntegerProperty SIMULATION_CYCLE_TIME =
+      new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime",
+                          100, "Simulator Cycle time (ms)", true, 0);
 
 
     // ALGORITHMS_SYNCHRONIZATION
     public static final BooleanProperty SYNC_FORBID_UNCON_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncForbidUncontrollableStates", true, "Forbid uncontrollable states when synchronizing");
     public static final BooleanProperty SYNC_EXPAND_FORBIDDEN_STATES = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandUncontrollableStates", true, "Expand forbidden states when synchronizing");
-    public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncInitialHashtableSize", (1 << 14) - 1, "Initial hashtable size", false, 1);
+    public static final IntegerProperty SYNC_INITIAL_HASHTABLE_SIZE =
+      new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION,
+                          "syncInitialHashtableSize", (1 << 14) - 1,
+                          "Initial hash table size", true, 1);
     public static final BooleanProperty SYNC_EXPAND_HASHTABLE = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncExpandHashtable", true, "Expand hashtable");
-    public static final IntegerProperty SYNC_NBR_OF_EXECUTERS = new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchNbrOfExecuters", 1, "Number of synchronization threads", false, 1);
+    public static final IntegerProperty SYNC_NBR_OF_EXECUTERS =
+      new IntegerProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION,
+                          "synchNbrOfExecuters", 1,
+                          "Number of synchronization threads", true, 1);
     public static final ObjectProperty<String> SYNC_AUTOMATON_NAME_SEPARATOR = new ObjectProperty<String>(PropertyType.ALGORITHMS_SYNCHRONIZATION, "synchAutomatonNameSeparator", "||", "Automata name separator");
 	public static final BooleanProperty SYNC_UNOBS_EVENTS_SYNC = new BooleanProperty(PropertyType.ALGORITHMS_SYNCHRONIZATION, "syncUnobsEventsSync", false, "Unobservable (non-tau) events synchronize");
 
@@ -298,11 +310,19 @@ public final class Config
                            VerificationAlgorithm.MODULAR,
                            VerificationAlgorithm.class,
                            "Default verificaton algorithm");
-    public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyExclusionStateLimit", 1000, "Exclusion state limit", false, 1);
-    public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyReachabilityStateLimit", 1000, "Reachability state limit", false, 1);
+    public static final IntegerProperty VERIFY_EXCLUSION_STATE_LIMIT =
+      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION,
+                          "verifyExclusionStateLimit", 1000,
+                          "Exclusion state limit", true, 1);
+    public static final IntegerProperty VERIFY_REACHABILITY_STATE_LIMIT =
+      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION,
+                          "verifyReachabilityStateLimit", 1000,
+                          "Reachability state limit", true, 1);
     public static final BooleanProperty VERIFY_ONE_EVENT_AT_A_TIME = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "verifyOneEventAtATime", false, "Verify one event at a time");
     public static final BooleanProperty VERIFY_SKIP_UNCONTROLLABILITY_CHECK = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "skipUncontrollabilityCheck", false, "Skip uncontrollability check");
-    public static final IntegerProperty VERIFY_NBR_OF_ATTEMPTS = new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "nbrOfAttempts", 5, "Number of attempts", false, 1);
+    public static final IntegerProperty VERIFY_NBR_OF_ATTEMPTS =
+      new IntegerProperty(PropertyType.ALGORITHMS_VERIFICATION, "nbrOfAttempts",
+                          5, "Number of attempts", true, 1);
     public static final BooleanProperty VERIFY_SHOW_BAD_TRACE = new BooleanProperty(PropertyType.ALGORITHMS_VERIFICATION, "showBadTrace", false, "Show trace to bad state");
 
     // ALGORITHMS_SYNTHESIS
@@ -389,9 +409,13 @@ public final class Config
     public static final IntegerProperty BDD2_MAXINCREASENODES =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "maxIncreaseNodes", 2500000, "Maximum number of nodes by which to increase node table after garbage collection");
     public static final DoubleProperty BDD2_INCREASEFACTOR =
-      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "increaseFactor", 2.0, "Factor by which to increase node table after garbage collection", false, 0.0);
+      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "increaseFactor", 2.0,
+                         "Factor by which to increase node table after garbage collection",
+                         true, 0.0);
     public static final DoubleProperty BDD2_CACHERATIO =
-      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "cacheRatio", 10.0, "Cache ratio for the operator caches (#tablenodes/#cachenodes)", false, 0.0);
+      new DoubleProperty(PropertyType.ALGORITHMS_BDD, "cacheRatio", 10.0,
+                         "Cache ratio for the operator caches (#tablenodes/#cachenodes)",
+                         true, 0.0);
     public static final ObjectProperty<BDDPartitioningType> BDD2_PARTITIONING =
       new ObjectProperty<>(PropertyType.ALGORITHMS_BDD, "partitioning",
                            BDDPartitioningType.MONOLITHIC,
@@ -405,7 +429,7 @@ public final class Config
                            "bddAutomataOrderingAlgorithm",
                            Options.ORDERING_ALGORITHM_NAMES[Options.ordering_algorithm],
                            Options.ORDERING_ALGORITHM_NAMES,
-                           String.class, "Automata ordering algorithm", false);
+                           String.class, "Automata ordering algorithm", true);
     public static final IntegerProperty BDD_PARTITION_MAX =
       new IntegerProperty(PropertyType.ALGORITHMS_BDD, "bddMaxPartitionSize", 10000, "Max partition size");
     public static final BooleanProperty SYNTHESIS_PEAKBDD =

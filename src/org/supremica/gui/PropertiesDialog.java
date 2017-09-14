@@ -203,8 +203,8 @@ extends JDialog
   {
     // Find all properties of this type and add to the panel
     for (final Property property : Property.getAllProperties()) {
-      // I only want properties of the current type
-      if (property.getPropertyType() == type) {
+      // I only want editable properties of the current type
+      if (property.isEditable() && property.getPropertyType() == type) {
         // Depending on the kind of property, different choice mechanics...
         final Chooser chooser;
         if (property instanceof BooleanProperty) {
@@ -220,7 +220,6 @@ extends JDialog
         } else {
           continue;
         }
-        chooser.setEnabled(!property.isImmutable());
         chooserList.add(chooser);
         panel.add((Component) chooser);
       }
@@ -273,8 +272,7 @@ extends JDialog
     @Override
     public void setInConfig()
     {
-      if (!property.isImmutable())
-        property.set(isSelected());
+      property.set(isSelected());
     }
 
     @Override
@@ -383,27 +381,18 @@ extends JDialog
     @Override
     public void setInConfig()
     {
-      if (!property.isImmutable())
-      {
-        try
-        {
-          final Number num = numberFormat.parse(text.getText());
-          property.set(num.intValue());
-        }
-        catch (final ParseException ex)
-        {
-          System.err.println("ParseException: " + ex.getMessage());
-          // Error in number format, ignore this result without error message!
-        }
-        catch (final NumberFormatException ex)
-        {
-          System.err.println("NumberFormatException: " + ex.getMessage());
-          // Error in number format, ignore this result without error message!
-        }
-        catch (final IllegalArgumentException ex)
-        {
-          System.err.println("Error setting value of property " + property + ", value out of range.");
-        }
+      try {
+        final Number num = numberFormat.parse(text.getText());
+        property.set(num.intValue());
+      } catch (final ParseException ex) {
+        System.err.println("ParseException: " + ex.getMessage());
+        // Error in number format, ignore this result without error message!
+      } catch (final NumberFormatException ex) {
+        System.err.println("NumberFormatException: " + ex.getMessage());
+        // Error in number format, ignore this result without error message!
+      } catch (final IllegalArgumentException ex) {
+        System.err.println("Error setting value of property " + property
+                           + ", value out of range.");
       }
     }
 
@@ -457,20 +446,13 @@ extends JDialog
     @Override
     public void setInConfig()
     {
-      if (!property.isImmutable())
-      {
-        try
-        {
-          property.set(Double.parseDouble(text.getText()));
-        }
-        catch (final NumberFormatException ex)
-        {
-          // Error in number format, ignore this result without error message!
-        }
-        catch (final IllegalArgumentException ex)
-        {
-          System.err.println("Error setting value of property " + property + ", value out of range.");
-        }
+      try {
+        property.set(Double.parseDouble(text.getText()));
+      } catch (final NumberFormatException ex) {
+        // Error in number format, ignore this result without error message!
+      } catch (final IllegalArgumentException ex) {
+        System.err.println("Error setting value of property " + property +
+                           ", value out of range.");
       }
     }
 
@@ -520,15 +502,13 @@ extends JDialog
     @Override
     public void setInConfig()
     {
-      if (!mProperty.isImmutable()) {
-        if (mComboBox != null) {
-          final Object selected = mComboBox.getSelectedItem();
-          @SuppressWarnings("unchecked")
-          final T value = (T) selected;
-          mProperty.setValue(value);
-        } else if (mTextField != null) {
-          mProperty.set(mTextField.getText());
-        }
+      if (mComboBox != null) {
+        final Object selected = mComboBox.getSelectedItem();
+        @SuppressWarnings("unchecked")
+        final T value = (T) selected;
+        mProperty.setValue(value);
+      } else if (mTextField != null) {
+        mProperty.set(mTextField.getText());
       }
     }
 
@@ -596,10 +576,8 @@ extends JDialog
     @Override
     public void setInConfig()
     {
-      if (!mProperty.isImmutable()) {
-        final Color color = getColor();
-        mProperty.set(color);
-      }
+      final Color color = getColor();
+      mProperty.set(color);
     }
 
     @Override

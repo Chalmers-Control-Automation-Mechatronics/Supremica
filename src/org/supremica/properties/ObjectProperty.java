@@ -27,7 +27,7 @@ public class ObjectProperty<T> extends Property
   //#########################################################################
   //# Constructors
   /**
-   * Creates a mutable object property without legal values.
+   * Creates an editable object property without legal values.
    * This constructor creates a property without legal values and using
    * the object type of the default value.
    * @param type    The property category.
@@ -38,11 +38,11 @@ public class ObjectProperty<T> extends Property
   public ObjectProperty(final PropertyType type, final String key,
                         final T value, final String comment)
   {
-    this(type, key, value, null, value.getClass(), comment, false);
+    this(type, key, value, null, value.getClass(), comment, true);
   }
 
   /**
-   * Creates a mutable object property for an enumeration type.
+   * Creates an editable object property for an enumeration type.
    * @param type    The property category.
    * @param key     The name of the property.
    * @param value   The default value of the property.
@@ -54,7 +54,7 @@ public class ObjectProperty<T> extends Property
                         final T value, final Class<T> clazz,
                         final String comment)
   {
-    this(type, key, value, clazz.getEnumConstants(), clazz, comment, false);
+    this(type, key, value, clazz.getEnumConstants(), clazz, comment, true);
   }
 
   /**
@@ -65,17 +65,15 @@ public class ObjectProperty<T> extends Property
    * @param legalValues An array containing the allowed values for the property.
    * @param clazz       The class of object values.
    * @param comment     A textual description of the property.
-   * @param immutable   A flag, indicating whether the property value can be
-   *                    changed by the user. Immutable (<CODE>true</CODE>)
-   *                    means that it cannot be changed, and calling the
-   *                    methods to change it will result in an exception.
+   * @param editable    A flag, indicating whether the user can edit the
+   *                    property value through the properties dialog.
    */
   public ObjectProperty(final PropertyType type, final String key,
                         final T value, final T[] legalValues,
                         final Class<?> clazz, final String comment,
-                        final boolean immutable)
+                        final boolean editable)
   {
-    super(type, key, comment, immutable);
+    super(type, key, comment, editable);
     mDefaultValue = mValue = value;
     mLegalValues = legalValues;
     mObjectClass = clazz;
@@ -121,7 +119,6 @@ public class ObjectProperty<T> extends Property
   {
     if (!mValue.equals(value)) {
       checkValid(value);
-      checkMutable();
       final String oldvalue = getAsString();
       mValue = value;
       firePropertyChanged(oldvalue);

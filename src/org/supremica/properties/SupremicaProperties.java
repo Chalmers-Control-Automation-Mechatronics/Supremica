@@ -124,10 +124,6 @@ public final class SupremicaProperties
             {
                 System.err.println("Unknown property: " + newKey);
             }
-            else if (orgProperty.isImmutable())
-            {
-                System.err.println("Property \"" + newKey + "\" is immutable");
-            }
             else
             {
                 try
@@ -188,7 +184,7 @@ public final class SupremicaProperties
 
 			for (final Property property : Property.getAllProperties())
 			{
-				if (saveAll && !property.isImmutable() ||
+				if (saveAll ||
 					property.currentValueDifferentFromDefaultValue())
 				{
 					writer.append("# " + property.getComment() + "\n");

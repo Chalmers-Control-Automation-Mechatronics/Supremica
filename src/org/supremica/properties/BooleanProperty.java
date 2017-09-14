@@ -66,20 +66,20 @@ public class BooleanProperty
     //#######################################################################
     //# Constructors
     public BooleanProperty(final PropertyType type,
-        final String key,
-        final boolean value,
-        final String comment)
+                           final String key,
+                           final boolean value,
+                           final String comment)
     {
-        this(type, key, value, comment, false);
+        this(type, key, value, comment, true);
     }
 
     public BooleanProperty(final PropertyType type,
-        final String key,
-        final boolean value,
-        final String comment,
-        final boolean immutable)
+                           final String key,
+                           final boolean value,
+                           final String comment,
+                           final boolean editable)
     {
-        super(type, key, comment, immutable);
+        super(type, key, comment, editable);
         mDefaultValue = value;
         mValue = value;
     }
@@ -90,7 +90,6 @@ public class BooleanProperty
     public void set(final boolean value)
     {
       if (mValue != value) {
-        checkMutable();
         final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
@@ -122,6 +121,7 @@ public class BooleanProperty
         return isTrue();
     }
 
+    @Override
     public void set(final String value)
     {
         final boolean boolval = Boolean.parseBoolean(value);

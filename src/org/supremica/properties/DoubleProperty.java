@@ -70,16 +70,16 @@ public class DoubleProperty
         final double value,
         final String comment)
     {
-        this(type, key, value, comment, false);
+        this(type, key, value, comment, true);
     }
 
     public DoubleProperty(final PropertyType type,
         final String key,
         final double value,
         final String comment,
-        final boolean immutable)
+        final boolean editable)
     {
-        this(type, key, value, comment, immutable,
+        this(type, key, value, comment, editable,
             Double.MIN_VALUE, Double.MAX_VALUE);
     }
 
@@ -87,21 +87,21 @@ public class DoubleProperty
         final String key,
         final double value,
         final String comment,
-        final boolean immutable,
+        final boolean editable,
         final double min)
     {
-        this(type, key, value, comment, immutable, min, Double.MAX_VALUE);
+        this(type, key, value, comment, editable, min, Double.MAX_VALUE);
     }
 
     public DoubleProperty(final PropertyType type,
         final String key,
         final double value,
         final String comment,
-        final boolean immutable,
+        final boolean editable,
         final double min,
         final double max)
     {
-        super(type, key, comment, immutable);
+        super(type, key, comment, editable);
         mDefaultValue = value;
         mValue = value;
         mMin = min;
@@ -112,16 +112,19 @@ public class DoubleProperty
 
     //#######################################################################
     //# Overrides for Abstract Base Class Property
+    @Override
     public void set(final String value)
     {
         set(Double.parseDouble(value));
     }
 
+    @Override
     public String getAsString()
     {
         return Double.toString(mValue);
     }
 
+    @Override
     public boolean currentValueDifferentFromDefaultValue()
     {
         return mDefaultValue != mValue;
@@ -148,7 +151,6 @@ public class DoubleProperty
     public void set(final double value)
     {
       if (mValue != value) {
-        checkMutable();
         checkValid(value);
         final String oldvalue = getAsString();
         mValue = value;
