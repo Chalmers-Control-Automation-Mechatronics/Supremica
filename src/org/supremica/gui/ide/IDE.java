@@ -53,6 +53,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.config.Version;
@@ -257,6 +258,15 @@ public class IDE
         mSplitPaneVertical.setTopComponent(panel);
       }
       mSplitPaneVertical.setDividerLocation(dividerLocation);
+      // Sometimes the divider gets set to a strange position. (Why???)
+      // The following delayed call seems to fix it ...
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          mSplitPaneVertical.setDividerLocation(dividerLocation);
+        }
+      });
       mModuleNameObserver.setModule(container);
       updateWindowTitle();
       break;
