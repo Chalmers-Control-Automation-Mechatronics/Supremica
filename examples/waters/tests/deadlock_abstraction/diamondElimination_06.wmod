@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="diamondElimination_06" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base">
+<Module Name="diamondElimination_06" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test of diamon elimination. In this example, a tree of tau-reachable states must be explored over several levels, and some of the states are also entered from different places. Morever, state 3 is not tau-minimal as a-succesor because preceded by 2, and state 5 is not tau-minimal as b-successor also because preceded by 2.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
@@ -172,10 +172,26 @@
                     </SimpleNode>
                     <SimpleNode Name="S2345">
                         <PointGeometry>
-                            <Point X="144" Y="256"/>
+                            <Point X="144" Y="208"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S34">
+                        <PointGeometry>
+                            <Point X="144" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="6" Y="-18"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <PointGeometry>
+                            <Point X="144" Y="400"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -197,7 +213,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="102" Y="253"/>
+                            <Point X="102" Y="205"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S012345" Target="S012345">
@@ -215,11 +231,52 @@
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-20" Y="3"/>
+                                <Point X="-21" Y="-5"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="119" Y="187"/>
+                            <Point X="127" Y="162"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S2345" Target="S34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-12"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S34" Target="S012345">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="4"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="78" Y="207"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S34" Target="S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="160" Y="352"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="S5" Target="S34">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-18" Y="-6"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="128" Y="352"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

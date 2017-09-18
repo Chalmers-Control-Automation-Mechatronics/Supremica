@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="diamondElimination_09" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>A test of diamon elimination. State 0 has a-successors 2 and 4, both of which have incoming tau-transitions, yet only 2 is tau-minimal..</ns2:Comment>
+    <ns2:Comment>A test of diamond elimination. State 0 has a-successors 2 and 4, both of which have incoming tau-transitions, yet only 2 is tau-minimal..</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
