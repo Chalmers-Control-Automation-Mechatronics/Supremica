@@ -46,7 +46,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
@@ -533,7 +532,6 @@ public class IDE
     // making sure it happens before logging is used.
     final ConfigurationFactory factory = new IDELogConfigurationFactory();
     ConfigurationFactory.setConfigurationFactory(factory);
-    Locale.setDefault(Locale.ENGLISH);
   }
 
 }
