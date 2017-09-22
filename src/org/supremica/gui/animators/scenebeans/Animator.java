@@ -57,8 +57,8 @@ import javax.swing.JPanel;
 
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import uk.ac.ic.doc.scenebeans.animation.Animation;
 import uk.ac.ic.doc.scenebeans.animation.AnimationCanvas;
@@ -68,12 +68,13 @@ import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 import uk.ac.ic.doc.scenebeans.input.MouseDispatcher;
 
+
 public class Animator
     extends JFrame
     implements ActionListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(Animator.class);
+    private static Logger logger = LogManager.getLogger(Animator.class);
 
     AnimationCanvas _canvas;
     private final MouseDispatcher _dispatcher;

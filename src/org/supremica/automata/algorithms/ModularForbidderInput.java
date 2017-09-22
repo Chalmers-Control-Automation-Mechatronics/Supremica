@@ -52,10 +52,12 @@ package org.supremica.automata.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.supremica.log.*;
-import org.supremica.automata.State;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
 
 
 /**
@@ -75,7 +77,7 @@ import org.supremica.automata.Automaton;
  */
 public class ModularForbidderInput
 {
-    private static Logger logger = LoggerFactory.createLogger(ModularForbidderInput.class);
+    private static Logger logger = LogManager.getLogger(ModularForbidderInput.class);
 
     private final ArrayList<SubState> subStates;
 
@@ -125,7 +127,7 @@ public class ModularForbidderInput
     {
         if(subStateIndex>=0 && subStateIndex<subStates.size() && automaton.containsStateWithIndex(stateIndex))
         {
-            final SubState ss = (SubState) subStates.get(subStateIndex);
+            final SubState ss = subStates.get(subStateIndex);
             final State state = automaton.getStateWithIndex(stateIndex);
             ss.addLocalState(automaton, state);
             return true;

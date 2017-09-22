@@ -43,6 +43,9 @@ import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 
 
@@ -72,7 +75,8 @@ public class SimulationStepAction
       final Simulation sim = panel.getSimulation();
       final List<SimulatorStep> possibleEvents = sim.getEnabledSteps();
       if (possibleEvents.isEmpty()) {
-        getIDE().error("No events are enabled.");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No events are enabled.");
       } else {
         sim.step(possibleEvents);
       }

@@ -63,16 +63,11 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 public class AutomataToSMV
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToSMV.class);
 	private final Automata theAutomata;
-//	private AutomataSynchronizerHelper syncHelper;
-//	private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 
 	public AutomataToSMV(final Automata theAutomata)

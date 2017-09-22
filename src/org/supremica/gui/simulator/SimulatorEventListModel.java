@@ -35,17 +35,22 @@
 
 package org.supremica.gui.simulator;
 
-import org.supremica.automata.algorithms.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
+import java.util.Iterator;
+
+import javax.swing.AbstractListModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
-import org.supremica.automata.Project;
 import org.supremica.automata.Automata;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.automata.execution.Controls;
-import org.supremica.automata.execution.Control;
+import org.supremica.automata.Project;
+import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
 import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
 
 public class SimulatorEventListModel
     extends AbstractListModel<Object>
@@ -53,7 +58,7 @@ public class SimulatorEventListModel
 {
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LoggerFactory.createLogger(SimulatorEventListModel.class);
+	private static Logger logger = LogManager.getLogger(SimulatorEventListModel.class);
 
     // private int[] currState;
     private final int[] events;
@@ -230,11 +235,13 @@ public class SimulatorEventListModel
         this.isLocked = doLock;
     }
 
+    @Override
     public int getSize()
     {
         return eventAmount;
     }
 
+    @Override
     public Object getElementAt(final int index)
     {
         LabeledEvent currEvent;
@@ -297,6 +304,7 @@ public class SimulatorEventListModel
 //              theExecuter.executeEvent(theEvent);
 //              return true;
 //      }
+    @Override
     public void signalUpdated()
     {
         update();

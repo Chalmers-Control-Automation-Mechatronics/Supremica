@@ -36,21 +36,24 @@
 package org.supremica.gui.simulator;
 
 import javax.swing.event.ListDataEvent;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.LabeledEvent;
 import org.supremica.properties.Config;
-import org.supremica.log.*;
 
 /**
- * @author ka
+ * Automatically execute controllable and uncontrollable events in the simulation.
  *
- * Automatically execute controllable and uncontrollable events in the simultation.
+ * @author Knut &Aring;kesson
  */
 class EventExecuter
     extends Thread
 
 //      implements ListDataListener
 {
-    protected static Logger logger = LoggerFactory.createLogger(EventExecuter.class);
+    protected static Logger logger = LogManager.getLogger(EventExecuter.class);
     protected long sleepTime = 100;
     protected boolean doRun = true;
     protected boolean executeControllableEvents = false;
@@ -58,7 +61,7 @@ class EventExecuter
     protected SimulatorEventListModel eventModel;
     protected SimulatorExecuter theExecuter;
 
-    public EventExecuter(SimulatorExecuter theExecuter, SimulatorEventListModel eventModel)
+    public EventExecuter(final SimulatorExecuter theExecuter, final SimulatorEventListModel eventModel)
     {
 
 //              this.sleepTime = sleepTime;
@@ -71,6 +74,7 @@ class EventExecuter
         System.out.println("sleepTime = " + sleepTime);    // DEBUG
     }
 
+    @Override
     public void run()
     {
         while (doRun)
@@ -79,7 +83,7 @@ class EventExecuter
             {
                 Thread.sleep(sleepTime);
             }
-            catch (InterruptedException e)
+            catch (final InterruptedException e)
             {}
 
             tryExecuteEvent();
@@ -87,14 +91,14 @@ class EventExecuter
     }
 
 //
-    public void executeControllableEvents(boolean executeControllableEvents)
+    public void executeControllableEvents(final boolean executeControllableEvents)
     {
         this.executeControllableEvents = executeControllableEvents;
 
         //tryExecuteEvent();
     }
 
-    public void executeUncontrollableEvents(boolean executeUncontrollableEvents)
+    public void executeUncontrollableEvents(final boolean executeUncontrollableEvents)
     {
         this.executeUncontrollableEvents = executeUncontrollableEvents;
 
@@ -110,11 +114,11 @@ class EventExecuter
     {
         eventModel.enterLock();
 
-        int nbrOfEvents = eventModel.getSize();
+        final int nbrOfEvents = eventModel.getSize();
 
         for (int i = 0; i < nbrOfEvents; i++)
         {
-            LabeledEvent currEvent = eventModel.getEventAt(i);
+            final LabeledEvent currEvent = eventModel.getEventAt(i);
 
             if (!currEvent.isControllable())
             {
@@ -138,11 +142,11 @@ class EventExecuter
     {
         eventModel.enterLock();
 
-        int nbrOfEvents = eventModel.getSize();
+        final int nbrOfEvents = eventModel.getSize();
 
         for (int i = 0; i < nbrOfEvents; i++)
         {
-            LabeledEvent currEvent = eventModel.getEventAt(i);
+            final LabeledEvent currEvent = eventModel.getEventAt(i);
 
             if (currEvent.isControllable())
             {
@@ -166,11 +170,11 @@ class EventExecuter
     {
         eventModel.enterLock();
 
-        int nbrOfEvents = eventModel.getSize();
+        final int nbrOfEvents = eventModel.getSize();
 
         for (int i = 0; i < nbrOfEvents; i++)
         {
-            LabeledEvent currEvent = eventModel.getEventAt(i);
+            final LabeledEvent currEvent = eventModel.getEventAt(i);
 
             logger.info("Automatically executed event: " + currEvent.getLabel());
 
@@ -214,18 +218,18 @@ class EventExecuter
         }
     }
 
-    public void contentsChanged(ListDataEvent e)
+    public void contentsChanged(final ListDataEvent e)
     {
 
         //tryExecuteEvent();
     }
 
-    public void intervalAdded(ListDataEvent e)
+    public void intervalAdded(final ListDataEvent e)
     {
         contentsChanged(e);
     }
 
-    public void intervalRemoved(ListDataEvent e)
+    public void intervalRemoved(final ListDataEvent e)
     {
         contentsChanged(e);
     }

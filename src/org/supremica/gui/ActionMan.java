@@ -57,6 +57,9 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -116,6 +119,7 @@ import org.supremica.gui.animators.scenebeans.Animator;
 //import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.examplegenerator.TestCasesDialog;
+import org.supremica.gui.ide.actions.IDEAction;
 import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.gui.texteditor.TextFrame;
 import org.supremica.gui.useractions.HelpAction;
@@ -125,10 +129,9 @@ import org.supremica.gui.useractions.SaveAction;
 import org.supremica.gui.useractions.SaveAsAction;
 import org.supremica.gui.useractions.SynthesizeAction;
 import org.supremica.gui.useractions.UpdateFromJGrafchartAction;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
+
 import org.swixml.SwingEngine;
 
 // -- MF -- Abstract class to save on duplicate code
@@ -161,11 +164,11 @@ abstract class FileImporter
 }
 
 /**
- * Handles most of the actions in Supremica. Will be reimplemented to IDEAction:s.
+ * Handles most of the actions in Supremica. Will be reimplemented to {@link IDEAction}s.
  */
 public class ActionMan
 {
-    private static Logger logger = LoggerFactory.createLogger(ActionMan.class);
+    private static Logger logger = LogManager.getLogger(ActionMan.class);
 
     // Ugly fixx here. We need a good way to globally get at the selected automata, the current project etc
     // gui here is filled in by (who?)
@@ -233,8 +236,7 @@ public class ActionMan
             try
             {
                 final int nbrOfAddedAutomata = gui.addProject(project);
-
-                gui.info("Successfully added " + nbrOfAddedAutomata + " automata.");
+                logger.info("Successfully added " + nbrOfAddedAutomata + " automata.");
             }
             catch (final Exception excp)
             {
@@ -276,7 +278,7 @@ public class ActionMan
             logger.debug(ex.getStackTrace());
         }
 
-        gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
+        logger.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
         /*
                   Collection selectedAutomata = gui.getSelectedAutomataAsCollection();
@@ -1299,9 +1301,10 @@ public class ActionMan
             vOptions.setInclusionAutomata(gui.getUnselectedAutomata());
         }
         final SynchronizationOptions sOptions = SynchronizationOptions.getDefaultVerificationOptions();
+        final JFrame owner = gui.getFrame();
 
         // Work!
-        new AutomataVerificationWorker(gui, selectedAutomata,
+        new AutomataVerificationWorker(owner, selectedAutomata,
                                        vOptions, sOptions, mOptions);
     }
 
@@ -1389,8 +1392,7 @@ public class ActionMan
             {
                 final Project newProject = projectBuilder.build(swingEngine);
                 final int nbrOfAddedAutomata = gui.addAutomata(newProject);
-
-                gui.info("Successfully created " + nbrOfAddedAutomata + " user interface automata.");
+                logger.info("Successfully created " + nbrOfAddedAutomata + " user interface automata.");
             }
             catch (final Exception ex)
             {
@@ -1629,9 +1631,8 @@ public class ActionMan
         {
             return;
         }
-
-        gui.info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
-        gui.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
+        logger.info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
+        logger.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
         for (final Iterator<?> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
         {
@@ -1667,7 +1668,7 @@ public class ActionMan
             }
 
             // logger.info(statusStr.toString());
-            gui.info(statusStr.toString());
+            logger.info(statusStr.toString());
         }
 
         if (selectedAutomata.size() > 1)
@@ -1682,7 +1683,7 @@ public class ActionMan
                 potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
             }
 
-            gui.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
+            logger.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
         }
     }
 
@@ -2014,7 +2015,7 @@ public class ActionMan
     {
         Project currProject = null;
 
-        gui.info("Opening " + file.getAbsolutePath() + " ...");
+        logger.info("Opening " + file.getAbsolutePath() + " ...");
 
         try
         {
@@ -2027,7 +2028,6 @@ public class ActionMan
             // this exception is caught while opening
             logger.error("Error while opening " + file.getAbsolutePath() + " .", ex);
             logger.debug(ex.getStackTrace());
-
             return;
         }
 
@@ -2055,10 +2055,7 @@ public class ActionMan
         try
         {
             final int nbrOfAddedAutomata = gui.addProject(currProject);
-
-            //gui.addActions(currProject.getActions());
-            //gui.addControls(currProject.getControls());
-            gui.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully opened and added " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception excp)
         {
@@ -2182,14 +2179,12 @@ public class ActionMan
 
     public static void importAutFile(final Gui gui, final File file)
     {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
-
+        logger.info("Importing " + file.getAbsolutePath() + " ...");
         try
         {
             final Automata currAutomata = null;    // AutomataBuildFromAut.build(file);
             final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
-
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception ex)
         {
@@ -2202,7 +2197,7 @@ public class ActionMan
 
     public static void importWatersFile(final Gui gui, final File file)
     {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
+        logger.info("Importing " + file.getAbsolutePath() + " ...");
 
         try
         {
@@ -2219,7 +2214,7 @@ public class ActionMan
             final Automata currAutomata = builder.build(module);
             final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception ex)
         {
@@ -2233,7 +2228,7 @@ public class ActionMan
     @SuppressWarnings("deprecation")
 	public static void importHYBFile(final Gui gui, final File file)
     {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
+        logger.info("Importing " + file.getAbsolutePath() + " ...");
 
         try
         {
@@ -2241,7 +2236,7 @@ public class ActionMan
             final Automata currAutomata = builder.build(file.toURL());
             final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception ex)
         {
@@ -2255,7 +2250,7 @@ public class ActionMan
     @SuppressWarnings("deprecation")
 	public static void importHISCFile(final Gui gui, final File file)
     {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
+        logger.info("Importing " + file.getAbsolutePath() + " ...");
 
         try
         {
@@ -2263,7 +2258,7 @@ public class ActionMan
             final Automata currAutomata = builder.build(file.toURL());
             final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception ex)
         {
@@ -2277,7 +2272,7 @@ public class ActionMan
     @SuppressWarnings("deprecation")
 	public static void importUMDESFile(final Gui gui, final File file)
     {
-        gui.info("Importing " + file.getAbsolutePath() + " ...");
+        logger.info("Importing " + file.getAbsolutePath() + " ...");
 
         try
         {
@@ -2285,7 +2280,7 @@ public class ActionMan
             final Automata currAutomata = builder.build(file.toURL());
             final int nbrOfAddedAutomata = gui.addAutomata(currAutomata);
 
-            gui.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
+            logger.info("Successfully imported " + nbrOfAddedAutomata + " automata.");
         }
         catch (final Exception ex)
         {

@@ -52,6 +52,9 @@ import java.util.LinkedList;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -65,21 +68,18 @@ import org.supremica.automata.algorithms.AutomataSynthesizer;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.gui.ExecutionDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
 
 public class AutomataMinimizer
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataMinimizer.class);
+    private static Logger logger = LogManager.getLogger(AutomataMinimizer.class);
     // Stoppable stuff
     private ExecutionDialog executionDialog;
     private Abortable threadToAbort = null;
     private boolean abortRequested = false;
 
-    /** The automata being minimized (may be a copy of the original). */
+    /** The automata being minimised (may be a copy of the original). */
     private Automata theAutomata;
     private final  Automata setOfHalf ;
     /** The supplied options. */
@@ -462,32 +462,13 @@ public class AutomataMinimizer
         }
 
         // Print statistics
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            // Print total reduction statistics
-            AutomatonMinimizer.logStatistics(options);
-            // Print largest automaton sizeif observable
-
-            logger.info("The automaton with the most states had " + mostStates + " states.");
-            logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
-            // Print total state & transition number examined
-            logger.info("The automata encountered had " + totalStates + " states and " + totalTransitions + " transitions in total.");
-        }
-        else
-        {
-            //logger.info("The automaton with the most states had " + mostStates + " states.");
-            //logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
-        }
-        //logger.info("Timer time: " + taskSelectionTimer);
-        //logger.info(theAutomata.getName() + " & " + initialNbrOfAutomata + " & & " + mostStates + " & " + mostTransitions + " & TIME & true/false & " + AutomatonMinimizer.getWodesStatisticsLaTeX() + " & ALGO \\\\");
-        // Return the result of the minimization!
-
-
-
-//        if(theAutomata.size()<2){
-//            theAutomata.addAutomata(setOfHalf);
-//
-//        }
+        // Print total reduction statistics
+        AutomatonMinimizer.logStatistics(options);
+        // Print largest automaton size if observable
+        logger.info("The automaton with the most states had " + mostStates + " states.");
+        logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
+        // Print total state & transition number examined
+        logger.info("The automata encountered had " + totalStates + " states and " + totalTransitions + " transitions in total.");
         return theAutomata;
     }
 
@@ -1040,7 +1021,7 @@ public class AutomataMinimizer
 
             if (localAutomata.size() > 0)
             {
-                logger.verbose("The automata " + localAutomata + " now have local events: " + local);
+                logger.info("The automata " + localAutomata + " now have local events: " + local);
             }
         }
 

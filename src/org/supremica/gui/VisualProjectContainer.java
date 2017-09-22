@@ -35,15 +35,17 @@
 
 package org.supremica.gui;
 
-import java.util.*;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.supremica.automata.Listeners;
+import org.supremica.automata.Project;
+
 
 public class VisualProjectContainer
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(VisualProjectContainer.class);
-    private List<VisualProject> theProjects;
+    private final List<VisualProject> theProjects;
     private VisualProject currentProject;
     private VisualProjectContainerListeners projectListeners = null;
 
@@ -52,13 +54,13 @@ public class VisualProjectContainer
         theProjects = new LinkedList<VisualProject>();
     }
 
-    public void addProject(VisualProject theProject)
+    public void addProject(final VisualProject theProject)
     {
         addProject(theProject, false);
     }
 
-    public void addProject(VisualProject theProject, boolean setActive)
-    {        
+    public void addProject(final VisualProject theProject, final boolean setActive)
+    {
         theProjects.add(theProject);
 
         if (setActive)
@@ -67,7 +69,7 @@ public class VisualProjectContainer
         }
     }
 
-    public void removeProject(VisualProject theProject)
+    public void removeProject(final VisualProject theProject)
     {
         theProjects.remove(theProject);
 
@@ -77,16 +79,16 @@ public class VisualProjectContainer
         }
     }
 
-    public VisualProject getProject(String name)
+    public VisualProject getProject(final String name)
     {
         if (name == null)
         {
             return null;
         }
 
-        for (Iterator<VisualProject> projIt = iterator(); projIt.hasNext(); )
+        for (final Iterator<VisualProject> projIt = iterator(); projIt.hasNext(); )
         {
-            VisualProject currProject = projIt.next();
+            final VisualProject currProject = projIt.next();
 
             if (name.equals(currProject.getName()))
             {
@@ -102,7 +104,7 @@ public class VisualProjectContainer
         return currentProject;
     }
 
-    public void setActiveProject(VisualProject theProject)
+    public void setActiveProject(final VisualProject theProject)
     {
         this.currentProject = theProject;
     }
@@ -127,9 +129,9 @@ public class VisualProjectContainer
         return projectListeners;
     }
 
-    public void addListener(VisualProjectContainerListener listener)
+    public void addListener(final VisualProjectContainerListener listener)
     {
-        Listeners currListeners = getListeners();
+        final Listeners currListeners = getListeners();
 
         currListeners.addListener(listener);
     }
@@ -144,7 +146,7 @@ public class VisualProjectContainer
     }
 
     @SuppressWarnings("unused")
-	private void notifyListeners(int mode, Project p)
+	private void notifyListeners(final int mode, final Project p)
     {
         if (projectListeners != null)
         {

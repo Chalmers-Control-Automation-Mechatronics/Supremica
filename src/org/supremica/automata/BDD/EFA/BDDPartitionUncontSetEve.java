@@ -1,6 +1,11 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +15,7 @@ import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
+
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
@@ -18,13 +24,6 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntProcedure;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -33,14 +32,11 @@ import gnu.trove.set.hash.TIntHashSet;
  * with the difference that the destination variables (EFA also include
  * updated values of variables).
  *
- * @author zhennan
+ * @author Zhennan Fei
  */
 
 public class BDDPartitionUncontSetEve
 {
-
-  static Logger logger =
-    LoggerFactory.createLogger(BDDPartitionUncontSetEve.class);
   /**
    * The reference to the bddExAutomata.
    */

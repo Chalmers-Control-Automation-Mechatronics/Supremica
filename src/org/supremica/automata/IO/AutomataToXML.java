@@ -49,81 +49,87 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
-import org.supremica.log.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.State;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.gui.ExportFormat;
+
 
 public class AutomataToXML
     implements AutomataSerializer
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToXML.class);
-    private Automata automata;
+    private final Automata automata;
     private boolean includeCost = true;
-    private boolean debugMode = false;
+    private final boolean debugMode = false;
     private final static int majorFileVersion = 0;
     private final static int minorFileVersion = 9;
-    
+
     // mappings between state/event and id
-    private Map<State, Integer> stateIdMap = new HashMap<State, Integer>();
-    private Map<LabeledEvent, Integer> eventIdMap = new HashMap<LabeledEvent, Integer>();
-    
-    public AutomataToXML(Automata automata)
+    private final Map<State, Integer> stateIdMap = new HashMap<State, Integer>();
+    private final Map<LabeledEvent, Integer> eventIdMap = new HashMap<LabeledEvent, Integer>();
+
+    public AutomataToXML(final Automata automata)
     {
         this.automata = automata;
     }
-    
-    public AutomataToXML(Automaton automaton)
+
+    public AutomataToXML(final Automaton automaton)
     {
-        this.automata = new Automata();  
+        this.automata = new Automata();
         this.automata.addAutomaton(automaton);
     }
-    
-    public void serialize(PrintWriter pw)
+
+    @Override
+    public void serialize(final PrintWriter pw)
     {
         pw.println("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>");
         pw.print("<Automata");
-        
+
         if (automata.getName() != null)
         {
             pw.print(" name=\"" + EncodingHelper.normalize(automata.getName(), ExportFormat.XML) + "\"");
         }
-        
+
         // To keep track of indices
         //AutomataIndexMap indexMap = new AutomataIndexMap(automata);
-        
+
         pw.print(" major=\"" + majorFileVersion + "\"");
-        pw.print(" minor=\"" + minorFileVersion + "\"");        
-        
+        pw.print(" minor=\"" + minorFileVersion + "\"");
+
         if ((automata.getComment() != null) && !automata.getComment().equals(""))
         {
             pw.print(" comment=\"" + EncodingHelper.normalize(automata.getComment(), ExportFormat.XML) + "\"");
         }
-        
+
         pw.println(">");
-        
-        for(Automaton aut : automata)
-        {   
+
+        for(final Automaton aut : automata)
+        {
             pw.println("<Automaton name=\"" + aut.getName() + "\" type=\"" + aut.getType().toString() + "\">");
-            
+
             // Print all events
             pw.println("\t<Events>");
-            
+
             int eventId = 0;
-            
-            for (LabeledEvent event : aut.getAlphabet())
-            {         
+
+            for (final LabeledEvent event : aut.getAlphabet())
+            {
                 eventIdMap.put(event, eventId);
                 pw.print("\t\t<Event id=\"" + eventId + "\" label=\"" + EncodingHelper.normalize(event.getLabel(), ExportFormat.XML) + "\"");
-                
+
                 eventId++;
-                
+
                 //--
                 // pw.print("\t\t<Event id=\"" + EncodingHelper.normalize(event.getId()) + "\" label=\"" + EncodingHelper.normalize(event.getLabel()) + "\"");
                 //--
@@ -131,59 +137,59 @@ public class AutomataToXML
                 {
                     pw.print(" controllable=\"false\"");
                 }
-                
+
                 if (!event.isPrioritized())
                 {
                     pw.print(" prioritized=\"false\"");
                 }
-                
+
                 if (!event.isObservable())
                 {
                     pw.print(" observable=\"false\"");
                 }
-                
+
                 if (event.isOperatorIncrease())
                 {
                     pw.print(" operatorIncrease=\"true\"");
                 }
-                
+
                 if (event.isOperatorReset())
                 {
                     pw.print(" operatorReset=\"true\"");
                 }
-                
+
                 if (event.isImmediate())
                 {
                     pw.print(" immediate=\"true\"");
                 }
-                
+
                 if (debugMode)
                 {
                     pw.print(" index=" + event.getIndex());
                 }
-                
+
                 pw.println("/>");
             }
-            
+
             pw.println("\t</Events>");
-            
+
             // Print all states
             pw.println("\t<States>");
-            
+
             int stateId = 0;    // we need to make up id
-            
-            for(State state: aut)
-            {         
+
+            for(final State state: aut)
+            {
                 stateIdMap.put(state, stateId);    // The arc must be able to find it fast
                 pw.print("\t\t<State id=\"" + stateId + "\"");    // no longer need to normalize
-                
+
                 stateId++;
-                
+
                 //--
                 // pw.print("\t\t<State id=\"" + EncodingHelper.normalize(state.getId()) + "\"");
                 //--
                 pw.print(" name=\"" + EncodingHelper.normalize(state.getName(), ExportFormat.XML) + "\"");    // always print the name
-                
+
                 //--
                 // if (!state.getId().equals(state.getName()))
                 // {
@@ -194,58 +200,58 @@ public class AutomataToXML
                 {
                     pw.print(" initial=\"true\"");
                 }
-                
+
                 if (state.isAccepting())
                 {
                     pw.print(" accepting=\"true\"");
                 }
-                
+
                 if (state.isForbidden())
                 {
                     pw.print(" forbidden=\"true\"");
                 }
-                
+
                 if (includeCost)
                 {
-                    double value = state.getCost();
-                    
+                    final double value = state.getCost();
+
                     if (value != State.UNDEF_COST)
                     {
                         pw.print(" cost=\"" + value + "\"");
                     }
                 }
-                
+
                 if (debugMode)
                 {
                     pw.print(" synchIndex=" + state.getIndex());
                 }
-                
+
                 // printIntArray(pw, ((StateRegular)state).getOutgoingEventsIndicies());
                 pw.println("/>");
             }
-            
+
             pw.println("\t</States>");
-            
+
             // Print all transitions
             pw.println("\t<Transitions>");
-            
-            for (State sourceState : aut) 
+
+            for (final State sourceState : aut)
             {
-                Integer sourceId = stateIdMap.get(sourceState);
-                Iterator<Arc> outgoingArcsIt = sourceState.outgoingArcsIterator();
-                
+                final Integer sourceId = stateIdMap.get(sourceState);
+                final Iterator<Arc> outgoingArcsIt = sourceState.outgoingArcsIterator();
+
                 while (outgoingArcsIt.hasNext())
                 {
-                    Arc arc = (Arc) outgoingArcsIt.next();
-                    State destState = arc.getToState();
-                    Integer destId = stateIdMap.get(destState);
-                    LabeledEvent event = arc.getEvent();
-                    Integer eventID = eventIdMap.get(event);
-                    
+                    final Arc arc = outgoingArcsIt.next();
+                    final State destState = arc.getToState();
+                    final Integer destId = stateIdMap.get(destState);
+                    final LabeledEvent event = arc.getEvent();
+                    final Integer eventID = eventIdMap.get(event);
+
                     pw.print("\t\t<Transition source=\"" + sourceId);
                     pw.print("\" dest=\"" + destId);
                     pw.println("\" event=\"" + eventID + "\"/>");
-                    
+
                     //--
                     // pw.print("\t\t<Transition source=\"" + EncodingHelper.normalize(sourceState.getId()));
                     // pw.print("\" dest=\"" + EncodingHelper.normalize(destState.getId()));
@@ -253,39 +259,40 @@ public class AutomataToXML
                     //--
                 }
             }
-            
+
             pw.println("\t</Transitions>");
             pw.println("</Automaton>");
         }
-        
+
         pw.println("</Automata>");
         pw.flush();
         pw.close();
     }
-    
-    public void serialize(String fileName)
+
+    @Override
+    public void serialize(final String fileName)
     throws IOException
     {
         serialize(new PrintWriter(new FileWriter(fileName)));
     }
-    
-    public void serialize(File theFile)
+
+    public void serialize(final File theFile)
     throws IOException
     {
         serialize(theFile.getAbsolutePath());
     }
-    
+
     public String serialize()
     {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
         serialize(pw);
         return sw.toString();
     }
-    
-    void printIntArray(PrintWriter pw, int[] theArray)
+
+    void printIntArray(final PrintWriter pw, final int[] theArray)
     {
-        for (int i : theArray)
+        for (final int i : theArray)
         {
             if (i == 0)
             {
@@ -297,13 +304,13 @@ public class AutomataToXML
             }
         }
     }
-    
-    public boolean writeCost(boolean b)
+
+    public boolean writeCost(final boolean b)
     {
-        boolean old = includeCost;
-        
+        final boolean old = includeCost;
+
         includeCost = b;
-        
+
         return old;
     }
 }

@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,13 +79,6 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -1788,11 +1785,5 @@ public class ProjectingNonBlockingChecker extends AbstractConflictChecker
   private final RemoveImpossibleTransitions mRIT = null;
   @SuppressWarnings("unused")
   private final MergeEvents mME = null;
-
-  // #########################################################################
-  // # Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-      LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }

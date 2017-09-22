@@ -40,6 +40,9 @@ import java.util.List;
 
 import javax.swing.Action;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.VisualProject;
 
 
@@ -54,7 +57,7 @@ public class SimulatorLaunchAnimatorAction
     /**
      * Constructor.
      */
-    public SimulatorLaunchAnimatorAction(List<IDEAction> actionList)
+    public SimulatorLaunchAnimatorAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -68,7 +71,8 @@ public class SimulatorLaunchAnimatorAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -76,24 +80,25 @@ public class SimulatorLaunchAnimatorAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
+        final Logger logger = LogManager.getLogger();
         try
         {
-            VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+            final VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
 
             if (!currProject.hasAnimation())
             {
-                ide.info("No animation present.");
-
+                logger.info("No animation present.");
                 return;
             }
 
             currProject.getAnimator();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            ide.error("Exception while getting Animator.", ex);
+            logger.error("Exception while getting Animator.", ex);
         }
     }
 }

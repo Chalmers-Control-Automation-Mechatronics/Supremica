@@ -53,6 +53,8 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.BooleanProperty;
+import org.supremica.properties.ObjectProperty;
 
 
 public class WatersPopupActionManager
@@ -63,6 +65,14 @@ public class WatersPopupActionManager
   public WatersPopupActionManager(final IDE ide)
   {
     mIDE = ide;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public IDE getIDE()
+  {
+    return mIDE;
   }
 
 
@@ -94,16 +104,48 @@ public class WatersPopupActionManager
 
   //#########################################################################
   //# Access to Actions
-  public IDEAction getCutAction()
+  /**
+   * Creates an action to toggle a {@link BooleanProperty} from
+   * Supremica's configuration.
+   * @param property  The property affected by the action.
+   * @param shortName A short name to describe the action. The short name
+   *                  is displayed when the action appears in the menu,
+   *                  and the (longer) comment of the property is used as a
+   *                  tool tip.
+   */
+  public IDEAction getConfigBooleanPropertyAction(final BooleanProperty property,
+                                                  final String shortName)
   {
-    final WatersActionManager master = mIDE.getActions();
-    return master.getAction(IDECutAction.class);
+    return new ConfigBooleanPropertyAction(mIDE, property, shortName);
+  }
+
+  /**
+   * Creates a new enumeration property action.
+   * @param property  The property affected by the action.
+   * @param value     The value assigned to the property when the action
+   *                  is triggered.
+   * @param comment   A comment to explain the action. Menu items are
+   *                  labelled by the string representation of the value,
+   *                  while the comment is used as a tool tip.
+   */
+  public <E extends Enum<E>>
+  IDEAction getConfigEnumPropertyAction(final ObjectProperty<E> property,
+                                        final E value,
+                                        final String comment)
+  {
+    return new ConfigEnumPropertyAction<E>(mIDE, property, value, comment);
   }
 
   public IDEAction getCopyAction()
   {
     final WatersActionManager master = mIDE.getActions();
     return master.getAction(IDECopyAction.class);
+  }
+
+  public IDEAction getCutAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(IDECutAction.class);
   }
 
   public IDEAction getDeleteAction()
@@ -114,10 +156,9 @@ public class WatersPopupActionManager
 
   public IDEAction getDeleteAction(final Proxy arg)
   {
-    if(arg == null || arg instanceof ModuleProxy){
+    if (arg == null || arg instanceof ModuleProxy) {
       return getDeleteAction();
-    }
-    else{
+    } else {
       return new IDEDeleteAction(mIDE, arg);
     }
   }
@@ -231,6 +272,12 @@ public class WatersPopupActionManager
     return master.getAction(InsertVariableAction.class);
   }
 
+  public IDEAction getLogClearAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(LogClearAction.class);
+  }
+
   public IDEAction getNodeInitialAction(final Proxy arg)
   {
     return new EditNodeInitialAction(mIDE, arg);
@@ -337,10 +384,6 @@ public class WatersPopupActionManager
     return new AnalyzeLanguageInclusionAction(mIDE, aut);
   }
 
-  //#######################################################################
-  //# Data Members
-  private final IDE mIDE;
-
   public IDEAction getDesktopSetStateAction(final AutomatonProxy automaton,
                                             final NodeProxy node)
   {
@@ -348,5 +391,8 @@ public class WatersPopupActionManager
   }
 
 
+  //#########################################################################
+  //# Data Members
+  private final IDE mIDE;
 
 }

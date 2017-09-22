@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +68,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -91,22 +92,20 @@ import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 import org.supremica.gui.AutomataVerificationWorker;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for much of the actual verification work.
  *
- * @author  ka
+ * @author  Knut &Aring;kesson
  * @since  November 28, 2001
  * @see  AutomataSynchronizerExecuter
  */
 public class AutomataVerifier
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataVerifier.class);
+    private static Logger logger = LogManager.getLogger(AutomataVerifier.class);
     private Automata theAutomata;
 
     // MF Started puting in all these timer.start/stop but...
@@ -633,19 +632,14 @@ public class AutomataVerifier
         // The name of the "synchronized" automata
         StringBuilder automataNames = new StringBuilder();
 
-        if (Config.VERBOSE_MODE.isTrue())
+        for (final Iterator<?> autIt = selectedAutomata.iterator();
+             autIt.hasNext(); )
         {
-            // For printing the names of the automata in selectedAutomata
-            for (final Iterator<?> autIt = selectedAutomata.iterator();
-            autIt.hasNext(); )
-            {
-                automataNames = automataNames.append(((Automaton) autIt.next()).getName());
-
-                if (autIt.hasNext())
-                {
-                    automataNames = automataNames.append("||");
-                }
-            }
+          automataNames = automataNames.append(((Automaton) autIt.next()).getName());
+          if (autIt.hasNext())
+          {
+            automataNames = automataNames.append("||");
+          }
         }
 
         // Was the result uncontrollable?
@@ -663,47 +657,33 @@ public class AutomataVerifier
                 automataIndices[i++] = indexMap.getAutomatonIndex(autIt.next());
             }
 
-            if (Config.VERBOSE_MODE.isTrue())
+            String states;
+            final int size = potentiallyUncontrollableStates.size(automataIndices);
+            if (size == 1)
             {
-                String states;
-                final int size = potentiallyUncontrollableStates.size(automataIndices);
-
-                if (size == 1)
-                {
-                    states = "one state";
-                }
-                else if (size == 2)
-                {
-                    states = "two states";
-                }
-                else
-                {
-                    states = size + " states";
-                }
-
-                logger.info("'" + automataNames + "' has " + states + " that might be uncontrollable...");
+              states = "one state";
             }
+            else if (size == 2)
+            {
+              states = "two states";
+            }
+            else
+            {
+              states = size + " states";
+            }
+            logger.info("'" + automataNames + "' has " + states + " that might be uncontrollable...");
 
             // Get a sorted array of indexes of automata with similar alphabets
             int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
             if (similarAutomata == null)
             {
                 // This never happens?
-
                 // There are no similar automata, this module must be uncontrollable
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    // Print the uncontrollable state(s)...
-                    synchHelper.printUncontrollableStates(automataIndices);
-                }
-
+                synchHelper.printUncontrollableStates(automataIndices);
                 return false;
             }
 
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
-            }
+            logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 
             // Make nbrOfAttempts attempts on proving controllability and
             // uncontrollability alternatingly and then give up
@@ -721,11 +701,7 @@ public class AutomataVerifier
                     if (moreSimilarAutomata != null)
                     {
                         final int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
-                        if (Config.VERBOSE_MODE.isTrue())
-                        {
-                            logger.info("All similar automata are already added, trying to add some more...");
-                        }
-
+                        logger.info("All similar automata are already added, trying to add some more...");
                         System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
                         System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, similarAutomata.length, moreSimilarAutomata.length);
 
@@ -733,24 +709,10 @@ public class AutomataVerifier
                     }
                     else
                     {
-                        if (Config.VERBOSE_MODE.isTrue())
-                        {
-                            logger.info("All similar automata are already added, " +
-                                "no chance for controllability.");
-
-                            // CAN'T BE DONE... TRACE NOT REMEMBERED...
-                            // Print the uncontrollable state(s)...
-                            //synchHelper.printUncontrollableStates();
-
-                            // Print event trace reaching uncontrollable state
-                            //if (verificationOptions.showBadTrace())
-                            //{
-                            //	synchHelper.displayTrace();
-                            //}
-                        }
-
-                        return false;
+                      logger.info("All similar automata are already added, " +
+                                  "no chance for controllability.");
                     }
+                    return false;
                 }
 
                 // Add the similar automata in hope of removing uncontrollable
@@ -767,18 +729,15 @@ public class AutomataVerifier
                 {
                     if (!verificationOptions.getSkipUncontrollabilityCheck())
                     {
-                        logger.verbose("Couldn't prove controllability, " +
-                            "trying to prove uncontrollability...");
+                        logger.info("Couldn't prove controllability, " +
+                                    "trying to prove uncontrollability...");
 
                         // Try to prove remaining states in the stateMemorizer as being uncontrollable
                         if (findUncontrollableStates(automataIndices))
                         {
                             // Uncontrollable state found!
-                            if (Config.VERBOSE_MODE.isTrue() || verificationOptions.showBadTrace())
-                            {
-                                // Print the uncontrollable state(s)...
-                                uncontrollabilityCheckHelper.printUncontrollableStates();
-                            }
+                            // Print the uncontrollable state(s)...
+                            uncontrollabilityCheckHelper.printUncontrollableStates();
                             if (verificationOptions.showBadTrace())
                             {
                                 // Print event trace reaching uncontrollable state
@@ -790,7 +749,7 @@ public class AutomataVerifier
                     }
                     else
                     {
-                        logger.verbose("Skipped uncontrollability check!");
+                        logger.info("Skipped uncontrollability check!");
                     }
                 }
                 else
@@ -807,20 +766,15 @@ public class AutomataVerifier
                 // controllable or uncontrollable. We now have no idea what so ever on the
                 // controllability so... we chicken out and give up.
                 // Print remaining suspected uncontrollable state(s)
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    logger.info("Unfortunately the following states might be uncontrollable...");
-                    synchHelper.printUncontrollableStates(automataIndices);
-                }
-
+                logger.info("Unfortunately the following states might be uncontrollable...");
+                synchHelper.printUncontrollableStates(automataIndices);
                 failure = true;
-
                 return false;
             }
         }
 
         // Nothing bad has happened. Very nice!
-        logger.verbose("'" + automataNames + "' is controllable.");
+        logger.info("'" + automataNames + "' is controllable.");
 
         return true;
     }
@@ -1011,7 +965,7 @@ public class AutomataVerifier
             stateAmountLimit = stateAmountLimit * 5;
         }
 
-        logger.verbose("stateAmountLimit: " + stateAmountLimit + ".");
+        logger.info("stateAmountLimit: " + stateAmountLimit + ".");
 
         synchHelper.clear();
 
@@ -1098,42 +1052,37 @@ public class AutomataVerifier
 		}
 		 */
 
-                logger.verbose("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
+                logger.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 
                 stateAmount = stateCount;
 
                 // Remove states in the stateMemorizer that are not represented in the new
-                // automaton and therefore can't be reached in the total synchronization.
+                // automaton and therefore can't be reached in the total synchronisation.
                 // Reachable states are marked with potentiallyUncontrollableStates.find() above.
                 potentiallyUncontrollableStates.clean(automataIndices);
 
                 // Print result
                 final int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
-                if (Config.VERBOSE_MODE.isTrue())
+                String message;
+                switch (statesLeft)
                 {
-                    String message;
+                case 0 :
+                  message = "No uncontrollable states ";
+                  break;
 
-                    switch (statesLeft)
-                    {
-                        case 0 :
-                            message = "No uncontrollable states ";
-                            break;
+                case 1 :
+                  message = "Still one state ";
+                  break;
 
-                        case 1 :
-                            message = "Still one state ";
-                            break;
+                case 2 :
+                  message = "Still two states ";
+                  break;
 
-                        case 2 :
-                            message = "Still two states ";
-                            break;
-
-                        default :
-                            message = "Still " + statesLeft + " states ";
-                    }
-
-                    logger.info(message + "left after adding" + addedAutomata + ".");
+                default :
+                  message = "Still " + statesLeft + " states ";
                 }
 
+                logger.info(message + "left after adding" + addedAutomata + ".");
                 // Are we ready?
                 if (statesLeft == 0)
                 {
@@ -1714,16 +1663,6 @@ public class AutomataVerifier
         final OPSearchAutomatonSimplifier simp =
                 new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
         simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
-        if (Config.VERBOSE_MODE.isTrue()) {
-            try {
-                final File wmod = theAutomata.getFileLocation();
-                final File dir = wmod.getParentFile();
-                final File log = new File(dir, "op.log");
-                simp.setLogFile(log);
-            } catch (final MalformedURLException exception) {
-                // No file - no logging
-            }
-        }
         return simp.run();
     }
 

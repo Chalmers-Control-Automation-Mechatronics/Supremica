@@ -35,14 +35,20 @@
 
 package org.supremica.gui;
 
-import org.supremica.log.*;
-import java.io.*;
-import att.grappa.*;
+import att.grappa.Graph;
+import att.grappa.GrappaPanel;
+import att.grappa.Parser;
+
+import java.io.StringReader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class PreLoader
 	extends Thread
 {
-	private static Logger logger = LoggerFactory.createLogger(PreLoader.class);
+	private static Logger logger = LogManager.getLogger(PreLoader.class);
 	private static PreLoader thisPreLoader = null;
 	private final static String dummyDot = "digraph state_automaton {graph [ center = true ];node [ label = \"Dummy\", shape = plaintext ];}";
 	private static Parser grappaParser = null;
@@ -51,7 +57,8 @@ public class PreLoader
 
 	private PreLoader() {}
 
-	public void run()
+	@Override
+  public void run()
 	{
 		load();
 	}
@@ -61,7 +68,7 @@ public class PreLoader
 
 		// logger.debug("running preloader");
 		// logger.debug(dummyDot);
-		StringReader reader = new StringReader(dummyDot);
+		final StringReader reader = new StringReader(dummyDot);
 
 		grappaParser = new Parser(reader);
 
@@ -69,7 +76,7 @@ public class PreLoader
 		{
 			grappaParser.parse();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception in PreLoader");
 			logger.debug(ex.getStackTrace());

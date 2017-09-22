@@ -54,6 +54,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.Border;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
@@ -64,9 +67,8 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.ExtDiningPhilosophers;
+
 
 class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -96,8 +98,7 @@ class ExtPhilosPanel extends JPanel implements TestCase, ActionListener {
 	JPanel traversing_algorithms;
 	JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
 	JRadioButton verticalButton = new JRadioButton("Vertical traversing");
-	private static Logger logger = LoggerFactory
-			.createLogger(ExtPhilosPanel.class);
+	private static Logger logger = LogManager.getLogger(ExtPhilosPanel.class);
 
 	Util util = new Util();
 

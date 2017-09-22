@@ -60,6 +60,7 @@ package org.supremica.properties;
 import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.gui.logging.IDELogLevel;
 import net.sourceforge.waters.gui.util.IconSet;
 import net.sourceforge.waters.gui.util.LookAndFeelOption;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -146,21 +147,30 @@ public final class Config
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
 
     // GENERAL_LOG
-    public static final BooleanProperty LOG_TO_CONSOLE =
-      new BooleanProperty(PropertyType.GENERAL_LOG, "logToConsole",
-			   true, "Log to Console");
-    public static final BooleanProperty LOG_TO_GUI =
-      new BooleanProperty(PropertyType.GENERAL_LOG, "logToGUI",
-			   false, "Log to Graphical User Interface");
+    public static final ObjectProperty<IDELogLevel> LOG_GUI_VERBOSITY =
+      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelGUI",
+                           IDELogLevel.INFO,
+                           IDELogLevel.getAllowedValuesForLogPanel(),
+                           IDELogLevel.class,
+                           "Verbosity level for graphical user interface",
+                           true);
+    public static final ObjectProperty<IDELogLevel> LOG_CONSOLE_VERBOSITY =
+      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelConsole",
+                           IDELogLevel.NONE, IDELogLevel.class,
+                           "Verbosity level for console (stderr)");
+    public static final ObjectProperty<String> LOG_FILE =
+      new ObjectProperty<String>(PropertyType.GENERAL_LOG, "logFileName",
+                                 "", "Log file");
+    public static final ObjectProperty<IDELogLevel> LOG_FILE_VERBOSITY =
+      new ObjectProperty<>(PropertyType.GENERAL_LOG, "logLevelFile",
+                           IDELogLevel.NONE, IDELogLevel.class,
+                           "Verbosity level for log file");
     public static final BooleanProperty GENERAL_REDIRECT_STDOUT =
       new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStdout",
-			   true, "Redirect stdout");
+                          false, "Capture stdout (System.out.println) in GUI ");
     public static final BooleanProperty GENERAL_REDIRECT_STDERR =
       new BooleanProperty(PropertyType.GENERAL_LOG, "generalRedirectStderr",
-			   false, "Redirect stderr");
-    public static final BooleanProperty VERBOSE_MODE =
-      new BooleanProperty(PropertyType.GENERAL_LOG, "verboseMode",
-			  false, "Verbose mode");
+                          false, "Capture stderr (System.err.println) in GUI ");
 
     // GENERAL_FILE
     public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");

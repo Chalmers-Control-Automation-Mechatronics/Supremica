@@ -33,7 +33,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 
@@ -93,7 +94,7 @@ public abstract class AbstractAbortable implements Abortable
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 

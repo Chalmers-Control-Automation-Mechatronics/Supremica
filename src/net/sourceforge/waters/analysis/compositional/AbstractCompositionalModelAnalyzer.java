@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -76,11 +80,7 @@ import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.map.hash.TObjectByteHashMap;
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.Logger;
 
 
 /**

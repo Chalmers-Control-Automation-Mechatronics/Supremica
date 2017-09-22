@@ -47,24 +47,13 @@ import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.AutomataMinimizationWorker;
 import org.supremica.gui.MinimizationDialog;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerMinimizeAction
     extends IDEAction
 {
-    @SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.createLogger(IDE.class);
-
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
     public AnalyzerMinimizeAction(final List<IDEAction> actionList)
     {
         super(actionList);

@@ -45,7 +45,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * A default implementation of the {@link AbstractionProcedure} interface.
@@ -153,7 +155,7 @@ abstract class AbstractAbstractionProcedure implements AbstractionProcedure
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 

@@ -4,6 +4,9 @@ import java.util.Iterator;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -11,9 +14,8 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 // This one is used for doMonolithic to return two values
 class MonolithicReturnValue
@@ -23,16 +25,16 @@ class MonolithicReturnValue
     public Alphabet disabledUncontrollableEvents;    // see AutomatonSynthesizer
 }
 
+
 public class MonolithicAutomataSynthesizer implements Abortable {
 	/**
-	 * This method synchronizes the given automata, and calculates the forbidden
+	 * This method synchronises the given automata, and calculates the forbidden
 	 * states. Uses the ordinary synthesis algorithm.
 	 */
-	private static Logger logger = LoggerFactory
-			.createLogger(MonolithicAutomataSynthesizer.class);
+	private static Logger logger = LogManager.getLogger(MonolithicAutomataSynthesizer.class);
 
 	/**
-	 * This method synchronizes the given automata, and calculates the forbidden
+	 * This method synchronises the given automata, and calculates the forbidden
 	 * states.
 	 */
 	public MonolithicReturnValue synthesizeSupervisor(Automata automata,
@@ -41,7 +43,7 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 			final ExecutionDialog executionDialog,
 			final AutomataSynchronizerHelperStatistics helperStatistics,
 			final boolean singleFixpoint) {
-		logger.verbose("Attempting monolithic synthesis for: " + automata);
+		logger.info("Attempting monolithic synthesis for: " + automata);
 
 		final MonolithicReturnValue retval = new MonolithicReturnValue();
 
@@ -115,31 +117,31 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
 			synchronizationOptions.setRememberDisabledEvents(true);
 		}
-		
+
 		/*
 		 * The collection uc_events is to keep track of which events are originally controllable
 		 * If uc_evenst is non-empty at the end of the synthesis, this means that the
 		 * uncontrollability of those events needs to be restored
 		**/
-		// final Alphabet uc_events = new Alphabet(); // 
+		// final Alphabet uc_events = new Alphabet(); //
 		// Note! Cannot use Alphabet here, since Alphabet does not allow multiple same-labeled events
 		// A linked list will do just fine, since we only add, and then traverse once at the end (no search)
 		final java.util.List<LabeledEvent> uc_events = new java.util.LinkedList<>();
-		
+
 		if (synthesizerOptions.getSynthesisType() == SynthesisType.NONBLOCKING)
 		{
 			automata = new Automata(automata);
-			// Only nonblocking? Then everything should be considered controllable! 
-			// But don't forget to restore everything, see issue #38 // MF 
-			for (final Automaton automaton : automata) 
+			// Only nonblocking? Then everything should be considered controllable!
+			// But don't forget to restore everything, see issue #38 // MF
+			for (final Automaton automaton : automata)
 			{
-				for (final LabeledEvent event : automaton.getAlphabet()) 
+				for (final LabeledEvent event : automaton.getAlphabet())
 				{
 					if(!event.isControllable())
-					{	
+					{
 						uc_events.add(event);	// Keep track that this events was uncontrollable...
 						event.setControllable(true);	// ... then set it controllable.
-					}						
+					}
 				}
 			}
 		}
@@ -217,12 +219,12 @@ public class MonolithicAutomataSynthesizer implements Abortable {
 			}
 		}
 
-		// Restore the unontrollability of the events that may have been made 
+		// Restore the unontrollability of the events that may have been made
 		// controllable for Monolithic Nonblocking (Explicit) synthesis, but
 		// were originally uncontrollable
 		for(final LabeledEvent ucev : uc_events)
 			ucev.setControllable(false);
-		
+
 		// Return the result
 		return retval;
 	}

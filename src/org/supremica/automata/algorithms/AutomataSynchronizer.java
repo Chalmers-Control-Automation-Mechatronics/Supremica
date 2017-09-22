@@ -66,6 +66,9 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -74,15 +77,13 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 public class AutomataSynchronizer
     implements Abortable
 {
 
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynchronizer.class);
+    private static Logger logger = LogManager.getLogger(AutomataSynchronizer.class);
 
     private Automata theAutomata;
     private AutomataSynchronizerHelper synchHelper;

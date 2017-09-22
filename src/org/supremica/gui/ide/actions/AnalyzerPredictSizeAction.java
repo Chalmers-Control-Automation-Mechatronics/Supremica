@@ -35,9 +35,14 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.GeneticAlgorithms;
@@ -53,7 +58,7 @@ public class AnalyzerPredictSizeAction
     /**
      * Constructor.
      */
-    public AnalyzerPredictSizeAction(List<IDEAction> actionList)
+    public AnalyzerPredictSizeAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -67,7 +72,8 @@ public class AnalyzerPredictSizeAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -75,19 +81,23 @@ public class AnalyzerPredictSizeAction
     /**
      * Predict the size, calculate the exact size and the worst case size and present the result.
      */
+    @Override
     public void doAction()
     {
-        Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // Calculate predicted synchronisation size
-        int prediction = (int) GeneticAlgorithms.predictSynchronizationSize(automata);
+        final int prediction = (int) GeneticAlgorithms.predictSynchronizationSize(automata);
         // Calculate exact synchronisation size (for comparison)
-        int exact = GeneticAlgorithms.calculateSynchronizationSize(automata);
+        final int exact = GeneticAlgorithms.calculateSynchronizationSize(automata);
         // Calculate worst case size
         int worst = 1;
-        for (Automaton aut: automata)
+        for (final Automaton aut: automata) {
             worst *= aut.nbrOfStates();
-
-        ide.info("Predicted size: " + prediction + ", exact size: " + exact + ", worst case size: " + worst + ".");
+        }
+        final Logger logger = LogManager.getLogger();
+        logger.info("Predicted size: " + prediction +
+                    ", exact size: " + exact +
+                    ", worst case size: " + worst + ".");
     }
 }

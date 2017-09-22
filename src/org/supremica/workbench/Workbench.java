@@ -1,7 +1,3 @@
-/*************************** Workbench.java ***********************/
-// Gui for the manual synthesis procedure we impose on the students
-// Owner: MF
-
 package org.supremica.workbench;
 
 import java.awt.GridBagConstraints;
@@ -21,6 +17,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
@@ -36,19 +35,22 @@ import org.supremica.gui.AutomatonViewer;
 import org.supremica.gui.AutomatonViewerFactory;
 import org.supremica.gui.CenteredFrame;
 import org.supremica.gui.VisualProject;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.testcases.StickPickingGame;
 
+
 /**
- * The main frame for the workbench.
+ * The main frame for the workbench. It contains the GUI for the manual
+ * synthesis procedure we impose on the students.
+ *
+ * @author Martin Fabian
  */
+
 public class Workbench
     extends CenteredFrame
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(Workbench.class);
+    private static Logger logger = LogManager.getLogger(Workbench.class);
     Automata automata = null;    // these are used "globally" in this file
     Automaton automaton = null;    // eventually the resulting supervisor
     VisualProject project = null;
@@ -338,7 +340,7 @@ class SynchButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(SynchButton.class);
+    private static Logger logger = LogManager.getLogger(SynchButton.class);
     SynchButton(final Workbench wb)
     {
         super("Synch", wb, "Synchronize the selected automata (make total specification)");
@@ -405,7 +407,7 @@ class CompareButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(CompareButton.class);
+    private static Logger logger = LogManager.getLogger(CompareButton.class);
     CompareButton(final Workbench wb)
     {
         super("Compare", wb, "Compare supervisor candidate vs. plant for controllability problems");
@@ -536,7 +538,7 @@ class ContButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(ContButton.class);
+    private static Logger logger = LogManager.getLogger(ContButton.class);
     ContButton(final Workbench wb)
     {
         super("Controllability", wb, "Forbid states that uncontrollably can reach forbidden states");
@@ -603,7 +605,7 @@ class NonblockButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(NonblockButton.class);
+    private static Logger logger = LogManager.getLogger(NonblockButton.class);
     NonblockButton(final Workbench wb)
     {
         super("Coreachability", wb, "Forbid states that can not reach marked states");
@@ -662,7 +664,7 @@ class ReachButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
+    private static Logger logger = LogManager.getLogger(ReachButton.class);
     ReachButton(final Workbench wb)
     {
         super("Reachability", wb, "Forbid non-reachable states");
@@ -724,7 +726,7 @@ class PurgeButton
     extends ButtonImpl
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(ReachButton.class);
+    private static Logger logger = LogManager.getLogger(ReachButton.class);
     PurgeButton(final Workbench wb)
     {
         super("Purge", wb, "Remove all forbidden states");

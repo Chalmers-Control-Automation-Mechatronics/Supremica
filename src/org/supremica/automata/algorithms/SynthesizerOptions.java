@@ -49,13 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
+
 
 public final class SynthesizerOptions
 {
-    private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
+    private static Logger logger = LogManager.getLogger(SynthesizerOptions.class);
 
     private boolean dialogOK = false;
     private SynthesisType synthesisType;

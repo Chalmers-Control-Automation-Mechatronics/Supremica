@@ -35,26 +35,31 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.SynchronizationDialog;
-import org.supremica.gui.AutomataSynchronizerWorker;
 import java.util.List;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.log.*;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.gui.AutomataSynchronizerWorker;
+import org.supremica.gui.SynchronizationDialog;
+import org.supremica.gui.ide.IDE;
+
 
 public class AnalyzerSynchronizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private final Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
-    public AnalyzerSynchronizerAction(List<IDEAction> actionList)
+    public AnalyzerSynchronizerAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -69,7 +74,7 @@ public class AnalyzerSynchronizerAction
     }
 
 	@Override
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -78,7 +83,7 @@ public class AnalyzerSynchronizerAction
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, true, true))
         {
             return;
@@ -91,7 +96,7 @@ public class AnalyzerSynchronizerAction
         {
             synchronizationOptions = new SynchronizationOptions();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             JOptionPane.showMessageDialog(ide.getFrame(), "Error constructing synchronizationOptions: " + ex.getMessage(), "Alert", JOptionPane.ERROR_MESSAGE);
             logger.debug(ex.getStackTrace());
@@ -100,7 +105,7 @@ public class AnalyzerSynchronizerAction
         }
 
         // Start a dialog to allow the user changing the options
-        SynchronizationDialog synchronizationDialog = new SynchronizationDialog(ide.getFrame(), synchronizationOptions);
+        final SynchronizationDialog synchronizationDialog = new SynchronizationDialog(ide.getFrame(), synchronizationOptions);
 
         synchronizationDialog.show();
 

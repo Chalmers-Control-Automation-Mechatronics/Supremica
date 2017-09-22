@@ -49,38 +49,49 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+
 
 public class AutomataToSattLineSFC
 	extends AutomataToControlBuilderSFC
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFC.class);
+	private static Logger logger = LogManager.getLogger(AutomataToSattLineSFC.class);
 
-	public AutomataToSattLineSFC(Project theProject)
+	public AutomataToSattLineSFC(final Project theProject)
 	{
-		this(theProject, (SattLineHelper) SattLineHelper.getInstance());
+		this(theProject, SattLineHelper.getInstance());
 	}
 
-	public AutomataToSattLineSFC(Project theProject, IEC61131Helper theHelper)
+	public AutomataToSattLineSFC(final Project theProject, final IEC61131Helper theHelper)
 	{
 		super(theProject, theHelper);
 	}
 
-	public void serialize(String filename)
+	@Override
+  public void serialize(final String filename)
 	{    // Empty
 	}
 
-	public void serialize(PrintWriter pw)
+	@Override
+  public void serialize(final PrintWriter pw)
 	{    // Empty
 	}
 
-	public void serialize_s(File theFile, String filename)
+	public void serialize_s(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter pw = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter pw = new PrintWriter(new FileWriter(theFile));
 
 		/*// Start of file header
 		Date theDate = new Date();
@@ -123,7 +134,7 @@ public class AutomataToSattLineSFC
 		{
 			unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());
@@ -137,9 +148,9 @@ public class AutomataToSattLineSFC
 		boolean firstEvent = true;
 		int lineLength = 0;
 
-		for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+		for (final Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
 		{
-			LabeledEvent currEvent = (LabeledEvent) alphaIt.next();
+			final LabeledEvent currEvent = alphaIt.next();
 
 			if (currEvent.getLabel().length() > 20)
 			{
@@ -207,28 +218,28 @@ public class AutomataToSattLineSFC
 		pw.close();
 	}
 
-	public void serialize_g(File theFile, String filename)
+	public void serialize_g(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((SattLineHelper) theHelper).printGFile(theWriter, filename);
 		theWriter.close();
 	}
 
-	public void serialize_p(File theFile, String filename)
+	public void serialize_p(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((SattLineHelper) theHelper).printLFile(theWriter, filename);
 		theWriter.close();
 	}
 
-	public void serialize_l(File theFile, String filename)
+	public void serialize_l(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((SattLineHelper) theHelper).printPFile(theWriter, filename);
 		theWriter.close();

@@ -42,26 +42,14 @@ import javax.swing.Action;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.DeadEventsDetector;
-import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerDeadEventsDetectorAction
     extends IDEAction
 {
-    @SuppressWarnings("unused")
-	private Logger logger = LoggerFactory.createLogger(IDE.class);
-
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerDeadEventsDetectorAction(List<IDEAction> actionList)
+    public AnalyzerDeadEventsDetectorAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -76,7 +64,8 @@ public class AnalyzerDeadEventsDetectorAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/waters/minimise16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -84,14 +73,15 @@ public class AnalyzerDeadEventsDetectorAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // logger.info("Before action");
 
-        DeadEventsDetector detector = new DeadEventsDetector(selectedAutomata);
+        final DeadEventsDetector detector = new DeadEventsDetector(selectedAutomata);
         detector.execute();
         //logger.info("After action");
     }

@@ -84,6 +84,9 @@ import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ADSUnmarshaller2;
 import org.supremica.automata.IO.HISCUnmarshaller;
@@ -91,6 +94,7 @@ import org.supremica.automata.IO.SupremicaMarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.TCTUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
+
 import org.xml.sax.SAXException;
 
 
@@ -505,9 +509,10 @@ public class DocumentContainerManager
     try {
       mDocumentManager.saveAs(doc, file);
       container.setCheckPoint();
+      final Logger logger = LogManager.getLogger();
       final String type = getTypeString(doc);
       final String msg = type + " saved to " + file;
-      mIDE.info(msg);
+      logger.info(msg);
       if (!uri.equals(olduri)) {
         mURIContainerMap.remove(olduri);
         mURIContainerMap.put(uri, container);
@@ -592,7 +597,8 @@ public class DocumentContainerManager
     final String type = getTypeString(doc);
     try {
       marshaller.marshal(doc, extfile);
-      mIDE.info(type + " saved to " + file);
+      final Logger logger = LogManager.getLogger();
+      logger.info(type + " saved to " + file);
     } catch (final WatersMarshalException exception) {
       showIOError(exception, maycancel);
     } catch (final IOException exception) {

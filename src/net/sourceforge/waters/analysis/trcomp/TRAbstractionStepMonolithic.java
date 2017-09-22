@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 
 /**

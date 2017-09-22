@@ -56,7 +56,8 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -323,7 +324,7 @@ class UnifiedEFASimplifier extends AbstractEFAAlgorithm
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 

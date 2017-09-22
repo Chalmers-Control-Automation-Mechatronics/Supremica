@@ -49,17 +49,34 @@
  */
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import java.util.*;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDPairing;
+import net.sf.javabdd.BDDVarSet;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.util.ArrayHelper;
-import org.supremica.automata.*;
+
 
 public class BDDAutomata
     implements Iterable<BDDAutomaton>
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    private static Logger logger = LogManager.getLogger(BDDAutomata.class);
 
     BDDManager manager;
     Automata theAutomata;
@@ -289,6 +306,7 @@ public class BDDAutomata
         }
     }
 
+    @Override
     protected void finalize()
     {
         done();
@@ -327,6 +345,7 @@ public class BDDAutomata
         theBDDAutomataList.add(bddAutomaton);
         automatonToBDDAutomatonMap.put(bddAutomaton.getAutomaton(), bddAutomaton);
     }
+    @Override
     public Iterator<BDDAutomaton> iterator()
     {
         return theBDDAutomataList.iterator();

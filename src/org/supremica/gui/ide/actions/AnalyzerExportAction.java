@@ -45,6 +45,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.IO.AutomataSSPCExporter;
@@ -61,24 +64,16 @@ import org.supremica.gui.ExportFormat;
 import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.texteditor.TextFrame;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerExportAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerExportAction(List<IDEAction> actionList)
+    public AnalyzerExportAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -92,7 +87,8 @@ public class AnalyzerExportAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Export16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -100,16 +96,17 @@ public class AnalyzerExportAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
             return;
         }
 
-        ExportDialog dlg = new ExportDialog(ide.getFrame());
+        final ExportDialog dlg = new ExportDialog(ide.getFrame());
 
         dlg.show();
 
@@ -118,7 +115,7 @@ public class AnalyzerExportAction
             return;
         }
 
-        ExportFormat exportMode = dlg.getExportMode();
+        final ExportFormat exportMode = dlg.getExportMode();
 
         if (exportMode != ExportFormat.UNKNOWN)
         {
@@ -131,9 +128,9 @@ public class AnalyzerExportAction
     // Add new export functions here and to the function above
     // MF: It's not that simple. The code below defeats that purpose. Where are the exporter objects?
     // OO was invented just to avoid the type of code below. It's a maintenance nightmare!!
-    private void automataExport(ExportFormat exportMode)
+    private void automataExport(final ExportFormat exportMode)
     {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -155,8 +152,8 @@ public class AnalyzerExportAction
         // Proper design would have solved this problem
         if (exportMode == ExportFormat.XML_DEBUG)
         {
-            AutomataToXML xport = new AutomataToXML(selectedAutomata);
-            TextFrame textframe = new TextFrame("XML debug output");
+            final AutomataToXML xport = new AutomataToXML(selectedAutomata);
+            final TextFrame textframe = new TextFrame("XML debug output");
 
             xport.serialize(textframe.getPrintWriter());
 
@@ -175,18 +172,18 @@ public class AnalyzerExportAction
 */
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
-                Automaton currAutomaton = (Automaton) autIt.next();
-                AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
-                TextFrame textframe = new TextFrame("Dot debug output");
+                final Automaton currAutomaton = autIt.next();
+                final AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
+                final TextFrame textframe = new TextFrame("Dot debug output");
 
                 try
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -197,18 +194,18 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.DSX_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
-                Automaton currAutomaton = (Automaton) autIt.next();
-                AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
-                TextFrame textframe = new TextFrame("DSX debug output");
+                final Automaton currAutomaton = autIt.next();
+                final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
+                final TextFrame textframe = new TextFrame("DSX debug output");
 
                 try
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -219,18 +216,18 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.FSM_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
-                Automaton currAutomaton = (Automaton) autIt.next();
-                AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
-                TextFrame textframe = new TextFrame("FSM debug output");
+                final Automaton currAutomaton = autIt.next();
+                final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
+                final TextFrame textframe = new TextFrame("FSM debug output");
 
                 try
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -241,14 +238,14 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.PCG_DEBUG)
         {
-            AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
-            TextFrame textframe = new TextFrame("PCG debug output");
+            final AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
+            final TextFrame textframe = new TextFrame("PCG debug output");
 
             try
             {
                 a2cg.serialize(textframe.getPrintWriter());
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.debug(ex.getStackTrace());
             }
@@ -257,13 +254,13 @@ public class AnalyzerExportAction
         }
         else if ((exportMode == ExportFormat.PCG) || (exportMode == ExportFormat.SSPC))
         {
-            JFileChooser fileExporter = new JFileChooser();
+            final JFileChooser fileExporter = new JFileChooser();
 
             fileExporter.setDialogTitle("Save as ...");
 
             if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
             {
-                File currFile = fileExporter.getSelectedFile();
+                final File currFile = fileExporter.getSelectedFile();
 
                 if (currFile == null)
                 {
@@ -274,7 +271,7 @@ public class AnalyzerExportAction
                 {
                     if (exportMode == ExportFormat.PCG)
                     {
-                        AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
+                        final AutomataToCommunicationGraph a2cg = new AutomataToCommunicationGraph(selectedAutomata);
 
                         a2cg.serialize(currFile.getAbsolutePath());
                     }
@@ -283,7 +280,7 @@ public class AnalyzerExportAction
                         new AutomataSSPCExporter(selectedAutomata, currFile.getAbsolutePath());
                     }
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                     ex.printStackTrace();    // TEMP!
@@ -314,10 +311,10 @@ public class AnalyzerExportAction
                  */
         if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator();
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
             autIt.hasNext(); )
             {
-                Automaton currAutomaton = (Automaton) autIt.next();
+                final Automaton currAutomaton = autIt.next();
 
                 automatonExport(exportMode, currAutomaton);
             }
@@ -336,7 +333,7 @@ public class AnalyzerExportAction
             {
                 fileExporter = FileDialogs.getSTSFileExporter();
             }
- /*           
+ /*
             else if (exportMode == ExportFormat.SP)
             {
                 fileExporter = FileDialogs.getSPFileExporter();
@@ -351,7 +348,7 @@ public class AnalyzerExportAction
 
             if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
             {
-                File currFile = fileExporter.getSelectedFile();
+                final File currFile = fileExporter.getSelectedFile();
 
                 if (currFile != null)
                 {
@@ -361,21 +358,21 @@ public class AnalyzerExportAction
                         {
                             if (exportMode == ExportFormat.XML)
                             {
-                                AutomataToXML exporter = new AutomataToXML(selectedAutomata);
+                                final AutomataToXML exporter = new AutomataToXML(selectedAutomata);
                                 exporter.serialize(currFile);
                             }
                             else if (exportMode == ExportFormat.STS)
                             {
-                                Automata automata = selectedAutomata;
+                                final Automata automata = selectedAutomata;
                                 MinimizationHelper.plantify(automata);
-                                AutomataToSTS exporter = new AutomataToSTS(automata);
+                                final AutomataToSTS exporter = new AutomataToSTS(automata);
                                 exporter.serialize(currFile);
 
                                 fileExporter = FileDialogs.getSTSFileExporter();
                                 fileExporter.setDialogTitle("Save spec as ...");
                                 if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
                                 {
-                                    File currFileSpec = fileExporter.getSelectedFile();
+                                    final File currFileSpec = fileExporter.getSelectedFile();
                                     if (currFileSpec != null)
                                     {
                                         if (!currFileSpec.isDirectory())
@@ -384,7 +381,7 @@ public class AnalyzerExportAction
                                             {
                                                 exporter.createSpec(currFileSpec);
                                             }
-                                            catch (Exception ex)
+                                            catch (final Exception ex)
                                             {
                                                 logger.error("Exception while exporting " + currFileSpec.getAbsolutePath(), ex);
                                                 logger.debug(ex.getStackTrace());
@@ -401,7 +398,7 @@ public class AnalyzerExportAction
                             }
                              */
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
                             logger.debug(ex.getStackTrace());
@@ -415,7 +412,7 @@ public class AnalyzerExportAction
 
     // Exporter when the type is already known
     // Add new export functions here and to the function above
-    public void automatonExport(ExportFormat exportMode, Automaton currAutomaton)
+    public void automatonExport(final ExportFormat exportMode, final Automaton currAutomaton)
     {
         JFileChooser fileExporter = null;
 
@@ -439,7 +436,7 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
         }
-/*        
+/*
         else if (exportMode == ExportFormat.SP)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
@@ -455,7 +452,7 @@ public class AnalyzerExportAction
 
         if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
         {
-            File currFile = fileExporter.getSelectedFile();
+            final File currFile = fileExporter.getSelectedFile();
 
             if (currFile != null)
             {
@@ -465,34 +462,34 @@ public class AnalyzerExportAction
                     {
                         if (exportMode == ExportFormat.XML)
                         {
-                            Automata currAutomata = new Automata();
+                            final Automata currAutomata = new Automata();
                             currAutomata.addAutomaton(currAutomaton);
-                            AutomataToXML exporter = new AutomataToXML(currAutomata);
+                            final AutomataToXML exporter = new AutomataToXML(currAutomata);
                             exporter.serialize(currFile);
                         }
                         else if (exportMode == ExportFormat.DOT)
                         {
-                            AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
+                            final AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
                         else if (exportMode == ExportFormat.DSX)
                         {
-                            AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
+                            final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
                         else if (exportMode == ExportFormat.FSM)
                         {
-                            AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
+                            final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
                         else if (exportMode == ExportFormat.STS)
                         {
-                            Automata currAutomata = new Automata();
+                            final Automata currAutomata = new Automata();
                             currAutomata.addAutomaton(currAutomaton);
-                            AutomataToSTS exporter = new AutomataToSTS(currAutomata);
+                            final AutomataToSTS exporter = new AutomataToSTS(currAutomata);
                             exporter.serialize(currFile);
                         }
-/*                        
+/*
                         else if (exportMode == ExportFormat.SP)
                         {
                             Project activeProject = ide.getActiveProject();
@@ -518,7 +515,7 @@ public class AnalyzerExportAction
                           }
                          */
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
                         logger.debug(ex.getStackTrace());

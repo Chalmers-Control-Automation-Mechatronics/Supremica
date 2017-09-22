@@ -35,19 +35,23 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.util.*;
-import org.supremica.log.*;
+import java.awt.BorderLayout;
+import java.util.Iterator;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.gui.treeview.*;
+import org.supremica.gui.treeview.AutomatonSubTree;
+import org.supremica.gui.treeview.SupremicaTreeNode;
 
-// I changed AlphabetViewer to accept Automata objects and to show the alphabets 
-// of all selected Automaton in the same window. That's probably what you want if 
-// you select more than one and request Alphabet viewing. Previously, one 
+// I changed AlphabetViewer to accept Automata objects and to show the alphabets
+// of all selected Automaton in the same window. That's probably what you want if
+// you select more than one and request Alphabet viewing. Previously, one
 // AlphabetViewer was opened for each automaton.
 public class AlphabetViewerPanel
 	extends JPanel
@@ -55,19 +59,17 @@ public class AlphabetViewerPanel
 // implements AutomatonListener // to what are we to listen?
 {
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AlphabetViewerPanel.class);
-	private Automata theAutomata;
+	private final Automata theAutomata;
 	@SuppressWarnings("unused")
 	private Alphabet theAlphabet;
 	@SuppressWarnings("unused")
-	private boolean showId = false;
+	private final boolean showId = false;
 	@SuppressWarnings("unused")
-	private boolean updateNeeded = false;
-	private JTree theTree = new JTree();
-	private JScrollPane scrollPanel = new JScrollPane(theTree);
+	private final boolean updateNeeded = false;
+	private final JTree theTree = new JTree();
+	private final JScrollPane scrollPanel = new JScrollPane(theTree);
 
-	public AlphabetViewerPanel(Automata theAutomata)    // What's the reason for passing an automata here?
+	public AlphabetViewerPanel(final Automata theAutomata)    // What's the reason for passing an automata here?
 		throws Exception    // Alphabets cannot exist outside an automaton?
 	{
 		this.theAutomata = theAutomata;
@@ -146,21 +148,21 @@ public class AlphabetViewerPanel
 **/
 	public void build()
 	{
-		SupremicaTreeNode root = new SupremicaTreeNode();    // Really AutomataSubTree(theAutomata, showalpha, nostates)?
-		Iterator<Automaton> autit = theAutomata.iterator();
+		final SupremicaTreeNode root = new SupremicaTreeNode();    // Really AutomataSubTree(theAutomata, showalpha, nostates)?
+		final Iterator<Automaton> autit = theAutomata.iterator();
 
 		while (autit.hasNext())
 		{
-			root.add(new AutomatonSubTree((Automaton) autit.next(), true, false));
+			root.add(new AutomatonSubTree(autit.next(), true, false));
 		}
 
-		DefaultTreeModel treeModel = new DefaultTreeModel(root);
+		final DefaultTreeModel treeModel = new DefaultTreeModel(root);
 
 		theTree.setModel(treeModel);
 		theTree.setRootVisible(false);
 		theTree.setShowsRootHandles(true);
 
-		// theTree.setExpanded(new TreePath(node));             
+		// theTree.setExpanded(new TreePath(node));
 		revalidate();
 	}
 
@@ -201,7 +203,8 @@ public class AlphabetViewerPanel
 				revalidate();
 		}
 **/
-	public void setVisible(boolean toVisible)
+	@Override
+  public void setVisible(final boolean toVisible)
 	{
 		super.setVisible(toVisible);
 

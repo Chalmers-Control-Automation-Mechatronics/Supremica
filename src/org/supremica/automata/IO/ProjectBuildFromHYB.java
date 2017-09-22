@@ -49,11 +49,25 @@
  */
 package org.supremica.automata.IO;
 
-import java.util.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.util.StringTokenizer;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+
 
 /**
  * Import files from Balemis DES-program, in the .HYB-format
@@ -70,9 +84,10 @@ import org.supremica.log.*;
  * states, 'lamp_off', 'switching_on' and 'lamp_on'. The first state
  * is the initial state. This defines the automaton.
  */
+
 public class ProjectBuildFromHYB
 {
-	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromHYB.class);
+	private static Logger logger = LogManager.getLogger(ProjectBuildFromHYB.class);
 	private ProjectFactory theProjectFactory = null;
 //	private Project currProject = null;
 //	private Automaton currAutomaton = null;
@@ -86,26 +101,26 @@ public class ProjectBuildFromHYB
 		this.theProjectFactory = new DefaultProjectFactory();
 	}
 
-	public ProjectBuildFromHYB(ProjectFactory theProjectFactory)
+	public ProjectBuildFromHYB(final ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
 	}
 
-	public Project build(URL url)
+	public Project build(final URL url)
 		throws Exception
 	{
-		String protocol = url.getProtocol();
+		final String protocol = url.getProtocol();
 
 		if (protocol.equals("file"))
 		{
 			//inputProtocol = InputProtocol.FileProtocol;
 
-			String fileName = url.getFile();
+			final String fileName = url.getFile();
 
 			thisFile = new File(fileName);
 			automatonName = thisFile.getName();
 
-			int lastdot = automatonName.lastIndexOf(".");
+			final int lastdot = automatonName.lastIndexOf(".");
 
 			if (lastdot > 0)
 			{
@@ -121,20 +136,20 @@ public class ProjectBuildFromHYB
 			return null;
 		}
 
-		InputStream stream = url.openStream();
+		final InputStream stream = url.openStream();
 
 		return build(stream);
 	}
 
-	private Project build(InputStream is)
+	private Project build(final InputStream is)
 		throws Exception
 	{
-		InputStreamReader isReader = new InputStreamReader(is);
-		BufferedReader reader = new BufferedReader(isReader);
+		final InputStreamReader isReader = new InputStreamReader(is);
+		final BufferedReader reader = new BufferedReader(isReader);
 
 		// Get the project
-		Project currProject = theProjectFactory.getProject();
-		Automaton currAutomaton = new Automaton(automatonName);
+		final Project currProject = theProjectFactory.getProject();
+		final Automaton currAutomaton = new Automaton(automatonName);
 		currProject.addAutomaton(currAutomaton);
 		currAlphabet = currAutomaton.getAlphabet();
 		// Loop over lines
@@ -152,7 +167,7 @@ public class ProjectBuildFromHYB
 			State toState;
 
 			// Loop over line tokens
-			StringTokenizer tokenizer = new StringTokenizer(currLine);
+			final StringTokenizer tokenizer = new StringTokenizer(currLine);
 			if (tokenizer.hasMoreTokens()) // This line is not empty
 			{
 				// Read fromState
@@ -177,11 +192,11 @@ public class ProjectBuildFromHYB
 
 				// Read event
 				// 'c_' stands for 'command', i.e. issued by supervisor/controller - i.e. controllable
-				// 'r_' and 'E_' stands for 'response' and 'event' respectively, appearing in the plant - 
+				// 'r_' and 'E_' stands for 'response' and 'event' respectively, appearing in the plant -
 				// i.e. uncontrollable
 				currToken = tokenizer.nextToken();
 				event = new LabeledEvent(currToken);
-				if (currToken.startsWith("c_")) 
+				if (currToken.startsWith("c_"))
 				{
 					event.setControllable(true);
 				}
@@ -191,7 +206,7 @@ public class ProjectBuildFromHYB
 				}
 				else
 				{
-					logger.warn("Unknown event prefix '" + currToken.substring(0,2)+ 
+					logger.warn("Unknown event prefix '" + currToken.substring(0,2)+
 								"' for event " + currToken + ", treating event as controllable.");
 					event.setControllable(true);
 				}
@@ -214,7 +229,7 @@ public class ProjectBuildFromHYB
 				}
 
 				// Add transition
-				Arc currArc = new Arc(fromState, toState, event);
+				final Arc currArc = new Arc(fromState, toState, event);
 				currAutomaton.addArc(currArc);
 
 				//logger.info("Add trans " + fromState + " " + toState + " " + event);

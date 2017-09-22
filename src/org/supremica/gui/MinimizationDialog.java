@@ -34,21 +34,47 @@
 //###########################################################################
 
 package org.supremica.gui;
+
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+
+import javax.swing.Box;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.ListModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
+import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
-import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
-import org.supremica.automata.algorithms.EquivalenceRelation;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.automata.*;
-import org.supremica.log.*;
-import java.util.Iterator;
+
+
 public class MinimizationDialog
     implements ActionListener
 {
-    private static Logger logger = LoggerFactory.createLogger(MinimizationDialog.class);
+    private static Logger logger = LogManager.getLogger(MinimizationDialog.class);
 
     private final JButton okButton;
     private final JButton cancelButton;
@@ -123,6 +149,7 @@ public class MinimizationDialog
         dialog.setVisible(true);
     }
 
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
         final Object source = event.getSource();
@@ -217,6 +244,7 @@ public class MinimizationDialog
             this.add(notePanel);
         }
 
+        @Override
         public void update(final MinimizationOptions options)
         {
             minimizationTypeBox.setSelectedItem(options.getMinimizationType());
@@ -225,6 +253,7 @@ public class MinimizationDialog
             ignoreMarking.setSelected(options.getIgnoreMarking());
         }
 
+        @Override
         public void regain(final MinimizationOptions options)
         {
             options.setMinimizationType((EquivalenceRelation) minimizationTypeBox.getSelectedItem());
@@ -233,6 +262,7 @@ public class MinimizationDialog
             options.setIgnoreMarking(ignoreMarking.isSelected());
         }
 
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
           alsoTransitions.setEnabled(true);
@@ -359,6 +389,7 @@ public class MinimizationDialog
             this.add(mainBox);
         }
 
+        @Override
         public void update(final MinimizationOptions options)
         {
             // compositionalMinimization.setSelected(options.getCompositionalMinimization());
@@ -378,6 +409,7 @@ public class MinimizationDialog
             this.repaint();
         }
 
+        @Override
         public void regain(final MinimizationOptions options)
         {
             // Update targetAlphabet
@@ -409,6 +441,7 @@ public class MinimizationDialog
             options.setTargetAlphabet(targetAlphabet);
         }
 
+        @Override
         public void actionPerformed(final ActionEvent e)
         {
             updatePanel();

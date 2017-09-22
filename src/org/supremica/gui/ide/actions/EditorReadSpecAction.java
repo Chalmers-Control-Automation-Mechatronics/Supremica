@@ -61,15 +61,17 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 public class EditorReadSpecAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    private final Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
     HashMap<String,HashSet<String>> event2guard;
 
 	private static final String TRUE_GUARD = "1";

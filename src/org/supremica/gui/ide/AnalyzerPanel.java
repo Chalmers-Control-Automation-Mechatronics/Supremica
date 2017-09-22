@@ -48,6 +48,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
@@ -134,8 +137,9 @@ public class AnalyzerPanel
       final Project supremicaProject = builder.build(des);
       final List<String> warnings = builder.getWarnings();
       if (!warnings.isEmpty()) {
+        final Logger logger = LogManager.getLogger();
         for (final String warning : warnings) {
-          ide.warn(warning);
+          logger.warn(warning);
         }
       }
       addProject(supremicaProject);

@@ -115,13 +115,22 @@ public class ObjectProperty<T> extends Property
     return mValue;
   }
 
-  public void setValue(final T value)
+  /**
+   * Sets the property to a new value.
+   * @param  value   The new value for the property.
+   * @return <CODE>true</CODE> if the new value was different from the old
+   *         value, <CODE>false</CODE> if the property was unchanged.
+   */
+  public boolean setValue(final T value)
   {
     if (!mValue.equals(value)) {
       checkValid(value);
       final String oldvalue = getAsString();
       mValue = value;
       firePropertyChanged(oldvalue);
+      return true;
+    } else {
+      return false;
     }
   }
 

@@ -37,26 +37,22 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+
 import javax.swing.Action;
+
 import org.supremica.gui.ScheduleDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-//import org.supremica.automata.Automata;
-//import org.supremica.automata.Automaton;
+
 
 /**
- *
  * @author Avenir Kobetski
  */
+
 public class AnalyzerScheduleAction
         extends IDEAction
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AnalyzerScheduleAction.class);
     private static final long serialVersionUID = 1L;
 
-    /** Creates a new instance of AnalyzerScheduleAction */
-    public AnalyzerScheduleAction(List<IDEAction> actionList)
+    public AnalyzerScheduleAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -67,7 +63,8 @@ public class AnalyzerScheduleAction
         putValue(Action.SHORT_DESCRIPTION, "Several scheduling methods to find a time-optimal working schedule for the automata");
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -75,9 +72,10 @@ public class AnalyzerScheduleAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        ScheduleDialog scheduleDialog = new ScheduleDialog(ide.getIDE());
+        final ScheduleDialog scheduleDialog = new ScheduleDialog(ide.getIDE());
         scheduleDialog.setVisible(true);
 
 //        Automata automata = ide.getSelectedAutomata();

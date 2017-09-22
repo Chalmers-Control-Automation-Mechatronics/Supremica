@@ -11,58 +11,58 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
- *
  * @author Avenir Kobetski
  */
+
 public class BookingPairsGraphExplorer
 {
     //temp
-    private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(BookingPairsGraphExplorer.class);
- 
-//    private ArrayList<int[]>[] neighbors;
-//    private int[][] vertices;
-    
+    private final Logger logger = LogManager.getLogger(BookingPairsGraphExplorer.class);
+
     @SuppressWarnings("unused")
 	private ArrayList<int[]>[] edges = null;
     @SuppressWarnings("unused")
-	private boolean[] inComponent;
+	private final boolean[] inComponent;
     @SuppressWarnings("unused")
-	private int[] rootIndex;
-    
-    public BookingPairsGraphExplorer(ArrayList<int[]>[] edges)
+	private final int[] rootIndex;
+
+    public BookingPairsGraphExplorer(final ArrayList<int[]>[] edges)
     {
         this.edges = edges;
         inComponent = new boolean[edges.length];
         rootIndex = new int[edges.length];
-        
+
         //TODO: Implementera Tarjan's algorithm
-        
+
         for (int i = 0; i < edges.length; i++)
         {
             for (int j = 0; j < edges[i].size(); j++)
             {
-                logger.info("There is an edge between Z" + i + " and Z" + 
-                        edges[i].get(j)[0] + " with color P" + edges[i].get(j)[1] + 
+                logger.info("There is an edge between Z" + i + " and Z" +
+                        edges[i].get(j)[0] + " with color P" + edges[i].get(j)[1] +
                         " and overlapping_property = " + edges[i].get(j)[4]);
             }
         }
     }
-    
+
 //    /** Creates a new instance of BookingPairsGraphExplorer */
 //    public BookingPairsGraphExplorer(int[][] bPairIndices)
 //    {
 //        // Store the vertices
-//        vertices = bPairIndices; 
-//        
+//        vertices = bPairIndices;
+//
 //        // Initialize the lists of pointers to the neighboring vertices
 //        neighbors = new ArrayList[vertices.length];
 //        for (int i = 0; i < vertices.length; i++)
 //        {
 //            neighbors[i] = new ArrayList<int[]>();
 //        }
-//        
+//
 //        for (int i = 0; i < vertices.length - 1; i++)
 //        {
 //            for (int j = i + 1; j < vertices.length; j++)
@@ -75,7 +75,7 @@ public class BookingPairsGraphExplorer
 //            }
 //        }
 //    }
-//    
+//
 //    public ArrayList<LabeledEvent[]> findConnectedCycles()
 //    {
 //        for (int i = 0; i < vertices.length; i++)
@@ -86,26 +86,26 @@ public class BookingPairsGraphExplorer
 //                logger.info("nb: " + nb[0] + " " + nb[1] + " " + nb[2]);
 //            }
 //        }
-//        
-//        
-//        
-//        
+//
+//
+//
+//
 //        //temp
 //        return null;
 //    }
-//    
+//
 //    /**
-//     * This method checks whether two vertices should be connected by an edge. 
-//     * This should only be done if the they represent booking of at least one common zone. 
+//     * This method checks whether two vertices should be connected by an edge.
+//     * This should only be done if the they represent booking of at least one common zone.
 //     *
-//     * @param   firstVertice    containing the indices of some robot and two zones, 
+//     * @param   firstVertice    containing the indices of some robot and two zones,
 //     *                          booked by this robot in a sequence
-//     * @param   secondVertice   containing the indices of some robot and two zones, 
+//     * @param   secondVertice   containing the indices of some robot and two zones,
 //     *                          booked by this robot in a sequence
 //     * @return  true if the vertices represent booking of at least one common zone.
 //     */
 //    private boolean bookSameZone(int[] firstVertice, int[] secondVertice)
-//    {       
+//    {
 //        // If any of the zone booking indices match for different plants, the vertices should be connected
 //        if (firstVertice[0] != secondVertice[0])
 //        {
@@ -116,11 +116,11 @@ public class BookingPairsGraphExplorer
 //                    if (firstVertice[i] == secondVertice[j])
 //                    {
 //                        return true;
-//                    }   
+//                    }
 //                }
-//            }   
+//            }
 //        }
-//        
+//
 //        return false;
 //    }
 }

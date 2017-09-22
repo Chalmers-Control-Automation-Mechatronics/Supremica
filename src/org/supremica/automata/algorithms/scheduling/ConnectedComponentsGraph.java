@@ -13,14 +13,11 @@ import java.util.ArrayList;
 
 
 /**
- *
  * @author Avenir Kobetski
  */
+
 public class ConnectedComponentsGraph
 {
-    @SuppressWarnings("unused")
-	private final org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(ConnectedComponentsGraph.class);
-
     @SuppressWarnings("unused")
 	private ArrayList<int[]>[] edges = null;
     @SuppressWarnings("unused")

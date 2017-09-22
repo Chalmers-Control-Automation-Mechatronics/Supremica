@@ -68,6 +68,9 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.UnaryExpressionSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataIndexForm;
@@ -79,15 +82,13 @@ import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
 
 /**
- * Performs all kinds of synchronization tasks, for synchronization, verification and synthesis.
+ * Performs all kinds of synchronisation tasks, for synchronisation,
+ * verification and synthesis.
  *
- *@author  ka
+ *@author  Knut &Aring;kesson
  *@since  November 28, 2001
  *@see  AutomataSynchronizer
  *@see  AutomataSynthesizer
@@ -95,7 +96,7 @@ import org.supremica.util.SupremicaException;
 public final class AutomataSynchronizerExecuter
     extends Thread
 {
-    private final static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerExecuter.class);
+    private final static Logger logger = LogManager.getLogger(AutomataSynchronizerExecuter.class);
     private final Thread threadToBeInterruptedUponException;
     private Throwable causeOfInterrupt;
 
@@ -182,10 +183,10 @@ public final class AutomataSynchronizerExecuter
      */
     public AutomataSynchronizerExecuter(final AutomataSynchronizerHelper synchronizerHelper)
     {
-        setUncaughtExceptionHandler(new UncaughtExceptionHandler() 
+        setUncaughtExceptionHandler(new UncaughtExceptionHandler()
 		{
 			@Override
-			public void uncaughtException(final Thread thread, final Throwable cause) 
+			public void uncaughtException(final Thread thread, final Throwable cause)
 			{
 				cause.printStackTrace();
 				causeOfInterrupt = cause;
@@ -560,8 +561,7 @@ public final class AutomataSynchronizerExecuter
                 if (exhaustiveSearch)
                 {
                     // Stop when uncontrollable state found
-                    logger.verbose("Uncontrollable state found.");
-
+                    logger.info("Uncontrollable state found.");
                     return;
                 }
             }
@@ -630,11 +630,7 @@ public final class AutomataSynchronizerExecuter
             if (insertionIndex == 0)
             {
                 // Found no corresponding transitions in the suspect automaton...
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    logger.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
-                }
-
+                logger.debug("The suspect automaton has no corresponding transitions, wandering aimlessly...");
                 // Here, the insertionIndex sets the maximium amount of states
                 // that are examined...
                 // insertionIndex = 2;
@@ -642,15 +638,7 @@ public final class AutomataSynchronizerExecuter
             }
             else
             {
-
-                // There are transitions in the suspect automaton...
-                // /*
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    logger.debug("Following transitions in the suspect automaton. There are " + insertionIndex + " such transitions...");
-                }
-
-                // */
+                logger.debug("Following transitions in the suspect automaton. There are " + insertionIndex + " such transitions...");
             }
 
             currEnabledEvents[insertionIndex] = Integer.MAX_VALUE;

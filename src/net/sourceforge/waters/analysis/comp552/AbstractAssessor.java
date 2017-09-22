@@ -76,11 +76,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
 import org.xml.sax.SAXException;
 
 
@@ -125,17 +120,6 @@ abstract class AbstractAssessor
 
   //#########################################################################
   //# Set Up
-  static void setUpLogger()
-  {
-    final PrintWriter writer = new PrintWriter(System.err);
-    final PatternLayout layout = new PatternLayout("%-5p %m%n");
-    final Appender appender = new WriterAppender(layout, writer);
-    appender.setName("stderr");
-    final Logger root = Logger.getRootLogger();
-    root.setLevel(Level.ERROR);
-    root.addAppender(appender);
-  }
-
   void processCommandLine(final String[] args)
   {
     try {

@@ -43,23 +43,20 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.ide.IDE;
 import org.supremica.workbench.Workbench;
-// Action related
 
-/**
- * A new action
- */
+
 public class WorkbenchAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
     public WorkbenchAction(final List<IDEAction> actionList)
     {
         super(actionList);
@@ -86,6 +83,7 @@ public class WorkbenchAction
     @Override
     public void doAction()
     {
+        final Logger logger = LogManager.getLogger();
         try
         {
             final VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
@@ -93,7 +91,7 @@ public class WorkbenchAction
 
             if (selection.size() <= 0)
             {
-                ide.getIDE().info("No automata selected.");
+                logger.info("No automata selected.");
                 return;
             }
 
@@ -102,7 +100,7 @@ public class WorkbenchAction
         }
         catch (final Exception ex)
         {
-            ide.getIDE().error("Error starting Workbench.");
+            logger.error("Error starting Workbench.");
         }
     }
 }

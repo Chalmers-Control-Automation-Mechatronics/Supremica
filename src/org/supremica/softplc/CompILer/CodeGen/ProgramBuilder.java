@@ -1,15 +1,29 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
-import org.supremica.log.Logger;
-import de.fub.bytecode.generic.*;
-import de.fub.bytecode.Constants;
 import java.io.File;
 
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECDirectVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeBOOL;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeConstant;
+
+import de.fub.bytecode.Constants;
+import de.fub.bytecode.generic.ArrayType;
+import de.fub.bytecode.generic.ClassGen;
+import de.fub.bytecode.generic.FieldGen;
+import de.fub.bytecode.generic.InstructionConstants;
+import de.fub.bytecode.generic.InstructionFactory;
+import de.fub.bytecode.generic.InstructionList;
+import de.fub.bytecode.generic.MethodGen;
+import de.fub.bytecode.generic.PUSH;
+import de.fub.bytecode.generic.Type;
+
 /**
- * handles java bytecode generation for IL programs. Especially
+ * Handles java bytecode generation for IL programs. Especially
  * parts that differs from function blocks (common parts are handled
- * by {@link ProgramAndFBBuilder})
+ * by {@link ProgramAndFBBuilder}).
+ *
  * @author Anders Röding
  */
 public class ProgramBuilder
@@ -35,7 +49,7 @@ public class ProgramBuilder
 	 * @param debug set whether debug messages should appear at standard output.
 	 *              Only used if there is no logger provided
 	 */
-	public ProgramBuilder(String programName, String dumpClassDir, Logger logger, boolean debug)
+	public ProgramBuilder(final String programName, final String dumpClassDir, final Logger logger, final boolean debug)
 	{
 		this.logger = logger;
 		this.debug = debug;
@@ -82,7 +96,8 @@ public class ProgramBuilder
 	 * @param v the direct variable
 	 * @param i the value the variable should be set to
 	 */
-	public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
+	@Override
+  public void emitDirectInit(final IECDirectVariable v, final TypeBOOL i)
 	{
 		if (v.isInput())
 		{
@@ -103,11 +118,12 @@ public class ProgramBuilder
 	 * @param var direct variable to load
 	 * @return instruction list with bytecode for loading var
 	 */
-	InstructionList emitLoadVariable(IECDirectVariable var)
+	@Override
+  InstructionList emitLoadVariable(final IECDirectVariable var)
 	{
-		InstructionList il = new InstructionList();
-		TypeConstant type = var.getType();
-		int nr = var.getNumber();
+		final InstructionList il = new InstructionList();
+		final TypeConstant type = var.getType();
+		final int nr = var.getNumber();
 
 		if (type == TypeConstant.T_BOOL)
 		{
@@ -138,11 +154,12 @@ public class ProgramBuilder
 	 * @param var variable to store TOS value in
 	 * @return instruction list with bytecode for storing TOS in var.
 	 */
-	InstructionList emitStoreVariable(IECDirectVariable var)
+	@Override
+  InstructionList emitStoreVariable(final IECDirectVariable var)
 	{
-		InstructionList il = new InstructionList();
-		TypeConstant type = var.getType();
-		int nr = var.getNumber();
+		final InstructionList il = new InstructionList();
+		final TypeConstant type = var.getType();
+		final int nr = var.getNumber();
 
 		if (var.isInput())
 		{

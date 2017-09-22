@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.simulator;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,10 +81,11 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-
-import gnu.trove.set.hash.THashSet;
 
 
 public class Simulation implements ModelObserver, Observer
@@ -248,8 +251,8 @@ public class Simulation implements ModelObserver, Observer
         ModuleContext.getEventKindToolTip(ekind, true) + ' ' + event.getName() +
         " is disabled by " + ModuleContext.getComponentKindToolTip(akind) +
         ' ' + disabling.getName() + '.';
-      final IDE ide = mModuleContainer.getIDE();
-      ide.error(msg);
+      final Logger logger = LogManager.getLogger();
+      logger.error(msg);
     } else {
       step(steps);
     }
@@ -373,26 +376,23 @@ public class Simulation implements ModelObserver, Observer
    */
   public void replayStep()
   {
-    if (mTrace != null)
-    {
-      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated)
-      {
-        if (mCurrentTime == mStateHistory.size() - 1)
-        {
-          mModuleContainer.getIDE().info(": Looping to start of control loop");
-          while (mCurrentTime != ((LoopTraceProxy)mTrace).getLoopIndex() + 1)
-          {
+    if (mTrace != null) {
+      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated) {
+        if (mCurrentTime == mStateHistory.size() - 1) {
+          final Logger logger = LogManager.getLogger();
+          logger.info(": Looping to start of control loop");
+          while (mCurrentTime != ((LoopTraceProxy) mTrace).getLoopIndex() + 1) {
             stepBack();
           }
-        }
-        else
+        } else {
           moveSafely(true);
-      }
-      else
+        }
+      } else {
         moveSafely(true);
-    }
-    else
+      }
+    } else {
       moveSafely(true);
+    }
   }
 
   public void switchToTraceMode(final TraceProxy trace)
@@ -745,8 +745,8 @@ public class Simulation implements ModelObserver, Observer
         }
       }
       buffer.append('.');
-      final IDE ide = mModuleContainer.getIDE();
-      ide.warn(buffer.toString());
+      final Logger logger = LogManager.getLogger();
+      logger.warn(buffer.toString());
     }
   }
 
@@ -1049,8 +1049,8 @@ public class Simulation implements ModelObserver, Observer
   {
     if (forward) {
       if (mCurrentTime == mStateHistory.size() - 1) {
-        final IDE ide = mModuleContainer.getIDE();
-        ide.error("No future events in simulation history!");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No future events in simulation history!");
         return false;
       } else {
         mCurrentTime++;
@@ -1058,8 +1058,8 @@ public class Simulation implements ModelObserver, Observer
       }
     } else {
       if (mCurrentTime == 0) {
-        final IDE ide = mModuleContainer.getIDE();
-        ide.error("No previous event in simulation history!");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No previous event in simulation history!");
         return false;
       } else {
         mCurrentTime--;

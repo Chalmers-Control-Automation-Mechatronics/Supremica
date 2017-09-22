@@ -74,9 +74,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
 
 /**
  * The projecting safety check algorithm.
@@ -981,12 +978,5 @@ public class ProjectingSafetyVerifier
   private final Map<AutomataHidden, AutomatonProxy> mMinAutMap =
     new HashMap<AutomataHidden, AutomatonProxy>();
   private final Set<AutomataHidden> mChecked = new HashSet<AutomataHidden>();
-
-
-  //#########################################################################
-  //# Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-    LoggerFactory.createLogger(ProjectingSafetyVerifier.class);
 
 }

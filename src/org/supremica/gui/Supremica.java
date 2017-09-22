@@ -70,7 +70,11 @@ import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.about.AboutPopup;
+import net.sourceforge.waters.gui.logging.LogPanel;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
@@ -78,20 +82,15 @@ import org.supremica.automata.Project;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.automata.IO.ProjectBuildFromXML;
 import org.supremica.gui.help.ContentHelp;
-import org.supremica.gui.ide.IDEReportInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
 public class Supremica
     extends JFrame
-    implements IDEReportInterface, TableModelListener,
-               Gui, VisualProjectContainerListener
+    implements TableModelListener, Gui, VisualProjectContainerListener
 {
     private static final long serialVersionUID = 1L;
-    private final Logger logger = LoggerFactory.createLogger(Supremica.class);
-    private final LogDisplay theLogDisplay = LogDisplay.getInstance();
+    private final Logger logger = LogManager.getLogger(Supremica.class);
     private JPanel contentPane;
     private final MainMenuBar menuBar = new MainMenuBar(this);
     private final MainToolBar toolBar = new MainToolBar(this);
@@ -154,8 +153,9 @@ public class Supremica
         vp.setBackground(Color.white);
         theAutomatonTable.setBackground(Color.white);
 
-        splitPaneVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, theLogDisplay.getComponent());
-        theLogDisplay.getComponent().updateUI();
+        final LogPanel logPanel = new LogPanel();
+        splitPaneVertical =
+          new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, logPanel);
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
@@ -362,30 +362,6 @@ public class Supremica
     }
 
     // ** MF ** Implementation of Gui stuff
-    @Override
-    public void error(final String msg)
-    {
-        logger.error(msg);
-    }
-
-    @Override
-    public void error(final String msg, final Throwable t)
-    {
-        logger.error(msg, t);
-    }
-
-    @Override
-    public void info(final String msg)
-    {
-        logger.info(msg);
-    }
-
-    @Override
-    public void debug(final String msg)
-    {
-        logger.debug(msg);
-    }
-
     @Override
     public void clearSelection()
     {

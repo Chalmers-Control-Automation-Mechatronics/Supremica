@@ -48,22 +48,16 @@
  */
 package org.supremica;
 
+import org.supremica.automata.TestPackageAutomata;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.supremica.automata.TestPackageAutomata;
-import org.supremica.properties.Config;
 
 public class TestPackageSupremica
 	extends TestCase
 {
-	static
-	{
-		Config.LOG_TO_CONSOLE.set(true);
-		Config.LOG_TO_GUI.set(false);
-	}
-
 	public TestPackageSupremica(final String name)
 	{
 		super(name);

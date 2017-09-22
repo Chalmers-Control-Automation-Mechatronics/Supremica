@@ -35,15 +35,25 @@
 
 package org.supremica.gui;
 
-import java.util.*;
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JRadioButtonMenuItem;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 
 /**
@@ -62,7 +72,7 @@ class EventHiderDialog
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory.createLogger(EventHiderDialog.class);
+    private static Logger logger = LogManager.getLogger(EventHiderDialog.class);
 
     private final IDEActionInterface ide;
 
@@ -84,6 +94,7 @@ class EventHiderDialog
         final JRadioButtonMenuItem preserveMenuIgnore = new JRadioButtonMenuItem("Ignore controllability", !preserveControllability);
         preserveMenuIgnore.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 preserveControllability = false;
@@ -94,6 +105,7 @@ class EventHiderDialog
         final JRadioButtonMenuItem preserveMenuPreserve = new JRadioButtonMenuItem("Preserve controllability", preserveControllability);
         preserveMenuPreserve.addActionListener(new ActionListener()
         {
+            @Override
             public void actionPerformed(final ActionEvent e)
             {
                 preserveControllability = true;
@@ -123,6 +135,7 @@ class EventHiderDialog
             setToolTipText("Do the hiding");
             addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(final ActionEvent e)
                 {
                     System.err.println("Tryck inte så hårt!");
@@ -132,6 +145,7 @@ class EventHiderDialog
         }
     }
 
+    @Override
     protected void doRestrict()
     {
         // The set of new automata, based on the selected automata
@@ -192,8 +206,6 @@ public class EventHider
 {
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(EventHider.class);
     private final IDEActionInterface ide;
 
     public EventHider(final IDEActionInterface ide)
@@ -203,6 +215,7 @@ public class EventHider
         this.ide = ide;
     }
 
+    @Override
     public void actionPerformed(final ActionEvent event)
     {
         // Get the selected automata

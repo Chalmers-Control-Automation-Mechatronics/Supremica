@@ -52,6 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.Border;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
@@ -62,9 +65,8 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.ExtCatMouse;
+
 
 class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		ActionListener
@@ -84,8 +86,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	JPanel traversing_algorithms;
 	private final JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
 	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
-	private static Logger logger = LoggerFactory
-			.createLogger(ExtCatMousePanel.class);
+	private static Logger logger = LogManager.getLogger(ExtCatMousePanel.class);
 
 	public ExtCatMousePanel()
 	{

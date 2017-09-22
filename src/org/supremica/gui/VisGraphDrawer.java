@@ -35,40 +35,45 @@
 
 package org.supremica.gui;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Polygon;
 import java.util.ArrayList;
 
-import org.supremica.log.*;
+import javax.swing.JFrame;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 public class VisGraphDrawer
 	extends JFrame
 {
     private static final long serialVersionUID = 1L;
 	/** The logger */
-	private static Logger logger = LoggerFactory.createLogger(VisGraphDrawer.class);
-	
+	private static Logger logger = LogManager.getLogger(VisGraphDrawer.class);
+
 	private static final int OFFSET = 50;
 	private final int DRAWABLE_AREA;
 	private final int FLETCH_SPREAD = 5;
-	
-	private ArrayList<GraphicalZone> zones = new ArrayList<GraphicalZone>();
-	private ArrayList<int[]> paths = new ArrayList<int[]>();
 
-	private double[] xyRange = new double[2];
+	private final ArrayList<GraphicalZone> zones = new ArrayList<GraphicalZone>();
+	private final ArrayList<int[]> paths = new ArrayList<int[]>();
+
+	private final double[] xyRange = new double[2];
 	private String[] robotNames;
 
-	public VisGraphDrawer(int width, int height)
+	public VisGraphDrawer(final int width, final int height)
 	{
 		super("Visibility Graph");
-		
+
 		DRAWABLE_AREA = Math.min(height, width) - 3 * OFFSET;
 
 		setSize(width, height);
 		setVisible(true);
 	}
 
-	public VisGraphDrawer(int width, int height, String[] robotNames)
+	public VisGraphDrawer(final int width, final int height, final String[] robotNames)
 	{
 		this(width, height);
 
@@ -79,17 +84,18 @@ public class VisGraphDrawer
 		}
 	}
 
-	public void paint(Graphics g)
+	@Override
+  public void paint(final Graphics g)
 	{
 		setBackground(Color.WHITE);
 		g.setColor(Color.BLACK);
-		
+
 		//Coordinate axes (x)
 		g.drawLine(OFFSET, getHeight() - OFFSET, getWidth() - OFFSET, getHeight() - OFFSET);
-		g.drawLine(getWidth() - OFFSET, getHeight() - OFFSET, getWidth() - OFFSET - FLETCH_SPREAD, getHeight() - OFFSET - FLETCH_SPREAD); 
-		g.drawLine(getWidth() - OFFSET, getHeight() - OFFSET, getWidth() - OFFSET - FLETCH_SPREAD, getHeight() - OFFSET + FLETCH_SPREAD); 
+		g.drawLine(getWidth() - OFFSET, getHeight() - OFFSET, getWidth() - OFFSET - FLETCH_SPREAD, getHeight() - OFFSET - FLETCH_SPREAD);
+		g.drawLine(getWidth() - OFFSET, getHeight() - OFFSET, getWidth() - OFFSET - FLETCH_SPREAD, getHeight() - OFFSET + FLETCH_SPREAD);
 
-		//Coordinate axes (y)		
+		//Coordinate axes (y)
 		g.drawLine(OFFSET, getHeight() - OFFSET, OFFSET, OFFSET);
 		g.drawLine(OFFSET, OFFSET, OFFSET - FLETCH_SPREAD, OFFSET + FLETCH_SPREAD);
 		g.drawLine(OFFSET, OFFSET, OFFSET + FLETCH_SPREAD, OFFSET + FLETCH_SPREAD);
@@ -102,9 +108,9 @@ public class VisGraphDrawer
 		}
 
 		//The goal cross
-		int xLimitPixel = getWidth() - 2 * OFFSET;
-		int yLimitPixel = 2 * OFFSET;
-		
+		final int xLimitPixel = getWidth() - 2 * OFFSET;
+		final int yLimitPixel = 2 * OFFSET;
+
 		g.drawLine(xLimitPixel, getHeight() - OFFSET - FLETCH_SPREAD, xLimitPixel, getHeight() - OFFSET + FLETCH_SPREAD);
 		g.drawLine(OFFSET - FLETCH_SPREAD, yLimitPixel, OFFSET + FLETCH_SPREAD, yLimitPixel);
 		g.drawLine(xLimitPixel - FLETCH_SPREAD, yLimitPixel + FLETCH_SPREAD, xLimitPixel + FLETCH_SPREAD, yLimitPixel - FLETCH_SPREAD);
@@ -112,12 +118,12 @@ public class VisGraphDrawer
 
 		//The goal coordinates
 		g.drawString("" + xyRange[0], xLimitPixel - 2 * FLETCH_SPREAD, getHeight() - OFFSET + 4 * FLETCH_SPREAD);
-		g.drawString("" + xyRange[1], OFFSET - 7 * FLETCH_SPREAD, yLimitPixel);		
+		g.drawString("" + xyRange[1], OFFSET - 7 * FLETCH_SPREAD, yLimitPixel);
 
 		//Zone graphics
 		for (int i=0; i<zones.size(); i++)
 		{
-			GraphicalZone currZone = zones.get(i);
+			final GraphicalZone currZone = zones.get(i);
 
 			//Zones
 			g.setColor(Color.RED);
@@ -143,7 +149,7 @@ public class VisGraphDrawer
 		//Optimal paths
 		for (int i=0; i<paths.size(); i++)
 		{
-			int[] currPath = paths.get(i);
+			final int[] currPath = paths.get(i);
 
 			g.setColor(Color.BLUE);
 			//g.setFont(Font.BOLD); //PLAIN
@@ -151,75 +157,75 @@ public class VisGraphDrawer
 		}
 	}
 
-	public void addZone(double[] xCoords, double[] yCoords, String zoneName)
-		throws Exception 
+	public void addZone(final double[] xCoords, final double[] yCoords, final String zoneName)
+		throws Exception
 	{
-		try 
+		try
 		{
-			if (xCoords != null && yCoords != null) 
+			if (xCoords != null && yCoords != null)
 			{
 				zones.add(new GraphicalZone(xCoords, yCoords, zoneName, this));
 			}
 		}
-		catch (Exception ex) 
+		catch (final Exception ex)
 		{
 			logger.error("Exception in VisGraphDrawer.addZone() ---> " + ex.getMessage());
 			throw ex;
 		}
 	}
 
-	public void addPath(double[] pathStart, double[] pathEnd)
+	public void addPath(final double[] pathStart, final double[] pathEnd)
 		throws Exception
 	{
-		try 
+		try
 		{
-			int[] path = new int[pathStart.length + pathEnd.length];
-			
+			final int[] path = new int[pathStart.length + pathEnd.length];
+
 			path[0] = toXPixels(pathStart[0]);
 			path[1] = toYPixels(pathStart[1]);
 			path[2] = toXPixels(pathEnd[0]);
 			path[3] = toYPixels(pathEnd[1]);
-			
+
 			paths.add(path);
 		}
-		catch (Exception ex) 
+		catch (final Exception ex)
 		{
 			logger.error("Exception in VisGraphDrawer.addPath() ---> " + ex.getMessage());
 			throw ex;
 		}
 	}
 
-	public int toXPixels(double x)
+	public int toXPixels(final double x)
 	{
 		return (int) Math.round(x / xyRange[0] * DRAWABLE_AREA) + OFFSET;
 	}
 
-	public int toYPixels(double y)
+	public int toYPixels(final double y)
 	{
 		return getHeight() - (int) Math.round(y / xyRange[1] * DRAWABLE_AREA) - OFFSET;
 	}
 
-	public double[] getXYRange() 
+	public double[] getXYRange()
 	{
 		return xyRange;
 	}
 
-	public void setXYRange(double[] xyRange)
+	public void setXYRange(final double[] xyRange)
 	{
 		this.xyRange[0] = xyRange[0];
 		this.xyRange[1] = xyRange[1];
 	}
 }
 
-class GraphicalZone 
+class GraphicalZone
 	extends Polygon
 {
     private static final long serialVersionUID = 1L;
 
-	private double[] xCoords = new double[2];
-	private double[] yCoords = new double[2];
-	private int[] xPixels = new int[2];
-	private int[] yPixels = new int[2];
+	private final double[] xCoords = new double[2];
+	private final double[] yCoords = new double[2];
+	private final int[] xPixels = new int[2];
+	private final int[] yPixels = new int[2];
 	private String name = "";
 
 	GraphicalZone()
@@ -227,7 +233,7 @@ class GraphicalZone
 		super();
 	}
 
-	GraphicalZone(double[] xCoords, double[] yCoords, String name, VisGraphDrawer drawer)
+	GraphicalZone(final double[] xCoords, final double[] yCoords, final String name, final VisGraphDrawer drawer)
 	{
 		this();
 
@@ -253,7 +259,7 @@ class GraphicalZone
 	{
 		return xCoords;
 	}
-	
+
 	public double[] getYCoords()
 	{
 		return yCoords;
@@ -263,13 +269,13 @@ class GraphicalZone
 	{
 		return xPixels;
 	}
-	
+
 	public int[] getYPixels()
 	{
 		return yPixels;
 	}
 
-	public String getName() 
+	public String getName()
 	{
 		return name;
 	}

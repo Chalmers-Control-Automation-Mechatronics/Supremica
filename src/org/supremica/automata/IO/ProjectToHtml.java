@@ -49,26 +49,42 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
-import org.supremica.properties.Config;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
 import org.supremica.gui.ExportFormat;
+import org.supremica.properties.Config;
+
 
 public class ProjectToHtml
 {
-	private static Logger logger = LoggerFactory.createLogger(ProjectToHtml.class);
-	private Project project;
-	private File directory;
+	private static Logger logger = LogManager.getLogger(ProjectToHtml.class);
+	private final Project project;
+	private final File directory;
 	@SuppressWarnings("unused")
-	private boolean overwrite;
-	private int maxNbrOfStatesInPng;
+	private final boolean overwrite;
+	private final int maxNbrOfStatesInPng;
 	private Process dotProcess;
 	private PrintWriter toDotWriter;
 	private InputStream fromDotStream;
 
-	public ProjectToHtml(Project project, File directory)
+	public ProjectToHtml(final Project project, final File directory)
 	{
 		this.overwrite = false;
 		this.project = project;
@@ -89,19 +105,19 @@ public class ProjectToHtml
 		serializeProject();
 
 		// Serialize all automata
-		for (Iterator<Automaton> projectIt = project.iterator(); projectIt.hasNext(); )
+		for (final Iterator<Automaton> projectIt = project.iterator(); projectIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) projectIt.next();
+			final Automaton aut = projectIt.next();
 
 			serializeAutomaton(aut);
 		}
 
 		// Serialize all events
-		Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true);    // project.getUnionAlphabet();
+		final Alphabet projectAlphabet = AlphabetHelpers.getUnionAlphabet(project, true, true);    // project.getUnionAlphabet();
 
-		for (Iterator<LabeledEvent> alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
+		for (final Iterator<LabeledEvent> alphIt = projectAlphabet.iterator(); alphIt.hasNext(); )
 		{
-			LabeledEvent ev = (LabeledEvent) alphIt.next();
+			final LabeledEvent ev = alphIt.next();
 
 			serializeEvent(ev);
 		}
@@ -110,17 +126,17 @@ public class ProjectToHtml
 	public void serializeProject()
 		throws Exception
 	{
-		PrintWriter pw = getPrintWriter("index.html");
+		final PrintWriter pw = getPrintWriter("index.html");
 
 		printHtmlBegin(pw, "Supremica Project: " + project.getName());
 		pw.println("<h1>Project: " + EncodingHelper.normalize(project.getName(), ExportFormat.HTML) + "</h1>");
 		pw.println("<h2>Plants:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator<Automaton> projectIt = project.plantIterator();
+		for (final Iterator<Automaton> projectIt = project.plantIterator();
 				projectIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) projectIt.next();
+			final Automaton aut = projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
@@ -129,10 +145,10 @@ public class ProjectToHtml
 		pw.println("<h2>Specifications:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator<Automaton> projectIt = project.specificationIterator();
+		for (final Iterator<Automaton> projectIt = project.specificationIterator();
 				projectIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) projectIt.next();
+			final Automaton aut = projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
@@ -141,10 +157,10 @@ public class ProjectToHtml
 		pw.println("<h2>Supervisors:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator<Automaton> projectIt = project.supervisorIterator();
+		for (final Iterator<Automaton> projectIt = project.supervisorIterator();
 				projectIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) projectIt.next();
+			final Automaton aut = projectIt.next();
 
 			pw.println("<li> <a href=\"automaton" + aut.getIndex() + ".html\">" + EncodingHelper.normalize(aut.getName(), ExportFormat.HTML) + "</a></li>");
 		}
@@ -153,10 +169,10 @@ public class ProjectToHtml
 		printHtmlEnd(pw);
 	}
 
-	public void serializeAutomaton(Automaton theAutomaton)
+	public void serializeAutomaton(final Automaton theAutomaton)
 		throws Exception
 	{
-		PrintWriter pw = getPrintWriter("automaton" + theAutomaton.getSynchIndex() + ".html");
+		final PrintWriter pw = getPrintWriter("automaton" + theAutomaton.getSynchIndex() + ".html");
 
 		printHtmlBegin(pw, "Supremica Automaton: " + theAutomaton.getName());
 		pw.println("<h1>Automaton: " + EncodingHelper.normalize(theAutomaton.getName(), ExportFormat.HTML) + "</h1>");
@@ -164,17 +180,17 @@ public class ProjectToHtml
 		pw.println("<h2>Alphabet:</h2>");
 		pw.println("<ul>");
 
-		for (Iterator<LabeledEvent> eventIt = theAutomaton.eventIterator();
+		for (final Iterator<LabeledEvent> eventIt = theAutomaton.eventIterator();
 				eventIt.hasNext(); )
 		{
-			LabeledEvent event = (LabeledEvent) eventIt.next();
+			final LabeledEvent event = eventIt.next();
 
 			pw.println("<li> <a href=\"event" + event.getIndex() + ".html\">" + EncodingHelper.normalize(event.getLabel(), ExportFormat.HTML) + "</a></li>");
 		}
 
 		pw.println("</ul>");
 
-		boolean pngCreated = createPngFile(theAutomaton);
+		final boolean pngCreated = createPngFile(theAutomaton);
 
 		if (pngCreated)
 		{
@@ -186,10 +202,10 @@ public class ProjectToHtml
 		printHtmlEnd(pw);
 	}
 
-	public void serializeEvent(LabeledEvent theEvent)
+	public void serializeEvent(final LabeledEvent theEvent)
 		throws Exception
 	{
-		PrintWriter pw = getPrintWriter("event" + theEvent.getIndex() + ".html");
+		final PrintWriter pw = getPrintWriter("event" + theEvent.getIndex() + ".html");
 
 		printHtmlBegin(pw, "Supremica Event: " + theEvent.getLabel());
 		pw.println("<h1>Event: " + EncodingHelper.normalize(theEvent.getLabel(), ExportFormat.HTML) + "</h1>");
@@ -202,7 +218,7 @@ public class ProjectToHtml
 		printHtmlEnd(pw);
 	}
 
-	private void printHtmlBegin(PrintWriter pw, String title)
+	private void printHtmlBegin(final PrintWriter pw, final String title)
 	{
 		pw.println("<!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML//EN\">");
 		pw.println("<html>");
@@ -212,7 +228,7 @@ public class ProjectToHtml
 		pw.println("<body bgcolor=\"#FFFFFF\">");
 	}
 
-	private void printHtmlEnd(PrintWriter pw)
+	private void printHtmlEnd(final PrintWriter pw)
 	{
 		pw.println("</body>");
 		pw.println("</html>");
@@ -220,7 +236,7 @@ public class ProjectToHtml
 		pw.close();
 	}
 
-	private boolean createPngFile(Automaton theAutomaton)
+	private boolean createPngFile(final Automaton theAutomaton)
 		throws Exception
 	{
 		if (theAutomaton.nbrOfStates() > maxNbrOfStatesInPng)
@@ -228,7 +244,7 @@ public class ProjectToHtml
 			return false;
 		}
 
-		File currFile = getFile("automaton" + theAutomaton.getSynchIndex() + ".png");
+		final File currFile = getFile("automaton" + theAutomaton.getSynchIndex() + ".png");
 
 		if (currFile != null)
 		{
@@ -236,7 +252,7 @@ public class ProjectToHtml
 			{
 				try
 				{
-					AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
+					final AutomatonToDot exporter = new AutomatonToDot(theAutomaton);
 
 					exporter.setUseStateColors(true);
 					exporter.setUseArcColors(true);
@@ -245,7 +261,7 @@ public class ProjectToHtml
 					{
 						dotProcess = Runtime.getRuntime().exec(Config.DOT_EXECUTE_COMMAND.get() + " -Tpng");
 					}
-					catch (IOException ex)
+					catch (final IOException ex)
 					{
 						logger.error("Cannot run dot. Make sure dot is in the path.");
 						logger.debug(ex.getStackTrace());
@@ -253,8 +269,8 @@ public class ProjectToHtml
 						throw ex;
 					}
 
-					OutputStream pOut = dotProcess.getOutputStream();
-					BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
+					final OutputStream pOut = dotProcess.getOutputStream();
+					final BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
 
 					toDotWriter = new PrintWriter(pBuffOut);
 					fromDotStream = dotProcess.getInputStream();
@@ -264,9 +280,9 @@ public class ProjectToHtml
 					toDotWriter.close();
 
 					// Send the response to a file
-					FileOutputStream fw = new FileOutputStream(currFile);
-					BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
-					BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
+					final FileOutputStream fw = new FileOutputStream(currFile);
+					final BufferedOutputStream buffOutStream = new BufferedOutputStream(fw);
+					final BufferedInputStream buffInStream = new BufferedInputStream(fromDotStream);
 					int currChar = buffInStream.read();
 
 					while (currChar != -1)
@@ -279,7 +295,7 @@ public class ProjectToHtml
 					buffInStream.close();
 					buffOutStream.close();
 				}
-				catch (Exception ex)
+				catch (final Exception ex)
 				{
 					logger.error("Error while exporting " + currFile.getAbsolutePath() + "\n", ex);
 					logger.debug(ex.getStackTrace());
@@ -295,10 +311,10 @@ public class ProjectToHtml
 	/**
 	 * Given a name create the corresponding file in the current directory.
 	 */
-	private File getFile(String name)
+	private File getFile(final String name)
 		throws Exception
 	{
-		File newFile = new File(directory, name);
+		final File newFile = new File(directory, name);
 
 		return newFile;
 	}
@@ -306,7 +322,7 @@ public class ProjectToHtml
 	/**
 	 * Given a name create the corresponding file and return a PrintWriter to that object..
 	 */
-	private PrintWriter getPrintWriter(String name)
+	private PrintWriter getPrintWriter(final String name)
 		throws Exception
 	{
 		return new PrintWriter(new FileWriter(getFile(name)));

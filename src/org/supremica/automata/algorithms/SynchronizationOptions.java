@@ -57,15 +57,11 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 public class SynchronizationOptions
 {
-	@SuppressWarnings("unused")
-	private final static Logger logger = LoggerFactory.createLogger(SynchronizationOptions.class);
-
 	private SynchronizationType syncType;    // PRIORITIZED, FULL, Broadcast, Unknown
 	private boolean forbidUnconStates;    // mark uc-states as uncontrollable
 	private boolean expandForbiddenStates;    // expand beyond an uc-state
@@ -258,7 +254,7 @@ public class SynchronizationOptions
 	{
 		this.unobsEventsSynch = set;
 	}
-	
+
     // Added these two methods and the mEFAMode member.
     // I hope I did it correctly. ~~~Robi
     public boolean getEFAMode()

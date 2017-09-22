@@ -48,13 +48,26 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+
 
 public class AlphabetAnalyzer
 {
-    private static Logger logger = LoggerFactory.createLogger(AlphabetAnalyzer.class);
+    private static Logger logger = LogManager.getLogger(AlphabetAnalyzer.class);
     private final Automata theAutomata;
 
     /**

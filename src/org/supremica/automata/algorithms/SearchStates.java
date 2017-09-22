@@ -1,32 +1,33 @@
-
-/* ***************** SearchStates.java *********************
- *
- *  Given an Automata object and a Matcher object, online
- *  synch the automata and save the matching states
- *
- *  Is it useful to first search each automaton for states
- *  matching that automatons pattern? At least, if some
- *  automaton has no states matching its pattern, then no
- *  global match exists.
- */
-
-//-- owner: MF
 package org.supremica.automata.algorithms;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.MonitorableThread;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
+
+/**
+ * <P>Given an Automata object and a Matcher object, online
+ * synch the automata and save the matching states.</P>
+ *
+ * <P>Is it useful to first search each automaton for states
+ * matching that automatons pattern? At least, if some
+ * automaton has no states matching its pattern, then no
+ * global match exists.</P>
+ *
+ * @author Martin Fabian
+ */
 
 public class SearchStates
     extends MonitorableThread
 {
-    private static final Logger logger = LoggerFactory.createLogger(SearchStates.class);
+    private static final Logger logger = LogManager.getLogger(SearchStates.class);
     private AutomataSynchronizer syncher = null;
     private ArrayList<int[]> container = null;
     private StateMatcher matcher = null;

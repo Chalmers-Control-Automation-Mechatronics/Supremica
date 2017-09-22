@@ -1,31 +1,47 @@
 package org.supremica.testcases.warehouse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.execution.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.ComputerHumanExtender;
+import org.supremica.automata.execution.Action;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.Command;
+import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
 
 class Resource
 {
-    private static Logger logger = LoggerFactory.createLogger(Resource.class);
+    private static Logger logger = LogManager.getLogger(Resource.class);
     @SuppressWarnings("unused")
-	private boolean exclusive;
-    private String identity;
-    private LinkedList<Resource> u1NextResources = new LinkedList<Resource>();
-    private LinkedList<Resource> u2NextResources = new LinkedList<Resource>();
+	private final boolean exclusive;
+    private final String identity;
+    private final LinkedList<Resource> u1NextResources = new LinkedList<Resource>();
+    private final LinkedList<Resource> u2NextResources = new LinkedList<Resource>();
     @SuppressWarnings("unused")
-	private User u1;
+	private final User u1;
     @SuppressWarnings("unused")
-	private User u2;
-    private int x;
-    private int y;
+	private final User u2;
+    private final int x;
+    private final int y;
     private Automaton theAutomaton = null;
-    private State orgInitialState;
-    private Warehouse warehouse;
-    
-    public Resource(Warehouse warehouse, int x, int y, boolean exclusive, User u1, User u2)
+    private final State orgInitialState;
+    private final Warehouse warehouse;
+
+    public Resource(final Warehouse warehouse, final int x, final int y, final boolean exclusive, final User u1, final User u2)
     {
         this.x = x;
         this.y = y;
@@ -34,66 +50,68 @@ class Resource
         this.u1 = u1;
         this.u2 = u2;
         theAutomaton = new Automaton("Zone_" + identity);
-        
+
         theAutomaton.setType(AutomatonType.SPECIFICATION);
-        
-        State initialState = theAutomaton.createUniqueState("idle");
-        
+
+        final State initialState = theAutomaton.createUniqueState("idle");
+
         initialState.setInitial(true);
         initialState.setAccepting(true);
         theAutomaton.addState(initialState);
-        
+
         orgInitialState = initialState;
         this.warehouse = warehouse;
     }
-    
+
     public String getIdentity()
     {
         return identity;
     }
-    
+
+    @Override
     public String toString()
     {
         return identity;
     }
-    
+
+    @Override
     public int hashCode()
     {
         return identity.hashCode();
     }
-    
+
     public int getX()
     {
         return x;
     }
-    
+
     public int getY()
     {
         return y;
     }
-    
-    public void addNextAGVResource(Resource currResource)
+
+    public void addNextAGVResource(final Resource currResource)
     {
         u1NextResources.add(currResource);
     }
-    
-    public void addNextTruckResource(Resource currResource)
+
+    public void addNextTruckResource(final Resource currResource)
     {
         u2NextResources.add(currResource);
     }
-    
+
     public Automaton getAutomaton()
     {
         buildTransitions();
-        
+
         return theAutomaton;
     }
-    
+
     private void buildTransitions()
     {
-        State usedByAGV = theAutomaton.createUniqueState("qagv");
-        State usedByTruck = theAutomaton.createUniqueState("qtruck");
-        
+        final State usedByAGV = theAutomaton.createUniqueState("qagv");
+        final State usedByTruck = theAutomaton.createUniqueState("qtruck");
+
         if (getIdentity().equals("16"))
         {
             usedByTruck.setInitial(true);
@@ -108,116 +126,116 @@ class Resource
             orgInitialState.setInitial(false);
             orgInitialState.setAccepting(false);
         }
-        
+
         theAutomaton.addState(usedByAGV);
         theAutomaton.addState(usedByTruck);
-        
-        Alphabet agvAlphabet = warehouse.getAGVAlphabet();
-        Alphabet truckAlphabet = warehouse.getTruckAlphabet();
-        Alphabet thisAlphabet = theAutomaton.getAlphabet();
-        
+
+        final Alphabet agvAlphabet = warehouse.getAGVAlphabet();
+        final Alphabet truckAlphabet = warehouse.getTruckAlphabet();
+        final Alphabet thisAlphabet = theAutomaton.getAlphabet();
+
         {
-            
+
             // Add agv allocation event
-            LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
-            LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
+            final LabeledEvent agvAllocationEvent = agvAlphabet.getEvent("agv" + getIdentity());
+            final LabeledEvent thisAGVAllocationEvent = new LabeledEvent(agvAllocationEvent);
             thisAGVAllocationEvent.setOperatorReset(true);
-            
+
             thisAlphabet.addEvent(thisAGVAllocationEvent);
-            
-            Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
-            
+
+            final Arc agvAllocationArc = new Arc(orgInitialState, usedByAGV, thisAGVAllocationEvent);
+
             try
             {
                 theAutomaton.addArc(agvAllocationArc);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Could not add arc." + ex);
             }
         }
-        
+
         {
-            
+
             // Add agv deallocation events
-            for (Iterator<Resource> nextResIt = u1NextResources.iterator();
+            for (final Iterator<Resource> nextResIt = u1NextResources.iterator();
             nextResIt.hasNext(); )
             {
-                Resource nextResource = nextResIt.next();
-                String nextIdentity = nextResource.getIdentity();
-                LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
-                LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
-                
+                final Resource nextResource = nextResIt.next();
+                final String nextIdentity = nextResource.getIdentity();
+                final LabeledEvent agvDeallocationEvent = agvAlphabet.getEvent("agv" + nextIdentity);
+                final LabeledEvent thisAGVDeallocationEvent = new LabeledEvent(agvDeallocationEvent);
+
                 thisAGVDeallocationEvent.setPrioritized(false);
                 thisAGVDeallocationEvent.setOperatorReset(true);
-                
+
                 thisAlphabet.addEvent(thisAGVDeallocationEvent);
-                
-                Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
-                
+
+                final Arc agvDeallocationArc = new Arc(usedByAGV, orgInitialState, thisAGVDeallocationEvent);
+
                 try
                 {
                     theAutomaton.addArc(agvDeallocationArc);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Could not add arc." + ex);
                 }
             }
         }
-        
+
         {
-            
+
             // Add truck allocation event
-            String truckAllocationString = "truck" + getIdentity();
-            LabeledEvent truckAllocationEvent = truckAlphabet.getEvent(truckAllocationString);
-            
+            final String truckAllocationString = "truck" + getIdentity();
+            final LabeledEvent truckAllocationEvent = truckAlphabet.getEvent(truckAllocationString);
+
             if (truckAllocationEvent == null)
             {
                 logger.debug("Could not find event " + truckAllocationString);
             }
             else
             {
-                LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
+                final LabeledEvent thisTruckAllocationEvent = new LabeledEvent(truckAllocationEvent);
                 truckAllocationEvent.setOperatorIncrease(true);
-                
+
                 thisAlphabet.addEvent(thisTruckAllocationEvent);
-                
-                Arc truckAllocationArc = new Arc(orgInitialState, usedByTruck, thisTruckAllocationEvent);
-                
+
+                final Arc truckAllocationArc = new Arc(orgInitialState, usedByTruck, thisTruckAllocationEvent);
+
                 try
                 {
                     theAutomaton.addArc(truckAllocationArc);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Could not add arc." + ex);
                 }
             }
         }
-        
+
         {
-            
+
             // Add truck deallocation events
-            for (Iterator<Resource> nextResIt = u2NextResources.iterator();
+            for (final Iterator<Resource> nextResIt = u2NextResources.iterator();
             nextResIt.hasNext(); )
             {
-                Resource nextResource = nextResIt.next();
-                String nextIdentity = nextResource.getIdentity();
-                LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
-                LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
+                final Resource nextResource = nextResIt.next();
+                final String nextIdentity = nextResource.getIdentity();
+                final LabeledEvent truckDeallocationEvent = truckAlphabet.getEvent("truck" + nextIdentity);
+                final LabeledEvent thisTruckDeallocationEvent = new LabeledEvent(truckDeallocationEvent);
                 truckDeallocationEvent.setOperatorIncrease(true);
-                
+
                 thisTruckDeallocationEvent.setPrioritized(false);
                 thisAlphabet.addEvent(thisTruckDeallocationEvent);
-                
-                Arc truckDeallocationArc = new Arc(usedByTruck, orgInitialState, thisTruckDeallocationEvent);
-                
+
+                final Arc truckDeallocationArc = new Arc(usedByTruck, orgInitialState, thisTruckDeallocationEvent);
+
                 try
                 {
                     theAutomaton.addArc(truckDeallocationArc);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.error("Could not add arc." + ex);
                 }
@@ -228,40 +246,40 @@ class Resource
 
 class User
 {
-    private boolean controllable;
-    private String identity;
-    private LinkedList<ArrayList<Object>> transitions = new LinkedList<ArrayList<Object>>();
+    private final boolean controllable;
+    private final String identity;
+    private final LinkedList<ArrayList<Object>> transitions = new LinkedList<ArrayList<Object>>();
     @SuppressWarnings("unused")
 	private Resource initial;
-    private Project theProject;
-    
-    public User(String identity, boolean controllable, Project theProject)
+    private final Project theProject;
+
+    public User(final String identity, final boolean controllable, final Project theProject)
     {
         this.identity = identity;
         this.controllable = controllable;
         this.theProject = theProject;
     }
-    
-    public void addTransition(Resource fromResource, Resource[] toResources)
+
+    public void addTransition(final Resource fromResource, final Resource[] toResources)
     {
-        ArrayList<Object> currTransition = new ArrayList<Object>(2);
-        
+        final ArrayList<Object> currTransition = new ArrayList<Object>(2);
+
         currTransition.add(fromResource);
         currTransition.add(toResources);
         transitions.addLast(currTransition);
-        
+
         if (identity.equalsIgnoreCase("agv"))
         {
             for (int i = 0; i < toResources.length; i++)
             {
-                fromResource.addNextAGVResource((Resource) toResources[i]);
+                fromResource.addNextAGVResource(toResources[i]);
             }
         }
         else if (identity.equalsIgnoreCase("truck"))
         {
             for (int i = 0; i < toResources.length; i++)
             {
-                fromResource.addNextTruckResource((Resource) toResources[i]);
+                fromResource.addNextTruckResource(toResources[i]);
             }
         }
         else
@@ -269,26 +287,26 @@ class User
             System.err.println("Unknown type");
         }
     }
-    
-    public void setInitalResource(Resource initial)
+
+    public void setInitalResource(final Resource initial)
     {
         this.initial = initial;
     }
-    
+
     public Automaton build()
     {
-        Automaton theAutomaton = new Automaton(identity);
-        
-        HashMap<Resource, State> resourceMap = new HashMap<Resource, State>();
-        
+        final Automaton theAutomaton = new Automaton(identity);
+
+        final HashMap<Resource, State> resourceMap = new HashMap<Resource, State>();
+
         // For each used resource add a state
-        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
+        for (final Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList<?> currTransition = transitionIt.next();
-            Resource resource = (Resource) currTransition.get(0);
-            State resourceState = new State(resource.getIdentity());
-            
+            final ArrayList<?> currTransition = transitionIt.next();
+            final Resource resource = (Resource) currTransition.get(0);
+            final State resourceState = new State(resource.getIdentity());
+
             //resourceState.setAccepting(true);
             //resourceState.setId(resource.getIdentity());
             //resourceState.setName(resource.getIdentity());
@@ -297,118 +315,119 @@ class User
                 resourceState.setInitial(true);
                 resourceState.setAccepting(true);
             }
-            
+
             if (identity.equals("agv") && resource.getIdentity().equals("41"))
             {
                 resourceState.setInitial(true);
                 resourceState.setAccepting(true);
             }
-            
+
             resourceMap.put(resource, resourceState);
             theAutomaton.addState(resourceState);
         }
-        
-        Actions theActions = theProject.getActions();
-        Controls theControls = theProject.getControls();
-        Alphabet theAlphabet = theAutomaton.getAlphabet();
-        
+
+        final Actions theActions = theProject.getActions();
+        final Controls theControls = theProject.getControls();
+        final Alphabet theAlphabet = theAutomaton.getAlphabet();
+
         // For each resource add an arc
-        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
+        for (final Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList<?> currTransition = transitionIt.next();
-            Resource sourceResource = (Resource) currTransition.get(0);
+            final ArrayList<?> currTransition = transitionIt.next();
+            final Resource sourceResource = (Resource) currTransition.get(0);
             @SuppressWarnings("unused")
+            final
 			State sourceState = resourceMap.get(sourceResource);
-            
+
             // System.err.println(identity + sourceResource.getIdentity());
-            String label = identity + sourceResource.getIdentity();
-            LabeledEvent currEvent = new LabeledEvent(label);
-            
+            final String label = identity + sourceResource.getIdentity();
+            final LabeledEvent currEvent = new LabeledEvent(label);
+
             //currEvent.setId(identity + sourceResource.getIdentity());
             if (!controllable)
             {
                 currEvent.setControllable(false);
                 //currEvent.setOperatorIncrease(true);
             }
-            
+
             if (identity.equalsIgnoreCase("agv"))
             {
                 currEvent.setOperatorReset(true);
             }
-            
+
             if (identity.equalsIgnoreCase("truck"))
             {
                 currEvent.setOperatorIncrease(true);
             }
-            
+
             theAlphabet.addEvent(currEvent);
-            
+
             // Add actions
-            Action theAction = new Action(label);
-            
+            final Action theAction = new Action(label);
+
             theAction.addCommand(new Command(identity + ".goX." + sourceResource.getX()));
             theAction.addCommand(new Command(identity + ".goY." + sourceResource.getY()));
             theActions.addAction(theAction);
-            
+
             // Add controls
-            Control theControl = new Control(label);
-            
+            final Control theControl = new Control(label);
+
             theControl.addCondition(new Condition(identity + "X.end"));
             theControl.addCondition(new Condition(identity + "Y.end"));
             theControls.addControl(theControl);
         }
-        
+
         // For each transition add an arc
-        for (Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
+        for (final Iterator<ArrayList<Object>> transitionIt = transitions.iterator();
         transitionIt.hasNext(); )
         {
-            ArrayList<?> currTransition = transitionIt.next();
-            Resource sourceResource = (Resource) currTransition.get(0);
-            Resource[] destResources = (Resource[]) currTransition.get(1);
-            State sourceState = resourceMap.get(sourceResource);
-            
+            final ArrayList<?> currTransition = transitionIt.next();
+            final Resource sourceResource = (Resource) currTransition.get(0);
+            final Resource[] destResources = (Resource[]) currTransition.get(1);
+            final State sourceState = resourceMap.get(sourceResource);
+
             for (int i = 0; i < destResources.length; i++)
             {
-                Resource destResource = destResources[i];
-                State destState = resourceMap.get(destResource);
-                LabeledEvent currEvent = theAlphabet.getEvent(identity + destResource.getIdentity());
-                
+                final Resource destResource = destResources[i];
+                final State destState = resourceMap.get(destResource);
+                final LabeledEvent currEvent = theAlphabet.getEvent(identity + destResource.getIdentity());
+
                 if (currEvent == null)
                 {
                     System.err.println("currEvent is null");
                     System.exit(0);
                 }
-                
+
                 //System.err.println("sourceState: " + sourceState + " destState: " + destState);
                 if (theAutomaton.getStateWithName(sourceState.getName()) == null)
                 {
                     System.err.println("source state is null");
                     System.exit(0);
                 }
-                
+
                 if (theAutomaton.getStateWithName(destState.getName()) == null)
                 {
                     System.err.println("dest state is null");
                     System.exit(0);
                 }
-                
-                Arc currArc = new Arc(sourceState, destState, currEvent);
-                
+
+                final Arc currArc = new Arc(sourceState, destState, currEvent);
+
                 theAutomaton.addArc(currArc);
             }
         }
-        
+
         //theAutomaton.setAlphabet(theAlphabet);
         theAutomaton.setType(AutomatonType.PLANT);
-        
+
         return theAutomaton;
     }
 }
 
 public class Warehouse
 {
-    private static Logger logger = LoggerFactory.createLogger(Warehouse.class);
+    private static Logger logger = LogManager.getLogger(Warehouse.class);
     protected Project theProject = null;
     protected int k = 3;
     protected int m = 1;
@@ -437,21 +456,21 @@ public class Warehouse
     Resource r33 = null;
     Resource r41 = null;
     Resource r42 = null;
-    
+
     public Warehouse()
     {
         this(3, 1);
     }
-    
-    public Warehouse(int k, int m)
+
+    public Warehouse(final int k, final int m)
     {
         this.k = k;
         this.m = m;
         theProject = new Project("Warehouse");
-        
-        User u1 = new User("agv", true, theProject);
-        User u2 = new User("truck", false, theProject);
-        
+
+        final User u1 = new User("agv", true, theProject);
+        final User u2 = new User("truck", false, theProject);
+
         r11 = new Resource(this, 1, 0, true, u1, u2);
         r12 = new Resource(this, 2, 0, true, u1, u2);
         r13 = new Resource(this, 3, 0, true, u1, u2);
@@ -475,7 +494,7 @@ public class Warehouse
         r33 = new Resource(this, 0, 6, true, u1, u2);
         r41 = new Resource(this, 4, 1, true, u1, u2);
         r42 = new Resource(this, 4, 5, true, u1, u2);
-        
+
         // agv
         u1.addTransition(r11, new Resource[]{ r12, r14, r31 });
         u1.addTransition(r12, new Resource[]{ r11, r13 });
@@ -500,7 +519,7 @@ public class Warehouse
         u1.addTransition(r33, new Resource[]{ r27 });
         u1.addTransition(r41, new Resource[]{ r16, r42 });
         u1.addTransition(r42, new Resource[]{ r26, r41 });
-        
+
         // truck
         u2.addTransition(r11, new Resource[]{ r12, r14, r31 });
         u2.addTransition(r12, new Resource[]{ r11, r13 });
@@ -522,48 +541,48 @@ public class Warehouse
         u2.addTransition(r31, new Resource[]{ r32, r11 });
         u2.addTransition(r32, new Resource[]{ r31, r33 });
         u2.addTransition(r33, new Resource[]{ r32, r27 });
-        
+
         agvAutomaton = u1.build();
         truckAutomaton = u2.build();
-        
+
         theProject.addAutomaton(agvAutomaton);
         theProject.addAutomaton(truckAutomaton);
     }
-    
-    public void setK(int k)
+
+    public void setK(final int k)
     {
         this.k = k;
     }
-    
+
     public int getK()
     {
         return k;
     }
-    
-    public void setM(int m)
+
+    public void setM(final int m)
     {
         this.m = m;
     }
-    
+
     public int getM()
     {
         return m;
     }
-    
+
     public Alphabet getAGVAlphabet()
     {
-        
+
         // return new Alphabet();
         return agvAutomaton.getAlphabet();
     }
-    
+
     public Alphabet getTruckAlphabet()
     {
-        
+
         // return new Alphabet();
         return truckAutomaton.getAlphabet();
     }
-    
+
     protected void buildProject()
     {
         theProject.addAutomaton(r11.getAutomaton());
@@ -589,32 +608,32 @@ public class Warehouse
         theProject.addAutomaton(r33.getAutomaton());
         theProject.addAutomaton(r41.getAutomaton());
         theProject.addAutomaton(r42.getAutomaton());
-        
-        ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k, m);
-        
+
+        final ComputerHumanExtender extender = new ComputerHumanExtender(theProject, k, m);
+
         try
         {
             extender.execute();
-            
-            Automaton newAutomaton = extender.getNewAutomaton();
-            
+
+            final Automaton newAutomaton = extender.getNewAutomaton();
+
             //newAutomaton.setName("Extender");
             theProject.addAutomaton(newAutomaton);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Error in ComputerHumanExtender");
             logger.debug(ex.getStackTrace());
         }
-        
+
     }
-    
+
     public Project getProject()
     {
-        
+
         //System.err.println("warehouse get project");
         buildProject();
-        
+
         //System.err.println(theProject.nbrOfAutomata());
         //System.err.println("Warehouse getProject");
         return theProject;

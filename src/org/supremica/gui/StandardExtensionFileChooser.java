@@ -35,30 +35,30 @@
 
 package org.supremica.gui;
 
-import javax.swing.filechooser.*;
-import javax.swing.*;
 import java.io.File;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
+
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
-import org.supremica.log.*;
+
 
 public class StandardExtensionFileChooser
 	extends JFileChooser
 {
 	private static final long serialVersionUID = 1L;
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(StandardExtensionFileChooser.class);
 
 	public StandardExtensionFileChooser() {}
 
 	/**
-	 * Adds the standard extension if nothing else is specificed.
+	 * Adds the standard extension if nothing else is specified.
 	 */
-	public File getSelectedFile()
+	@Override
+  public File getSelectedFile()
 	{
 
 		//System.err.println("getSelectedFile");
-		File orgFile = super.getSelectedFile();
+		final File orgFile = super.getSelectedFile();
 
 		if (getDialogType() != JFileChooser.SAVE_DIALOG)
 		{
@@ -70,7 +70,7 @@ public class StandardExtensionFileChooser
 			return orgFile;
 		}
 
-		FileFilter theFilter = getFileFilter();
+		final FileFilter theFilter = getFileFilter();
 
 		if (theFilter == null)
 		{
@@ -83,13 +83,13 @@ public class StandardExtensionFileChooser
 		}
 
 		//System.err.println("all files pre");
-		StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter) theFilter;
+		final StandardExtensionFileFilter standardFileFilter = (StandardExtensionFileFilter) theFilter;
 
 		if ("All Files".equals(theFilter.getDescription()))
 		{    // For some reason this does not work
 
 			//System.err.println("all files");
-			String fileName = getName(orgFile);
+			final String fileName = getName(orgFile);
 
 			if (fileName == null)
 			{
@@ -100,7 +100,7 @@ public class StandardExtensionFileChooser
 			{
 
 				//System.err.println("all files with fnuttar");
-				File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+				final File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
 
 				return newFile;
 			}
@@ -108,7 +108,7 @@ public class StandardExtensionFileChooser
 			return orgFile;
 		}
 
-		String fileName = getName(orgFile);
+		final String fileName = getName(orgFile);
 
 		if (fileName == null)
 		{
@@ -117,7 +117,7 @@ public class StandardExtensionFileChooser
 
 		if (fileName.startsWith("\"") && fileName.endsWith("\""))
 		{
-			File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
+			final File newFile = new File(orgFile.getParentFile().getAbsolutePath() + File.separator + fileName.substring(1, fileName.length() - 1));
 
 			return newFile;
 		}

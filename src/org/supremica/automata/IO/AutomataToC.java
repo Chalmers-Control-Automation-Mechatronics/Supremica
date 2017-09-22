@@ -62,16 +62,12 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
+
 
 public class AutomataToC
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToC.class);
 	private final Automata theAutomata;
-//	private AutomataSynchronizerHelper syncHelper;
 	private final SynchronizationType syncType = SynchronizationType.PRIORITIZED;
 	private Alphabet allEvents;
 

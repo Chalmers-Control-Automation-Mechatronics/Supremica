@@ -1,6 +1,7 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.log.Logger;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator;
 import org.supremica.softplc.CompILer.CodeGen.Constants.IlExprOperator;
 import org.supremica.softplc.CompILer.CodeGen.Constants.IlJumpOperator;
@@ -48,7 +49,8 @@ import de.fub.bytecode.generic.Type;
  * This class handles java bytecode generation. It handles all parts common
  * to IL programs ({@link ProgramBuilder}) and function blocks
  * ({@link FunctionBlockBuilder}).
- * @author Anders Röding
+ *
+ * @author Anders Röding,
  * @author Andreas Herner
  */
 public abstract class ProgramAndFBBuilder

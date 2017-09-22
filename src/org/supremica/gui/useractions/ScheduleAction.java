@@ -35,21 +35,21 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.log.*;
-import org.supremica.gui.*;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
+import org.supremica.gui.ScheduleDialog;
+
 
 /**
  *      Implements the dialog box allowing to choose different scheduling techniques.
  */
+
 public class ScheduleAction
     extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
-	
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(ScheduleAction.class);
 
     public ScheduleAction()
     {
@@ -62,21 +62,22 @@ public class ScheduleAction
      *      Calls the ScheduleDialog if the number of selected automata is equal to one.
      *      (Otherwise, synchronization is strongly recommended.)
      */
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         launchScheduleDialog();
     }
 
     private void launchScheduleDialog()
     {
-        ScheduleDialog dlg = null;
+        final ScheduleDialog dlg = null;
 
         try
         {
             // dlg = new ScheduleDialog(ActionMan.getGui());
             // dlg.setVisible(true);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             if (ex.getMessage().contains("javax") || ex.getMessage().contains("java.awt"))
             {}

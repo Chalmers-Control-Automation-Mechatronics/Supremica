@@ -35,21 +35,30 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.automata.algorithms.standard.Determinizer;
-import org.supremica.gui.Gui;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.Gui;
 
 public class MakeDeterministicAction
     extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
     private static final Logger logger =
-        LoggerFactory.createLogger(MakeDeterministicAction.class);
+        LogManager.getLogger(MakeDeterministicAction.class);
     private static LabeledEvent epsilon = new LabeledEvent("");
 
     private Automata newautomata;
@@ -64,18 +73,19 @@ public class MakeDeterministicAction
         this.newautomata = new Automata();
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         logger.debug("MakeDeterministicAction::actionPerformed");
 
-        Gui gui = ActionMan.getGui();
-        Automata automata = gui.getSelectedAutomata();
+        final Gui gui = ActionMan.getGui();
+        final Automata automata = gui.getSelectedAutomata();
 
         // Iterate over all automata
-        for (Iterator<?> autit = automata.iterator(); autit.hasNext(); )
+        for (final Iterator<?> autit = automata.iterator(); autit.hasNext(); )
         {
             // Determinize this automaton!
-            Automaton automaton = (Automaton) autit.next();
+            final Automaton automaton = (Automaton) autit.next();
 
             determinize(new Automaton(automaton));
         }
@@ -91,7 +101,7 @@ public class MakeDeterministicAction
                 // Clear
                 newautomata = new Automata();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.debug("MakeDeterministicAction::actionPerformed() -- ", ex);
                 logger.debug(ex.getStackTrace());
@@ -104,16 +114,16 @@ public class MakeDeterministicAction
     // For each non-deterministic state, add "epsilon" transitions, then call Determinizer
     // Note that we add a single epsilon event, so initially the automaton becomes even
     // more non-detm
-    private void determinize(Automaton automaton)
+    private void determinize(final Automaton automaton)
     {
         // automaton.beginTransaction();
         boolean doit = false;
 
         // Find nondeterminisms and add epsilon events
-        for (Iterator<State> stit = automaton.safeStateIterator();
+        for (final Iterator<State> stit = automaton.safeStateIterator();
         stit.hasNext(); )
         {
-            State state = stit.next();
+            final State state = stit.next();
 
             doit |= epsilonize(state, automaton);
         }
@@ -121,11 +131,11 @@ public class MakeDeterministicAction
         // If there is a need for determinization, determinize!
         if (doit)
         {
-            Determinizer determinizer = new Determinizer(automaton);
+            final Determinizer determinizer = new Determinizer(automaton);
 
             determinizer.execute();
 
-            Automaton newautomaton = determinizer.getNewAutomaton();
+            final Automaton newautomaton = determinizer.getNewAutomaton();
 
             newautomaton.setComment("detm(" + automaton.getName() + ")");
             newautomata.addAutomaton(newautomaton);
@@ -150,13 +160,13 @@ public class MakeDeterministicAction
      * by epsilon transitions instead.
      */
     @SuppressWarnings("deprecation")
-	private boolean epsilonize(State state, Automaton automaton)
+	private boolean epsilonize(final State state, final Automaton automaton)
     {
         boolean found = false;
-        HashMap<String, Arc> arcset = new HashMap<String, Arc>();
+        final HashMap<String, Arc> arcset = new HashMap<String, Arc>();
 
         // Initialize arc iterator
-        Iterator<Arc> arcit = state.safeOutgoingArcsIterator();
+        final Iterator<Arc> arcit = state.safeOutgoingArcsIterator();
 
                 /* Why treat the first arc differently?
                 if(arcit.hasNext())
@@ -174,7 +184,7 @@ public class MakeDeterministicAction
         // Iterate over the remaining arcs and add epsilon events for nondeterministic arcs
         while (arcit.hasNext())
         {
-            Arc arc = arcit.next();
+            final Arc arc = arcit.next();
 
             // Is this already an epsilon transition?
             if (arc.getEvent().isUnobservable())
@@ -207,12 +217,12 @@ public class MakeDeterministicAction
      * is replaced by
      *    fromState ---epsilon---> newState ---arcevent---> toState
      */
-    private void epsilonize(Arc arc, Automaton automaton)
+    private void epsilonize(final Arc arc, final Automaton automaton)
     {
-        State x = automaton.createUniqueState();    // This is the new intermediate state
+        final State x = automaton.createUniqueState();    // This is the new intermediate state
         automaton.addState(x);
-        Arc arc1 = new Arc(arc.getFromState(), x, epsilon);
-        Arc arc2 = new Arc(x, arc.getToState(), arc.getEvent());
+        final Arc arc1 = new Arc(arc.getFromState(), x, epsilon);
+        final Arc arc2 = new Arc(x, arc.getToState(), arc.getEvent());
 
         automaton.addArc(arc1);
         automaton.addArc(arc2);

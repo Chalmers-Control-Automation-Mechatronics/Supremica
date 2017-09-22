@@ -35,12 +35,17 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
+
+import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.KeyStroke;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 
 public class EditorPrintAction
@@ -48,37 +53,36 @@ public class EditorPrintAction
 {
     private static final long serialVersionUID = 1L;
 
-    public EditorPrintAction(List<IDEAction> actionList)
+    public EditorPrintAction(final List<IDEAction> actionList)
     {
         super(actionList);
-
-        //setEditorActiveRequired(true);
-
         putValue(Action.NAME, "Print...");
         putValue(Action.SHORT_DESCRIPTION, "Print current editor figure");
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_P));
         putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK));
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Print16.gif")));
-
         setEnabled(false);
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
+    @Override
     public void doAction()
     {
         try
         {
             ide.getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface().printFigure();
         }
-        catch (NullPointerException ex)
+        catch (final NullPointerException ex)
         {
             // This action should only be enabled when there's an editor panel open!
-            ide.getIDE().info("Must have an editor panel open.");
-        }        
+            final Logger logger = LogManager.getLogger();
+            logger.error("Must have an editor panel open.");
+        }
     }
 
     /**

@@ -53,13 +53,14 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.TableSorter;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.WhiteScrollPane;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
@@ -69,7 +70,7 @@ public class AnalyzerAutomataPanel
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel.class);
 
     private final AnalyzerPanel analyzerPanel;
     private final DocumentContainer moduleContainer;

@@ -63,14 +63,11 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
+
 
 public class AutomataToNQC
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToNQC.class);
 	private final Automata theAutomata;
     private AutomataIndexMap indexMap;
 	private final SynchronizationType syncType = SynchronizationType.PRIORITIZED;

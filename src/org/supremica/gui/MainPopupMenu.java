@@ -43,20 +43,22 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.useractions.BuildObserverAction;
 import org.supremica.gui.useractions.SaturateAction;
 import org.supremica.gui.useractions.ScheduleAction;
 import org.supremica.gui.useractions.SplitAction;
 import org.supremica.gui.useractions.WorkbenchAction;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.util.SupremicaMenuItem;
+
 
 class MainPopupMenu
     extends JPopupMenu
 {
-    private static Logger logger = LoggerFactory.createLogger(MainPopupMenu.class);
+    private static Logger logger = LogManager.getLogger(MainPopupMenu.class);
 
     private static final long serialVersionUID = 1L;
     private MenuHandler menuHandler = null;

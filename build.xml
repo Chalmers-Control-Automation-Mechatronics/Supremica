@@ -68,11 +68,17 @@
         <pathelement location="${jaxb-impl.jar}"/>
     </path>
 
+    <!-- LOG4J2 -->
+    <property name="log4j2.api.name" value="log4j-api-2.9.0.jar"/>
+    <property name="log4j2.core.name" value="log4j-core-2.9.0.jar"/>
+
     <!-- Build Instructions -->
     <path id="supremica.classpath">
         <pathelement location="${dist}/SupremicaLib.jar"/>
+        <pathelement location="${dist}/${log4j2.api.name}"/>
+        <pathelement location="${dist}/${log4j2.core.name}"/>
     </path>
-    
+
     <patternset id="all_nested_classfiles.patternset">
         <include name="**/*.class"/>
     </patternset>
@@ -124,7 +130,6 @@
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
@@ -280,9 +285,7 @@
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
-            <classpath>    
-                <pathelement location="${lib}/${unjared}"/>
-            </classpath>
+            <classpath refid="supremica.classpath"/>    
         </javac>
     </target>
     
@@ -354,11 +357,10 @@
                deprecation="false"
                verbose="false"
                includeantruntime="false"
-               encoding="ISO-8859-15"
-        >
+               encoding="ISO-8859-15">
             <classpath> 
                 <pathelement location="${build}"/>
-                <pathelement path="${lib}/${unjared}"/>
+                <path refid="supremica.classpath"/>
             </classpath>
         </javac>
     </target>
@@ -418,6 +420,8 @@
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>
         </jar>
+	<copy file="${lib}/${log4j2.api.name}" todir="${dist}"/>
+	<copy file="${lib}/${log4j2.core.name}" todir="${dist}"/>
     </target>
     
     <target name="downloads_supremica">
@@ -437,6 +441,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy todir="${build}/net/sourceforge/waters/model/marshaller">
             <fileset dir="${waters.xsd}" includes="*.xsd"/>
         </copy>
+	<copy file="${templates}/log4j2.xml" todir="${build}"/>
         <copy todir="${build}/net/sourceforge/waters/samples/maze">
             <fileset dir="${waters.examples}/maze" includes="*.wmod"/>
         </copy>
@@ -589,13 +594,6 @@ Class-Path: ${manifest.pathlist}</echo>
 
     
     <target name="-startfiles_local_supremica">
-        <!--
-        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-        <copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
--->
-
         <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/verifyRACLocal.cmd" perm="644"/>
         <copy file="${templates}/verifyRAC.cmd" todir="${dist}"/>

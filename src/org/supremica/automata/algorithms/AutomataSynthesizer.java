@@ -73,6 +73,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -89,9 +92,6 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
 
 /**
@@ -101,7 +101,7 @@ import org.supremica.util.ActionTimer;
 public class AutomataSynthesizer
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
+    private static Logger logger = LogManager.getLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
     private final Map<LabeledEvent,Automata> ucEventToPlantMap;
     private final SynchronizationOptions synchronizationOptions;
@@ -240,7 +240,7 @@ public class AutomataSynthesizer
             }
 
             // Present result
-            if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
+            if (min.size() == 1 && min.getFirstAutomaton().nbrOfStates() < 100)
             {
                 // This may not be true if more advanced simplification rules have been used!
                 logger.info("The following states are allowed by the maximally permissive, "
@@ -826,8 +826,8 @@ public class AutomataSynthesizer
             }
 
             // Will the supervisor affect the system at all?
-            logger.verbose("Examining whether the supervisor candidate " +
-                currSupervisor + " is needed.");
+            logger.info("Examining whether the supervisor candidate " +
+                        currSupervisor + " is needed.");
             mThreadToAbort = verifier;
             // if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
             if (verifier.verify())

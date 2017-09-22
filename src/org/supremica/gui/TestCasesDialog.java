@@ -69,6 +69,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
@@ -78,8 +81,6 @@ import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.AllocationBatch;
 import org.supremica.testcases.Arbiter;
 import org.supremica.testcases.BricksGame;
@@ -1597,7 +1598,7 @@ public class TestCasesDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
+    private static Logger logger = LogManager.getLogger(TestCasesDialog.class);
     private final ExampleTab extab = new ExampleTab();
     private Project project = null;
     private final Object gui;

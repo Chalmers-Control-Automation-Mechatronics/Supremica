@@ -35,24 +35,29 @@
 
 package org.supremica.gui.simulator;
 
-import org.supremica.automata.algorithms.*;
-import org.supremica.log.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.event.ListDataListener;
+import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataEvent;
-import org.supremica.automata.Project;
+import javax.swing.event.ListDataListener;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
+
 
 public class SimulatorEventList
     extends JPanel
     implements ListDataListener
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(SimulatorEventList.class);
     @SuppressWarnings("unused")
 	private final boolean showStateId = false;
     @SuppressWarnings("unused")
@@ -97,6 +102,7 @@ public class SimulatorEventList
         add(scrollPanel, BorderLayout.CENTER);
         theList.addMouseListener(new MouseAdapter()
         {
+            @Override
             public void mouseClicked(final MouseEvent e)
             {
                 if (clickable())
@@ -173,16 +179,19 @@ public class SimulatorEventList
         return eventsList;
     }
 
+    @Override
     public void contentsChanged(final ListDataEvent e)
     {
         update();
     }
 
+    @Override
     public void intervalAdded(final ListDataEvent e)
     {
         contentsChanged(e);
     }
 
+    @Override
     public void intervalRemoved(final ListDataEvent e)
     {
         contentsChanged(e);

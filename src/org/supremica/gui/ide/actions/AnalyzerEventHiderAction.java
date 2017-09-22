@@ -44,24 +44,13 @@ import javax.swing.ImageIcon;
 import org.supremica.automata.Automata;
 import org.supremica.gui.EventHider;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerEventHiderAction
     extends IDEAction
 {
-    @SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.createLogger(IDE.class);
-
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
     public AnalyzerEventHiderAction(final List<IDEAction> actionList)
     {
         super(actionList);

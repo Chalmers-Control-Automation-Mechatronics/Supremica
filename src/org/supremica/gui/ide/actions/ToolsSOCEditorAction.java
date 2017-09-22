@@ -35,29 +35,22 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
-import javax.swing.ImageIcon;
-import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
-import org.supremica.external.processeditor.SOCFrame;
+import java.util.List;
 
-/**
- * A new action
- */
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+import org.supremica.external.processeditor.SOCFrame;
+import org.supremica.gui.ide.IDE;
+
+
 public class ToolsSOCEditorAction
     extends IDEAction
 {
-    @SuppressWarnings("unused")
-	private Logger logger = LoggerFactory.createLogger(IDE.class);
-
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public ToolsSOCEditorAction(List<IDEAction> actionList)
+    public ToolsSOCEditorAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -68,7 +61,8 @@ public class ToolsSOCEditorAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/processeditor/icon.ico")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -76,9 +70,10 @@ public class ToolsSOCEditorAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-    	SOCFrame soc = new SOCFrame();
+    	final SOCFrame soc = new SOCFrame();
     	soc.getGraphContainer().setIDE( ide.getIDE() );
     }
 }

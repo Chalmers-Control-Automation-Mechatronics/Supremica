@@ -1,6 +1,12 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +17,7 @@ import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -21,27 +28,14 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 
 import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
-import gnu.trove.procedure.TIntProcedure;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
- * @author zhennan
+ * @author Zhennan Fei
  */
 
 public class BDDPartitionSetEve extends BDDPartitionSet
 {
-
-  @SuppressWarnings("unused")
-  private static Logger logger =
-    LoggerFactory.createLogger(BDDPartitionSetEve.class);
-
   /**
    * A map where the key is the index of an event in the index map while the
    * value is the BDD expression of partition.

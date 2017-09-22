@@ -35,17 +35,19 @@
 
 package org.supremica.gui.ide.actions;
 
+import java.awt.event.ActionEvent;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.swing.Action;
-import java.awt.event.ActionEvent;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.ModularForbidder;
 import org.supremica.automata.algorithms.ModularForbidderInput;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 /**
  * A new action
@@ -53,14 +55,14 @@ import org.supremica.log.LoggerFactory;
 public class AnalyzerModularForbidderAction
     extends IDEAction
 {
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerModularForbidderAction.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerModularForbidderAction.class);
 
      private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public AnalyzerModularForbidderAction(List<IDEAction> actionList)
+    public AnalyzerModularForbidderAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -74,7 +76,8 @@ public class AnalyzerModularForbidderAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -82,16 +85,17 @@ public class AnalyzerModularForbidderAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         logger.info("ModularForbidder started...");
 
-        Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // MODULAR FORBIDDER!
         try
         {
-            ModularForbidderInput mfi = new ModularForbidderInput();
+            final ModularForbidderInput mfi = new ModularForbidderInput();
 
             mfi.createSubState();
             Iterator<Automaton> it = automata.getPlantAutomata().iterator();
@@ -108,10 +112,10 @@ public class AnalyzerModularForbidderAction
                 mfi.addLocalStateIn(it.next(), 0, 0);
             }
 
-            ModularForbidder mf = new ModularForbidder(mfi, ide.getIDE().getActiveProject());
+            final ModularForbidder mf = new ModularForbidder(mfi, ide.getIDE().getActiveProject());
             ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(mf.execute());
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.debug("AnalyzerModularForbidderAction::actionPerformed() -- ", ex);
             logger.debug(ex.getStackTrace());

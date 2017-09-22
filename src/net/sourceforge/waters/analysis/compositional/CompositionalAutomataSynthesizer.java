@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,10 +67,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.Logger;
 
 
 /**

@@ -67,6 +67,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Arc;
@@ -87,8 +90,6 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.gui.ActionMan;
 import org.supremica.gui.ExecutionDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
 
@@ -100,7 +101,7 @@ public class AutomatonMinimizer
     implements Abortable
 {
     int l=0;
-    private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
+    private static Logger logger = LogManager.getLogger(AutomatonMinimizer.class);
 
     // Stoppable stuff
     private ExecutionDialog executionDialog = null;
@@ -197,12 +198,9 @@ public class AutomatonMinimizer
         final int before = theAutomaton.nbrOfStates();
         final int epsilons = theAutomaton.nbrOfEpsilonTransitions();
         final int total = theAutomaton.nbrOfTransitions();
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            logger.info("Minimizing " + theAutomaton + " with " + before +
-                " states and " + epsilons + " epsilon transitions (" +
-                Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
-        }
+        logger.info("Minimizing " + theAutomaton + " with " + before +
+                    " states and " + epsilons + " epsilon transitions (" +
+                    Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
 
         // Are the options valid?
         if (!options.isValid())
@@ -232,7 +230,7 @@ public class AutomatonMinimizer
                 final State state = it.next();
                 if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
                 {
-                    logger.verbose("The state " + state + " will be removed since it is not reachable.");
+                    logger.info("The state " + state + " will be removed since it is not reachable.");
                     toBeRemoved.add(state);
                 }
 
@@ -431,18 +429,15 @@ public class AutomatonMinimizer
             */
 
             // Message
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                final int after = theAutomaton.nbrOfStates();
-                logger.info("There were " + before + " states before and " + after +
-                    " states after the minimization. Reduction: " +
-                    Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
-            }
+            final int after = theAutomaton.nbrOfStates();
+            logger.info("There were " + before + " states before and " + after +
+                        " states after the minimization. Reduction: " +
+                        Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
             // Start listening again
             theAutomaton.endTransaction();
 
-            logger.verbose("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
+            logger.info("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
 
             totalHWS += countHWS;
             totalBSE += countBSE;
@@ -486,19 +481,17 @@ public class AutomatonMinimizer
 
                 if (trivialCount > 0)
                 {
-                    logger.verbose("Removed " + trivialCount + " trivially equivalent states " +
-                        "before running the partitioning.");
+                    logger.info("Removed " + trivialCount + " trivially equivalent states " +
+                                "before running the partitioning.");
                 }
                 final int loopCount = mergeEpsilonLoops(theAutomaton);
 //                logger.info("loop count: "+loopCount);
                 if (loopCount > 0)
                 {
-                    logger.verbose("Removed " + loopCount + " states involved in silent loops " +
-                        "before running the partitioning.");
+                    logger.info("Removed " + loopCount + " states involved in silent loops " +
+                                "before running the partitioning.");
                 }
-
                 totalOES = totalOES + trivialCount + loopCount;
-
             }
 
             ////////////
@@ -549,8 +542,8 @@ public class AutomatonMinimizer
                 final int count = runConflictEquivalenceRules(theAutomaton);
                 if (count > 0)
                 {
-                    logger.verbose("Removed " + count + " states based on conflict equivalence " +
-                        "before running the partitioning.");
+                    logger.info("Removed " + count + " states based on conflict equivalence " +
+                                "before running the partitioning.");
                 }
             }
 
@@ -618,8 +611,8 @@ public class AutomatonMinimizer
         //logger.info("oes:"+totalOES);
         if (diffSize > 0)
         {
-            logger.verbose("Removed " + diffSize + " states based on partitioning with " +
-                "respect to observation equivalence.");
+            logger.info("Removed " + diffSize + " states based on partitioning with " +
+                        "respect to observation equivalence.");
         }
 
         if (abortRequested)
@@ -637,8 +630,8 @@ public class AutomatonMinimizer
             final int count = runConflictEquivalenceRules(theAutomaton);
             if (count > 0)
             {
-                logger.verbose("Removed " + count + " states based on conflict equivalence " +
-                    "after running partitioning.");
+                logger.info("Removed " + count + " states based on conflict equivalence " +
+                            "after running partitioning.");
             }
         }
 
@@ -654,31 +647,10 @@ public class AutomatonMinimizer
 
         removeUnusedEpsilonEvents(theAutomaton);
         // Message
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            final int after = theAutomaton.nbrOfStates();
-            logger.info("There were " + before + " states before and " + after +
-                " states after the minimization. Reduction: " +
-                Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
-        }
-
-        // Start listening again
-
-//            for (final Iterator<Arc> arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
-//            {
-//
-//                final Arc arc = arcIt.next();
-//                if (arc.getEvent().isUnobservable())
-//                {
-//                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
-//                   arc.setEvent(orig);
-//                   if(!theAutomaton.getAlphabet().contains(orig)){
-//                   theAutomaton.getAlphabet().addEvent(orig);}
-//
-//                }
-//            }
-
-
+        final int after = theAutomaton.nbrOfStates();
+        logger.info("There were " + before + " states before and " + after +
+                    " states after the minimization. Reduction: " +
+                    Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -2361,7 +2333,7 @@ public class AutomatonMinimizer
                         if (currState.isInitial())
                         {
                             // We know that the system is blocking!
-                            logger.verbose("The system was found to be blocking.");
+                            logger.info("The system was found to be blocking.");
 
                             // Do nothing...
                             //continue;
@@ -3241,7 +3213,7 @@ public class AutomatonMinimizer
             final State state = it.next();
             if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
             {
-                logger.verbose("The state " + state + " will be removed since it is not reachable.");
+                logger.info("The state " + state + " will be removed since it is not reachable.");
                 toBeRemoved.add(state);
             }
 

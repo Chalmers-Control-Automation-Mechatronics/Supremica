@@ -62,6 +62,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
@@ -273,7 +276,8 @@ public abstract class WatersAnalyzeAction
             container.switchToTraceMode(counterexample);
             final String comment = counterexample.getComment();
             if (comment != null && comment.length() > 0) {
-              ide.info(comment);
+              final Logger logger = LogManager.getLogger();
+              logger.info(comment);
             }
           }
         });

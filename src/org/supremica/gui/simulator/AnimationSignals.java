@@ -35,53 +35,61 @@
 
 package org.supremica.gui.simulator;
 
-import org.supremica.log.*;
-import java.util.*;
-import uk.ac.ic.doc.scenebeans.event.AnimationListener;
-import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import uk.ac.ic.doc.scenebeans.animation.Animation;
+import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
+import uk.ac.ic.doc.scenebeans.event.AnimationListener;
+
 
 class AnimationSignals
 	implements AnimationListener
 {
-	private static Logger logger = LoggerFactory.createLogger(AnimationSignals.class);
+	private static Logger logger = LogManager.getLogger(AnimationSignals.class);
 	@SuppressWarnings("unused")
-	private Animation theAnimation;
-	private HashMap<String, Boolean> theSignals = new HashMap<String, Boolean>();
+	private final Animation theAnimation;
+	private final HashMap<String, Boolean> theSignals = new HashMap<String, Boolean>();
 	@SuppressWarnings("unused")
-	private LinkedList<?> observers = new LinkedList<Object>();
+	private final LinkedList<?> observers = new LinkedList<Object>();
 
-	public AnimationSignals(Animation theAnimation)
+	public AnimationSignals(final Animation theAnimation)
 	{
 		this.theAnimation = theAnimation;
 
 		theAnimation.addAnimationListener(this);
 
-		Set<?> theEvents = theAnimation.getEventNames();
+		final Set<?> theEvents = theAnimation.getEventNames();
 
-		for (Iterator<?> evIt = theEvents.iterator(); evIt.hasNext(); )
+		for (final Iterator<?> evIt = theEvents.iterator(); evIt.hasNext(); )
 		{
-			String currEvent = (String) evIt.next();
+			final String currEvent = (String) evIt.next();
 
 			theSignals.put(currEvent, Boolean.TRUE);
 		}
 	}
 
-	public void registerInterest(SignalObserver observer)
+	public void registerInterest(final SignalObserver observer)
 	{
 
 //              observers.add(observer);
 	}
 
-	public synchronized void animationEvent(AnimationEvent ev)
+	@Override
+  public synchronized void animationEvent(final AnimationEvent ev)
 	{
 		logger.info("AnimationEvent: " + ev.getName());
 
-		String currEvent = ev.getName();
+		final String currEvent = ev.getName();
 
 		if (currEvent.charAt(0) == '~')
 		{
-			String currSignal = currEvent.substring(1, currEvent.length());
+			final String currSignal = currEvent.substring(1, currEvent.length());
 
 			logger.info("Setting " + currSignal + " to FALSE");
 			theSignals.put(currSignal, Boolean.FALSE);
@@ -107,9 +115,9 @@ class AnimationSignals
 				}
 		}
 */
-	public synchronized boolean isTrue(String theSignal)
+	public synchronized boolean isTrue(final String theSignal)
 	{
-		Boolean currValue = theSignals.get(theSignal);
+		final Boolean currValue = theSignals.get(theSignal);
 
 		if (currValue == null)
 		{

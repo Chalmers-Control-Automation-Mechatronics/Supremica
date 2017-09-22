@@ -15,25 +15,21 @@
 
 package org.supremica.automata.algorithms.Guard;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
+
 /**
- *
- * @author Sajed
+ * @author Sajed Miremadi
  */
 
 public final class GuardOptions
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(GuardOptions.class);
-	private String event;    
+	private String event;
 	private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from forbidden states; 2: Optimal case
     // I do not understand. 0 and 1 seem to be the same.
     // Please clarify, or better use an enumeration. ~~~ Robi
     private boolean dialogOK = false;
-    private int nbrOfExecuters;
+    private final int nbrOfExecuters;
 
 	public GuardOptions()
 	{
@@ -48,7 +44,7 @@ public final class GuardOptions
 		this.expressionType = 2;
 	}
 
-	public void setDialogOK(boolean bool)
+	public void setDialogOK(final boolean bool)
 	{
 		dialogOK = bool;
 	}
@@ -72,13 +68,13 @@ public final class GuardOptions
     {
         return event;
     }
-        
-    public void setExpressionType(int set)
+
+    public void setExpressionType(final int set)
 	{
 		expressionType = set;
 	}
-        
-        public void setEvent(String set)
+
+        public void setEvent(final String set)
 	{
 		event = set;
 	}
@@ -96,9 +92,9 @@ public final class GuardOptions
 
 	public static GuardOptions getDefaultGuardOptions()
 	{
-		GuardOptions options = new GuardOptions();
+		final GuardOptions options = new GuardOptions();
 		options.setExpressionType(2);
-		options.setEvent(""); 
+		options.setEvent("");
 		return options;
 	}
 }

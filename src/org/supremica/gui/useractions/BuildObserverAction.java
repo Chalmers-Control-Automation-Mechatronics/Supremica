@@ -35,20 +35,25 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
-import org.supremica.gui.Gui;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.Gui;
 
 public class BuildObserverAction
     extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(BuildObserverAction.class);
+    private static Logger logger = LogManager.getLogger(BuildObserverAction.class);
 
     private Automata newautomata;
 
@@ -61,17 +66,18 @@ public class BuildObserverAction
         this.newautomata = new Automata();
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         logger.debug("BuildObserverAction::actionPerformed");
 
-        Gui gui = ActionMan.getGui();
-        Automata automata = gui.getSelectedAutomata();
+        final Gui gui = ActionMan.getGui();
+        final Automata automata = gui.getSelectedAutomata();
 
         // Iterate over all automata
-        for (Iterator<Automaton> autit = automata.iterator(); autit.hasNext(); )
+        for (final Iterator<Automaton> autit = automata.iterator(); autit.hasNext(); )
         {
-            Automaton automaton = (Automaton) autit.next();
+            final Automaton automaton = autit.next();
 
             observerize(new Automaton(automaton));
         }
@@ -84,7 +90,7 @@ public class BuildObserverAction
 
                 newautomata = new Automata();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.debug("BuildObserverAction::actionPerformed() -- ", ex);
                 logger.debug(ex.getStackTrace());
@@ -96,7 +102,7 @@ public class BuildObserverAction
 
     // For each non-deterministic state, add "epsilon" transitions, then call Determinizer
     // Note that we add a single epsilon event, so initially the automaton becomes even more non-detm
-    private void observerize(Automaton automaton)
+    private void observerize(final Automaton automaton)
     {
 
         // automaton.beginTransaction();
@@ -106,11 +112,11 @@ public class BuildObserverAction
 
         if (doit)
         {
-            ObserverBuilder observerbuilder = new ObserverBuilder(automaton);
+            final ObserverBuilder observerbuilder = new ObserverBuilder(automaton);
 
             observerbuilder.execute();
 
-            Automaton newautomaton = observerbuilder.getNewAutomaton();
+            final Automaton newautomaton = observerbuilder.getNewAutomaton();
 
             newautomaton.setComment("obs(" + automaton.getName() + ")");
             newautomata.addAutomaton(newautomaton);

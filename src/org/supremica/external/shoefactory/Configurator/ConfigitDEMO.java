@@ -49,33 +49,54 @@
 */
 package org.supremica.external.shoefactory.Configurator;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import com.configit_software.ctrlmngr.CS_CtrlMngr;
+
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.InputStream;
 import java.net.URL;
-import java.io.*;
-import com.configit_software.ctrlmngr.*;
-import org.supremica.gui.*;
-import org.supremica.log.*;
-import org.supremica.external.shoefactory.Executor.*;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.border.Border;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.external.shoefactory.Executor.FactoryExecutorDEMO;
+import org.supremica.gui.Gui;
+import org.supremica.gui.Supremica;
+
 
 public class ConfigitDEMO
 	extends JFrame
 	implements ActionListener
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(Configit.class);
+	private static Logger logger = LogManager.getLogger(Configit.class);
 	CS_CtrlMngr ctrl_mngr = null;
 	Container c;
 	Gui gui;
 	private boolean resetok = true;
 	@SuppressWarnings("unused")
-	private int total = 0;
+	private final int total = 0;
 	@SuppressWarnings("unused")
-	private String[] Gender = { "Male", "Female" };
+	private final String[] Gender = { "Male", "Female" };
 	@SuppressWarnings("unused")
-	private String[] GeneralType = { "Children", "Adult" };
+	private final String[] GeneralType = { "Children", "Adult" };
 	private String[] Size;
 	private String[] Color;
 	private String[] Sole;
@@ -126,18 +147,18 @@ public class ConfigitDEMO
 	FactoryExecutorDEMO fe = new FactoryExecutorDEMO();
 	ConfigConverter cc = new ConfigConverter();
 
-	public ConfigitDEMO(Gui g)
+	public ConfigitDEMO(final Gui g)
 	{
 		gui = g;
 
-		URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.vt");
+		final URL url = Supremica.class.getResource("/shoefactory/ShoeFactory.vt");
 		InputStream vtStream = null;
 
 		try
 		{
 			vtStream = url.openStream();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error(ex.getStackTrace());
 
@@ -265,9 +286,9 @@ public class ConfigitDEMO
 		pack();
 	}
 
-	public String UnStr(String S)
+	public String UnStr(final String S)
 	{
-		char[] tmp = new char[S.length() + 2];
+		final char[] tmp = new char[S.length() + 2];
 		int i = 0;
 
 		tmp[0] = '(';
@@ -280,12 +301,12 @@ public class ConfigitDEMO
 
 		tmp[i + 1] = ')';
 
-		String str = new String(tmp);
+		final String str = new String(tmp);
 
 		return str;
 	}
 
-	private static String printValueState(CS_CtrlMngr ctrl_mngr, int variable, int value)
+	private static String printValueState(final CS_CtrlMngr ctrl_mngr, final int variable, final int value)
 	{
 		String state;
 
@@ -663,7 +684,8 @@ public class ConfigitDEMO
 		}
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 		if (e.getSource() == JB)
 		{
@@ -689,7 +711,7 @@ public class ConfigitDEMO
 			}
 			else
 			{
-				int selection = JOptionPane.showConfirmDialog(this, "You have made the following choices:\nColor: " + ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)) + "\nSize: " + ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(1)) + "\nSole: " + ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)) + "\nModel: " + ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)) + "\nPress OK to confirm.", "Submit order", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+				final int selection = JOptionPane.showConfirmDialog(this, "You have made the following choices:\nColor: " + ctrl_mngr.getValueName(3, ctrl_mngr.getSelectedValue(3)) + "\nSize: " + ctrl_mngr.getValueName(1, ctrl_mngr.getSelectedValue(1)) + "\nSole: " + ctrl_mngr.getValueName(4, ctrl_mngr.getSelectedValue(4)) + "\nModel: " + ctrl_mngr.getValueName(5, ctrl_mngr.getSelectedValue(5)) + "\nPress OK to confirm.", "Submit order", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 
 				if (selection == JOptionPane.OK_OPTION)
 				{
@@ -803,13 +825,13 @@ public class ConfigitDEMO
 		reset();
 	}
 
-	public void assign(int var, int val)
+	public void assign(final int var, final int val)
 	{
-		boolean force = ctrl_mngr.getState(var, val) == CS_CtrlMngr.VALUE_FORCEABLE;
+		final boolean force = ctrl_mngr.getState(var, val) == CS_CtrlMngr.VALUE_FORCEABLE;
 
 		if (force)
 		{
-			int selection = JOptionPane.showConfirmDialog(this, "The selected item is not compatible with previous choices.\nPress OK to force your new choice.\nPress Cancel to return without changes", "Conflicting selections", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			final int selection = JOptionPane.showConfirmDialog(this, "The selected item is not compatible with previous choices.\nPress OK to force your new choice.\nPress Cancel to return without changes", "Conflicting selections", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 
 			if (selection == JOptionPane.OK_OPTION)
 			{

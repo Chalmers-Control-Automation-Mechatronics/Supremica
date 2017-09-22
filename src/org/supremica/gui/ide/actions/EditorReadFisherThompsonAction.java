@@ -79,17 +79,12 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
 import org.supremica.gui.ide.DocumentContainerManager;
-import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 public class EditorReadFisherThompsonAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-    private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
 
     public EditorReadFisherThompsonAction(final List<IDEAction> actionList)

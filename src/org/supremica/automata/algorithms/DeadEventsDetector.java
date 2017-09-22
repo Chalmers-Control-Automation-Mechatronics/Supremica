@@ -51,13 +51,14 @@ package org.supremica.automata.algorithms;
 
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -65,14 +66,14 @@ import org.supremica.log.LoggerFactory;
  */
 public class DeadEventsDetector
 {
-    public DeadEventsDetector(Automaton automaton)
+    public DeadEventsDetector(final Automaton automaton)
     {
         mAutomaton = automaton;
     }
 
-    public DeadEventsDetector(Automata automata)
+    public DeadEventsDetector(final Automata automata)
     {
-		AutomataSynchronizer synchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), false);
+		final AutomataSynchronizer synchronizer = new AutomataSynchronizer(automata, new SynchronizationOptions(), false);
        	synchronizer.execute();
        	mAutomaton = synchronizer.getAutomaton();
     }
@@ -81,13 +82,13 @@ public class DeadEventsDetector
     public void execute()
     {
 
-        Alphabet deadEvents = new Alphabet(mAutomaton.getAlphabet());
+        final Alphabet deadEvents = new Alphabet(mAutomaton.getAlphabet());
 
-        for (Iterator<Arc> arcIt = mAutomaton.arcIterator(); arcIt.hasNext(); )
+        for (final Iterator<Arc> arcIt = mAutomaton.arcIterator(); arcIt.hasNext(); )
         {
-            Arc currArc = arcIt.next();
+            final Arc currArc = arcIt.next();
 
-			LabeledEvent currEvent = currArc.getEvent();
+			final LabeledEvent currEvent = currArc.getEvent();
 			if (deadEvents.contains(currEvent))
 			{
 				deadEvents.removeEvent(currEvent);
@@ -105,15 +106,15 @@ public class DeadEventsDetector
 		else
 		{
 			mLogger.info("The following events are dead");
-			for (Iterator<LabeledEvent> it = deadEvents.iterator(); it.hasNext(); )
+			for (final Iterator<LabeledEvent> it = deadEvents.iterator(); it.hasNext(); )
 			{
-				LabeledEvent event = it.next();
+				final LabeledEvent event = it.next();
 				mLogger.info(event.getLabel());
 			}
 		}
     }
 
 
-    private Automaton mAutomaton;
-    private static Logger mLogger = LoggerFactory.createLogger(DeadEventsDetector.class);
+    private final Automaton mAutomaton;
+    private static Logger mLogger = LogManager.getLogger(DeadEventsDetector.class);
 }

@@ -41,15 +41,17 @@ import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 class AnalyzerPopupMenu
     extends JPopupMenu
 {
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerPopupMenu.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerPopupMenu.class);
 
     private static final long serialVersionUID = 1L;
     private final IDEActionInterface ide;

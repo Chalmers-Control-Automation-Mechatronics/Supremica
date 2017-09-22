@@ -63,14 +63,16 @@ import java.util.Iterator;
 
 import net.sourceforge.waters.config.Version;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.Project;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
+
 
 /** This class generates an IEC-61499 function block
  *  application implementing the automata in the
@@ -80,7 +82,7 @@ public class AutomataToIEC61499
 {
 
 	private static final String xmlnsLibraryElementString = "xmlns=\"http://www.holobloc.com/xml/LibraryElement\" ";
-	private static Logger logger = LoggerFactory.createLogger(AutomataToIEC61499.class);
+	private static Logger logger = LogManager.getLogger(AutomataToIEC61499.class);
 	private final Project theProject;
 	private final Alphabet allEvents;
 	private boolean comments = false;

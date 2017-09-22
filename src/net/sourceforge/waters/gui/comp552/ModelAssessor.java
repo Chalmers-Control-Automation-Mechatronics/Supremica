@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.comp552;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -102,11 +104,9 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.xml.sax.SAXException;
 
-import gnu.trove.set.hash.THashSet;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -130,8 +130,6 @@ public class ModelAssessor
     final String outputdir = args[3];
 
     try {
-      final LoggerFactory loggerfactory = LoggerFactory.getInstance();
-      loggerfactory.logToNull();
       final ModelAssessor assessor =
         new ModelAssessor(config, classlist, inputdir, outputdir);
       assessor.run();
@@ -158,7 +156,7 @@ public class ModelAssessor
   private static void usage()
   {
     System.err.println
-      ("USAGE: java ModelAssess <config> <classlist> <inputdir> <outputdir>");
+      ("USAGE: java ModelAssessor <config> <classlist> <inputdir> <outputdir>");
     System.exit(1);
   }
 

@@ -34,11 +34,17 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.simulator.EventStatus;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.EventProxy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -60,6 +66,7 @@ class EventExecuteAction extends WatersAction
     updateEnabledStatus();
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     final Simulation sim = getObservedSimulation();
@@ -80,7 +87,8 @@ class EventExecuteAction extends WatersAction
   {
     final Simulation sim = getObservedSimulation();
     if (sim == null) {
-      getIDE().error("Simulation has not been set!");
+      final Logger logger = LogManager.getLogger();
+      logger.error("Simulation has not been set!");
       return false;
     } else {
       final EventStatus status = sim.getEventStatus(mEvent);

@@ -49,38 +49,51 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 
 public class AutomataToSattLineSFCForBallProcess
 	extends AutomataToSattLineSFC
 {
-	private static Logger logger = LoggerFactory.createLogger(AutomataToSattLineSFCForBallProcess.class);
+	private static Logger logger = LogManager.getLogger(AutomataToSattLineSFCForBallProcess.class);
 
-	public AutomataToSattLineSFCForBallProcess(Project theProject)
+	public AutomataToSattLineSFCForBallProcess(final Project theProject)
 	{
-		this(theProject, (BallProcessHelper) BallProcessHelper.getInstance());
+		this(theProject, BallProcessHelper.getInstance());
 	}
 
-	public AutomataToSattLineSFCForBallProcess(Project theProject, IEC61131Helper theHelper)
+	public AutomataToSattLineSFCForBallProcess(final Project theProject, final IEC61131Helper theHelper)
 	{
 		super(theProject, theHelper);
 	}
 
-	public void serialize(String filename)
+	@Override
+  public void serialize(final String filename)
 	{    // Empty
 	}
 
-	public void serialize(PrintWriter pw)
+	@Override
+  public void serialize(final PrintWriter pw)
 	{    // Empty
 	}
 
-	public void serialize_s(File theFile, String filename)
+	@Override
+  public void serialize_s(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		/* Macro for printing of Ball Process type definitions, variables
 		and the LabIO sub module handling the interaction with the physical
@@ -103,34 +116,38 @@ public class AutomataToSattLineSFCForBallProcess
 		theWriter.close();
 	}
 
-	public void serialize_g(File theFile, String filename)
+	@Override
+  public void serialize_g(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((BallProcessHelper) theHelper).printGFile(theWriter, filename);
 		theWriter.close();
 	}
 
-	public void serialize_l(File theFile, String filename)
+	@Override
+  public void serialize_l(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((BallProcessHelper) theHelper).printLFile(theWriter, filename);
 		theWriter.close();
 	}
 
-	public void serialize_p(File theFile, String filename)
+	@Override
+  public void serialize_p(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		((BallProcessHelper) theHelper).printPFile(theWriter, filename);
 		theWriter.close();
 	}
 
-	protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)
+	@Override
+  protected void printEventMonitorAction(final LabeledEvent theEvent, final PrintWriter pw)
 	{
 
 		/* We should not replace '.' with '_'. Needed for IP.xxx and (RE)SET_OP.yyy.
@@ -140,9 +157,10 @@ public class AutomataToSattLineSFCForBallProcess
 		pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel() + theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
 	}
 
-	protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
+	@Override
+  protected String computeGenerationCondition(final Project theProject, final Alphabet theExtConfAlphabet, final LabeledEvent theEvent)
 	{
-		StringBuilder theCondition = new StringBuilder();
+		final StringBuilder theCondition = new StringBuilder();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 		int lineLength = 0;
@@ -150,7 +168,7 @@ public class AutomataToSattLineSFCForBallProcess
 		/* We create the uncontrollable disablement condition first. */
 		if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
 		{
-			String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+			final String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
 
 			theCondition.append(theUcCondition);
 		}
@@ -165,10 +183,10 @@ public class AutomataToSattLineSFCForBallProcess
 		}
 
 		/* And then the actual generation condition. */
-		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) autIt.next();
-			Alphabet theAlphabet = aut.getAlphabet();
+			final Automaton aut = autIt.next();
+			final Alphabet theAlphabet = aut.getAlphabet();
 
 			if (theAlphabet.contains(theEvent.getLabel()))
 			{
@@ -179,13 +197,13 @@ public class AutomataToSattLineSFCForBallProcess
 				boolean stateFound = false;
 				boolean firstState = true;
 
-				for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
-					Arc anArc = (Arc) arcIt.next();
+					final Arc anArc = arcIt.next();
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						final LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -195,7 +213,7 @@ public class AutomataToSattLineSFCForBallProcess
 
 							stateFound = true;
 
-							State sourceState = (State) anArc.getFromState();
+							final State sourceState = anArc.getFromState();
 
 							if (firstAutomaton)
 							{
@@ -228,7 +246,7 @@ public class AutomataToSattLineSFCForBallProcess
 							}
 						}
 					}
-					catch (Exception ex)
+					catch (final Exception ex)
 					{
 
 						// This should not happen since the event exists in the automaton.
@@ -264,7 +282,8 @@ public class AutomataToSattLineSFCForBallProcess
 		return theCondition.toString();
 	}
 
-	protected String ucDisablementCondition(Alphabet theAlphabet)
+	@Override
+  protected String ucDisablementCondition(final Alphabet theAlphabet)
 	{
 
 		/* Must fix 140 character line length limit. There are at least 31
@@ -276,7 +295,7 @@ public class AutomataToSattLineSFCForBallProcess
 		 its precondition. Even so, it may not be useable since
 		 the step timer variable retains its value until the step
 		 is reactivated. Maybe we should just ignore it. */
-		StringBuilder theCondition = new StringBuilder("");
+		final StringBuilder theCondition = new StringBuilder("");
 
 		/* QUICK AND DIRTY HACK preventing locking behaviour: !event AND NOT !event.
 		   This is safe assuming that the event monitors remain last in execution order. */
@@ -316,9 +335,10 @@ public class AutomataToSattLineSFCForBallProcess
 		return theCondition.toString();
 	}
 
-	protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
+	@Override
+  protected String computeCeaseCondition(final Project theProject, final LabeledEvent theEvent)
 	{
-		StringBuilder theCondition = new StringBuilder();
+		final StringBuilder theCondition = new StringBuilder();
 		boolean firstAutomaton = true;
 		boolean nextAutomaton = false;
 		int lineLength = 31;
@@ -326,10 +346,10 @@ public class AutomataToSattLineSFCForBallProcess
 		/* This version takes care of line length limits and assumes that the
 		   ordering of the SFCs doesn't change. Then we can allow self loops.
 		   In general, that is not the case for IT/DA PLCs, such as Satt Line. */
-		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-			Automaton aut = (Automaton) autIt.next();
-			Alphabet theAlphabet = aut.getAlphabet();
+			final Automaton aut = autIt.next();
+			final Alphabet theAlphabet = aut.getAlphabet();
 
 			if (theAlphabet.contains(theEvent.getLabel()))
 			{
@@ -340,13 +360,13 @@ public class AutomataToSattLineSFCForBallProcess
 				boolean stateFound = false;
 				boolean firstState = true;
 
-				for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+				for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
 				{
-					Arc anArc = (Arc) arcIt.next();
+					final Arc anArc = arcIt.next();
 
 					try
 					{
-						LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
+						final LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
 
 						if (arcEvent.getLabel().equals(theEvent.getLabel()))
 						{
@@ -357,7 +377,7 @@ public class AutomataToSattLineSFCForBallProcess
 							stateFound = true;
 
 							// State sourceState = (State) anArc.getFromState(); Use postset instead.
-							State destinationState = (State) anArc.getToState();
+							final State destinationState = anArc.getToState();
 
 							if (firstAutomaton)
 							{
@@ -400,7 +420,7 @@ public class AutomataToSattLineSFCForBallProcess
 							}
 						}
 					}
-					catch (Exception ex)
+					catch (final Exception ex)
 					{
 
 						// This should not happen since the event exists in the automaton.
@@ -439,12 +459,13 @@ public class AutomataToSattLineSFCForBallProcess
 		return theCondition.toString();
 	}
 
-	protected void printTransition(Automaton theAutomaton, Arc theArc, PrintWriter pw)
+	@Override
+  protected void printTransition(final Automaton theAutomaton, final Arc theArc, final PrintWriter pw)
 	{
 		/* Again, we should not replace '.' with '_' in event labels. */
 		try
 		{
-			LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
+			final LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
 
 			if (event.getLabel().equalsIgnoreCase("timer"))
 			{
@@ -463,7 +484,7 @@ public class AutomataToSattLineSFCForBallProcess
 				pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel() + theHelper.getTransitionConditionSuffix());
 			}
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Failed getting event label. Code generation aborted. " + ex);
 			logger.debug(ex.getStackTrace());

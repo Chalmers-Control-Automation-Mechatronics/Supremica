@@ -1,5 +1,9 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.math.BigInteger;
@@ -16,6 +20,7 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -23,6 +28,9 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomataIndexMap;
@@ -33,20 +41,15 @@ import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 /**
- *
  * @author Sajed Miremadi, Zhennan Fei
  */
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    private static Logger logger = LogManager.getLogger(BDDAutomata.class);
     private final BDDExtendedManager manager;
     List<ExtendedAutomaton> theExAutomata;
     ExtendedAutomata orgExAutomata;

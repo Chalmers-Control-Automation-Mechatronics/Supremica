@@ -34,23 +34,19 @@
 package net.sourceforge.waters.junit;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+
+import junit.framework.TestCase;
 
 
 public abstract class AbstractWatersTest
@@ -81,29 +77,8 @@ public abstract class AbstractWatersTest
   {
     super.setUp();
     final File dir = getOutputDirectory();
-    final String name = "log4j.log";
-    mLogFile = new File(dir, name);
-    final OutputStream stream = new FileOutputStream(mLogFile, true);
-    final PrintWriter writer = new PrintWriter(stream);
-    final PatternLayout layout = new PatternLayout("%-5p %m%n");
-    final Appender appender = new WriterAppender(layout, writer);
-    final String fullname = mLogFile.toString();
-    appender.setName(fullname);
-    final Logger root = Logger.getRootLogger();
-    root.addAppender(appender);
-  }
-
-  @Override
-  protected void tearDown() throws Exception
-  {
-    if (mLogFile != null) {
-      final Logger root = Logger.getRootLogger();
-      final String fullname = mLogFile.toString();
-      final Appender appender = root.getAppender(fullname);
-      root.removeAppender(appender);
-      appender.close();
-    }
-    super.tearDown();
+    mConfigurationFactory = new WatersLogConfigurationFactory(dir);
+    ConfigurationFactory.setConfigurationFactory(mConfigurationFactory);
   }
 
 
@@ -145,9 +120,9 @@ public abstract class AbstractWatersTest
     }
   }
 
-  protected File getLogFile()
+  protected String getLogFileName()
   {
-    return mLogFile;
+    return mConfigurationFactory.getFileName();
   }
 
 
@@ -215,7 +190,7 @@ public abstract class AbstractWatersTest
         // Funny thing, when run from ANT, the text after the first newline
         // in the argument passed to fail() gets printed on the console.
         // So we suppress the output and refer the programmer to the log file.
-        diagnostics = msg + " (See " + mLogFile + " for details.)";
+        diagnostics = msg + " (See " + getLogFileName() + " for details.)";
       }
       fail(diagnostics);
     }
@@ -242,7 +217,7 @@ public abstract class AbstractWatersTest
   protected Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 
@@ -250,7 +225,6 @@ public abstract class AbstractWatersTest
   //# Data Members
   private final File mInputRoot;
   private final File mOutputRoot;
-
-  private File mLogFile;
+  private WatersLogConfigurationFactory mConfigurationFactory;
 
 }

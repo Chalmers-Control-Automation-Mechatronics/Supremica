@@ -1,16 +1,7 @@
-/********************* Forbidder ***********************/
-// Owner: MF
-/**
- * Implements modular forbidden states by forbidden event
- * self-loops. Takes Automata and a set of global states
- * and generates a unique forbidden event for each state,
- * and self-loops the states of the respective automata
- * with the forbidden event. Only handles plant components,
- * any specs must first be plantified by the user. There is
- * also an option to use a dump state, instead of self-loop.
- */
-
 package org.supremica.automata.algorithms;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -22,18 +13,29 @@ import org.supremica.automata.ForbiddenEvent;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.gui.VisualProject;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
+
+/**
+ * Implements modular forbidden states by forbidden event
+ * selfloops. Takes Automata and a set of global states
+ * and generates a unique forbidden event for each state,
+ * and self-loops the states of the respective automata
+ * with the forbidden event. Only handles plant components,
+ * any specifications must first be plantified by the user. There is
+ * also an option to use a dump state, instead of self-loop.
+ *
+ * @author Martin Fabian
+ */
 
 public class Forbidder
 {
-    private static final Logger logger = LoggerFactory.createLogger(Forbidder.class);
+    private static final Logger logger = LogManager.getLogger(Forbidder.class);
 
 	// These are public since they are used elsewhere (org.supremica.testcases.CatMouse, for instance)
     public static final String FORBIDDEN_EVENT_PREFIX = "x:";	// prefix for forbidden events
     public static final String FORBIDDEN_AUTOMATA_PREFIX = "X:";   // prefix added to name of plant automata with forbidden event selfloops
 	public static final String FORBIDDEN_SPEC_NAME = FORBIDDEN_AUTOMATA_PREFIX + "spec"; // As of Aug 2017 we only generate a single spec, with this name
-	
+
     private Automaton[] the_automata;
     private final int[] selected_indices;
     private final SearchStates search_states;
@@ -272,7 +274,7 @@ public class Forbidder
 
     /**
      * Make a spec with a single marked state, and only this forbidden event in its alphabet
-	 * Here we make one spec for each x-event, but we could really make a single spec with all x-events. Should we? 
+	 * Here we make one spec for each x-event, but we could really make a single spec with all x-events. Should we?
      **/
     private Automaton makeSpec(final ForbiddenEvent x_event)
     {
@@ -300,10 +302,10 @@ public class Forbidder
             the_project.addAutomaton(the_specs[i]);
         }
     }
-	
+
 	/**
-	 * This static function generates the forbidden events and adds the self-loops (or dump transitions) 
-	 * so as to specify in a "modular" way global forbidden states. Synthesis must remove these global states 
+	 * This static function generates the forbidden events and adds the self-loops (or dump transitions)
+	 * so as to specify in a "modular" way global forbidden states. Synthesis must remove these global states
 	 * due to the structure of the generated system. Note that the elements of "automata" are changed, no copies are made.
 	 * @param automata The automata to which add self-loops (or dump-transitions)
 	 * @param states Set of state-sets where each state-set is a global state combination to forbid. This is a matrix where each row
@@ -317,42 +319,42 @@ public class Forbidder
 	public static Automaton forbidStates(final Automaton[] automata, final State[][] states, final String prefix, final boolean use_dump)
 	{
 		assert automata != null && states != null && prefix == null : "null arguments are not allowed";
-		
+
 		final Automaton x_spec = new Automaton(Forbidder.FORBIDDEN_SPEC_NAME);
 		x_spec.setType(AutomatonType.SPECIFICATION);
 		final State init_state = new State("x0");
 		init_state.setInitial(true);
 		init_state.setAccepting(true);
 		x_spec.addState(init_state);
-		
+
 		final Alphabet x_alpha = x_spec.getAlphabet();	// Holds the x-events
-		
-		final int WIDTH = automata.length;	
+
+		final int WIDTH = automata.length;
 		assert automata.length == states[0].length : "The automata and state vectors must be same length";
-		
+
 		final int HEIGHT = states.length; // This is the number of forbidden global states
-		
+
 		for(int i = 0; i < HEIGHT; i++)
 		{
 			// Create the forbidden event for this state combination
 			final StringBuffer x_event_label = new StringBuffer(prefix);
 			x_event_label.append(i);
 			final LabeledEvent x_event = new ForbiddenEvent(x_event_label.toString());
-			x_event.setControllable(false);			
-			
+			x_event.setControllable(false);
+
 			final State[] x_states = states[i];
 			for(int j = 0; j < WIDTH; j++)
 			{
 				final State x_state = x_states[j];
 				if(x_state == null)	// A null state means this particular automaton is not involved in the forbidden partially global state
 					continue;
-				
+
 				final Automaton x_automaton = automata[j];
 				assert x_automaton != null : "Cannot handle null automaton";
 				assert x_automaton.containsState(x_state) : "Automaton " + x_automaton.getName() + " does not have state " + x_state.getName();
-				
+
 				x_automaton.getAlphabet().addEvent(x_event);	// Throws if the event is already there! It shouldn't be.
-				
+
 				if(use_dump == false)	// use self-loops
 				{
 					final Arc x_arc = new Arc(x_state, x_state, x_event);
@@ -365,10 +367,10 @@ public class Forbidder
 					x_automaton.addArc(x_arc);
 				}
 			}
-			
+
 			x_alpha.addEvent(x_event);
 		}
-		
+
 		return x_spec;	// If we used dump, the caller can silently just throw away this one
 	}
 }

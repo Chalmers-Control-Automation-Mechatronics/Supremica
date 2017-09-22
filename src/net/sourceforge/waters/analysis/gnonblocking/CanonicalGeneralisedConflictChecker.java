@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import gnu.trove.set.hash.THashSet;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -81,12 +81,9 @@ import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
 
 /**
- * The projecting controllability check algorithm.
+ * The canonicalising generalised conflict check algorithm.
  *
  * @author Simon Ware
  */
@@ -1775,12 +1772,5 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   private BufferedWriter mWriter = null;
 
   private AutomataStats mStats;
-
-
-  // #########################################################################
-  // # Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-      LoggerFactory.createLogger(CanonicalGeneralisedConflictChecker.class);
 
 }

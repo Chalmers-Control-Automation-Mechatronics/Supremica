@@ -96,7 +96,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -118,6 +118,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robi Malik
  */
+
 public class TRCompositionalConflictChecker
   extends AbstractTRCompositionalVerifier
   implements ConflictChecker

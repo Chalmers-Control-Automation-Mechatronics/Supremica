@@ -1,18 +1,19 @@
 package org.supremica.automata.algorithms.bbsd;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
-import org.supremica.automata.*;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-// import org.supremica.util.ActionTimer;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 
-public class BBSDAbstraction {
 
-    @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.createLogger(BBSDAbstraction.class);
-    //public static ActionTimer timer = new ActionTimer();
-
+public class BBSDAbstraction
+{
     // Create a dummy state that is used for local loops
     final State dummy = new State("SelfLoopDummyState");
 
@@ -50,7 +51,7 @@ public class BBSDAbstraction {
         final Map<State, HashSet<BlockTransition>> blockTransitions = new Hashtable<>();
 
         // Create a tau event that can be used instead of local events
-        LabeledEvent localEvent = new LabeledEvent("tau_" + aut.getName());
+        final LabeledEvent localEvent = new LabeledEvent("tau_" + aut.getName());
         if (local_events.size() > 0) {
             aut.getAlphabet().addEvent(localEvent);
             for (final Arc t : aut.iterableArcs())
@@ -67,7 +68,7 @@ public class BBSDAbstraction {
             // logger.info("1: " + timer.toString());
 
             // Calculate local transitions
-            Set<Arc> LB_trans = new HashSet<>();
+            final Set<Arc> LB_trans = new HashSet<>();
             for (final Arc t : aut.iterableArcs())
                 if (t.getEvent().equals(localEvent) && !t.getToState().equals(dummy) && pi.get(t.getFromState()).equals(pi.get(t.getToState())))
                     LB_trans.add(t);
@@ -83,7 +84,7 @@ public class BBSDAbstraction {
             while(!coreachability_finished) {
                 coreachability_finished = true;
                 for (final Arc t : LB_trans) {
-                    int pi1 = pi.get(t.getToState());
+                    final int pi1 = pi.get(t.getToState());
                     for (final State s : aut.iterableStates()) {
                         if (pi1 == pi.get(s)) {
                             final Set<State> ss = coreachable.get(s);
@@ -116,10 +117,10 @@ public class BBSDAbstraction {
 
             for (final Arc t : aut.iterableArcs()) {
                 if (!LB_trans.contains(t)) {
-                    State s1 = t.getFromState();
-                    BlockTransition bt = new BlockTransition(pi.get(s1), t.getEvent(), ((t.getToState().equals(dummy)) ? 0 : pi.get(t.getToState())));
+                    final State s1 = t.getFromState();
+                    final BlockTransition bt = new BlockTransition(pi.get(s1), t.getEvent(), ((t.getToState().equals(dummy)) ? 0 : pi.get(t.getToState())));
                     blockTransitions.get(s1).add(bt);
-                    for (State s2 : coreachable.get(s1))
+                    for (final State s2 : coreachable.get(s1))
                         blockTransitions.get(s2).add(bt);
                 }
             }
@@ -175,9 +176,9 @@ public class BBSDAbstraction {
         // Add one state for each block
         // logger.info("6: " + timer.toString());
 
-        boolean[] initial = new boolean[blocks];
-        boolean[] forbidden = new boolean[blocks];
-        boolean[] notAccepting = new boolean[blocks];
+        final boolean[] initial = new boolean[blocks];
+        final boolean[] forbidden = new boolean[blocks];
+        final boolean[] notAccepting = new boolean[blocks];
 
         for (final State s2 : aut.iterableStates()) {
             if (s2.isInitial())

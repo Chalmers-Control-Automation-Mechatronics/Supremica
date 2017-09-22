@@ -20,11 +20,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 import net.sf.javabdd.BDD;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.EFA.BDDEdges;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomata;
 import org.supremica.automata.BDD.EFA.BDDExtendedAutomaton;
@@ -37,13 +37,11 @@ import org.supremica.automata.BDD.EFA.BDDPartitionSetAut;
 import org.supremica.automata.BDD.EFA.IDD;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
+
 /**
- *
- * @author Sajed
+ * @author Sajed Miremadi
  */
 public final class BDDExtendedGuardGenerator {
 
@@ -83,8 +81,6 @@ public final class BDDExtendedGuardGenerator {
     private boolean applyComplementHeuristics = false;
     private boolean applyIndependentHeuristics = false;
     private boolean generateIDD_PS = false;
-    @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
     String bestStateSet = "";
     private boolean isEventBlocked = false;
     private final EditorSynthesizerOptions options;

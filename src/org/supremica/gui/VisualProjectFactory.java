@@ -35,18 +35,17 @@
 
 package org.supremica.gui;
 
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+
 
 public class VisualProjectFactory
 	implements ProjectFactory
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(VisualProjectFactory.class);
-
 	public VisualProjectFactory() {}
 
-	public Project getProject()
+	@Override
+  public Project getProject()
 	{
 		return new VisualProject();
 	}

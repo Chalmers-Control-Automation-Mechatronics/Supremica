@@ -154,7 +154,8 @@ public class IDECutAction
           WatersDataFlavor.canCopy(selection) &&
           watersOwner.canDelete(selection);
       } else if (swingOwner != null) {
-        enabled = swingOwner.getSelectedText() != null;
+        enabled =
+          swingOwner.isEditable() && swingOwner.getSelectedText() != null;
       } else {
         enabled = false;
       }

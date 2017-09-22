@@ -58,14 +58,15 @@ import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
 
 
 public class BDDManager
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDManager.class);
+    private static Logger logger = LogManager.getLogger(BDDManager.class);
 
     static BDDFactory factory;
 

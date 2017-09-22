@@ -43,6 +43,9 @@ import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
@@ -51,22 +54,20 @@ import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
 
 /**
  * Thread dealing with synthesis.
  *
- *@author  hugo
- *@since November 18, 2004
+ * @author Hugo Flordal
+ * @since November 18, 2004
  */
 public class AutomataSynthesisWorker
     extends Thread
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynthesisWorker.class);
+    private static Logger logger = LogManager.getLogger(AutomataSynthesisWorker.class);
 
     private final IDEActionInterface ide;
     private final Automata theAutomata;

@@ -54,15 +54,17 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Helper methods for processing alphabets.
  */
+
 public class AlphabetHelpers
 {
-    private static Logger logger = LoggerFactory.createLogger(AlphabetHelpers.class);
+    private static Logger logger = LogManager.getLogger(AlphabetHelpers.class);
 
     public static Alphabet getUnionAlphabet(final Automata theAutomata)
     {

@@ -35,24 +35,26 @@
 
 package org.supremica.gui.useractions;
 
-//import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
 
-//import javax.help.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.gui.Gui;
+import javax.swing.AbstractAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.algorithms.AutomatonSplit;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.Gui;
 
 public class SplitAction
 	extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
 	private static final Logger logger =
-	    LoggerFactory.createLogger(SplitAction.class);
+	    LogManager.getLogger(SplitAction.class);
 
 	private Automata newautomata;
 
@@ -65,17 +67,18 @@ public class SplitAction
 		this.newautomata = new Automata();
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 		logger.debug("SplitAction::actionPerformed");
 
-		Gui gui = ActionMan.getGui();
-		Automata automata = gui.getSelectedAutomata();
+		final Gui gui = ActionMan.getGui();
+		final Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator<Automaton> autit = automata.iterator(); autit.hasNext(); )
+		for (final Iterator<Automaton> autit = automata.iterator(); autit.hasNext(); )
 		{
-			Automaton automaton = (Automaton) autit.next();
+			final Automaton automaton = autit.next();
 
 			split(new Automaton(automaton));
 		}
@@ -88,7 +91,7 @@ public class SplitAction
 
 				newautomata = new Automata();
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				logger.debug("SplitAction::actionPerformed() -- ", ex);
 				logger.debug(ex.getStackTrace());
@@ -98,9 +101,9 @@ public class SplitAction
 		logger.debug("SplitAction::actionPerformed done");
 	}
 
-	private void split(Automaton automaton)
+	private void split(final Automaton automaton)
 	{
-		Automata split = AutomatonSplit.split(automaton);
+		final Automata split = AutomatonSplit.split(automaton);
 
 		newautomata.addAutomata(split);
 	}

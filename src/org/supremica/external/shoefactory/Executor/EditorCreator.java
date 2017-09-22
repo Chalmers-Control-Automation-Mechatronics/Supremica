@@ -1,15 +1,18 @@
 package org.supremica.external.shoefactory.Executor;
 
-import grafchart.sfc.*;
-import org.supremica.log.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import grafchart.sfc.EditorAPI;
+
 
 public class EditorCreator
 {
-	private static Logger logger = LoggerFactory.createLogger(EditorCreator.class);
+	private static Logger logger = LogManager.getLogger(EditorCreator.class);
 	static EditorAPI e = null;
 	static boolean running = false;
 
-	public EditorCreator(String[] args)
+	public EditorCreator(final String[] args)
 	{
 		if (e == null)
 		{

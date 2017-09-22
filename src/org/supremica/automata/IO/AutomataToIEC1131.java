@@ -48,34 +48,48 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.util.SupremicaException;
-import java.io.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 import org.supremica.automata.algorithms.SynchronizationType;
-import org.supremica.automata.execution.*;
+import org.supremica.automata.execution.Action;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.Command;
+import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.EventTimer;
+import org.supremica.automata.execution.Signal;
+import org.supremica.automata.execution.Signals;
+import org.supremica.util.SupremicaException;
+
 
 public class AutomataToIEC1131
-
-    //implements AutomataSerializer
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataToIEC1131.class);
-    private Project theProject;
+    private static Logger logger = LogManager.getLogger(AutomataToIEC1131.class);
+    private final Project theProject;
 
     //private SynchronizationOptions syncOptions;
     //private AutomataSynchronizerHelper syncHelper;
-    private SynchronizationType syncType = SynchronizationType.PRIORITIZED;
+    private final SynchronizationType syncType = SynchronizationType.PRIORITIZED;
     private Alphabet allEvents;
-    private IEC61131Helper theHelper;
+    private final IEC61131Helper theHelper;
 
-    public AutomataToIEC1131(Project theProject)
+    public AutomataToIEC1131(final Project theProject)
 	throws Exception
     {
 	this(theProject, IEC61131Helper.getInstance());
     }
 
-    public AutomataToIEC1131(Project theProject, IEC61131Helper theHelper)
+    public AutomataToIEC1131(final Project theProject, final IEC61131Helper theHelper)
 	throws Exception
     {
 	this.theProject = theProject;
@@ -88,58 +102,58 @@ public class AutomataToIEC1131
 	allEvents = theProject.setIndices();
     }
 
-    void printBeginProgram(PrintWriter pw)
+    void printBeginProgram(final PrintWriter pw)
     {
 	theHelper.printBeginProgram(pw, "AutomaticallyGeneratedProgram");
     }
 
-    void printEndProgram(PrintWriter pw)
+    void printEndProgram(final PrintWriter pw)
     {
 	theHelper.printEndProgram(pw);
     }
 
-    void printBeginVariables(PrintWriter pw)
+    void printBeginVariables(final PrintWriter pw)
     {
 	theHelper.printBeginVariables(pw);
     }
 
-    void printEndVariables(PrintWriter pw)
+    void printEndVariables(final PrintWriter pw)
     {
 	theHelper.printEndVariables(pw);
     }
 
-    void printSignalVariables(PrintWriter pw)
+    void printSignalVariables(final PrintWriter pw)
     {
 
 	// Input signals
-	for (Iterator<Signal> theIt = theProject.inputSignalsIterator();
+	for (final Iterator<Signal> theIt = theProject.inputSignalsIterator();
 	     theIt.hasNext(); )
 	{
-	    Signal currSignal = (Signal) theIt.next();
-	    int currPort = currSignal.getPort();
+	    final Signal currSignal = theIt.next();
+	    final int currPort = currSignal.getPort();
 
 	    theHelper.printBooleanInputVariableDeclaration(pw, "si_" + currPort, currPort, currSignal.getLabel());
 	}
 
 	// Output signals
-	for (Iterator<Signal> theIt = theProject.outputSignalsIterator();
+	for (final Iterator<Signal> theIt = theProject.outputSignalsIterator();
 	     theIt.hasNext(); )
 	{
-	    Signal currSignal = (Signal) theIt.next();
-	    int currPort = currSignal.getPort();
+	    final Signal currSignal = theIt.next();
+	    final int currPort = currSignal.getPort();
 
 	    theHelper.printBooleanOutputVariableDeclaration(pw, "so_" + currPort, currPort, currSignal.getLabel());
 	}
     }
 
-    void printEventVariables(PrintWriter pw)
+    void printEventVariables(final PrintWriter pw)
     {
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printBooleanVariableDeclaration(pw, "e_" + currEventIndex, currEvent.getLabel() + (currEvent.isControllable()
 													 ? " controllable"
@@ -149,18 +163,18 @@ public class AutomataToIEC1131
 	theHelper.printBooleanVariableDeclaration(pw, "enabledEvent", "True if an event is enabled, false otherwise",2);
     }
 
-    void printStateVariables(PrintWriter pw,int tabs)
+    void printStateVariables(final PrintWriter pw,final int tabs)
     {
-	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+	for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
-	    Automaton currAutomaton = (Automaton) autIt.next();
-	    int currAutomatonIndex = currAutomaton.getSynchIndex();
+	    final Automaton currAutomaton = autIt.next();
+	    final int currAutomatonIndex = currAutomaton.getSynchIndex();
 
-	    for (Iterator<State> stateIt = currAutomaton.stateIterator();
+	    for (final Iterator<State> stateIt = currAutomaton.stateIterator();
 		 stateIt.hasNext(); )
 	    {
-		State currState = (State) stateIt.next();
-		int currStateIndex = currState.getSynchIndex();
+		final State currState = stateIt.next();
+		final int currStateIndex = currState.getSynchIndex();
 
 		theHelper.printBooleanVariableDeclaration(pw, "q_" + currAutomatonIndex + "_" + currStateIndex, currState.getName() + " in " + currAutomaton.getName(),tabs);
 	    }
@@ -169,33 +183,33 @@ public class AutomataToIEC1131
 	theHelper.printBooleanVariableDeclaration(pw, "initialized", "Set the inital state the first scan cycle",1);
     }
 
-    void printTimerVariables(PrintWriter pw)
+    void printTimerVariables(final PrintWriter pw)
     {
-	for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
+	for (final Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 	{
-	    EventTimer currTimer = (EventTimer) theIt.next();
+	    final EventTimer currTimer = theIt.next();
 
 	    theHelper.printTimerVariableDeclaration(pw, "timer_" + currTimer.getSynchIndex(), currTimer.getName());
 	}
     }
 
-    public void printILBegin(PrintWriter pw)
+    public void printILBegin(final PrintWriter pw)
     {
 	theHelper.printILBegin(pw);
     }
 
-    public void printILEnd(PrintWriter pw)
+    public void printILEnd(final PrintWriter pw)
     {
 	theHelper.printILLabel(pw, "end");
 	theHelper.printILEnd(pw);
     }
 
-    public void printSTBegin(PrintWriter pw)
+    public void printSTBegin(final PrintWriter pw)
     {
 	theHelper.printSTBegin(pw);
     }
 
-    public void printSTEnd(PrintWriter pw)
+    public void printSTEnd(final PrintWriter pw)
     {
 	theHelper.printSTEnd(pw);
     }
@@ -223,28 +237,28 @@ public class AutomataToIEC1131
      *
      * after_initialization:
      */
-    void printInitializationStructureAsST(PrintWriter pw)
+    void printInitializationStructureAsST(final PrintWriter pw)
     {
 	pw.println("\n\t(* Set the initial state *)");
 	pw.println("\tIF (NOT initialized)");
 	pw.println("\tTHEN");
 
-	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+	for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
-	    Automaton currAutomaton = (Automaton) autIt.next();
-	    int currAutomatonIndex = currAutomaton.getSynchIndex();
-	    State initialState = currAutomaton.getInitialState();
+	    final Automaton currAutomaton = autIt.next();
+	    final int currAutomatonIndex = currAutomaton.getSynchIndex();
+	    final State initialState = currAutomaton.getInitialState();
 
 	    if (initialState == null)
 	    {
-		String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
+		final String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
 
 		logger.error(errMessage);
 
 		throw new IllegalStateException(errMessage);
 	    }
 
-	    int currStateIndex = initialState.getSynchIndex();
+	    final int currStateIndex = initialState.getSynchIndex();
 
 	    pw.println("\t\tq_" + currAutomatonIndex + "_" + currStateIndex + " := TRUE;");
 	}
@@ -276,7 +290,7 @@ public class AutomataToIEC1131
      *
      * after_initialization:
      */
-    void printInitializationStructureAsIL(PrintWriter pw)
+    void printInitializationStructureAsIL(final PrintWriter pw)
 	throws Exception
     {
 	theHelper.printILComment(pw, "Set the initial state");
@@ -284,9 +298,9 @@ public class AutomataToIEC1131
 	theHelper.printILCommand(pw, "JMPC", "after_initialization");
 
 	// Initialize timer delays
-	for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
+	for (final Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 	{
-	    EventTimer currTimer = (EventTimer) theIt.next();
+	    final EventTimer currTimer = theIt.next();
 
 	    theHelper.printILCommand(pw, "LD", "DINT#" + currTimer.getDelay());
 	    theHelper.printILCommand(pw, "ST", "timer_" + currTimer.getSynchIndex() + ".tonPT");
@@ -294,22 +308,22 @@ public class AutomataToIEC1131
 
 	theHelper.printILCommand(pw, "LD", "TRUE");
 
-	for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+	for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	{
-	    Automaton currAutomaton = (Automaton) autIt.next();
-	    int currAutomatonIndex = currAutomaton.getSynchIndex();
-	    State initialState = currAutomaton.getInitialState();
+	    final Automaton currAutomaton = autIt.next();
+	    final int currAutomatonIndex = currAutomaton.getSynchIndex();
+	    final State initialState = currAutomaton.getInitialState();
 
 	    if (initialState == null)
 	    {
-		String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
+		final String errMessage = "AutomataTOIEC1131.printInitializationStructure: " + "all automata must have an initial state";
 
 		logger.error(errMessage);
 
 		throw new SupremicaException(errMessage);
 	    }
 
-	    int currStateIndex = initialState.getSynchIndex();
+	    final int currStateIndex = initialState.getSynchIndex();
 
 	    theHelper.printILCommand(pw, "S", "q_" + currAutomatonIndex + "_" + currStateIndex);
 	}
@@ -343,18 +357,18 @@ public class AutomataToIEC1131
      * )
      * ST e_1
      */
-    void printComputeEnabledEventsAsST(PrintWriter pw)
+    void printComputeEnabledEventsAsST(final PrintWriter pw)
     {
 	pw.println("\n\tenabledEvent = FALSE;");
 	pw.println("\n\t(* Compute the enabled events *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
-		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getIndex();
+		final LabeledEvent currEvent = alphIt.next();
+		final int currEventIndex = currEvent.getIndex();
 
 		pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 
@@ -362,11 +376,11 @@ public class AutomataToIEC1131
 
 		pw.print("\te_" + currEventIndex + " := ");
 
-		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-		    Automaton currAutomaton = (Automaton) autIt.next();
-		    Alphabet currAlphabet = currAutomaton.getAlphabet();
-		    int currAutomatonIndex = currAutomaton.getSynchIndex();
+		    final Automaton currAutomaton = autIt.next();
+		    final Alphabet currAlphabet = currAutomaton.getAlphabet();
+		    final int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 		    if (syncType == SynchronizationType.PRIORITIZED)
 		    {    // All automata that has this event as prioritized must be able to execute it
@@ -388,11 +402,11 @@ public class AutomataToIEC1131
 
 			    pw.print("(");
 
-			    for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			    for (final Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 				 stateIt.hasNext(); )
 			    {
-				State currState = (State) stateIt.next();
-				int currStateIndex = currState.getSynchIndex();
+				final State currState = stateIt.next();
+				final int currStateIndex = currState.getSynchIndex();
 
 				if (previousState)
 				{
@@ -416,7 +430,7 @@ public class AutomataToIEC1131
 		    }
 		    else
 		    {
-			String errMessage = "Unsupported SynchronizationType";
+			final String errMessage = "Unsupported SynchronizationType";
 
 			logger.error(errMessage);
 
@@ -454,7 +468,7 @@ public class AutomataToIEC1131
      * )
      * ST e_1
      */
-    void printComputeEnabledEventsAsIL(PrintWriter pw)
+    void printComputeEnabledEventsAsIL(final PrintWriter pw)
 	throws Exception
     {
 	theHelper.printILCommand(pw, "LD", "FALSE");
@@ -462,20 +476,20 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Compute the enabled events");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 
 	    boolean previousCondition = false;
 
-	    for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+	    for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 	    {
-		Automaton currAutomaton = (Automaton) autIt.next();
-		Alphabet currAlphabet = currAutomaton.getAlphabet();
-		int currAutomatonIndex = currAutomaton.getSynchIndex();
+		final Automaton currAutomaton = autIt.next();
+		final Alphabet currAlphabet = currAutomaton.getAlphabet();
+		final int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 		if (syncType == SynchronizationType.PRIORITIZED)
 		{    // All automata that has this event as prioritized must be able to execute it
@@ -495,11 +509,11 @@ public class AutomataToIEC1131
 
 			boolean previousState = false;
 
-			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (final Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
-			    State currState = stateIt.next();
-			    int currStateIndex = currState.getSynchIndex();
+			    final State currState = stateIt.next();
+			    final int currStateIndex = currState.getSynchIndex();
 
 			    if (previousState)
 			    {
@@ -530,7 +544,7 @@ public class AutomataToIEC1131
 		}
 		else
 		{
-		    String errMessage = "Unsupported SynchronizationType";
+		    final String errMessage = "Unsupported SynchronizationType";
 
 		    logger.error(errMessage);
 
@@ -542,15 +556,15 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printCheckEnabledEventsAsIL(PrintWriter pw)
+    void printCheckEnabledEventsAsIL(final PrintWriter pw)
     {
 	theHelper.printILComment(pw, "Check if the events are externally enabled");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "JMP", "check_e_" + currEventIndex);
@@ -560,27 +574,27 @@ public class AutomataToIEC1131
 	theHelper.printILComment(pw, "Check if the events are enabled by timers");
 
 	// Iterate over all events and compute which events that are enabled by the timer
-	for (Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
+	for (final Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
 	{
-	    EventTimer currTimer = (EventTimer) timerIt.next();
-	    int currTimerIndex = currTimer.getSynchIndex();
+	    final EventTimer currTimer = timerIt.next();
+	    final int currTimerIndex = currTimer.getSynchIndex();
 
 	    //theHelper.printILLabel(pw, "check_timer_" + currTimerIndex);
 	    theHelper.printILComment(pw, "Condition for timer " + currTimer.getName());
 
-	    String currTimeoutLabel = currTimer.getTimeoutEvent();
+	    final String currTimeoutLabel = currTimer.getTimeoutEvent();
 
 	    if (!allEvents.contains(currTimeoutLabel))
 	    {
-		String errMessage = "Could not find event: " + currTimeoutLabel;
+		final String errMessage = "Could not find event: " + currTimeoutLabel;
 
 		logger.error(errMessage);
 
 		throw new IllegalStateException(errMessage);
 	    }
 
-	    LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Timeout event is \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -598,32 +612,32 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printStartTimersAsIL(PrintWriter pw)
+    void printStartTimersAsIL(final PrintWriter pw)
 	throws Exception
     {
 	theHelper.printILComment(pw, "Start timers");
 
-	for (Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
+	for (final Iterator<EventTimer> timerIt = theProject.timerIterator(); timerIt.hasNext(); )
 	{
-	    EventTimer currTimer = (EventTimer) timerIt.next();
-	    int currTimerIndex = currTimer.getSynchIndex();
+	    final EventTimer currTimer = timerIt.next();
+	    final int currTimerIndex = currTimer.getSynchIndex();
 
 	    //theHelper.printILLabel(pw, "check_timer_" + currTimerIndex);
 	    theHelper.printILComment(pw, "Start timer " + currTimer.getName());
 
-	    String currTimeoutLabel = currTimer.getStartEvent();
+	    final String currTimeoutLabel = currTimer.getStartEvent();
 
 	    if (!allEvents.contains(currTimeoutLabel))
 	    {
-		String errMessage = "Could not find event: " + currTimeoutLabel;
+		final String errMessage = "Could not find event: " + currTimeoutLabel;
 
 		logger.error(errMessage);
 
 		throw new IllegalStateException(errMessage);
 	    }
 
-	    LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = allEvents.getEvent(currTimeoutLabel);
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Start event is \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -720,33 +734,33 @@ public class AutomataToIEC1131
      * e_1:                 LD e_1
      * end_of_jumps:
      */
-    void printChangeStateTransitionsAsST(PrintWriter pw)
+    void printChangeStateTransitionsAsST(final PrintWriter pw)
 	throws Exception
     {
 	pw.println("\n\t(* Change state in the automata *)");
 	pw.println("\t(* It is in general not safe to have more than one event set to true at this point *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
-		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getIndex();
+		final LabeledEvent currEvent = alphIt.next();
+		final int currEventIndex = currEvent.getIndex();
 
 		pw.println("\n\t(* Transition for event \"" + currEvent.getLabel() + "\" *)");
 		pw.println("\tIF (e_" + currEventIndex + ")");
 		pw.println("\tTHEN");
 
-		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-		    Automaton currAutomaton = (Automaton) autIt.next();
-		    Alphabet theAlphabet = currAutomaton.getAlphabet();
-		    int currAutomatonIndex = currAutomaton.getSynchIndex();
+		    final Automaton currAutomaton = autIt.next();
+		    final Alphabet theAlphabet = currAutomaton.getAlphabet();
+		    final int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 		    if (theAlphabet.contains(currEvent.getLabel()))
 		    {
-			LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
+			final LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 			if (currAutomatonEvent == null)
 			{
@@ -757,19 +771,19 @@ public class AutomataToIEC1131
 
 			boolean previousState = false;
 
-			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (final Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
-			    State currState = (State) stateIt.next();
-			    int currStateIndex = currState.getSynchIndex();
-			    State toState = currState.nextState(currAutomatonEvent);
+			    final State currState = stateIt.next();
+			    final int currStateIndex = currState.getSynchIndex();
+			    final State toState = currState.nextState(currAutomatonEvent);
 
 			    if (toState == null)
 			    {
 				throw new SupremicaException("AutomataToIEC1131.printChangeTransitionsAsST: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 			    }
 
-			    int toStateIndex = toState.getSynchIndex();
+			    final int toStateIndex = toState.getSynchIndex();
 
 			    if (currState != toState)
 			    {
@@ -826,18 +840,18 @@ public class AutomataToIEC1131
      *                              LD e_1
      * end_of_jumps:
      */
-    void printChangeStateTransitionsAsIL(PrintWriter pw)
+    void printChangeStateTransitionsAsIL(final PrintWriter pw)
     {
 	theHelper.printILComment(pw, "Change state in the automata");
 	theHelper.printILComment(pw, "It is in general not safe to have more than one event set to true at this point");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
 	    while (alphIt.hasNext())
 	    {
-		LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-		int currEventIndex = currEvent.getIndex();
+		final LabeledEvent currEvent = alphIt.next();
+		final int currEventIndex = currEvent.getIndex();
 
 		theHelper.printILComment(pw, "Transition for event \"" + currEvent.getLabel() + "\"");
 		theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -847,15 +861,15 @@ public class AutomataToIEC1131
 		theHelper.printILCommand(pw, "JMP", "do_e_" + currEventIndex);
 		theHelper.printILLabel(pw, "after_do_e_" + currEventIndex);
 
-		for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+		for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
 		{
-		    Automaton currAutomaton = (Automaton) autIt.next();
-		    Alphabet currAlphabet = currAutomaton.getAlphabet();
-		    int currAutomatonIndex = currAutomaton.getSynchIndex();
+		    final Automaton currAutomaton = autIt.next();
+		    final Alphabet currAlphabet = currAutomaton.getAlphabet();
+		    final int currAutomatonIndex = currAutomaton.getSynchIndex();
 
 		    if (currAlphabet.contains(currEvent.getLabel()))
 		    {
-			LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
+			final LabeledEvent currAutomatonEvent = currAutomaton.getAlphabet().getEvent(currEvent.getLabel());
 
 			if (currAutomatonEvent == null)
 			{
@@ -863,19 +877,19 @@ public class AutomataToIEC1131
 			}
 
 			theHelper.printILComment(pw, "Transitions in " + currAutomaton.getName());
-			for (Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
+			for (final Iterator<State> stateIt = currAutomaton.statesThatEnableEventIterator(currEvent.getLabel());
 			     stateIt.hasNext(); )
 			{
-			    State currState = (State) stateIt.next();
-			    int currStateIndex = currState.getSynchIndex();
-			    State toState = currState.nextState(currAutomatonEvent);
+			    final State currState = stateIt.next();
+			    final int currStateIndex = currState.getSynchIndex();
+			    final State toState = currState.nextState(currAutomatonEvent);
 
 			    if (toState == null)
 			    {
 				throw new IllegalStateException("AutomataToIEC1131.printChangeTransitionsAsIL: " + "Could not find the next state from state " + currState.getName() + " with label " + currEvent.getLabel() + " in automaton " + currAutomaton.getName());
 			    }
 
-			    int toStateIndex = toState.getSynchIndex();
+			    final int toStateIndex = toState.getSynchIndex();
 
 			    if (currState != toState)
 			    {
@@ -902,18 +916,18 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printComputeSingleEnabledEventAsIL(PrintWriter pw)
+    void printComputeSingleEnabledEventAsIL(final PrintWriter pw)
 	throws Exception
     {
 	theHelper.printILComment(pw, "Make sure only one event is enabled");
 	theHelper.printILComment(pw, "Priority is given to uncontrollable events");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
+	for (final Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
 	     alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -923,11 +937,11 @@ public class AutomataToIEC1131
 	    theHelper.printILCommand(pw, "ST", "enabledEvent");
 	}
 
-	for (Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
+	for (final Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
 	     alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILComment(pw, "Enable condition for event \"" + currEvent.getLabel() + "\"");
 	    theHelper.printILCommand(pw, "LD", "e_" + currEventIndex);
@@ -938,29 +952,29 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printComputeSingleEnabledEventAsST(PrintWriter pw)
+    void printComputeSingleEnabledEventAsST(final PrintWriter pw)
 	throws Exception
     {
 	pw.println("\n\t(* Make sure only one event is enabled *)");
 	pw.println("\t(* Priority is given to uncontrollable events *)");
 
 	// Iterate over all events and compute which events that are enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
+	for (final Iterator<LabeledEvent> alphIt = allEvents.uncontrollableEventIterator();
 	     alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 	    pw.println("\te_" + currEventIndex + " = " + "e_" + currEventIndex + " AND (NOT enabledEvent);");
 	    pw.println("\tenabledEvent = " + "enabledEvent OR " + "e_" + currEventIndex + ";");
 	}
 
-	for (Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
+	for (final Iterator<LabeledEvent> alphIt = allEvents.controllableEventIterator();
 	     alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    pw.println("\n\t(* Enable condition for event \"" + currEvent.getLabel() + "\" *)");
 	    pw.println("\te_" + currEventIndex + " = " + "e_" + currEventIndex + " AND (NOT enabledEvent);");
@@ -968,30 +982,30 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printDoActionsAsIL(PrintWriter pw)
+    void printDoActionsAsIL(final PrintWriter pw)
 	throws Exception
     {
-	Actions theActions = theProject.getActions();
-	Signals outputSignals = theProject.getOutputSignals();
+	final Actions theActions = theProject.getActions();
+	final Signals outputSignals = theProject.getOutputSignals();
 
 	theHelper.printILComment(pw, "The actions");
 
 	// Iterate over all events and compute which events that are externally enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILLabel(pw, "do_e_" + currEventIndex);
 	    theHelper.printILComment(pw, "Action for event " + currEvent.getLabel());
 
 	    if (theActions.hasAction(currEvent.getLabel()))
 	    {
-		Action currAction = theActions.getAction(currEvent.getLabel());
+		final Action currAction = theActions.getAction(currEvent.getLabel());
 
-		for (Iterator<Command> it = currAction.commandIterator(); it.hasNext(); )
+		for (final Iterator<Command> it = currAction.commandIterator(); it.hasNext(); )
 		{
-		    Command currCommand = (Command) it.next();
+		    final Command currCommand = it.next();
 
 		    if (currCommand.getValue())
 		    {
@@ -1007,7 +1021,7 @@ public class AutomataToIEC1131
 			throw new SupremicaException("Could not find output signal " + currCommand.getLabel());
 		    }
 
-		    Signal currSignal = outputSignals.getSignal(currCommand.getLabel());
+		    final Signal currSignal = outputSignals.getSignal(currCommand.getLabel());
 
 		    theHelper.printILCommand(pw, "ST", "so_" + currSignal.getPort());
 		}
@@ -1017,18 +1031,18 @@ public class AutomataToIEC1131
 	}
     }
 
-    void printCheckConditionsAsIL(PrintWriter pw)
+    void printCheckConditionsAsIL(final PrintWriter pw)
     {
-	Controls theControls = theProject.getControls();
-	Signals inputSignals = theProject.getInputSignals();
+	final Controls theControls = theProject.getControls();
+	final Signals inputSignals = theProject.getInputSignals();
 
 	theHelper.printILComment(pw, "The conditions");
 
 	// Iterate over all events and compute which events that are externally enabled
-	for (Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
+	for (final Iterator<LabeledEvent> alphIt = allEvents.iterator(); alphIt.hasNext(); )
 	{
-	    LabeledEvent currEvent = (LabeledEvent) alphIt.next();
-	    int currEventIndex = currEvent.getIndex();
+	    final LabeledEvent currEvent = alphIt.next();
+	    final int currEventIndex = currEvent.getIndex();
 
 	    theHelper.printILLabel(pw, "check_e_" + currEventIndex);
 	    theHelper.printILComment(pw, "Condition for event " + currEvent.getLabel());
@@ -1037,24 +1051,24 @@ public class AutomataToIEC1131
 
 	    if (theControls.hasControl(currEvent.getLabel()))
 	    {
-		Control currControl = theControls.getControl(currEvent.getLabel());
+		final Control currControl = theControls.getControl(currEvent.getLabel());
 		int i = 0;
 
-		for (Iterator<Condition> it = currControl.conditionIterator();
+		for (final Iterator<Condition> it = currControl.conditionIterator();
 		     it.hasNext(); )
 		{
-		    Condition currCondition = (Condition) it.next();
+		    final Condition currCondition = it.next();
 
 		    if (!inputSignals.hasSignal(currCondition.getLabel()))
 		    {
-			String errMessage = "Could not find input signal " + currCondition.getLabel();
+			final String errMessage = "Could not find input signal " + currCondition.getLabel();
 
 			logger.error(errMessage);
 
 			throw new IllegalStateException(errMessage);
 		    }
 
-		    Signal currSignal = inputSignals.getSignal(currCondition.getLabel());
+		    final Signal currSignal = inputSignals.getSignal(currCondition.getLabel());
 
 		    theHelper.printILCommand(pw, "LD", "si_" + currSignal.getPort());
 
@@ -1164,7 +1178,7 @@ public class AutomataToIEC1131
     }
     }
     */
-    public void serializeStructuredText(PrintWriter pw)
+    public void serializeStructuredText(final PrintWriter pw)
 	throws Exception
     {
 	//initialize();
@@ -1183,7 +1197,7 @@ public class AutomataToIEC1131
 	printEndProgram(pw);
     }
 
-    public void serializeInstructionList(PrintWriter pw)
+    public void serializeInstructionList(final PrintWriter pw)
 	throws Exception
     {
 	//initialize();

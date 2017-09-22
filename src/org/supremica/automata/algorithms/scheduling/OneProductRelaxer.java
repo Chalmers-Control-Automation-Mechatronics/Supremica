@@ -2,25 +2,27 @@ package org.supremica.automata.algorithms.scheduling;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import org.supremica.automata.*;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.State;
+
 
 public class OneProductRelaxer
 	implements Relaxer
 {
-    private NodeExpander expander; 
-    private ModifiedAstar scheduler;
-    private Automata plantAutomata;
-    
-    @SuppressWarnings("unused")
-	private org.supremica.log.Logger logger = org.supremica.log.LoggerFactory.createLogger(this.getClass());
+    private final NodeExpander expander;
+    private final ModifiedAstar scheduler;
+    private final Automata plantAutomata;
 
     /**
      * The remaining cost for each state of each robot (if run independently of other robots).
      * int[] = [robot_index, state_index].
      */
     private double[][] remainingCosts;
-	
-    public OneProductRelaxer(NodeExpander expander, ModifiedAstar scheduler)
+
+    public OneProductRelaxer(final NodeExpander expander, final ModifiedAstar scheduler)
             throws Exception
     {
             this.expander = expander;
@@ -44,31 +46,31 @@ public class OneProductRelaxer
 
         for (int i=0; i<plantAutomata.size(); i++)
         {
-            Automaton theAuto = plantAutomata.getAutomatonAt(i);
-            
+            final Automaton theAuto = plantAutomata.getAutomatonAt(i);
+
             // An accepting state is found for the current automaton. In order
             // for the algorithm to work properly, it is assumed that the model is
             // such that the accepting state is also the last state in the sequence(s)
             // of operations, described by the current automaton.
             State markedState = null;
-            
-            for (Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
+
+            for (final Iterator<State> stateIt = theAuto.stateIterator(); stateIt.hasNext(); )
             {
                 markedState = stateIt.next();
-                
+
                 if (markedState.isAccepting())
                 {
                     break;
                 }
             }
-            
+
             if (! markedState.isAccepting())
 			{
                 throw new Exception("No accepting state for " + theAuto.getName() + " was found during preprocessing...");
             }
-            
-            ArrayList<State> estList = new ArrayList<State>();
-            
+
+            final ArrayList<State> estList = new ArrayList<State>();
+
             remainingCosts[i] = new double[theAuto.nbrOfStates()];
             for (int j=0; j<remainingCosts[i].length; j++)
             {
@@ -82,20 +84,20 @@ public class OneProductRelaxer
             else
             {
                 remainingCosts[i][expander.getIndexMap().getStateIndex(theAuto, markedState)] = markedState.getCost();
-                
+
                 estList.add(markedState);
-                
+
                 while (!estList.isEmpty())
                 {
-                    Iterator<Arc> incomingArcIterator = estList.remove(0).incomingArcsIterator();
-                    
+                    final Iterator<Arc> incomingArcIterator = estList.remove(0).incomingArcsIterator();
+
                     while (incomingArcIterator.hasNext())
                     {
-                        Arc currArc = incomingArcIterator.next();
-                        State currState = currArc.getFromState();
-                        State nextState = currArc.getToState();
-                        int currStateIndex = expander.getIndexMap().getStateIndex(theAuto, currState);
-                        int nextStateIndex = expander.getIndexMap().getStateIndex(theAuto, nextState);
+                        final Arc currArc = incomingArcIterator.next();
+                        final State currState = currArc.getFromState();
+                        final State nextState = currArc.getToState();
+                        final int currStateIndex = expander.getIndexMap().getStateIndex(theAuto, currState);
+                        final int nextStateIndex = expander.getIndexMap().getStateIndex(theAuto, nextState);
 
                         if (remainingCosts[i][currStateIndex] == -1)
                         {
@@ -104,8 +106,8 @@ public class OneProductRelaxer
                         }
                         else
                         {
-                            double newRemainingCost = nextState.getCost() + remainingCosts[i][nextStateIndex];
-                            
+                            final double newRemainingCost = nextState.getCost() + remainingCosts[i][nextStateIndex];
+
                             if (newRemainingCost < remainingCosts[i][currStateIndex])
                             {
                                 remainingCosts[i][currStateIndex] = newRemainingCost;
@@ -119,33 +121,35 @@ public class OneProductRelaxer
     }
 
     /**
-	 * This returns the one-product relaxation value for the supplied node. 
-	 * This is done by calculating the remaining cost for each robot/plant. 
-	 * The maximum remaining cost is returned to be used as an estimate of 
-	 * the total remaining cost of the system. 
-	 * 
+	 * This returns the one-product relaxation value for the supplied node.
+	 * This is done by calculating the remaining cost for each robot/plant.
+	 * The maximum remaining cost is returned to be used as an estimate of
+	 * the total remaining cost of the system.
+	 *
 	 * @param node the current node
-	 * @return double the heuristic function, h(n), that guides the search, 
+	 * @return double the heuristic function, h(n), that guides the search,
 	 * in this case it is the "1-product relaxation"
 	 */
-    public double getRelaxation(Node node) 
+    @Override
+    public double getRelaxation(final Node node)
         throws Exception
     {
         double estimate = 0;
-        double[] currCosts = expander.getCosts(node);
+        final double[] currCosts = expander.getCosts(node);
         @SuppressWarnings("unused")
+        final
 		int[] activeAutomataIndex = scheduler.getActiveAutomataIndex();
 
-        for (int i=0; i<scheduler.getActiveLength(); i++) 
+        for (int i=0; i<scheduler.getActiveLength(); i++)
         {
-            double altEstimate = currCosts[i] + remainingCosts[i][(int)node.getValueAt(scheduler.getActiveAutomataIndex()[i])]; 
+            final double altEstimate = currCosts[i] + remainingCosts[i][(int)node.getValueAt(scheduler.getActiveAutomataIndex()[i])];
 
             if (altEstimate > estimate)
             {
                 estimate = altEstimate;
             }
         }
-        
+
         return estimate;
     }
 

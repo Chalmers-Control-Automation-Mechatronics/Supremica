@@ -49,13 +49,21 @@
  */
 package org.supremica.automata.IO;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
-import org.supremica.log.*;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
@@ -63,11 +71,10 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.SynthesizerOptions;
 
+
 public class AutomataToSTS
     implements AutomataSerializer
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToSTS.class);
     private final Automata automata;
     @SuppressWarnings("unused")
 	private final boolean includeCost = true;
@@ -84,7 +91,8 @@ public class AutomataToSTS
         this.automata.addAutomaton(automaton);
     }
 
-	public void serialize(final PrintWriter pw)
+	@Override
+  public void serialize(final PrintWriter pw)
     {
         pw.println("root = plant");
         final String[][] root = new String[automata.size()+1][];
@@ -270,6 +278,7 @@ public class AutomataToSTS
         createSpec(theFile.getAbsolutePath());
     }
 
+    @Override
     public void serialize(final String fileName)
     throws IOException
     {

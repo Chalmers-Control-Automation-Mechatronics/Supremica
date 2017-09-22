@@ -45,27 +45,28 @@ import javax.swing.JOptionPane;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.ProxyTools;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.algorithms.minimization.AutomataMinimizer;
 import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
 /**
- * Thread dealing with minimization.
+ * Thread dealing with minimisation.
  *
- *@author hugo
+ *@author Hugo Flordal
  *@since November 11, 2004
  */
 public class AutomataMinimizationWorker
     extends Thread
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataMinimizationWorker.class);
+    private static Logger logger = LogManager.getLogger(AutomataMinimizationWorker.class);
 
     private final Frame frame;
     private final Automata theAutomata;

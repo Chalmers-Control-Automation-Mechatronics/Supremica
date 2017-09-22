@@ -42,27 +42,23 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.gui.AutomataHierarchyViewer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
-/**
- * A new action
- */
+
 public class AnalyzerViewModularStructureAction
     extends IDEAction
 {
-    private final Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
     public AnalyzerViewModularStructureAction(final List<IDEAction> actionList)
     {
         super(actionList);

@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
@@ -43,6 +44,9 @@ import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
@@ -80,6 +84,7 @@ public class DesktopEditAction extends WatersDesktopAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent e)
   {
     final SimpleComponentSubject comp = getSimpleComponent();
@@ -90,8 +95,9 @@ public class DesktopEditAction extends WatersDesktopAction
         final ModuleContainer modContainer = (ModuleContainer) docContainer;
         modContainer.showEditor(comp);
       } catch (final GeometryAbsentException exception) {
+        final Logger logger = LogManager.getLogger();
         final String msg = exception.getMessage(comp);
-        ide.error(msg);
+        logger.error(msg);
       }
     }
   }

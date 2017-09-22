@@ -38,12 +38,11 @@ import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
-
-import org.supremica.gui.ide.IDEReportInterface;
 
 
 /**
@@ -59,10 +58,10 @@ public class AboutPopup
 
   //#########################################################################
   //# Constructor
-  public AboutPopup(final IDEReportInterface ide)
+  public AboutPopup(final JFrame owner)
   {
-    super(ide.getFrame(), "About " + Version.getInstance().getTitle());
-    final AboutPanel panel = new AboutPanel(ide);
+    super(owner, "About " + Version.getInstance().getTitle());
+    final AboutPanel panel = new AboutPanel();
     final Border border = BorderFactory.createEmptyBorder(2, 4, 2, 1);
     panel.setBorder(border);
     final int scaledWidth =
@@ -76,7 +75,7 @@ public class AboutPopup
     panel.setPreferredSize(panelSize);
     add(panel);
     pack();
-    setLocationRelativeTo(ide.getFrame());
+    setLocationRelativeTo(owner);
     setResizable(false);
   }
 

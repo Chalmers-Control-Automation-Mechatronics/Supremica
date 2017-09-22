@@ -1,5 +1,7 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import net.sf.javabdd.BDD;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
@@ -26,25 +29,25 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
-
-import gnu.trove.list.array.TIntArrayList;
 
 
 /**
- * @author sajed, zhennan
+ * @author Sajed Miremadi, Zhennan Fei
  */
+
 public class BDDExtendedSynthesizer {
 
-    private static Logger logger = LoggerFactory.createLogger(BDDExtendedSynthesizer.class);
+    private static Logger logger = LogManager.getLogger(BDDExtendedSynthesizer.class);
 
     public BDDExtendedAutomata bddAutomata;
     ExtendedAutomata theAutomata;

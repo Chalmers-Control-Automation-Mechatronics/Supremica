@@ -35,29 +35,27 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
 
 
-/**
- * A new action
- */
 public class AnalyzerRenameAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerRenameAction(List<IDEAction> actionList)
+    public AnalyzerRenameAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -71,7 +69,8 @@ public class AnalyzerRenameAction
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -79,9 +78,10 @@ public class AnalyzerRenameAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -89,20 +89,20 @@ public class AnalyzerRenameAction
         }
 
 
-        for(Automaton currAutomaton : selectedAutomata)
+        for(final Automaton currAutomaton : selectedAutomata)
         {
-            String currAutomatonName = currAutomaton.getName();
+            final String currAutomatonName = currAutomaton.getName();
 
             try
             {
-                String newName = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
+                final String newName = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
 
                 if (newName != null)
                 {
                     ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().renameAutomaton(currAutomaton, newName);
                 }
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Exception while renaming the automaton " + currAutomatonName, ex);
                 logger.debug(ex.getStackTrace());

@@ -49,13 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
+
 
 public final class EditorSynthesizerOptions
 {
-    private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
+    private static Logger logger = LogManager.getLogger(SynthesizerOptions.class);
 
     private boolean dialogOK = false;
     private SynthesisType synthesisType;
@@ -86,7 +88,7 @@ public final class EditorSynthesizerOptions
     private String event;
     private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
 
-    //Optimization options
+    //Optimisation options
     private String optVariable;
     private boolean typeOfVarOpt = true;
 

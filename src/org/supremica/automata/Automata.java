@@ -70,15 +70,17 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.plain.base.DocumentElement;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.IO.ProjectBuildFromXML;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 /**
  * An ordered set of Automaton-objects.
  * @see Automaton
  */
+
 public class Automata
     extends DocumentElement
     implements AutomatonListener, Iterable<Automaton>, ProductDESProxy
@@ -86,7 +88,7 @@ public class Automata
 	private static final long serialVersionUID = 1L;
 
 	private static final String DEFAULT_NAME = "Untitled";
-    private static Logger logger = LoggerFactory.createLogger(Automata.class);
+    private static Logger logger = LogManager.getLogger(Automata.class);
     private ArrayList<Automaton> theAutomata;
     private HashMap<String,Automaton> nameMap;
     private String name = DEFAULT_NAME;
@@ -153,6 +155,7 @@ public class Automata
         this(file.toURL());
     }
 
+    @Override
     public Automata clone()
     {
         //Automata clonedObject = (Automata)super.clone();
@@ -180,8 +183,8 @@ public class Automata
      * Adds the automaton aut to this Automata. If there already is an automaton with the
      * same name as aut, aut is NOT added.
 	 * Returns false if aut has same name as an existing automaton
-	 * 
-	 * This one is for backward compatibility only, really all actions that add 
+	 *
+	 * This one is for backward compatibility only, really all actions that add
 	 * automata should use the one below with tweakName == true // MF
      */
     public boolean addAutomaton(final Automaton aut)
@@ -190,24 +193,24 @@ public class Automata
     }
 
 	/**
-	 * Adds the given automaton the this Automata. If tweakName is true, 
+	 * Adds the given automaton the this Automata. If tweakName is true,
 	 * and there already exists an automaton with the same name as the
 	 * the given automaton, then create a unique name and add it.
-	 * 
+	 *
 	 * @param aut The Automaton to add
-	 * @param tweakName If true, the automaton is added with an altered unique name if necessary 
+	 * @param tweakName If true, the automaton is added with an altered unique name if necessary
 	 * @return Returns false if the given automaton is not added, else true
 	 */
 	public boolean addAutomaton(final Automaton aut, final boolean tweakName)
 	{
 		if(containsAutomaton(aut.getName()))
-		{ 
+		{
 			if(!tweakName)
 			{
 				return false;	// Name exists already and we should not generate a new unique name
 			}
 			// Generate a unique name that does not already exist
-			aut.setName(this.getUniqueAutomatonName(aut.getName()));		
+			aut.setName(this.getUniqueAutomatonName(aut.getName()));
 		}
 
 		// Here we know the automaton has a unique name
@@ -217,7 +220,7 @@ public class Automata
         notifyListeners(AutomataListeners.MODE_AUTOMATON_ADDED, aut);
 		return true;
 	}
-	
+
     /**
      * Adds all automata in 'automata' to this Automata. Automata with the same name as
      * already present automata are NOT added.
@@ -294,7 +297,7 @@ public class Automata
         }
 
         final Automaton firstAutomaton = aut;
-        final Automaton secondAutomaton = (Automaton) theAutomata.get(secondAutomatonIndex);
+        final Automaton secondAutomaton = theAutomata.get(secondAutomatonIndex);
 
         theAutomata.set(firstAutomatonIndex, secondAutomaton);
         theAutomata.set(secondAutomatonIndex, firstAutomaton);
@@ -369,7 +372,7 @@ public class Automata
 
         for (final Iterator<Automaton> theIt = plantIterator(); theIt.hasNext(); )
         {
-            final Automaton currAutomaton = (Automaton) theIt.next();
+            final Automaton currAutomaton = theIt.next();
 
             newAutomata.addAutomaton(currAutomaton);
         }
@@ -393,7 +396,7 @@ public class Automata
 
         for (final Iterator<Automaton> theIt = specificationIterator(); theIt.hasNext(); )
         {
-            final Automaton currAutomaton = (Automaton) theIt.next();
+            final Automaton currAutomaton = theIt.next();
 
             newAutomata.addAutomaton(currAutomaton);
         }
@@ -417,7 +420,7 @@ public class Automata
 
         for (final Iterator<Automaton> theIt = supervisorIterator(); theIt.hasNext(); )
         {
-            final Automaton currAutomaton = (Automaton) theIt.next();
+            final Automaton currAutomaton = theIt.next();
 
             newAutomata.addAutomaton(currAutomaton);
         }
@@ -927,6 +930,7 @@ public class Automata
         return automataAlphabet.minus(automaton.getAlphabet());
     }
 
+    @Override
     public Set<AutomatonProxy> getAutomata()
     {
         final Iterator<Automaton> iterator = iterator();
@@ -938,6 +942,7 @@ public class Automata
         return automata;
     }
 
+    @Override
     public Set<EventProxy> getEvents()
     {
         return getUnionAlphabet().getWatersEventsWithPropositions();
@@ -1011,8 +1016,8 @@ public class Automata
                 return false;
             }
 
-            final Automaton thisAutomaton = (Automaton) thisAutIt.next();
-            final Automaton otherAutomaton = (Automaton) otherAutIt.next();
+            final Automaton thisAutomaton = thisAutIt.next();
+            final Automaton otherAutomaton = otherAutIt.next();
 
             if (!thisAutomaton.equalAutomaton(otherAutomaton))
             {
@@ -1124,26 +1129,32 @@ public class Automata
         return buf.toString();
     }
 
+    @Override
     public void stateAdded(final Automaton aut, final State q)
     {    // Do nothing
     }
 
+    @Override
     public void stateRemoved(final Automaton aut, final State q)
     {    // Do nothing
     }
 
+    @Override
     public void arcAdded(final Automaton aut, final Arc a)
     {    // Do nothing
     }
 
+    @Override
     public void arcRemoved(final Automaton aut, final Arc a)
     {    // Do nothing
     }
 
+    @Override
     public void attributeChanged(final Automaton aut)
     {    // Do nothing
     }
 
+    @Override
     public void automatonRenamed(final Automaton aut, final String oldName)
     {
         nameMap.remove(oldName);
@@ -1156,6 +1167,7 @@ public class Automata
         updated(null);
     }
 
+    @Override
     public void updated(final Object obj)
     {
         notifyListeners();
@@ -1255,7 +1267,7 @@ public class Automata
         {
             while (autIt.hasNext())
             {
-                theAutomaton = (Automaton) autIt.next();
+                theAutomaton = autIt.next();
 
                 if (theAutomaton.getType() == theType)
                 {
@@ -1274,7 +1286,7 @@ public class Automata
 
         for (final Iterator<Automaton> it = iterator(); it.hasNext(); )
         {
-            final Automaton automaton = (Automaton) it.next();
+            final Automaton automaton = it.next();
 
             sbuf.append(automaton.toString());
             sbuf.append("\n");
@@ -1283,6 +1295,7 @@ public class Automata
         return sbuf.toString();
     }
 
+    @Override
     public String toString()
     {
         final StringBuilder sbuf = new StringBuilder("{");
@@ -1538,21 +1551,25 @@ public class Automata
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
     public Class<ProductDESProxy> getProxyInterface()
     {
         return ProductDESProxy.class;
     }
 
+    @Override
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
 
+    @Override
     public int refHashCode()
     {
         return getName().hashCode();
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
         throws VisitorException
     {

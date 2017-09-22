@@ -35,21 +35,25 @@
 
 package org.supremica.gui;
 
-import org.supremica.log.*;
-import org.supremica.automata.IO.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomataListener;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.IO.AutomataSerializer;
+import org.supremica.automata.IO.AutomataToHierarchyToDot;
+
 
 public class AutomataHierarchyViewer
     extends DotViewer
     implements AutomataListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(AutomataHierarchyViewer.class);
-    private Automata theAutomata;
+    private static Logger logger = LogManager.getLogger(AutomataHierarchyViewer.class);
+    private final Automata theAutomata;
 
-    public AutomataHierarchyViewer(Automata theAutomata)
+    public AutomataHierarchyViewer(final Automata theAutomata)
     throws Exception
     {
         this.theAutomata = theAutomata;
@@ -60,30 +64,35 @@ public class AutomataHierarchyViewer
     }
 
     // Implementation of AutomataListener interface
-    public void automatonAdded(Automata automata, Automaton automaton)
+    @Override
+    public void automatonAdded(final Automata automata, final Automaton automaton)
     {
         updated(automata, theAutomata);
     }
 
-    public void automatonRemoved(Automata automata, Automaton automaton)
+    @Override
+    public void automatonRemoved(final Automata automata, final Automaton automaton)
     {
         updated(automata, theAutomata);
     }
 
-    public void automatonRenamed(Automata automata, Automaton automaton)
+    @Override
+    public void automatonRenamed(final Automata automata, final Automaton automaton)
     {
         updated(automata, theAutomata);
     }
 
-    public void actionsOrControlsChanged(Automata automata)
+    @Override
+    public void actionsOrControlsChanged(final Automata automata)
     {
         updated(automata, theAutomata);
     }
 
     // End of interface implementation
+    @Override
     public AutomataSerializer getSerializer()
     {
-        AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
+        final AutomataToHierarchyToDot serializer = new AutomataToHierarchyToDot(theAutomata);
 
         serializer.setLeftToRight(leftToRightCheckBox.isSelected());
         serializer.setWithLabels(withLabelsCheckBox.isSelected());
@@ -94,7 +103,7 @@ public class AutomataHierarchyViewer
         {
             serializer.serialize("Output.txt");
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error(ex.getMessage());
         }

@@ -60,6 +60,9 @@ import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.about.WelcomeScreen;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.logging.IDEAppender;
+import net.sourceforge.waters.gui.logging.IDELogConfigurationFactory;
+import net.sourceforge.waters.gui.logging.LogPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
@@ -70,15 +73,18 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+
 import org.supremica.automata.Project;
-import org.supremica.gui.SupremicaLoggerFactory;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ProcessCommandLineArguments;
+
 import org.xml.sax.SAXException;
 
 
@@ -100,12 +106,6 @@ public class IDE
   //#########################################################################
   //# Constructors
   public IDE()
-    throws JAXBException, SAXException
-  {
-    this(true);
-  }
-
-  public IDE(final boolean showVersion)
     throws JAXBException, SAXException
   {
     // Instantiate all actions
@@ -138,7 +138,7 @@ public class IDE
     mToolBar = new IDEToolBar(this);
     contents.add(mToolBar, BorderLayout.NORTH);
     mWelcomeScreen = new WelcomeScreen(this);
-    mLogPanel = new LogPanel();
+    mLogPanel = new LogPanel(mPopupActionManager);
     mSplitPaneVertical =
       new JSplitPane(JSplitPane.VERTICAL_SPLIT, mWelcomeScreen, mLogPanel);
     mSplitPaneVertical.setContinuousLayout(false);
@@ -156,18 +156,6 @@ public class IDE
     attach(this);
     addComponentListener(this);
     updateWindowTitle();
-
-    if (showVersion) {
-      // Show Version number
-      info(Version.getInstance().toString());
-      // Show memory
-      final int MB = 1024*1024;
-      info("JVM:" + System.getProperty("java.version") +
-           ", Free/Total/Max mem: " +
-           Runtime.getRuntime().freeMemory()/MB + "/" +
-           Runtime.getRuntime().totalMemory()/MB + "/" +
-           Runtime.getRuntime().maxMemory()/MB + " MB");
-    }
   }
 
 
@@ -214,6 +202,11 @@ public class IDE
   public DocumentManager getDocumentManager()
   {
     return mDocumentContainerManager.getDocumentManager();
+  }
+
+  public LogPanel getLogPanel()
+  {
+    return mLogPanel;
   }
 
   public JFileChooser getFileChooser()
@@ -371,34 +364,20 @@ public class IDE
 
 
   //#########################################################################
-  //# Interface org.supremica.gui.ide.IDEReportInterface
-  @Override
-  public void error(final String msg)
+  //# Logging
+  private void initializeLoggers(final boolean showVersionInLogPanel)
   {
-    LOGGER.error(msg);
-  }
-
-  @Override
-  public void error(final String msg, final Throwable t)
-  {
-    LOGGER.error(msg, t);
-  }
-
-  @Override
-  public void info(final String msg)
-  {
-    LOGGER.info(msg);
-  }
-
-  public void warn(final String msg)
-  {
-    LOGGER.warn(msg);
-  }
-
-  @Override
-  public void debug(final String msg)
-  {
-    LOGGER.debug(msg);
+    IDEAppender.configure(mLogPanel);
+    if (showVersionInLogPanel) {
+      final Logger logger = LogManager.getLogger();
+      logger.info(Version.getInstance().toString());
+      final int mb = 1024 * 1024;
+      logger.info("JVM:" + System.getProperty("java.version") +
+                  ", Free/Total/Max mem: " +
+                  Runtime.getRuntime().freeMemory()/mb + "/" +
+                  Runtime.getRuntime().totalMemory()/mb + "/" +
+                  Runtime.getRuntime().maxMemory()/mb + " MiB");
+    }
   }
 
 
@@ -409,16 +388,11 @@ public class IDE
   {
     // Process command line arguments and load configuration
     final List<File> files = ProcessCommandLineArguments.process(args);
-    // Initialise logging
-    SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
-    LOGGER = SupremicaLoggerFactory.createLogger(IDE.class);
     // Initialise look & feel, load fonts and icons
     IconAndFontLoader.initialize();
     // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
-    final boolean showVersion =
-      hasFiles || Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue();
-    final IDE ide = new IDE(showVersion);
+    final IDE ide = new IDE();
     // Open initial module(s)
     if (hasFiles) {
       ide.openFiles(files);
@@ -427,6 +401,8 @@ public class IDE
     }
     // Show!
     ide.setVisible(true);
+    ide.initializeLoggers(hasFiles ||
+                          Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue());
   }
 
 
@@ -547,21 +523,16 @@ public class IDE
   private final LogPanel mLogPanel;
   private final JFileChooser mFileChooser;
 
-  // Logger. Must not be initialised until ProcessCommandLineArguments
-  // has finished (or messages WILL disappear).  Try running "IDE -h" and
-  // "IDE", _both_ should give output, to console and log display,
-  // respectively.
-  private static Logger LOGGER = null;
-  public static void setLogger(final Logger aLogger) {
-    LOGGER = aLogger;
-  }
-
 
   //#########################################################################
   //# Static Class Constants
   private static final long serialVersionUID = -3896438636773221026L;
 
   static {
+    // Configure loggers in static initialiser,
+    // making sure it happens before logging is used.
+    final ConfigurationFactory factory = new IDELogConfigurationFactory();
+    ConfigurationFactory.setConfigurationFactory(factory);
     Locale.setDefault(Locale.ENGLISH);
   }
 

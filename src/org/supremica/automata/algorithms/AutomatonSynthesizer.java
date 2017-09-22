@@ -49,12 +49,16 @@
  */
 
 package org.supremica.automata.algorithms;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.Abortable;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -65,20 +69,18 @@ import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.automata.StateSet;
 import org.supremica.automata.algorithms.standard.ObserverBuilder;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 /**
- * A monolithic synthesizer that can handle non-blocking and controllability problems.
+ * A monolithic synthesiser that can handle non-blocking and controllability problems.
  *
- *@author ka
+ *@author Knut &Aring;kesson
  *@since November 28, 2000
  */
 public class AutomatonSynthesizer
     implements Abortable
 {
-    protected static Logger logger = LoggerFactory.createLogger(AutomatonSynthesizer.class);
+    protected static Logger logger = LogManager.getLogger(AutomatonSynthesizer.class);
     protected Automaton theAutomaton;
     protected StateSet acceptingStates = new StateSet();
     protected SynthesizerOptions synthesizerOptions;

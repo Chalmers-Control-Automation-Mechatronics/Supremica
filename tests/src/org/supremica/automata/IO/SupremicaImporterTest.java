@@ -9,10 +9,10 @@
 
 package org.supremica.automata.IO;
 
-import java.net.URI;
-import java.util.Arrays;
 import java.io.File;
 import java.io.FileFilter;
+import java.net.URI;
+import java.util.Arrays;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -31,7 +31,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 
 
@@ -145,6 +146,7 @@ public class SupremicaImporterTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
@@ -168,6 +170,7 @@ public class SupremicaImporterTest
   }
 
 
+  @Override
   protected void tearDown()
     throws Exception
   {
@@ -186,6 +189,7 @@ public class SupremicaImporterTest
     return new File(getInputRoot(), "includeInJarFile");
   }
 
+  @Override
   protected File getOutputDirectory()
   {
     final String classname = getClass().getName();
@@ -205,6 +209,7 @@ public class SupremicaImporterTest
 
     //#######################################################################
     //# Interface java.io.FileFilter
+    @Override
     public boolean accept(final File path)
     {
       final String name = path.getName();

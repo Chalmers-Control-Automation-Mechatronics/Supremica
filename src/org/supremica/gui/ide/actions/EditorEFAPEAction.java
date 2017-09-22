@@ -35,6 +35,8 @@
 
 package org.supremica.gui.ide.actions;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -58,17 +60,14 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.supremica.automata.algorithms.IISCT.EFAPartialEvaluator;
-
-import gnu.trove.set.hash.THashSet;
 
 /**
  * Editor class of the Transition Projection method.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
- * @version %I%, %G%
- * @since 1.0
  */
 public class EditorEFAPEAction
  extends IDEAction
@@ -154,7 +153,7 @@ public class EditorEFAPEAction
       System.err.println("Finish importing ...");
     } catch (AnalysisException | EvalException | IOException |
              UnsupportedFlavorException ex) {
-      final Logger logger = Logger.getLogger(getClass());
+      final Logger logger = LogManager.getLogger(getClass());
       final String msg = ex.getMessage() == null ? "" : ex.getMessage();
       logger.error(ProxyTools.getShortClassName(ex) + " caught in " +
                    ProxyTools.getShortClassName(this) + ": " + msg);

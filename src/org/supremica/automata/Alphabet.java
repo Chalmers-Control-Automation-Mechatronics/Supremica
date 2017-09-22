@@ -61,8 +61,9 @@ import java.util.TreeSet;
 
 import net.sourceforge.waters.model.des.EventProxy;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * Important note:
@@ -70,14 +71,14 @@ import org.supremica.log.LoggerFactory;
  * an Events object, then rehash must be called otherwise
  * strange errors will arise.
  *
- *@author  ka
+ *@author  Knut &Aring;kesson
  *@since  November 28, 2001
  *@see  org.supremica.automata.AlphabetHelpers
  */
 public class Alphabet
     implements Iterable<LabeledEvent>
 {
-    private static Logger logger = LoggerFactory.createLogger(Alphabet.class);
+    private static Logger logger = LogManager.getLogger(Alphabet.class);
     private int idIndex = 0;
     private Listeners listeners = null;
     private Map<String,LabeledEvent> theEvents = new TreeMap<String,LabeledEvent>();
@@ -200,7 +201,7 @@ public class Alphabet
 
 // Why does it throw exception if the event is already in the alphabet? Is this correct?
 // Does all usages of addEvent have to test for containment before adding the event? It seems so.
-// Can this be changed to only throw if the new event has properties different from the old one?		
+// Can this be changed to only throw if the new event has properties different from the old one?
 // MF
         if (contains(ev))
         {

@@ -48,33 +48,32 @@
  */
 package org.supremica.automata;
 
-import org.supremica.log.*;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.supremica.util.Args;
-import java.util.*;
+
 
 public final class AutomataIndexMap
 {
     private final Map<Automaton, Integer> automatonToIndexMap;
-    private final Automaton[] indexToAutomatonArray;    
+    private final Automaton[] indexToAutomatonArray;
     private final Map<AutomatonAndStateEntry, Integer> automatonStateEntryToIndexMap;
     private final Map<AutomatonAndIntegerEntry, State> automatonIntegerEntryToStateMap;
     private final Map<LabeledEvent, Integer> eventToIndexMap;
     private final LabeledEvent[] indexToEventArray;
-    
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataIndexMap.class);
-    
+
     public AutomataIndexMap(final Automata theAutomata)
     {
         // This useful variable stores the union of the automata events
-        Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
-        
+        final Alphabet unionAlphabet = theAutomata.getUnionAlphabet();
+
         int initialStateMapCapacity = 0;
-        for (Automaton currAutomaton : theAutomata)
-        {           
+        for (final Automaton currAutomaton : theAutomata)
+        {
             initialStateMapCapacity += currAutomaton.nbrOfStates();
         }
- 
+
         // The hashtables are initialized with appropriate capacities.
         automatonToIndexMap = new HashMap<Automaton, Integer>(theAutomata.size()*2);
         indexToAutomatonArray = new Automaton[theAutomata.size()];
@@ -82,35 +81,35 @@ public final class AutomataIndexMap
         automatonIntegerEntryToStateMap = new HashMap<AutomatonAndIntegerEntry, State>(initialStateMapCapacity*2);
         eventToIndexMap = new HashMap<LabeledEvent, Integer>(unionAlphabet.size()*2);
         indexToEventArray = new LabeledEvent[unionAlphabet.size()];
-        
+
         // The automatonIndex and the stateIndex hashmaps are filled
         int automatonIndex = 0;
-        for (Automaton currAutomaton : theAutomata)
-        {   
+        for (final Automaton currAutomaton : theAutomata)
+        {
             // The automatonIndex hashtable is updated
             automatonToIndexMap.put(currAutomaton, automatonIndex);
             indexToAutomatonArray[automatonIndex] = currAutomaton;
             automatonIndex++;
-            
+
             int stateIndex = 0;
-            for (State currState : currAutomaton)
+            for (final State currState : currAutomaton)
             {
                 automatonStateEntryToIndexMap.put(new AutomatonAndStateEntry(currAutomaton, currState), stateIndex);
                 automatonIntegerEntryToStateMap.put(new AutomatonAndIntegerEntry(currAutomaton, stateIndex), currState);
                 stateIndex++;
             }
         }
-        
+
         // The eventIndex map is filled
         int eventIndex = 0;
-        for (LabeledEvent currEvent : unionAlphabet)
+        for (final LabeledEvent currEvent : unionAlphabet)
         {
             eventToIndexMap.put(currEvent, eventIndex);
             indexToEventArray[eventIndex] = currEvent;
             eventIndex++;
         }
     }
-    
+
     /**
      * Returns the index corresponding to the current automaton, as stored in the
      * automaton index hashtable.
@@ -123,13 +122,13 @@ public final class AutomataIndexMap
         Args.checkForNull(automaton);
         return automatonToIndexMap.get(automaton);
     }
-    
+
     public Automaton getAutomatonAt(final int index)
     {
         Args.checkForIndex(index);
         return indexToAutomatonArray[index];
     }
-      
+
     /**
      * Returns the index corresponding to the current event, as stored in the
      * event index hashtable.
@@ -142,13 +141,13 @@ public final class AutomataIndexMap
         Args.checkForNull(event);
         return eventToIndexMap.get(event);
     }
-    
+
     public LabeledEvent getEventAt(final int index)
     {
         Args.checkForIndex(index);
         return indexToEventArray[index];
     }
-    
+
     /**
      * Returns the index corresponding to the current state, as stored in the
      * state index hashtable.
@@ -160,27 +159,27 @@ public final class AutomataIndexMap
     public int getStateIndex(final Automaton automaton, final State state)
     {
         Args.checkForNull(automaton);
-        Args.checkForNull(state);      
+        Args.checkForNull(state);
         return automatonStateEntryToIndexMap.get(new AutomatonAndStateEntry(automaton, state));
     }
-    
+
     public int getStateIndex(final int automatonIndex, final State state)
     {
         if (automatonIndex < 0)
         {
             throw new IndexOutOfBoundsException("automatonIndex has to >= 0");
         }
-        Automaton currAutomaton = getAutomatonAt(automatonIndex);
+        final Automaton currAutomaton = getAutomatonAt(automatonIndex);
         return getStateIndex(currAutomaton, state);
     }
-    
+
     public State getStateAt(final Automaton automaton, final int stateIndex)
     {
         Args.checkForNull(automaton);
         Args.checkForIndex(stateIndex);
         return automatonIntegerEntryToStateMap.get(new AutomatonAndIntegerEntry(automaton, stateIndex));
     }
-    
+
     public State getStateAt(final int automatonIndex, final int stateIndex)
     {
         if (automatonIndex < 0)
@@ -190,28 +189,30 @@ public final class AutomataIndexMap
         if (stateIndex < 0)
         {
             throw new IndexOutOfBoundsException("stateIndex has to >= 0");
-        }        
-        Automaton currAutomaton = getAutomatonAt(automatonIndex);
+        }
+        final Automaton currAutomaton = getAutomatonAt(automatonIndex);
         return getStateAt(currAutomaton, stateIndex);
     }
-    
+
     static class AutomatonAndStateEntry
     {
         Automaton automaton;
         State state;
-        
+
         public AutomatonAndStateEntry(final Automaton automaton, final State state)
         {
             this.automaton = automaton;
             this.state = state;
         }
 
+        @Override
         public int hashCode()
         {
             return (automaton.getName() + state.getName()).hashCode();
         }
-        
-        public boolean equals(Object other)
+
+        @Override
+        public boolean equals(final Object other)
         {
             if (other instanceof AutomatonAndStateEntry)
             {
@@ -225,19 +226,21 @@ public final class AutomataIndexMap
     {
         Automaton automaton;
         int stateIndex;
-        
-        public AutomatonAndIntegerEntry(Automaton automaton, int stateIndex)
+
+        public AutomatonAndIntegerEntry(final Automaton automaton, final int stateIndex)
         {
             this.automaton = automaton;
             this.stateIndex = stateIndex;
         }
 
+        @Override
         public int hashCode()
         {
             return (automaton.getName().hashCode() * stateIndex);
         }
-        
-        public boolean equals(Object other)
+
+        @Override
+        public boolean equals(final Object other)
         {
             if (other instanceof AutomatonAndIntegerEntry)
             {

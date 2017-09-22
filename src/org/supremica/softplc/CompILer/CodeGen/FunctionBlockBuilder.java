@@ -1,14 +1,24 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
-import org.supremica.log.Logger;
-import de.fub.bytecode.generic.*;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECDirectVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeBOOL;
+
 import de.fub.bytecode.Constants;
+import de.fub.bytecode.generic.ClassGen;
+import de.fub.bytecode.generic.InstructionConstants;
+import de.fub.bytecode.generic.InstructionFactory;
+import de.fub.bytecode.generic.InstructionList;
+import de.fub.bytecode.generic.MethodGen;
+import de.fub.bytecode.generic.Type;
+
 
 /**
  * The class FunctionBlockBuilder is used to generate java bytecode parts that
  * are specific to IL function blocks and not common with IL programs. The
- * common parts of code are instead generated in {@link ProgramAndFBBuilder}
+ * common parts of code are instead generated in {@link ProgramAndFBBuilder}.
+ *
  * @author Anders Röding
  */
 public class FunctionBlockBuilder
@@ -29,7 +39,7 @@ public class FunctionBlockBuilder
 	 * @param debug set whether debug messages should appear at
 		 *              standard output. Only used if there is no logger provided
 	 */
-	public FunctionBlockBuilder(String functionBlockName, String outDir, Logger logger, boolean debug)
+	public FunctionBlockBuilder(final String functionBlockName, final String outDir, final Logger logger, final boolean debug)
 	{
 		this.logger = logger;
 		this.debug = debug;
@@ -61,7 +71,8 @@ public class FunctionBlockBuilder
 	 *                       instanciated the FunctionBlock)
 	 *
 	 */
-	public void emitVarField(String varName, Object type, boolean global, boolean inputOutputVar)
+	@Override
+  public void emitVarField(final String varName, final Object type, final boolean global, final boolean inputOutputVar)
 	{
 		if (global)
 		{
@@ -80,7 +91,8 @@ public class FunctionBlockBuilder
 	 * @param v the direct variable
 	 * @param i the value the variable should be set to
 	 */
-	public void emitDirectInit(IECDirectVariable v, TypeBOOL i)
+	@Override
+  public void emitDirectInit(final IECDirectVariable v, final TypeBOOL i)
 	{
 		error("Direct variables are not allowed in function and therefore " + "you can't initialise such variables. " + v);
 	}
@@ -93,7 +105,8 @@ public class FunctionBlockBuilder
 	 * already should have been changed into DirectVariables by a Checker.
 	 * @param var direct variable to load
 	 */
-	InstructionList emitLoadVariable(IECDirectVariable var)
+	@Override
+  InstructionList emitLoadVariable(final IECDirectVariable var)
 	{
 		error("Reference to direct variable not allowed in function blocks " + var);
 
@@ -105,7 +118,8 @@ public class FunctionBlockBuilder
 	 * the specified variable
 	 * @param var variable to store TOS value in
 	 */
-	InstructionList emitStoreVariable(IECDirectVariable var)
+	@Override
+  InstructionList emitStoreVariable(final IECDirectVariable var)
 	{
 		error("Reference to direct variable not allowed in function blocks " + var);
 

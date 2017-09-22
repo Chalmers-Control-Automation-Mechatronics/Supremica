@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
@@ -61,7 +62,9 @@ import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
-import org.supremica.gui.ide.IDEReportInterface;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
 
 
@@ -80,9 +83,8 @@ public class AboutPanel
 
   //#########################################################################
   //# Constructor
-  public AboutPanel(final IDEReportInterface ide)
+  public AboutPanel()
   {
-    mIDE = ide;
     final HTMLDocument doc = createContents();
     setContentType("text/html");
     setDocument(doc);
@@ -111,12 +113,13 @@ public class AboutPanel
       }
       final String name = event.getDescription();
       final URL url = Version.class.getResource(name);
-      final JFrame owner = mIDE.getFrame();
+      final JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
       try {
         @SuppressWarnings("unused")
         final HTMLPopup popup = new HTMLPopup(title, url, owner);
       } catch (final IOException exception) {
-        mIDE.error("Could not find licence file " + url);
+        final Logger logger = LogManager.getLogger();
+        logger.error("Could not find licence file " + url);
       }
     }
   }
@@ -300,11 +303,6 @@ public class AboutPanel
     private String mVersionInfo = null;
 
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final IDEReportInterface mIDE;
 
 
   //#########################################################################

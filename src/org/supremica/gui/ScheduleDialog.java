@@ -60,6 +60,9 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.scheduling.ModifiedAstar;
@@ -72,8 +75,6 @@ import org.supremica.automata.algorithms.scheduling.milp.Milp;
 import org.supremica.automata.algorithms.scheduling.milp.RandomPathUsingMilp;
 import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 public class ScheduleDialog
@@ -96,7 +97,7 @@ public class ScheduleDialog
         SchedulingConstants.VIS_GRAPH_NODE_RELAXATION,
         SchedulingConstants.BRUTE_FORCE_RELAXATION};
     private static final String[] milpHeuristics = new String[] {SchedulingConstants.OPTIMAL, SchedulingConstants.SUBOPTIMAL};
-    private static Logger logger = LoggerFactory.createLogger(ScheduleDialog.class);
+    private static Logger logger = LogManager.getLogger(ScheduleDialog.class);
     private final JComboBox<String> optiMethodsBox, heuristicsBox;
     private final JCheckBox nodeExpander, buildAutomaton, vgDrawer, balanceVelocities;
     @SuppressWarnings("unused")
@@ -694,7 +695,7 @@ public class ScheduleDialog
                     }
                     catch (final Exception ex)
                     {
-                        ide.getIDE().error("Could not add " + scheduleAuto + " to editor." + ex);
+                        logger.error("Could not add " + scheduleAuto + " to editor." + ex);
                     }
                 }
                 else
@@ -728,7 +729,7 @@ class ApproxWeightsDialog
     private double xWeight = -1;
     private double yWeight = -1;
     private boolean threadDone = false;
-    private final static Logger logger = LoggerFactory.createLogger(ApproxWeightsDialog.class);
+    private final static Logger logger = LogManager.getLogger(ApproxWeightsDialog.class);
 
     public ApproxWeightsDialog(final ScheduleDialog scheduleDlg)
         throws Exception

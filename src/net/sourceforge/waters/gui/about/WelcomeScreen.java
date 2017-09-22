@@ -163,7 +163,7 @@ public class WelcomeScreen
   private void createContents()
   {
     // Create the about box with the version information
-    mAboutPanel = new AboutPanel(mIDE);
+    mAboutPanel = new AboutPanel();
     final Border border = new AboutBoxBorder();
     mAboutPanel.setBorder(border);
     final float maxWidth = IconAndFontLoader.GLOBAL_SCALE_FACTOR * MAX_WIDTH;

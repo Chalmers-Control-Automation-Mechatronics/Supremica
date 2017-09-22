@@ -38,9 +38,13 @@ package org.supremica.gui;
 import java.awt.EventQueue;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.analysis.Abortable;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.AutomataVerifier;
@@ -50,30 +54,24 @@ import org.supremica.automata.algorithms.VerificationOptions;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.bbsd.BBSDDiagnosabilityVerification;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
-import org.supremica.gui.ide.IDEReportInterface;
-import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.supremica.gui.ide.IDE;
 import org.supremica.util.ActionTimer;
 
 /**
  * Thread dealing with verification.
  *
- * @author  ka
+ * @author Knut &Aring;kesson
  * @since November 28, 2001
  */
 public class AutomataVerificationWorker
     extends Thread
     implements Abortable
 {
-    private static final Logger logger = LoggerFactory.createLogger(AutomataVerificationWorker.class);
+    private static final Logger logger = LogManager.getLogger(AutomataVerificationWorker.class);
 
-    private IDEReportInterface workbench = null;
     private Automata theAutomata = null;
-    //private VisualProjectContainer theVisualProjectContainer = null;
 
-    // private String newAutomatonName = null;
-    // private Automaton theAutomaton = null;
+    private final JFrame mOwner;
     private final VerificationOptions verificationOptions;
     private final SynchronizationOptions synchronizationOptions;
     private final MinimizationOptions minimizationOptions;
@@ -82,16 +80,14 @@ public class AutomataVerificationWorker
     @SuppressWarnings("unused")
 	private final EventQueue eventQueue = new EventQueue();
 
-    public AutomataVerificationWorker(final IDEReportInterface workbench, final Automata theAutomata,
-        final VerificationOptions verificationOptions,
-        final SynchronizationOptions synchronizationOptions,
-        final MinimizationOptions minimizationOptions)
+    public AutomataVerificationWorker(final JFrame owner,
+                                      final Automata theAutomata,
+                                      final VerificationOptions verificationOptions,
+                                      final SynchronizationOptions synchronizationOptions,
+                                      final MinimizationOptions minimizationOptions)
     {
-        this.workbench = workbench;
+        mOwner = owner;
         this.theAutomata = theAutomata;
-        //theVisualProjectContainer = workbench.getVisualProjectContainer();
-
-        // this.newAutomatonName = newAutomatonName;
         this.verificationOptions = verificationOptions;
         this.synchronizationOptions = synchronizationOptions;
         this.minimizationOptions = minimizationOptions;
@@ -111,7 +107,7 @@ public class AutomataVerificationWorker
         final String errorMessage = AutomataVerifier.validOptions(theAutomata, verificationOptions);
         if (errorMessage != null)
         {
-            JOptionPane.showMessageDialog(workbench.getFrame(), errorMessage,
+            JOptionPane.showMessageDialog(mOwner, errorMessage,
                 "Alert", JOptionPane.ERROR_MESSAGE);
             requestAbort();
 
@@ -181,7 +177,7 @@ public class AutomataVerificationWorker
         catch (final Exception ex)
         {
             requestAbort();
-            JOptionPane.showMessageDialog(workbench.getFrame(), ex.getMessage(),
+            JOptionPane.showMessageDialog(mOwner, ex.getMessage(),
                 "Error", JOptionPane.ERROR_MESSAGE);
             logger.error(ex.getMessage());
             logger.debug(ex.getStackTrace());
@@ -193,7 +189,7 @@ public class AutomataVerificationWorker
         final ArrayList<Abortable> threadsToStop = new ArrayList<Abortable>();
         threadsToStop.add(this);
         threadsToStop.add(automataVerifier);
-        executionDialog = new ExecutionDialog(workbench.getFrame(), "Verifying", threadsToStop);
+        executionDialog = new ExecutionDialog(mOwner, "Verifying", threadsToStop);
         executionDialog.setMode(ExecutionDialogMode.VERIFYING);
         automataVerifier.setExecutionDialog(executionDialog);
 
@@ -205,13 +201,14 @@ public class AutomataVerificationWorker
 
         // Add test result from Diagnosability verification
         if (vtype == VerificationType.DIAGNOSABILITY &&
-            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD) 
+            verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD)
 		{
             final Automata result = BBSDDiagnosabilityVerification.getFinalAutomata();
-            if (result != null)
-                ((IDEActionInterface)workbench).getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+            if (result != null && mOwner instanceof IDE) {
+              final IDE ide = (IDE) mOwner;
+              ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+            }
         }
-
 
         threadsToStop.clear();
 
@@ -234,12 +231,12 @@ public class AutomataVerificationWorker
             // Show message dialog with result
             if (verificationSuccess)
             {
-                JOptionPane.showMessageDialog(workbench.getFrame(), successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(mOwner, successMessage, "Good news", JOptionPane.INFORMATION_MESSAGE);
                 logger.info(successMessage);
             }
             else
             {
-                JOptionPane.showMessageDialog(workbench.getFrame(), failureMessage, "Bad news", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(mOwner, failureMessage, "Bad news", JOptionPane.ERROR_MESSAGE);
                 logger.info(failureMessage);
             }
 
@@ -248,7 +245,7 @@ public class AutomataVerificationWorker
         }
         else
         {
-            JOptionPane.showMessageDialog(workbench.getFrame(), "Execution stopped after " + timer.toString(), "Execution stopped", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mOwner, "Execution stopped after " + timer.toString(), "Execution stopped", JOptionPane.INFORMATION_MESSAGE);
             automataVerifier.displayInfo();
             logger.info("Execution stopped after " + timer.toString());
         }

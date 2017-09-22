@@ -35,25 +35,38 @@
 
 package org.supremica.gui;
 
-import java.util.*;
-import java.io.*;
-import javax.swing.*;
-import java.awt.*;
-import javax.swing.table.*;
-import org.supremica.automata.*;
-import org.supremica.log.*;
+import java.awt.Container;
+import java.awt.Frame;
+import java.io.File;
+import java.net.URL;
+import java.util.HashMap;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataListener;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.Project;
+import org.supremica.automata.IO.EncodingHelper; // should really be in the util-package, not?
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
+import org.supremica.gui.ide.AnalyzerAutomataPanel;
 import org.supremica.gui.simulator.SimulatorExecuter;
-import grafchart.sfc.JGrafchartSupremicaEditor;
-import java.net.URL;
 import org.supremica.properties.Config;
 import org.supremica.util.ResourceClassLoader;
-import org.swixml.SwingEngine;
-//import org.swixml.Localizer;
 import org.supremica.util.SupremicaException;
-import org.supremica.automata.IO.EncodingHelper; // should really be in the util-package, not?
-import org.supremica.gui.ide.AnalyzerAutomataPanel;
+
+import grafchart.sfc.JGrafchartSupremicaEditor;
+import org.swixml.SwingEngine;
+
 
 /**
  * VisualProject is responsible for keeping track of all windows and other "visual" resources
@@ -63,7 +76,7 @@ public class VisualProject
     extends Project
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(VisualProject.class);
+    private static Logger logger = LogManager.getLogger(VisualProject.class);
 
     private Automata selectedAutomata = null;
     private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
@@ -86,7 +99,7 @@ public class VisualProject
         initialize();
     }
 
-    public VisualProject(String name)
+    public VisualProject(final String name)
     {
         super(name);
 
@@ -125,11 +138,11 @@ public class VisualProject
     }
 
 	@Override
-    public void automatonRenamed(Automaton aut, String oldName)
+    public void automatonRenamed(final Automaton aut, final String oldName)
     {
         //System.err.println("Rename " + aut + " from " + oldName);
 
-        AutomatonViewer theViewer = theAutomatonViewerContainer.get(oldName);
+        final AutomatonViewer theViewer = theAutomatonViewerContainer.get(oldName);
 
         if (theViewer != null)
         {
@@ -137,7 +150,7 @@ public class VisualProject
             theAutomatonViewerContainer.put(aut.getName(), theViewer);
         }
 
-        AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(oldName);
+        final AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(oldName);
 
         if (theExplorer != null)
         {
@@ -145,7 +158,7 @@ public class VisualProject
             theAutomatonExplorerContainer.put(aut.getName(), theExplorer);
         }
 
-        AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(oldName);
+        final AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(oldName);
 
         if (theAlphabetViewer != null)
         {
@@ -157,11 +170,11 @@ public class VisualProject
     }
 
 	@Override
-    public void removeAutomaton(Automaton aut)
+    public void removeAutomaton(final Automaton aut)
     {
         super.removeAutomaton(aut);
 
-        AutomatonViewer theViewer = theAutomatonViewerContainer.get(aut.getName());
+        final AutomatonViewer theViewer = theAutomatonViewerContainer.get(aut.getName());
 
         if (theViewer != null)
         {
@@ -170,7 +183,7 @@ public class VisualProject
             theAutomatonViewerContainer.remove(aut.getName());
         }
 
-        AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(aut.getName());
+        final AutomatonExplorer theExplorer = theAutomatonExplorerContainer.get(aut.getName());
 
         if (theExplorer != null)
         {
@@ -180,7 +193,7 @@ public class VisualProject
         }
 
 
-        AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(aut.getName());
+        final AlphabetViewer theAlphabetViewer = theAlphabetViewerContainer.get(aut.getName());
 
         if (theAlphabetViewer != null)
         {
@@ -190,7 +203,7 @@ public class VisualProject
         }
     }
 
-    public void setSelectedAutomata(Automata theAutomata)
+    public void setSelectedAutomata(final Automata theAutomata)
     {
         this.selectedAutomata = theAutomata;
     }
@@ -221,7 +234,7 @@ public class VisualProject
         return projectFile;
     }
 
-    public void setProjectFile(File projectFile)
+    public void setProjectFile(final File projectFile)
     {
         this.projectFile = projectFile;
     }
@@ -240,16 +253,16 @@ public class VisualProject
          * This would also solve the exception problem that occurs when you simply want to
          * as whether a viewer exists for a certain automaton..
          */
-    public AutomatonViewer getAutomatonViewer(String automatonName)
+    public AutomatonViewer getAutomatonViewer(final String automatonName)
     throws Exception
     {
         return getAutomatonViewer(automatonName, new DefaultAutomatonViewerFactory());
     }
 
-    public AutomatonViewer getAutomatonViewer(String automatonName, AutomatonViewerFactory maker)
+    public AutomatonViewer getAutomatonViewer(final String automatonName, final AutomatonViewerFactory maker)
     throws Exception
     {
-        Automaton automaton = getAutomaton(automatonName);
+        final Automaton automaton = getAutomaton(automatonName);
         if(automaton == null)
         {
             throw new SupremicaException(automatonName + " does not exist in VisualProjectContainer");
@@ -260,7 +273,7 @@ public class VisualProject
             // Check with the user that its ok to display the automaton
             if (showAutomatonViewer(automaton))
             {
-                AutomatonViewer viewer = returnAutomatonViewer(automaton);
+                final AutomatonViewer viewer = returnAutomatonViewer(automaton);
 
                 viewer.setVisible(true);
                 viewer.setState(Frame.NORMAL);
@@ -279,14 +292,14 @@ public class VisualProject
             {
                 if(showAutomatonViewer(automaton))
                 {
-                    AutomatonViewer viewer = createAutomatonViewer(automaton, maker);
+                    final AutomatonViewer viewer = createAutomatonViewer(automaton, maker);
                     viewer.setVisible(true);
 
                     return viewer;
                 }
                 else return null;	// null here means "viewer not created since user cancelled due to large state-space"
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 throw new SupremicaException("Error while viewing: " + automatonName);
             }
@@ -298,16 +311,16 @@ public class VisualProject
     }
 
     // This is what it should really be like, one task - one function...
-    public boolean showAutomatonViewer(Automaton automaton)
+    public boolean showAutomatonViewer(final Automaton automaton)
     {
-        int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
+        final int maxNbrOfStates = Config.DOT_MAX_NBR_OF_STATES.get();
         if (maxNbrOfStates < automaton.nbrOfStates())
         {
             String msg = "The automata " + automaton + " has " + automaton.nbrOfStates() + " states. It is not recommended to display an automaton with more than " + maxNbrOfStates + " states.";
             msg = EncodingHelper.linebreakAdjust(msg);
 
-            Object[] options = { "Continue", "Abort" };
-            int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
+            final Object[] options = { "Continue", "Abort" };
+            final int response = JOptionPane.showOptionDialog(ActionMan.gui.getFrame(), msg, "Warning", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
             if(response == JOptionPane.NO_OPTION)
             {
                 return false; // user chose to "Abort"
@@ -318,32 +331,32 @@ public class VisualProject
     }
 
     // When will any of these throw an exception?? When automaton == null, but else...?
-    public boolean existsAutomatonViewer(Automaton automaton)
+    public boolean existsAutomatonViewer(final Automaton automaton)
     throws Exception
     {
         return theAutomatonViewerContainer.containsKey(automaton.getName());
     }
 
-    public AutomatonViewer returnAutomatonViewer(Automaton automaton)
+    public AutomatonViewer returnAutomatonViewer(final Automaton automaton)
     throws Exception
     {
         return theAutomatonViewerContainer.get(automaton.getName());
     }
 
-    public AutomatonViewer createAutomatonViewer(Automaton automaton, AutomatonViewerFactory maker)
+    public AutomatonViewer createAutomatonViewer(final Automaton automaton, final AutomatonViewerFactory maker)
     throws Exception
     {
-        AutomatonViewer viewer = maker.createAutomatonViewer(automaton);
+        final AutomatonViewer viewer = maker.createAutomatonViewer(automaton);
         theAutomatonViewerContainer.put(automaton.getName(), viewer);
         return viewer;
     }
 
-    public AutomatonExplorer getAutomatonExplorer(String automaton)
+    public AutomatonExplorer getAutomatonExplorer(final String automaton)
     throws Exception
     {
         if (theAutomatonExplorerContainer.containsKey(automaton))
         {
-            AutomatonExplorer explorer = theAutomatonExplorerContainer.get(automaton);
+            final AutomatonExplorer explorer = theAutomatonExplorerContainer.get(automaton);
 
             explorer.setVisible(true);
 
@@ -351,13 +364,13 @@ public class VisualProject
         }
         else
         {
-            Automaton currAutomaton = getAutomaton(automaton);
+            final Automaton currAutomaton = getAutomaton(automaton);
 
             if (currAutomaton != null)
             {
                 try
                 {
-                    AutomatonExplorer explorer = new AutomatonExplorer(this, currAutomaton);
+                    final AutomatonExplorer explorer = new AutomatonExplorer(this, currAutomaton);
 
                     theAutomatonExplorerContainer.put(automaton, explorer);
                     explorer.setVisible(true);
@@ -365,7 +378,7 @@ public class VisualProject
 
                     return explorer;
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     throw new SupremicaException("Error while exploring: " + automaton);
                 }
@@ -400,7 +413,7 @@ public class VisualProject
 
         if (theAnimator == null)
         {
-            URL url = getAnimationURL();
+            final URL url = getAnimationURL();
 //            url = new URL("file:/C:/Supremica/trunk/animations/scenebeans/agv/agv.xml");
             theAnimator = AnimationItem.createInstance(url);
         }
@@ -440,7 +453,7 @@ public class VisualProject
             try
             {
                 theSwingEngine = new SwingEngine();
-                ResourceClassLoader resourceClassLoader = new ResourceClassLoader(ClassLoader.getSystemClassLoader());
+                final ResourceClassLoader resourceClassLoader = new ResourceClassLoader(ClassLoader.getSystemClassLoader());
                 theSwingEngine.setClassLoader(resourceClassLoader);
                 //Localizer localizer = theSwingEngine.getLocalizer();
                 //localizer.setClassLoader(resourceClassLoader);
@@ -454,7 +467,7 @@ public class VisualProject
                     ((JFrame) theUserInterface).setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 }
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error(ex);
             }
@@ -496,11 +509,11 @@ public class VisualProject
     {
         if (theJGrafchartEditor == null)
         {
-            String[] args = new String[1];
+            final String[] args = new String[1];
 
             args[0] = "";
 
-            JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
+            final JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
 
             grafchart.sfc.Editor.singleton = theEditor;
             theJGrafchartEditor = theEditor;
@@ -577,12 +590,14 @@ public class VisualProject
         public LightTableModel()
         {}
 
+        @Override
         public int getColumnCount()
         {
             return 1;
         }
 
-        public String getColumnName(int columnIndex)
+        @Override
+        public String getColumnName(final int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -592,7 +607,8 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class<?> getColumnClass(int column)
+        @Override
+        public Class<?> getColumnClass(final int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -602,6 +618,7 @@ public class VisualProject
             return String.class;
         }
 
+        @Override
         public int getRowCount()
         {
             return nbrOfAutomata();
@@ -612,9 +629,10 @@ public class VisualProject
             return getRowCount();
         }
 
-        public Object getValueAt(int rowIndex, int columnIndex)
+        @Override
+        public Object getValueAt(final int rowIndex, final int columnIndex)
         {
-            Automaton theAutomaton = getAutomatonAt(rowIndex);
+            final Automaton theAutomaton = getAutomatonAt(rowIndex);
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -624,12 +642,14 @@ public class VisualProject
             return "Unknown";
         }
 
-        public boolean isCellEditable(int rowIndex, int columnIndex)
+        @Override
+        public boolean isCellEditable(final int rowIndex, final int columnIndex)
         {
             return false;
         }
 
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+        @Override
+        public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex)
         {}
 
         public void updateListeners()
@@ -637,26 +657,31 @@ public class VisualProject
             fireTableDataChanged();
         }
 
-        public void automatonAdded(Automata automata, Automaton automaton)
+        @Override
+        public void automatonAdded(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRemoved(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRemoved(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRenamed(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRenamed(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void actionsOrControlsChanged(Automata automata)
+        @Override
+        public void actionsOrControlsChanged(final Automata automata)
         {    // Do nothing
         }
 
-        public void updated(Object theObject)
+        @Override
+        public void updated(final Object theObject)
         {
             updateListeners();
         }
@@ -671,12 +696,14 @@ public class VisualProject
         public FullTableModel()
         {}
 
+        @Override
         public int getColumnCount()
         {
             return 4;
         }
 
-        public String getColumnName(int columnIndex)
+        @Override
+        public String getColumnName(final int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -701,7 +728,8 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class<?> getColumnClass(int column)
+        @Override
+        public Class<?> getColumnClass(final int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -721,6 +749,7 @@ public class VisualProject
             return String.class;
         }
 
+        @Override
         public int getRowCount()
         {
             return nbrOfAutomata();
@@ -731,9 +760,10 @@ public class VisualProject
             return getRowCount();
         }
 
-        public Object getValueAt(int rowIndex, int columnIndex)
+        @Override
+        public Object getValueAt(final int rowIndex, final int columnIndex)
         {
-            Automaton theAutomaton = getAutomatonAt(rowIndex);
+            final Automaton theAutomaton = getAutomatonAt(rowIndex);
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -742,7 +772,7 @@ public class VisualProject
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
-                AutomatonType currType = theAutomaton.getType();
+                final AutomatonType currType = theAutomaton.getType();
 
                 return currType.toString();
             }
@@ -760,7 +790,8 @@ public class VisualProject
             return "Unknown";
         }
 
-        public boolean isCellEditable(int rowIndex, int columnIndex)
+        @Override
+        public boolean isCellEditable(final int rowIndex, final int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
@@ -770,7 +801,8 @@ public class VisualProject
             return false;
         }
 
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+        @Override
+        public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex)
         {}
 
         public void updateListeners()
@@ -778,27 +810,32 @@ public class VisualProject
             fireTableDataChanged();
         }
 
-        public void automatonAdded(Automata automata, Automaton automaton)
+        @Override
+        public void automatonAdded(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRemoved(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRemoved(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRenamed(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRenamed(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void actionsOrControlsChanged(Automata automata)
+        @Override
+        public void actionsOrControlsChanged(final Automata automata)
         {
             // Do nothing
         }
 
-        public void updated(Object theObject)
+        @Override
+        public void updated(final Object theObject)
         {
             updateListeners();
         }
@@ -814,12 +851,14 @@ public class VisualProject
         public AnalyzerTableModel()
         {}
 
+        @Override
         public int getColumnCount()
         {
             return 5;
         }
 
-        public String getColumnName(int columnIndex)
+        @Override
+        public String getColumnName(final int columnIndex)
         {
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -849,7 +888,8 @@ public class VisualProject
             return "Unknown";
         }
 
-        public Class<?> getColumnClass(int column)
+        @Override
+        public Class<?> getColumnClass(final int column)
         {
             if (column == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -869,6 +909,7 @@ public class VisualProject
             return String.class;
         }
 
+        @Override
         public int getRowCount()
         {
             return nbrOfAutomata();
@@ -879,9 +920,10 @@ public class VisualProject
             return getRowCount();
         }
 
-        public Object getValueAt(int rowIndex, int columnIndex)
+        @Override
+        public Object getValueAt(final int rowIndex, final int columnIndex)
         {
-            Automaton theAutomaton = getAutomatonAt(rowIndex);
+            final Automaton theAutomaton = getAutomatonAt(rowIndex);
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_NAME_COLUMN)
             {
@@ -890,7 +932,7 @@ public class VisualProject
 
             if (columnIndex == AnalyzerAutomataPanel.TABLE_TYPE_COLUMN)
             {
-                AutomatonType currType = theAutomaton.getType();
+                final AutomatonType currType = theAutomaton.getType();
 
                 return currType.toString();
             }
@@ -913,12 +955,14 @@ public class VisualProject
             return "Unknown";
         }
 
-        public boolean isCellEditable(int rowIndex, int columnIndex)
+        @Override
+        public boolean isCellEditable(final int rowIndex, final int columnIndex)
         {
             return false;
         }
 
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex)
+        @Override
+        public void setValueAt(final Object aValue, final int rowIndex, final int columnIndex)
         {}
 
         public void updateListeners()
@@ -926,26 +970,31 @@ public class VisualProject
             fireTableDataChanged();
         }
 
-		public void automatonAdded(Automata automata, Automaton automaton)
+		@Override
+    public void automatonAdded(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRemoved(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRemoved(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void automatonRenamed(Automata automata, Automaton automaton)
+        @Override
+        public void automatonRenamed(final Automata automata, final Automaton automaton)
         {
             updateListeners();
         }
 
-        public void actionsOrControlsChanged(Automata automata)
+        @Override
+        public void actionsOrControlsChanged(final Automata automata)
         {    // Do nothing
         }
 
-        public void updated(Object theObject)
+        @Override
+        public void updated(final Object theObject)
         {
             updateListeners();
         }

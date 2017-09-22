@@ -4,11 +4,13 @@
 	<classpathentry kind="src" path="waters/java/src"/>
 	<classpathentry kind="src" path="tests/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="dist/Supremica.jar" sourcepath="src"/>
 	<classpathentry kind="lib" path="dist/SupremicaLib.jar" sourcepath="">
 		<attributes>
 			<attribute name="javadoc_location" value="http://javabdd.sourceforge.net/apidocs/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="dist/Supremica.jar" sourcepath="src"/>
+	<classpathentry kind="lib" path="lib/log4j-api-2.9.0.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-core-2.9.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

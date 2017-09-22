@@ -53,13 +53,14 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.Gui;
 import org.supremica.gui.Utility;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 class TextArea extends JFrame {
@@ -155,7 +156,7 @@ public class TestCasesDialog
     extends JDialog
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(TestCasesDialog.class);
+    private static Logger logger = LogManager.getLogger(TestCasesDialog.class);
     private final ExampleTab extab = new ExampleTab();
     private Project project = null;
     private final Object gui;
