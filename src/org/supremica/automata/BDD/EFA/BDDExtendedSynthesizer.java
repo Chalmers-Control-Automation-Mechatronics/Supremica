@@ -214,7 +214,7 @@ public class BDDExtendedSynthesizer {
             SimpleExpressionSubject ses2 = null;
 
             // Some edges could have multiple events. If a guard is generated for one event, we need to
-            // create an extra edge labeled by the event, copy the existing guards and actions and
+            // create an extra edge labeled by the event, copy the existing guards and actions (if any) and
             // put the generated guards there.
 
             final ListSubject<AbstractSubject> eventList = ep.getLabelBlock().getEventIdentifierListModifiable();
@@ -242,13 +242,17 @@ public class BDDExtendedSynthesizer {
                   final LabelBlockSubject lbs = new LabelBlockSubject();
                   lbs.getEventIdentifierListModifiable().add(event.clone());
 
+                  GuardActionBlockSubject clonedGuardActionBlock = null;
+                  if (ep.getGuardActionBlock() != null)
+                    clonedGuardActionBlock = ep.getGuardActionBlock().clone();
+
                   manipulatedEdge = new EdgeSubject(ep.getSource(),
                                                     ep.getTarget(),
                                                     lbs,
-                                                    ep.getGuardActionBlock(),
-                                                    null, // straight line
-                                                    ep.getStartPoint(),
-                                                    ep.getEndPoint());
+                                                    clonedGuardActionBlock,
+                                                    null,
+                                                    null,
+                                                    null);
 
                   edgesToBeAdded.add(manipulatedEdge);
                 }
