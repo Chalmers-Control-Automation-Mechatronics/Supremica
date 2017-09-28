@@ -24,21 +24,12 @@
     <property name="help" value="help"/>
     <property name="lib" value="lib"/>
     <property name="unjared" value="unjared"/>
-    
-    <property name="xmlrpc_basepackage" value="helma"/>
-    <property name="xmlrpc_basedir" value="helma"/>
-    
+     
     <property name="resources" value="resources"/>
     
     <property name="supremica_basepackage" value="org.supremica"/>
     <property name="supremica_basedir" value="org/supremica"/>
     
-    <!--property name="jgrafchart_basepackage" value="org.jgrafchart"/>
-    <property name="jgrafchart_basedir" value="org/jgrafchart"/-->
-    
-    <property name="project.name" value="Supremica"/>
-    <property name="backup.dir" value="../backup"/>
-    <property name="installer.dir" value="C:\Supremica Installer"/>
     <property name="javalibs.dir" value="lib/unjared"/>
     
     <property name="logs" location="logs"/>
@@ -69,13 +60,13 @@
     </path>
 
     <!-- LOG4J2 -->
-    <property name="log4j2.api.name" value="log4j-api-2.9.0.jar"/>
-    <property name="log4j2.core.name" value="log4j-core-2.9.0.jar"/>
+    <property name="log4j2.api.jar" value="log4j-api-2.9.0.jar"/>
+    <property name="log4j2.core.jar" value="log4j-core-2.9.0.jar"/>
 
-    <!-- Build Instructions -->
+    <!-- Class paths -->
     <path id="other.jars.classpath">
-        <pathelement location="${dist}/${log4j2.api.name}"/>
-        <pathelement location="${dist}/${log4j2.core.name}"/>
+        <pathelement location="${dist}/${log4j2.api.jar}"/>
+        <pathelement location="${dist}/${log4j2.core.jar}"/>
     </path>
     
     <path id="supremica.classpath">
@@ -94,6 +85,7 @@
     </taskdef>
     
 
+    <!-- Build Instructions -->
     <!-- 
 *       Build this target after checking out the sources for the
 *       first time. 
@@ -137,7 +129,7 @@
         <!-- <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
         <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>   
+        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->
@@ -195,16 +187,15 @@
         <delete dir="${dist}"/>
         <mkdir dir="${dist}"/>
         <delete dir="${src}/org/w3"/>
-        <mkdir dir="${src}/org/w3"/>        
+        <mkdir dir="${src}/org/w3"/>
         <delete dir="${doc}/api"/>
-        <mkdir dir="${doc}/api"/>               
+        <mkdir dir="${doc}/api"/>
         <delete dir="${lib}/${unjared}"/>
-        <mkdir dir="${lib}/${unjared}"/>        
+        <mkdir dir="${lib}/${unjared}"/>
         <delete dir="${resources}"/>
         <mkdir dir="${resources}"/>
         <delete dir="${lib}/${unjared}/META-INF"/>
         <mkdir dir="${lib}/${unjared}/META-INF"/>
-        <delete dir="${src}/net/sourceforge/waters/external/promela/parser"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -223,24 +214,6 @@
         </tstamp>
     </target>
             
-    <target name="backup" depends="-init,clean">
-        <tar tarfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar" 
-             basedir="../${project.name}"
-             excludes="rsync/**,put,get,lib/unjared/**"/>
-        <gzip zipfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar.gz"
-              src="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
-        <delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
-    </target>
-    
-    <target name="backup_src" depends="-init,clean">
-        <tar tarfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar" 
-             basedir="../${project.name}/src"
-             excludes="rsync/**,put,get"/>
-        <gzip zipfile="${backup.dir}/${project.name}_onlysrc_${DSTAnet/sourceforge/waters/configMP}_${TSTAMP}.tar.gz"
-              src="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
-        <delete file="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
-    </target>
-    
     <target name="version" depends="-init,detect_arch">
         <delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
         <property name="version.dir" value="net/sourceforge/waters/config"/>
@@ -355,31 +328,6 @@
 *       Reuses existing class files, but recompiles those
 *       source files that have changed.
     -->
-    <!-- 
-<target name="compile_jgrafchart">
-        <javac
-                debug="on"
-                debuglevel="source"
-                srcdir="${src}"
-                destdir="${build}"
-                classpath="${lib}/${unjared}"
-                includeJavaRuntime="yes"
-                deprecation="false"
-                verbose="false"
-                includeantruntime="false"
-                excludes="${supremica_basedir}/**,
-                        ${jgrafchart_basedir}/external/**,              
-                        ${jgrafchart_basedir}/io/**,
-                        ${xmlrpc_basedir}/**"   
-        />
-
-</target>
--->
-    
-    <!-- Compile Runtime
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
     <target name="compile_runtime_softplc">
         <javac
             srcdir="${runtimesoftplcsrc}"
@@ -390,7 +338,6 @@
             encoding="ISO-8859-15"
             includeantruntime="false">
         </javac>
-        
     </target>
         
     <target name="build" depends="compile,-jar_supremica,-startfiles_supremica" description=
@@ -406,8 +353,8 @@
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>
         </jar>
-	<copy file="${lib}/${log4j2.api.name}" todir="${dist}"/>
-	<copy file="${lib}/${log4j2.core.name}" todir="${dist}"/>
+	<copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
+	<copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
     </target>
     
     <target name="downloads_supremica">
@@ -659,15 +606,6 @@ Class-Path: ${manifest.pathlist}</echo>
         -->
     </target>
 
-    <!--
-<target name="-startfiles_jgrafchart">
-        <copy file="${templates}/JGrafChart" todir="${dist}"/>  
-        <chmod file="${dist}/JGrafChart" perm="755"/>   
-        <copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>      
-        <chmod file="${dist}/JGrafChart.cmd" perm="644"/>
-</target>
--->
-   
     <target name="-run_tests" depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
         <delete>
