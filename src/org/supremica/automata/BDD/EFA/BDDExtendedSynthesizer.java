@@ -59,7 +59,6 @@ public class BDDExtendedSynthesizer {
     ExpressionParser parser = null;
     long nbrOfStates = -1;
     private Set<ExtendedAutomaton> autTobeDeclaredAsVars;
-    private final EditorSynthesizerOptions options;
 
     public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata, final  EditorSynthesizerOptions options)
     {
@@ -67,8 +66,7 @@ public class BDDExtendedSynthesizer {
         bddAutomata = new BDDExtendedAutomata(theAutomata, options);
         factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        this.options = options;
-        if (options.getCreateAutVars())
+        if (options.getAddGuards())
           autTobeDeclaredAsVars = new HashSet<ExtendedAutomaton>();
     }
 
@@ -227,8 +225,7 @@ public class BDDExtendedSynthesizer {
 
               if (currBDDGG != null && !currBDDGG.guardIsTrue())
               {
-                if (options.getCreateAutVars())
-                  autTobeDeclaredAsVars.addAll(currBDDGG.getAutGuardVars());
+                autTobeDeclaredAsVars.addAll(currBDDGG.getAutGuardVars());
 
                 EdgeSubject manipulatedEdge = null;
                 if (eventList.size() - eventsToBeRemovedFromEdge.size() == 1)
@@ -301,8 +298,7 @@ public class BDDExtendedSynthesizer {
           ((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable().addAll(edgesToBeAdded);
         }
       }
-      if (options.getCreateAutVars())
-        createAutVarsAndUpdates();
+      createAutVarsAndUpdates();
     }
 
     private void createAutVarsAndUpdates()

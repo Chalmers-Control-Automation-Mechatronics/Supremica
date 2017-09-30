@@ -84,7 +84,7 @@ public final class BDDExtendedGuardGenerator {
     String bestStateSet = "";
     private boolean isEventBlocked = false;
     private final EditorSynthesizerOptions options;
-    private Set<ExtendedAutomaton> autGuardVars;
+    private final Set<ExtendedAutomaton> autGuardVars;
 
     /** Creates a new instance of BDDExtendedGuardGenerator */
     public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata, final String eventName, final BDD states, final EditorSynthesizerOptions options) {
@@ -93,10 +93,8 @@ public final class BDDExtendedGuardGenerator {
         manager = automataBDD.getManager();
         automataBDD.setPathRoot(Config.FILE_SAVE_PATH.getAsString() + "/");
         generateIDD_PS = options.getSaveIDDInFile();
-
+        autGuardVars = new HashSet<ExtendedAutomaton>();
         this.options = options;
-        if (options.getCreateAutVars())
-          this.autGuardVars = new HashSet<ExtendedAutomaton>();
         /*
         final ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
         final ExpressionParser parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
@@ -662,11 +660,8 @@ public final class BDDExtendedGuardGenerator {
             final String autVarName = idd.getRoot().getName();
             final BDDExtendedAutomaton bddAut = automataBDD.getBDDExAutomaton(autVarName);
             final boolean isAutomaton = (bddAut != null) ? true : false;
-            if (options.getCreateAutVars())
-            {
-              if (isAutomaton && !autGuardVars.contains(bddAut.getExAutomaton()))
+            if (isAutomaton && !autGuardVars.contains(bddAut.getExAutomaton()))
                 autGuardVars.add(bddAut.getExAutomaton());
-            }
             StringIntPair expr_Nbr = null;
             final String idChild = iddChild.getRoot().getID();
             if (!applyComplementHeuristics)

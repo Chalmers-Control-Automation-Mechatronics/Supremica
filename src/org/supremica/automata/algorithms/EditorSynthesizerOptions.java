@@ -69,7 +69,6 @@ public final class EditorSynthesizerOptions
     private boolean reduceSupervisors;
     private boolean printGuard;
     private boolean addGuards;
-    private boolean createAutVars;
     private boolean saveInFile;
     private boolean saveIDDInFile;
     private boolean compHeuristic;
@@ -107,7 +106,6 @@ public final class EditorSynthesizerOptions
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
             Config.SYNTHESIS_PRINT_GUARD.get(),
             Config.SYNTHESIS_ADD_GUARDS.get(),
-            Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.get(),
             Config.SYNTHESIS_SAVE_IN_FILE.get(),
             Config.SYNTHESIS_REACHABILITY.get(),
             Config.SYNTHESIS_PEAKBDD.get(),
@@ -129,7 +127,6 @@ public final class EditorSynthesizerOptions
                                      final boolean reduceSupervisors,
                                      final boolean computePrintGuard,
                                      final boolean addGuards,
-                                     final boolean createAutVars,
                                      final boolean saveInFile,
                                      final boolean reachability,
                                      final boolean peakBDD,
@@ -144,7 +141,6 @@ public final class EditorSynthesizerOptions
         this.reduceSupervisors = reduceSupervisors;
         this.printGuard = computePrintGuard;
         this.addGuards = addGuards;
-        this.createAutVars = createAutVars;
         this.saveInFile = saveInFile;
         this.reachability = reachability;
         this.peakBDD = peakBDD;
@@ -308,16 +304,6 @@ public final class EditorSynthesizerOptions
         addGuards = bool;
     }
 
-    public boolean getCreateAutVars()
-    {
-        return createAutVars;
-    }
-
-    public void setCreateAutVars(final boolean bool)
-    {
-        createAutVars = bool;
-    }
-
     public boolean getSaveInFile()
     {
         return saveInFile;
@@ -414,7 +400,6 @@ public final class EditorSynthesizerOptions
 //        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
         Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
         Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
-        Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.set(createAutVars);
         Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
         Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
         Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
@@ -429,7 +414,6 @@ public final class EditorSynthesizerOptions
     {
         return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
                                             SynthesisAlgorithm.MONOLITHIC_WATERS,
-                                            true,
                                             true,
                                             true,
                                             true,
