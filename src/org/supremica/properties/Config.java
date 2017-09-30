@@ -370,7 +370,6 @@ public final class Config
     public static final BooleanProperty SYNTHESIS_LOCALIZE_SUPERVISORS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "synthesisLocalizeSupervisors", false, "Try to localize supervisors");
     public static final BooleanProperty SYNTHESIS_PRINT_GUARD = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "generateGuard", false, "Generate guards for the controllable events");
     public static final BooleanProperty SYNTHESIS_ADD_GUARDS = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "addGuards", false, "Add the guards to the model");
-    public static final BooleanProperty SYNTHESIS_CREATE_AUTOMATON_VARIABLES = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "createAutVars", false, "Create automaton variables");
     public static final BooleanProperty SYNTHESIS_SAVE_IN_FILE = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "saveInFile", false, "Save the guard-event pairs in a file");
     public static final BooleanProperty SYNTHESIS_COMPLEMENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "complementHeuristic", true, "Apply the complement heuristic");
     public static final BooleanProperty SYNTHESIS_INDEPENDENT_HEURISTIC = new BooleanProperty(PropertyType.ALGORITHMS_SYNTHESIS, "independentHeuristic", true, "Apply the independent heuristic");
