@@ -317,7 +317,7 @@ public class LogPanel extends JPanel
    * panel, the information is copied into a LogEventInfo object for display
    * by the AWT event dispatching thread. The copying is necessary, because
    * LOG4J2 may overwrite the original {@link LogEvent} when the appenders
-   * have finished, and it cannot used any more when the AWT event
+   * have finished, and it cannot be used any more when the AWT event
    * dispatching thread is invoked with delay.
    */
   private class LogEventInfo
