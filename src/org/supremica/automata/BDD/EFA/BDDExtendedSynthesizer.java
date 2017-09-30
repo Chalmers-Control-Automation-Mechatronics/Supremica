@@ -307,20 +307,26 @@ public class BDDExtendedSynthesizer {
 
     private void createAutVarsAndUpdates()
     {
-      for (final ExtendedAutomaton aut: autTobeDeclaredAsVars)
+      for (final ExtendedAutomaton aut: this.autTobeDeclaredAsVars)
       {
         final Set<String> markedValues = new HashSet<>();
         for (final NodeProxy node: aut.getMarkedLocations())
            markedValues.add(node.getName());
 
         final String autVarName = aut.getName() + ExtendedAutomata.getlocVarSuffix();
+        // Add automaton variables to extended automata
         aut.getExAutomata().addEnumerationVariable(autVarName,
                                                    aut.getNameToLocationMap().keySet(),
-                                                   aut.getInitialLocation().getName(), markedValues);
+                                                   aut.getInitialLocation().getName(),
+                                                   markedValues);
 
         for (final EdgeSubject edge:aut.getComponent().getGraph().getEdgesModifiable())
         {
+          final String sourceState = edge.getSource().getName();
           final String targetState = edge.getTarget().getName();
+          // No need to add assignment to self-loop
+          if (sourceState.equals(targetState))
+            continue;
           if (edge.getGuardActionBlock() == null)
             edge.setGuardActionBlock(new GuardActionBlockSubject());
           final String assignment = autVarName + " = " + targetState;
