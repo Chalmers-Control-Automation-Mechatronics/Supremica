@@ -83,6 +83,7 @@ public final class BDDExtendedGuardGenerator {
     private boolean generateIDD_PS = false;
     String bestStateSet = "";
     private boolean isEventBlocked = false;
+    @SuppressWarnings("unused")
     private final EditorSynthesizerOptions options;
     private final Set<ExtendedAutomaton> autGuardVars;
 
