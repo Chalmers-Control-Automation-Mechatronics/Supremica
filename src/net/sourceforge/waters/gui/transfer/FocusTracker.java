@@ -256,6 +256,7 @@ public class FocusTracker
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   private void fireSelectionChanged()

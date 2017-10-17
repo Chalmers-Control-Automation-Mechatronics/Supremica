@@ -39,6 +39,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -57,7 +59,7 @@ import javax.swing.JRadioButton;
  * It is implemented as a {@link JPanel} containing a {@link JRadioButton}
  * without label and a borderless {@link JButton} with an image and a textual
  * label, which is linked to the radio button.
- * 
+ *
  * @author Robi Malik
  */
 
@@ -68,16 +70,32 @@ public class IconRadioButton
 
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new radio button.
+   * @param text        The textual label, e.g., "Controllable".
+   * @param icon        The icon to be used.
+   * @param group       The button group to contain the radio button.
+   * @param accelerator The accelerator key to be used. This should be a
+   *                    lower-case character that appears in the textual
+   *                    label. It will be set as mnemonic (underlined), and
+   *                    a key binding for the look-and-feel's mouseless
+   *                    modifier (usually Alt) together with this character
+   *                    will be created.
+   */
   public IconRadioButton(final String text,
                          final Icon icon,
-                         final ButtonGroup group)
+                         final ButtonGroup group,
+                         final char accelerator)
   {
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
+    final int code = KeyEvent.getExtendedKeyCodeForChar(accelerator);
+    final int mnemonicIndex = text.toLowerCase().indexOf(accelerator);
     mButton = new JRadioButton();
     mButton.setFocusable(false);
     mButton.setRequestFocusEnabled(false);
+    mButton.setMnemonic(code);
     group.add(mButton);
     constraints.gridx = GridBagConstraints.RELATIVE;
     constraints.gridy = 0;
@@ -92,6 +110,7 @@ public class IconRadioButton
     label.setBorderPainted(false);
     label.setContentAreaFilled(false);
     label.setRequestFocusEnabled(false);
+    label.setDisplayedMnemonicIndex(mnemonicIndex);
     label.addActionListener(this);
     constraints.weightx = 1.0;
     layout.setConstraints(label, constraints);
@@ -124,6 +143,7 @@ public class IconRadioButton
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     mButton.doClick();
@@ -137,6 +157,6 @@ public class IconRadioButton
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2464050848059521705L;
 
 }

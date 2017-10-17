@@ -151,8 +151,8 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * method {@link #addMenus()}.
  * </P>
  *
- * @see net.sourceforge.waters.gui.actions.WatersActionManager
- * @see org.supremica.gui.ide.actions.Actions
+ * @see WatersActionManager
+ * @see Actions
  *
  * @author Knut &Aring;kesson, Robi Malik
  */
@@ -172,6 +172,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# F10:
 //# F11:
 //# F12:
+//# ESC: Edit/Deselect all
 
 //###########################################################################
 //# ALT-Hotkeys:
@@ -266,6 +267,7 @@ public class IDEMenuBar extends JMenuBar
     Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
       (analyzeListener);
   }
+
 
   //#########################################################################
   //# Initialisation
@@ -739,13 +741,14 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
-  // #########################################################################
-  // # Inner Class ToolsPropertyListener
+
+  //#########################################################################
+  //# Inner Class ToolsPropertyListener
   private class FilePropertyListener implements
       SupremicaPropertyChangeListener
   {
-    // #######################################################################
-    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    //#######################################################################
+    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
     @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
@@ -754,13 +757,14 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
-  // #########################################################################
-  // # Inner Class CreatePropertyListener
+
+  //#########################################################################
+  //# Inner Class CreatePropertyListener
   private class CreatePropertyListener implements
       SupremicaPropertyChangeListener
   {
-    // #######################################################################
-    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    //#######################################################################
+    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
     @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
@@ -769,13 +773,14 @@ public class IDEMenuBar extends JMenuBar
     }
   }
 
-  // #########################################################################
-  // # Inner Class ToolsPropertyListener
+
+  //#########################################################################
+  //# Inner Class ToolsPropertyListener
   private class ToolsPropertyListener implements
       SupremicaPropertyChangeListener
   {
-    // #######################################################################
-    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    //#######################################################################
+    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
     @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
@@ -785,11 +790,13 @@ public class IDEMenuBar extends JMenuBar
   }
 
 
+  //#########################################################################
+  //# Inner Class AnalyzePropertyListener
   private class AnalyzePropertyListener implements
       SupremicaPropertyChangeListener
   {
-    // #######################################################################
-    // # Interface org.supremica.properties.SupremicaPropertyChangeListener
+    //#######################################################################
+    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
     @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
@@ -800,19 +807,19 @@ public class IDEMenuBar extends JMenuBar
   }
 
 
-  // #########################################################################
-  // # Inner Class NewFromTemplateHandler
+  //#########################################################################
+  //# Inner Class NewFromTemplateHandler
   class NewFromTemplateHandler implements ActionListener
   {
-    // #######################################################################
-    // # Constructor
+    //#######################################################################
+    //# Constructor
     public NewFromTemplateHandler(final TemplateItem item)
     {
       mItem = item;
     }
 
-    // #######################################################################
-    // # Interface java.awt.event.ActionListener
+    //#######################################################################
+    //# Interface java.awt.event.ActionListener
     @Override
     public void actionPerformed(final ActionEvent event)
     {
@@ -851,9 +858,10 @@ public class IDEMenuBar extends JMenuBar
   private JMenu mConfigureMenu = null;
   private JMenu mHelpMenu = null;
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2077418542695726371L;
 
   private static final int MAX_MODULES = 24;
 
