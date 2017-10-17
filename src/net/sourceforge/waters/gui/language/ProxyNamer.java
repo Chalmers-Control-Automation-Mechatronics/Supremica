@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.gui.language;
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,9 +70,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 
 /**
  * <P>A utility class to give English names to items based on their type.</P>
@@ -86,8 +86,8 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * naming, and does not always correlate with the WATERS interface
  * hierarchy.</P>
  *
- * <P>This class only has static public methods. This may be changed later
- * when support for different locales is needed.</P>
+ * <P>This class only has static public methods. This may be changed
+ * if support for different locales is needed.</P>
  *
  * @see ProxyNamerTest
  *
@@ -158,63 +158,55 @@ public class ProxyNamer {
   private ProxyNamer()
   {
     mNameMap = new HashMap<Class<? extends Proxy>,NameEntry>(32);
-    createEntry(AutomatonProxy.class, "Automaton", "Automata");
-    createEntry(AliasProxy.class, "Alias", "Aliases",  false, Proxy.class);
-    createEntry(ConstantAliasProxy.class, "Named Constant",
-                false, AliasProxy.class);
-    createEntry(ComponentProxy.class, "Component");
-    createEntry(EdgeProxy.class, "Edge",
-                true, NodeProxy.class);
+    createEntry(AutomatonProxy.class, "Automaton", "Automata", Proxy.class);
+    createEntry(AliasProxy.class, "Alias", "Aliases", Proxy.class);
+    createEntry(ConstantAliasProxy.class, "Named Constant", AliasProxy.class);
+    createEntry(ComponentProxy.class, "Component", Proxy.class);
+    createEntry(EdgeProxy.class, "Edge", Proxy.class, NodeProxy.class);
     createEntry(EventAliasProxy.class, "Event Alias", "Event Aliases",
-                false, AliasProxy.class);
-    createEntry(EventDeclProxy.class, "Event",
-                true, ComponentProxy.class);
-    createEntry(ForeachProxy.class, "Foreach Block");
-    createEntry(GraphProxy.class, "Graph", "Graph");
+                AliasProxy.class);
+    createEntry(EventDeclProxy.class, "Event", Proxy.class,
+                ComponentProxy.class);
+    createEntry(ForeachProxy.class, "Foreach Block", Proxy.class);
+    createEntry(GraphProxy.class, "Graph", "Graph", Proxy.class,
+                SimpleComponentProxy.class);
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
-                true, EdgeProxy.class);
-    createEntry(GroupNodeProxy.class, "Group Node",
-                false, NodeProxy.class);
-    createEntry(IdentifierProxy.class, "Label",
-                true, EventDeclProxy.class, LabelBlockProxy.class);
-    createEntry(IndexedIdentifierProxy.class, "Label",
-                false, IdentifierProxy.class);
-    createEntry(InstanceProxy.class, "Instance",
-                false, ComponentProxy.class);
-    createEntry(LabelGeometryProxy.class, "Label",
-                true, SimpleNodeProxy.class);
+                IdentifierProxy.class, EdgeProxy.class);
+    createEntry(GroupNodeProxy.class, "Group Node", NodeProxy.class);
+    createEntry(IdentifierProxy.class, "Label", Proxy.class,
+                EventDeclProxy.class, LabelBlockProxy.class);
+    createEntry(IndexedIdentifierProxy.class, "Label", IdentifierProxy.class);
+    createEntry(InstanceProxy.class, "Instance", ComponentProxy.class);
+    createEntry(LabelGeometryProxy.class, "Label", IdentifierProxy.class,
+                SimpleNodeProxy.class);
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
-                true, EdgeProxy.class);
-    createEntry(ModuleProxy.class, "Module");
-    createEntry(NodeProxy.class, "Node", false, Proxy.class);
-    createEntry(ParameterBindingProxy.class, "Binding",
-                true, InstanceProxy.class);
-    createEntry(PointGeometryProxy.class, "Node Label",
-                false, SimpleNodeProxy.class);
+                EdgeProxy.class);
+    createEntry(ModuleProxy.class, "Module", Proxy.class);
+    createEntry(NodeProxy.class, "Node", Proxy.class);
+    createEntry(ParameterBindingProxy.class, "Binding", Proxy.class,
+                InstanceProxy.class);
+    createEntry(PointGeometryProxy.class, "Node Label", Proxy.class,
+                SimpleNodeProxy.class);
     createEntry(Proxy.class, "Item");
-    createEntry(QualifiedIdentifierProxy.class, "Label",
-                false, IdentifierProxy.class);
+    createEntry(QualifiedIdentifierProxy.class, "Label", IdentifierProxy.class);
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
-                false, ComponentProxy.class);
-    createEntry(SimpleIdentifierProxy.class, "Label",
-                false, IdentifierProxy.class);
-    createEntry(SimpleNodeProxy.class, "Node",
-                false, NodeProxy.class);
+                ComponentProxy.class);
+    createEntry(SimpleIdentifierProxy.class, "Label", IdentifierProxy.class);
+    createEntry(SimpleNodeProxy.class, "Node", NodeProxy.class);
     createEntry(VariableComponentProxy.class, "Variable",
-                false, ComponentProxy.class);
-    createEntry(VariableMarkingProxy.class, "Marking",
-                true, VariableComponentProxy.class);
+                ComponentProxy.class);
+    createEntry(VariableMarkingProxy.class, "Marking", Proxy.class,
+                VariableComponentProxy.class);
     mCountVisitor = new CountVisitor();
   }
 
 
   //#########################################################################
   //# Initialisation
-  @SuppressWarnings("unchecked")
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular)
   {
-    createEntry(iface, singular, false);
+    createEntry(iface, singular, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -222,27 +214,27 @@ public class ProxyNamer {
                            final String singular,
                            final String plural)
   {
-    createEntry(iface, singular, plural, false);
+    createEntry(iface, singular, plural, null);
   }
 
   @SuppressWarnings("unchecked")
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular,
-                           final boolean constituent,
-                           final Class<? extends Proxy>... parents)
+                           final Class<? extends Proxy> superType,
+                           final Class<? extends Proxy>... containers)
   {
-    createEntry(iface, singular, singular + "s", constituent, parents);
+    createEntry(iface, singular, singular + "s", superType, containers);
   }
 
   @SuppressWarnings("unchecked")
   private void createEntry(final Class<? extends Proxy> iface,
                            final String singular,
                            final String plural,
-                           final boolean constituent,
-                           final Class<? extends Proxy>... parents)
+                           final Class<? extends Proxy> superType,
+                           final Class<? extends Proxy>... containers)
   {
     final boolean vowel = hasInitialVowel(singular);
-    createEntry(iface, singular, plural, vowel, constituent, parents);
+    createEntry(iface, singular, plural, vowel, superType, containers);
   }
 
   @SuppressWarnings("unchecked")
@@ -250,11 +242,11 @@ public class ProxyNamer {
                            final String singular,
                            final String plural,
                            final boolean vowel,
-                           final boolean constituent,
-                           final Class<? extends Proxy>... parents)
+                           final Class<? extends Proxy> superType,
+                           final Class<? extends Proxy>... containers)
   {
     final NameEntry entry =
-      new NameEntry(singular, plural, vowel, constituent, parents);
+      new NameEntry(singular, plural, vowel, superType, containers);
     mNameMap.put(iface, entry);
   }
 
@@ -319,7 +311,7 @@ public class ProxyNamer {
         iter.advance();
         final Class<? extends Proxy> key = iter.key();
         final Class<? extends Proxy> ancestor =
-          getLeastCommonAncestor(iface, key);
+          getLeastCommonSuperType(iface, key);
         count += iter.value();
         iface = ancestor;
       }
@@ -368,36 +360,57 @@ public class ProxyNamer {
 
   //#########################################################################
   //# Auxiliary Methods
-  private Class<? extends Proxy> getLeastCommonAncestor
+  private Class<? extends Proxy> getLeastCommonSuperType
     (final Class<? extends Proxy> iface1, final Class<? extends Proxy> iface2)
   {
     if (iface1 == null) {
       return iface2;
     } else if (iface2 == null) {
       return iface1;
-    } else if (isAncestor(iface1, iface2, false)) {
+    } else if (isSuperType(iface1, iface2)) {
       return iface1;
-    } else if (isAncestor(iface2, iface1, false)) {
+    } else if (isSuperType(iface2, iface1)) {
       return iface2;
     } else {
       Class<? extends Proxy> parent1 = getSuperType(iface1);
-      while (parent1 != null && !isAncestor(parent1, iface2, false)) {
+      while (parent1 != null && !isSuperType(parent1, iface2)) {
         parent1 = getSuperType(parent1);
       }
       return parent1;
     }
   }
 
+  private boolean isSuperType(final Class<? extends Proxy> ancestor,
+                              final Class<? extends Proxy> descendant)
+  {
+    if (ancestor == descendant) {
+      return true;
+    }
+    final NameEntry entry = getEntry(descendant);
+    final Class<? extends Proxy> parent = entry.getSuperType();
+    if (parent == null) {
+      return false;
+    } else {
+      return isSuperType(ancestor, parent);
+    }
+  }
+
   private boolean isConstituentOfGeneralisation(Class<? extends Proxy> constituent,
                                                 Class<? extends Proxy> container)
   {
-    Class<? extends Proxy> superType = getSuperType(constituent);
-    while (superType != null) {
-      constituent = superType;
-      superType = getSuperType(constituent);
+    while (constituent != null) {
+      final NameEntry entry = getEntry(constituent);
+      final Class<? extends Proxy>[] containers = entry.getContainers();
+      if (containers.length > 0) {
+        break;
+      }
+      constituent = getSuperType(constituent);
+    }
+    if (constituent == null) {
+      return false;
     }
     while (container != null && container != constituent) {
-      if (isAncestor(container, constituent, true)) {
+      if (isContainer(container, constituent)) {
         return true;
       }
       container = getSuperType(container);
@@ -405,19 +418,15 @@ public class ProxyNamer {
     return false;
   }
 
-  private boolean isAncestor(final Class<? extends Proxy> ancestor,
-                             final Class<? extends Proxy> descendant,
-                             final boolean constituent)
+  private boolean isContainer(final Class<? extends Proxy> ancestor,
+                              final Class<? extends Proxy> descendant)
   {
     if (ancestor == descendant) {
       return true;
     }
     final NameEntry entry = getEntry(descendant);
-    if (entry.isConstituent() != constituent) {
-      return false;
-    }
-    for (final Class<? extends Proxy> parent : entry.getParents()) {
-      if (isAncestor(ancestor, parent, constituent)) {
+    for (final Class<? extends Proxy> parent : entry.getContainers()) {
+      if (isContainer(ancestor, parent)) {
         return true;
       }
     }
@@ -461,14 +470,14 @@ public class ProxyNamer {
     private NameEntry(final String singular,
                       final String plural,
                       final boolean vowel,
-                      final boolean constituent,
-                      final Class<? extends Proxy>... parents)
+                      final Class<? extends Proxy> superType,
+                      final Class<? extends Proxy>... containers)
     {
       mSingular = singular;
       mPlural = plural;
       mHasInitialVowel = vowel;
-      mParents = parents;
-      mIsConstituent = constituent;
+      mSuperType = superType;
+      mContainers = containers;
     }
 
     //#######################################################################
@@ -488,26 +497,14 @@ public class ProxyNamer {
       return mHasInitialVowel;
     }
 
-    private Class<? extends Proxy>[] getParents()
+    private Class<? extends Proxy>[] getContainers()
     {
-      return mParents;
+      return mContainers;
     }
 
     private Class<? extends Proxy> getSuperType()
     {
-      if (mIsConstituent) {
-        return null;
-      } else if (mParents.length == 0) {
-        return null;
-      } else {
-        assert mParents.length == 1;
-        return mParents[0];
-      }
-    }
-
-    private boolean isConstituent()
-    {
-      return mIsConstituent;
+      return mSuperType;
     }
 
     //#######################################################################
@@ -523,8 +520,8 @@ public class ProxyNamer {
     private final String mSingular;
     private final String mPlural;
     private final boolean mHasInitialVowel;
-    private final boolean mIsConstituent;
-    private final Class<? extends Proxy>[] mParents;
+    private final Class<? extends Proxy> mSuperType;
+    private final Class<? extends Proxy>[] mContainers;
   }
 
 

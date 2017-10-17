@@ -43,6 +43,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
+import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -196,6 +197,13 @@ public class ProxyNamerTest extends AbstractWatersTest
     final IdentifierProxy ident1 = mFactory.createSimpleIdentifierProxy("e1");
     final IdentifierProxy ident2 = mFactory.createSimpleIdentifierProxy("e1");
     testName("Labels", ident1, ident2);
+  }
+
+  public void testIdentifierWithGABlock() throws Exception
+  {
+    final IdentifierProxy ident = mFactory.createSimpleIdentifierProxy("e1");
+    final GuardActionBlockProxy block = mFactory.createGuardActionBlockProxy();
+    testName("Labels", ident, block);
   }
 
   public void testIdentifierWithLabelBlock() throws Exception
