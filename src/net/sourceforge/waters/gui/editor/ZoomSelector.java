@@ -52,6 +52,9 @@ import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
+import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
 
@@ -169,12 +172,19 @@ public class ZoomSelector
   //# Auxiliary Methods
   private GraphEditorPanel getGraphEditorPanel()
   {
-    final EditorWindowInterface iface = mIDE.getActiveEditorWindowInterface();
-    if (iface == null) {
+    final DocumentContainer container = mIDE.getActiveDocumentContainer();
+    if (container == null) {
       return null;
-    } else {
-      return iface.getGraphEditorPanel();
     }
+    final EditorPanel editor = container.getEditorPanel();
+    if (editor == null) {
+      return null;
+    }
+    final ComponentEditorPanel compEditor = editor.getActiveEditorWindowInterface();
+    if (compEditor == null) {
+      return null;
+    }
+    return compEditor.getGraphEditorPanel();
   }
 
 
