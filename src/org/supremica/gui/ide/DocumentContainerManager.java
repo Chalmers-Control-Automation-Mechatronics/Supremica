@@ -575,6 +575,8 @@ public class DocumentContainerManager
       }
     } else if (doc instanceof ModuleProxy) {
       firePendingSave(container);
+      // TODO Fix bug - this only loads the last project sent to the analyzer.
+      // It does not always match the module.
       final Project project = container.getAnalyzerPanel().getVisualProject();
       marshalDocument(file, project, maycancel);
     } else {
@@ -582,6 +584,64 @@ public class DocumentContainerManager
                                    clazz.getName() + "!");
     }
   }
+
+  /*
+   * This alternative method could support saving modules as .xml or .wdes,
+   * but it needs more work ... ~~~Robi
+  private void saveDocument(final FileFilter filter,
+                            final File file,
+                            final boolean mayCancel)
+  {
+    final DocumentContainer container = getActiveContainer();
+    final DocumentProxy doc = container.getDocument();
+    final ProxyMarshaller<? extends DocumentProxy> marshaller =
+      mDocumentManager.findProxyMarshaller(filter);
+    // But what if the user selected "all files" and typed a name?
+    final Class<? extends DocumentProxy> marshalledClazz =
+      marshaller.getDocumentClass();
+    final DocumentProxy marshalledDoc;
+    if (marshalledClazz.isAssignableFrom(doc.getClass())) {
+      firePendingSave(container);
+      marshalledDoc = marshalledClazz.cast(doc);
+    } else if (doc instanceof ProductDESProxy &&
+               ModuleProxy.class.isAssignableFrom(marshalledClazz)) {
+      // Converting Supremica >> Waters ...
+      // If analyser active, check if there are unsupported features
+      // in the project ...
+      final AnalyzerPanel analyzer = container.getAnalyzerPanel();
+      if (container.getActivePanel() == analyzer &&
+          !SupremicaUnmarshaller.validate(analyzer.getVisualProject())) {
+        final int choice = JOptionPane.showConfirmDialog
+          (mIDE.getFrame(), WARN_UNSUPPORTED,
+           "Warning", JOptionPane.YES_NO_OPTION);
+        if (choice != JOptionPane.YES_OPTION) {
+          return;
+        }
+      }
+      if (container instanceof ModuleContainer) {
+        firePendingSave(container);
+        marshalledDoc = container.getEditorPanel().getModuleSubject();
+      } else if (container instanceof AutomataContainer) {
+        try {
+          final Project project = (Project) doc;
+          marshalledDoc = mProductDESImporter.importModule(project);
+        } catch (final ParseException exception) {
+          showParseError(exception);
+          return;
+        }
+      } else {
+        throw new ClassCastException("Unknown document container type: " +
+                                     container.getClass().getName() + "!");
+      }
+    } else if (doc instanceof ModuleProxy &&
+               Project.class.isAssignableFrom(marshalledClazz)) {
+      // Converting Waters >> Supremica ...
+      // Must wait for background compiler to finish, check for errors,
+      // if possible convert compiled DES to Supremica project
+    }
+    // Finally save the marshalledDoc using the marshaller
+  }
+  */
 
   private void marshalDocument(final File file,
                                final DocumentProxy doc,
@@ -592,13 +652,13 @@ public class DocumentContainerManager
     final ProxyMarshaller<DocumentProxy> marshaller =
       mDocumentManager.findProxyMarshaller(clazz);
     final String ext = marshaller.getDefaultExtension();
-    final File extfile =
+    final File extFile =
       StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
     final String type = getTypeString(doc);
     try {
-      marshaller.marshal(doc, extfile);
+      marshaller.marshal(doc, extFile);
       final Logger logger = LogManager.getLogger();
-      logger.info(type + " saved to " + file);
+      logger.info(type + " saved to " + extFile);
     } catch (final WatersMarshalException exception) {
       showIOError(exception, maycancel);
     } catch (final IOException exception) {
@@ -617,20 +677,19 @@ public class DocumentContainerManager
   private JFileChooser getSaveFileChooser()
   {
     final JFileChooser chooser = mIDE.getFileChooser();
-    final FileFilter modfilter = mDocumentManager.
-    findProxyMarshaller(ModuleProxy.class).getDefaultFileFilter();
-    final FileFilter supfilter = mDocumentManager.
-    findProxyMarshaller(Project.class).getDefaultFileFilter();
-    final FileFilter current = chooser.getFileFilter();
     chooser.setDialogType(JFileChooser.SAVE_DIALOG);
     chooser.setMultiSelectionEnabled(false);
     chooser.resetChoosableFileFilters();
-    chooser.addChoosableFileFilter(modfilter);
-    chooser.addChoosableFileFilter(supfilter);
-    if (current == modfilter || current == supfilter) {
-      chooser.setFileFilter(current);
+    final FileFilter modFilter = mDocumentManager.
+      findProxyMarshaller(ModuleProxy.class).getDefaultFileFilter();
+    chooser.addChoosableFileFilter(modFilter);
+    if (getActiveContainer() instanceof AutomataContainer) {
+      final FileFilter supFilter= mDocumentManager.
+        findProxyMarshaller(Project.class).getDefaultFileFilter();
+      chooser.addChoosableFileFilter(supFilter);
+      chooser.setFileFilter(supFilter);
     } else {
-      chooser.setFileFilter(modfilter);
+      chooser.setFileFilter(modFilter);
     }
     return chooser;
   }
