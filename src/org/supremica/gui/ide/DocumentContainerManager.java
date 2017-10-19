@@ -61,6 +61,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.PendingSaveEvent;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -79,7 +80,6 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -345,7 +345,7 @@ public class DocumentContainerManager
       return ModuleContainer.TYPE_STRING;
     } else {
       throw new ClassCastException
-      ("Unknown document type: " + doc.getClass().getName() + "!");
+        ("Unknown document type: " + doc.getClass().getName() + "!");
     }
   }
 
@@ -450,19 +450,19 @@ public class DocumentContainerManager
 
   //#########################################################################
   //# Auxiliary Methods --- Saving
-  private void saveActiveContainer(final boolean maycancel)
+  private void saveActiveContainer(final boolean mayCancel)
   {
     final DocumentContainer container = getActiveContainer();
     final DocumentProxy doc = container.getDocument();
     try {
       final File file = doc.getFileLocation();
       if (file == null) {
-        saveActiveContainerAs(maycancel);
+        saveActiveContainerAs(mayCancel);
       } else {
-        saveContainer(container, file, maycancel);
+        saveDocument(container, doc, file, mayCancel);
       }
     } catch (final MalformedURLException exception) {
-      saveActiveContainerAs(maycancel);
+      saveActiveContainerAs(mayCancel);
     }
   }
 
@@ -471,82 +471,40 @@ public class DocumentContainerManager
     final JFileChooser chooser = getSaveFileChooser();
     final int returnVal = chooser.showSaveDialog(mIDE.getFrame());
     if (returnVal == JFileChooser.APPROVE_OPTION) {
+      File file = chooser.getSelectedFile();
       final FileFilter filter = chooser.getFileFilter();
-      final File file = chooser.getSelectedFile();
+      if (filter instanceof StandardExtensionFileFilter) {
+        final StandardExtensionFileFilter extender =
+          (StandardExtensionFileFilter) filter;
+        file = extender.ensureDefaultExtension(file);
+      }
       final DocumentContainer container = getActiveContainer();
       container.adjustDocumentName(file);
-      saveDocument(filter, file, maycancel);
+      saveDocument(file, maycancel);
     } else {
       mWasCancelled = true;
     }
   }
 
-  private void saveContainer(final DocumentContainer container,
-                             final File file,
-                             final boolean maycancel)
-  {
-    final URI uri = file.toURI();
-    final DocumentContainer other = mURIContainerMap.get(uri);
-    final DocumentProxy doc = container.getDocument();
-    final URI olduri = doc.getLocation();
-    if (other != null && other != container) {
-      final String text = getWarningText(file, WARN_FILE_OPEN);
-      final int choice =
-        showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
-      if (choice != JOptionPane.OK_OPTION) {
-        return;
-      }
-      closeContainer(other);
-    } else if (file.exists() && !uri.equals(olduri)) {
-      final String text = getWarningText(file, WARN_FILE_EXISTS);
-      final int choice =
-        showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
-      if (choice != JOptionPane.OK_OPTION) {
-        return;
-      }
-    }
-    firePendingSave(container);
-    try {
-      mDocumentManager.saveAs(doc, file);
-      container.setCheckPoint();
-      final Logger logger = LogManager.getLogger();
-      final String type = getTypeString(doc);
-      final String msg = type + " saved to " + file;
-      logger.info(msg);
-      if (!uri.equals(olduri)) {
-        mURIContainerMap.remove(olduri);
-        mURIContainerMap.put(uri, container);
-        fireContainerSwitch(container);
-      }
-    } catch (final WatersMarshalException exception) {
-      showIOError(exception, maycancel);
-    } catch (final IOException exception) {
-      showIOError(exception, maycancel);
-    }
-  }
-
-  private void saveDocument(final FileFilter filter,
-                            final File file,
-                            final boolean maycancel)
+  private void saveDocument(final File file,
+                            final boolean mayCancel)
   {
     final DocumentContainer container = getActiveContainer();
     final DocumentProxy doc = container.getDocument();
     final Class<? extends DocumentProxy> clazz = doc.getClass();
     final ProxyMarshaller<? extends DocumentProxy> marshaller =
       mDocumentManager.findProxyMarshaller(clazz);
-    final FileFilter docfilter = marshaller.getDefaultFileFilter();
-    if (docfilter == filter) {
-      final String ext = marshaller.getDefaultExtension();
-      final File extfile =
-        StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
-      saveContainer(container, extfile, maycancel);
+    final FileFilter docFilter = marshaller.getDefaultFileFilter();
+    if (doc instanceof ModuleProxy ||
+        doc instanceof Project && docFilter.accept(file)) {
+      final File extFile = ensureDefaultExtension(file, doc);
+      saveDocument(container, doc, extFile, mayCancel);
     } else if (doc instanceof Project) {
       // Converting Supremica >> Waters ...
       // If analyser active, check if there are unsupported features
       // in the project ...
-      final AnalyzerPanel analyzer = container.getAnalyzerPanel();
-      if (container.getActivePanel() == analyzer &&
-          !SupremicaUnmarshaller.validate(analyzer.getVisualProject())) {
+      final Project project = (Project) doc;
+      if (!SupremicaUnmarshaller.validate(project)) {
         final int choice = JOptionPane.showConfirmDialog
           (mIDE.getFrame(), WARN_UNSUPPORTED,
            "Warning", JOptionPane.YES_NO_OPTION);
@@ -554,34 +512,16 @@ public class DocumentContainerManager
           return;
         }
       }
-      if (container instanceof ModuleContainer) {
-        firePendingSave(container);
-        final ModuleProxy module =
-          container.getEditorPanel().getModuleSubject();
-        marshalDocument(file, module, maycancel);
-      } else if (container instanceof AutomataContainer) {
-        final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-        final ProductDESImporter importer = new ProductDESImporter(factory);
-        final Project project = (Project) doc;
-        try {
-          final ModuleProxy module = importer.importModule(project);
-          marshalDocument(file, module, maycancel);
-        } catch (final ParseException exception) {
-          showParseError(exception);
-        }
-      } else {
-        throw new ClassCastException("Unknown document container type: " +
-                                     container.getClass().getName() + "!");
+      try {
+        final ModuleProxy module = mProductDESImporter.importModule(project);
+        final File extFile = ensureDefaultExtension(file, module);
+        saveDocument(container, module, extFile, mayCancel);
+      } catch (final ParseException exception) {
+        showParseError(exception);
       }
-    } else if (doc instanceof ModuleProxy) {
-      firePendingSave(container);
-      // TODO Fix bug - this only loads the last project sent to the analyzer.
-      // It does not always match the module.
-      final Project project = container.getAnalyzerPanel().getVisualProject();
-      marshalDocument(file, project, maycancel);
     } else {
-      throw new ClassCastException("Unknown document type: " +
-                                   clazz.getName() + "!");
+      throw new ClassCastException("Unknown document type " +
+                                   ProxyTools.getShortClassName(clazz) + "!");
     }
   }
 
@@ -643,27 +583,59 @@ public class DocumentContainerManager
   }
   */
 
-  private void marshalDocument(final File file,
-                               final DocumentProxy doc,
-                               final boolean maycancel)
+  private void saveDocument(final DocumentContainer container,
+                            final DocumentProxy doc,
+                            final File file,
+                            final boolean maycancel)
+  {
+    final URI uri = file.toURI();
+    final DocumentContainer other = mURIContainerMap.get(uri);
+    final URI olduri = doc.getLocation();
+    if (other != null && other != container) {
+      final String text = getWarningText(file, WARN_FILE_OPEN);
+      final int choice =
+        showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
+      if (choice != JOptionPane.OK_OPTION) {
+        return;
+      }
+      closeContainer(other);
+    } else if (file.exists() && !uri.equals(olduri)) {
+      final String text = getWarningText(file, WARN_FILE_EXISTS);
+      final int choice =
+        showWarningDialog(text, JOptionPane.OK_CANCEL_OPTION);
+      if (choice != JOptionPane.OK_OPTION) {
+        return;
+      }
+    }
+    firePendingSave(container);
+    try {
+      mDocumentManager.saveAs(doc, file);
+      container.setCheckPoint();
+      final Logger logger = LogManager.getLogger();
+      final String type = getTypeString(doc);
+      final String msg = type + " saved to " + file;
+      logger.info(msg);
+      if (!uri.equals(olduri)) {
+        mURIContainerMap.remove(olduri);
+        mURIContainerMap.put(uri, container);
+        fireContainerSwitch(container);
+      }
+    } catch (final WatersMarshalException exception) {
+      showIOError(exception, maycancel);
+    } catch (final IOException exception) {
+      showIOError(exception, maycancel);
+    }
+  }
+
+  private File ensureDefaultExtension(final File file,
+                                      final DocumentProxy doc)
   {
     @SuppressWarnings("unchecked")
     final Class<DocumentProxy> clazz = (Class<DocumentProxy>) doc.getClass();
     final ProxyMarshaller<DocumentProxy> marshaller =
       mDocumentManager.findProxyMarshaller(clazz);
     final String ext = marshaller.getDefaultExtension();
-    final File extFile =
-      StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
-    final String type = getTypeString(doc);
-    try {
-      marshaller.marshal(doc, extFile);
-      final Logger logger = LogManager.getLogger();
-      logger.info(type + " saved to " + extFile);
-    } catch (final WatersMarshalException exception) {
-      showIOError(exception, maycancel);
-    } catch (final IOException exception) {
-      showIOError(exception, maycancel);
-    }
+    return StandardExtensionFileFilter.ensureDefaultExtension(file, ext);
   }
 
 
