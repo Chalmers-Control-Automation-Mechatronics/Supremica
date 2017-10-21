@@ -36,6 +36,7 @@
 package org.supremica.gui.ide;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -102,6 +103,9 @@ public class AnalyzerAutomataPanel
         analyzerTableModel = getActiveProject().getAnalyzerTableModel();
         theTableSorter = new TableSorter(analyzerTableModel);
         theAutomatonTable = new JTable(theTableSorter);
+        final Font font = theAutomatonTable.getFont();
+        final int height = (int) Math.ceil(1.5f * font.getSize2D());
+        theAutomatonTable.setRowHeight(height);
         theAutomatonTable.setTableHeader(new JTableHeader(theAutomatonTable.getColumnModel())
         {
 			private static final long serialVersionUID = 1L;
