@@ -276,7 +276,8 @@ public abstract class WatersAnalyzeAction
             container.switchToTraceMode(counterexample);
             final String comment = counterexample.getComment();
             if (comment != null && comment.length() > 0) {
-              final Logger logger = LogManager.getLogger();
+              final Logger logger =
+                LogManager.getLogger(WatersAnalyzeAction.this.getClass());
               logger.info(comment);
             }
           }
