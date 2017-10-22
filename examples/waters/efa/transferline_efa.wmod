@@ -1,13 +1,12 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="transferline_efa" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>EFA model with instantiation of Wonham's tranferline. 
-This version is based on old compiler semantics, representing the uncontrollable for synthesis.
+    <ns2:Comment>EFA model with instantiation of Wonham's tranferline.
+This version is based on old compiler semantics, representing the uncontrollable model for synthesis.
 Under normalising semantics, the buffer module generates errors due to disablement of an uncontrollable event in a specification. Please use the module transferline_norm instead.
 Parametrised by:
 A - size of buffers A
 B - size of buffers B
-N - number of serially connected cells.
-</ns2:Comment>
+N - number of serially connected cells.</ns2:Comment>
     <ConstantAliasList>
         <ConstantAlias Scope="OPTIONAL_PARAMETER" Name="N">
             <ConstantAliasExpression>
