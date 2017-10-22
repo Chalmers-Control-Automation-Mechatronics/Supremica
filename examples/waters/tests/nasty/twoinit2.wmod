@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="twoinit2" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="twoinit2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test case for compositional verification.
 This tests whether counterexample expansion can cope with an automaton that has both blocking and coreachable initial states.</ns2:Comment>
     <EventDeclList>
-        <EventDecl Kind="CONTROLLABLE" Name="a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="blocker">
+        <SimpleComponent Kind="SPEC" Name="blocker">
             <Graph Deterministic="false">
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">

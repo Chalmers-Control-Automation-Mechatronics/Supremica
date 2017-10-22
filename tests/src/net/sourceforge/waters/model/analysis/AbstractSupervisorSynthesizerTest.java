@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.analysis;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,6 +52,7 @@ import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -64,8 +67,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -608,6 +609,38 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
   */
+
+
+  //#########################################################################
+  //# Test Cases --- Nondeterministic
+  public void testTwoInit2() throws Exception
+  {
+    try {
+      final ProductDESProxy des =
+        getCompiledDES("tests", "nasty", "twoinit2.wmod");
+      runSynthesizer(des, false);
+      fail("Expected " +
+           ProxyTools.getShortClassName(NondeterministicDESException.class) +
+           " not caught!");
+    } catch (final NondeterministicDESException exception) {
+      assertMentions(exception, "'blocker'");
+    }
+  }
+
+  public void testNondeterministicConflicting() throws Exception
+  {
+    try {
+      final ProductDESProxy des =
+        getCompiledDES("tests", "nondeterministic",
+                       "NondeterministicConflicting.wmod");
+      runSynthesizer(des, true);
+      fail("Expected " +
+           ProxyTools.getShortClassName(NondeterministicDESException.class) +
+           " not caught!");
+    } catch (final NondeterministicDESException exception) {
+      assertMentions(exception, "'NondeterministicAut'", "'S1'", "'a2'");
+    }
+  }
 
 
   //#########################################################################

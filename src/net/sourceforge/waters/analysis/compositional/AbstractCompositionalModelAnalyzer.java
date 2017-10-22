@@ -71,6 +71,7 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -1208,6 +1209,9 @@ public abstract class AbstractCompositionalModelAnalyzer
           }
           // fall through ...
         case PLANT:
+          if (!supportsNondeterminism()) {
+            AutomatonTools.checkDeterministic(aut);
+          }
           mCurrentAutomata.add(aut);
           addEventsToAutomata(aut);
           mDirtyAutomata.add(aut);

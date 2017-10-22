@@ -112,6 +112,15 @@ public abstract class AbstractCompositionalSynthesizer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    mNondeterminismEnabled = enable;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
   @Override
   public void setOutputName(final String name)
@@ -144,6 +153,12 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return mNondeterminismEnabled;
+  }
+
   @Override
   public CompositionalSynthesisResult getAnalysisResult()
   {
@@ -360,6 +375,7 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
+  private boolean mNondeterminismEnabled = false;
   private String mOutputName;
 
 }

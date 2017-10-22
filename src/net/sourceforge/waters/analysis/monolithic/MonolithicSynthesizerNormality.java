@@ -75,6 +75,7 @@ import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -192,6 +193,12 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   }
 
   @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    mNondeterminismEnabled = enable;
+  }
+
+  @Override
   public void setSupervisorReductionEnabled(final boolean enable)
   {
     mSupervisorReductionEnabled = enable;
@@ -219,6 +226,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   {
     return mDisabledEvents;
   }
+
 
   //#########################################################################
   //# Overrides for Base Class
@@ -306,6 +314,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         stateToIndex.put(state, snum);
         mOriginalStates[a][snum] = state;
         if (state.isInitial()) {
+          if (!initials.isEmpty() && !supportsNondeterminism()) {
+            throw new NondeterministicDESException(aut, state);
+          }
           initials.add(snum);
         }
         final Collection<EventProxy> props = state.getPropositions();
@@ -322,20 +333,24 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
       for (final TransitionProxy trans : aut.getTransitions()) {
         final EventProxy event = trans.getEvent();
         final int e = mEventEncoding.getEventCode(event);
-        final int source = stateToIndex.get(trans.getSource());
-        final int target = stateToIndex.get(trans.getTarget());
-        TIntArrayList list = autTransitionLists[e][source];
-        TIntArrayList listRvs = autTransitionListsRvs[e][target];
+        final StateProxy source = trans.getSource();
+        final int s = stateToIndex.get(source);
+        final StateProxy target = trans.getTarget();
+        final int t = stateToIndex.get(target);
+        TIntArrayList list = autTransitionLists[e][s];
+        TIntArrayList listRvs = autTransitionListsRvs[e][t];
         if (list == null) {
           list = new TIntArrayList(1);
-          autTransitionLists[e][source] = list;
+          autTransitionLists[e][s] = list;
+        } else if (!supportsNondeterminism()) {
+          throw new NondeterministicDESException(aut, source, event);
         }
-        list.add(target);
+        list.add(t);
         if (listRvs == null) {
           listRvs = new TIntArrayList(1);
-          autTransitionListsRvs[e][target] = listRvs;
+          autTransitionListsRvs[e][t] = listRvs;
         }
-        listRvs.add(source);
+        listRvs.add(s);
       }
       for (final EventProxy event : localEvents) {
         if (translator.getEventKind(event) != EventKind.PROPOSITION) {
@@ -1097,8 +1112,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   @Override
   public boolean supportsNondeterminism()
   {
-    return true;
+    return mNondeterminismEnabled;
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -1597,6 +1613,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
   //# Data Members
   private EventProxy mConfiguredMarking;
   private EventProxy mUsedMarking;
+  private boolean mNondeterminismEnabled = false;
   private boolean mNonblockingSupported = true;
   private boolean mSupervisorReductionEnabled = false;
   private boolean mSupervisorLocalizationEnabled = false;

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,8 +66,6 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -319,12 +319,11 @@ public class ModularControllabilityChecker
     (final ModularHeuristic heuristic, final SafetyTraceProxy trace)
   {
     final KindTranslator translator = getKindTranslator();
-    final int traceLength = trace.getEvents().size();
     final Collection<AutomatonProxy> failedSpecs = new LinkedList<>();
     for (final AutomatonProxy aut : trace.getAutomata()) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         final TraceFinder finder = heuristic.getTraceFinder(aut);
-        if (finder.computeNumberOfAcceptedSteps(trace) < traceLength) {
+        if (finder.isRejectingSpec(trace)) {
           failedSpecs.add(aut);
         }
       }

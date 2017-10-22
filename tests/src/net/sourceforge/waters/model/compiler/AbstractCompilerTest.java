@@ -1052,21 +1052,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   /**
-   * Asserts that the exception mentions all the phrases in the culprit.
-   */
-  private void assertMentions(final WatersException exception,
-                              final String[] culprit)
-  {
-    final String msg = exception.getMessage();
-    for (final String phrase : culprit) {
-      assertTrue("Caught " + exception.getClass().getSimpleName() +
-                 " as expected, but message '" + msg +
-                 "' does not mention culprit: " + phrase + "!",
-                 msg.contains(phrase));
-    }
-  }
-
-  /**
    * Checks if the exception mentions all of the phrases in the culprit.
    */
   private boolean mentions(final WatersException exception,

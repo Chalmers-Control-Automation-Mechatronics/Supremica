@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="NondeterministicConflicting" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="NondeterministicConflicting" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A test to check whether conflict checkers can handle models with only one nondeterministic automaton.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="a1"/>
-        <EventDecl Kind="CONTROLLABLE" Name="a2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="a1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="a2"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="SPEC" Name="AutA">
@@ -15,52 +15,52 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point X="80" Y="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="80" X="208"/>
+                            <Point X="208" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="192" X="112"/>
+                            <Point X="112" Y="192"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Source="S1" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="129" X="149"/>
+                            <Point X="149" Y="129"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S0" Source="S2">
+                    <Edge Source="S2" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S1" Source="S1">
+                    <Edge Source="S1" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
@@ -76,43 +76,43 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="64" X="80"/>
+                            <Point X="80" Y="64"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="64" X="176"/>
+                            <Point X="176" Y="64"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="45" X="125"/>
+                            <Point X="125" Y="45"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S0" Source="S1">
+                    <Edge Source="S1" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="84" X="129"/>
+                            <Point X="129" Y="84"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S1" Source="S1">
+                    <Edge Source="S1" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>
@@ -128,65 +128,65 @@
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="80"/>
+                            <Point X="80" Y="48"/>
                         </PointGeometry>
                         <InitialArrowGeometry>
-                            <Point Y="-5" X="-5"/>
+                            <Point X="-5" Y="-5"/>
                         </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point Y="48" X="208"/>
+                            <Point X="208" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point Y="160" X="208"/>
+                            <Point X="208" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
                         <PointGeometry>
-                            <Point Y="96" X="144"/>
+                            <Point X="144" Y="96"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point Y="10" X="0"/>
+                            <Point X="0" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="S1" Source="S0">
+                    <Edge Source="S0" Target="S1">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S3" Source="S1">
+                    <Edge Source="S1" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S2" Source="S1">
+                    <Edge Source="S1" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="S0" Source="S2">
+                    <Edge Source="S2" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a1"/>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="141" X="114"/>
+                            <Point X="114" Y="141"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="S0" Source="S3">
+                    <Edge Source="S3" Target="S0">
                         <LabelBlock>
                             <SimpleIdentifier Name="a2"/>
                         </LabelBlock>

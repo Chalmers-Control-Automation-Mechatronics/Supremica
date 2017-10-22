@@ -39,6 +39,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
@@ -46,6 +47,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 
 
@@ -208,6 +210,29 @@ public abstract class AbstractWatersTest
       final Proxy proxy1 = iter1.next();
       final Proxy proxy2 = iter2.next();
       assertProxyEquals(eq, msg, proxy1, proxy2);
+    }
+  }
+
+
+  //#########################################################################
+  //# Exception Checking Assertions
+  /**
+   * Asserts that an exception message mentions a several phrases.
+   * @param  exception  The exception to be checked.
+   * @param  culprits   Phrases to be searched for in the exception
+   *                    message. If the message does not textually include
+   *                    each of these strings, then an {@link
+   *                    AssertionFailedError} will result.
+   */
+  public void assertMentions(final WatersException exception,
+                             final String... culprits)
+  {
+    final String msg = exception.getMessage();
+    for (final String culprit : culprits) {
+      assertTrue("Caught " + exception.getClass().getSimpleName() +
+                 " as expected, but message '" + msg +
+                 "' does not mention culprit: " + culprit + "!",
+                 msg.contains(culprit));
     }
   }
 
