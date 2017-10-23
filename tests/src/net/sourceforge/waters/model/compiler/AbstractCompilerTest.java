@@ -70,6 +70,7 @@ import net.sourceforge.waters.model.expr.TypeMismatchException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -905,7 +906,9 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Customisation
-  void configure(final ModuleCompiler compiler) { }
+  void configure(final ModuleCompiler compiler)
+  {
+  }
 
   abstract String[] getTestSuffices();
 
@@ -1006,19 +1009,28 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
     // Find the expected file, and compare.
     final File location = module.getFileLocation().getParentFile();
-    for (int i = 0; i < fileNames.length; i++) {
-      final File expectedFileName = new File(location, fileNames[i]);
-      if (expectedFileName.exists() || i == 3) {
-        compare(des, expectedFileName);
+    File expectedFileName = null;
+    for (final String fileName : fileNames) {
+      expectedFileName = new File(location, fileName);
+      if (expectedFileName.exists()) {
         break;
-      } else continue;
+      }
     }
+    compare(des, expectedFileName);
 
     // Test source information.
     if (mCompiler.isSourceInfoEnabled()) {
       mSourceInfoChecker = new SourceInfoCheckVisitor(mCompiler, module, des);
       mSourceInfoChecker.checkSourceInfo();
     }
+
+    // Test back import.
+    final ModuleProxy backImport = mBackImporter.importModule(des);
+    final ModuleCompiler backCompiler =
+      new ModuleCompiler(mDocumentManager, mProductDESFactory, backImport);
+    backCompiler.setOptimizationEnabled(false);
+    final ProductDESProxy backCompiledDES = backCompiler.compile();
+    compare(backCompiledDES, expectedFileName);
   }
 
   private ProductDESProxy compile(final ModuleProxy module)
@@ -1180,6 +1192,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
+    mBackImporter = new ProductDESImporter(mModuleFactory, mDocumentManager);
     mDescendantCheckVisitor = new DescendantCheckVisitor();
   }
 
@@ -1193,6 +1206,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     mModuleMarshaller = null;
     mProductDESMarshaller = null;
     mDocumentManager = null;
+    mBackImporter = null;
     mDescendantCheckVisitor = null;
     super.tearDown();
   }
@@ -1425,7 +1439,9 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
+  private ProductDESImporter mBackImporter;
   private ModuleCompiler mCompiler;
   private DescendantCheckVisitor mDescendantCheckVisitor;
   private SourceInfoCheckVisitor mSourceInfoChecker;
+
 }

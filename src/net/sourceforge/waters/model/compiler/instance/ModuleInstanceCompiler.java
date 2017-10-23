@@ -900,14 +900,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         final ModuleProxy module =
           mDocumentManager.load(uri, filename, ModuleProxy.class);
         mContext = new ModuleBindingContext(module, fullname, info);
-        mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
+        mNameSpace = mNameSpace.getOrAddChildNameSpace(suffix);
         mCompilationInfo.setExceptions(new MultiEvalException());
         return visitModuleProxy(module);
 
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof EvalException &&
-          !(cause instanceof EvalAbortException)) {
+            !(cause instanceof EvalAbortException)) {
           mCompilationInfo.setExceptions(oldExceptions);
           final EvalException evalCause = (EvalException) cause;
           for (final EvalException ex : evalCause.getAll()) {

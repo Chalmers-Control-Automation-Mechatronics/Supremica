@@ -35,9 +35,12 @@ package net.sourceforge.waters.model.expr;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
@@ -263,23 +266,51 @@ public class ExpressionScanner {
    * net.sourceforge.waters.model.module.SimpleIdentifierProxy
    * SimpleIdentifierProxy}, or as names of any Waters elements that are
    * identified by strings rather than identifiers.
-   * Identifiers must start with a character, underscore, or colon,
-   * which can be followed by more characters, digits, underscores, or colons.
+   * Identifiers must start with a letter, underscore, colon, or escaped
+   * group, which can be followed by more letter, digits, underscores,
+   * colons, or escaped groups.
    * @param  word        The string to be examined.
    * @return <CODE>true</CODE> if the given string is a valid identifier.
    */
   public static boolean isWatersIdentifier(final String word)
   {
     final int len = word.length();
-    if (len == 0 || !isIdentifierStart(word.charAt(0))) {
+    if (len == 0) {
       return false;
-    } else {
-      for (int index = 1; index < len; index++) {
-        if (!isIdentifierCharacter(word.charAt(index))) {
+    }
+    char ch = word.charAt(0);
+    if (isIdentifierStart(ch)) {
+      int index;
+      for (index = 1; index < len; index++) {
+        ch = word.charAt(index);
+        if (isEscapeStartCharachter(ch)) {
+          break;
+        } else if (!isIdentifierCharacter(word.charAt(index))) {
           return false;
         }
       }
-      return true;
+      if (index == len) {
+        return true;
+      }
+    } else if (!isEscapeStartCharachter(ch)) {
+      return false;
+    }
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    final StringReader reader = new StringReader(word);
+    try {
+      final ExpressionScanner scanner = new ExpressionScanner(optable, reader);
+      final Token token = scanner.next();
+      if (token.getType() != Token.Type.SYMBOL) {
+        return false;
+      } else if (scanner.getNextCharacter() >= 0) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (final ParseException exception) {
+      return false;
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
     }
   }
 
@@ -287,8 +318,6 @@ public class ExpressionScanner {
    * Checks whether the given simple identifier has a syntactically
    * correct name. Identifiers must pass the test {@link
    * #isWatersIdentifier(String) isWatersIdentifier()}.
-   * Identifiers must start with a character, underscore, or colon,
-   * which can be followed by more characters, digits, underscores, or colons.
    * @throws TypeMismatchException to indicate the name is invalid.
    */
   public static void checkWatersIdentifier(final SimpleIdentifierProxy ident)
