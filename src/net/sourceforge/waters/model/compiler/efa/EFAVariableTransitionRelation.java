@@ -256,7 +256,11 @@ class EFAVariableTransitionRelation
     if (other != null && getClass() == other.getClass()) {
       final EFAVariableTransitionRelation rel =
         (EFAVariableTransitionRelation) other;
-      return mIsEmpty ? rel.mIsEmpty : mParts.equals(rel.mParts);
+      if (mIsEmpty) {
+        return rel.mIsEmpty;
+      } else {
+        return !rel.mIsEmpty && mParts.equals(rel.mParts);
+      }
     } else {
       return false;
     }
@@ -265,7 +269,7 @@ class EFAVariableTransitionRelation
   @Override
   public int hashCode()
   {
-    return mIsEmpty ? 0 : mParts.hashCode();
+    return mIsEmpty ? -1 : mParts.hashCode();
   }
 
 

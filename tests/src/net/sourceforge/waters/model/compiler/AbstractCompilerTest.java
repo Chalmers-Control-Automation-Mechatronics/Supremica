@@ -376,7 +376,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
 
   //#########################################################################
-  //# Successful Test Cases using EFA
+  //# Successful Test Cases using EFSMs
+  public void testCompile_AliceRoom()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "alice_room");
+    testCompile(module);
+  }
+
   public void testCompile_AmbiguousVariableStatus()
     throws IOException, WatersException
   {
