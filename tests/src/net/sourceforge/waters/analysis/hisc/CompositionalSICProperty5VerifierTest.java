@@ -80,7 +80,7 @@ public class CompositionalSICProperty5VerifierTest
     checker.setSelfloopOnlyEventsEnabled(true);
     checker.setAlwaysEnabledEventsEnabled(true);
     checker.setCounterExampleEnabled(true);
-    checker.setTraceCheckingEnabled(true);
+    checker.setOutputCheckingEnabled(true);
     return new SICProperty5Verifier(checker, factory);
   }
 

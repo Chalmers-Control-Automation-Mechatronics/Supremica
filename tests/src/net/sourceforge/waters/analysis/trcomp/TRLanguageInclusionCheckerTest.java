@@ -67,8 +67,8 @@ public class TRLanguageInclusionCheckerTest
   protected LanguageInclusionChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final TRCompositionalLanguageInclusionChecker checker =
-      new TRCompositionalLanguageInclusionChecker();
+    final TRLanguageInclusionChecker checker =
+      new TRLanguageInclusionChecker();
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
     checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinS);
     checker.setInternalStateLimit(5000);
@@ -79,7 +79,7 @@ public class TRLanguageInclusionCheckerTest
     checker.setSelfloopOnlyEventsEnabled(true);
     checker.setAlwaysEnabledEventsEnabled(true);
     checker.setCounterExampleEnabled(true);
-    checker.setTraceCheckingEnabled(true);
+    checker.setOutputCheckingEnabled(true);
     return checker;
   }
 

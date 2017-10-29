@@ -33,14 +33,25 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * A model verifier that checks its input for controllability.
- * This model verifier checks whether the behaviour of all plant and spec
- * components in its input model is contained in the behaviour of all
- * properties in the input model.
+ * <P>A model verifier that checks its input for language inclusion.</P>
+ *
+ * <P>This model verifier checks whether the behaviour of all plant and
+ * specification components in its input model is contained in the behaviour
+ * of all properties in the input model.</P>
+ *
+ * <P>Plants and specifications are identified using the kind translator
+ * ({@link KindTranslator}, with plants labelled as {@link
+ * ComponentKind#PLANT PLANT} and specifications labelled as {@link
+ * ComponentKind#SPEC SPEC}. Other component types are ignored.
+ * The {@link LanguageInclusionKindTranslator} can be used to relabel
+ * {@link ComponentKind#PROPERTY PROPERTY} automata as specifications.</P>
  *
  * @author Robi Malik
  */
@@ -49,6 +60,7 @@ public interface LanguageInclusionChecker extends SafetyVerifier
 {
 
   // Not really necessary to redeclare, but removes Eclipse compiler error.
+  @Override
   public VerificationResult getAnalysisResult();
 
 }

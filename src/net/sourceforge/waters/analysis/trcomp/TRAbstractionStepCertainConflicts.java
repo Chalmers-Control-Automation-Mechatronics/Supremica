@@ -392,7 +392,7 @@ class TRAbstractionStepCertainConflicts
 
     //#######################################################################
     //# Data Members
-    private final TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
+    private final TRLanguageInclusionChecker mLanguageInclusionChecker;
     private final EventProxy mCertainConflictsEvent;
     private final TRAutomatonProxy mPropertyAutomaton;
     private List<LanguageInclusionAutomaton> mLanguageInclusionAutomata;

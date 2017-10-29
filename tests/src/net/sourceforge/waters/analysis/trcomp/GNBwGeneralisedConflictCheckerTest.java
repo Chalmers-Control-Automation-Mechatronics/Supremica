@@ -81,7 +81,7 @@ public class GNBwGeneralisedConflictCheckerTest
     checker.setAlwaysEnabledEventsEnabled(true);
     checker.setPruningDeadlocks(true);
     checker.setCounterExampleEnabled(true);
-    checker.setTraceCheckingEnabled(true);
+    checker.setOutputCheckingEnabled(true);
     return checker;
   }
 

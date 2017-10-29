@@ -73,7 +73,7 @@ public class DefaultAnalysisResult
   public DefaultAnalysisResult(final Class<?> clazz)
   {
     mAnalyzerClass = clazz;
-    mFinished = false;
+    mFinished = mSatisfied = false;
     mRunTime = -1;
     mCompileTime = -1;
     mException = null;

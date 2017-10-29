@@ -82,7 +82,7 @@ public class NB1StandardConflictCheckerTest
     checker.setAlwaysEnabledEventsEnabled(true);
     checker.setPruningDeadlocks(false);
     checker.setCounterExampleEnabled(true);
-    checker.setTraceCheckingEnabled(true);
+    checker.setOutputCheckingEnabled(true);
     return checker;
   }
 

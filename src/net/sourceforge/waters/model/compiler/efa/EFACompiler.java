@@ -86,6 +86,9 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * <P>The third pass of the compiler.</P>
@@ -379,7 +382,13 @@ public class EFACompiler extends AbortableCompiler
     throws EvalException
   {
     final ConstraintList guard = propagator.getAllConstraints();
-    //System.err.println(edecl.getEventDecl().getName() + " . " + guard);
+    if (guard != null) {
+      final Logger logger = LogManager.getLogger();
+      if (logger.isTraceEnabled()) {
+        logger.trace("Event instance: {} : {}",
+                     edecl.getEventDecl().getName(), guard.toString());
+      }
+    }
     mTransitionRelationBuilder.addEventRecord(edecl, guard, locations);
   }
 

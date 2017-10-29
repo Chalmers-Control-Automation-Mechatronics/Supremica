@@ -472,7 +472,7 @@ public class CommandLineTool
       appenderBuilder.add(builder.newLayout("PatternLayout").
                           addAttribute("pattern", "%-5level %msg%n"));
       builder.add(appenderBuilder);
-      builder.add(builder.newRootLogger(Level.ALL).
+      builder.add(builder.newRootLogger(Level.DEBUG).
                   add(builder.newAppenderRef("stdout")));
       return builder.build();
     }

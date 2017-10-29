@@ -52,19 +52,18 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -77,35 +76,72 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
+ * <P>The core algorithm for compositional safety verification.</P>
+ *
+ * <P>This is the compositional part of the language inclusion check, which
+ * performs compositional minimisation to check a single property. This class
+ * is not usually called directly, as problems with more them one property
+ * and controllability checks must be implemented by transforming the model
+ * first. For a general language inclusion check, please use {@link
+ * TRLanguageInclusionChecker}.</P>
+ *
+ * <P>The input model is expected to contain an arbitrary number of {@link
+ * ComponentKind#PLANT PLANT} automata and a single {@link ComponentKind#SPEC
+ * SPEC} automaton (as determined by the kind translator).</P>
+ *
+ * <P>The algorithm is compositional minimisation of the plant using natural
+ * projection, implemented by an abstraction sequence consisting of:</P>
+ * <OL>
+ * <LI>&tau;-Loop Removal ({@link TauLoopRemovalTRSimplifier})</LI>
+ * <LI>Subset Construction ({@link SubsetConstructionTRSimplifier})</LI>
+ * <LI>Minimisation ({@link ObservationEquivalenceTRSimplifier})</LI>
+ * </OL>
+ * <P>After minimisation, a configurable monolithic {@link
+ * LanguageInclusionChecker} is called to solve the abstracted problem.</P>
+ *
+ * <P>The simplifiers support the following special event types:</P>
+ * <DL>
+ * <DT><STRONG>Blocked events</STRONG></DT>
+ * <DD>Events found to be disabled in a plant component (not in the
+ * specification) are removed from the model.</DD>
+ * <DT><STRONG>Failing events</STRONG></DT>
+ * <DD>An event is considered failing if it is always disabled in the
+ * specification and always enabled in all plants other than the one
+ * considered. If such an event is possible, it is clear that the property
+ * fails, so exploration beyond these events is unnecessary.</DD>
+ * <DT><STRONG>Selfloop-only events</STRONG></DT>
+ * <DD>If an event only appears on selfloops in the plants and not at all
+ * in the specification, it can be removed from the model. If it appears only
+ * on selfloops in all plants other than the one considered and not at all
+ * in the specification, this fact is exploited for better minimisation.</DD>
+ * </DL>
+ *
+ * <P><I>References:</I><BR>
+ * Simon Ware, Robi Malik. The Use of Language Projection for Compositional
+ * Verification of Discrete Event Systems. Proc. 9th International Workshop
+ * on Discrete Event Systems (WODES'08), 322-327, G&ouml;teborg, Sweden,
+ * 2008.<BR>
+ * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
+ * Always Enabled Events and Selfloop-only Events. Proc. 2nd International
+ * Workshop on Formal Techniques for Safety-Critical Systems, FTSCS 2013,
+ * 147-162, Queenstown, New Zealand, 2013.</P>
+ *
+ * @see TRLanguageInclusionChecker
+ *
  * @author Robi Malik
  */
 
-public class TRCompositionalLanguageInclusionChecker
+class TRCompositionalOnePropertyChecker
   extends AbstractTRCompositionalVerifier
   implements LanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public TRCompositionalLanguageInclusionChecker()
+  TRCompositionalOnePropertyChecker(final SafetyDiagnostics diag)
   {
-    this(null);
-  }
-
-  public TRCompositionalLanguageInclusionChecker(final ProductDESProxy model)
-  {
-    this(model,
-         LanguageInclusionKindTranslator.getInstance(),
-         LanguageInclusionDiagnostics.getInstance());
-  }
-
-  public TRCompositionalLanguageInclusionChecker
-    (final ProductDESProxy model,
-     final KindTranslator translator,
-     final SafetyDiagnostics diag)
-  {
-    super(model, translator,
-          new NativeSafetyVerifier(translator, diag,
+    super(null, null,
+          new NativeSafetyVerifier(null, diag,
                                    ProductDESElementFactory.getInstance()));
     mDiagnostics = diag;
   }
@@ -145,58 +181,6 @@ public class TRCompositionalLanguageInclusionChecker
   //#########################################################################
   //# Invocation
   @Override
-  public boolean run()
-    throws AnalysisException
-  {
-    final Logger logger = getLogger();
-    final long start = System.currentTimeMillis();
-    final KindTranslator translator = getKindTranslator();
-    final ProductDESProxy des = getModel();
-    boolean hasProperty = false;
-    AnalysisResult result = null;
-    // Check one property at a time,
-    // using full setUp-run-tearDown cycle each time ...
-    for (final AutomatonProxy aut : des.getAutomata()) {
-      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
-        try {
-          logger.debug("Checking property " + aut.getName() + " ...");
-          hasProperty = true;
-          mRawProperty = aut;
-          if (!super.run()) {
-            return false;
-          }
-        } finally {
-          final AnalysisResult subResult = getAnalysisResult();
-          if (result == null) {
-            result = subResult;
-            setAnalysisResult(result);
-          } else if (subResult != null) {
-            result.merge(subResult);
-          }
-          if (result != null && !result.isSatisfied()) {
-            final long stop = System.currentTimeMillis();
-            result.setRuntime(stop - start);
-          }
-        }
-      }
-    }
-    if (!hasProperty) {
-      logger.debug("Did not find any properties to check, returning TRUE.");
-      result = createAnalysisResult();
-      result.setSatisfied(true);
-      result.setNumberOfAutomata(0);
-      result.setNumberOfStates(0);
-      result.setNumberOfTransitions(0);
-      final long usage = DefaultAnalysisResult.getCurrentMemoryUsage();
-      result.updatePeakMemoryUsage(usage);
-      setAnalysisResult(result);
-    }
-    final long stop = System.currentTimeMillis();
-    result.setRuntime(stop - start);
-    return true;
-  }
-
-  @Override
   protected void setUp()
     throws AnalysisException
   {
@@ -206,36 +190,58 @@ public class TRCompositionalLanguageInclusionChecker
     if (result.isFinished()) {
       return;
     }
-    // Set up property automaton ...
+    // Find the property ...
     final Logger logger = getLogger();
+    final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy des = getModel();
+    AutomatonProxy property = null;
+    for (final AutomatonProxy aut : des.getAutomata()) {
+      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
+        if (property == null) {
+          property = aut;
+        } else {
+          throw new AnalysisConfigurationException
+            ("Calling " + ProxyTools.getShortClassName(this) +
+             " with more than one property!");
+        }
+      }
+    }
+    if (property == null) {
+      logger.debug("No property given to check, returning TRUE.");
+      setSatisfiedResult();
+      return;
+    }
+
+    // Set up property automaton ...
     final TRAbstractionStepInput step;
-    if (getPreservingEncodings() && mRawProperty instanceof TRAutomatonProxy) {
-      final TRAutomatonProxy tr = (TRAutomatonProxy) mRawProperty;
+    if (isPreservingEncodings() && property instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) property;
       step = new TRAbstractionStepInput(tr);
     } else {
-      final EventEncoding eventEnc = createInitialEventEncoding(mRawProperty);
-      step = new TRAbstractionStepInput(mRawProperty, eventEnc);
+      final EventEncoding eventEnc = createInitialEventEncoding(property);
+      step = new TRAbstractionStepInput(property, eventEnc);
     }
     final TransitionRelationSimplifier simplifier = getSimplifier();
     final int config = simplifier.getPreferredInputConfiguration();
-    mCurrentProperty = step.createOutputAutomaton(config);
+    mProperty = step.createOutputAutomaton(config);
     if (isCounterExampleEnabled()) {
-      addAbstractionStep(step, mCurrentProperty);
+      addAbstractionStep(step, mProperty);
     }
-    if (!hasInitialState(mCurrentProperty)) {
-      logger.debug("System fails property " + mRawProperty.getName() +
-                   ", because it has no initial state.");
+    if (!hasInitialState(mProperty)) {
+      logger.debug("System fails property {}, because it has no initial state.",
+                   property.getName());
       result.setSatisfied(false);
       final TRSubsystemInfo subsys = getCurrentSubsystem();
       dropSubsystem(subsys);
-      dropTrivialAutomaton(mCurrentProperty);
+      dropTrivialAutomaton(mProperty);
       return;
     }
-    final ListBufferTransitionRelation rel =
-      mCurrentProperty.getTransitionRelation();
+    final ListBufferTransitionRelation rel = mProperty.getTransitionRelation();
+    rel.removeProperSelfLoopEvents();
+    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
+    mMonolithicAutomataLimit = iter.advance() ? 1 : 2;
     mHasStronglyFailingEvent = false;
     final SpecialEventsFinder finder = getSpecialEventsFinder();
-    rel.removeProperSelfLoopEvents();
     finder.setBlockedEventsDetected(true);
     finder.setFailingEventsDetected(false);
     finder.setSelfloopOnlyEventsDetected(isSelfloopOnlyEventsEnabled());
@@ -263,21 +269,21 @@ public class TRCompositionalLanguageInclusionChecker
       }
     }
     if (trivial) {
-      logger.debug("Skipping trivial property " + mRawProperty.getName() + ".");
+      logger.debug("Skipping trivial property {}.", property.getName());
       result.setSatisfied(true);
       return;
     }
     finder.setAlwaysEnabledEventsDetected(mHasStronglyFailingEvent);
+
     final TRSubsystemInfo subsys = getCurrentSubsystem();
-    subsys.registerEvents(mCurrentProperty, status, true);
+    subsys.registerEvents(mProperty, status, true);
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mRawProperty = null;
-    mCurrentProperty = null;
+    mProperty = null;
   }
 
 
@@ -295,6 +301,10 @@ public class TRCompositionalLanguageInclusionChecker
     return mHasStronglyFailingEvent;
   }
 
+  /**
+   * Override that ensures only the plants (all automata except the property)
+   * are initialised by the call to superclass {@link #setUp()} method.
+   */
   @Override
   protected TRAutomatonProxy createInitialAutomaton(final AutomatonProxy aut)
     throws AnalysisException
@@ -307,18 +317,16 @@ public class TRCompositionalLanguageInclusionChecker
     }
   }
 
+  /**
+   * Override to calculate the minimum number of components in a final
+   * monolithic check. The property should always be included, if present.
+   * If the property is a one-state blocking automaton, it is optimised out
+   * and the final monolithic check has only one automaton.
+   */
   @Override
   protected int getMonolithicAutomataLimit()
   {
-    if (mRawProperty instanceof TRAutomatonProxy) {
-      final TRAutomatonProxy aut = (TRAutomatonProxy) mRawProperty;
-      final ListBufferTransitionRelation rel = aut.getTransitionRelation();
-      final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-      return iter.advance() ? 1 : 2;
-    } else {
-      final int numTrans = mRawProperty.getTransitions().size();
-      return numTrans > 0 ? 1 : 2;
-    }
+    return mMonolithicAutomataLimit;
   }
 
   @Override
@@ -330,10 +338,8 @@ public class TRCompositionalLanguageInclusionChecker
       }
     }
     final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Dropping subsystem because it shares no events " +
-                   "with property " + mCurrentProperty.getName() + ".");
-    }
+    logger.debug("Dropping subsystem because it shares no events with property {}.",
+                 mProperty.getName());
     dropSubsystem(subsys);
     return true;
   }
@@ -346,14 +352,14 @@ public class TRCompositionalLanguageInclusionChecker
     final String name;
     final List<TRAutomatonProxy> automata;
     if (subsys == null || subsys.getNumberOfAutomata() == 0) {
-      name = mCurrentProperty.getName();
-      automata = Collections.singletonList(mCurrentProperty);
+      name = mProperty.getName();
+      automata = Collections.singletonList(mProperty);
     } else {
       final List<TRAutomatonProxy> plants = subsys.getAutomata();
       final int numAutomata = plants.size() + 1;
       automata = new ArrayList<>(numAutomata);
       automata.addAll(plants);
-      automata.add(mCurrentProperty);
+      automata.add(mProperty);
       name = AutomatonTools.getCompositionName(plants);
     }
     final ProductDESProxyFactory factory = getFactory();
@@ -372,17 +378,11 @@ public class TRCompositionalLanguageInclusionChecker
     }
     final Logger logger = getLogger();
     if (monolithicResult.isSatisfied()) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Subsystem satisfies property " +
-                     mCurrentProperty.getName() + ".");
-      }
+      logger.debug("Subsystem satisfies property {}.", mProperty.getName());
       dropSubsystem(subsys);
       return setSatisfiedResult();
     } else {
-      if (logger.isDebugEnabled()) {
-        logger.debug("Subsystem fails property " +
-                     mCurrentProperty.getName() + ".");
-      }
+      logger.debug("Subsystem fails property {}.", mProperty.getName());
       combinedResult.setSatisfied(false);
       if (isCounterExampleEnabled()) {
         dropPendingSubsystems();
@@ -491,8 +491,8 @@ public class TRCompositionalLanguageInclusionChecker
   private final SafetyDiagnostics mDiagnostics;
 
   // Data Structures
-  private AutomatonProxy mRawProperty;
-  private TRAutomatonProxy mCurrentProperty;
+  private TRAutomatonProxy mProperty;
+  private int mMonolithicAutomataLimit;
   private boolean mHasStronglyFailingEvent;
 
 }

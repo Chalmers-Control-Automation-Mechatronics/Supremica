@@ -233,6 +233,11 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Simple Access
+  void setProductDES(final ProductDESProxy des)
+  {
+    mProductDES = des;
+  }
+
   void setComment(final String comment)
   {
     mComment = comment;
@@ -697,7 +702,7 @@ public abstract class TRTraceProxy
   //# Data Members
   private URI mLocation;
   private String mComment;
-  private final ProductDESProxy mProductDES;
+  private ProductDESProxy mProductDES;
   private EventProxy[] mEvents;
   private Map<TRAbstractionStep,int[]> mTraceData;
   private Map<AutomatonProxy,TRAbstractionStep> mAutomataMap;

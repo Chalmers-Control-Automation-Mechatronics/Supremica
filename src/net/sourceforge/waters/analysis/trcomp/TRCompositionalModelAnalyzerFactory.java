@@ -116,10 +116,10 @@ public class TRCompositionalModelAnalyzerFactory
   }
 
   @Override
-  public TRCompositionalLanguageInclusionChecker createLanguageInclusionChecker
+  public TRLanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxyFactory factory)
   {
-    return new TRCompositionalLanguageInclusionChecker();
+    return new TRLanguageInclusionChecker();
   }
 
   @Override

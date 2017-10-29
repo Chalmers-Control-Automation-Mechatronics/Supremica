@@ -33,11 +33,7 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -45,30 +41,29 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
-import org.apache.logging.log4j.Logger;
-
 
 /**
- * A general compositional model verifier to be subclassed for different
- * algorithms. This class extends the abstract compositional model analyser
- * class ({@link AbstractTRCompositionalAnalyzer} to implement the
- * {@link ModelVerifier} interface and provide counterexample support.
+ * A general delegating compositional model verifier to be subclassed for
+ * different algorithms. This class extends the abstract delegating
+ * compositional model analyser class ({@link AbstractTRDelegatingAnalyzer}
+ * to implement the {@link ModelVerifier} interface and provide counterexample
+ * support.
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractTRCompositionalVerifier
-  extends AbstractTRCompositionalAnalyzer
+public abstract class AbstractTRDelegatingVerifier
+  extends AbstractTRDelegatingAnalyzer
   implements ModelVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractTRCompositionalVerifier(final ProductDESProxy model,
-                                         final KindTranslator translator,
-                                         final ModelVerifier mono)
+  public AbstractTRDelegatingVerifier(final ProductDESProxy model,
+                                      final KindTranslator translator,
+                                      final AbstractTRAnalyzer delegate)
   {
-    super(model, translator, mono);
+    super(model, translator, delegate);
   }
 
 
@@ -92,13 +87,15 @@ public abstract class AbstractTRCompositionalVerifier
   @Override
   public void setShortCounterExampleRequested(final boolean req)
   {
-    mShortCounterExampleRequested = req;
+    final ModelVerifier delegate = (ModelVerifier) getDelegate();
+    delegate.setShortCounterExampleRequested(req);
   }
 
   @Override
   public boolean isShortCounterExampleRequested()
   {
-    return mShortCounterExampleRequested;
+    final ModelVerifier delegate = (ModelVerifier) getDelegate();
+    return delegate.isShortCounterExampleRequested();
   }
 
   @Override
@@ -130,25 +127,15 @@ public abstract class AbstractTRCompositionalVerifier
 
 
   //#########################################################################
-  //# Invocation
-  @Override
-  protected void setUp()
-    throws AnalysisException
+  //# Auxiliary Methods
+  /**
+   * Stores a verification result indicating that the property checked
+   * is satisfied and marks the run as completed.
+   * @return <CODE>true</CODE>
+   */
+  protected boolean setSatisfiedResult()
   {
-    super.setUp();
-    final ModelVerifier mono = getMonolithicVerifier();
-    mono.setCounterExampleEnabled(isCounterExampleEnabled());
-    mono.setShortCounterExampleRequested(mShortCounterExampleRequested);
-  }
-
-
-  //#########################################################################
-  //# Hooks
-  protected abstract TRTraceProxy createEmptyTrace(ProductDESProxy des);
-
-  protected void checkIntermediateCounterExample(final TRTraceProxy trace)
-    throws AnalysisException
-  {
+    return setBooleanResult(true);
   }
 
   /**
@@ -163,43 +150,5 @@ public abstract class AbstractTRCompositionalVerifier
     result.setCounterExample(counterexample);
     return setBooleanResult(false);
   }
-
-  @Override
-  protected TRTraceProxy computeCounterExample() throws AnalysisException
-  {
-    final CompositionalVerificationResult result = getAnalysisResult();
-    if (!result.isSatisfied() && isCounterExampleEnabled()) {
-      final Logger logger = getLogger();
-      logger.debug("Starting trace expansion ...");
-      final long start = System.currentTimeMillis();
-      getSpecialEventsListener().setEnabled(true);
-      final ProductDESProxy des = getModel();
-      final TRTraceProxy trace = createEmptyTrace(des);
-      final List<TRAbstractionStep> seq = getAbstractionSequence();
-      final int end = seq.size();
-      final ListIterator<TRAbstractionStep> iter = seq.listIterator(end);
-      while (iter.hasPrevious()) {
-        checkAbort();
-        final TRAbstractionStep step = iter.previous();
-        step.reportExpansion();
-        step.expandTrace(trace, this);
-        if (isOutputCheckingEnabled()) {
-          checkIntermediateCounterExample(trace);
-        }
-        iter.remove();
-      }
-      final long stop = System.currentTimeMillis();
-      result.setCounterExample(trace);
-      result.setCounterExampleTime(stop -start);
-      return trace;
-    } else {
-      return null;
-    }
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private boolean mShortCounterExampleRequested = false;
 
 }
