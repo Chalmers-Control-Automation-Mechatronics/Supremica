@@ -100,6 +100,7 @@ public class SimpleExpressionCompiler
     mCloner = new SourceInfoCloner(factory, compilationInfo);
 
     final BinaryEvaluator assigner = new BinaryAssignmentEvaluator();
+    final BinaryEvaluator sumEvaluator = new BinarySumEvaluator();
     mBinaryEvaluatorMap = new HashMap<BinaryOperator,BinaryEvaluator>(32);
     mBinaryEvaluatorMap.put(optable.getAndOperator(),
                             new BinaryAndEvaluator());
@@ -119,8 +120,7 @@ public class SimpleExpressionCompiler
                             new BinaryLessEqualsEvaluator());
     mBinaryEvaluatorMap.put(optable.getLessThanOperator(),
                             new BinaryLessThanEvaluator());
-    mBinaryEvaluatorMap.put(optable.getMinusOperator(),
-                            new BinaryMinusEvaluator());
+    mBinaryEvaluatorMap.put(optable.getMinusOperator(), sumEvaluator);
     mBinaryEvaluatorMap.put(optable.getModuloOperator(),
                             new BinaryModuloEvaluator());
     mBinaryEvaluatorMap.put(optable.getNotEqualsOperator(),
@@ -128,8 +128,7 @@ public class SimpleExpressionCompiler
     mBinaryEvaluatorMap.put(optable.getOrOperator(),
                             new BinaryOrEvaluator());
     mBinaryEvaluatorMap.put(optable.getOrWithOperator(), assigner);
-    mBinaryEvaluatorMap.put(optable.getPlusOperator(),
-                            new BinaryPlusEvaluator());
+    mBinaryEvaluatorMap.put(optable.getPlusOperator(), sumEvaluator);
     mBinaryEvaluatorMap.put(optable.getRangeOperator(),
                             new BinaryRangeEvaluator());
     mBinaryEvaluatorMap.put(optable.getTimesOperator(),
@@ -156,11 +155,12 @@ public class SimpleExpressionCompiler
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
     mEquality = new ModuleEqualityVisitor(false);
+    mSumSimplifier = new SumSimplifier(factory, this);
   }
 
 
   //#########################################################################
-  //# Invocation
+  //# Public Invocation
   public SimpleExpressionProxy simplify(final SimpleExpressionProxy expr,
                                         final BindingContext context)
     throws EvalException
@@ -287,20 +287,29 @@ public class SimpleExpressionCompiler
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private SimpleExpressionProxy simplify(final SimpleExpressionProxy expr)
-    throws EvalException
+  //# Package Local Invocation
+  SimpleExpressionProxy invokeSimplificationVisitor(final SimpleExpressionProxy expr)
+    throws VisitorException
   {
-    return mSimplificationVisitor.simplify(expr);
+    return mSimplificationVisitor.process(expr);
   }
 
-  private boolean isAtomicValue(final SimpleExpressionProxy expr)
+  boolean isAtomicValue(final SimpleExpressionProxy expr)
   {
     try {
       return (Boolean) expr.acceptVisitor(mAtomicVisitor);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private SimpleExpressionProxy simplify(final SimpleExpressionProxy expr)
+    throws EvalException
+  {
+    return mSimplificationVisitor.simplify(expr);
   }
 
   private SimpleExpressionProxy processIdentifier
@@ -1060,7 +1069,7 @@ public class SimpleExpressionCompiler
   {
 
     //#######################################################################
-    //# Overrides for Abstract Baseclass AbstractBinaryComparisonEvaluator
+    //# Overrides for Abstract Base Class AbstractBinaryComparisonEvaluator
     @Override
     boolean includesEquality()
     {
@@ -1117,44 +1126,6 @@ public class SimpleExpressionCompiler
         return false;
       } else {
         return null;
-      }
-    }
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class BinaryMinusEvaluator
-  private class BinaryMinusEvaluator extends BinaryEvaluator {
-
-    //#######################################################################
-    //# Evaluation
-    @Override
-    SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
-      throws EvalException
-    {
-      final SimpleExpressionProxy origLHS = expr.getLeft();
-      final SimpleExpressionProxy simpLHS = simplify(origLHS);
-      final boolean atomLHS = isAtomicValue(simpLHS);
-      final int intLHS = atomLHS ? getIntValue(simpLHS) : Integer.MAX_VALUE;
-      final SimpleExpressionProxy origRHS = expr.getRight();
-      final SimpleExpressionProxy simpRHS = simplify(origRHS);
-      final boolean atomRHS = isAtomicValue(simpRHS);
-      final int intRHS = atomRHS ? getIntValue(simpRHS) : Integer.MAX_VALUE;
-      if (atomLHS && atomRHS) {
-        return createIntConstantProxy(intLHS - intRHS);
-      } else if (intLHS == 0) {
-        final UnaryOperator op = mOperatorTable.getUnaryMinusOperator();
-        final SimpleExpressionProxy copy =
-          mFactory.createUnaryExpressionProxy(op, simpRHS);
-        mCompilationInfo.add(copy, expr);
-        return copy;
-      } else if (intRHS == 0) {
-        return simpLHS;
-      } else if (mEquality.equals(simpLHS, simpRHS)) {
-        return createIntConstantProxy(0);
-      } else {
-        return createExpression(expr, simpLHS, simpRHS);
       }
     }
 
@@ -1256,8 +1227,8 @@ public class SimpleExpressionCompiler
 
 
   //#########################################################################
-  //# Inner Class BinaryPlusEvaluator
-  private class BinaryPlusEvaluator extends BinaryEvaluator {
+  //# Inner Class BinarySumEvaluator
+  private class BinarySumEvaluator extends BinaryEvaluator {
 
     //#######################################################################
     //# Evaluation
@@ -1265,23 +1236,7 @@ public class SimpleExpressionCompiler
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
-      final SimpleExpressionProxy origLHS = expr.getLeft();
-      final SimpleExpressionProxy simpLHS = simplify(origLHS);
-      final boolean atomLHS = isAtomicValue(simpLHS);
-      final int intLHS = atomLHS ? getIntValue(simpLHS) : Integer.MAX_VALUE;
-      final SimpleExpressionProxy origRHS = expr.getRight();
-      final SimpleExpressionProxy simpRHS = simplify(origRHS);
-      final boolean atomRHS = isAtomicValue(simpRHS);
-      final int intRHS = atomRHS ? getIntValue(simpRHS) : Integer.MAX_VALUE;
-      if (atomLHS && atomRHS) {
-        return createIntConstantProxy(intLHS + intRHS);
-      } else if (intLHS == 0) {
-        return simpRHS;
-      } else if (intRHS == 0) {
-        return simpLHS;
-      } else {
-        return createExpression(expr, simpLHS, simpRHS);
-      }
+      return mSumSimplifier.normaliseSum(expr);
     }
 
   }
@@ -1385,14 +1340,7 @@ public class SimpleExpressionCompiler
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
-      final SimpleExpressionProxy origsub = expr.getSubTerm();
-      final SimpleExpressionProxy simpsub = simplify(origsub);
-      if (isAtomicValue(simpsub)) {
-        final int value = getIntValue(simpsub);
-        return createIntConstantProxy(-value);
-      } else {
-        return createExpression(expr, simpsub);
-      }
+      return mSumSimplifier.normaliseSum(expr);
     }
 
   }
@@ -1685,6 +1633,7 @@ public class SimpleExpressionCompiler
   private final AtomicVisitor mAtomicVisitor;
   private final RangeVisitor mRangeVisitor;
   private final ModuleEqualityVisitor mEquality;
+  private final SumSimplifier mSumSimplifier;
 
   private boolean mIsEvaluating;
   /**

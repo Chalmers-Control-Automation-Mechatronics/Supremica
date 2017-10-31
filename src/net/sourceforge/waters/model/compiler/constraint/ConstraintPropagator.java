@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.ModuleBindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SumSimplifier;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -164,6 +165,7 @@ public class ConstraintPropagator
       RightLessThanRestrictionRule.createRule(factory, optable),
       RightLessEqualsRestrictionRule.createRule(factory, optable)
     };
+    mSumSimplifier = new SumSimplifier(mFactory);
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
     mNormalizedConstraints = new TreeSet<>(mListComparator);
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
@@ -192,6 +194,7 @@ public class ConstraintPropagator
     mNegator = propagator.mNegator;
     mNormalizationRules = propagator.mNormalizationRules;
     mRewriteRules = propagator.mRewriteRules;
+    mSumSimplifier = propagator.mSumSimplifier;
     mUnprocessedConstraints =
       new LinkedList<>(propagator.mUnprocessedConstraints);
     mNormalizedConstraints = new TreeSet<>(mListComparator);
@@ -224,6 +227,11 @@ public class ConstraintPropagator
   Comparator<SimpleExpressionProxy> getEquationComparator()
   {
     return mEquationComparator;
+  }
+
+  SumSimplifier getSumSimplifier()
+  {
+    return mSumSimplifier;
   }
 
 
@@ -1368,6 +1376,7 @@ public class ConstraintPropagator
   private final RelationNormalizationRule mNegator;
   private final SimplificationRule[] mNormalizationRules;
   private final SimplificationRule[] mRewriteRules;
+  private final SumSimplifier mSumSimplifier;
 
   private final List<SimpleExpressionProxy> mUnprocessedConstraints;
   private final Collection<SimpleExpressionProxy> mNormalizedConstraints;
