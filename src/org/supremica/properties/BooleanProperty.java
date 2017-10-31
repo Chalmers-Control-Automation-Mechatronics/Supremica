@@ -103,12 +103,21 @@ public class BooleanProperty extends Property
 
   //#########################################################################
   //# Specific Access
-  public void set(final boolean value)
+  /**
+   * Sets this Boolean property to the given value.
+   * @param  value  The new value of the property.
+   * @return <CODE>true</CODE> if the new value was different from the old
+   *         value.
+   */
+  public boolean set(final boolean value)
   {
     if (mValue != value) {
       final String oldvalue = getAsString();
       mValue = value;
       firePropertyChanged(oldvalue);
+      return true;
+    } else {
+      return false;
     }
   }
 

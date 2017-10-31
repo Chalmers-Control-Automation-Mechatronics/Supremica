@@ -201,6 +201,10 @@ public final class Config
     public static IntegerProperty GUI_IDE_YPOS =
       new IntegerProperty(PropertyType.GUI, "ideFrameY",
                           0, "Y position at which IDE opens", false, 0);
+    public static BooleanProperty GUI_IDE_MAXIMIZED =
+      new BooleanProperty(PropertyType.GUI, "ideFrameMaximized", false,
+                          "Whether or not the IDE opens as a maximized window ",
+                          false);
 
     public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
     public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");

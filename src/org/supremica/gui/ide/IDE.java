@@ -38,11 +38,13 @@ package org.supremica.gui.ide;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
@@ -99,7 +101,8 @@ import org.xml.sax.SAXException;
 
 public class IDE
   extends JFrame
-  implements IDEActionInterface, Observer, Subject, ComponentListener
+  implements IDEActionInterface, Observer, Subject,
+             ComponentListener, WindowStateListener
 {
 
   //#########################################################################
@@ -121,14 +124,19 @@ public class IDE
     mPopupActionManager = new WatersPopupActionManager(this);
     mModuleNameObserver = new ModuleNameObserver();
 
-    // Create GUI
+    // Set frame size and position from configuration file
     final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.get(),
                                          Config.GUI_IDE_HEIGHT.get());
     setPreferredSize(size);
-    setLocation(Config.GUI_IDE_XPOS.get(), Config.GUI_IDE_YPOS.get());
+    if (Config.GUI_IDE_MAXIMIZED.get()) {
+      setExtendedState(Frame.MAXIMIZED_BOTH);
+    } else {
+      setLocation(Config.GUI_IDE_XPOS.get(), Config.GUI_IDE_YPOS.get());
+    }
     final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
     setIconImages(images);
 
+    // Create GUI
     final BorderLayout layout = new BorderLayout();
     final JPanel contents = (JPanel) getContentPane();
     contents.setLayout(layout);
@@ -150,10 +158,11 @@ public class IDE
     final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
     mFileChooser = new JFileChooser(startdir);
 
-    // Initialise document managers
+    // Initialise document managers and register listeners
     mDocumentContainerManager = new DocumentContainerManager(this);
     attach(this);
     addComponentListener(this);
+    addWindowStateListener(this);
     updateWindowTitle();
   }
 
@@ -303,20 +312,24 @@ public class IDE
   @Override
   public void componentResized(final ComponentEvent event)
   {
-    final boolean changedWidth = Config.GUI_IDE_WIDTH.set(getWidth());
-    final boolean changedHeight = Config.GUI_IDE_HEIGHT.set(getHeight());
-    if (changedWidth || changedHeight) {
-      SupremicaProperties.savePropertiesLater();
+    if (getExtendedState() == Frame.NORMAL) {
+      final boolean changedWidth = Config.GUI_IDE_WIDTH.set(getWidth());
+      final boolean changedHeight = Config.GUI_IDE_HEIGHT.set(getHeight());
+      if (changedWidth || changedHeight) {
+        SupremicaProperties.savePropertiesLater();
+      }
     }
   }
 
   @Override
   public void componentMoved(final ComponentEvent event)
   {
-    final boolean changedX = Config.GUI_IDE_XPOS.set(getX());
-    final boolean changedY = Config.GUI_IDE_YPOS.set(getY());
-    if (changedX || changedY) {
-      SupremicaProperties.savePropertiesLater();
+    if (getExtendedState() == Frame.NORMAL) {
+      final boolean changedX = Config.GUI_IDE_XPOS.set(getX());
+      final boolean changedY = Config.GUI_IDE_YPOS.set(getY());
+      if (changedX || changedY) {
+        SupremicaProperties.savePropertiesLater();
+      }
     }
   }
 
@@ -328,6 +341,20 @@ public class IDE
   @Override
   public void componentHidden(final ComponentEvent event)
   {
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.WindowStateListener
+  @Override
+  public void windowStateChanged(final WindowEvent event)
+  {
+    final int state = event.getNewState();
+    final boolean changed =
+      Config.GUI_IDE_MAXIMIZED.set(state == Frame.MAXIMIZED_BOTH);
+    if (changed) {
+      SupremicaProperties.savePropertiesLater();
+    }
   }
 
 
