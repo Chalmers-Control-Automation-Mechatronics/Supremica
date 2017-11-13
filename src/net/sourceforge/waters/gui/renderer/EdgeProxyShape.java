@@ -166,7 +166,7 @@ abstract class EdgeProxyShape
 
 
   //#########################################################################
-  //# Auxliary Methods
+  //# Auxiliary Methods
   /**
    * Gets the middle of this edge. This simply is the middle between the
    * start and end points. It may or may not actually be on the edge.
@@ -258,7 +258,7 @@ abstract class EdgeProxyShape
   static final double ARROW_ANGLE;// = 0.3 * Math.PI;
   static
   {
-      if (Config.GUI_EDITOR_LAYOUT_MODE.get().equals(Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES))
+      if (Config.GUI_EDITOR_LAYOUT_MODE.get() == LayoutMode.ChalmersIDES)
           ARROW_ANGLE = 0.2 * Math.PI;
       else
           ARROW_ANGLE = 0.3 * Math.PI;
@@ -270,7 +270,6 @@ abstract class EdgeProxyShape
    * The height of the arrow, i.e., the distance it covers on the line.
    */
   static final double ARROW_HEIGHT = 7.0;
-  //static final double ARROW_HEIGHT = 6.0;
   /**
    * The square of the arrow height.
    */

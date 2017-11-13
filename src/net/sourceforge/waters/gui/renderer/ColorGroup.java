@@ -31,70 +31,49 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Font;
-
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.PropositionIcon.ColorInfo;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * An implementation of the {@link RenderingContext} interface based on
- * a module context. This implementation obtains event fonts and proposition
- * colours using the best guess of a module context, while suppressing all
- * highlighting.
+ * Enumeration of coloured items in a rendered graph.
+ *
+ * These are mapped to actual colour by the {@link RenderingContext}.
+ * The default colours are defined in class {@link EditorColor}.
  *
  * @author Robi Malik
  */
 
-public class ModuleRenderingContext
-  extends DefaultRenderingContext
+enum ColorGroup
 {
-
-  //#########################################################################
-  //# Constructors
-  public ModuleRenderingContext(final ModuleContext context)
-  {
-    mModuleContext = context;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-  @Override
-  public ColorInfo getMarkingColorInfo(final GraphProxy graph,
-                                       final SimpleNodeProxy node)
-  {
-    return mModuleContext.guessPropositionColors(graph, node);
-  }
-
-  @Override
-  public Font getFont(final IdentifierProxy ident)
-  {
-    if (mModuleContext.guessEventKind(ident) == EventKind.UNCONTROLLABLE) {
-      return EditorColor.UNCONTROLLABLE_FONT;
-    } else {
-      return EditorColor.DEFAULT_FONT;
-    }
-  }
-
-  @Override
-  public boolean causesPropositionStatusChange(final ModelChangeEvent event,
-                                               final GraphProxy graph)
-  {
-    return mModuleContext.causesPropositionStatusChange(event, graph);
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final ModuleContext mModuleContext;
-
+  /**
+   * A regular graphical item such as a node or edge, but not a group node.
+   */
+  GRAPH_ITEM,
+  /**
+   * A group node.
+   */
+  GROUP_NODE,
+  /**
+   * A state name.
+   */
+  NODE_LABEL,
+  /**
+   * An event name or other element of a label block.
+   */
+  EVENT_LABEL,
+  /**
+   * A regular guard in a guard/action block.
+   */
+  NORMAL_GUARD,
+  /**
+   * A special guard added by seamless synthesis.
+   */
+  ADDED_GUARD,
+  /**
+   * An action in a guard/action block.
+   */
+  ACTION
 }

@@ -116,7 +116,7 @@ public class CommandLineTool
    */
   public static void main(final String[] args)
   {
-    boolean verbose = true;
+    Level verbosity = Level.DEBUG;
     boolean stats = false;
     boolean noargs = false;
     int timeout = -1;
@@ -145,7 +145,9 @@ public class CommandLineTool
         if (noargs) {
           argList.add(arg);
         } else if (arg.equals("-q") || arg.equals("-quiet")) {
-          verbose = false;
+          verbosity = null;
+        } else if (arg.equals("-v") || arg.equals("-verbose")) {
+          verbosity = Level.ALL;
         } else if (arg.equals("-wrapper") && i + 1 < args.length) {
           wrapperName = args[++i];
         } else if (arg.equals("-stats")) {
@@ -183,9 +185,9 @@ public class CommandLineTool
         }
       }
 
-      if (verbose) {
+      if (verbosity != null) {
         final ConfigurationFactory factory =
-          new VerboseLogConfigurationFactory();
+          new VerboseLogConfigurationFactory(verbosity);
         ConfigurationFactory.setConfigurationFactory(factory);
       }
 
@@ -282,7 +284,7 @@ public class CommandLineTool
           }
         }
         System.out.print(fullName + " ... ");
-        if (verbose) {
+        if (verbosity != null) {
           System.out.println();
         } else {
           System.out.flush();
@@ -312,7 +314,7 @@ public class CommandLineTool
             formatter.format("%b (%.0f states, %d nodes, %.3f s)\n",
                              satisfied, numstates, numnodes, difftime);
           }
-          if (verbose && result instanceof ProxyResult<?>) {
+          if (verbosity != null && result instanceof ProxyResult<?>) {
             final ProxyResult<?> proxyResult = (ProxyResult<?>) result;
             final Proxy proxy = proxyResult.getComputedProxy();
             if (proxy != null) {
@@ -435,6 +437,13 @@ public class CommandLineTool
     extends ConfigurationFactory
   {
     //#######################################################################
+    //# Constructor
+    private VerboseLogConfigurationFactory(final Level verbosity)
+    {
+      mVerbosity = verbosity;
+    }
+
+    //#######################################################################
     //# Overrides for org.apache.logging.log4j.core.config.ConfigurationFactory
     @Override
     public Configuration getConfiguration(final LoggerContext loggerContext,
@@ -472,10 +481,14 @@ public class CommandLineTool
       appenderBuilder.add(builder.newLayout("PatternLayout").
                           addAttribute("pattern", "%-5level %msg%n"));
       builder.add(appenderBuilder);
-      builder.add(builder.newRootLogger(Level.DEBUG).
+      builder.add(builder.newRootLogger(mVerbosity).
                   add(builder.newAppenderRef("stdout")));
       return builder.build();
     }
+
+    //#######################################################################
+    //# Data Members
+    private final Level mVerbosity;
   }
 
 

@@ -31,61 +31,91 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Font;
+import java.awt.Color;
 
-import net.sourceforge.waters.gui.util.PropositionIcon;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.subject.base.ModelChangeEvent;
+import net.sourceforge.waters.gui.EditorColor;
+
+import org.supremica.properties.Config;
 
 
-public interface RenderingContext
+/**
+ * Enumeration of possible layout modes used by the graph renderer.
+ *
+ * @author Robi Malik
+ */
+
+public enum LayoutMode
 {
+
+  //#########################################################################
+  //# Enumeration Constants
+  /**
+   * The default rendering mode of the editor,
+   * showing all information in colour.
+   */
+  Default,
+  /**
+   * The default mode without colour.
+   * All elements are black (or perhaps grey).
+   * Used for EPS generation.
+   */
+  BlackAndWhite {
+    @Override
+    Color getColor(final ColorGroup group)
+    {
+      switch (group) {
+      case GROUP_NODE:
+        return EditorColor.DEFAULTCOLOR_NODEGROUP;
+      case NODE_LABEL:
+        if (Config.GUI_EDITOR_STATE_NAMES_HIDDEN.get()) {
+          return null;
+        }
+        // fall through ...
+      default:
+        return Color.BLACK;
+      }
+    }
+  },
+  /**
+   * The old Chalmers mode.
+   * Black and white, marked states circled instead of shaded.
+   */
+  ChalmersIDES;
+
 
   //#########################################################################
   //# Methods
   /**
-   * Gets a font for the display of the given identifier.
-   * This method is used to provide different fonts for event labels that are
-   * known to be controllable or uncontrollable.
-   * This method is expected to return the same font each time it is called
-   * for the same input; to change the font for an identifier, the identifier
-   * must be removed from shape producer's cache.
+   * Gets the colour to render items of the given type.
+   * @param  group  The colour group identifying the type of object to be
+   *                rendered.
+   * @return The colour to be used, or <CODE>null</CODE> to suppress rendering
+   *         of the item.
    */
-  public Font getFont(IdentifierProxy ident);
-
-  /**
-   * Gets rendering information for the display of the given item.
-   * The rendering information provides the colours and highlighting status
-   * for an item to be displayed. This method is <I>not</I> required to
-   * return the same result when called multiply with the same input.
-   */
-  public RenderingInformation getRenderingInformation(Proxy proxy);
-
-  /**
-   * Gets colour information for the display of the given simple node in
-   * the given graph.
-   * This method is used to obtain proposition colours for node with marking
-   * propositions.
-   * This method is expected to return the same colour information each time
-   * it is called for the same input; to change the colours for a node, the
-   * node must be removed from shape producer's cache.
-   */
-  public PropositionIcon.ColorInfo getMarkingColorInfo(GraphProxy graph,
-                                                       SimpleNodeProxy node);
-
-  /**
-   * Returns whether given event may cause the proposition status of
-   * the given graph to change. The proposition status of a graph
-   * indicates whether the graph uses any propositions, i.e., whether
-   * states without propositions are rendered with a filled or a
-   * transparent background.
-   */
-  public boolean causesPropositionStatusChange(ModelChangeEvent event,
-                                               GraphProxy graph);
+  Color getColor(final ColorGroup group)
+  {
+    switch (group) {
+    case GRAPH_ITEM:
+      return EditorColor.DEFAULTCOLOR;
+    case GROUP_NODE:
+      return EditorColor.DEFAULTCOLOR_NODEGROUP;
+    case NODE_LABEL:
+      return EditorColor.NODE_LABEL_COLOR;
+    case EVENT_LABEL:
+      return EditorColor.TEXTCOLOR;
+    case NORMAL_GUARD:
+      return EditorColor.GUARDCOLOR;
+    case ADDED_GUARD:
+      return EditorColor.ADDEDGUARDCOLOR;
+    case ACTION:
+      return EditorColor.ACTIONCOLOR;
+    default:
+      throw new IllegalArgumentException("Unsupported colour group " +
+                                         group + "!");
+    }
+  }
 
 }

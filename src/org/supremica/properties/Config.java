@@ -61,6 +61,7 @@ import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.gui.logging.IDELogLevel;
+import net.sourceforge.waters.gui.renderer.LayoutMode;
 import net.sourceforge.waters.gui.util.IconSet;
 import net.sourceforge.waters.gui.util.LookAndFeelOption;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -235,10 +236,9 @@ public final class Config
     public static final ColorProperty GUI_EDITOR_BACKGROUND_COLOR =
       new ColorProperty(PropertyType.GUI_EDITOR, "backgroundColor",
                         Color.WHITE, "Automaton background colour");
-    public static final ObjectProperty<LAYOUT_MODE_LEGALVALUES> GUI_EDITOR_LAYOUT_MODE =
+    public static final ObjectProperty<LayoutMode> GUI_EDITOR_LAYOUT_MODE =
       new ObjectProperty<>(PropertyType.GUI_EDITOR, "layoutMode",
-                           LAYOUT_MODE_LEGALVALUES.Default,
-                           LAYOUT_MODE_LEGALVALUES.class,
+                           LayoutMode.Default, LayoutMode.class,
                            "Layout mode");
     public static final BooleanProperty GUI_EDITOR_DEFAULT_EMPTY_MODULE =
       new BooleanProperty(PropertyType.GUI_EDITOR, "defaultEmptyModule",
@@ -255,13 +255,15 @@ public final class Config
     public static final IntegerProperty GUI_EDITOR_NODE_RADIUS =
       new IntegerProperty(PropertyType.GUI_EDITOR, "nodeRadius", 6,
                           "Node size", true, 4, 32, 1);
+    public static final BooleanProperty GUI_EDITOR_STATE_NAMES_HIDDEN =
+      new BooleanProperty(PropertyType.GUI_EDITOR, "hideStateNames",
+                          false, "Suppress state names", false);
     public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE =
       new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode",
                           true, "Control points move with node");
     public static final BooleanProperty GUI_EDITOR_EDGEARROW_AT_END =
       new BooleanProperty(PropertyType.GUI_EDITOR, "edgeArrowAtEnd",
                           true, "Draw edge arrows at the end");
-    public static enum LAYOUT_MODE_LEGALVALUES { Default, ChalmersIDES }
     public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT =
       new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout",
                           10000, "Maximum layout time", true, 0);

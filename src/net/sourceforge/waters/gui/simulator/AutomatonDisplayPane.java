@@ -566,7 +566,7 @@ public class AutomatonDisplayPane
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
     @Override
-    public PropositionIcon.ColorInfo getColorInfo(final GraphProxy graph,
+    public PropositionIcon.ColorInfo getMarkingColorInfo(final GraphProxy graph,
                                                   final SimpleNodeProxy node)
     {
       // The spring embedder modifies a copy of our graph. When it is running,

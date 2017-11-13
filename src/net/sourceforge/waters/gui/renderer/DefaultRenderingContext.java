@@ -101,7 +101,7 @@ public class DefaultRenderingContext
   }
 
   @Override
-  public ColorInfo getColorInfo(final GraphProxy graph,
+  public ColorInfo getMarkingColorInfo(final GraphProxy graph,
                                 final SimpleNodeProxy node)
   {
     final PlainEventListProxy props = node.getPropositions();

@@ -84,6 +84,7 @@ public class SimpleNodeProxyShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public GeneralPath getShape()
   {
     return mShape;
@@ -92,11 +93,13 @@ public class SimpleNodeProxyShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.ProxyShape
+  @Override
   public SimpleNodeProxy getProxy()
   {
     return (SimpleNodeProxy) super.getProxy();
   }
 
+  @Override
   public List<Handle> getHandles()
   {
     return mHandles;
@@ -106,6 +109,7 @@ public class SimpleNodeProxyShape
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.gui.renderer.AbstractProxyShape
+  @Override
   public void draw(final Graphics2D graphics,
                    final RenderingInformation status)
   {
@@ -152,7 +156,7 @@ public class SimpleNodeProxyShape
     } else {
       // Draw marking
       final Object layoutMode = Config.GUI_EDITOR_LAYOUT_MODE.get();
-      if (layoutMode == Config.LAYOUT_MODE_LEGALVALUES.ChalmersIDES) {
+      if (layoutMode == LayoutMode.ChalmersIDES) {
         // CHALMERS IDES MODE---SINGLE TYPE OF MARKING, DOUBLE CIRCLES
         graphics.setColor(EditorColor.DEFAULTCOLOR);
         graphics.setStroke(SINGLESTROKE);
@@ -164,7 +168,7 @@ public class SimpleNodeProxyShape
       } else {
         // DEFAULT MODE
         double i = 0;
-        final double degrees = 360.0 / (double) colors.size();
+        final double degrees = 360.0 / colors.size();
         for (final Color c : colors) {
           final Arc2D arc = new Arc2D.Double(bounds, i, degrees, Arc2D.PIE);
           graphics.setColor(c);
