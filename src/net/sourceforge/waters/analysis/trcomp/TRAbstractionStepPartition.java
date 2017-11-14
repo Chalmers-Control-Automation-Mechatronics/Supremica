@@ -199,9 +199,7 @@ class TRAbstractionStepPartition
   public void reportExpansion()
   {
     final Logger logger = getLogger();
-    if (logger.isDebugEnabled()) {
-      logger.debug("Expanding partition of " + getName() + " ...");
-    }
+    logger.debug("Expanding partition of {} ...", getName());
   }
 
 
@@ -330,7 +328,7 @@ class TRAbstractionStepPartition
                                                  final TRTraceSearchRecord pred)
     {
       // Trick! Search records contain the number of consumed events,
-      // or the number of consumed events plus one, if the all events
+      // or the number of consumed events plus one, if all events
       // in the input trace have been consumed and a state equivalent
       // to the end state of the input trace has been reached.
       // For generalised nonblocking, the search has to continue towards

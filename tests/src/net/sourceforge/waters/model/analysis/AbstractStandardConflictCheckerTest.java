@@ -392,6 +392,13 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testFMS2016error() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "fms2016error.wmod");
+    runModelVerifier(des, false);
+  }
+
   public void testFTechnikConflict() throws Exception
   {
     final ProductDESProxy des =

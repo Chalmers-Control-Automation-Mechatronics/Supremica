@@ -42,7 +42,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
-public class NB3StandardConflictCheckerTest
+public class NB3wStandardConflictCheckerTest
   extends AbstractStandardConflictCheckerTest
 {
 
@@ -51,7 +51,7 @@ public class NB3StandardConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(NB3StandardConflictCheckerTest.class);
+      new TestSuite(NB3wStandardConflictCheckerTest.class);
     return testSuite;
   }
 
@@ -70,9 +70,9 @@ public class NB3StandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB3);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB3w);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinE);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinS);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

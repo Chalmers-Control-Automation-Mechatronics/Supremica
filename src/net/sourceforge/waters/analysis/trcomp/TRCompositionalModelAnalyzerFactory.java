@@ -41,6 +41,7 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -102,6 +103,7 @@ public class TRCompositionalModelAnalyzerFactory
     addArgument(new AlwaysEnabledEventsArgument());
     addArgument(new DeadlockPruningArgument());
     addArgument(new SecondaryFactoryArgument());
+    addArgument(new TraceCheckingArgument());
     addArgument(new DumpFileArgument());
   }
 
@@ -596,6 +598,33 @@ public class TRCompositionalModelAnalyzerFactory
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceCheckingArgument
+  private static class TraceCheckingArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private TraceCheckingArgument()
+    {
+      super("-oc",
+            "Enable counterexample and other output validation\n(for debugging)");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+      throws AnalysisConfigurationException
+    {
+      final AbstractTRCompositionalAnalyzer compositional =
+        (AbstractTRCompositionalAnalyzer) analyzer;
+      compositional.setOutputCheckingEnabled(true);
     }
   }
 

@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
-
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -215,6 +215,22 @@ public class ActiveEventsTRSimplifierTest
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "abstraction", "activeEvents17.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_18()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents18.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_activeEvents_19()
+  throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "abstraction", "activeEvents19.wmod");
     runTransitionRelationSimplifier(des);
   }
 
