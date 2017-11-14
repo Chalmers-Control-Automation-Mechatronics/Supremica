@@ -459,4 +459,16 @@ public class Project
     {
         return hasAnimation() || (getTimers().size() > 0) || (getInputSignals().size() > 0) || (getOutputSignals().size() > 0) || (getActions().size() > 0) || (getControls().size() > 0);
     }
+
+    public boolean hasNonPrioritizedEvents()
+    {
+      for (final Automaton aut : this) {
+        for (final LabeledEvent event : aut.getAlphabet()) {
+          if (!event.isPrioritized()) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
 }

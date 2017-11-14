@@ -25,115 +25,109 @@ import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
 import org.supremica.automata.Project;
+
 import org.xml.sax.SAXException;
 
 
-public class SupremicaUnmarshaller
-    implements ProxyUnmarshaller<Project>
+public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
 {
 
-    //#########################################################################
-    //# Constructor
-    public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
-        throws JAXBException, SAXException
-    {
-        builder = new ProjectBuildFromXML();
-        //mImporter = new ProductDESImporter(modfactory);
-    }    
-    
-    //#########################################################################
-    //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
-    public Project unmarshal(final URI uri)
-        throws WatersUnmarshalException, IOException
-    {
-        URL url = uri.toURL();
-        final Project project;
-        try
-        {
-            project = builder.build(url);
-            project.setLocation(uri);
-        }
-        catch (Exception ex)
-        {
-            throw new WatersUnmarshalException(ex);
-        }
-            
-        /*
-        // Examine the result
-        if (validate(project))                
-            return mImporter.importModule(project);
-        else
-            // Would like to import it directly into the analyzer not to miss out
-            // on the Supremica-specific parts...
-         */
-        return project;
-    }       
-    
-    public Class<Project> getDocumentClass()
-    {
-        return Project.class;
-    }
-    
-    public String getDefaultExtension()
-    {
-        return ".xml";
-    }
-
-    public String getDescription()
-    {
-        return "Supremica Project files [*.xml]";
-    }
-    
-    public Collection<String> getSupportedExtensions()
-    {
-        final String ext = getDefaultExtension();
-        return Collections.singletonList(ext);
-    }
-
-    public FileFilter getDefaultFileFilter()
-    {
-        final String ext = getDefaultExtension();
-        final String description = getDescription();
-        return StandardExtensionFileFilter.getFilter(description, ext);
-    }
-
-    public Collection<FileFilter> getSupportedFileFilters()
-    {
-        final FileFilter filter = getDefaultFileFilter();
-        return Collections.singletonList(filter);
-    }
-
-    public DocumentManager getDocumentManager()
-    {
-        //return mImporter.getDocumentManager();
-        return mDocumentManager;
-    }
-    
-    public void setDocumentManager(DocumentManager manager)
-    {
-        //mImporter.setDocumentManager(manager);
-        mDocumentManager = manager;
-    }    
+  //#########################################################################
+  //# Constructor
+  public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
+    throws JAXBException, SAXException
+  {
+    builder = new ProjectBuildFromXML();
+  }
 
 
-    //#########################################################################
-    //# Static Class Methods
-    /**
-     * Examines if there are conversion problems in a Supremica project.
-     */
-    public static boolean validate(Project project)
-    {
-        if (project.hasAnimation())
-        {
-            return false;
-        }
-        
-        return true;
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  @Override
+  public Project unmarshal(final URI uri)
+    throws WatersUnmarshalException, IOException
+  {
+    final URL url = uri.toURL();
+    final Project project;
+    try {
+      project = builder.build(url);
+      project.setLocation(uri);
+    } catch (final Exception ex) {
+      throw new WatersUnmarshalException(ex);
     }
+    return project;
+  }
 
-    
-    //#########################################################################
-    //# Data Members
-    private final ProjectBuildFromXML builder;
-    private DocumentManager mDocumentManager;
+  @Override
+  public Class<Project> getDocumentClass()
+  {
+    return Project.class;
+  }
+
+  @Override
+  public String getDefaultExtension()
+  {
+    return ".xml";
+  }
+
+  public String getDescription()
+  {
+    return "Supremica Project files [*.xml]";
+  }
+
+  @Override
+  public Collection<String> getSupportedExtensions()
+  {
+    final String ext = getDefaultExtension();
+    return Collections.singletonList(ext);
+  }
+
+  public FileFilter getDefaultFileFilter()
+  {
+    final String ext = getDefaultExtension();
+    final String description = getDescription();
+    return StandardExtensionFileFilter.getFilter(description, ext);
+  }
+
+  @Override
+  public Collection<FileFilter> getSupportedFileFilters()
+  {
+    final FileFilter filter = getDefaultFileFilter();
+    return Collections.singletonList(filter);
+  }
+
+  @Override
+  public DocumentManager getDocumentManager()
+  {
+    return mDocumentManager;
+  }
+
+  @Override
+  public void setDocumentManager(final DocumentManager manager)
+  {
+    mDocumentManager = manager;
+  }
+
+
+  //#########################################################################
+  //# Static Class Methods
+  /**
+   * Checks for Supremica-to-Waters conversion problems.
+   * This method examines the given Supremica project to determine whether
+   * it uses any features that cannot be converted to Waters.
+   * The present implementation checks for the presence of an animation
+   * and for events marked as <I>not prioritised</I>.
+   * @return <CODE>true</CODE> if the given project can be converted to
+   *         Waters without loss of information, <CODE>false</CODE> otherwise.
+   */
+  public static boolean isWatersCompatible(final Project project)
+  {
+    return !project.hasAnimation() && !project.hasNonPrioritizedEvents();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ProjectBuildFromXML builder;
+  private DocumentManager mDocumentManager;
 }

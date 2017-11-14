@@ -395,7 +395,7 @@ public class DocumentContainerManager
     } else if (doc instanceof Project) {
       try {
         final Project project = (Project) doc;
-        if (SupremicaUnmarshaller.validate(project)) {
+        if (SupremicaUnmarshaller.isWatersCompatible(project)) {
           final ModuleSubject module =
             (ModuleSubject) mProductDESImporter.importModule(project);
           return new ModuleContainer(mIDE, module);
@@ -504,7 +504,7 @@ public class DocumentContainerManager
       // If analyser active, check if there are unsupported features
       // in the project ...
       final Project project = (Project) doc;
-      if (!SupremicaUnmarshaller.validate(project)) {
+      if (!SupremicaUnmarshaller.isWatersCompatible(project)) {
         final int choice = JOptionPane.showConfirmDialog
           (mIDE.getFrame(), WARN_UNSUPPORTED,
            "Warning", JOptionPane.YES_NO_OPTION);
