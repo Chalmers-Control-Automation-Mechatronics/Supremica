@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
@@ -42,9 +43,14 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+ * Old implementation of the projecting controllability check algorithm.
+ * This class does not fully support nondeterminism and is superseded by
+ * {@link TRControllabilityChecker}.
+ *
  * @author Robi Malik
  */
 
+@Deprecated
 public class ProjectingControllabilityChecker
   extends ProjectingSafetyVerifier
   implements ControllabilityChecker

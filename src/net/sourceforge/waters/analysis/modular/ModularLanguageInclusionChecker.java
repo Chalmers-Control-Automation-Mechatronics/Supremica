@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
@@ -69,7 +70,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>The model verifier checking the individual properties can be
  * configured. It typically is a {@link ModularControllabilityChecker}
- * or {@link ProjectingControllabilityChecker}. The modular language
+ * or {@link TRControllabilityChecker}. The modular language
  * inclusion checker is only useful for models with more than one
  * property; if there is only one property, it will delegate the
  * complete task to the secondary model verifier.</P>
