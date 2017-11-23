@@ -67,6 +67,7 @@ import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.EventOnlyKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -494,13 +495,14 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsUsed());
 
-    final KindTranslator translator = getKindTranslator();
     mSynchronousProductBuilder = createSynchronousProductBuilder();
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
 
     final ModelAnalyzer mono = getMonolithicAnalyzer();
     if (mono != null) {
-      mono.setKindTranslator(translator);
+      final KindTranslator translator = getKindTranslator();
+      final KindTranslator eventOnly = new EventOnlyKindTranslator(translator);
+      mono.setKindTranslator(eventOnly);
       mono.setNodeLimit(getMonolithicStateLimit());
       mono.setTransitionLimit(getMonolithicTransitionLimit());
       final AnalysisResult dummy = mono.createAnalysisResult();
@@ -656,10 +658,11 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
+    final KindTranslator eventOnly = new EventOnlyKindTranslator(translator);
     final TRAbstractSynchronousProductBuilder builder =
       new TRSynchronousProductBuilder();
     builder.setDetailedOutputEnabled(true);
-    builder.setKindTranslator(translator);
+    builder.setKindTranslator(eventOnly);
     builder.setRemovingSelfloops(true);
     builder.setNodeLimit(mInternalStateLimit);
     builder.setTransitionLimit(mInternalTransitionLimit);
@@ -1122,6 +1125,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       }
       final int config = mTRSimplifier.getPreferredInputConfiguration();
       final TRAutomatonProxy created = step.createOutputAutomaton(config);
+      created.setKind(ComponentKind.PLANT);
       if (!hasInitialState(created)) {
         final Logger logger = getLogger();
         logger.debug("Terminating early as automaton " + aut.getName() +
@@ -1170,7 +1174,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   protected void dropSubsystem(final TRSubsystemInfo subsys)
   {
-    if (isDetailedOutputEnabled()) {
+    if (subsys != null && isDetailedOutputEnabled()) {
       for (final TRAutomatonProxy aut : subsys.getAutomata()) {
         dropTrivialAutomaton(aut);
       }

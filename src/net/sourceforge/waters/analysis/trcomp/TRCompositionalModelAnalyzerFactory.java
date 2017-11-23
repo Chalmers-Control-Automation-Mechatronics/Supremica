@@ -111,6 +111,13 @@ public class TRCompositionalModelAnalyzerFactory
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
   @Override
+  public TRControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new TRControllabilityChecker();
+  }
+
+  @Override
   public TRCompositionalConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
   {

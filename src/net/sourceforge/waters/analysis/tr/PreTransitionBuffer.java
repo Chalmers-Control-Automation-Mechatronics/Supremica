@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,8 +43,6 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.des.AutomatonTools;
-
-import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -203,6 +203,7 @@ public class PreTransitionBuffer
       states.clear();
     }
   }
+
 
   //#########################################################################
   //# Debugging

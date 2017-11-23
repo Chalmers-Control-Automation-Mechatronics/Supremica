@@ -61,7 +61,7 @@ import org.apache.logging.log4j.Logger;
  * <P>The compositional language inclusion check algorithm.</P>
 
  * <P>This is the front-end for the compositional language inclusion check
- * algorithm check. The checker supports arbitrary input models with any
+ * algorithm. The checker supports arbitrary input models with any
  * number of properties.</P>
  *
  * <P>The internal representation of automata is based on list buffer
@@ -71,8 +71,8 @@ import org.apache.logging.log4j.Logger;
  * passed to {@link TRCompositionalOnePropertyChecker}.</P>
  *
  * <P><I>References:</I><BR>
- * Simon Ware, Robi Malik. The Use of Language Projection for Compositional
- * Verification of Discrete Event Systems. Proc. 9th International Workshop
+ * Simon Ware, Robi Malik. The use of language projection for compositional
+ * verification of discrete event systems. Proc. 9th International Workshop
  * on Discrete Event Systems (WODES'08), 322-327, G&ouml;teborg, Sweden,
  * 2008.</P>
  *
@@ -80,7 +80,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class TRLanguageInclusionChecker
-  extends AbstractTRDelegatingVerifier
+  extends AbstractTRDelegatingSafetyVerifier
   implements LanguageInclusionChecker
 {
 
@@ -103,35 +103,7 @@ public class TRLanguageInclusionChecker
      final KindTranslator translator,
      final SafetyDiagnostics diag)
   {
-    super(model, translator,
-          new TRCompositionalOnePropertyChecker(diag));
-  }
-
-
-  //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.des.SafetyVerifier
-  @Override
-  public SafetyDiagnostics getDiagnostics()
-  {
-    final TRCompositionalOnePropertyChecker delegate = getDelegate();
-    return delegate.getDiagnostics();
-  }
-
-  @Override
-  public TRSafetyTraceProxy getCounterExample()
-  {
-    final VerificationResult result = getAnalysisResult();
-    return (TRSafetyTraceProxy) result.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.trcomp.AbstractTRDelegatingVerifier
-  @Override
-  protected TRCompositionalOnePropertyChecker getDelegate()
-  {
-    return (TRCompositionalOnePropertyChecker) super.getDelegate();
+    super(model, translator, diag);
   }
 
 
