@@ -1243,7 +1243,11 @@ public class ModuleContext
     @Override
     public Icon visitInstanceProxy(final InstanceProxy inst)
     {
-      return IconAndFontLoader.ICON_INSTANCE;
+      if (hasErrorIcon(inst)) {
+        return IconAndFontLoader.ICON_INSTANCE_ERROR;
+      } else {
+        return IconAndFontLoader.ICON_INSTANCE;
+      }
     }
 
     @Override

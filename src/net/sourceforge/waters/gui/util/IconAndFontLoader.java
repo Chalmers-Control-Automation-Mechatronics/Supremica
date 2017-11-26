@@ -264,6 +264,7 @@ public class IconAndFontLoader
   private static final String NAME_FOREACH_ERROR = "foreach_error";
   private static final String NAME_FORBIDDEN = "ForbiddenState16";
   private static final String NAME_INSTANCE = "instance";
+  private static final String NAME_INSTANCE_ERROR = "instance_error";
   private static final String NAME_NEW_AUTOMATON = "new_automaton";
   private static final String NAME_NEW_BINDING = "new_binding";
   private static final String NAME_NEW_CONSTANT = "new_constant";
@@ -346,6 +347,8 @@ public class IconAndFontLoader
   public static final ImageIcon ICON_FOREACH = getWatersIcon(NAME_FOREACH);
   public static final ImageIcon ICON_FOREACH_ERROR = getWatersIcon(NAME_FOREACH_ERROR);
   public static final ImageIcon ICON_INSTANCE = getWatersIcon(NAME_INSTANCE);
+  public static final ImageIcon ICON_INSTANCE_ERROR =
+    getWatersIcon(NAME_INSTANCE_ERROR);
   public static final ImageIcon ICON_NEW_AUTOMATON =
     getWatersIcon(NAME_NEW_AUTOMATON);
   public static final ImageIcon ICON_NEW_BINDING = getWatersIcon(NAME_NEW_BINDING);
