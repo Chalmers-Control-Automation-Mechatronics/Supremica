@@ -464,11 +464,20 @@ public class AutomataMinimizer
         // Print statistics
         // Print total reduction statistics
         AutomatonMinimizer.logStatistics(options);
-        // Print largest automaton size if observable
-        logger.info("The automaton with the most states had " + mostStates + " states.");
-        logger.info("The automaton with the most transitions had " + mostTransitions + " transitions.");
-        // Print total state & transition number examined
-        logger.info("The automata encountered had " + totalStates + " states and " + totalTransitions + " transitions in total.");
+//        // Print largest automaton size if observable
+//        logger.info("The automaton with the most states had " + 
+//                mostStates + " states.");
+//        logger.info("The automaton with the most transitions had " + 
+//                mostTransitions + " transitions.");
+//        // Print total state & transition number examined
+//        logger.info("The automata encountered had " + totalStates + 
+//                " states and " + totalTransitions + " transitions in total.");
+        final StringBuffer statstr = new StringBuffer("Operation statistics:\n");
+        statstr.append("\tAutomaton with most states had: ").append(mostStates).append(" states\n");
+        statstr.append("\tAutomaton with most transitions had: ").append(mostTransitions).append(" transitions\n");
+        statstr.append("\tTotal number of states: ").append(totalStates).append('\n');
+        statstr.append("\tTotal number of transitions: ").append(totalTransitions);
+        logger.info(statstr.toString());
         return theAutomata;
     }
 
