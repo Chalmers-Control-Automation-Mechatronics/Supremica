@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.util;
 
+import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
+
 import java.awt.Font;
 import java.awt.Image;
 import java.net.URL;
@@ -97,7 +99,9 @@ public class IconAndFontLoader
     FONT_SMALL = acceleratorBase.deriveFont(GLOBAL_SCALE_FACTOR *
                                             acceleratorBase.getSize2D());
     HTML_FONT_SIZE = 0.85f * FONT_NORMAL.getSize2D();
-    if (GLOBAL_SCALE_FACTOR != 1.0f) {
+    if (GLOBAL_SCALE_FACTOR != 1.0f ||
+        UIManager.getLookAndFeel() instanceof WindowsLookAndFeel) {
+      // Windows fonts may be scaled by OS, so re-scale even if at 100%
       final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
       final FontUIResource titleRes = new FontUIResource(FONT_TITLE);
       final FontUIResource acceleratorRes = new FontUIResource(FONT_SMALL);
