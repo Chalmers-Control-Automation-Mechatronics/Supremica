@@ -129,17 +129,8 @@ public class BDDAutomata
         final AutomataSorter automataSorter = new PCGAutomataSorter();
 
         theAutomata = automataSorter.sortAutomata(orgAutomata);
-        manager = new BDDManager();
 
-        //Adding a forbidden state for transforming an uncontrallibility problem to nonblocking problem
-        for (final Automaton currAutomaton : theAutomata)
-        {
-            if(currAutomaton.isSpecification())
-            {
-                final State forbiddenState = new State("FS");
-                currAutomaton.addState(forbiddenState);
-            }
-        }
+        manager = new BDDManager();
 
         try
         {
@@ -174,12 +165,9 @@ public class BDDAutomata
         destStateDomains = new BDDDomain[theAutomata.size()];
 
         int i = 0;
-        @SuppressWarnings("unused")
-        BDD currUnconEvents = null;
         for (final Automaton automaton : theAutomata)
         {
             final int nbrOfStates = automaton.nbrOfStates();
-            //System.err.println("nbrOfStates: " + nbrOfStates);
             final BDDDomain tempStateDomain = manager.createDomain(nbrOfStates);
             final BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
             final BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
@@ -190,7 +178,7 @@ public class BDDAutomata
             final int[] vars = sourceStateDomain.vars();
             final int nbrOfVars = vars.length;
             aut2nbrOfBits.put(automaton.getName(), nbrOfVars);
-//            System.out.println(automaton.getName()+": ");
+
             for(int h=0;h<nbrOfVars;h++)
             {
                 final int[] var = new int[1];
@@ -198,36 +186,19 @@ public class BDDAutomata
                 bddVar2BDD.put(vars[h], manager.getFactory().buildCube(1, var));
                 bddVar2AutName.put(vars[h], automaton.getName());
                 bddVar2bitValue.put(vars[h], h);
-//                System.out.println(""+vars[h]);
             }
 
             bddAutomaton.initialize();
 
-/*            vars = destStateDomain.vars();
-            for(int h=0;h<vars.length;h++)
-            {
-                bddVar2AutName.put(vars[h], automaton.getName());
-            }
-*/
             sourceStateVariables.unionWith(sourceStateDomain.set());
             destStateVariables.unionWith(destStateDomain.set());
             sourceStateDomains[i] = sourceStateDomain;
             sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
             destStateDomains[i].setName(automaton.getName());
-
             tempStateDomains[i] = tempStateDomain;
 
-            currUnconEvents = bddAutomaton.getUncontrollableEvents();
-
-//            selfLoopsBDD = selfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
-
-
-//            if(bddAutomaton.getAutomaton().getName().equals("P1"))
-//                    bddAutomaton.getTransitionForwardBDD().printDot();
-
             add(bddAutomaton);
-
             i++;
         }
 
@@ -449,7 +420,9 @@ public class BDDAutomata
     {
         if (reachableStatesBDD == null)
         {
+            logger.info(eventDomain != null);
             reachableStatesBDD = BDDManager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            // satCount seems use wrong sourceStateVariables!!
             nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);
         }
         return reachableStatesBDD;

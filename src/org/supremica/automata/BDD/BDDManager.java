@@ -56,6 +56,7 @@ import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 
 import org.apache.logging.log4j.LogManager;
@@ -82,13 +83,12 @@ public class BDDManager
 
     public BDDManager(final BDDPackage bddpackage, final int nodenum, final int cachesize)
     {
-        if (factory == null)
-        {
-            factory = BDDFactory.init(bddpackage.getBDDPackageName(), nodenum, cachesize);
-            factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
-            factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
-            factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
-        }
+      if (factory == null) {
+        factory = BDDFactory.init(bddpackage.getBDDPackageName(), nodenum, cachesize);
+        factory.setMaxIncrease(Config.BDD2_MAXINCREASENODES.get());
+        factory.setIncreaseFactor(Config.BDD2_INCREASEFACTOR.get());
+        factory.setCacheRatio(Config.BDD2_CACHERATIO.get());
+      }
     }
 
     public BDDFactory getFactory()
@@ -100,8 +100,9 @@ public class BDDManager
     {
         if (factory != null)
         {
-            factory.done();
-            factory = null;
+          factory.clearAllDomains();
+          factory.done();
+          factory = null;
         }
     }
 
@@ -168,7 +169,9 @@ public class BDDManager
         bdd.orWith(sourceBDD);
     }
 
-    public static BDD reachableStates(final BDD initialStates, final BDDTransitions transitions, final BDDVarSet sourceStateVariables, final BDDVarSet eventVariables, final BDDPairing destToSourceStatePairing)
+    public static BDD reachableStates(final BDD initialStates,final BDDTransitions transitions,
+                                      final BDDVarSet sourceStateVariables, final BDDVarSet eventVariables,
+                                      final BDDPairing destToSourceStatePairing)
     {
         final BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
@@ -177,12 +180,12 @@ public class BDDManager
         do
         {
             // Keep a copy of the previously discovered states
-            // This will be used in the terminatiion condition for
+            // This will be used in the termination condition for
             // the operation.
             previousReachableStatesBDD = reachableStatesBDD.id();
 
-            // Compute AND function of rechable states and the transitions.
-            // By using this all dest states that can be reached from the current set of
+            // Compute AND function of reachable states and the transitions.
+            // By using this all destination states that can be reached from the current set of
             // reachable states will be in the DestDomainVariables.
             // The source states in the BDD are those states that survived the AND function,
             // which is all states that had an (in the composition) enabled event.
