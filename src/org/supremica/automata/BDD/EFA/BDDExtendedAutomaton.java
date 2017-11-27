@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDPairing;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -42,13 +43,13 @@ public class BDDExtendedAutomaton {
     BDDDomain destLocationDomain;
     BDDPairing sourceToDestPairing;
     BDDPairing destToSourcePairing;
-    private BDD edgeForwardBDD;
-    private BDD edgeBackwardBDD;
+    private final BDD edgeForwardBDD;
+    private final BDD edgeBackwardBDD;
     private BDD forbiddenStateSet;
     private BDD allowedStateSet;
-    private BDD edgeForwardWithoutDestBDD;
-    private BDD edgesWithoutDestClocksBDD;
-    private BDD edgesWithoutDestLWBDD;
+    private final BDD edgeForwardWithoutDestBDD;
+    private final BDD edgesWithoutDestClocksBDD;
+    private final BDD edgesWithoutDestLWBDD;
     HashMap<Integer, String> bddIndex2SourceStateName;
     public HashMap<String, HashSet<Integer>> enablingSigmaMap;
     BDD edgeForwardBDDWithoutSelfLoops; // The DFA partitioning approach needs this BDD.
@@ -116,7 +117,7 @@ public class BDDExtendedAutomaton {
 
         //System.err.println(theExAutomaton.getName());
         for (final NodeProxy currLocation : theExAutomaton.getNodes()) {
-            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD) 
+            if (bddExAutomata.synType.equals(SynthesisAlgorithm.PARTITIONBDD)
                     || bddExAutomata.synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
                 // Add the node proxy in the map
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {
@@ -141,8 +142,8 @@ public class BDDExtendedAutomaton {
             // Then add state properties
             final int locationIndex = bddExAutomata.getLocationIndex(theExAutomaton, currLocation);
             //System.err.println(currLocation.getName() + ": " + locationIndex);
-            SimpleExpressionProxy invariant = TimeInvariantAttributeFactory.getInvariant(currLocation.getAttributes());
-            if (invariant != null) {                
+            final SimpleExpressionProxy invariant = TimeInvariantAttributeFactory.getInvariant(currLocation.getAttributes());
+            if (invariant != null) {
                 manager.addLocationInvariant(locationInvariants, manager.guard2BDD(invariant), locationIndex, sourceLocationDomain);
             } else {
                 manager.addLocation(locationInvariants, locationIndex, sourceLocationDomain);
@@ -165,6 +166,23 @@ public class BDDExtendedAutomaton {
         }
         if (!anyMarkedLocation) {
             markedLocations = tempMarkedLocations.id();
+        }
+
+        // add forbidden (blocked) event indices to the corresponding collections
+        for (final EventDeclProxy event : theExAutomaton.getAlphabet())
+        {
+          final int eventIndex = bddExAutomata.getEventIndex(event);
+
+          caredEventsIndex.add(eventIndex);
+          if(event.getKind() == EventKind.UNCONTROLLABLE){
+              caredUncontrollableEventsIndex.add(eventIndex);
+              if(theExAutomaton.isSpecification()) {
+                  bddExAutomata.specUncontrollableEventIndexList.add(eventIndex);
+              }
+              else if(!bddExAutomata.plantUncontrollableEventIndexList.contains(eventIndex)){
+                  bddExAutomata.plantUncontrollableEventIndexList.add(eventIndex);
+              }
+          }
         }
 
         bddExAutomata.addInitialLocations(initialLocation);
@@ -267,21 +285,20 @@ public class BDDExtendedAutomaton {
         }
 
         final BDD destLocationBDD = manager.getFactory().buildCube(locationIndex, destLocationDomain.vars());
-
         sourceLocationBDD.andWith(destLocationBDD);
         selfLoopsBDD.orWith(sourceLocationBDD);
     }
 
     private void addNodeProxy(final EdgeSubject theEdge) {
 
-        BDD theEdgeBDD = manager.getOneBDD();
-        BDD edgeEventsBDD = manager.getZeroBDD();
-        
+        final BDD theEdgeBDD = manager.getOneBDD();
+        final BDD edgeEventsBDD = manager.getZeroBDD();
+
         if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
-            int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getSource());
-            int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getTarget());
-            BDD sourceLocationBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
-            BDD destLocationBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
+            final int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getSource());
+            final int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, theEdge.getTarget());
+            final BDD sourceLocationBDD = manager.getFactory().buildCube(sourceLocationIndex, sourceLocationDomain.vars());
+            final BDD destLocationBDD = manager.getFactory().buildCube(destLocationIndex, destLocationDomain.vars());
             theEdgeBDD.andWith(sourceLocationBDD.andWith(destLocationBDD));
         }
 
@@ -291,7 +308,7 @@ public class BDDExtendedAutomaton {
             final String eventName = ((SimpleIdentifierProxy) eventIterator.next()).getName();
             final EventDeclProxy theEvent = bddExAutomata.getExtendedAutomata().eventIdToProxy(eventName);
             final int eventIndex = bddExAutomata.getEventIndex(theEvent);
-            
+
             if (bddExAutomata.orgExAutomata.getVars().isEmpty()) { // for the DFA partitioning method
                 edgeEventsBDD.orWith(manager.getFactory().buildCube(eventIndex, bddExAutomata.getEventDomain().vars()));
             }
@@ -323,7 +340,7 @@ public class BDDExtendedAutomaton {
     public TIntHashSet getCaredEventsIndex() {
         return caredEventsIndex;
     }
-    
+
     public TIntHashSet getCaredUncontrollableEventsIndex() {
         return caredUncontrollableEventsIndex;
     }
@@ -331,7 +348,7 @@ public class BDDExtendedAutomaton {
     public BDD getSelfLoopsBDD() {
         return selfLoopsBDD;
     }
-    
+
     public BDD getEdgeForwardWithoutSelfLoops () {
         return edgeForwardBDDWithoutSelfLoops;
     }
