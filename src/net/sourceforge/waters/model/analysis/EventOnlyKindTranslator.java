@@ -31,50 +31,60 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular;
+package net.sourceforge.waters.model.analysis;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.io.Serializable;
 
-import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.
-       AbstractLanguageInclusionCheckerTest;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public class ProjectingLanguageInclusionCheckerTest
-  extends AbstractLanguageInclusionCheckerTest
+/**
+ * <P>A kind translator for events only.
+ * The event-only kind translator masks another kind translator.
+ * It returns the same event kinds as the masked translator, and reads
+ * the component kinds directly from the automata without any translation.
+ *
+ * @author Robi Malik
+ */
+
+public class EventOnlyKindTranslator
+  implements KindTranslator, Serializable
 {
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Constructor
+  /**
+   * Creates an event-only kind translator.
+   * @param parent The masked kind translator that provides event kinds.
+   */
+  public EventOnlyKindTranslator(final KindTranslator parent)
   {
-    final TestSuite testSuite =
-      new TestSuite(ProjectingLanguageInclusionCheckerTest.class);
-    return testSuite;
-  }
-
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
+    mParent = parent;
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ProjectingLanguageInclusionChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+  @Override
+  public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    final SafetyVerifier subchecker =
-      new NativeLanguageInclusionChecker(factory);
-    final SafetyProjectionBuilder projector = new Projection2(factory);
-    final ProjectingLanguageInclusionChecker checker =
-      new ProjectingLanguageInclusionChecker(factory, subchecker, projector);
-    checker.setMaxProjStates(2000);
-    return checker;
+    return aut.getKind();
   }
+
+  @Override
+  public EventKind getEventKind(final EventProxy event)
+  {
+    return mParent.getEventKind(event);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final KindTranslator mParent;
+
+  private static final long serialVersionUID = -3554422505706642871L;
 
 }

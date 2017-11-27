@@ -66,11 +66,13 @@ import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.logging.log4j.Logger;
 
@@ -194,11 +196,11 @@ class TRCompositionalOnePropertyChecker
     final Logger logger = getLogger();
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
-    AutomatonProxy property = null;
+    mRawProperty = null;
     for (final AutomatonProxy aut : des.getAutomata()) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
-        if (property == null) {
-          property = aut;
+        if (mRawProperty == null) {
+          mRawProperty = aut;
         } else {
           throw new AnalysisConfigurationException
             ("Calling " + ProxyTools.getShortClassName(this) +
@@ -206,7 +208,7 @@ class TRCompositionalOnePropertyChecker
         }
       }
     }
-    if (property == null) {
+    if (mRawProperty == null) {
       logger.debug("No property given to check, returning TRUE.");
       setSatisfiedResult();
       return;
@@ -214,32 +216,35 @@ class TRCompositionalOnePropertyChecker
 
     // Set up property automaton ...
     final TRAbstractionStepInput step;
-    if (isPreservingEncodings() && property instanceof TRAutomatonProxy) {
-      final TRAutomatonProxy tr = (TRAutomatonProxy) property;
+    if (isPreservingEncodings() && mRawProperty instanceof TRAutomatonProxy) {
+      final TRAutomatonProxy tr = (TRAutomatonProxy) mRawProperty;
       step = new TRAbstractionStepInput(tr);
     } else {
-      final EventEncoding eventEnc = createInitialEventEncoding(property);
-      step = new TRAbstractionStepInput(property, eventEnc);
+      final EventEncoding eventEnc = createInitialEventEncoding(mRawProperty);
+      step = new TRAbstractionStepInput(mRawProperty, eventEnc);
     }
     final TransitionRelationSimplifier simplifier = getSimplifier();
     final int config = simplifier.getPreferredInputConfiguration();
-    mProperty = step.createOutputAutomaton(config);
+    mConvertedProperty = step.getOutputAutomaton(config);
+    mConvertedProperty.setKind(ComponentKind.SPEC);
     if (isCounterExampleEnabled()) {
-      addAbstractionStep(step, mProperty);
+      addAbstractionStep(step, mConvertedProperty);
     }
-    if (!hasInitialState(mProperty)) {
-      logger.debug("System fails property {}, because it has no initial state.",
-                   property.getName());
+    if (!hasInitialState(mConvertedProperty)) {
+      logger.debug("System fails property {}, which has no initial state.",
+                   mRawProperty.getName());
       result.setSatisfied(false);
       final TRSubsystemInfo subsys = getCurrentSubsystem();
       dropSubsystem(subsys);
-      dropTrivialAutomaton(mProperty);
+      dropTrivialAutomaton(mConvertedProperty);
       return;
     }
-    final ListBufferTransitionRelation rel = mProperty.getTransitionRelation();
+    final ListBufferTransitionRelation rel =
+      mConvertedProperty.getTransitionRelation();
     rel.removeProperSelfLoopEvents();
     final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
     mMonolithicAutomataLimit = iter.advance() ? 1 : 2;
+    getPreselectionHeuristic().setContext(this);
     mHasStronglyFailingEvent = false;
     final SpecialEventsFinder finder = getSpecialEventsFinder();
     finder.setBlockedEventsDetected(true);
@@ -269,21 +274,22 @@ class TRCompositionalOnePropertyChecker
       }
     }
     if (trivial) {
-      logger.debug("Skipping trivial property {}.", property.getName());
+      logger.debug("Skipping trivial property {}.", mRawProperty.getName());
       result.setSatisfied(true);
       return;
     }
     finder.setAlwaysEnabledEventsDetected(mHasStronglyFailingEvent);
 
     final TRSubsystemInfo subsys = getCurrentSubsystem();
-    subsys.registerEvents(mProperty, status, true);
+    subsys.registerEvents(mConvertedProperty, status, true);
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mProperty = null;
+    mRawProperty = null;
+    mConvertedProperty = null;
   }
 
 
@@ -339,7 +345,7 @@ class TRCompositionalOnePropertyChecker
     }
     final Logger logger = getLogger();
     logger.debug("Dropping subsystem because it shares no events with property {}.",
-                 mProperty.getName());
+                 mConvertedProperty.getName());
     dropSubsystem(subsys);
     return true;
   }
@@ -352,14 +358,14 @@ class TRCompositionalOnePropertyChecker
     final String name;
     final List<TRAutomatonProxy> automata;
     if (subsys == null || subsys.getNumberOfAutomata() == 0) {
-      name = mProperty.getName();
-      automata = Collections.singletonList(mProperty);
+      name = mConvertedProperty.getName();
+      automata = Collections.singletonList(mConvertedProperty);
     } else {
       final List<TRAutomatonProxy> plants = subsys.getAutomata();
       final int numAutomata = plants.size() + 1;
       automata = new ArrayList<>(numAutomata);
       automata.addAll(plants);
-      automata.add(mProperty);
+      automata.add(mConvertedProperty);
       name = AutomatonTools.getCompositionName(plants);
     }
     final ProductDESProxyFactory factory = getFactory();
@@ -378,11 +384,11 @@ class TRCompositionalOnePropertyChecker
     }
     final Logger logger = getLogger();
     if (monolithicResult.isSatisfied()) {
-      logger.debug("Subsystem satisfies property {}.", mProperty.getName());
+      logger.debug("Subsystem satisfies property {}.", mConvertedProperty.getName());
       dropSubsystem(subsys);
       return setSatisfiedResult();
     } else {
-      logger.debug("Subsystem fails property {}.", mProperty.getName());
+      logger.debug("Subsystem fails property {}.", mConvertedProperty.getName());
       combinedResult.setSatisfied(false);
       if (isCounterExampleEnabled()) {
         dropPendingSubsystems();
@@ -422,7 +428,7 @@ class TRCompositionalOnePropertyChecker
     final TRSafetyTraceProxy safetyTrace = (TRSafetyTraceProxy) trace;
     final TRSafetyTraceProxy cloned = new TRSafetyTraceProxy(safetyTrace);
     cloned.setUpForTraceChecking();
-    final KindTranslator translator = getKindTranslator();
+    final KindTranslator translator = new PropertyKindTranslator();
     TraceChecker.checkSafetyCounterExample(cloned, true, translator);
   }
 
@@ -486,12 +492,38 @@ class TRCompositionalOnePropertyChecker
 
 
   //#########################################################################
+  //# Inner Class PropertyKindTranslator
+  private class PropertyKindTranslator implements KindTranslator
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
+    public ComponentKind getComponentKind(final AutomatonProxy aut)
+    {
+      if (aut == mConvertedProperty || aut == mRawProperty) {
+        return ComponentKind.SPEC;
+      } else {
+        return ComponentKind.PLANT;
+      }
+    }
+
+    @Override
+    public EventKind getEventKind(final EventProxy event)
+    {
+      final KindTranslator translator = getKindTranslator();
+      return translator.getEventKind(event);
+    }
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Configuration
   private final SafetyDiagnostics mDiagnostics;
 
   // Data Structures
-  private TRAutomatonProxy mProperty;
+  private AutomatonProxy mRawProperty;
+  private TRAutomatonProxy mConvertedProperty;
   private int mMonolithicAutomataLimit;
   private boolean mHasStronglyFailingEvent;
 

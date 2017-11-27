@@ -31,64 +31,55 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular;
+package net.sourceforge.waters.analysis.trcomp;
 
-import net.sourceforge.waters.analysis.annotation.CompNonBlockingChecker;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-/**
- * A factory that produces projecting model verifiers.
- *
- * @author Robi Malik
- */
-
-public class CompModelVerifierFactory
-  extends AbstractModelAnalyzerFactory
+public class TRControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
-  //# Constructors
-  private CompModelVerifierFactory()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
+    final TestSuite testSuite =
+      new TestSuite(TRControllabilityCheckerTest.class);
+    return testSuite;
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
-  protected void addArguments()
-  {
-    super.addArguments();
-    addArgument(ModularHeuristicFactory.getMethodArgument());
-    addArgument(ModularHeuristicFactory.getPreferenceArgument());
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
-  public CompNonBlockingChecker createConflictChecker
+  protected ControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    return new CompNonBlockingChecker(null, factory);
+    final TRControllabilityChecker checker = new TRControllabilityChecker();
+    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustSp);
+    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSSp);
+    checker.setInternalStateLimit(5000);
+    checker.setMonolithicStateLimit(100000);
+    checker.setInternalTransitionLimit(500000);
+    checker.setBlockedEventsEnabled(true);
+    checker.setFailingEventsEnabled(true);
+    checker.setSelfloopOnlyEventsEnabled(true);
+    checker.setAlwaysEnabledEventsEnabled(true);
+    checker.setCounterExampleEnabled(true);
+    checker.setOutputCheckingEnabled(true);
+    return checker;
   }
-
-
-  //#########################################################################
-  //# Factory Instantiation
-  public static CompModelVerifierFactory getInstance()
-  {
-    if (theInstance == null) {
-      theInstance = new CompModelVerifierFactory();
-    }
-    return theInstance;
-  }
-
-
-  //#########################################################################
-  //# Class Variables
-  private static CompModelVerifierFactory theInstance = null;
 
 }

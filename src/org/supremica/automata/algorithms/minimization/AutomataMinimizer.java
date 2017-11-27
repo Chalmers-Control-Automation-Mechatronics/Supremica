@@ -261,9 +261,9 @@ public class AutomataMinimizer
 			  MinimizationTask oldTask = getNextMinimizationTask(false);
 			  if (!oldTask.equals(newTask))
 			  {
-			  logger.info("Unequal!!");
-			  logger.info("New: " + newTask);
-			  logger.info("Old: " + oldTask);
+			  logger.debug("Unequal!!");
+			  logger.debug("New: " + newTask);
+			  logger.debug("Old: " + oldTask);
 			  }
              */
 
@@ -353,7 +353,7 @@ public class AutomataMinimizer
                      final Automata selectClone = selection.clone();
                      final String name = "HalfWaySynthesisResult(" + selection.getFirstAutomaton().getName() + ")";
                      // Automaton aut=new Automaton(name );
-//                        logger.info(selection);
+//                        logger.debug(selection);
 					// Synch
 					final SynchronizationOptions synchOptions = SynchronizationOptions.getDefaultSynchronizationOptions();
 					synchOptions.setUseShortStateNames(useShortStateNames);
@@ -383,7 +383,7 @@ public class AutomataMinimizer
                 if (min.nbrOfStates() == 1 && !min.getInitialState().isAccepting())
                 {
                     // Return a one state blocking automaton (min for example)
-                    logger.info("Early termination--a blocking state can be reached silently!");
+                    logger.debug("Early termination--a blocking state can be reached silently!");
                     if (options.getMinimizationType()
                             == EquivalenceRelation.SYNTHESISABSTRACTION) {
                         min.synthesisHide(new Alphabet(min.getAlphabet()).
@@ -411,7 +411,7 @@ public class AutomataMinimizer
                     }
                     if (ok)
                     {
-                        logger.info("Early termination--all states are marked!");
+                        logger.debug("Early termination--all states are marked!");
                         final Automaton aut = new Automaton("NONBLOCK");
                         final State state = new State("q");
                         state.setAccepting(true);
@@ -598,7 +598,7 @@ public class AutomataMinimizer
                     if ((heuristic.maximize() && thisValue > bestValue) ||
                         (heuristic.minimize() && thisValue < bestValue))
                     {
-                        //logger.info(heuristic + ", " + selection);
+                        //logger.debug(heuristic + ", " + selection);
                         bestValue = thisValue;
                         taskAutomata = selection;
                         continue loop;
@@ -619,7 +619,7 @@ public class AutomataMinimizer
                             if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
                                 (nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
                             {
-                                //logger.info(nextHeuristic + ", " + selection);
+                                //logger.debug(nextHeuristic + ", " + selection);
                                 taskAutomata = selection;
                                 continue loop;
                             }
@@ -661,7 +661,7 @@ public class AutomataMinimizer
                         // If the automaton has no transitions, add it to the task without further ado
                         if (aut.nbrOfTransitions() == 0)
                         {
-                            //logger.info("It happened!!" + aut);
+                            //logger.debug("It happened!!" + aut);
                             taskExtra.addAutomaton(aut);
                             continue;
                         }
@@ -705,11 +705,11 @@ public class AutomataMinimizer
                             // Equal in all regards? Compare alphabetical order to get reproducible results
                             if (aut.compareTo(bestAutomaton) < 0)
                             {
-                                //logger.info(bestAutomaton + " " + aut);
+                                //logger.debug(bestAutomaton + " " + aut);
                                 bestAutomaton = aut;
                             }
                         }
-                        //logger.info("Apa: " + aut);
+                        //logger.debug("Apa: " + aut);
                     }
                     // Got no result?
                     if (bestAutomaton == null)
@@ -738,7 +738,7 @@ public class AutomataMinimizer
                     /*
                     if (neighbours.size() == 0)
                     {
-                        logger.info("Disjoint!! " + bestAutomaton + " size " + bestAutomaton.nbrOfStates());
+                        logger.debug("Disjoint!! " + bestAutomaton + " size " + bestAutomaton.nbrOfStates());
                     }
                      */
                     loop: for (final Automaton aut: neighbours)
@@ -758,7 +758,7 @@ public class AutomataMinimizer
                         if ((heuristic.maximize() && thisValue > bestValue) ||
                             (heuristic.minimize() && thisValue < bestValue))
                         {
-                            //logger.info(heuristic + ", this: " + thisValue + ", selection: " + selection);
+                            //logger.debug(heuristic + ", this: " + thisValue + ", selection: " + selection);
                             bestValue = thisValue;
                             taskAutomata.clear();
                             taskAutomata.addAutomata(selection);
@@ -777,7 +777,7 @@ public class AutomataMinimizer
                                 if ((nextHeuristic.maximize() && nextHeuristicThis > nextHeuristicBest) ||
                                     (nextHeuristic.minimize() && nextHeuristicThis < nextHeuristicBest))
                                 {
-                                    //logger.info(nextHeuristic + ", this: " + nextHeuristicThis + ", selection: " + selection);
+                                    //logger.debug(nextHeuristic + ", this: " + nextHeuristicThis + ", selection: " + selection);
                                     taskAutomata.clear();
                                     taskAutomata.addAutomata(selection);
                                     continue loop;
@@ -810,7 +810,7 @@ public class AutomataMinimizer
                     neighbours.removeAutomaton(bestAutomaton);
                     if (neighbours.size() == 0)
                     {
-                        logger.info("Disjoint!! " + bestAutomaton);
+                        logger.debug("Disjoint!! " + bestAutomaton);
                     }
                     for (final Automaton aut: neighbours)
                     {
@@ -890,7 +890,7 @@ public class AutomataMinimizer
         // A choice has been made?
         if (taskAutomata.size() == 0)
         {
-            logger.info("Could not find a task! Everything is disjoint?");
+            logger.debug("Could not find a task! Everything is disjoint?");
             return null;
         }
 
@@ -914,7 +914,7 @@ public class AutomataMinimizer
     {
 
 
-//        logger.info("hide these in monolithic"+hideThese);
+//        logger.debug("hide these in monolithic"+hideThese);
         //System.err.println("Minimizing " + automata + ", hiding: " + hideThese);
 
         // Synchronize, or if there's just one automaton, just find it
@@ -945,7 +945,7 @@ public class AutomataMinimizer
         }
 
         // Return miminisation of aut
-//        logger.info("in monolithic minimization"+ monolithicMinimization(aut, hideThese).getName()+"selfloops "+ monolithicMinimization(aut, hideThese).nbrOfSelfLoops());
+//        logger.debug("in monolithic minimization"+ monolithicMinimization(aut, hideThese).getName()+"selfloops "+ monolithicMinimization(aut, hideThese).nbrOfSelfLoops());
         return monolithicMinimization(aut, hideThese);
     }
 
@@ -971,8 +971,8 @@ public class AutomataMinimizer
             minimizer.useShortStateNames(useShortStateNames);
             threadToAbort = minimizer;
             final Automaton newAut = minimizer.getMinimizedAutomaton(options, hideThese);
-//            logger.info("self loop after minimized automaton"+newAut.nbrOfSelfLoops());
-//            logger.info("states after minimized automaton"+newAut.nbrOfStates());
+//            logger.debug("self loop after minimized automaton"+newAut.nbrOfSelfLoops());
+//            logger.debug("states after minimized automaton"+newAut.nbrOfStates());
             aut = newAut;
             threadToAbort = null;
             if (abortRequested)
@@ -1002,7 +1002,7 @@ public class AutomataMinimizer
                 if (sharers.size() == 0)
                 {
                     eventToAutomataMap.remove(event);
-                    logger.info("Event " + event + " was removed altogether from inadequateness.");
+                    logger.debug("Event " + event + " was removed altogether from inadequateness.");
                 }
             }
 
@@ -1021,7 +1021,7 @@ public class AutomataMinimizer
 
             if (localAutomata.size() > 0)
             {
-                logger.info("The automata " + localAutomata + " now have local events: " + local);
+                logger.debug("The automata " + localAutomata + " now have local events: " + local);
             }
         }
 
@@ -1030,7 +1030,7 @@ public class AutomataMinimizer
         Alphabet blocked = aut.getBlockedEvents();
         if (blocked != null)
         {
-            logger.info("Blocked: " + blocked + " in " + aut);
+            logger.debug("Blocked: " + blocked + " in " + aut);
         }
          */
 

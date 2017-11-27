@@ -31,50 +31,63 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.modular;
+package net.sourceforge.waters.analysis.trcomp;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
-import net.sourceforge.waters.model.analysis.
-  AbstractControllabilityCheckerTest;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
+import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-public class ProjectingControllabilityCheckerTest
-  extends AbstractControllabilityCheckerTest
+/**
+ * <P>An abstract base class for delegation-based safety verifiers
+ * in the TR-compositional framework.</P>
+ *
+ * @author Robi Malik
+ */
+
+public abstract class AbstractTRDelegatingSafetyVerifier
+  extends AbstractTRDelegatingVerifier
+  implements SafetyVerifier
 {
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Constructor
+  public AbstractTRDelegatingSafetyVerifier
+    (final ProductDESProxy model,
+     final KindTranslator translator,
+     final SafetyDiagnostics diag)
   {
-    final TestSuite testSuite =
-      new TestSuite(ProjectingControllabilityCheckerTest.class);
-    return testSuite;
-  }
-
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
+    super(model, translator,
+          new TRCompositionalOnePropertyChecker(diag));
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
-  protected ProjectingControllabilityChecker createModelVerifier
-    (final ProductDESProxyFactory factory)
+  //# Interface for net.sourceforge.waters.model.analysis.des.SafetyVerifier
+  @Override
+  public SafetyDiagnostics getDiagnostics()
   {
-    final ControllabilityChecker subchecker =
-      new NativeControllabilityChecker(factory);
-    final SafetyProjectionBuilder projector = new Projection2(factory);
-    final ProjectingControllabilityChecker checker =
-      new ProjectingControllabilityChecker(factory, subchecker, projector);
-    //checker.setMaxProjStates(2000);
-    return checker;
+    final TRCompositionalOnePropertyChecker delegate = getDelegate();
+    return delegate.getDiagnostics();
+  }
+
+  @Override
+  public TRSafetyTraceProxy getCounterExample()
+  {
+    final VerificationResult result = getAnalysisResult();
+    return (TRSafetyTraceProxy) result.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.trcomp.AbstractTRDelegatingVerifier
+  @Override
+  protected TRCompositionalOnePropertyChecker getDelegate()
+  {
+    return (TRCompositionalOnePropertyChecker) super.getDelegate();
   }
 
 }

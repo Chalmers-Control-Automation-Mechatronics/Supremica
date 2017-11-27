@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Point;
@@ -121,8 +123,6 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
-import gnu.trove.set.hash.THashSet;
-
 
 /**
  * The Tree used to view the constant aliases, event aliases, components and
@@ -163,7 +163,8 @@ public abstract class ModuleTree
     }
     setShowsRootHandles(true);
     setAutoscrolls(true);
-    setRowHeight(IconAndFontLoader.getWatersIconSize());
+    // Two extra pixels, hopefully enough to underline errors ...
+    setRowHeight(IconAndFontLoader.getWatersIconSize() + 2);
     // Don't expand/collapse on double-click, never collapse the root.
     setToggleClickCount(0);
     manager.installCutCopyPasteActions(this);

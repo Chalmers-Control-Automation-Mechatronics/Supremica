@@ -331,6 +331,11 @@ public abstract class TRTraceProxy
     mTraceData.remove(step);
   }
 
+  void replaceEvent(final int pos, final EventProxy event)
+  {
+    mEvents[pos] = event;
+  }
+
   void addStutteringSteps(final List<EventProxy> newEvents,
                           final List<EventProxy> nonStutterEvents)
   {
@@ -579,7 +584,9 @@ public abstract class TRTraceProxy
     {
       final AutomatonProxy aut = (AutomatonProxy) key;
       final TRAbstractionStep step = mAutomataMap.get(aut);
-      assert step != null;
+      if (step == null) {
+        return null;
+      }
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
       if (s < 0) {

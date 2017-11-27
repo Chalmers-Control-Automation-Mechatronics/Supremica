@@ -33,9 +33,7 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
-import net.sourceforge.waters.analysis.modular.ProjectingLanguageInclusionChecker;
-import net.sourceforge.waters.analysis.modular.Projection2;
-import net.sourceforge.waters.analysis.modular.SafetyProjectionBuilder;
+import net.sourceforge.waters.analysis.trcomp.TRLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -43,7 +41,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 public abstract class AbstractConflictCheckerCounterexampleTest
-extends AbstractConflictCheckerTest
+  extends AbstractConflictCheckerTest
 {
 
   //#########################################################################
@@ -65,11 +63,7 @@ extends AbstractConflictCheckerTest
   protected LanguageInclusionChecker createLanguageInclusionChecker
     (final ProductDESProxy des, final ProductDESProxyFactory factory)
   {
-    final LanguageInclusionChecker checker =
-      super.createLanguageInclusionChecker(des, factory);
-    final SafetyProjectionBuilder projector = new Projection2(factory);
-    return new ProjectingLanguageInclusionChecker(des, factory,
-                                                  checker, projector);
+    return new TRLanguageInclusionChecker(des);
   }
 
 

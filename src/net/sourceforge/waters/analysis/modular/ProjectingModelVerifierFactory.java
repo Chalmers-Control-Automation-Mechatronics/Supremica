@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -45,10 +46,13 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * A factory that produces projecting model verifiers.
+ * These model verifiers are deprecated, and should be replaced by those
+ * provided through {@link TRCompositionalModelAnalyzerFactory}.
  *
  * @author Robi Malik
  */
 
+@Deprecated
 public class ProjectingModelVerifierFactory
   extends AbstractModelAnalyzerFactory
 {
