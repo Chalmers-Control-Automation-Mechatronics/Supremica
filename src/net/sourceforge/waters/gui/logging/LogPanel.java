@@ -240,20 +240,23 @@ public class LogPanel extends JPanel
     try {
       final Document document = mTextPane.getDocument();
       int pos = document.getLength();
-      final AttributeSet attribs = event.getAttributes();
+      final AttributeSet textAttribs = event.getAttributes();
       if (pos > 0) {
-        document.insertString(pos, "\n", attribs);
+        document.insertString(pos, "\n", textAttribs);
       }
       final Icon icon = event.getIcon();
       if (icon != null) {
         final JLabel label = new JLabel(icon);
         label.setText(" ");
         label.setAlignmentY(0.8f);
-        mTextPane.insertComponent(label);
+        final MutableAttributeSet iconAttribs = new SimpleAttributeSet();
+        StyleConstants.setComponent(iconAttribs, label);
+        pos = document.getLength();
+        document.insertString(pos, " ", iconAttribs);
       }
       pos = document.getLength();
       final String text = event.getText();
-      document.insertString(pos, text, attribs);
+      document.insertString(pos, text, textAttribs);
     } catch (final BadLocationException exception) {
       throw new IllegalStateException(exception);
     }
