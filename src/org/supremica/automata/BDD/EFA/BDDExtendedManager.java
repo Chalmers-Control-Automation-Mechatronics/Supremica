@@ -1,5 +1,15 @@
 package org.supremica.automata.BDD.EFA;
 
+/**
+ *
+ * @author Sajed Miremadi, Zhennan Fei
+ */
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.procedure.TIntObjectProcedure;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +19,7 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -22,16 +33,6 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.properties.Config;
-
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.procedure.TIntObjectProcedure;
-import gnu.trove.set.hash.TIntHashSet;
 
 public class BDDExtendedManager extends BDDAbstractManager {
 
@@ -306,7 +307,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
     BDD getDisjunctiveInitiallyUncontrollableStates() {
 
-        if (bddExAutomata.plants.isEmpty() && bddExAutomata.specs.isEmpty()) {
+        if (bddExAutomata.plants.isEmpty() || bddExAutomata.specs.isEmpty()) {
             return getZeroBDD();
         } else {
 
@@ -322,11 +323,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
                     new BDDPartitionUncontSetEve(bddExAutomata, bddExAutomata.specs, specUncontrollableEvents).getUncontrollableEvents2EnabledStates();
             final BDD uncontrollableStates = getZeroBDD();
 
-            for(final TIntIterator itr = sharedUncontrollableEvents.iterator(); itr.hasNext();) {
+            for(final TIntIterator itr = sharedUncontrollableEvents.iterator(); itr.hasNext();)
+            {
                 final int unConEventIndex = itr.next();
                 final BDD statesEnabledByPlants = plantsEnabledStates.get(unConEventIndex).and(bddExAutomata.getReachableStates());
-                    final BDD statesEnabledBySpecs = specEnabledStates.get(unConEventIndex).and(bddExAutomata.getReachableStates());
-                    uncontrollableStates.orWith(statesEnabledByPlants.and(statesEnabledBySpecs.not()));
+                final BDD statesEnabledBySpecs = specEnabledStates.get(unConEventIndex).and(bddExAutomata.getReachableStates());
+                uncontrollableStates.orWith(statesEnabledByPlants.and(statesEnabledBySpecs.not()));
             }
             return uncontrollableStates.and(bddExAutomata.getReachableStates());
         }

@@ -501,8 +501,7 @@ public class DocumentContainerManager
       saveDocument(container, doc, extFile, mayCancel);
     } else if (doc instanceof Project) {
       // Converting Supremica >> Waters ...
-      // If analyser active, check if there are unsupported features
-      // in the project ...
+      // Check if there are unsupported features in the project ...
       final Project project = (Project) doc;
       if (!SupremicaUnmarshaller.isWatersCompatible(project)) {
         final int choice = JOptionPane.showConfirmDialog
@@ -513,9 +512,13 @@ public class DocumentContainerManager
         }
       }
       try {
+        // Convert the project to Waters and save
         final ModuleProxy module = mProductDESImporter.importModule(project);
         final File extFile = ensureDefaultExtension(file, module);
         saveDocument(container, module, extFile, mayCancel);
+        // Open the converted project in the editor
+        closeContainer(container);
+        newContainer(module);
       } catch (final ParseException exception) {
         showParseError(exception);
       }
@@ -612,9 +615,7 @@ public class DocumentContainerManager
       mDocumentManager.saveAs(doc, file);
       container.setCheckPoint();
       final Logger logger = LogManager.getLogger();
-      final String type = getTypeString(doc);
-      final String msg = type + " saved to " + file;
-      logger.info(msg);
+      logger.info("{} saved to {}", getTypeString(doc), file);
       if (!uri.equals(olduri)) {
         mURIContainerMap.remove(olduri);
         mURIContainerMap.put(uri, container);

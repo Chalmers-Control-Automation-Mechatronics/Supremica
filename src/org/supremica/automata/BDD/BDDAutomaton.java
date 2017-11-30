@@ -100,12 +100,7 @@ public class BDDAutomaton
 
     BDDAutomaton(final BDDAutomata bddAutomata, final Automaton theAutomaton, final BDDDomain sourceStateDomain, final BDDDomain destStateDomain)
     {
-/*        System.out.println("automaton name: "+theAutomaton.getName());
-        System.out.println("source state domain vars: ");
-        int[] vars = sourceStateDomain.vars();
-        for(int i = 0;i<vars.length;i++)
-            System.out.println(""+vars[i]);
-*/
+
         this.manager = bddAutomata.getBDDManager();
 
         this.bddAutomata = bddAutomata;
@@ -144,7 +139,6 @@ public class BDDAutomaton
 
         final Alphabet inverseAlphabet = bddAutomata.getInverseAlphabet(theAutomaton);
 
-//        System.out.println("Automaton "+theAutomaton.getName());
         for (final State currState : theAutomaton)
         {
             final Alphabet outgoingUnconEvents = new Alphabet();
@@ -157,17 +151,6 @@ public class BDDAutomaton
                     outgoingUnconEvents.add(currArc.getEvent());
 
                 addTransition(currArc);
-            }
-
-            //Specification to Plant transformation for handling uncontrrollabilty
-            if(theAutomaton.isSpecification())
-            {
-                final Alphabet unconEvents = new Alphabet(theAutomaton.getAlphabet().getUncontrollableAlphabet());
-                final Alphabet missingOutgoingUnconEvents = unconEvents.minus(outgoingUnconEvents);
-                for(final LabeledEvent event:missingOutgoingUnconEvents)
-                {
-                    addTransition(currState, theAutomaton.getStateWithName("FS"), event);
-                }
             }
 
             // Self loop events not in this alphabet
@@ -453,11 +436,13 @@ public class BDDAutomaton
         return nbrOfTerms;
     }
 
+    @Override
     public int hashCode()
     {
         return theAutomaton.hashCode();
     }
 
+    @Override
     public boolean equals(final Object other)
     {
         return theAutomaton.equals(other);
