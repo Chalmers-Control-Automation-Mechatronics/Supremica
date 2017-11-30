@@ -198,7 +198,7 @@ public class AutomatonMinimizer
         final int before = theAutomaton.nbrOfStates();
         final int epsilons = theAutomaton.nbrOfEpsilonTransitions();
         final int total = theAutomaton.nbrOfTransitions();
-        logger.info("Minimizing " + theAutomaton + " with " + before +
+        logger.debug("Minimizing " + theAutomaton + " with " + before +
                     " states and " + epsilons + " epsilon transitions (" +
                     Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
 
@@ -230,7 +230,7 @@ public class AutomatonMinimizer
                 final State state = it.next();
                 if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
                 {
-                    logger.info("The state " + state + " will be removed since it is not reachable.");
+                    logger.debug("The state " + state + " will be removed since it is not reachable.");
                     toBeRemoved.add(state);
                 }
 
@@ -430,14 +430,14 @@ public class AutomatonMinimizer
 
             // Message
             final int after = theAutomaton.nbrOfStates();
-            logger.info("There were " + before + " states before and " + after +
+            logger.debug("There were " + before + " states before and " + after +
                         " states after the minimization. Reduction: " +
                         Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
             // Start listening again
             theAutomaton.endTransaction();
 
-            logger.info("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
+            logger.debug("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
 
             totalHWS += countHWS;
             totalBSE += countBSE;
@@ -481,14 +481,14 @@ public class AutomatonMinimizer
 
                 if (trivialCount > 0)
                 {
-                    logger.info("Removed " + trivialCount + " trivially equivalent states " +
+                    logger.debug("Removed " + trivialCount + " trivially equivalent states " +
                                 "before running the partitioning.");
                 }
                 final int loopCount = mergeEpsilonLoops(theAutomaton);
 //                logger.info("loop count: "+loopCount);
                 if (loopCount > 0)
                 {
-                    logger.info("Removed " + loopCount + " states involved in silent loops " +
+                    logger.debug("Removed " + loopCount + " states involved in silent loops " +
                                 "before running the partitioning.");
                 }
                 totalOES = totalOES + trivialCount + loopCount;
@@ -542,7 +542,7 @@ public class AutomatonMinimizer
                 final int count = runConflictEquivalenceRules(theAutomaton);
                 if (count > 0)
                 {
-                    logger.info("Removed " + count + " states based on conflict equivalence " +
+                    logger.debug("Removed " + count + " states based on conflict equivalence " +
                                 "before running the partitioning.");
                 }
             }
@@ -611,7 +611,7 @@ public class AutomatonMinimizer
         //logger.info("oes:"+totalOES);
         if (diffSize > 0)
         {
-            logger.info("Removed " + diffSize + " states based on partitioning with " +
+            logger.debug("Removed " + diffSize + " states based on partitioning with " +
                         "respect to observation equivalence.");
         }
 
@@ -630,7 +630,7 @@ public class AutomatonMinimizer
             final int count = runConflictEquivalenceRules(theAutomaton);
             if (count > 0)
             {
-                logger.info("Removed " + count + " states based on conflict equivalence " +
+                logger.debug("Removed " + count + " states based on conflict equivalence " +
                             "after running partitioning.");
             }
         }
@@ -648,7 +648,7 @@ public class AutomatonMinimizer
         removeUnusedEpsilonEvents(theAutomaton);
         // Message
         final int after = theAutomaton.nbrOfStates();
-        logger.info("There were " + before + " states before and " + after +
+        logger.debug("There were " + before + " states before and " + after +
                     " states after the minimization. Reduction: " +
                     Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
@@ -2670,9 +2670,9 @@ public class AutomatonMinimizer
     public static void logStatistics(final MinimizationOptions options)
     {
         if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
-            logger.info("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
+            logger.debug("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
         else if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
-            logger.info("Reduction statistics: halfway Synthesis: " + totalHWS + ", bisimulation equivalence " + totalBSE);
+            logger.debug("Reduction statistics: halfway Synthesis: " + totalHWS + ", bisimulation equivalence " + totalBSE);
     }
 
     public static String getStatisticsLaTeX()
@@ -3213,7 +3213,7 @@ public class AutomatonMinimizer
             final State state = it.next();
             if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
             {
-                logger.info("The state " + state + " will be removed since it is not reachable.");
+                logger.debug("The state " + state + " will be removed since it is not reachable.");
                 toBeRemoved.add(state);
             }
 
