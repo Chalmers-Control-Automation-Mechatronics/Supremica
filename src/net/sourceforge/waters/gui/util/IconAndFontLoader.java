@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.util;
 
 import com.sun.java.swing.plaf.windows.WindowsLookAndFeel;
 
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.net.URL;
@@ -105,6 +106,8 @@ public class IconAndFontLoader
       final FontUIResource normalRes = new FontUIResource(FONT_NORMAL);
       final FontUIResource titleRes = new FontUIResource(FONT_TITLE);
       final FontUIResource acceleratorRes = new FontUIResource(FONT_SMALL);
+      final int iconSize = iconSet.getSize();
+      final Dimension swatchSize = new Dimension(iconSize, iconSize);
       final UIDefaults defaults = UIManager.getLookAndFeelDefaults();
       for (final Map.Entry<Object,Object> entry : defaults.entrySet()) {
         final Object key = entry.getKey();
@@ -124,6 +127,8 @@ public class IconAndFontLoader
           entry.setValue(acceleratorRes);
         } else if (name.endsWith("Font")) {
           entry.setValue(normalRes);
+        } else if (name.endsWith("SwatchSize")) {
+          entry.setValue(swatchSize);
         } else if (name.equals("Application.useSystemFontSettings")) {
           entry.setValue(false);
         }
