@@ -60,6 +60,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -468,7 +469,7 @@ public class ModularControllabilitySynthesizer
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);
@@ -537,7 +538,7 @@ public class ModularControllabilitySynthesizer
   //# Debugging
   private void logSubsystem(final ProductDESProxy des)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       final KindTranslator translator = getKindTranslator();
       final StringBuilder builder =

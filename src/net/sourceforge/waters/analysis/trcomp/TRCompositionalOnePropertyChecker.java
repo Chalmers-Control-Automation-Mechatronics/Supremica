@@ -74,6 +74,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -193,7 +194,7 @@ class TRCompositionalOnePropertyChecker
       return;
     }
     // Find the property ...
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
     mRawProperty = null;
@@ -343,7 +344,7 @@ class TRCompositionalOnePropertyChecker
         return false;
       }
     }
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     logger.debug("Dropping subsystem because it shares no events with property {}.",
                  mConvertedProperty.getName());
     dropSubsystem(subsys);
@@ -382,7 +383,7 @@ class TRCompositionalOnePropertyChecker
       monolithicResult = mono.getAnalysisResult();
       combinedResult.addMonolithicAnalysisResult(monolithicResult);
     }
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (monolithicResult.isSatisfied()) {
       logger.debug("Subsystem satisfies property {}.", mConvertedProperty.getName());
       dropSubsystem(subsys);

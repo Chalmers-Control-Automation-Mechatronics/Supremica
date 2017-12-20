@@ -45,6 +45,7 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -169,7 +170,7 @@ public abstract class AbstractTRCompositionalVerifier
   {
     final CompositionalVerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("Starting trace expansion ...");
       final long start = System.currentTimeMillis();
       getSpecialEventsListener().setEnabled(true);

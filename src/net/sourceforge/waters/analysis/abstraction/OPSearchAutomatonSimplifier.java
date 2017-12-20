@@ -84,6 +84,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -222,7 +223,7 @@ public class OPSearchAutomatonSimplifier
   public boolean run()
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     try {
       if (logger.isDebugEnabled()) {
         final AutomatonProxy aut = getInputAutomaton();

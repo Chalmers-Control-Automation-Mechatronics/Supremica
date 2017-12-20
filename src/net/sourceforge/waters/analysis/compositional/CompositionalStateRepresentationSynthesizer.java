@@ -63,6 +63,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -282,7 +283,7 @@ public class CompositionalStateRepresentationSynthesizer extends
         final Collection<EventProxy> events = getModel().getEvents();
         result.close(factory, events, getOutputName());
       }
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("CompositionalSynthesizer done.");
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
@@ -491,7 +492,7 @@ public class CompositionalStateRepresentationSynthesizer extends
       automaton = automata.get(0);
       break;
     default:
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       if (logger.isDebugEnabled()) {
         double estimate = 1.0;
         for (final AutomatonProxy aut : automata) {
@@ -594,7 +595,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   void reportAbstractionResult(final AutomatonProxy aut,
                                final AutomatonProxy dist)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       /*
        * final boolean nonblocking = AnalysisTools.isNonBlocking(aut); final
@@ -614,7 +615,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   void reportSupervisor(final String kind,
                         final ListBufferTransitionRelation sup)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
         "Got " + kind + " supervisor '" + sup.getName() + "' with "
