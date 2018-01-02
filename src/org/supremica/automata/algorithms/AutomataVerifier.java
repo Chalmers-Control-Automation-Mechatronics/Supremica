@@ -59,6 +59,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -120,6 +121,7 @@ public class AutomataVerifier
     private AutomataSynchronizerHelper synchHelper;
     private final ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>();
     private StateMemorizer potentiallyUncontrollableStates;
+    private BDDVerifier bddVerifier;
 
     // Used by findUncontrollableStates
     private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
@@ -226,112 +228,100 @@ public class AutomataVerifier
     /**
      * This is an attempt to clean up this interface.
      */
-    public boolean verify()
-      throws UnsupportedOperationException
-    {
-      try {
-        // Find out what should be done and do it!
-        final VerificationType vtype =
-          verificationOptions.getVerificationType();
-        switch (vtype) {
-        case CONTROLLABILITY:
-        case INVERSECONTROLLABILITY:
-        case LANGUAGEINCLUSION:
-          // All of these verification types use the same algorithm. Just need to do some preparation first...
-          // Inverse controllability? Invert controllability!
-          if (vtype == VerificationType.INVERSECONTROLLABILITY)
-          {
-            // Invert controllability and plant/spec status
-            prepareForInverseControllability();
-          }
-          else if (vtype == VerificationType.LANGUAGEINCLUSION)
-          {
-            // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-            prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
-          }
-          // We're gonna do some synchronization! Initialize a synchronization helper!
-          // Only some of the below algorithms use this helper?
-          synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
+  public boolean verify() throws UnsupportedOperationException, AnalysisAbortException
+  {
+    try {
+      // Find out what should be done and do it!
+      final VerificationType vtype =
+        verificationOptions.getVerificationType();
+      switch (vtype) {
+      case CONTROLLABILITY:
+      case INVERSECONTROLLABILITY:
+      case LANGUAGEINCLUSION:
+        // All of these verification types use the same algorithm. Just need to do some preparation first...
+        // Inverse controllability? Invert controllability!
+        if (vtype == VerificationType.INVERSECONTROLLABILITY) {
+          // Invert controllability and plant/spec status
+          prepareForInverseControllability();
+        } else if (vtype == VerificationType.LANGUAGEINCLUSION) {
+          // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+          prepareForLanguageInclusion(verificationOptions
+            .getInclusionAutomata());
+        }
+        // We're gonna do some synchronization! Initialize a synchronization helper!
+        // Only some of the below algorithms use this helper?
+        synchHelper =
+          new AutomataSynchronizerHelper(theAutomata, synchronizationOptions,
+                                         false);
+        synchHelper.setExecutionDialog(executionDialog);
+        // Work!
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHIC) {
+          return monolithicControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MODULAR) {
+          return modularControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+                   || verificationOptions
+                     .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.SAT) {
+          return true; // Alexey add a call to your code here
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
+        }
+      case CONTROLLABILITYNONBLOCKING:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+            || verificationOptions
+              .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalControllabilityNonblockingVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
+        }
+      case NONBLOCKING:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHIC) {
+          // We're gonna do some serious synchronization! Initialize a synchronization helper!
+          synchronizationOptions.setForbidUncontrollableStates(false);
+          synchronizationOptions.setExpandForbiddenStates(true);
+          synchHelper =
+            new AutomataSynchronizerHelper(theAutomata,
+                                           synchronizationOptions, false);
           synchHelper.setExecutionDialog(executionDialog);
           // Work!
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-          {
-            return monolithicControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-          {
-            return modularControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.SAT)
-          {
-            return true; // Alexey add a call to your code here
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case CONTROLLABILITYNONBLOCKING:
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalControllabilityNonblockingVerification();
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case NONBLOCKING:
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-          {
-            // We're gonna do some serious synchronization! Initialize a synchronization helper!
-            synchronizationOptions.setForbidUncontrollableStates(false);
-            synchronizationOptions.setExpandForbiddenStates(true);
-            synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
-            synchHelper.setExecutionDialog(executionDialog);
-            // Work!
-            return monolithicNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
-          {
-            return monolithicBDDNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalNonblockingVerification();
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case OP:
-            return observerPropertyVerification();
-        case DIAGNOSABILITY:
-            if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD)
-        {
-            return BBSDDiagnosabilityVerification();
+          return monolithicNonblockingVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD) {
+          return monolithicBDDNonblockingVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+                   || verificationOptions
+                     .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalNonblockingVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
         }
-        else
-        {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+      case OP:
+        return observerPropertyVerification();
+      case DIAGNOSABILITY:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.BBSD) {
+          return BBSDDiagnosabilityVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
         }
-        default:
-          throw new UnsupportedOperationException
-            ("The selected type of verification is not implemented!");
-        }
+      default:
+        throw new UnsupportedOperationException("The selected type of verification is not implemented!");
       }
-      catch (final Exception e)
-      {
-        e.printStackTrace();
-        logger.error("Exception in AutomataVerifier: " + e);
-        throw new RuntimeException(e);    // Try change this later
-      }
+    } catch (final Exception e) {
+      e.printStackTrace();
+      logger.debug("Exception in AutomataVerifier: " + e);
+      throw new RuntimeException(e); // Try change this later
     }
+  }
 
     /**
      * Prepares the helper and the automataindexform for inverse controllability...
@@ -1204,17 +1194,27 @@ public class AutomataVerifier
      *
      *@return  true if the system is nonblocking
      */
-    private boolean monolithicBDDNonblockingVerification()
-    throws Exception
-    {
-        final BDDVerifier bddVerifier = new BDDVerifier(theAutomata);
-        final boolean isNonblocking = bddVerifier.isNonblocking();
-        logger.info("Number of reachable state: " + bddVerifier.numberOfReachableStates());
-        logger.info("Number of coreachable states: " + bddVerifier.numberOfCoreachableStates());
-        logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
-        bddVerifier.done();
-        return isNonblocking;
+  private boolean monolithicBDDNonblockingVerification()
+  throws Exception
+  {
+    bddVerifier = new BDDVerifier(theAutomata);
+    boolean isNonblocking = false;
+    try {
+      isNonblocking = bddVerifier.isNonblocking();
+      logger.info("Number of reachable state: "
+                  + bddVerifier.numberOfReachableStates());
+      logger.info("Number of coreachable states: "
+                  + bddVerifier.numberOfCoreachableStates());
+      logger.info("Number of blocking states: "
+                  + bddVerifier.numberOfBlockingStates());
+    } catch (final Exception ex) {
+      requestAbort();
+      throw ex;
+    } finally {
+      bddVerifier.done();
     }
+    return isNonblocking;
+  }
 
     /**
      * Examines controllability by synchronizing all automata in the system and in each state check if some
@@ -1716,7 +1716,7 @@ public class AutomataVerifier
     @Override
     public void requestAbort()
     {
-        logger.debug("AutomataVerifier requested to stop.");
+        logger.debug("AutomataVerifier is requested to stop.");
 
         abortRequested = true;
 
@@ -1724,6 +1724,11 @@ public class AutomataVerifier
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
             synchronizationExecuters.get(i).requestStop();
+        }
+
+        if (bddVerifier != null)
+        {
+          bddVerifier.requestAbort();
         }
 
         if (threadToAbort != null)
