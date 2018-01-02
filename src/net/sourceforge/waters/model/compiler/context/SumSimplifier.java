@@ -173,7 +173,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    *                            equation.
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return <CODE>true</CODE> if the equation is already normalised,
-   *         <CIDE>false</CODE> otherwise. A return value of <CODE>true</CODE>
+   *         <CODE>false</CODE> otherwise. A return value of <CODE>true</CODE>
    *         means that a call to {@link #normaliseEquation(SimpleExpressionProxy,SimpleExpressionProxy,Comparator)
    *         normaliseEquation()} will return a changed equation.
    */
