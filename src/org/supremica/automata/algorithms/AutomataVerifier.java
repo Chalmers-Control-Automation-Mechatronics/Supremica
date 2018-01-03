@@ -316,9 +316,12 @@ public class AutomataVerifier
       default:
         throw new UnsupportedOperationException("The selected type of verification is not implemented!");
       }
+    } catch (final AnalysisAbortException exception) {
+      logger.info("Verification aborted.");
+      throw new RuntimeException(exception);
     } catch (final Exception e) {
       e.printStackTrace();
-      logger.debug("Exception in AutomataVerifier: " + e);
+      logger.error("Exception in AutomataVerifier", e);
       throw new RuntimeException(e); // Try change this later
     }
   }
