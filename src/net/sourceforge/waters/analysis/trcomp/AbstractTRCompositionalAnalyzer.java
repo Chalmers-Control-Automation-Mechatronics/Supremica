@@ -81,6 +81,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -523,7 +524,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   public boolean run() throws AnalysisException
   {
     try {
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       setUp();
       final AnalysisResult result = getAnalysisResult();
       if (result.isFinished()) {
@@ -793,7 +794,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     // Log ...
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     if (logger.isDebugEnabled()) {
       logger.debug("Simplifying " + aut.getName() + " ...");
@@ -861,7 +862,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     (final TRCandidate candidate)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       mStepNo++;
       logger.debug("Composing " + candidate + " (step " + mStepNo +") ...");
@@ -1127,7 +1128,7 @@ public abstract class AbstractTRCompositionalAnalyzer
       final TRAutomatonProxy created = step.createOutputAutomaton(config);
       created.setKind(ComponentKind.PLANT);
       if (!hasInitialState(created)) {
-        final Logger logger = getLogger();
+        final Logger logger = LogManager.getLogger();
         logger.debug("Terminating early as automaton " + aut.getName() +
                      " has no initial state.");
         setSatisfiedResult();
@@ -1249,7 +1250,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   void countSpecialEvents(final EventEncoding enc)
   {
     final CompositionalAnalysisResult stats = getAnalysisResult();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final int numEvents = enc.getNumberOfProperEvents();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = enc.getProperEventStatus(e);
@@ -1274,14 +1275,14 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   void recordUnsuccessfulComposition(final OverflowException exception)
   {
-    getLogger().debug(exception.getMessage());
+    LogManager.getLogger().debug(exception.getMessage());
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
   }
 
   void recordMonolithicAttempt(final ProductDESProxy des)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       double estimate = 1.0;
       final Collection<AutomatonProxy> automata = des.getAutomata();

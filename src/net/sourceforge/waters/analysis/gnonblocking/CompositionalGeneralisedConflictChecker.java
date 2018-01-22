@@ -80,6 +80,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -751,7 +752,7 @@ public class CompositionalGeneralisedConflictChecker
                                                final EventProxy tau)
       throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     AutomatonProxy abstractedAut = autToAbstract;
     for (final AbstractionRule rule : mAbstractionRules) {
       try {

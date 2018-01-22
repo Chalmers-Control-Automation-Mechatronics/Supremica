@@ -69,6 +69,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -130,7 +131,7 @@ public class TRControllabilityChecker
     throws AnalysisException
   {
     super.setUp();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final KindTranslator translator = getKindTranslator();
     final ProductDESProxy des = getModel();
 
@@ -250,7 +251,7 @@ public class TRControllabilityChecker
         return result.isSatisfied();
       }
       final TRCompositionalOnePropertyChecker delegate = getDelegate();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       for (final EventInfo info : mEventInfo) {
         final EventProxy event = info.getEvent();
         logger.debug("Checking controllability with respect to {} ...",

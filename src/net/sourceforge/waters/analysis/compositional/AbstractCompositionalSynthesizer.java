@@ -56,6 +56,7 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -299,7 +300,7 @@ public abstract class AbstractCompositionalSynthesizer
   void reportAbstractionResult(final AutomatonProxy aut,
                                final AutomatonProxy dist)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       /*
        * final boolean nonblocking = AnalysisTools.isNonBlocking(aut); final
@@ -318,7 +319,7 @@ public abstract class AbstractCompositionalSynthesizer
   void reportSupervisor(final String kind,
                         final ListBufferTransitionRelation sup)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
         "Got " + kind + " supervisor '" + sup.getName() + "' with " +

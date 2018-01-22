@@ -195,10 +195,16 @@ public class AutomataVerificationWorker
 
         // Solve the problem and measure the time it takes!
         final ActionTimer timer = new ActionTimer();
-        timer.start();
-        verificationSuccess = automataVerifier.verify();
-        timer.stop();
-
+        verificationSuccess = false;
+        try {
+          timer.start();
+          verificationSuccess = automataVerifier.verify();
+          timer.stop();
+        }
+        catch (final Exception ex)
+        {
+          this.requestAbort();
+        }
         // Add test result from Diagnosability verification
         if (vtype == VerificationType.DIAGNOSABILITY &&
             verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD)
@@ -268,7 +274,7 @@ public class AutomataVerificationWorker
     {
         abortRequested = true;
 
-        logger.debug("AutomataVerificationWorker requested to stop.");
+        logger.debug("AutomataVerificationWorker is requested to stop.");
 
         if (executionDialog != null)
         {

@@ -58,6 +58,9 @@ import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
+import net.sourceforge.waters.model.analysis.AbstractAbortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,7 +68,7 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.properties.Config;
 
 
-public class BDDManager
+public class BDDManager extends AbstractAbortable
 {
     private static Logger logger = LogManager.getLogger(BDDManager.class);
 
@@ -169,16 +172,17 @@ public class BDDManager
         bdd.orWith(sourceBDD);
     }
 
-    public static BDD reachableStates(final BDD initialStates,final BDDTransitions transitions,
+    public BDD reachableStates(final BDD initialStates,final BDDTransitions transitions,
                                       final BDDVarSet sourceStateVariables, final BDDVarSet eventVariables,
                                       final BDDPairing destToSourceStatePairing)
+                                        throws AnalysisAbortException, OverflowException
     {
         final BDD reachableStatesBDD = initialStates.id();
         BDD previousReachableStatesBDD = null;
 
-        logger.debug("In reachableStates");
         do
         {
+            checkAbort();
             // Keep a copy of the previously discovered states
             // This will be used in the termination condition for
             // the operation.
@@ -231,7 +235,6 @@ public class BDDManager
                 return null;
             }
 
-
             // Now all states that could be reached from the current set of states
             // are in the DestDomainVariables. Now we need to move them from DestDomainVariables
             // to SourceDomainVariables so they are comparaable with our previous reachable states.
@@ -251,13 +254,19 @@ public class BDDManager
         return reachableStatesBDD;
     }
 
-    public static BDD coreachableStates(final BDD markedStates, final BDDTransitions transitions, final BDDVarSet sourceStateVariables, final BDDVarSet eventVariables, final BDDPairing destToSourceStatePairing)
+    public BDD coreachableStates(final BDD markedStates,
+                                 final BDDTransitions transitions,
+                                 final BDDVarSet sourceStateVariables,
+                                 final BDDVarSet eventVariables,
+                                 final BDDPairing destToSourceStatePairing)
+                                   throws AnalysisAbortException, OverflowException
     {
         final BDD coreachableStatesBDD = markedStates.id();
         BDD previousCoreachableStatesBDD = null;
 
         do
         {
+            checkAbort();
             previousCoreachableStatesBDD = coreachableStatesBDD.id();
 
             BDD previousStatesAndTransitionsBDD;

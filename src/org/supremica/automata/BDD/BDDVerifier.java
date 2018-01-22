@@ -51,100 +51,129 @@ package org.supremica.automata.BDD;
 
 import java.io.File;
 
+import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.ProjectBuildFromXML;
 
 
-public class BDDVerifier
+public class BDDVerifier implements Abortable
 {
+    private static Logger logger = LogManager.getLogger(BDDVerifier.class);
+    private boolean isAborting;
     BDDAutomata bddAutomata;
-    
-    public BDDVerifier(Automata theAutomata)
+
+    public BDDVerifier(final Automata theAutomata)
     {
         bddAutomata = new BDDAutomata(theAutomata);
     }
-    
-    public double numberOfReachableStates()
+
+    public double numberOfReachableStates() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.numberOfReachableStates();
     }
-    
-    public double numberOfCoreachableStates()
+
+    public double numberOfCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.numberOfCoreachableStates();
     }
-    
-    public double numberOfReachableAndCoreachableStates()
+
+    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.numberOfReachableAndCoreachableStates();
     }
- 
-    public double numberOfBlockingStates()
+
+    public double numberOfBlockingStates() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.numberOfBlockingStates();
     }
-        
-    public boolean isNonblocking()
+
+    public boolean isNonblocking() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.isNonblocking();
     }
-    
+
     public boolean isControllable()
     {
         return false;
     }
-    
+
     public boolean isNonblockingAndControllable()
     {
         return false;
     }
-    
+
     public void done()
     {
         if (bddAutomata != null)
         {
-            bddAutomata.done();            
-            bddAutomata = null;            
+            bddAutomata.done();
+            bddAutomata = null;
         }
     }
-    
-    public static void main(String[] args)
+
+    public static void main(final String[] args)
     throws Exception
     {
         System.err.println("Loading: " + args[0]);
-        
-        ProjectBuildFromXML builder = new ProjectBuildFromXML();
-        Project theProject = builder.build(new File(args[0]));
-        
-        BDDVerifier bddVerifier = new BDDVerifier(theProject);
-        
+
+        final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+        final Project theProject = builder.build(new File(args[0]));
+
+        final BDDVerifier bddVerifier = new BDDVerifier(theProject);
+
         long startTime = System.currentTimeMillis();
-        double nbrOfReachableStates = bddVerifier.numberOfReachableStates();
+        final double nbrOfReachableStates = bddVerifier.numberOfReachableStates();
         long stopTime = System.currentTimeMillis();
         long compTime = stopTime - startTime;
-        
+
         System.err.println("Computation time (ms): " + compTime);
         System.err.println("Reachable states: " + nbrOfReachableStates);
-        
+
         startTime = System.currentTimeMillis();
-        double nbrOfCoreachableStates = bddVerifier.numberOfCoreachableStates();
+        final double nbrOfCoreachableStates = bddVerifier.numberOfCoreachableStates();
         stopTime = System.currentTimeMillis();
         compTime = stopTime - startTime;
-        
+
         System.err.println("Computation time (ms): " + compTime);
         System.err.println("Coreachable states: " + nbrOfCoreachableStates);
-        
+
         startTime = System.currentTimeMillis();
-        double nbrOfReachableAndCoreachableStates = bddVerifier.numberOfReachableAndCoreachableStates();
+        final double nbrOfReachableAndCoreachableStates = bddVerifier.numberOfReachableAndCoreachableStates();
         stopTime = System.currentTimeMillis();
         compTime = stopTime - startTime;
-        
+
         System.err.println("Computation time (ms): " + compTime);
         System.err.println("ReachableAndCoreachable states: " + nbrOfReachableAndCoreachableStates);
-        
+
         System.err.println("isNonblocking: " + bddVerifier.isNonblocking());
     }
-    
+
+    @Override
+    public void requestAbort()
+    {
+      logger.debug("BDDVerifier is requested to stop.");
+      isAborting = true;
+      bddAutomata.requestAbort();
+    }
+
+    @Override
+    public boolean isAborting()
+    {
+      return isAborting;
+    }
+
+    @Override
+    public void resetAbort()
+    {
+      isAborting = false;
+    }
+
 }
 

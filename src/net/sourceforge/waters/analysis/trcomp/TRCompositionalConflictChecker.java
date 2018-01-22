@@ -96,6 +96,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
@@ -344,7 +345,7 @@ public class TRCompositionalConflictChecker
   protected boolean earlyTerminationCheck(final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     boolean allAutomataOmega = true;
     TRAutomatonProxy omegaBlocker = null;
     for (final TRAutomatonProxy aut : subsys.getAutomata()) {
@@ -460,7 +461,7 @@ public class TRCompositionalConflictChecker
         monolithicResult = mono.getAnalysisResult();
         combinedResult.addMonolithicAnalysisResult(monolithicResult);
       }
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       if (monolithicResult.isSatisfied()) {
         if (mConfiguredPreconditionMarking == null) {
           logger.debug("Subsystem is nonblocking.");
@@ -612,7 +613,7 @@ public class TRCompositionalConflictChecker
     if (mConfiguredPreconditionMarking == null) {
       return createDropSteps(subsys);
     }
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     logger.debug("Checking subsystem for reachable precondition-marked state ...");
     final TRLanguageInclusionChecker checker =
       getLanguageInclusionChecker();
