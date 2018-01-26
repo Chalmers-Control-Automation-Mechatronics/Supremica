@@ -42,10 +42,14 @@ import javax.swing.Action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.supremica.automata.Alphabet;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.automata.algorithms.AutomatonSplit;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.gui.AutomataSynchronizerWorker;
+// import org.supremica.selectedAautomata.algorithms.AutomatonSplit;
 
 /**
  * A new action
@@ -53,10 +57,9 @@ import org.supremica.automata.algorithms.AutomatonSplit;
 public class AnalyzerExperimentAction
     extends IDEAction
 {
-    private static Logger logger = LogManager.getLogger(AnalyzerExperimentAction.class);
-
-     private static final long serialVersionUID = 1L;
-
+    private static final Logger logger = LogManager.getLogger(AnalyzerExperimentAction.class);
+    private static final long serialVersionUID = 1L;
+	
     /**
      * Constructor.
      */
@@ -68,7 +71,7 @@ public class AnalyzerExperimentAction
         setAnalyzerActiveRequired(false);
 
         putValue(Action.NAME, "Experiment");
-        putValue(Action.SHORT_DESCRIPTION, "Test of new stuff");
+        putValue(Action.SHORT_DESCRIPTION, "Test of new stuff - this time: interleave");
         //putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_D));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
@@ -87,13 +90,17 @@ public class AnalyzerExperimentAction
     public void doAction()
     {
         logger.info("Experiment started...");
-
-        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+		
+		final Automata allAutomataBefore = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // EXPERIMENT!
         {
+		/* This is some kind fo "split", unclear who wrote it but apparently it was not good 
+		 * to get a menu option of its own...
+		
             // "DECOMPOSE" INDIVUDUAL AUTOMATA
-            for (final Automaton automaton: automata)
+            for (final Automaton automaton: selectedAautomata)
             {
                 final Automata result = AutomatonSplit.split(automaton);
 
@@ -107,6 +114,60 @@ public class AnalyzerExperimentAction
                     logger.debug(ex.getStackTrace());
                 }
             }
+		 * **************/
+
+		/* This is a first try of doing proper interelave -- MF
+		 * It turns out that this can be done by using actions already available. It goes like this:
+		   1. Make all events unobservable (wtch out for already unobservable events, such as tau events!)
+		   2. Synchronize ordinarily
+		   3. Set the obervability property back of all events touched under 1 above
+		   4. Do language preserving minimization		
+		 **/
+			final Alphabet alpha = selectedAutomata.getUnionAlphabet();
+			final Alphabet changed_alpha = new Alphabet();	// Here we store the ones we change
+			
+			for(final LabeledEvent event : alpha)
+			{	
+				if(event.isObservable())
+				{
+					event.setObservable(false);
+					changed_alpha.add(event);
+				}
+			}
+			
+			// Now synchronize
+			final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+			final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+			if(asw != null)
+			{
+				asw.start();	// Start this thread and wait for it to finish
+				
+				// while(asw.isAlive())
+				{
+					try
+					{
+						asw.join(); // For some reason this join seems not to work...
+									// the num of automata after is the same as the num of automata before
+									// But the synched automaton IS added to the Analyzer
+					}
+					catch (InterruptedException excp) 
+					{
+						logger.error("InterruptedException: " + excp);
+					}					
+				}
+			}
+			
+			// Now, somehow get the newly created automaton, the synch result
+			final Automata allAutomataAfter = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+			// The diff between allAutomataBefore and allAutomataAfter shoudl be a single automaton, the one we look for
+			final int num = allAutomataAfter.nbrOfAutomata() - allAutomataBefore.nbrOfAutomata();
+			if(num != 1)
+			{
+				// Something is seriously wrong, either no automaton or more than one was created by the synch...
+				logger.error("Experiment error! " + num + " number of automata was created, we expected one, and only one!");
+			}
+			
+
         }
 
         logger.info("Experiment finished.");
