@@ -272,7 +272,7 @@ public class AboutPanel
                 minorVersion = Integer.parseInt(subMatcher.group(1));
               }
             }
-            if (minorVersion > 28) {
+            if (minorVersion > 40) {
               mVersionInfo +=
                 " - <span style=\"color: red;\">incompatible</span>";
             }
