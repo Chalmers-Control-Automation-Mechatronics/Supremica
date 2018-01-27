@@ -73,6 +73,9 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
 import org.supremica.automata.Automata;
@@ -83,24 +86,23 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
 import org.supremica.gui.ExecutionDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.IntArrayHashTable;
 import org.supremica.util.IntArrayList;
 import org.supremica.util.SupremicaException;
 
-//import EDU.oswego.cs.dl.util.concurrent.Rendezvous;
+
 /**
- * Contains information that is common to all synchronization threads.
+ * Contains information that is common to all synchronisation threads.
  * <p/>
- * @author ka
- * @author Mohammad Reza Shoaei (EFA synchronization)
+ * @author Knut &Aring;kesson
+ * @author Mohammad Reza Shoaei (EFA synchronisation)
  * @since November 28, 2001
  */
+
 public class AutomataSynchronizerHelper
 {
 
-	private final static Logger logger = LoggerFactory.createLogger(AutomataSynchronizerHelper.class);
+	private final static Logger logger = LogManager.getLogger(AutomataSynchronizerHelper.class);
 	private AutomataIndexForm theAutomataIndexForm;
 	private final IntArrayHashTable theStates;
 	private final IntArrayList statesToProcess;
@@ -171,7 +173,7 @@ public class AutomataSynchronizerHelper
 		{
 			throw new IllegalArgumentException("syncOptions must be non-null");
 		}
-		
+
 		if(syncOptions.getEFAMode())
 		{
 			this.arc2EdgeTable = arc2EdgeTable;

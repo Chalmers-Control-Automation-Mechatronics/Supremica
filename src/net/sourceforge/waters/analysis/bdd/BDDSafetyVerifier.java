@@ -60,7 +60,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <P>A BDD implementation of a general safety verifier.</P>
@@ -144,7 +145,7 @@ public class BDDSafetyVerifier
   public boolean run()
     throws AnalysisException
   {
-    getLogger().debug("BDDSafetyVerifier.run(): " +
+    LogManager.getLogger().debug("BDDSafetyVerifier.run(): " +
                       getModel().getName() + " ...");
     try {
       setUp();
@@ -184,7 +185,7 @@ public class BDDSafetyVerifier
       }
     } finally {
       tearDown();
-      getLogger().debug("BDDSafetyVerifier.run(): " +
+      LogManager.getLogger().debug("BDDSafetyVerifier.run(): " +
                         getModel().getName() + " done.");
     }
   }
@@ -298,7 +299,7 @@ public class BDDSafetyVerifier
     mConditionBDDs = mConditionPartitioning.getFullPartition();
     mConditionPartitioning = null;
     final int condcount1 = mConditionBDDs.size();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && condcount0 > condcount1) {
       logger.debug("Merged conditions: " + condcount0 +
                    " >> " + condcount1);

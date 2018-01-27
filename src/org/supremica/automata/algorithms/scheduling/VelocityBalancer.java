@@ -12,6 +12,9 @@ package org.supremica.automata.algorithms.scheduling;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Arc;
@@ -21,16 +24,13 @@ import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
 
 
 /**
- * Creates a new instance of VelocityBalancer
- *
  * @author Avenir Kobetski
  */
+
 public class VelocityBalancer
 {
   /**
@@ -90,7 +90,7 @@ public class VelocityBalancer
   int[] plantIndexMapping;
 
   /** The logger */
-  private final Logger logger = LoggerFactory.createLogger(this.getClass());
+  private final Logger logger = LogManager.getLogger(this.getClass());
 
   Scheduler callingScheduler = null;
 

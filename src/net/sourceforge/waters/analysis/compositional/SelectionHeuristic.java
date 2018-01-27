@@ -44,8 +44,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * <P>An abstract type to represent an arbitrary selection heuristic.
@@ -220,13 +218,6 @@ public abstract class SelectionHeuristic<T extends Comparable<? super T>>
   public String toString()
   {
     return getName();
-  }
-
-  @Override
-  public Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
   }
 
 }

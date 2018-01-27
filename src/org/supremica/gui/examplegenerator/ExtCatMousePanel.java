@@ -52,6 +52,9 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.Border;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.algorithms.AutomataSynthesizer;
@@ -62,12 +65,11 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.ExtCatMouse;
 
+
 class ExtCatMousePanel extends CatMousePanel implements TestCase,
-		ActionListener 
+		ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	private final Util util = new Util();
@@ -84,10 +86,9 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	JPanel traversing_algorithms;
 	private final JRadioButton zigzagButton = new JRadioButton("Zigzag traversing");
 	private final JRadioButton verticalButton = new JRadioButton("Vertical traversing");
-	private static Logger logger = LoggerFactory
-			.createLogger(ExtCatMousePanel.class);
+	private static Logger logger = LogManager.getLogger(ExtCatMousePanel.class);
 
-	public ExtCatMousePanel() 
+	public ExtCatMousePanel()
 	{
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
@@ -107,7 +108,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 		selfloops.setSelected(false);
 		selfloops.setEnabled(false);
 		selfloops.setToolTipText("Forbidden selfloops are not applicable to this example");
-		
+
 		all_cases.addActionListener(this);
 
 		final JPanel NK = new JPanel();
@@ -146,7 +147,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	}
 
 	@Override
-	public void actionPerformed(final ActionEvent e) 
+	public void actionPerformed(final ActionEvent e)
 	{
 		if (multiple.isSelected()) {
 			int_step_cats.setEnabled(true);
@@ -173,7 +174,7 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 
 	// This function will be called when "Synthesize" button is pressed
 	@Override
-	public void synthesizeSupervisor(final IDE ide) throws Exception 
+	public void synthesizeSupervisor(final IDE ide) throws Exception
 	{
 		int number_of_cats = int_num.get();
 		int number_of_levels = int_num_levels.get();
@@ -192,10 +193,10 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 					synthesizerOptions);
 			synthesizerDialog.setVisible(true);
 		} else {
-			// Default is BDD
-			synthesizerOptions
-					.setSynthesisType(SynthesisType.NONBLOCKING_CONTROLLABLE);
-			synthesizerOptions.setSynthesisAlgorithm(SynthesisAlgorithm.BDD);
+			synthesizerOptions.setSynthesisType
+			  (SynthesisType.NONBLOCKING_CONTROLLABLE);
+			synthesizerOptions.setSynthesisAlgorithm
+			  (SynthesisAlgorithm.MONOLITHIC_WATERS);
 			synthesizerOptions.setPurge(true);
 			synthesizerOptions.setMaximallyPermissive(true);
 			synthesizerOptions.setMaximallyPermissiveIncremental(true);
@@ -264,33 +265,17 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 				final Automaton supervisor = asw.getSupervisor();
 				result_text += " " + supervisor.nbrOfStates();
 			} else {
-				final AutomataSynthesizer synthesizer = new AutomataSynthesizer(ecm
-						.getAutomata(), SynchronizationOptions
-						.getDefaultSynthesisOptions(), synthesizerOptions);
-
-				if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD) {
-					synthesizer.execute();
-
-					final BigDecimal time = synthesizer.getTimeSeconds();
-					result_text += " " + time + "\t";
-					result_text += " \t";
-
-					final long nbrOfStates = synthesizer.getNbrOfStatesBDD();
-					result_text += " " + nbrOfStates + "\t";
-
-					final long nbrOfNodes = synthesizer.getNbrOfNodesBDD();
-					result_text += " " + nbrOfNodes;
-				} else {
-					final Automaton supervisor = synthesizer.execute()
-							.getFirstAutomaton();
-
-					final BigDecimal time = synthesizer.getTimeSeconds();
-					result_text += " " + time + "\t";
-					result_text += " \t";
-
-					final int nbrOfStates = supervisor.getStateSet().size();
-					result_text += " " + nbrOfStates;
-				}
+			  final AutomataSynthesizer synthesizer =
+			    new AutomataSynthesizer(ecm.getAutomata(),
+			                            SynchronizationOptions.getDefaultSynthesisOptions(),
+			                            synthesizerOptions);
+			  final Automaton supervisor =
+			    synthesizer.execute().getFirstAutomaton();
+			  final BigDecimal time = synthesizer.getTimeSeconds();
+			  result_text += " " + time + "\t";
+			  result_text += " \t";
+			  final int nbrOfStates = supervisor.getStateSet().size();
+			  result_text += " " + nbrOfStates;
 			}
 
 			System.err.println("Finished. ");
@@ -311,12 +296,12 @@ class ExtCatMousePanel extends CatMousePanel implements TestCase,
 	}
 
 	@Override
-	public Project generateAutomata() throws Exception 
+	public Project generateAutomata() throws Exception
 	{
 		final ExtCatMouse cm = new ExtCatMouse(int_num.get(), int_num_levels.get());
 		return cm.getProject();
 	}
-  
+
   // Debugging only!
   	public static void main(final String[] args)
 	{

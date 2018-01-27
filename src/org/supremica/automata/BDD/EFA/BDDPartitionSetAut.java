@@ -1,31 +1,27 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
-import java.util.Iterator;
-
-import net.sf.javabdd.BDD;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.hash.TIntHashSet;
+
+import java.util.Iterator;
+
+import net.sf.javabdd.BDD;
+
+import net.sourceforge.waters.model.module.EventDeclProxy;
+
+import org.supremica.automata.ExtendedAutomaton;
 
 
 /**
  * The class implements the automaton-based partitioning approach for DFAs.
  *
- * @author zhennan
+ * @author Zhennan Fei
  */
 
 public class BDDPartitionSetAut extends BDDPartitionSet
 {
-
-  static Logger logger = LoggerFactory.createLogger(BDDPartitionSetAut.class);
-
   /**
    * A map where the key is the index of an event in the index map while the
    * value is its BDD.

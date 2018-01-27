@@ -45,7 +45,8 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -128,7 +129,7 @@ public class SelectionHeuristicMinSync
       }
       return dsize;
     } catch (final OutOfMemoryError error) {
-      final Logger logger = analyzer.getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       addOverflowCandidate(candidate);
       return Double.POSITIVE_INFINITY;

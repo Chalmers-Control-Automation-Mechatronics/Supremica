@@ -116,6 +116,7 @@ public class StandardExtensionFileFilter
 
   //#########################################################################
   //# Overrides for Abstract Base Class javax.swing.filechooser.FileFilter
+  @Override
   public boolean accept(final File file)
   {
     if (file.isDirectory()) {
@@ -126,6 +127,7 @@ public class StandardExtensionFileFilter
     }
   }
 
+  @Override
   public String getDescription()
   {
     return mDescription;
@@ -190,7 +192,7 @@ public class StandardExtensionFileFilter
    */
   public static File ensureDefaultExtension(final File file, final String ext)
   {
-    if (hasExtension(file, ext)) {
+    if (file.getName().indexOf('.') >= 0) {
       return file;
     } else {
       return new File(file.getPath() + ext);

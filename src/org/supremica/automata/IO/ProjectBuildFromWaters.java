@@ -67,7 +67,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.*;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -76,8 +81,18 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
 import org.supremica.properties.Config;
 
 
@@ -493,6 +508,6 @@ public class ProjectBuildFromWaters
     private boolean mIncludesProperties;
 
     private static final Logger logger =
-        LoggerFactory.createLogger(ProjectBuildFromWaters.class);
+        LogManager.getLogger(ProjectBuildFromWaters.class);
 
 }

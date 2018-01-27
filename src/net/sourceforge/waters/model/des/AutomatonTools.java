@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.model.des;
 
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.strategy.HashingStrategy;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,10 +43,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
+import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.strategy.HashingStrategy;
 
 
 /**
@@ -205,6 +206,7 @@ public final class AutomatonTools
    * associated with any given pair of source state and event.
    * This method uses a hash table to perform the determinism check
    * in time complexity linear in the number of transitions.
+   * @see #checkDeterministic(AutomatonProxy) checkDeterministic()
    */
   public static boolean isDeterministic(final AutomatonProxy aut)
   {
@@ -226,6 +228,42 @@ public final class AutomatonTools
       }
     }
     return true;
+  }
+
+  /**
+   * Checks whether the given automaton is deterministic, throwing an
+   * exception if it is not.
+   * An automaton is considered as deterministic if it has at most
+   * one initial state, and whether there exists at most one transition
+   * associated with any given pair of source state and event.
+   * This method uses a hash table to perform the determinism check
+   * in time complexity linear in the number of transitions.
+   * @throws NondeterministicDESException to indicate that the given
+   *   automaton is nondeterministic.
+   * @see #isDeterministic(AutomatonProxy) isDeterministic()
+   */
+  public static void checkDeterministic(final AutomatonProxy aut)
+    throws NondeterministicDESException
+  {
+    boolean hasInit = false;
+    for (final StateProxy state : aut.getStates()) {
+      if (state.isInitial()) {
+        if (hasInit) {
+          throw new NondeterministicDESException(aut, state);
+        } else {
+          hasInit = true;
+        }
+      }
+    }
+    final Set<TransitionProxy> transitions =
+      new WatersHashSet<TransitionProxy>(TransitionHashingStrategy.INSTANCE);
+    for (final TransitionProxy trans : aut.getTransitions()) {
+      if (!transitions.add(trans)) {
+        final StateProxy source = trans.getSource();
+        final EventProxy event = trans.getEvent();
+        throw new NondeterministicDESException(aut, source, event);
+      }
+    }
   }
 
   /**

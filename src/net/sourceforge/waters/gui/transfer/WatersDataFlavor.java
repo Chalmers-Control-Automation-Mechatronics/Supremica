@@ -41,18 +41,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
-import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 
@@ -71,9 +75,8 @@ import gnu.trove.set.hash.THashSet;
  * instances of this class or its subclasses, and they control the behaviour
  * of the transferables.</P>
  *
- * <P>Transferables are created by the {@link
- * #createTransferable(Collection) createTransferable()} methods.
- * Given a list of {@link Proxy} objects, this method creates a
+ * <P>Given a list of {@link Proxy} objects, the {@link
+ * #createTransferable(Collection) createTransferable()} method creates a
  * transferable in the following steps:</P>
  * <OL>
  * <LI>The input list is reduced to ensure that the transferable does
@@ -91,7 +94,8 @@ import gnu.trove.set.hash.THashSet;
  *     reduceDataFlavorList()}.</LI>
  * <LI>The data stored in the transferable is copied from the input data by
  *     a call to the primary data flavour's {@link
- *     #createExportData(Collection) createExportData()} method.</LI>
+ *     #createExportData(Collection,ModuleContext) createExportData()}
+ *     method.</LI>
  * <LI>Using the data flavours and the copied data, an instance of
  *     {@link ProxyTransferable} is created and returned as the
  *     transferable.</LI>
@@ -143,7 +147,7 @@ public abstract class WatersDataFlavor extends DataFlavor
   public static ProxyTransferable createTransferable
     (final Collection<? extends Proxy> data)
   {
-    return createTransferable(data, true);
+    return createTransferable(data, null, true);
   }
 
   /**
@@ -151,29 +155,39 @@ public abstract class WatersDataFlavor extends DataFlavor
    * {@link Proxy} objects. This method automatically determines appropriate
    * data flavours for the given list of objects and makes modifications to
    * the data as necessary.
-   * @param  data   The objects to be stored in the transferable.
-   *                The data will be duplicated and copies will be stored
-   *                in the transferable.
+   * @param  data    The objects to be stored in the transferable.
+   *                 The data will be duplicated and copies will be stored
+   *                 in the transferable.
+   * @param  context The module context of the module containing the data,
+   *                 or <CODE>null</CODE> if the data does not belong to any
+   *                 module being edited.
    * @param  supportsIdentifier Whether or not the created transferable
-   *                should support the identifier data flavor
-   *                {@link WatersDataFlavor#IDENTIFIER}. Most transferables
-   *                support this flavor, but it can be suppressed by setting
-   *                this parameter to <CODE>false</CODE>.
+   *                 should support the identifier data flavour
+   *                 {@link WatersDataFlavor#IDENTIFIER}. Most transferables
+   *                 support this flavour, but it can be suppressed by setting
+   *                 this parameter to <CODE>false</CODE>.
    * @return An instance of {@link ProxyTransferable} containing the data.
    * @throws IllegalArgumentException to indicate that no suitable
    *         data flavour could be identified for the given data.
    * @see WatersDataFlavor
    */
   public static ProxyTransferable createTransferable
-    (Collection<? extends Proxy> data, final boolean supportsIdentifier)
+    (Collection<? extends Proxy> data,
+     final ModuleContext context,
+     boolean supportsIdentifier)
   {
     data = getReducedData(data);
     final DataFlavorVisitor visitor = DataFlavorVisitor.getInstance();
     final List<WatersDataFlavor> flavors =
       visitor.getTransferDataFlavors(data);
     int count = flavors.size() + 1;
-    if (!supportsIdentifier && flavors.contains(WatersDataFlavor.IDENTIFIER)) {
-      count--;
+    if (flavors.contains(WatersDataFlavor.IDENTIFIER)) {
+      if (!supportsIdentifier) {
+        count--;
+      } else if (!WatersDataFlavor.IDENTIFIER.supports(data)) {
+        supportsIdentifier = false;
+        count--;
+      }
     }
     final DataFlavor[] flavorsArray = new DataFlavor[count];
     int index = 0;
@@ -184,7 +198,7 @@ public abstract class WatersDataFlavor extends DataFlavor
     }
     flavorsArray[index] = DataFlavor.stringFlavor;
     final WatersDataFlavor flavor0 = flavors.get(0);
-    final List<Proxy> exportData = flavor0.createExportData(data);
+    final List<Proxy> exportData = flavor0.createExportData(data, context);
     return new ProxyTransferable(flavorsArray, exportData);
   }
 
@@ -201,7 +215,8 @@ public abstract class WatersDataFlavor extends DataFlavor
 
   /**
    * Creates a {@link Transferable} containing a single {@link Proxy} object.
-   * This method behaves like the {@link #createTransferable(Collection,boolean)
+   * This method behaves like the {@link
+   * #createTransferable(Collection,ModuleContext,boolean)
    * createTransferable()} method.
    * @see WatersDataFlavor
    */
@@ -209,7 +224,7 @@ public abstract class WatersDataFlavor extends DataFlavor
     (final Proxy proxy, final boolean supportsIdentifier)
   {
     final List<Proxy> data = Collections.singletonList(proxy);
-    return createTransferable(data, supportsIdentifier);
+    return createTransferable(data, null, supportsIdentifier);
   }
 
 
@@ -284,14 +299,18 @@ public abstract class WatersDataFlavor extends DataFlavor
    * convert it to a form that can be stored in a transferable. Typically,
    * this is done using a
    * {@link net.sourceforge.waters.model.base.ProxyCloner ProxyCloner}.
-   * @param  data     Collection of objects to be stored in a
-   *                  {@link Transferable}.
+   * @param  data    Collection of objects to be stored in a
+   *                 {@link Transferable}.
+   * @param  context The module context of the module containing the data,
+   *                 or <CODE>null</CODE> if the data does not belong to any
+   *                 module being edited.
    * @return List of data used to create a {@link ProxyTransferable}.
    *         The returned data should not share any references with the
    *         input.
    * @see WatersDataFlavor
    */
-  abstract List<Proxy> createExportData(Collection<? extends Proxy> data);
+  abstract List<Proxy> createExportData(Collection<? extends Proxy> data,
+                                        ModuleContext context);
 
   /**
    * Copies the data from a {@link Transferable} using this data flavour as
@@ -316,15 +335,16 @@ public abstract class WatersDataFlavor extends DataFlavor
   //# Available Data Flavours
   /**
    * The data flavour for a list of module components, as contained in the
-   * components list tree-view. It is implemented as a {@link
-   * ProxyTransferable} and contains a list of objects of type {@link
-   * net.sourceforge.waters.model.module.SimpleComponentProxy}, {@link
-   * net.sourceforge.waters.model.module.VariableComponentProxy}, {@link
-   * net.sourceforge.waters.model.module.InstanceProxy}, or {@link
-   * net.sourceforge.waters.model.module.ForeachProxy}.
+   * components list tree-view. It is implemented as a
+   * {@link ProxyTransferable} and contains a list of objects of type
+   * {@link SimpleComponentProxy}, {@link VariableComponentProxy},
+   * {@link InstanceProxy}, {@link ForeachProxy}, and possibly
+   * {@link EventDeclProxy}. The event declarations are added to facilitate
+   * copying and pasting of automata between modules together with their
+   * events.
+   * @see ComponentDataFlavor
    */
-  public static final WatersDataFlavor COMPONENT =
-    new ModuleDataFlavor(ComponentProxy.class);
+  public static final WatersDataFlavor COMPONENT = new ComponentDataFlavor();
 
   /**
    * The data flavour for a list of constant aliases, as contained in the
@@ -378,7 +398,7 @@ public abstract class WatersDataFlavor extends DataFlavor
    * list of objects of type {@link IdentifierProxy} or {@link
    * net.sourceforge.waters.model.module.ForeachProxy}
    */
-  public static final WatersDataFlavor IDENTIFIER =
+  public static final IdentifierDataFlavor IDENTIFIER =
     new IdentifierDataFlavor();
 
   /**

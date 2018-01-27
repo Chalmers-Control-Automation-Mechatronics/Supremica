@@ -38,8 +38,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.ControlledToolbar;
-
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
 
@@ -63,7 +61,7 @@ public abstract class ToolAction
              final String name,
              final String description,
              final ImageIcon icon,
-             final ControlledToolbar.Tool tool)
+             final IDEToolBar.Tool tool)
   {
     super(ide);
     putValue(Action.NAME, name);
@@ -86,7 +84,7 @@ public abstract class ToolAction
 
   //#########################################################################
   //# Data Members
-  private final ControlledToolbar.Tool mTool;
+  private final IDEToolBar.Tool mTool;
 
 
   //#########################################################################

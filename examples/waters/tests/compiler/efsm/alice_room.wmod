@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="alice_room" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>An EFSM compiler test.
+In this test case, a hash collision occurs between the predicate for the :accepting proposition (true) and that of one of the branches of one of the events (false).</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="bd"/>
+        <EventDecl Kind="PROPOSITION" Name=":forbidden"/>
+        <EventDecl Kind="CONTROLLABLE" Name="bl"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ad"/>
+        <EventDecl Kind="CONTROLLABLE" Name="al"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ar"/>
+        <EventDecl Kind="CONTROLLABLE" Name="au"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="alice">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="176" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="room">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="368" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="bd"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-92" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="326" Y="262"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="(yb-1!=ya) | xb!=xa">
+                                    <BinaryExpression Operator="!=">
+                                        <BinaryExpression Operator="-">
+                                            <SimpleIdentifier Name="yb"/>
+                                            <IntConstant Value="1"/>
+                                        </BinaryExpression>
+                                        <SimpleIdentifier Name="ya"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="xb"/>
+                                        <SimpleIdentifier Name="xa"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <Actions>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="yb"/>
+                                    <BinaryExpression Operator="-">
+                                        <SimpleIdentifier Name="yb"/>
+                                        <IntConstant Value="1"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="ya"/>
+                                    <SimpleIdentifier Name="ya"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="xa"/>
+                                    <SimpleIdentifier Name="xa"/>
+                                </BinaryExpression>
+                                <BinaryExpression Operator="=">
+                                    <SimpleIdentifier Name="xb"/>
+                                    <SimpleIdentifier Name="xb"/>
+                                </BinaryExpression>
+                            </Actions>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-138" Y="-15"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <VariableComponent Name="ya">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="ya"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="ya"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="xa">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="xa"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="xa"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="yb">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="yb"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="yb"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <VariableComponent Name="xb">
+            <VariableRange>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableRange>
+            <VariableInitial>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="xb"/>
+                    <IntConstant Value="0"/>
+                </BinaryExpression>
+            </VariableInitial>
+            <VariableMarking>
+                <SimpleIdentifier Name=":accepting"/>
+                <BinaryExpression Operator="==">
+                    <SimpleIdentifier Name="xb"/>
+                    <IntConstant Value="2"/>
+                </BinaryExpression>
+            </VariableMarking>
+        </VariableComponent>
+        <SimpleComponent Kind="PLANT" Name="MyRoom">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-31" Y="-7"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name=":forbidden"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="160" Y="304"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-30" Y="-6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ad"/>
+                            <SimpleIdentifier Name="al"/>
+                            <SimpleIdentifier Name="ar"/>
+                            <SimpleIdentifier Name="au"/>
+                            <SimpleIdentifier Name="bd"/>
+                            <SimpleIdentifier Name="bl"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-27" Y="-38"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="&amp;" Text="xa == xb &amp; ya == yb">
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="xa"/>
+                                        <SimpleIdentifier Name="xb"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="==">
+                                        <SimpleIdentifier Name="ya"/>
+                                        <SimpleIdentifier Name="yb"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="8" Y="16"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ad"/>
+                            <SimpleIdentifier Name="al"/>
+                            <SimpleIdentifier Name="ar"/>
+                            <SimpleIdentifier Name="au"/>
+                            <SimpleIdentifier Name="bd"/>
+                            <SimpleIdentifier Name="bl"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-94"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="222" Y="176"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="|" Text="xa != xb | ya != yb">
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="xa"/>
+                                        <SimpleIdentifier Name="xb"/>
+                                    </BinaryExpression>
+                                    <BinaryExpression Operator="!=">
+                                        <SimpleIdentifier Name="ya"/>
+                                        <SimpleIdentifier Name="yb"/>
+                                    </BinaryExpression>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-7"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

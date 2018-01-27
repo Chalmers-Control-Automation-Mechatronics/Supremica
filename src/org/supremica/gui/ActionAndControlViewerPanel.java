@@ -35,30 +35,45 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.util.Iterator;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.*;
-import org.supremica.automata.*;
-import org.supremica.automata.execution.*;
-import org.supremica.log.*;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataListener;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.Project;
+import org.supremica.automata.execution.Action;
+import org.supremica.automata.execution.Actions;
+import org.supremica.automata.execution.Command;
+import org.supremica.automata.execution.Condition;
+import org.supremica.automata.execution.Control;
+import org.supremica.automata.execution.Controls;
+import org.supremica.automata.execution.EventTimer;
+import org.supremica.automata.execution.Signal;
+
 
 public class ActionAndControlViewerPanel
 	extends JPanel
 	implements AutomataListener
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(ActionAndControlViewerPanel.class);
-	private Project theProject;
+	private static Logger logger = LogManager.getLogger(ActionAndControlViewerPanel.class);
+	private final Project theProject;
 	@SuppressWarnings("unused")
-	private boolean updateNeeded = false;
-	private JTree theTree = new JTree();
-	private JScrollPane scrollPanel = new JScrollPane(theTree);
+	private final boolean updateNeeded = false;
+	private final JTree theTree = new JTree();
+	private final JScrollPane scrollPanel = new JScrollPane(theTree);
 
-	public ActionAndControlViewerPanel(Project theProject)
+	public ActionAndControlViewerPanel(final Project theProject)
 		throws Exception
 	{
 		this.theProject = theProject;
@@ -76,147 +91,148 @@ public class ActionAndControlViewerPanel
 	public void build()
 		throws Exception
 	{
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Execution");
-		DefaultMutableTreeNode inputSignalsNode = new DefaultMutableTreeNode("InputSignals");
+		final DefaultMutableTreeNode root = new DefaultMutableTreeNode("Execution");
+		final DefaultMutableTreeNode inputSignalsNode = new DefaultMutableTreeNode("InputSignals");
 
 		root.add(inputSignalsNode);
 
-		DefaultMutableTreeNode outputSignalsNode = new DefaultMutableTreeNode("OutputSignals");
+		final DefaultMutableTreeNode outputSignalsNode = new DefaultMutableTreeNode("OutputSignals");
 
 		root.add(outputSignalsNode);
 
-		DefaultMutableTreeNode actionsNode = new DefaultMutableTreeNode("Actions");
+		final DefaultMutableTreeNode actionsNode = new DefaultMutableTreeNode("Actions");
 
 		root.add(actionsNode);
 
-		DefaultMutableTreeNode controlsNode = new DefaultMutableTreeNode("Controls");
+		final DefaultMutableTreeNode controlsNode = new DefaultMutableTreeNode("Controls");
 
 		root.add(controlsNode);
 
-		DefaultMutableTreeNode timersNode = new DefaultMutableTreeNode("Timers");
+		final DefaultMutableTreeNode timersNode = new DefaultMutableTreeNode("Timers");
 
 		root.add(timersNode);
 
-		for (Iterator<Signal> theIt = theProject.inputSignalsIterator();
+		for (final Iterator<Signal> theIt = theProject.inputSignalsIterator();
 				theIt.hasNext(); )
 		{
-			Signal currSignal = (Signal) theIt.next();
-			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+			final Signal currSignal = theIt.next();
+			final DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
 
 			inputSignalsNode.add(currSignalNode);
 
-			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
+			final DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
 
 			currSignalNode.add(currPortNode);
 
-			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
 
 			currPortNode.add(currPortNodeAttribute);
 		}
 
-		for (Iterator<Signal> theIt = theProject.outputSignalsIterator();
+		for (final Iterator<Signal> theIt = theProject.outputSignalsIterator();
 				theIt.hasNext(); )
 		{
-			Signal currSignal = (Signal) theIt.next();
-			DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
+			final Signal currSignal = theIt.next();
+			final DefaultMutableTreeNode currSignalNode = new DefaultMutableTreeNode(currSignal.getLabel());
 
 			outputSignalsNode.add(currSignalNode);
 
-			DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
+			final DefaultMutableTreeNode currPortNode = new DefaultMutableTreeNode("Port");
 
 			currSignalNode.add(currPortNode);
 
-			DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
+			final DefaultMutableTreeNode currPortNodeAttribute = new DefaultMutableTreeNode(new Integer(currSignal.getPort()));
 
 			currPortNode.add(currPortNodeAttribute);
 		}
 
-		Actions currActions = theProject.getActions();
+		final Actions currActions = theProject.getActions();
 
 		if (currActions != null)
 		{
-			for (Iterator<Action> actIt = currActions.iterator(); actIt.hasNext(); )
+			for (final Iterator<Action> actIt = currActions.iterator(); actIt.hasNext(); )
 			{
-				Action currAction = (Action) actIt.next();
-				DefaultMutableTreeNode currActionNode = new DefaultMutableTreeNode(currAction.getLabel());
+				final Action currAction = actIt.next();
+				final DefaultMutableTreeNode currActionNode = new DefaultMutableTreeNode(currAction.getLabel());
 
 				actionsNode.add(currActionNode);
 
-				for (Iterator<Command> cmdIt = currAction.commandIterator();
+				for (final Iterator<Command> cmdIt = currAction.commandIterator();
 						cmdIt.hasNext(); )
 				{
-					Command currCommand = (Command) cmdIt.next();
-					DefaultMutableTreeNode currCommandNode = new DefaultMutableTreeNode(currCommand);
+					final Command currCommand = cmdIt.next();
+					final DefaultMutableTreeNode currCommandNode = new DefaultMutableTreeNode(currCommand);
 
 					currActionNode.add(currCommandNode);
 				}
 			}
 		}
 
-		Controls currControls = theProject.getControls();
+		final Controls currControls = theProject.getControls();
 
 		if (currControls != null)
 		{
-			for (Iterator<Control> conIt = currControls.iterator(); conIt.hasNext(); )
+			for (final Iterator<Control> conIt = currControls.iterator(); conIt.hasNext(); )
 			{
-				Control currControl = (Control) conIt.next();
-				DefaultMutableTreeNode currControlNode = new DefaultMutableTreeNode(currControl.getLabel());
+				final Control currControl = conIt.next();
+				final DefaultMutableTreeNode currControlNode = new DefaultMutableTreeNode(currControl.getLabel());
 
 				controlsNode.add(currControlNode);
 
-				for (Iterator<Condition> condIt = currControl.conditionIterator();
+				for (final Iterator<Condition> condIt = currControl.conditionIterator();
 						condIt.hasNext(); )
 				{
-					Condition currCondition = (Condition) condIt.next();
-					DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currCondition);
+					final Condition currCondition = condIt.next();
+					final DefaultMutableTreeNode currConditionNode = new DefaultMutableTreeNode(currCondition);
 
 					currControlNode.add(currConditionNode);
 				}
 			}
 		}
 
-		for (Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
+		for (final Iterator<EventTimer> theIt = theProject.timerIterator(); theIt.hasNext(); )
 		{
-			EventTimer currTimer = (EventTimer) theIt.next();
-			DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());
+			final EventTimer currTimer = theIt.next();
+			final DefaultMutableTreeNode currTimerNode = new DefaultMutableTreeNode(currTimer.getName());
 
 			timersNode.add(currTimerNode);
 
 			// Start event
-			DefaultMutableTreeNode currStartEventNode = new DefaultMutableTreeNode("Start event");
+			final DefaultMutableTreeNode currStartEventNode = new DefaultMutableTreeNode("Start event");
 
 			currTimerNode.add(currStartEventNode);
 
-			DefaultMutableTreeNode currStartEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getStartEvent());
+			final DefaultMutableTreeNode currStartEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getStartEvent());
 
 			currStartEventNode.add(currStartEventNodeAttribute);
 
 			// Timeout event
-			DefaultMutableTreeNode currTimeoutEventNode = new DefaultMutableTreeNode("Timeout event");
+			final DefaultMutableTreeNode currTimeoutEventNode = new DefaultMutableTreeNode("Timeout event");
 
 			currTimerNode.add(currTimeoutEventNode);
 
-			DefaultMutableTreeNode currTimeoutEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getTimeoutEvent());
+			final DefaultMutableTreeNode currTimeoutEventNodeAttribute = new DefaultMutableTreeNode(currTimer.getTimeoutEvent());
 
 			currTimeoutEventNode.add(currTimeoutEventNodeAttribute);
 
 			// delay
-			DefaultMutableTreeNode currDelayNode = new DefaultMutableTreeNode("Delay (ms)");
+			final DefaultMutableTreeNode currDelayNode = new DefaultMutableTreeNode("Delay (ms)");
 
 			currTimerNode.add(currDelayNode);
 
-			DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(new Integer(currTimer.getDelay()));
+			final DefaultMutableTreeNode currDelayNodeAttribute = new DefaultMutableTreeNode(new Integer(currTimer.getDelay()));
 
 			currDelayNode.add(currDelayNodeAttribute);
 		}
 
-		DefaultTreeModel treeModel = new DefaultTreeModel(root);
+		final DefaultTreeModel treeModel = new DefaultTreeModel(root);
 
 		theTree.setModel(treeModel);
 		revalidate();
 	}
 
-	public void setVisible(boolean toVisible)
+	@Override
+  public void setVisible(final boolean toVisible)
 	{
 		super.setVisible(toVisible);
 	}
@@ -227,31 +243,36 @@ public class ActionAndControlViewerPanel
 		{
 			build();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("ActionAndControlViewerPanel::rebuild ", ex);
 			logger.debug(ex.getStackTrace());
 		}
 	}
 
-	public void automatonAdded(Automata automata, Automaton automaton)
+	@Override
+  public void automatonAdded(final Automata automata, final Automaton automaton)
 	{    // Do nothing
 	}
 
-	public void automatonRemoved(Automata automata, Automaton automaton)
+	@Override
+  public void automatonRemoved(final Automata automata, final Automaton automaton)
 	{    // Do nothing
 	}
 
-	public void automatonRenamed(Automata automata, Automaton automaton)
+	@Override
+  public void automatonRenamed(final Automata automata, final Automaton automaton)
 	{    // Do nothing
 	}
 
-	public void actionsOrControlsChanged(Automata automata)
+	@Override
+  public void actionsOrControlsChanged(final Automata automata)
 	{
 		rebuild();
 	}
 
-	public void updated(Object o)
+	@Override
+  public void updated(final Object o)
 	{
 		rebuild();
 	}

@@ -31,16 +31,16 @@ public class ColorProperty
                        final Color value,
                        final String comment)
   {
-    this(type, key, value, comment, false);
+    this(type, key, value, comment, true);
   }
 
   public ColorProperty(final PropertyType type,
                        final String key,
                        final Color value,
                        final String comment,
-                       final boolean immutable)
+                       final boolean editable)
   {
-    super(type, key, comment, immutable);
+    super(type, key, comment, editable);
     mDefaultValue = value;
     mValue = value;
   }
@@ -48,12 +48,14 @@ public class ColorProperty
 
   //#########################################################################
   //# Overrides for Abstract Base Class Property
+  @Override
   public void set(final String value)
   {
     final Color color = Color.decode(value);
     set(color);
   }
 
+  @Override
   public String getAsString()
   {
     final int rgb = mValue.getRGB() & 0xffffff;
@@ -61,6 +63,7 @@ public class ColorProperty
     return "#" + hex.substring(1);
   }
 
+  @Override
   public boolean currentValueDifferentFromDefaultValue()
   {
     return !mDefaultValue.equals(mValue);
@@ -77,7 +80,6 @@ public class ColorProperty
   public void set(final Color color)
   {
     if (!mValue.equals(color)) {
-      checkMutable();
       final Color oldColor = mValue;
       mValue = color;
       firePropertyChanged(oldColor);
@@ -123,6 +125,7 @@ public class ColorProperty
 
     //#######################################################################
     //# Interface org.supremica.properties.PropertyChangeListener
+    @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
       mComponent.setBackground(mValue);

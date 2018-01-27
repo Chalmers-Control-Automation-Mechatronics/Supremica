@@ -49,10 +49,10 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * <P>The <STRONG>MustSp</STRONG> preselection heuristic used by compositional
  * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
  *
- * <P>The <STRONG>MustSp</STRONG> preselection heuristic forms two candidate
+ * <P>The <STRONG>MustSp</STRONG> preselection heuristic forms two candidates
  * for each event: the first contains all automata where the event is not
  * selfloop-only, and the second contains all automata where the event is
- * not always enabled..</P>
+ * not always enabled.</P>
 
  * <P><I>Reference:</I><BR>
  * Colin Pilbrow, Robi Malik. Compositional Nonblocking Verification with
@@ -77,9 +77,12 @@ class TRPreselectionHeuristicMustSp extends TRPreselectionHeuristic
     final Map<List<TRAutomatonProxy>,TRCandidate> candidates =
       new HashMap<>(numEvents);
     for (final TREventInfo info : events) {
-      checkAbort();
       final Set<TRAutomatonProxy> automata = info.getAutomata();
       final int numAutomata = automata.size();
+      if (numAutomata <= 1) {
+        continue;
+      }
+      checkAbort();
       List<TRAutomatonProxy> notAlwaysEnabled = new ArrayList<>(numAutomata);
       List<TRAutomatonProxy> notSelfloopOnly = notAlwaysEnabled;
       boolean useNotAlwaysEnabled = false;

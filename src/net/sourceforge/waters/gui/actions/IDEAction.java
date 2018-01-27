@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -186,6 +187,21 @@ public abstract class IDEAction
       return (ModuleWindowInterface) panel;
     } else {
       return null;
+    }
+  }
+
+  /**
+   * Retrieves the module context for the currently edited module.
+   * @return  The module context, or <CODE>null</CODE> if no module is being
+   *          edited.
+   */
+  ModuleContext getActiveModuleContext()
+  {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    } else {
+      return container.getModuleContext();
     }
   }
 

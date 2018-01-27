@@ -35,6 +35,8 @@
 
 package org.supremica.gui.ide;
 
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -52,13 +54,14 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.TableSorter;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.WhiteScrollPane;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
@@ -68,7 +71,7 @@ public class AnalyzerAutomataPanel
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerAutomataPanel.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel.class);
 
     private final AnalyzerPanel analyzerPanel;
     private final DocumentContainer moduleContainer;
@@ -82,15 +85,17 @@ public class AnalyzerAutomataPanel
     public static int TABLE_EVENTS_COLUMN = 3;
     public static int TABLE_TRANSITIONS_COLUMN = 4;
 
+    private static final float PREFERRED_WIDTH = 0.4f;
+
     AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
     {
-        this.analyzerPanel = analyzerPanel;
-        this.moduleContainer = moduleContainer;
-
-        setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
-        setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-        initialize();
-        //validate();
+      this.analyzerPanel = analyzerPanel;
+      this.moduleContainer = moduleContainer;
+      initialize();
+      final int width =
+        Math.round(PREFERRED_WIDTH * Config.GUI_IDE_WIDTH.get());
+      final Dimension size = new Dimension(width, 0);
+      setPreferredSize(size);
     }
 
     private void initialize()
@@ -98,6 +103,9 @@ public class AnalyzerAutomataPanel
         analyzerTableModel = getActiveProject().getAnalyzerTableModel();
         theTableSorter = new TableSorter(analyzerTableModel);
         theAutomatonTable = new JTable(theTableSorter);
+        final Font font = theAutomatonTable.getFont();
+        final int height = (int) Math.ceil(1.5f * font.getSize2D());
+        theAutomatonTable.setRowHeight(height);
         theAutomatonTable.setTableHeader(new JTableHeader(theAutomatonTable.getColumnModel())
         {
 			private static final long serialVersionUID = 1L;

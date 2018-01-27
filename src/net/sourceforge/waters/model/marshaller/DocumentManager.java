@@ -37,15 +37,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -486,8 +487,8 @@ public class DocumentManager
    *           to indicate that no registered {@link ProxyMarshaller} for the
    *           given class was found.
    */
-  public <DD extends DocumentProxy> ProxyMarshaller<DD> findProxyMarshaller(
-      final Class<DD> clazz)
+  public <DD extends DocumentProxy> ProxyMarshaller<DD> findProxyMarshaller
+    (final Class<DD> clazz)
   {
     final ProxyMarshaller<?> marshaller = getProxyMarshaller(clazz);
     if (marshaller != null) {
@@ -497,9 +498,37 @@ public class DocumentManager
         (Class<ProxyMarshaller<DD>>) preclazz;
       return marshallerclazz.cast(marshaller);
     } else {
-      throw new IllegalArgumentException("Unsupported document class "
-          + clazz.getName() + "!");
+      throw new IllegalArgumentException("Unsupported document class " +
+                                         clazz.getName() + "!");
     }
+  }
+
+  /**
+   * Searches for a marshaller that uses the given file filter as its default
+   * file filter. This method can be used to choose a marshaller based on the
+   * file extension selected by the user in a file dialog, provided that the
+   * dialog is set up using file filters obtained from this document manager.
+   * @param filter
+   *           The file filter to search for.
+   * @return   The first {@link ProxyMarshaller} that uses the given file filter
+   *           as its default file filter, using object identity to test for
+   *           equality.
+   * @throws IllegalArgumentException
+   *           to indicate that no registered {@link ProxyMarshaller} using
+   *           the given file filter as default has been found.
+   */
+  public ProxyMarshaller<? extends DocumentProxy> findProxyMarshaller
+    (final FileFilter filter)
+  {
+    for (final ProxyMarshaller<? extends DocumentProxy> marshaller :
+         mClassMarshallerMap.values()) {
+      if (marshaller.getDefaultFileFilter() == filter) {
+        return marshaller;
+      }
+    }
+    throw new IllegalArgumentException
+      ("Can't find marshaller with default file filter '" +
+       filter.getDescription() + "'!");
   }
 
   /**

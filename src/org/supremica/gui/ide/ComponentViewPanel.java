@@ -99,8 +99,6 @@ public class ComponentViewPanel
         surface = new GraphEditorPanel
             (element.getGraph(), mModule, mModuleContainer, this,
 			 ide.getToolBar(), manager);
-        surface.setPreferredSize(IDEDimensions.rightAnalyzerPreferredSize);
-        surface.setMinimumSize(IDEDimensions.rightAnalyzerMinimumSize);
         events = new GraphEventPanel(this, element, manager);
 
         final LayoutManager layout = new BorderLayout();

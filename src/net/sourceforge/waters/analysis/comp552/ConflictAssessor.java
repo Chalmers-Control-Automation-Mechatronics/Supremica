@@ -104,13 +104,12 @@ public class ConflictAssessor extends AbstractAssessor
   public static void main(final String[] args)
   {
     try {
-      setUpLogger();
       final ConflictAssessor assessor = new ConflictAssessor();
       assessor.processCommandLine(args);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");
       System.err.println(exception.getClass().getName() +
-        " caught in main()!");
+                         " caught in main()!");
       exception.printStackTrace(System.err);
       System.exit(1);
     }

@@ -35,17 +35,16 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Component;
+import java.util.Collection;
+
 import javax.swing.JFrame;
-import org.supremica.gui.ide.IDEReportInterface;
+
 import org.supremica.automata.Automata;
-import org.supremica.automata.Project;
 import org.supremica.automata.Automaton;
-import org.supremica.gui.VisualProjectContainer;
+import org.supremica.automata.Project;
 
 public interface Gui
-    extends IDEReportInterface
 {
     void repaint();
 

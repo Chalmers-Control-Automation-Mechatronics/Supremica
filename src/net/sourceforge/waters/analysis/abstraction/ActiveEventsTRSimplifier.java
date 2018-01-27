@@ -63,7 +63,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * incoming equivalence.</P>
  *
  * <P>This rule merges all states that are weakly incoming equivalent and have
- * equal sets of eligible events. Am equivalence relation between states is a
+ * equal sets of eligible events. An equivalence relation between states is a
  * weak incoming equivalence relation if for any two equivalent states,
  * either both or none are silently reachable from an initial states,
  * both states are reachable by the same events from state outside of their
@@ -81,7 +81,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  * <LI>Refine partition based on incoming equivalence within equivalence
  *     classes. Separate states that do or do not have incoming transitions
  *     with a given event from within their own equivalence class, and
- *     separate states with an outgoing transition to a different equivalent
+ *     separate states with an outgoing transition to a different equivalence
  *     class by an active events from states that stay within the same class
  *     by that event.</LI>
  * <LI>Repeat steps 2. and&nbsp;3. for any equivalence classes that have been
@@ -91,9 +91,14 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  *     step&nbsp;1.</LI>
  * </OL>
  *
- * <P><I>Reference:</I> Hugo Flordal, Robi Malik. Compositional Verification
- * in Supervisory Control. SIAM Journal of Control and Optimization,
- * 48(3), 1914-1938, 2009.</P>
+ * <P><I>References:</I><BR>
+ * Hugo Flordal, Robi Malik. Compositional verification in supervisory control.
+ * SIAM Journal of Control and Optimization, <STRONG>48</STRONG>(3), 1914-1938,
+ * 2009.<BR>
+ * Robi Malik. Advanced selfloop removal in compositional nonblocking
+ * verification of discrete event systems. Proc. 11th International Conference
+ * on Automation Science and Engineering (CASE 2015), 819-824, G&ouml;teborg,
+ * Sweden, 2015.</P>
  *
  * @author Robi Malik
  */
@@ -171,7 +176,8 @@ public class ActiveEventsTRSimplifier
     mSetBuffer = new IntSetBuffer(numEvents + 1);
     mSetReadIterator = mSetBuffer.iterator();
     mListBuffer = new IntListBuffer();
-    mListReadIterator = mListBuffer.createReadOnlyIterator();
+    mListReadIterator1 = mListBuffer.createReadOnlyIterator();
+    mListReadIterator2 = mListBuffer.createReadOnlyIterator();
     mListWriteIterator = mListBuffer.createModifyingIterator();
     createTauClosure();
   }
@@ -262,7 +268,7 @@ public class ActiveEventsTRSimplifier
     mTauClosure = null;
     mFullEventClosureIterator = null;
     mListBuffer = null;
-    mListReadIterator = null;
+    mListReadIterator1 = mListReadIterator2 = null;
     mListWriteIterator = null;
     mSetReadIterator = null;
   }
@@ -640,16 +646,16 @@ public class ActiveEventsTRSimplifier
 
     private void setUpStateToClass()
     {
-      mListReadIterator.reset(mList);
+      mListReadIterator1.reset(mList);
       if (mSize == 1) {
-        mListReadIterator.advance();
-        final int state = mListReadIterator.getCurrentData();
+        mListReadIterator1.advance();
+        final int state = mListReadIterator1.getCurrentData();
         mFirstState = state;
         mStateToClass[state] = null;
       } else {
         mFirstState = Integer.MAX_VALUE;
-        while (mListReadIterator.advance()) {
-          final int state = mListReadIterator.getCurrentData();
+        while (mListReadIterator1.advance()) {
+          final int state = mListReadIterator1.getCurrentData();
           mStateToClass[state] = this;
           if (state < mFirstState) {
             mFirstState = state;
@@ -733,9 +739,9 @@ public class ActiveEventsTRSimplifier
           boolean exit = false;
           boolean nonexit = false;
           if (event > EventEncoding.TAU && event < numEvents) {
-            mListReadIterator.reset(mList);
-            while (mListReadIterator.advance()) {
-              final int state = mListReadIterator.getCurrentData();
+            mListReadIterator2.reset(mList);
+            while (mListReadIterator2.advance()) {
+              final int state = mListReadIterator2.getCurrentData();
               final byte status =
                 ActiveEventsTRSimplifier.this.splitOtherClasses(state, event);
               if ((status & INTERNAL) != 0) {
@@ -1039,7 +1045,8 @@ public class ActiveEventsTRSimplifier
   private TauClosure mTauClosure;
   private TransitionIterator mFullEventClosureIterator;
   private IntListBuffer mListBuffer;
-  private IntListBuffer.ReadOnlyIterator mListReadIterator;
+  private IntListBuffer.ReadOnlyIterator mListReadIterator1;
+  private IntListBuffer.ReadOnlyIterator mListReadIterator2;
   private IntListBuffer.ModifyingIterator mListWriteIterator;
   private IntSetBuffer.IntSetIterator mSetReadIterator;
 

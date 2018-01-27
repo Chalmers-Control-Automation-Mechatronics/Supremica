@@ -1,21 +1,15 @@
 package org.supremica.automata.BDD.EFA;
 
+
 /**
- *
- * @author sajed
+ * @author Sajed Miremadi
  */
-
-import org.supremica.log.*;
-
 
 public class BDDEdgeFactory
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(BDDEdgeFactory.class);
-
     BDDExtendedAutomata bddExAutomata;
 
-    public BDDEdgeFactory(BDDExtendedAutomata bddExAutomata)
+    public BDDEdgeFactory(final BDDExtendedAutomata bddExAutomata)
     {
         this.bddExAutomata = bddExAutomata;
     }

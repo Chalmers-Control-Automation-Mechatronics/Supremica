@@ -49,17 +49,39 @@
  */
 package org.supremica.automata.BDD;
 
-import net.sf.javabdd.*;
-import org.supremica.log.*;
-import java.util.*;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDPairing;
+import net.sf.javabdd.BDDVarSet;
+
+import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.Automata;
+import org.supremica.automata.AutomataIndexMap;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
 import org.supremica.util.ArrayHelper;
-import org.supremica.automata.*;
+
 
 public class BDDAutomata
-    implements Iterable<BDDAutomaton>
+    implements Iterable<BDDAutomaton>, Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDAutomata.class);
+    private static Logger logger = LogManager.getLogger(BDDAutomata.class);
+    private boolean isAborting;
 
     BDDManager manager;
     Automata theAutomata;
@@ -112,17 +134,8 @@ public class BDDAutomata
         final AutomataSorter automataSorter = new PCGAutomataSorter();
 
         theAutomata = automataSorter.sortAutomata(orgAutomata);
-        manager = new BDDManager();
 
-        //Adding a forbidden state for transforming an uncontrallibility problem to nonblocking problem
-        for (final Automaton currAutomaton : theAutomata)
-        {
-            if(currAutomaton.isSpecification())
-            {
-                final State forbiddenState = new State("FS");
-                currAutomaton.addState(forbiddenState);
-            }
-        }
+        manager = new BDDManager();
 
         try
         {
@@ -157,12 +170,9 @@ public class BDDAutomata
         destStateDomains = new BDDDomain[theAutomata.size()];
 
         int i = 0;
-        @SuppressWarnings("unused")
-        BDD currUnconEvents = null;
         for (final Automaton automaton : theAutomata)
         {
             final int nbrOfStates = automaton.nbrOfStates();
-            //System.err.println("nbrOfStates: " + nbrOfStates);
             final BDDDomain tempStateDomain = manager.createDomain(nbrOfStates);
             final BDDDomain sourceStateDomain = manager.createDomain(nbrOfStates);
             final BDDDomain destStateDomain = manager.createDomain(nbrOfStates);
@@ -173,7 +183,7 @@ public class BDDAutomata
             final int[] vars = sourceStateDomain.vars();
             final int nbrOfVars = vars.length;
             aut2nbrOfBits.put(automaton.getName(), nbrOfVars);
-//            System.out.println(automaton.getName()+": ");
+
             for(int h=0;h<nbrOfVars;h++)
             {
                 final int[] var = new int[1];
@@ -181,36 +191,19 @@ public class BDDAutomata
                 bddVar2BDD.put(vars[h], manager.getFactory().buildCube(1, var));
                 bddVar2AutName.put(vars[h], automaton.getName());
                 bddVar2bitValue.put(vars[h], h);
-//                System.out.println(""+vars[h]);
             }
 
             bddAutomaton.initialize();
 
-/*            vars = destStateDomain.vars();
-            for(int h=0;h<vars.length;h++)
-            {
-                bddVar2AutName.put(vars[h], automaton.getName());
-            }
-*/
             sourceStateVariables.unionWith(sourceStateDomain.set());
             destStateVariables.unionWith(destStateDomain.set());
             sourceStateDomains[i] = sourceStateDomain;
             sourceStateDomains[i].setName(automaton.getName());
             destStateDomains[i] = destStateDomain;
             destStateDomains[i].setName(automaton.getName());
-
             tempStateDomains[i] = tempStateDomain;
 
-            currUnconEvents = bddAutomaton.getUncontrollableEvents();
-
-//            selfLoopsBDD = selfLoopsBDD.or(bddAutomaton.getSelfLoopsBDD());
-
-
-//            if(bddAutomaton.getAutomaton().getName().equals("P1"))
-//                    bddAutomaton.getTransitionForwardBDD().printDot();
-
             add(bddAutomaton);
-
             i++;
         }
 
@@ -289,6 +282,7 @@ public class BDDAutomata
         }
     }
 
+    @Override
     protected void finalize()
     {
         done();
@@ -327,6 +321,7 @@ public class BDDAutomata
         theBDDAutomataList.add(bddAutomaton);
         automatonToBDDAutomatonMap.put(bddAutomaton.getAutomaton(), bddAutomaton);
     }
+    @Override
     public Iterator<BDDAutomaton> iterator()
     {
         return theBDDAutomataList.iterator();
@@ -382,7 +377,7 @@ public class BDDAutomata
         uncontrollableStatesBDD = uncontrollableStatesBDD.and(uncontrollableStates);
     }
 
-    public double numberOfReachableStates()
+    public double numberOfReachableStates() throws AnalysisAbortException, OverflowException
     {
         if (nbrOfReachableStates < 0)
         {
@@ -391,7 +386,7 @@ public class BDDAutomata
         return nbrOfReachableStates;
     }
 
-    public double numberOfCoreachableStates()
+    public double numberOfCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         if (nbrOfCoreachableStates < 0)
         {
@@ -400,7 +395,7 @@ public class BDDAutomata
         return nbrOfCoreachableStates;
     }
 
-    public double numberOfBlockingStates()
+    public double numberOfBlockingStates() throws AnalysisAbortException, OverflowException
     {
         if (nbrOfBlockingStates < 0)
         {
@@ -409,7 +404,7 @@ public class BDDAutomata
         return nbrOfBlockingStates;
     }
 
-    public double numberOfReachableAndCoreachableStates()
+    public double numberOfReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         if (nbrOfReachableAndCoreachableStates < 0)
         {
@@ -418,7 +413,7 @@ public class BDDAutomata
         return nbrOfReachableAndCoreachableStates;
     }
 
-    public boolean isNonblocking()
+    public boolean isNonblocking() throws AnalysisAbortException, OverflowException
     {
         final BDD reachableStatesBDD = getReachableStates();
         final BDD coreachableStatesBDD = getCoreachableStates();
@@ -426,27 +421,28 @@ public class BDDAutomata
         return impBDD.equals(manager.getOneBDD());
     }
 
-    public BDD getReachableStates()
+    public BDD getReachableStates() throws AnalysisAbortException, OverflowException
     {
         if (reachableStatesBDD == null)
         {
-            reachableStatesBDD = BDDManager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            reachableStatesBDD = manager.reachableStates(initialStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            // satCount seems use wrong sourceStateVariables!!
             nbrOfReachableStates = reachableStatesBDD.satCount(sourceStateVariables);
         }
         return reachableStatesBDD;
     }
 
-    BDD getCoreachableStates()
+    BDD getCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         if (coreachableStatesBDD == null)
         {
-            coreachableStatesBDD = BDDManager.coreachableStates(markedStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
+            coreachableStatesBDD = manager.coreachableStates(markedStatesBDD, bddTransitions, sourceStateVariables, eventDomain.set(), destToSourceStatePairing);
             nbrOfCoreachableStates = coreachableStatesBDD.satCount(sourceStateVariables);
         }
         return coreachableStatesBDD;
     }
 
-    public BDD getReachableAndCoreachableStates()
+    public BDD getReachableAndCoreachableStates() throws AnalysisAbortException, OverflowException
     {
         if (reachableAndCoreachableStatesBDD == null)
         {
@@ -462,7 +458,7 @@ public class BDDAutomata
         return reachableAndCoreachableStatesBDD;
     }
 
-    public Automaton getSupervisor()
+    public Automaton getSupervisor() throws AnalysisAbortException, OverflowException
     {
         final Automaton supervisorAutomaton = new Automaton("Sup");
         final BDD reachableAndCoreachableStatesBDD = getReachableAndCoreachableStates();
@@ -534,6 +530,26 @@ public class BDDAutomata
     public BDD getForbiddenStates()
     {
         return forbiddenStatesBDD;
+    }
+
+    @Override
+    public void requestAbort()
+    {
+      // TODO Auto-generated method stub
+      isAborting = true;
+      manager.requestAbort();
+    }
+
+    @Override
+    public boolean isAborting()
+    {
+      return isAborting;
+    }
+
+    @Override
+    public void resetAbort()
+    {
+      isAborting = false;
     }
 
 }

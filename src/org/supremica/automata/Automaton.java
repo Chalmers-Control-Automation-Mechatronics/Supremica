@@ -50,25 +50,38 @@
  */
 package org.supremica.automata;
 
-import org.supremica.util.SupremicaException;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.util.Args;
-import org.supremica.properties.Config;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.model.base.ProxyVisitor;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.properties.Config;
+import org.supremica.util.Args;
+import org.supremica.util.SupremicaException;
+
 
 public class Automaton
     implements AutomatonProxy, Iterable<State>
 {
-    private static Logger logger = LoggerFactory.createLogger(Automaton.class);
+    private static Logger logger = LogManager.getLogger(Automaton.class);
 
     /**
      * The name of the automaton.
@@ -218,6 +231,7 @@ public class Automaton
     /**
      * Returns the name of the automaton, or, if there is no name, returns the comment.
      */
+    @Override
     public String getName()
     {
         if ((name == null) || (name.equals("") && !getComment().equals("")))
@@ -645,13 +659,13 @@ public class Automaton
 
         final State oldinit = getInitialState();
         final State newinit = getStateWithName(state.getName());
-        
-        // Return if the input state is already the initial state 
+
+        // Return if the input state is already the initial state
         if (oldinit != null && oldinit.equalState(newinit))
         {
           return;
         }
-        
+
         if (newinit == null)
         {
             throw new IllegalStateException("No such state, " + state);
@@ -1245,6 +1259,7 @@ public class Automaton
     /**
      * Returns the state iterator.
      */
+    @Override
     public Iterator<State> iterator()
     {
         return stateIterator();
@@ -1897,6 +1912,7 @@ public class Automaton
         return alphabet.nbrOfUnobservableEvents();
     }
 
+    @Override
     public boolean equals(final Object other)
     {
         if (other instanceof Automaton)
@@ -2049,6 +2065,7 @@ public class Automaton
     public void updated(final Object o)
     {}
 
+    @Override
     public int hashCode()
     {
         // Generate hascode from name, or if that's null, from the comment
@@ -2096,7 +2113,7 @@ public class Automaton
         final State dump = createUniqueState("dump");
         addState(dump);
         */
-        DumpState dump = getDumpState(true);
+        final DumpState dump = getDumpState(true);
 
         // saturate, else something will always be done
         saturate(dump, alpha, dump);
@@ -2123,9 +2140,9 @@ public class Automaton
 	 * Return the unique dump state.
 	 * If the create param is true, the state is created it it does not already exist
 	 */
-	public DumpState getDumpState(boolean create)
+	public DumpState getDumpState(final boolean create)
 	{
-		State s = getStateWithName(DumpState.DUMPSTATENAME);
+		final State s = getStateWithName(DumpState.DUMPSTATENAME);
 		if(s != null)
 		{
 			return (DumpState) s;	// We know this is the dump state!
@@ -2134,7 +2151,7 @@ public class Automaton
 		// else it does not exist already, should we create it?
 		if(create)
 		{
-			DumpState d = new DumpState();
+			final DumpState d = new DumpState();
 			addState(d);
 			return d;
 		}
@@ -2312,11 +2329,13 @@ public class Automaton
             this.arcIt = arcIt;
         }
 
+        @Override
         public boolean hasNext()
         {
             return arcIt.hasNext();
         }
 
+        @Override
         public LabeledEvent next()
         {
             final Arc nextArc = (Arc) arcIt.next();
@@ -2337,6 +2356,7 @@ public class Automaton
             return nextEvent;
         }
 
+        @Override
         public void remove()
         {
             throw new UnsupportedOperationException();
@@ -2361,11 +2381,13 @@ public class Automaton
             findNext();
         }
 
+        @Override
         public boolean hasNext()
         {
             return currState != null;
         }
 
+        @Override
         public State next()
         {
             final State returnState = currState;
@@ -2375,6 +2397,7 @@ public class Automaton
             return returnState;
         }
 
+        @Override
         public void remove()
         {
             throw new UnsupportedOperationException();
@@ -2426,6 +2449,7 @@ public class Automaton
         return sbuf.toString();
     }
 
+    @Override
     public String toString()
     {
         return "'" + getName() + "'";
@@ -2482,6 +2506,7 @@ public class Automaton
 
     private AutomatonProxy correspondingAutomatonProxy = null;
 
+    @Override
     public Automaton clone()
     {
         return new Automaton(this);
@@ -2490,26 +2515,31 @@ public class Automaton
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
     public Class<AutomatonProxy> getProxyInterface()
     {
         return AutomatonProxy.class;
     }
 
+    @Override
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
 
+    @Override
     public int refHashCode()
     {
         return getName().hashCode();
     }
 
+    @Override
     public int compareTo(final NamedProxy partner)
     {
         return getName().compareTo(((Automaton) partner).getName());
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
     {
@@ -2521,16 +2551,19 @@ public class Automaton
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.AutomatonProxy
+    @Override
     public ComponentKind getKind()
     {
         return AutomatonType.toKind(type);
     }
 
+    @Override
     public Set<StateProxy> getStates()
     {
         return getStateSet().getWatersStates();
     }
 
+    @Override
     public Collection<TransitionProxy> getTransitions()
     {
         final LinkedList<TransitionProxy> transitions = new LinkedList<TransitionProxy>();
@@ -2544,6 +2577,7 @@ public class Automaton
         return transitions;
     }
 
+    @Override
     public Set<EventProxy> getEvents()
     {
         final Set <EventProxy> currSet = getAlphabet().getWatersEvents();
@@ -2555,6 +2589,7 @@ public class Automaton
         return currSet;
     }
 
+    @Override
     public Map<String,String> getAttributes()
     {
       return Collections.emptyMap();

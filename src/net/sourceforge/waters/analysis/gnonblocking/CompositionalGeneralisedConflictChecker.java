@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,13 +80,8 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -751,7 +752,7 @@ public class CompositionalGeneralisedConflictChecker
                                                final EventProxy tau)
       throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     AutomatonProxy abstractedAut = autToAbstract;
     for (final AbstractionRule rule : mAbstractionRules) {
       try {

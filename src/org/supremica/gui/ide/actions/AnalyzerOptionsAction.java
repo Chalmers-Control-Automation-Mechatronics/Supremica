@@ -40,7 +40,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.PropertiesDialog;
 
@@ -58,7 +58,7 @@ public class AnalyzerOptionsAction extends IDEAction
     super(actionList);
     putValue(Action.NAME, "Options...");
     putValue(Action.SHORT_DESCRIPTION, "Options");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_OPTIONS);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPTIONS);
   }
 
 

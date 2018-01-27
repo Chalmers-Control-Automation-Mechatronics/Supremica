@@ -1,18 +1,14 @@
 package org.supremica.automata.algorithms.scheduling;
 
-import java.util.Hashtable;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
-import org.supremica.log.*;
 
 @SuppressWarnings("unchecked")
 public class ClosedNodes extends Hashtable<Object,Object> {
 
 	private static final long serialVersionUID = 1L;
 	public static final int CLOSED_NODE_INFO_SIZE = 2;
-
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(ClosedNodes.class);
 
     @SuppressWarnings("unused")
 	private final int compositeStateSize;

@@ -46,7 +46,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -160,7 +161,7 @@ abstract public class AbstractSDLanguageInclusionChecker
   //# Logging
   void logHibEvent(final EventProxy hib, final Collection<EventProxy> hibs)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       mHibIndex++;
       logger.debug("Prohibitable event " + hib.getName() +

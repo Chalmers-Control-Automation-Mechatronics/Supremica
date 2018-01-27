@@ -1,5 +1,7 @@
 package org.supremica.automata.BDD.EFA;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import net.sf.javabdd.BDD;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
@@ -26,25 +29,25 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.SynthesisType;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.ActionTimer;
-
-import gnu.trove.list.array.TIntArrayList;
 
 
 /**
- * @author sajed, zhennan
+ * @author Sajed Miremadi, Zhennan Fei
  */
+
 public class BDDExtendedSynthesizer {
 
-    private static Logger logger = LoggerFactory.createLogger(BDDExtendedSynthesizer.class);
+    private static Logger logger = LogManager.getLogger(BDDExtendedSynthesizer.class);
 
     public BDDExtendedAutomata bddAutomata;
     ExtendedAutomata theAutomata;
@@ -56,7 +59,6 @@ public class BDDExtendedSynthesizer {
     ExpressionParser parser = null;
     long nbrOfStates = -1;
     private Set<ExtendedAutomaton> autTobeDeclaredAsVars;
-    private final EditorSynthesizerOptions options;
 
     public BDDExtendedSynthesizer(final ExtendedAutomata theAutomata, final  EditorSynthesizerOptions options)
     {
@@ -64,8 +66,7 @@ public class BDDExtendedSynthesizer {
         bddAutomata = new BDDExtendedAutomata(theAutomata, options);
         factory = ModuleSubjectFactory.getInstance();
         parser = new ExpressionParser(factory, CompilerOperatorTable.getInstance());
-        this.options = options;
-        if (options.getCreateAutVars())
+        if (options.getAddGuards())
           autTobeDeclaredAsVars = new HashSet<ExtendedAutomaton>();
     }
 
@@ -211,7 +212,7 @@ public class BDDExtendedSynthesizer {
             SimpleExpressionSubject ses2 = null;
 
             // Some edges could have multiple events. If a guard is generated for one event, we need to
-            // create an extra edge labeled by the event, copy the existing guards and actions and
+            // create an extra edge labeled by the event, copy the existing guards and actions (if any) and
             // put the generated guards there.
 
             final ListSubject<AbstractSubject> eventList = ep.getLabelBlock().getEventIdentifierListModifiable();
@@ -224,8 +225,7 @@ public class BDDExtendedSynthesizer {
 
               if (currBDDGG != null && !currBDDGG.guardIsTrue())
               {
-                if (options.getCreateAutVars())
-                  autTobeDeclaredAsVars.addAll(currBDDGG.getAutGuardVars());
+                autTobeDeclaredAsVars.addAll(currBDDGG.getAutGuardVars());
 
                 EdgeSubject manipulatedEdge = null;
                 if (eventList.size() - eventsToBeRemovedFromEdge.size() == 1)
@@ -239,13 +239,17 @@ public class BDDExtendedSynthesizer {
                   final LabelBlockSubject lbs = new LabelBlockSubject();
                   lbs.getEventIdentifierListModifiable().add(event.clone());
 
+                  GuardActionBlockSubject clonedGuardActionBlock = null;
+                  if (ep.getGuardActionBlock() != null)
+                    clonedGuardActionBlock = ep.getGuardActionBlock().clone();
+
                   manipulatedEdge = new EdgeSubject(ep.getSource(),
                                                     ep.getTarget(),
                                                     lbs,
-                                                    ep.getGuardActionBlock(),
-                                                    null, // straight line
-                                                    ep.getStartPoint(),
-                                                    ep.getEndPoint());
+                                                    clonedGuardActionBlock,
+                                                    null,
+                                                    null,
+                                                    null);
 
                   edgesToBeAdded.add(manipulatedEdge);
                 }
@@ -294,26 +298,31 @@ public class BDDExtendedSynthesizer {
           ((SimpleComponentSubject)simSubj).getGraph().getEdgesModifiable().addAll(edgesToBeAdded);
         }
       }
-      if (options.getCreateAutVars())
-        createAutVarsAndUpdates();
+      createAutVarsAndUpdates();
     }
 
     private void createAutVarsAndUpdates()
     {
-      for (final ExtendedAutomaton aut: autTobeDeclaredAsVars)
+      for (final ExtendedAutomaton aut: this.autTobeDeclaredAsVars)
       {
         final Set<String> markedValues = new HashSet<>();
         for (final NodeProxy node: aut.getMarkedLocations())
            markedValues.add(node.getName());
 
         final String autVarName = aut.getName() + ExtendedAutomata.getlocVarSuffix();
+        // Add automaton variables to extended automata
         aut.getExAutomata().addEnumerationVariable(autVarName,
                                                    aut.getNameToLocationMap().keySet(),
-                                                   aut.getInitialLocation().getName(), markedValues);
+                                                   aut.getInitialLocation().getName(),
+                                                   markedValues);
 
         for (final EdgeSubject edge:aut.getComponent().getGraph().getEdgesModifiable())
         {
+          final String sourceState = edge.getSource().getName();
           final String targetState = edge.getTarget().getName();
+          // No need to add assignment to self-loop
+          if (sourceState.equals(targetState))
+            continue;
           if (edge.getGuardActionBlock() == null)
             edge.setGuardActionBlock(new GuardActionBlockSubject());
           final String assignment = autVarName + " = " + targetState;

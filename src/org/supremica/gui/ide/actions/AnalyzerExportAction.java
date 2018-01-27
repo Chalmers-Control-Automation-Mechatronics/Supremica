@@ -45,6 +45,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.IO.AutomataSSPCExporter;
@@ -54,7 +57,6 @@ import org.supremica.automata.IO.AutomataToXML;
 import org.supremica.automata.IO.AutomatonToDot;
 import org.supremica.automata.IO.AutomatonToDsx;
 import org.supremica.automata.IO.AutomatonToFSM;
-import org.supremica.automata.IO.AutomatonToSMC;
 import org.supremica.automata.IO.FileFormats;
 import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.gui.ExportDialog;
@@ -62,23 +64,15 @@ import org.supremica.gui.ExportFormat;
 import org.supremica.gui.FileDialogs;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.texteditor.TextFrame;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerExportAction
     extends IDEAction
 {
-    final private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
     public AnalyzerExportAction(final List<IDEAction> actionList)
     {
         super(actionList);
@@ -93,7 +87,7 @@ public class AnalyzerExportAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Export16.gif")));
     }
 
-	@Override
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
@@ -102,7 +96,7 @@ public class AnalyzerExportAction
     /**
      * The code that is run when the action is invoked.
      */
-	@Override
+    @Override
     public void doAction()
     {
         final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
@@ -176,30 +170,12 @@ public class AnalyzerExportAction
             return;
         }
 */
-		if(exportMode == ExportFormat.SMC_DEBUG)
-		{
-			for(Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
-			{
-				final Automaton currAutomaton = (Automaton) autIt.next();
-				final AutomatonToSMC smcExporter = new AutomatonToSMC(currAutomaton);
-				final TextFrame textFrame = new TextFrame("SMC debug output");
-				
-				try
-				{
-					smcExporter.serialize(textFrame.getPrintWriter());
-				}
-				catch(Exception ex)
-				{
-					logger.debug(ex.getStackTrace());
-				}
-			}
-		}
-		
         if (exportMode == ExportFormat.DOT_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
+            autIt.hasNext(); )
             {
-                final Automaton currAutomaton = (Automaton) autIt.next();
+                final Automaton currAutomaton = autIt.next();
                 final AutomatonToDot exporter = new AutomatonToDot(currAutomaton);
                 final TextFrame textframe = new TextFrame("Dot debug output");
 
@@ -207,7 +183,7 @@ public class AnalyzerExportAction
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -218,9 +194,10 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.DSX_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
+            autIt.hasNext(); )
             {
-                final Automaton currAutomaton = (Automaton) autIt.next();
+                final Automaton currAutomaton = autIt.next();
                 final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                 final TextFrame textframe = new TextFrame("DSX debug output");
 
@@ -228,7 +205,7 @@ public class AnalyzerExportAction
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -239,9 +216,10 @@ public class AnalyzerExportAction
 
         if (exportMode == ExportFormat.FSM_DEBUG)
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
+            autIt.hasNext(); )
             {
-                final Automaton currAutomaton = (Automaton) autIt.next();
+                final Automaton currAutomaton = autIt.next();
                 final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
                 final TextFrame textframe = new TextFrame("FSM debug output");
 
@@ -249,7 +227,7 @@ public class AnalyzerExportAction
                 {
                     exporter.serialize(textframe.getPrintWriter());
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                 }
@@ -267,7 +245,7 @@ public class AnalyzerExportAction
             {
                 a2cg.serialize(textframe.getPrintWriter());
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.debug(ex.getStackTrace());
             }
@@ -302,7 +280,7 @@ public class AnalyzerExportAction
                         new AutomataSSPCExporter(selectedAutomata, currFile.getAbsolutePath());
                     }
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug(ex.getStackTrace());
                     ex.printStackTrace();    // TEMP!
@@ -331,14 +309,12 @@ public class AnalyzerExportAction
                                                 return;
                                                 }
                  */
-        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || 
-				(exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG) ||
-				(exportMode == ExportFormat.SMC)
-				)
+        if ((exportMode == ExportFormat.DOT) || (exportMode == ExportFormat.DSX) || (exportMode == ExportFormat.FSM) || (exportMode == ExportFormat.PCG))
         {
-            for (Iterator<Automaton> autIt = selectedAutomata.iterator(); autIt.hasNext(); )
+            for (final Iterator<Automaton> autIt = selectedAutomata.iterator();
+            autIt.hasNext(); )
             {
-                final Automaton currAutomaton = (Automaton) autIt.next();
+                final Automaton currAutomaton = autIt.next();
 
                 automatonExport(exportMode, currAutomaton);
             }
@@ -357,7 +333,7 @@ public class AnalyzerExportAction
             {
                 fileExporter = FileDialogs.getSTSFileExporter();
             }
- /*           
+ /*
             else if (exportMode == ExportFormat.SP)
             {
                 fileExporter = FileDialogs.getSPFileExporter();
@@ -368,7 +344,7 @@ public class AnalyzerExportAction
                 return;
             }
 
-            fileExporter.setDialogTitle("Export Project as ...");
+            fileExporter.setDialogTitle("Save Project as ...");
 
             if (fileExporter.showSaveDialog(ide.getIDE()) == JFileChooser.APPROVE_OPTION)
             {
@@ -405,7 +381,7 @@ public class AnalyzerExportAction
                                             {
                                                 exporter.createSpec(currFileSpec);
                                             }
-                                            catch (Exception ex)
+                                            catch (final Exception ex)
                                             {
                                                 logger.error("Exception while exporting " + currFileSpec.getAbsolutePath(), ex);
                                                 logger.debug(ex.getStackTrace());
@@ -422,7 +398,7 @@ public class AnalyzerExportAction
                             }
                              */
                         }
-                        catch (Exception ex)
+                        catch (final Exception ex)
                         {
                             logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
                             logger.debug(ex.getStackTrace());
@@ -460,11 +436,7 @@ public class AnalyzerExportAction
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.STS);
         }
-		else if(exportMode == ExportFormat.SMC)
-		{
-			fileExporter = FileDialogs.getExportFileChooser(FileFormats.SMC);
-		}
-/*        
+/*
         else if (exportMode == ExportFormat.SP)
         {
             fileExporter = FileDialogs.getExportFileChooser(FileFormats.SP);
@@ -505,11 +477,6 @@ public class AnalyzerExportAction
                             final AutomatonToDsx exporter = new AutomatonToDsx(currAutomaton);
                             exporter.serialize(currFile.getAbsolutePath());
                         }
-						else if(exportMode == ExportFormat.SMC)
-						{
-							final AutomatonToSMC exporter = new AutomatonToSMC(currAutomaton);
-							exporter.serialize(currFile.getAbsolutePath());
-						}
                         else if (exportMode == ExportFormat.FSM)
                         {
                             final AutomatonToFSM exporter = new AutomatonToFSM(currAutomaton);
@@ -522,7 +489,7 @@ public class AnalyzerExportAction
                             final AutomataToSTS exporter = new AutomataToSTS(currAutomata);
                             exporter.serialize(currFile);
                         }
-/*                        
+/*
                         else if (exportMode == ExportFormat.SP)
                         {
                             Project activeProject = ide.getActiveProject();
@@ -548,7 +515,7 @@ public class AnalyzerExportAction
                           }
                          */
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
                         logger.error("Exception while exporting " + currFile.getAbsolutePath(), ex);
                         logger.debug(ex.getStackTrace());

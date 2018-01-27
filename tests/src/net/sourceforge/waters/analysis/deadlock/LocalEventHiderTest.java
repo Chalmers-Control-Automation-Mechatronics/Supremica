@@ -33,16 +33,22 @@
 
 package net.sourceforge.waters.analysis.deadlock;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESIntegrityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
+
+import gnu.trove.list.array.TIntArrayList;
 
 
 /**
@@ -72,6 +78,7 @@ public class LocalEventHiderTest
     // mSimplifier = createTransitionRelationSimplifier();
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
     mIsomorphismChecker = new IsomorphismChecker(factory, false, true);
+    eventsToHide = new ArrayList<EventProxy>();
   }
 
   @Override
@@ -113,6 +120,98 @@ public class LocalEventHiderTest
     runTransitionRelationSimplifier(des);
   }
 
+  public void test_hiding_02() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_02.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_03() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_03.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_04() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_04.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_05() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_05.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_06.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_07() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_07.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_08() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_08.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_09() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_09.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_10() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_10.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_11() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_11.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_12() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_12.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_13() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_13.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test_hiding_14() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "annotation", "hiding_14.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+
   //#########################################################################
   //# Instantiating and Checking Modules
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
@@ -121,13 +220,18 @@ public class LocalEventHiderTest
     getLogger().info("Checking " + des.getName() + " ...");
     final AutomatonProxy before = findAutomaton(des, BEFORE);
     // calculate annotated form
-    final GeneralizedTransitionRelation tr = new GeneralizedTransitionRelation(des, before);
+    final GeneralizedTransitionRelation tr =
+      new GeneralizedTransitionRelation(before, getTau(des));
     tr.annotateWithProps();
+    tr.checkIntegrity();
+    final LocalEventHider hider = new LocalEventHider(tr);
+    hider.run(getEventsToHide(des, tr));
+    tr.checkIntegrity();
     // calculate unannotated form
-    final AutomatonProxy unannotated = null;
+    final AutomatonProxy unannotated =
+      tr.unannotate(des, getProductDESProxyFactory(), eventsToHide.toArray(new EventProxy[eventsToHide.size()]));
     checkResult(des, unannotated);
     getLogger().info("Done " + des.getName());
-
   }
 
 
@@ -144,7 +248,7 @@ public class LocalEventHiderTest
     } else {
       final String name = des.getName();
       final String basename = appendSuffixes(name, mBindings);
-      final String comment = "Test output after annotation and unannotation";
+      final String comment = "Test output from LocalEventHider";
 //      final String comment =
 //        "Test output from " +
 //        ProxyTools.getShortClassName(mSimplifier) + '.';
@@ -158,6 +262,31 @@ public class LocalEventHiderTest
         mIsomorphismChecker.checkIsomorphism(result, expected);
       }
     }
+  }
+
+  private int[] getEventsToHide(final ProductDESProxy des, final GeneralizedTransitionRelation tr)
+  {
+    final Set<EventProxy> events = tr.getEvents();
+    final TIntArrayList localEvents = new TIntArrayList(events.size());
+    for (final EventProxy ep : events) {
+      if (!ep.getName().equals(TAU) && !ep.isObservable()) {
+        final int index = tr.eventToInt(ep);
+        localEvents.add(index);
+        eventsToHide.add(ep);
+      }
+    }
+    return localEvents.toArray();
+  }
+
+  public EventProxy getTau(final ProductDESProxy des) {
+
+    final Set<EventProxy> desEvents = des.getEvents();
+    for (final EventProxy ep : desEvents) {
+      if (ep.getName().equals(TAU) && ep.getKind() == EventKind.UNCONTROLLABLE && !ep.isObservable()) {
+          return ep;
+      }
+    }
+    return null;
   }
 
   //#########################################################################
@@ -181,11 +310,12 @@ public class LocalEventHiderTest
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;
+  private static  List<EventProxy> eventsToHide;
+
 
   //#########################################################################
   //# Class Constants
-  protected static final String TAU = "tau";
-
+  protected static final String TAU = ":tau";
   protected static final String BEFORE = "before";
   protected static final String AFTER = "after";
 

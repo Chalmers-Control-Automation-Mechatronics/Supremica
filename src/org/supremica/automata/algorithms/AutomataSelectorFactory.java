@@ -49,9 +49,18 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
 
 // AutomataSelector a set of specs/sups/plants,
 // For each spec/sup it returns that automaton together with the plants with which
@@ -126,6 +135,7 @@ class AutomataSelectorFactory
             }
         }
 
+        @Override
         public Automata next()
         {
             super.partialSet.clear();
@@ -174,6 +184,7 @@ class AutomataSelectorFactory
             return super.partialSet;
         }
 
+        @Override
         public Automata addPlant(final Alphabet alpha)
         {
             final Automata result = super.addPlant(alpha);
@@ -184,6 +195,7 @@ class AutomataSelectorFactory
             return result;
         }
 
+        @Override
         public Automata addPlants(final Alphabet alpha)
         {
             final Automata result = super.addPlants(alpha);
@@ -222,7 +234,7 @@ class AutomataSelectorFactory
     static class PerSpecificationAutomataSelector
         implements AutomataSelector
     {
-        private static Logger logger = LoggerFactory.createLogger(AutomataSelector.class);
+        private static Logger logger = LogManager.getLogger(AutomataSelector.class);
         private final Automata globalSet;
         private final Automata partialSet = new Automata();
         private final Iterator<Automaton> specIterator;
@@ -258,6 +270,7 @@ class AutomataSelectorFactory
         /**
          * Returns a spec/supervisor together with the plants sharing uncontrollable events
          */
+        @Override
         public Automata next()
         {
             partialSet.clear();
@@ -265,7 +278,7 @@ class AutomataSelectorFactory
             // Iterate over spec/sups (not really, we check this later)
             while (specIterator.hasNext())
             {
-                final Automaton spec = (Automaton) specIterator.next();
+                final Automaton spec = specIterator.next();
                 assert (spec.isSupervisor() || spec.isSpecification());
 
                 progress++;
@@ -304,6 +317,7 @@ class AutomataSelectorFactory
         /**
          * To your current selection of spec and plants, add all plants that have these events..
          */
+        @Override
         public Automata addPlants(final Alphabet events)
         {
             for (final LabeledEvent event : events)
@@ -321,6 +335,7 @@ class AutomataSelectorFactory
          * To your current selection of spec and plants, add one plant that has at least one
          * of these events and that has not been added before, if there is one...
          */
+        @Override
         public Automata addPlant(final Alphabet events)
         {
             for (final LabeledEvent event : events)
@@ -346,6 +361,7 @@ class AutomataSelectorFactory
          * Return the sequential number of the last supervisor/spec considered or 0 if no
          * supervisor/spec has ever been considered.
          */
+        @Override
         public int getProgress()
         {
             return progress/progressMax;

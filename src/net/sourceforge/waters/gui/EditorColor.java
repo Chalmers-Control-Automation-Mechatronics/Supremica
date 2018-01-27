@@ -86,7 +86,7 @@ public class EditorColor
     if (o instanceof GroupNodeProxy) {
       return DEFAULTCOLOR_NODEGROUP;
     } else if (o instanceof LabelGeometryProxy) {
-      return DEFAULTCOLOR_LABEL;
+      return NODE_LABEL_COLOR;
     } else {
       return DEFAULTCOLOR;
     }
@@ -145,10 +145,10 @@ public class EditorColor
   /** The colour of guard expressions. */
   public static final Color GUARDCOLOR = Color.CYAN.darker().darker();
 
-  /** The color of guard expressions. */
+  /** The colour of guard expressions. */
   public static final Color ADDEDGUARDCOLOR = new Color(114,68,174);
 
-  /** The color of action expressions. */
+  /** The colour of action expressions. */
   public static final Color ACTIONCOLOR = Color.RED.darker().darker();
 
   /** The colour of the drag-select area. */
@@ -158,7 +158,7 @@ public class EditorColor
   public static final Color DEFAULTCOLOR = Color.BLACK;
 
   /** The default colour of node labels. */
-  public static final Color DEFAULTCOLOR_LABEL = Color.GREEN.darker().darker();
+  public static final Color NODE_LABEL_COLOR = Color.GREEN.darker().darker();
 
   /** The default colour of group nodes. */
   public static final Color DEFAULTCOLOR_NODEGROUP = new Color(64,64,64);

@@ -36,7 +36,7 @@
 package org.supremica.gui.ide;
 
 import java.awt.Component;
-
+import java.io.File;
 
 import org.supremica.automata.Project;
 
@@ -50,7 +50,7 @@ public class AutomataContainer
     public AutomataContainer(final IDE ide, final Project project)
     {
         super(ide, project);
-        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");        
+        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
         mAnalyzerPanel.addProject(project);
     }
 
@@ -58,29 +58,48 @@ public class AutomataContainer
     //#######################################################################
     //# Overrides for Abstract Base Class
     //# org.supremica.gui.ide.DocumentContainer
+    @Override
     public Component getPanel()
     {
         return mAnalyzerPanel;
     }
 
+    @Override
     public EditorPanel getEditorPanel()
     {
         return null;
     }
 
+    @Override
     public AnalyzerPanel getAnalyzerPanel()
     {
         return mAnalyzerPanel;
     }
 
+    @Override
     public Component getActivePanel()
     {
         return mAnalyzerPanel;
     }
 
+    @Override
     public String getTypeString()
     {
         return TYPE_STRING;
+    }
+
+    @Override
+    void adjustDocumentName(final File file)
+    {
+      String tail = file.getName();
+      final int dotpos = tail.indexOf('.');
+      if (dotpos >= 0) {
+        tail = tail.substring(0, dotpos);
+      }
+      if (tail.length() > 0) {
+        final Project project = getAutomata();
+        project.setName(tail);
+      }
     }
 
 

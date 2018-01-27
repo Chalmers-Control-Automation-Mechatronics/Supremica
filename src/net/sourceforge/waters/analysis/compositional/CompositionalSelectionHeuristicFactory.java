@@ -49,7 +49,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -436,7 +437,7 @@ public class CompositionalSelectionHeuristicFactory
         }
         return dsize;
       } catch (final OutOfMemoryError error) {
-        final Logger logger = mAnalyzer.getLogger();
+        final Logger logger = LogManager.getLogger();
         logger.debug("<out of memory>");
         return Double.POSITIVE_INFINITY;
       } catch (final OverflowException overflow) {

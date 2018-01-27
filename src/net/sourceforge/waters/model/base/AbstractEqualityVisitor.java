@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.base;
 
+import gnu.trove.strategy.HashingStrategy;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -47,8 +49,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-
-import gnu.trove.strategy.HashingStrategy;
 
 
 /**
@@ -242,6 +242,21 @@ public abstract class AbstractEqualityVisitor
   {
     for (final Proxy current : collection) {
       if (equals(element, current)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks whether the given two collections of proxies have a non-empty
+   * intersection, using the equality defined by this visitor.
+   */
+  public boolean intersects(final Collection<? extends Proxy> collection1,
+                            final Collection<? extends Proxy> collection2)
+  {
+    for (final Proxy current : collection1) {
+      if (contains(collection2, current)) {
         return true;
       }
     }

@@ -91,6 +91,23 @@ public abstract class DocumentContainer
   }
 
   /**
+   * Activates this container. This method is called after the container
+   * has been selected. It typically requests the focus for one of its
+   * controls.
+   */
+  void activate()
+  {
+  }
+
+  /**
+   * Deactivates this container. This method is called before the container
+   * becomes inactive due to selection of another one.
+   */
+  void deactivate()
+  {
+  }
+
+  /**
    * Cleans up. This method is called by the GUI to notify that the
    * document of this container has been closed by the user. It should
    * unregister all listeners on external components and perform any

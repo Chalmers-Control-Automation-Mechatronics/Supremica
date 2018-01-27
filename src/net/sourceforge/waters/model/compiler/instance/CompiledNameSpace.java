@@ -126,19 +126,21 @@ class CompiledNameSpace
     return COMPONENT_LOOKUP_VISITOR.getComponent(this, ident, true);
   }
 
-  CompiledNameSpace getNameSpace(final IdentifierProxy ident)
+  CompiledNameSpace getOrAddNameSpace(final IdentifierProxy ident)
   {
-    try {
-      return NAMESPACE_LOOKUP_VISITOR.getNameSpace(this, ident, false);
-    } catch (final EvalException exception) {
-      throw exception.getRuntimeException();
-    }
+    return NAMESPACE_LOOKUP_VISITOR.getOrAddNameSpace(this, ident);
   }
 
-  CompiledNameSpace findNameSpace(final IdentifierProxy ident)
-    throws EvalException
+  CompiledNameSpace getOrAddChildNameSpace(final IdentifierProxy suffix)
   {
-    return NAMESPACE_LOOKUP_VISITOR.getNameSpace(this, ident, true);
+    final ProxyAccessor<IdentifierProxy> accessor =
+      mNameSpaceMap.createAccessor(suffix);
+    CompiledNameSpace nameSpace = mNameSpaceMap.get(accessor);
+    if (nameSpace == null) {
+      nameSpace = new CompiledNameSpace(suffix, this);
+      mNameSpaceMap.put(accessor, nameSpace);
+    }
+    return nameSpace;
   }
 
   void addEvent(final IdentifierProxy ident, final CompiledEvent event)
@@ -151,13 +153,6 @@ class CompiledNameSpace
     throws EvalException
   {
     COMPONENT_ADD_VISITOR.addComponent(this, ident, comp);
-  }
-
-  void addNameSpace(final IdentifierProxy ident,
-                    final CompiledNameSpace subspace)
-    throws EvalException
-  {
-    NAMESPACE_ADD_VISITOR.addNameSpace(this, ident, subspace);
   }
 
   IdentifierProxy getPrefixedIdentifier(final IdentifierProxy ident,
@@ -203,21 +198,6 @@ class CompiledNameSpace
     }
   }
 
-  private CompiledNameSpace lookupNameSpace(final IdentifierProxy ident,
-                                            final boolean throwing)
-    throws UndefinedIdentifierException
-  {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      mNameSpaceMap.createAccessor(ident);
-    final CompiledNameSpace namespace = mNameSpaceMap.get(accessor);
-    if (throwing && namespace == null) {
-      final String prefixed = getPrefixedName(ident);
-      throw new UndefinedIdentifierException(prefixed, "namespace", null);
-    } else {
-      return namespace;
-    }
-  }
-
   private Object putEvent(final String name, final CompiledEvent event)
     throws DuplicateIdentifierException
   {
@@ -242,21 +222,6 @@ class CompiledNameSpace
     } else {
       final String prefixed = getPrefixedName(ident);
       throw new DuplicateIdentifierException(prefixed, "component", null);
-    }
-  }
-
-  private Object putNameSpace(final IdentifierProxy ident,
-                              final CompiledNameSpace subspace)
-    throws DuplicateIdentifierException
-  {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      mNameSpaceMap.createAccessor(ident);
-    final CompiledNameSpace old = mNameSpaceMap.get(accessor);
-    if (old == null) {
-      return mNameSpaceMap.put(accessor, subspace);
-    } else {
-      final String prefixed = getPrefixedName(ident);
-      throw new DuplicateIdentifierException(prefixed, "namespace", null);
     }
   }
 
@@ -367,15 +332,11 @@ class CompiledNameSpace
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
-      try {
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        mNameSpace =
-          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        return (CompiledEvent) comp.acceptVisitor(this);
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      mNameSpace =
+        NAMESPACE_LOOKUP_VISITOR.getOrAddNameSpace(mNameSpace, base);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return (CompiledEvent) comp.acceptVisitor(this);
     }
 
     @Override
@@ -443,19 +404,15 @@ class CompiledNameSpace
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
-      try {
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        final CompiledNameSpace namespace =
-          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, mThrowing);
-        if (namespace == null) {
-          return null;
-        }
-        mNameSpace = namespace;
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        return (IdentifiedProxy) comp.acceptVisitor(this);
-      } catch (final EvalException exception) {
-        throw wrap(exception);
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      final CompiledNameSpace namespace =
+        NAMESPACE_LOOKUP_VISITOR.getOrAddNameSpace(mNameSpace, base);
+      if (namespace == null) {
+        return null;
       }
+      mNameSpace = namespace;
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return (IdentifiedProxy) comp.acceptVisitor(this);
     }
 
     @Override
@@ -484,22 +441,14 @@ class CompiledNameSpace
   {
     //#######################################################################
     //# Invocation
-    private CompiledNameSpace getNameSpace(final CompiledNameSpace namespace,
-                                           final IdentifierProxy ident,
-                                           final boolean throwing)
-      throws EvalException
+    private CompiledNameSpace getOrAddNameSpace(final CompiledNameSpace nameSpace,
+                                                final IdentifierProxy ident)
     {
       try {
-        mNameSpace = namespace;
-        mThrowing = throwing;
+        mNameSpace = nameSpace;
         return (CompiledNameSpace) ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
-        final Throwable cause = exception.getCause();
-        if (throwing && cause instanceof EvalException) {
-          throw (EvalException) cause;
-        } else {
-          throw exception.getRuntimeException();
-        }
+        throw exception.getRuntimeException();
       }
     }
 
@@ -508,13 +457,8 @@ class CompiledNameSpace
     @Override
     public CompiledNameSpace visitIndexedIdentifierProxy
       (final IndexedIdentifierProxy ident)
-      throws VisitorException
     {
-      try {
-        return mNameSpace.lookupNameSpace(ident, mThrowing);
-      } catch (final UndefinedIdentifierException exception) {
-        throw wrap(exception);
-      }
+      return mNameSpace.getOrAddChildNameSpace(ident);
     }
 
     @Override
@@ -531,19 +475,13 @@ class CompiledNameSpace
     @Override
     public CompiledNameSpace visitSimpleIdentifierProxy
       (final SimpleIdentifierProxy ident)
-      throws VisitorException
     {
-      try {
-        return mNameSpace.lookupNameSpace(ident, mThrowing);
-      } catch (final UndefinedIdentifierException exception) {
-        throw wrap(exception);
-      }
+      return mNameSpace.getOrAddChildNameSpace(ident);
     }
 
     //#######################################################################
     //# Data Members
     private CompiledNameSpace mNameSpace;
-    private boolean mThrowing;
   }
 
 
@@ -553,13 +491,13 @@ class CompiledNameSpace
   {
     //#######################################################################
     //# Invocation
-    private void addEvent(final CompiledNameSpace namespace,
+    private void addEvent(final CompiledNameSpace nameSpace,
                           final IdentifierProxy ident,
                           final CompiledEvent event)
       throws EvalException
     {
       try {
-        mNameSpace = namespace;
+        mNameSpace = nameSpace;
         mEvent = event;
         ident.acceptVisitor(this);
       } catch (final VisitorException exception) {
@@ -595,15 +533,11 @@ class CompiledNameSpace
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
-      try {
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        mNameSpace =
-          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        return comp.acceptVisitor(this);
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      mNameSpace =
+        NAMESPACE_LOOKUP_VISITOR.getOrAddNameSpace(mNameSpace, base);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
     }
 
     @Override
@@ -670,15 +604,11 @@ class CompiledNameSpace
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
-      try {
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        mNameSpace =
-          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        return comp.acceptVisitor(this);
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      mNameSpace =
+        NAMESPACE_LOOKUP_VISITOR.getOrAddNameSpace(mNameSpace, base);
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      return comp.acceptVisitor(this);
     }
 
     @Override
@@ -697,80 +627,6 @@ class CompiledNameSpace
     //# Data Members
     private CompiledNameSpace mNameSpace;
     private IdentifiedProxy mComponent;
-  }
-
-
-  //#########################################################################
-  //# Inner Class NameSpaceAddVisitor
-  private static class NameSpaceAddVisitor extends DefaultModuleProxyVisitor
-  {
-    //#######################################################################
-    //# Invocation
-    private void addNameSpace(final CompiledNameSpace namespace,
-                              final IdentifierProxy ident,
-                              final CompiledNameSpace subspace)
-      throws EvalException
-    {
-      try {
-        mNameSpace = namespace;
-        mSubSpace = subspace;
-        ident.acceptVisitor(this);
-      } catch (final VisitorException exception) {
-        final Throwable cause = exception.getCause();
-        if (cause instanceof EvalException) {
-          throw (EvalException) cause;
-        } else {
-          throw exception.getRuntimeException();
-        }
-      }
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
-    @Override
-    public Object visitIndexedIdentifierProxy
-      (final IndexedIdentifierProxy ident)
-      throws VisitorException
-    {
-      try {
-        return mNameSpace.putNameSpace(ident, mSubSpace);
-      } catch (final DuplicateIdentifierException exception) {
-        throw wrap(exception);
-      }
-    }
-
-    @Override
-    public Object visitQualifiedIdentifierProxy
-      (final QualifiedIdentifierProxy ident)
-      throws VisitorException
-    {
-      try {
-        final IdentifierProxy base = ident.getBaseIdentifier();
-        mNameSpace =
-          NAMESPACE_LOOKUP_VISITOR.getNameSpace(mNameSpace, base, true);
-        final IdentifierProxy comp = ident.getComponentIdentifier();
-        return comp.acceptVisitor(this);
-      } catch (final EvalException exception) {
-        throw wrap(exception);
-      }
-    }
-
-    @Override
-    public Object visitSimpleIdentifierProxy
-      (final SimpleIdentifierProxy ident)
-      throws VisitorException
-    {
-      try {
-        return mNameSpace.putNameSpace(ident, mSubSpace);
-      } catch (final DuplicateIdentifierException exception) {
-        throw wrap(exception);
-      }
-    }
-
-    //#######################################################################
-    //# Data Members
-    private CompiledNameSpace mNameSpace;
-    private CompiledNameSpace mSubSpace;
   }
 
 
@@ -800,7 +656,5 @@ class CompiledNameSpace
     new EventAddVisitor();
   private static final ComponentAddVisitor COMPONENT_ADD_VISITOR =
     new ComponentAddVisitor();
-  private static final NameSpaceAddVisitor NAMESPACE_ADD_VISITOR =
-    new NameSpaceAddVisitor();
 
 }

@@ -41,7 +41,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.EventDeclEditorDialog;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -69,7 +69,7 @@ public class InsertEventDeclAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_E);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_E, ActionEvent.ALT_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_EVENT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_EVENT);
   }
 
 

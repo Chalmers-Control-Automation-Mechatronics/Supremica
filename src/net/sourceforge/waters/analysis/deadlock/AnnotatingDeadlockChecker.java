@@ -39,7 +39,8 @@ import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -106,7 +107,7 @@ public class AnnotatingDeadlockChecker
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);

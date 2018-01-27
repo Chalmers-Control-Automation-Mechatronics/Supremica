@@ -196,7 +196,7 @@ class EFAEventDecl {
     mTransitionMap;
   /**
    * The set of individual events to be generated from this event group. For
-   * each guard condition, representing a set of possible combination of
+   * each guard condition, representing a set of possible combinations of
    * variable values, an event may be generated.
    */
   private final Collection<EFAEvent> mEvents;

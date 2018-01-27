@@ -866,7 +866,6 @@ public class EventTableModel
   private class GraphSearchVisitor
     extends DefaultModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private boolean isEventInGraph(final IdentifierProxy ident)
@@ -952,9 +951,9 @@ public class EventTableModel
       throws VisitorException
     {
       for (final Proxy proxy : list) {
-        final boolean found = (Boolean) proxy.acceptVisitor(this);
+        final Boolean found = (Boolean) proxy.acceptVisitor(this);
         if (found) {
-          return true;
+          return found;
         }
       }
       return false;
@@ -963,7 +962,6 @@ public class EventTableModel
     //#######################################################################
     //# Data Members
     private IdentifierProxy mIdentifier;
-
   }
 
 

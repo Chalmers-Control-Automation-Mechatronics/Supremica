@@ -49,7 +49,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 /**
  * The utility class that contains the functions that do the real job.
@@ -89,7 +89,7 @@ public class Utility
     {
         frame.setSize(width, height);    // from Component
         frame.setLocation(getPosForCenter(new Dimension(width, height)));    // from Component
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         frame.setIconImages(images);
     }
 

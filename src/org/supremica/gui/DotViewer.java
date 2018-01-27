@@ -35,7 +35,6 @@
 
 package org.supremica.gui;
 
-//import org.supremica.automata.algorithms.*;
 import att.grappa.Graph;
 import att.grappa.GrappaPanel;
 
@@ -72,11 +71,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.JViewport;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.IO.AutomataSerializer;
 import org.supremica.gui.texteditor.TextFrame;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 /**
  * Abstract class for the viewer frame. Implemented by the different viewers.
@@ -89,7 +90,7 @@ public abstract class DotViewer
 	implements DotBuilderGraphObserver
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(DotViewer.class);
+	private static Logger logger = LogManager.getLogger(DotViewer.class);
 	private Graph theGraph;
 
 	private JScrollPane currScrollPanel = null;

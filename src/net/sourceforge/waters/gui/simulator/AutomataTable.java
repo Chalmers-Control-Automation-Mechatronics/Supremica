@@ -34,10 +34,14 @@
 package net.sourceforge.waters.gui.simulator;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -47,15 +51,15 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 class AutomataTable extends JTable
 {
-
 
   //#########################################################################
   //# Constructor
@@ -64,45 +68,62 @@ class AutomataTable extends JTable
     super(new AutomataTableModel(sim, desktop));
     mSimulation = sim;
     mDesktop = desktop;
-    final int height =
-      Math.max(AUTOMATA_TABLE_MINHEIGHT, IconLoader.getWatersIconHeight());
-    setRowHeight(height);
-    final TableCellRenderer textrenderer = new TextCellRenderer();
-    setDefaultRenderer(String.class, textrenderer);
-    final TableCellRenderer iconrenderer = new IconCellRenderer();
-    setDefaultRenderer(ImageIcon.class, iconrenderer);
-    setDefaultRenderer(Icon.class, iconrenderer);
-    final TableColumnModel colmodel = getColumnModel();
-    if (colmodel.getColumnCount() != 0) {
-      colmodel.getColumn(0).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(0).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(1).setPreferredWidth(BROAD_WIDTH);
-      colmodel.getColumn(2).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(2).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(3).setPreferredWidth(NARROW_WIDTH);
-      colmodel.getColumn(3).setMaxWidth(NARROW_WIDTH);
-      colmodel.getColumn(4).setPreferredWidth(BROAD_WIDTH);
+    final TableCellRenderer textRenderer = new TextCellRenderer();
+    setDefaultRenderer(String.class, textRenderer);
+    final TableCellRenderer iconRenderer = new IconCellRenderer();
+    setDefaultRenderer(ImageIcon.class, iconRenderer);
+    setDefaultRenderer(Icon.class, iconRenderer);
+    setShowGrid(false);
+    setIntercellSpacing(new Dimension(0, 0));
+
+    final AutomataTableModel tableModel = getModel();
+    final TableColumnModel columnModel = getColumnModel();
+    final int iconSize = IconAndFontLoader.getWatersIconSize();
+    final int absoluteGap = Math.round(RELATIVE_GAP * iconSize);
+    final int iconSizePlusGap = iconSize + absoluteGap;
+    setRowHeight(iconSizePlusGap);
+    final int columnCount = columnModel.getColumnCount();
+    if (columnCount != 0) {
+      final TableColumn column0 = columnModel.getColumn(0);
+      column0.setMinWidth(iconSizePlusGap);
+      column0.setMaxWidth(iconSizePlusGap);
+      final BufferedImage img =
+        new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+      final Graphics2D g2d = img.createGraphics();
+      final FontMetrics fm = g2d.getFontMetrics(getFont());
+      for (int i = 1; i < columnCount; i++) {
+        final String title = tableModel.getColumnName(i);
+        final int width = fm.stringWidth(title);
+        final TableColumn column = columnModel.getColumn(i);
+        column.setMinWidth(width + absoluteGap);
+        final Class<?> clazz = tableModel.getColumnClass(i);
+        if (Icon.class.isAssignableFrom(clazz)) {
+          column.setMaxWidth(width + absoluteGap);
+        } else if (String.class.isAssignableFrom(clazz)) {
+          column.setPreferredWidth(2 * width);
+        }
+      }
+      g2d.dispose();
     }
-    addMouseListener(new AutomatonMouseListener());
     getTableHeader().setReorderingAllowed(false);
-    final ListSelectionModel listMod = getSelectionModel();
-    listMod.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    final ListSelectionModel listModel = getSelectionModel();
+    listModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    addMouseListener(new AutomatonMouseListener());
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
-    setShowGrid(!DISABLE_AUTOMATON_GRIDLINES);
     mPopupFactory = new SimulatorPopupFactory(sim);
-    this.addMouseMotionListener(new MouseMotionListener(){
+    addMouseMotionListener(new MouseMotionListener() {
       @Override
-      public void mouseDragged(final MouseEvent e)
+      public void mouseDragged(final MouseEvent event)
       {
         // Do nothing
       }
 
       @Override
-      public void mouseMoved(final MouseEvent e)
+      public void mouseMoved(final MouseEvent event)
       {
-        final int row = AutomataTable.this.rowAtPoint(e.getPoint());
-        final AutomatonProxy aut =
-          AutomataTable.this.getModel().getAutomaton(row);
+        final int row = rowAtPoint(event.getPoint());
+        final AutomatonProxy aut = tableModel.getAutomaton(row);
         final ToolTipVisitor visitor = sim.getToolTipVisitor();
         final String tooltip = visitor.getToolTip(aut, true);
         setToolTipText(tooltip);
@@ -124,7 +145,6 @@ class AutomataTable extends JTable
   //# Inner Class TextCellRenderer
   private class TextCellRenderer extends DefaultTableCellRenderer
   {
-
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
     @Override
@@ -144,8 +164,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 2739259938102695664L;
   }
 
 
@@ -153,7 +172,6 @@ class AutomataTable extends JTable
   //# Inner Class TextCellRenderer
   private class IconCellRenderer extends DefaultTableCellRenderer
   {
-
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
     @Override
@@ -171,8 +189,7 @@ class AutomataTable extends JTable
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 7455415810847160716L;
   }
 
 
@@ -180,7 +197,6 @@ class AutomataTable extends JTable
   //# Inner Class AutomatonMouseListener
   private class AutomatonMouseListener extends MouseAdapter
   {
-
     //#######################################################################
     //# Interface java.awt.event.MouseListener
     @Override
@@ -213,7 +229,7 @@ class AutomataTable extends JTable
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Auxiliary Methods
     private AutomatonProxy getAutomaton(final MouseEvent event)
     {
@@ -232,7 +248,6 @@ class AutomataTable extends JTable
   //# Inner Class TableHeaderMouseListener
   private class TableHeaderMouseListener extends MouseAdapter
   {
-
     //#######################################################################
     //# Interface java.awt.event.MouseListener
     @Override
@@ -245,7 +260,6 @@ class AutomataTable extends JTable
         model.addSortingMethod(column);
       }
     }
-
   }
 
 
@@ -258,16 +272,8 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Class Constants
-  private static final boolean DISABLE_AUTOMATON_GRIDLINES = true;
+  private static final float RELATIVE_GAP = 0.1f;
 
-  private static final int AUTOMATA_TABLE_MINHEIGHT = 20;
-
-  // Arbitrary value: Any value will work,
-  // but this is close to the 'normal' value
-  private static final int DUMMY_WIDTH = 245;
-  private static final int NARROW_WIDTH = DUMMY_WIDTH / 10;
-  private static final int BROAD_WIDTH = 35 * DUMMY_WIDTH / 100;
-
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -9036493474591272655L;
 
 }

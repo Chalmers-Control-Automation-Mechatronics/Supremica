@@ -59,8 +59,9 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
@@ -103,8 +104,6 @@ public class ComponentEditorPanel
         mSurface = new GraphEditorPanel
             (component.getGraph(), mModule, mModuleContainer, this,
 			 ide.getToolBar(), manager);
-        mSurface.setPreferredSize(IDEDimensions.rightEditorPreferredSize);
-        mSurface.setMinimumSize(IDEDimensions.rightEditorMinimumSize);
         mEventsPane = new GraphEventPanel(this, component, manager);
 
         final LayoutManager layout = new BorderLayout();
@@ -164,7 +163,7 @@ public class ComponentEditorPanel
             final PrinterJob printJob = PrinterJob.getPrinterJob();
             if (printJob.getPrintService() == null)
             {
-                mModuleContainer.getIDE().error("No default printer set.");
+                LOGGER.error("No default printer set.");
                 return;
             }
             printJob.setPrintable(mSurface);
@@ -216,6 +215,6 @@ public class ComponentEditorPanel
     //# Static Class Constants
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER =
-		LoggerFactory.createLogger(ComponentEditorPanel.class);
+		LogManager.getLogger(ComponentEditorPanel.class);
 
 }

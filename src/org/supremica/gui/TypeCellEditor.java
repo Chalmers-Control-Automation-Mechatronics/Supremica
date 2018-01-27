@@ -35,59 +35,69 @@
 
 package org.supremica.gui;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import java.util.*;
-import org.supremica.log.*;
+import java.util.Iterator;
+
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automaton;
-import org.supremica.gui.VisualProjectContainer;
 import org.supremica.automata.AutomatonType;
+
 
 class TypeCellEditor
 	implements CellEditorListener
 {
-	private JTable theTable;
-	private TableSorter theTableSorter;
-	private JComboBox<AutomatonType> automatonTypeCombo;
-	private VisualProjectContainer theVisualProjectContainer;
-	private static Logger logger = LoggerFactory.createLogger(TypeCellEditor.class);
+	private final JTable theTable;
+	private final TableSorter theTableSorter;
+	private final JComboBox<AutomatonType> automatonTypeCombo;
+	private final VisualProjectContainer theVisualProjectContainer;
+	private static Logger logger = LogManager.getLogger(TypeCellEditor.class);
 
-	public TypeCellEditor(JTable theTable, TableSorter theTableSorter, VisualProjectContainer theVisualProjectContainer)
+	public TypeCellEditor(final JTable theTable, final TableSorter theTableSorter, final VisualProjectContainer theVisualProjectContainer)
 	{
 		this.theTable = theTable;
 		this.theVisualProjectContainer = theVisualProjectContainer;
 		this.theTableSorter = theTableSorter;
 		automatonTypeCombo = new JComboBox<AutomatonType>();
 
-		Iterator<AutomatonType> typeIt = AutomatonType.iterator();
+		final Iterator<AutomatonType> typeIt = AutomatonType.iterator();
 
 		while (typeIt.hasNext())
 		{
 			automatonTypeCombo.addItem(typeIt.next());
 		}
 
-		TableColumnModel columnModel = theTable.getColumnModel();
-		TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
-		DefaultCellEditor cellEditor = new DefaultCellEditor(automatonTypeCombo);
+		final TableColumnModel columnModel = theTable.getColumnModel();
+		final TableColumn typeColumn = columnModel.getColumn(Supremica.TABLE_TYPE_COLUMN);
+		final DefaultCellEditor cellEditor = new DefaultCellEditor(automatonTypeCombo);
 
 		cellEditor.setClickCountToStart(2);
 		typeColumn.setCellEditor(cellEditor);
 		cellEditor.addCellEditorListener(this);
 	}
 
-	public void editingCanceled(ChangeEvent e) {}
+	@Override
+  public void editingCanceled(final ChangeEvent e) {}
 
-	public void editingStopped(ChangeEvent e)
+	@Override
+  public void editingStopped(final ChangeEvent e)
 	{
 		if (automatonTypeCombo.getSelectedIndex() >= 0)
 		{
-			AutomatonType selectedValue = (AutomatonType) automatonTypeCombo.getSelectedItem();
+			final AutomatonType selectedValue = (AutomatonType) automatonTypeCombo.getSelectedItem();
 
 			if (selectedValue != null)
 			{
-				int selectedRow = theTable.getSelectedRow();
-				int orgRow = theTableSorter.getOriginalRowIndex(selectedRow);
+				final int selectedRow = theTable.getSelectedRow();
+				final int orgRow = theTableSorter.getOriginalRowIndex(selectedRow);
 
 				if (selectedRow >= 0)
 				{
@@ -97,7 +107,7 @@ class TypeCellEditor
 					{
 						currAutomaton = theVisualProjectContainer.getActiveProject().getAutomatonAt(orgRow);
 					}
-					catch (Exception ex)
+					catch (final Exception ex)
 					{
 						logger.error("Could not find automaton at row " + orgRow);
 						logger.debug(ex.getStackTrace());

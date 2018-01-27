@@ -1,8 +1,9 @@
 package org.supremica.util;
 
-import org.supremica.log.*;
 import java.lang.reflect.Method;
+
 import javax.swing.JOptionPane;
+
 
 /**
 * A simple, static class to display a URL in the system browser.
@@ -25,8 +26,6 @@ import javax.swing.JOptionPane;
 */
 public class BrowserControl
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(BrowserControl.class);
   	private static final String errMsg = "Error attempting to launch web browser";
 	/**
 	 * Display a file in the system browser.  If you want to display a
@@ -35,24 +34,24 @@ public class BrowserControl
 	 * @param url the file's url (the url must start with either "http://" or
 	 * "file://").
 	 */
-	public static void displayURL(String url) 
+	public static void displayURL(final String url)
 	{
-		String osName = System.getProperty("os.name");
+		final String osName = System.getProperty("os.name");
 		try
 		{
-			if (osName.startsWith("Mac OS")) 
+			if (osName.startsWith("Mac OS"))
 			{
-				Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
-				Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] {String.class});
+				final Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
+				final Method openURL = fileMgr.getDeclaredMethod("openURL", new Class[] {String.class});
 				openURL.invoke(null, new Object[] {url});
 			}
 			else if (osName.startsWith("Windows"))
 			{
 				Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
 			}
-			else 
+			else
 			{ //assume Unix or Linux
-				String[] browsers = {
+				final String[] browsers = {
 					"firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape" };
 				String browser = null;
 				for (int count = 0; count < browsers.length && browser == null; count++)
@@ -60,7 +59,7 @@ public class BrowserControl
 						browser = browsers[count];
 				if (browser == null)
 				{
-					throw new Exception("Could not find web browser");	
+					throw new Exception("Could not find web browser");
 				}
 				else
 				{
@@ -68,7 +67,7 @@ public class BrowserControl
 				}
 			}
 		}
-		catch (Exception e) 
+		catch (final Exception e)
 		{
 			JOptionPane.showMessageDialog(null, errMsg + ":\n" + e.getLocalizedMessage());
 		}
@@ -99,7 +98,7 @@ public class BrowserControl
 	/**
 	 * Simple example.
 	 */
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		displayURL("http://www.supremica.org");
 	}

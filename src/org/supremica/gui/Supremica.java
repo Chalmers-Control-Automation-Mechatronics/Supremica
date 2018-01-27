@@ -70,29 +70,27 @@ import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.about.AboutPopup;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.logging.LogPanel;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.EncodingHelper;
 import org.supremica.automata.IO.ProjectBuildFromXML;
-import org.supremica.comm.xmlrpc.Server;
 import org.supremica.gui.help.ContentHelp;
-import org.supremica.gui.ide.IDEReportInterface;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 
 public class Supremica
     extends JFrame
-    implements IDEReportInterface, TableModelListener,
-               Gui, VisualProjectContainerListener
+    implements TableModelListener, Gui, VisualProjectContainerListener
 {
     private static final long serialVersionUID = 1L;
-    private final Logger logger = LoggerFactory.createLogger(Supremica.class);
-    private final LogDisplay theLogDisplay = LogDisplay.getInstance();
+    private final Logger logger = LogManager.getLogger(Supremica.class);
     private JPanel contentPane;
     private final MainMenuBar menuBar = new MainMenuBar(this);
     private final MainToolBar toolBar = new MainToolBar(this);
@@ -108,8 +106,6 @@ public class Supremica
     @SuppressWarnings("unused")
 	private MenuHandler menuHandler;
     private JSplitPane splitPaneVertical;
-    @SuppressWarnings("unused")
-	private Server xmlRpcServer = null;
     private ContentHelp help = null;
     @SuppressWarnings("unused")
 	private CSH.DisplayHelpFromSource helpDisplayer = null;
@@ -137,27 +133,6 @@ public class Supremica
 
         logger.info("Supremica version: " + Version.getInstance().toString());
 
-        if (Config.XML_RPC_ACTIVE.isTrue())
-        {
-            boolean serverStarted = true;
-
-            try
-            {
-                xmlRpcServer = new Server(theVisualProjectContainer, Config.XML_RPC_PORT.get());
-            }
-            catch (final Exception e)
-            {
-                serverStarted = false;
-
-                logger.warn("Another server already running on port " + Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
-            }
-
-            if (serverStarted)
-            {
-                logger.info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
-            }
-        }
-
         layout = new BorderLayout();
         fullTableModel = getActiveProject().getFullTableModel();
         theTableSorter = new TableSorter(fullTableModel);
@@ -178,8 +153,9 @@ public class Supremica
         vp.setBackground(Color.white);
         theAutomatonTable.setBackground(Color.white);
 
-        splitPaneVertical = new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, theLogDisplay.getComponent());
-        theLogDisplay.getComponent().updateUI();
+        final LogPanel logPanel = new LogPanel();
+        splitPaneVertical =
+          new JSplitPane(JSplitPane.VERTICAL_SPLIT, theAutomatonTableScrollPane, logPanel);
 
         enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 
@@ -354,7 +330,7 @@ public class Supremica
 
     public void initialize()
     {
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         setVisible(true);
         splitPaneVertical.setDividerLocation(0.7);
@@ -386,30 +362,6 @@ public class Supremica
     }
 
     // ** MF ** Implementation of Gui stuff
-    @Override
-    public void error(final String msg)
-    {
-        logger.error(msg);
-    }
-
-    @Override
-    public void error(final String msg, final Throwable t)
-    {
-        logger.error(msg, t);
-    }
-
-    @Override
-    public void info(final String msg)
-    {
-        logger.info(msg);
-    }
-
-    @Override
-    public void debug(final String msg)
-    {
-        logger.debug(msg);
-    }
-
     @Override
     public void clearSelection()
     {

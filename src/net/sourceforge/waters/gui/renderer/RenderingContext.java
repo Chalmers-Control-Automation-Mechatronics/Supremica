@@ -45,6 +45,9 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 
 public interface RenderingContext
 {
+
+  //#########################################################################
+  //# Methods
   /**
    * Gets a font for the display of the given identifier.
    * This method is used to provide different fonts for event labels that are
@@ -72,8 +75,8 @@ public interface RenderingContext
    * it is called for the same input; to change the colours for a node, the
    * node must be removed from shape producer's cache.
    */
-  public PropositionIcon.ColorInfo getColorInfo(GraphProxy graph,
-                                                SimpleNodeProxy node);
+  public PropositionIcon.ColorInfo getMarkingColorInfo(GraphProxy graph,
+                                                       SimpleNodeProxy node);
 
   /**
    * Returns whether given event may cause the proposition status of

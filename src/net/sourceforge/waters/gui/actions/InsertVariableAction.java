@@ -41,7 +41,7 @@ import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.VariableEditorDialog;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -69,7 +69,7 @@ public class InsertVariableAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_V);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.ALT_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_VARIABLE);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_VARIABLE);
   }
 
 

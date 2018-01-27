@@ -73,6 +73,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Automata;
@@ -89,12 +92,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 import org.supremica.util.ActionTimer;
-import org.supremica.util.BDD.BDDAutomata;
-import org.supremica.util.BDD.OnlineBDDSupervisor;
 
 /**
  * Does synthesis in automata-scale, modularly,
@@ -103,7 +101,7 @@ import org.supremica.util.BDD.OnlineBDDSupervisor;
 public class AutomataSynthesizer
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataSynthesizer.class);
+    private static Logger logger = LogManager.getLogger(AutomataSynthesizer.class);
     private Automata theAutomata;
     private final Map<LabeledEvent,Automata> ucEventToPlantMap;
     private final SynchronizationOptions synchronizationOptions;
@@ -242,7 +240,7 @@ public class AutomataSynthesizer
             }
 
             // Present result
-            if (Config.VERBOSE_MODE.isTrue() && (min.size() == 1) && (min.getFirstAutomaton().nbrOfStates() < 100))
+            if (min.size() == 1 && min.getFirstAutomaton().nbrOfStates() < 100)
             {
                 // This may not be true if more advanced simplification rules have been used!
                 logger.info("The following states are allowed by the maximally permissive, "
@@ -427,76 +425,6 @@ public class AutomataSynthesizer
 
         //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
-
-        else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.BDD)
-        {
-            // BDD synthesis
-            final SynthesisType type = synthesizerOptions.getSynthesisType();
-            final boolean doControllabilitySynth = (type == SynthesisType.NONBLOCKING_CONTROLLABLE) | (type == SynthesisType.CONTROLLABLE);
-            final boolean doNonblockingSynth = (type == SynthesisType.NONBLOCKING_CONTROLLABLE) | (type == SynthesisType.NONBLOCKING);
-
-            final Automata newAutomata = new Automata(theAutomata);
-            final AutomataBDDSynthesizer bddSynthesizer = new AutomataBDDSynthesizer(newAutomata,
-               		doNonblockingSynth, doControllabilitySynth);
-            try {
-            	@SuppressWarnings("unused")
-              final
-				BDDAutomata bdda = bddSynthesizer.getBDDAutomata();
-            	@SuppressWarnings("unused")
-              final
-				int safeStates = bddSynthesizer.computeSafeStates();
-
-/*
-            int coreach_int = bddSynthesizer.coReachStates();
-            int dead_int = bddSynthesizer.deadStates();
-
-            int reach_int = bddSynthesizer.reachStates();
-            int uc_int = bddSynthesizer.UCStates();
-
-            System.err.println("number of reachable states: "+bdda.count_states(reach_int));
-            System.err.println("number of uncontrollable states: "+bdda.count_states(uc_int));
-*/
- //           	System.err.println("Computing number of states and nodes...");
-/*
-            bdda.show_states(reach_int);
-            bdda.show_states(coreach_int);
-            bdda.show_states(dead_int);
-*/
-
-//            numberOfStatesBDD = bdda.count_states(bdd_int);
-//            bddSynthesizer.extractOnlineSupervisor();
-
-//            	numberOfStatesBDD = bdda.count_states(safeStates);
-
-//            bdda.show_states(bdd_int);
-
-//            numberOfNodesBDD = bdda.nodeCount(bdd_int);
-
-//            System.err.println("number of nodes (BDD): "+numberOfNodesBDD);
-
-//            	System.err.println("number of states (BDD): "+numberOfStatesBDD);
-
-            	if (synthesizerOptions.doExtractSupervisor())
-            	{
-            		//Perform BDD synthesis
-
-            		final OnlineBDDSupervisor supervisor = bddSynthesizer.extractOnlineSupervisor();
-                    //result.addAutomaton(sup);
-                	try
-                    {
-                	final Automaton supAutomaton = supervisor.createAutomaton();
-                        result.addAutomaton(supAutomaton);
-                    }
-                    finally
-                    {
-                            //clean up (this is needed because of the buddy lib)
-                            supervisor.cleanup();
-                    }
-            	}
-            } finally {
-                    bddSynthesizer.cleanup();
-            }
-        }
         else if (synthesizerOptions.getSynthesisAlgorithm() == SynthesisAlgorithm.MONOLITHICBDD)
         {
             final BDDSynthesizer bddSynthesizer = new BDDSynthesizer(theAutomata);
@@ -898,8 +826,8 @@ public class AutomataSynthesizer
             }
 
             // Will the supervisor affect the system at all?
-            logger.verbose("Examining whether the supervisor candidate " +
-                currSupervisor + " is needed.");
+            logger.info("Examining whether the supervisor candidate " +
+                        currSupervisor + " is needed.");
             mThreadToAbort = verifier;
             // if (AutomataVerifier.verifyModularInclusion(currAutomata, new Automata(currSupervisor)))
             if (verifier.verify())

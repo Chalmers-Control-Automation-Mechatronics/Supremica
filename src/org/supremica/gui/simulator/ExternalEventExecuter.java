@@ -35,17 +35,19 @@
 
 package org.supremica.gui.simulator;
 
-import org.supremica.automata.*;
+import java.util.Iterator;
+import java.util.Stack;
+import java.util.TreeMap;
 
-import java.util.*;
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.LabeledEvent;
 
 /**
- * @author Arash
- *
  * ExternalEventExecuter execute events by asking an external interface.
  * The external interface is assumed to be interfaced to a dynamic library called "executer".
- * For exemple, in MS windows, a DLL called "executer.dll" should be in the system PATH.
+ * For example, in MS windows, a DLL called "executer.dll" should be in the system PATH.
  *
+ * @author Arash Vahidi
  */
 class ExternalEventExecuter
     extends EventExecuter
@@ -118,6 +120,7 @@ class ExternalEventExecuter
         // XXX: the thread is started from the base class. what if it starts executing before we have initialized the DLL?
     }
 
+    @Override
     public void run()
     {
         while (doRun)

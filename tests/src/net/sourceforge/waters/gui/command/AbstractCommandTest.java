@@ -71,13 +71,11 @@ import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 
-import org.supremica.gui.SupremicaLoggerFactory;
 import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.log.Logger;
 
 
 public abstract class AbstractCommandTest extends AbstractWatersTest
@@ -101,8 +99,6 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
   protected void setUp() throws Exception
   {
     super.setUp();
-    final Logger logger = SupremicaLoggerFactory.createLogger(IDE.class);
-    IDE.setLogger(logger);
     mIDE = new IDE();
     mSubjectFactory = ModuleSubjectFactory.getInstance();
     mPlainCloner = ModuleElementFactory.getCloningInstance();
@@ -368,7 +364,7 @@ public abstract class AbstractCommandTest extends AbstractWatersTest
           // Funny thing, when run from ANT, the text after the first newline
           // in the argument passed to fail() gets printed on the console.
           // So we suppress the output and refer the programmer to the log file.
-          fullmsg = msg + " (See " + getLogFile() + " for details.)";
+          fullmsg = msg + " (See " + getLogFileName() + " for details.)";
         }
         fail(fullmsg);
       } catch (final IOException exception) {

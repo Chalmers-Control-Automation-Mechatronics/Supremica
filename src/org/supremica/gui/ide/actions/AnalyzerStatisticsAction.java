@@ -40,7 +40,10 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
@@ -68,7 +71,7 @@ public class AnalyzerStatisticsAction
         putValue(Action.SHORT_DESCRIPTION, "Statistics");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, IconLoader.ICON_CONSOLE_INFO);
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_CONSOLE_INFO);
     }
 
     @Override
@@ -83,17 +86,16 @@ public class AnalyzerStatisticsAction
     @Override
     public void doAction()
     {
+        final Logger logger = LogManager.getLogger();
         final int nbrOfAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().nbrOfAutomata();
-        //gui.info("Number of automata: " + nbrOfAutomata);
-
         final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, true))
         {
             return;
         }
 
-        ide.getIDE().info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
-        ide.getIDE().info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
+        logger.info("Number of selected automata: " + selectedAutomata.size() + " (" + nbrOfAutomata + ")");
+        logger.info("Size of union alphabet: " + selectedAutomata.getUnionAlphabet().size());
 
         for (final Automaton currAutomaton : selectedAutomata)
         {
@@ -128,7 +130,7 @@ public class AnalyzerStatisticsAction
             }
 
             // logger.info(statusStr.toString());
-            ide.getIDE().info(statusStr.toString());
+            logger.info(statusStr.toString());
         }
 
         if (selectedAutomata.size() > 1)
@@ -140,7 +142,7 @@ public class AnalyzerStatisticsAction
                 potentialNumberOfStates = potentialNumberOfStates * currAutomaton.nbrOfStates();
             }
 
-            ide.getIDE().info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
+            logger.info("Number of potential states: " + new Double(potentialNumberOfStates).longValue());
         }
     }
 }

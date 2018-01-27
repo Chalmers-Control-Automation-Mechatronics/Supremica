@@ -45,7 +45,8 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -123,27 +124,6 @@ public abstract class AbstractTRCompositionalVerifier
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets whether counterexample checking is enabled.
-   * If enabled, the generated counterexample is checked for correctness
-   * after each step during counterexample. This is a very slow process,
-   * and only recommend for testing and debugging.
-   * This setting is disabled by default.
-   */
-  public void setTraceCheckingEnabled(final boolean checking)
-  {
-    mTraceCheckingEnabled = checking;
-  }
-
-  /**
-   * Returns whether counterexample checking is enabled.
-   * @see #setTraceCheckingEnabled(boolean) setTraceCheckingEnabled()
-   */
-  public boolean isTraceCheckingEnabled()
-  {
-    return mTraceCheckingEnabled;
-  }
-
   public ModelVerifier getMonolithicVerifier()
   {
     return (ModelVerifier) getMonolithicAnalyzer();
@@ -190,7 +170,7 @@ public abstract class AbstractTRCompositionalVerifier
   {
     final CompositionalVerificationResult result = getAnalysisResult();
     if (!result.isSatisfied() && isCounterExampleEnabled()) {
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("Starting trace expansion ...");
       final long start = System.currentTimeMillis();
       getSpecialEventsListener().setEnabled(true);
@@ -204,7 +184,7 @@ public abstract class AbstractTRCompositionalVerifier
         final TRAbstractionStep step = iter.previous();
         step.reportExpansion();
         step.expandTrace(trace, this);
-        if (mTraceCheckingEnabled) {
+        if (isOutputCheckingEnabled()) {
           checkIntermediateCounterExample(trace);
         }
         iter.remove();
@@ -222,6 +202,5 @@ public abstract class AbstractTRCompositionalVerifier
   //#########################################################################
   //# Data Members
   private boolean mShortCounterExampleRequested = false;
-  private boolean mTraceCheckingEnabled = false;
 
 }

@@ -55,7 +55,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 import org.supremica.gui.ide.IDE;
@@ -91,7 +91,7 @@ public class IDEPasteAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_P);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_PASTE);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_PASTE);
     setEnabled(false);
   }
 

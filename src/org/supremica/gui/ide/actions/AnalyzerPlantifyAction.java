@@ -40,12 +40,13 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.Plantifier;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 /**
@@ -57,7 +58,7 @@ import org.supremica.log.LoggerFactory;
 public class AnalyzerPlantifyAction
     extends IDEAction
 {
-    private final Logger logger = LoggerFactory.createLogger(AnalyzerPlantifyAction.class);
+    private final Logger logger = LogManager.getLogger(AnalyzerPlantifyAction.class);
 	private static final long serialVersionUID = 1L;
 
     /**
@@ -70,7 +71,7 @@ public class AnalyzerPlantifyAction
         setAnalyzerActiveRequired(true);
         putValue(Action.NAME, "Plantify");
         putValue(Action.SHORT_DESCRIPTION, "Turns specifications and supervisors into plants");
-        putValue(Action.SMALL_ICON, IconLoader.ICON_PLANT);
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_PLANT);
     }
 
     @Override

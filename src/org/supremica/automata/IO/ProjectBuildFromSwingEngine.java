@@ -49,15 +49,24 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.swixml.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.AutomatonType;
+import org.supremica.automata.DefaultProjectFactory;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.ProjectFactory;
+import org.supremica.automata.State;
+
+import org.swixml.SwingEngine;
+
 
 public class ProjectBuildFromSwingEngine
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(ProjectBuildFromSwingEngine.class);
 	ProjectFactory theProjectFactory;
 
 	public ProjectBuildFromSwingEngine()
@@ -65,34 +74,34 @@ public class ProjectBuildFromSwingEngine
 		this.theProjectFactory = new DefaultProjectFactory();
 	}
 
-	public ProjectBuildFromSwingEngine(ProjectFactory theProjectFactory)
+	public ProjectBuildFromSwingEngine(final ProjectFactory theProjectFactory)
 	{
 		this.theProjectFactory = theProjectFactory;
 	}
 
-	public Project build(SwingEngine theSwingEngine)
+	public Project build(final SwingEngine theSwingEngine)
 	{
-		Project newProject = theProjectFactory.getProject();
+		final Project newProject = theProjectFactory.getProject();
 
-		Map<?,?> idMap = theSwingEngine.getIdMap();
-		Set<?> idSet = idMap.keySet();
+		final Map<?,?> idMap = theSwingEngine.getIdMap();
+		final Set<?> idSet = idMap.keySet();
 
-		for (Iterator<?> idIt = idSet.iterator(); idIt.hasNext(); )
+		for (final Iterator<?> idIt = idSet.iterator(); idIt.hasNext(); )
 		{
-			String currId = (String) idIt.next();
+			final String currId = (String) idIt.next();
 
-			Automaton currAutomaton = new Automaton(currId);
+			final Automaton currAutomaton = new Automaton(currId);
 			currAutomaton.setType(AutomatonType.PLANT);
 
-			State initialState = new State(currId + "_initial");
+			final State initialState = new State(currId + "_initial");
 			initialState.setInitial(true);
 			initialState.setAccepting(true);
 
-			LabeledEvent currEvent = new LabeledEvent(currId + "_isEnabled");
+			final LabeledEvent currEvent = new LabeledEvent(currId + "_isEnabled");
 
 			currAutomaton.getAlphabet().addEvent(currEvent);
 
-			Arc currArc = new Arc(initialState, initialState, currEvent);
+			final Arc currArc = new Arc(initialState, initialState, currEvent);
 			currAutomaton.addArc(currArc);
 
 

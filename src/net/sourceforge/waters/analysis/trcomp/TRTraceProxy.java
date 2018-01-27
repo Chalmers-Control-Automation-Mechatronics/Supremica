@@ -233,6 +233,11 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Simple Access
+  void setProductDES(final ProductDESProxy des)
+  {
+    mProductDES = des;
+  }
+
   void setComment(final String comment)
   {
     mComment = comment;
@@ -324,6 +329,11 @@ public abstract class TRTraceProxy
   {
     final TRAbstractionStep step = mAutomataMap.remove(aut);
     mTraceData.remove(step);
+  }
+
+  void replaceEvent(final int pos, final EventProxy event)
+  {
+    mEvents[pos] = event;
   }
 
   void addStutteringSteps(final List<EventProxy> newEvents,
@@ -574,7 +584,9 @@ public abstract class TRTraceProxy
     {
       final AutomatonProxy aut = (AutomatonProxy) key;
       final TRAbstractionStep step = mAutomataMap.get(aut);
-      assert step != null;
+      if (step == null) {
+        return null;
+      }
       final int[] states = mTraceData.get(step);
       final int s = states[mIndex];
       if (s < 0) {
@@ -697,7 +709,7 @@ public abstract class TRTraceProxy
   //# Data Members
   private URI mLocation;
   private String mComment;
-  private final ProductDESProxy mProductDES;
+  private ProductDESProxy mProductDES;
   private EventProxy[] mEvents;
   private Map<TRAbstractionStep,int[]> mTraceData;
   private Map<AutomatonProxy,TRAbstractionStep> mAutomataMap;

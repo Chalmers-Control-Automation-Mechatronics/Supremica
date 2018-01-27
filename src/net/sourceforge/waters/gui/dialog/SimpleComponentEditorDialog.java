@@ -67,7 +67,7 @@ import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -158,6 +158,7 @@ public class SimpleComponentEditorDialog
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent event)
         {
           commitDialog();
@@ -176,14 +177,17 @@ public class SimpleComponentEditorDialog
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
     mPlantButton =
-      new IconRadioButton("Plant", IconLoader.ICON_PLANT, mKindGroup);
+      new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
+                          mKindGroup, 'p');
     mPropertyButton =
-      new IconRadioButton("Property", IconLoader.ICON_PROPERTY, mKindGroup);
+      new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
+                          mKindGroup, 'o');
     mSpecButton =
-      new IconRadioButton("Specification", IconLoader.ICON_SPEC, mKindGroup);
+      new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC,
+                          mKindGroup, 's');
     mSupervisorButton =
-      new IconRadioButton("Supervisor", IconLoader.ICON_SUPERVISOR,
-                          mKindGroup);
+      new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
+                          mKindGroup, 'u');
     switch (template.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -443,6 +447,7 @@ public class SimpleComponentEditorDialog
 
     //#######################################################################
     //# Overrides for net.sourceforge.waters.gui.AttributesPanel
+    @Override
     boolean isInputLocked()
     {
       return SimpleComponentEditorDialog.this.isInputLocked();

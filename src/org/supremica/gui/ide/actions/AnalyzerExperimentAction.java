@@ -35,14 +35,17 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.AutomatonSplit;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 /**
  * A new action
@@ -50,14 +53,14 @@ import org.supremica.log.LoggerFactory;
 public class AnalyzerExperimentAction
     extends IDEAction
 {
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerExperimentAction.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerExperimentAction.class);
 
      private static final long serialVersionUID = 1L;
 
     /**
      * Constructor.
      */
-    public AnalyzerExperimentAction(List<IDEAction> actionList)
+    public AnalyzerExperimentAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -71,7 +74,8 @@ public class AnalyzerExperimentAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Remove16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -79,24 +83,25 @@ public class AnalyzerExperimentAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
         logger.info("Experiment started...");
 
-        Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // EXPERIMENT!
         {
             // "DECOMPOSE" INDIVUDUAL AUTOMATA
-            for (Automaton automaton: automata)
+            for (final Automaton automaton: automata)
             {
-                Automata result = AutomatonSplit.split(automaton);
+                final Automata result = AutomatonSplit.split(automaton);
 
                 try
                 {
                     ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
                 }
-                catch (Exception ex)
+                catch (final Exception ex)
                 {
                     logger.debug("SplitAction::actionPerformed() -- ", ex);
                     logger.debug(ex.getStackTrace());

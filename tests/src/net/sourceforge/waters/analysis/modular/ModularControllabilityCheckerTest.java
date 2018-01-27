@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.
   AbstractControllabilityCheckerTest;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class ModularControllabilityCheckerTest
@@ -50,7 +50,7 @@ public class ModularControllabilityCheckerTest
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    TestSuite testSuite =
+    final TestSuite testSuite =
       new TestSuite(ModularControllabilityCheckerTest.class);
     return testSuite;
   }
@@ -64,6 +64,7 @@ public class ModularControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractControllabilityCheckerTest
+  @Override
   public void testFischertechnik() throws Exception
   {
     try {
@@ -77,12 +78,16 @@ public class ModularControllabilityCheckerTest
   //#########################################################################
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
+  @Override
   protected ModularControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory desfactory)
   {
     final ModularModelVerifierFactory checkerfactory =
       ModularModelVerifierFactory.getInstance();
-    return checkerfactory.createControllabilityChecker(desfactory);
+    final ModularControllabilityChecker checker =
+      checkerfactory.createControllabilityChecker(desfactory);
+    checker.setCollectsFailedSpecs(true);
+    return checker;
   }
 
 }

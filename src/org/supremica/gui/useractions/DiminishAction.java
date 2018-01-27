@@ -35,20 +35,29 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.gui.Gui;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import javax.swing.AbstractAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.AutomatonPurge;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.Gui;
 
 public class DiminishAction
 	extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(DiminishAction.class);
+	private static Logger logger = LogManager.getLogger(DiminishAction.class);
 
 	private Automata newautomata = new Automata();
 	private int statenbr = 0;
@@ -60,17 +69,18 @@ public class DiminishAction
 		putValue(SHORT_DESCRIPTION, "Diminish selected automata (experimental)");
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 		logger.debug("DiminishAction::actionPerformed");
 
-		Gui gui = ActionMan.getGui();
-		Automata automata = gui.getSelectedAutomata();
+		final Gui gui = ActionMan.getGui();
+		final Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator<?> autit = automata.iterator(); autit.hasNext(); )
+		for (final Iterator<?> autit = automata.iterator(); autit.hasNext(); )
 		{
-			Automaton automaton = new Automaton((Automaton) autit.next());    // make a copy
+			final Automaton automaton = new Automaton((Automaton) autit.next());    // make a copy
 
 			if (diminish(automaton))    // If any states forbidden, remove them, but delicately
 			{
@@ -89,7 +99,7 @@ public class DiminishAction
 
 				newautomata = new Automata();
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				logger.debug("DiminishAction::actionPerformed() -- ", ex);
 				logger.debug(ex.getStackTrace());
@@ -99,13 +109,13 @@ public class DiminishAction
 		logger.debug("DiminishAction::actionPerformed done");
 	}
 
-	private boolean diminish(Automaton automaton)
+	private boolean diminish(final Automaton automaton)
 	{
 		boolean didit = false;
 
-		for (Iterator<State> stit = automaton.stateIterator(); stit.hasNext(); )
+		for (final Iterator<State> stit = automaton.stateIterator(); stit.hasNext(); )
 		{
-			State state = stit.next();
+			final State state = stit.next();
 
 			didit |= diminish(state);
 		}
@@ -115,16 +125,16 @@ public class DiminishAction
 
 	// We assume all labels look like <xxx>.hi or <xxx>.lo
 	// If we for a state q find both .hi and .lo for the same <xxx>, then forbid q
-	private boolean diminish(State state)
+	private boolean diminish(final State state)
 	{
 		logger.debug("State" + "(" + ++statenbr + "): " + state.getName());
 
-		for (Iterator<Arc> arcItA = state.outgoingArcsIterator(); arcItA.hasNext(); )
+		for (final Iterator<Arc> arcItA = state.outgoingArcsIterator(); arcItA.hasNext(); )
 		{
-			Arc arc = arcItA.next();
-			LabeledEvent event = arc.getEvent();
+			final Arc arc = arcItA.next();
+			final LabeledEvent event = arc.getEvent();
 
-			for (Iterator<Arc> arcItB = state.outgoingArcsIterator();
+			for (final Iterator<Arc> arcItB = state.outgoingArcsIterator();
 					arcItB.hasNext(); )
 			{
 				if (hiloMatch(event, arcItB.next().getEvent()))
@@ -143,14 +153,14 @@ public class DiminishAction
 	}
 
 	// This can be much improved, ok for now
-	private boolean hiloMatch(LabeledEvent ev1, LabeledEvent ev2)
+	private boolean hiloMatch(final LabeledEvent ev1, final LabeledEvent ev2)
 	{
-		String label1 = ev1.getLabel();
-		String label2 = ev2.getLabel();
+		final String label1 = ev1.getLabel();
+		final String label2 = ev2.getLabel();
 
 		// Find the index of the "."
-		int idx1 = label1.indexOf(".");
-		int idx2 = label2.indexOf(".");
+		final int idx1 = label1.indexOf(".");
+		final int idx2 = label2.indexOf(".");
 
 		logger.debug("label1: " + label1 + " =? label2: " + label2);
 
@@ -182,16 +192,16 @@ public class DiminishAction
 	// We make two passes, one for removing arcs between forbidden states
 	// Next pass for adjusting the remaining arcs
 	// Finally, we purge the forbidden stuff
-	private void purgeDelicately(Automaton automaton)
+	private void purgeDelicately(final Automaton automaton)
 	{
 		logger.debug("Purging delicately...");
 		automaton.beginTransaction();
 
 		// Remove all arcs between two forbidden states (is it safe to do this?)
-		LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
-		for (Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
+		final LinkedList<Arc> toBeRemoved = new LinkedList<Arc>();
+		for (final Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
-			Arc arc = (Arc) arcit.next();
+			final Arc arc = (Arc) arcit.next();
 
 			if (arc.getFromState().isForbidden() && arc.getToState().isForbidden())
 			{
@@ -201,25 +211,25 @@ public class DiminishAction
 		while (toBeRemoved.size() != 0)
 		{
 			automaton.removeArc(toBeRemoved.remove(0));
-		}				
+		}
 
-		// Now, lets adjust the remaining arcs. 
+		// Now, lets adjust the remaining arcs.
 		// If we reach a forbidden state, we need to take that arc further down the chain
 		// Do we know that it is a chain? What about nondeterminism??
-		for (Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
+		for (final Iterator<?> arcit = automaton.arcIterator(); arcit.hasNext(); )
 		{
-			Arc arc = (Arc) arcit.next();
-			State nextstate = arc.getToState();
+			final Arc arc = (Arc) arcit.next();
+			final State nextstate = arc.getToState();
 
 			if (nextstate.isForbidden())
 			{
 				// We know that from the forbidden state, we reach a non-forbidden one
 				// (otherwise this transition would have been removed above)
 				// We don't know if there are multiple non-forbidden states reached, however!
-				for (Iterator<?> narcit = nextstate.outgoingArcsIterator();
+				for (final Iterator<?> narcit = nextstate.outgoingArcsIterator();
 						narcit.hasNext(); )
 				{
-					Arc newarc = (Arc) narcit.next();
+					final Arc newarc = (Arc) narcit.next();
 
 					logger.debug("Add arc<" + arc.getFromState().getName() + ", " + newarc.getToState().getName() + ", " + arc.getEvent().getLabel() + ">");
 					automaton.addArc(new Arc(arc.getFromState(), newarc.getToState(), arc.getEvent()));
@@ -231,16 +241,16 @@ public class DiminishAction
 		while (toBeRemoved.size() != 0)
 		{
 			automaton.removeArc(toBeRemoved.remove(0));
-		}				
+		}
 
 		// Remove the forbidden states
-		AutomatonPurge automatonPurge = new AutomatonPurge(automaton);
+		final AutomatonPurge automatonPurge = new AutomatonPurge(automaton);
 
 		try
 		{
 			automatonPurge.execute();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception in AutomataPurge. Automaton: " + automaton.getName(), ex);
 			logger.debug(ex.getStackTrace());

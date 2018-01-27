@@ -18,9 +18,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.Args;
+
 
 public class ExtendedAutomataIndexMap {
 
@@ -42,9 +41,6 @@ public class ExtendedAutomataIndexMap {
     private Set<String> EFANames = null;
     private Set<String> variableNames = null;
     ExtendedAutomata theExAutomata = null;
-    @SuppressWarnings("unused")
-    private static final Logger logger =
-            LoggerFactory.createLogger(AutomataIndexMap.class);
 
     public ExtendedAutomataIndexMap() {
         var2initValMap = new HashMap<String, Integer>();

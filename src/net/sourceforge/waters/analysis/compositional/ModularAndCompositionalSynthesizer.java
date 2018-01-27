@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
@@ -59,9 +61,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -98,7 +99,8 @@ public class ModularAndCompositionalSynthesizer
     mCompositionalSynthesizer.setAbstractionProcedureCreator
       (AutomataSynthesisAbstractionProcedureFactory.OE);
     mCompositionalConflictChecker = new CompositionalConflictChecker(factory);
-    mCompositionalConflictChecker.setAbstractionProcedureCreator(ConflictAbstractionProcedureFactory.NBA);
+    mCompositionalConflictChecker.setAbstractionProcedureCreator
+      (ConflictAbstractionProcedureFactory.NBA);
   }
 
 
@@ -189,6 +191,63 @@ public class ModularAndCompositionalSynthesizer
   }
 
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    mConfiguredMarking = marking;
+    mUsedMarking = null;
+  }
+
+  @Override
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    return mConfiguredMarking;
+  }
+
+  @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    mModularSynthesizer.setNondeterminismEnabled(enable);
+    mCompositionalSynthesizer.setNondeterminismEnabled(enable);
+  }
+
+  @Override
+  public void setSupervisorReductionEnabled(final boolean enable)
+  {
+    mModularSynthesizer.setSupervisorReductionEnabled(enable);
+    mCompositionalSynthesizer.setSupervisorReductionEnabled(enable);
+  }
+
+  @Override
+  public boolean getSupervisorReductionEnabled()
+  {
+    return mModularSynthesizer.getSupervisorReductionEnabled();
+  }
+
+  @Override
+  public void setSupervisorLocalizationEnabled(final boolean enable)
+  {
+    mModularSynthesizer.setSupervisorLocalizationEnabled(enable);
+    mCompositionalSynthesizer.setSupervisorLocalizationEnabled(enable);
+  }
+
+  @Override
+  public boolean getSupervisorLocalizationEnabled()
+  {
+    return mModularSynthesizer.getSupervisorLocalizationEnabled();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return mModularSynthesizer.supportsNondeterminism();
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -220,48 +279,6 @@ public class ModularAndCompositionalSynthesizer
     if (mCompositionalConflictChecker != null) {
       mCompositionalConflictChecker.resetAbort();
     }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mConfiguredMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mConfiguredMarking;
-  }
-
-  @Override
-  public void setSupervisorReductionEnabled(final boolean enable)
-  {
-    mModularSynthesizer.setSupervisorReductionEnabled(enable);
-    mCompositionalSynthesizer.setSupervisorReductionEnabled(enable);
-  }
-
-  @Override
-  public boolean getSupervisorReductionEnabled()
-  {
-    return mModularSynthesizer.getSupervisorReductionEnabled();
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mModularSynthesizer.setSupervisorLocalizationEnabled(enable);
-    mCompositionalSynthesizer.setSupervisorLocalizationEnabled(enable);
-  }
-
-  @Override
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mModularSynthesizer.getSupervisorLocalizationEnabled();
   }
 
 
@@ -405,7 +422,7 @@ public class ModularAndCompositionalSynthesizer
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);
@@ -415,12 +432,6 @@ public class ModularAndCompositionalSynthesizer
     } finally {
       tearDown();
     }
-  }
-
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
   }
 
 

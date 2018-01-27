@@ -40,7 +40,7 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -55,7 +55,7 @@ public class SimulationResetAction
     super(ide);
     putValue(Action.NAME, "Reset");
     putValue(Action.SHORT_DESCRIPTION, "Reset the Simulation");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_RESET);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_RESET);
     updateEnabledStatus();
   }
 

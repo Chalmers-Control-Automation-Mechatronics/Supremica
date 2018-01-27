@@ -51,8 +51,6 @@ package org.supremica.automata.algorithms;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 
-import org.supremica.util.BDD.JDDLoader;
-
 public enum SynthesisAlgorithm
 {
 
@@ -73,15 +71,9 @@ public enum SynthesisAlgorithm
   COMPOSITIONAL("Compositional"),
   //    SYNTHESISA("Compositional (SynthesisA)"),
   COMPOSITIONAL_WATERS("Compositional (Waters)", true,
-                       ModelAnalyzerFactoryLoader.Compositional),
+                       ModelAnalyzerFactoryLoader.Compositional);
   //IDD("IDD"),
   //MonolithicSingleFixpoint("MONOLITHIC (single fixpoint)", false),    // works, but is very slow [due to lame implementation :s ]
-  BDD("BDD") {
-    @Override
-    public boolean isLoadable() {
-      return JDDLoader.canLoadJDD();
-    }
-  };
 
 
   //#########################################################################

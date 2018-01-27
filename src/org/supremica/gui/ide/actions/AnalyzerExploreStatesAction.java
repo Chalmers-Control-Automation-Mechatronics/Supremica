@@ -42,28 +42,23 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
-/**
- * A new action
- */
 public class AnalyzerExploreStatesAction
     extends IDEAction
 {
-    private final Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerExploreStatesAction(List<IDEAction> actionList)
+    public AnalyzerExploreStatesAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -78,7 +73,7 @@ public class AnalyzerExploreStatesAction
     }
 
 	@Override
-    public void actionPerformed(ActionEvent e)
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -90,7 +85,7 @@ public class AnalyzerExploreStatesAction
     public void doAction()
     {
        // Retrieve the selected automata and make a sanity check
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
 
         // Sanitycheck
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, false, false, true))
@@ -104,15 +99,15 @@ public class AnalyzerExploreStatesAction
             // One automaton selected
 
             // Get automaton
-            Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
-            String currAutomatonName = theAutomaton.getName();
+            final Automaton theAutomaton = selectedAutomata.getFirstAutomaton();
+            final String currAutomatonName = theAutomaton.getName();
 
             // Get AutomatonExplorer
             try
             {
                 ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonExplorer(currAutomatonName);
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Exception in AutomatonExplorer. Automaton: " + theAutomaton.getName(), ex);
                 logger.debug(ex.getStackTrace());
@@ -135,12 +130,12 @@ public class AnalyzerExploreStatesAction
             {
                 JOptionPane.showMessageDialog(ide.getFrame(), "The automata explorer only works in the \"forward\" direction!", "Alert", JOptionPane.INFORMATION_MESSAGE);
 
-                AutomataExplorer explorer = new AutomataExplorer(selectedAutomata);
+                final AutomataExplorer explorer = new AutomataExplorer(selectedAutomata);
 
                 explorer.setVisible(true);
                 explorer.initialize();
             }
-            catch (Exception ex)
+            catch (final Exception ex)
             {
                 logger.error("Exception in AutomataExplorer.", ex);
                 logger.debug(ex.getStackTrace());

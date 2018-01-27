@@ -1,25 +1,28 @@
-/************************ Remover.java ************************************
- * Given a set of automata and a set of states, all outgoing transitions
- * from those states are removed. This algorithm is accessed from FindStates
- * once some states have actually been found (see PresentStates.java)
- */
 package org.supremica.automata.algorithms;
 
 import java.util.function.Predicate;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
+import org.supremica.gui.PresentStates;
 import org.supremica.gui.VisualProject;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 /**
+ * Given a set of automata and a set of states, all outgoing transitions
+ * from those states are removed. This algorithm is accessed from FindStates
+ * once some states have actually been found (see {@link PresentStates})
+ *
  * @author Martin Fabian
  */
+
 public class Remover
 {
-	private static final Logger logger = LoggerFactory.createLogger(Forbidder.class);
+	private static final Logger logger = LogManager.getLogger(Forbidder.class);
 	private final int[] selected_rows;
 	private final SearchStates search_states;
 	@SuppressWarnings("unused")

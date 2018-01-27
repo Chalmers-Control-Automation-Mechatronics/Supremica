@@ -49,30 +49,41 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Alphabet;
+import org.supremica.automata.AlphabetHelpers;
+import org.supremica.automata.Arc;
+import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
+import org.supremica.automata.algorithms.EnumerateStates;
 
 public class AutomataToControlBuilderSFC
     implements AutomataSerializer
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataToControlBuilderSFC.class);
+    private static Logger logger = LogManager.getLogger(AutomataToControlBuilderSFC.class);
+
     protected ControlBuilderHelper theHelper = null;
-//    private String fileName = null;
     protected Project theProject;
     protected boolean debugMode = false;
     protected int transitionCounter = 0;
     protected int eventMonitorCounter = 0;
     protected int automatonCounter = 1;
-    
-    public AutomataToControlBuilderSFC(Project theProject)
+
+    public AutomataToControlBuilderSFC(final Project theProject)
     {
         this(theProject, ControlBuilderHelper.getInstance());
     }
-    
-    public AutomataToControlBuilderSFC(Project theProject, IEC61131Helper theHelper)
+
+    public AutomataToControlBuilderSFC(final Project theProject, final IEC61131Helper theHelper)
     {
         this.theProject = theProject;
         if (theHelper instanceof ControlBuilderHelper)
@@ -84,39 +95,41 @@ public class AutomataToControlBuilderSFC
             logger.error("Helper must be of type ControlBuilderHelper");
         }
     }
-    
-    public void serialize(String fileName)
+
+    @Override
+    public void serialize(final String fileName)
     {    // Empty
     }
-    
-    public void serialize(PrintWriter pw)
+
+    @Override
+    public void serialize(final PrintWriter pw)
     {    // Empty
     }
-    
-    public void serializeApp(File theFile, String filename)
+
+    public void serializeApp(final File theFile, final String filename)
     {
         try
         {
-            FileWriter theWriter = new FileWriter(theFile);
-            PrintWriter thePrintWriter = new PrintWriter(theWriter);
-            String theFileName = theFile.getName();
-            
+            final FileWriter theWriter = new FileWriter(theFile);
+            final PrintWriter thePrintWriter = new PrintWriter(theWriter);
+            final String theFileName = theFile.getName();
+
             serializeApp(thePrintWriter, theFileName.substring(0, theFileName.length() - 4));
             thePrintWriter.close();
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Exception while generating ControlBuilder code. " + ex);
             logger.debug(ex.getStackTrace());
         }
     }
-    
-    public void serializeApp(PrintWriter pw, String filename)
+
+    public void serializeApp(final PrintWriter pw, final String filename)
     {
-        
+
         // Start of file header
         //Date theDate = new Date();
-        
+
         // Should perhaps get current date and time, but how do I format it?
         //logger.info(theDate.toString());
         pw.println("HEADER SyntaxVersion_ '3.1' ChangedDate_ '2002-01-25-22:20:41.631'");
@@ -126,76 +139,76 @@ public class AutomataToControlBuilderSFC
         pw.println("FileHistory_");
         pw.println("(* This source code unit was created 2002-01-25 22:20 by Supremica. *)");
         pw.println("ENDDEF");
-        
+
         // End of file header
         // Start of Program invocation
         pw.println(filename);
         pw.println("Invocation ( 0.0 , 0.0 , 0.0 , 1.0 , 1.0 )");
         pw.println(": ROOT_MODULE");
-        
+
         // Use generic Program1 for now
         pw.println("PROGRAM Program1 : SINGLE_PROGRAM");
-        
+
         // Start of variable declarations
         pw.println("VAR");
-        
+
         Alphabet unionAlphabet = null;
-        
+
         try
         {
             unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
             logger.debug(ex.getStackTrace());
-            
+
             return;
         }
-        
+
         // . is not allowed in simple variable names, replaced with _
         // #"@|*: Max identfier length (variable, step name etc) = 32.
-        for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+        for (final Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
         {
-            LabeledEvent currEvent = (LabeledEvent) alphaIt.next();
-            
+            final LabeledEvent currEvent = alphaIt.next();
+
             if (currEvent.getLabel().length() > 32)
             {
                 logger.warn("Event label " + currEvent.getLabel() + " too long. ControlBuilder's maximum identifier length is 32. CB will truncate, duplicates possible. (Please rename event label yourself.)");
             }
-            
+
             pw.println(currEvent.getLabel().replace('.', '_') + " : bool;");
         }
-        
+
         pw.println("END_VAR\n");
-        
+
         // End of variable declarations.
         // Here comes the automata, the tricky part.
         automatonConverter(theProject, pw);
-        
+
         // Event Monitors should be generated here.
         generateEventMonitors(theProject, pw);
-        
+
         // End of Program code
         pw.println("END_PROGRAM;\n");
         pw.println("ModuleDef");
         pw.println("ClippingBounds := ( -10.0 , -10.0 ) ( 10.0 , 10.0 )");
         pw.println("ZoomLimits := 0.0 0.01\n");
-        
+
         // End of Module definition
         pw.println("END_MODULE");
     }
-    
-    public void serializePrj(File theFile, String filename)
+
+    public void serializePrj(final File theFile, final String filename)
     throws Exception
     {
-        PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
-        
+        final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+
         serializePrj(theWriter, filename);
         theWriter.close();
     }
-    
-    public void serializePrj(PrintWriter pw, String filename)
+
+    public void serializePrj(final PrintWriter pw, final String filename)
     {
         pw.println("'2002-01-11-16:24:38.775'");
         pw.println("Header");
@@ -212,14 +225,14 @@ public class AutomataToControlBuilderSFC
         pw.println("ColorTable");
         pw.println(" ( ColorModel HLS\n )");
     }
-    
-    protected void automatonConverter(Project theProject, PrintWriter pw)
+
+    protected void automatonConverter(final Project theProject, final PrintWriter pw)
     {
-        EnumerateStates enumer = new EnumerateStates(theProject, "q");
-        
+        final EnumerateStates enumer = new EnumerateStates(theProject, "q");
+
         enumer.execute();
-        
-        for (Iterator<Automaton> automataIt = theProject.iterator();
+
+        for (final Iterator<Automaton> automataIt = theProject.iterator();
         automataIt.hasNext(); )
         {
             // Each automaton is translated into a ControlBuilder Sequence.
@@ -229,24 +242,24 @@ public class AutomataToControlBuilderSFC
             // The difficulty is to know when the alternative branches merge, and if they do it the "ControlBuilder way".
             // A transition may be followed by a PARALLELSEQuence which has PARALLELBRANCHes.
             // This cannot happen for an automaton.
-            Automaton aut = (Automaton) automataIt.next();
-            
+            final Automaton aut = automataIt.next();
+
             aut.clearVisitedStates();
-            
+
             transitionCounter = 1;
-            
+
             if (aut.getName().length() > theHelper.getIdentifierLengthLimit())
             {
                 logger.warn("The name of automaton " + aut.getName() + theHelper.getIdentifierLengthErrorMessage() + automatonCounter);
                 aut.setName("Automaton_" + automatonCounter++);
             }
-            
+
             // If there is _no_ ordinary, that is, non-fork, arc to the first step in drawing order it is an OPENSEQUENCE.
             // Is this reaaly correct? Won't check that for now ...
             // OPENSEQUENCE might not be supported in ControlBuilder
             // COORD must be same for all sequences? Should probably be obsoleted.
-            State initState = aut.getInitialState();
-            
+            final State initState = aut.getInitialState();
+
             if (initState.nbrOfIncomingArcs() > 0)
             {
                 pw.println("SEQUENCE " + aut.getName().replace('.', '_') + theHelper.getSequenceControlString() + theHelper.getCoord());
@@ -255,10 +268,10 @@ public class AutomataToControlBuilderSFC
             {
                 pw.println("OPENSEQUENCE " + aut.getName().replace('.', '_') + theHelper.getSequenceControlString() + theHelper.getCoord());
             }
-            
+
             printSequence(aut, initState, pw);
             aut.clearVisitedStates();
-            
+
             if (initState.nbrOfIncomingArcs() > 0)
             {
                 pw.println("ENDSEQUENCE\n\n");
@@ -269,43 +282,43 @@ public class AutomataToControlBuilderSFC
             }
         }    // End of automata conversion
     }
-    
-    protected void generateEventMonitors(Project theProject, PrintWriter pw)
+
+    protected void generateEventMonitors(final Project theProject, final PrintWriter pw)
     {
-        
+
         // Step 1. Get alphabet
         Alphabet unionAlphabet = null;
-        
+
         try
         {
             unionAlphabet = AlphabetHelpers.getUnionAlphabet(theProject);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Failed getting union of alphabets of the selected automata. Code generation aborted. " + ex);
             logger.debug(ex.getStackTrace());
-            
+
             return;
         }
-        
-        Alphabet testAlphabet = new Alphabet(unionAlphabet);
-        
+
+        final Alphabet testAlphabet = new Alphabet(unionAlphabet);
+
         // Step 2. Pick an event
-        for (Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
+        for (final Iterator<LabeledEvent> alphaIt = unionAlphabet.iterator(); alphaIt.hasNext(); )
         {
-            LabeledEvent theEvent = (LabeledEvent) alphaIt.next();
-            
+            final LabeledEvent theEvent = alphaIt.next();
+
             if (testAlphabet.contains(theEvent.getLabel()))
             {
-                
+
                 // Step 3. Compute ExtendedConflict(event)
                 logger.debug(theEvent.getLabel());
-                
-                Alphabet extConfAlphabet = extendedConflict(theProject, theEvent, testAlphabet);
-                
+
+                final Alphabet extConfAlphabet = extendedConflict(theProject, theEvent, testAlphabet);
+
                 testAlphabet.minus(extConfAlphabet);
                 logger.debug(Integer.toString(testAlphabet.size()));
-                
+
                                 /* Step 4. Compute EventMonitor()
                                  We must take care of the controllability of the events in this
                                  step. Only controllable events should be generated. The uncontrollable
@@ -314,187 +327,187 @@ public class AutomataToControlBuilderSFC
             }
         }    // Step 5. Terminate if event set exhausted
     }
-    
-    protected Alphabet extendedConflict(Project theProject, LabeledEvent theEvent, Alphabet iteratorAlphabet)
+
+    protected Alphabet extendedConflict(final Project theProject, final LabeledEvent theEvent, final Alphabet iteratorAlphabet)
     {
-        
+
         // Step 1. Initialise. C = {theEvent}, D = empty.
-        Alphabet theExtConfAlphabet = new Alphabet();
-        Alphabet testAlphabet = new Alphabet();
-        
+        final Alphabet theExtConfAlphabet = new Alphabet();
+        final Alphabet testAlphabet = new Alphabet();
+
         try
         {
             theExtConfAlphabet.addEvent(theEvent);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            
+
             // This should not happen since theExtConfAlphabet is empty.
             logger.error("Failed adding event when computing extended conflict. Code generation erroneous. " + ex);
             logger.debug(ex.getStackTrace());
-            
+
             return theExtConfAlphabet;
         }
-        
+
         boolean ready = false;
-        
+
         while (!ready)
         {
-            
+
             // Step 2. Pick e in C \ D.
-            for (Iterator<LabeledEvent> alphaIt = iteratorAlphabet.iterator();
+            for (final Iterator<LabeledEvent> alphaIt = iteratorAlphabet.iterator();
             alphaIt.hasNext(); )
             {
-                LabeledEvent confEvent = (LabeledEvent) alphaIt.next();
-                
+                final LabeledEvent confEvent = alphaIt.next();
+
                 if (theExtConfAlphabet.contains(confEvent.getLabel()) &&!testAlphabet.contains(confEvent.getLabel()))
                 {
-                    
+
                     // Step 3. Let C = C + Conflict(e), D = D + {e}.
-                    Alphabet conflictAlphabet = computeConflict(theProject, confEvent);
-                    
+                    final Alphabet conflictAlphabet = computeConflict(theProject, confEvent);
+
                     theExtConfAlphabet.union(conflictAlphabet);
-                    
+
                     try
                     {
                         testAlphabet.addEvent(confEvent);
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
-                        
+
                         // This should not happen since testAlphabet didn't contain the event.
                         logger.error("Failed adding event when computing extended conflict. Code generation erroneous " + ex);
                         logger.debug(ex.getStackTrace());
-                        
+
                         return theExtConfAlphabet;
                     }
                 }
             }
-            
+
             // Step 4. If C = D return, else repeat from step 2.
             if (theExtConfAlphabet.size() == testAlphabet.size())
             {
                 ready = true;
-                
+
                 logger.debug("Finished computing extended conflict");
             }
         }
-        
+
         return theExtConfAlphabet;
     }
-    
-    protected Alphabet computeConflict(Project theProject, LabeledEvent theEvent)
+
+    protected Alphabet computeConflict(final Project theProject, final LabeledEvent theEvent)
     {
-        Alphabet confAlphabet = new Alphabet();
-        
+        final Alphabet confAlphabet = new Alphabet();
+
         try
         {
             confAlphabet.addEvent(theEvent);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            
+
             // This should not happen since confAlphabet is empty.
             logger.error("Failed adding event when computing conflict. " + ex);
             logger.debug(ex.getStackTrace());
-            
+
             return confAlphabet;
         }
-        
+
         // Iterate over the automata, if the event is present we must find all states
         // that have transitions with this event. For each state, an iterator over the
         // outgoing arcs find such events.
-        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+        for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
-            Automaton aut = (Automaton) autIt.next();
-            Alphabet theAlphabet = aut.getAlphabet();
-            
+            final Automaton aut = autIt.next();
+            final Alphabet theAlphabet = aut.getAlphabet();
+
             logger.debug(aut.getName().replace('.', '_'));
-            
+
             if (theAlphabet.contains(theEvent.getLabel()))
             {
                 logger.debug("The event " + theEvent.getLabel() + " exsits in the automaton " + aut.getName().replace('.', '_'));
-                
+
                 // The event exists in this automaton. What arcs?
-                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+                for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                    Arc anArc = (Arc) arcIt.next();
-                    
+                    final Arc anArc = arcIt.next();
+
                     try
                     {
-                        LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
-                        
+                        final LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
+
                         if (arcEvent.getLabel().equals(theEvent.getLabel()))
                         {
                             logger.debug("Event " + theEvent.getLabel() + " labels arc");
-                            
+
                             // The event labels this arc. Get conflicting arcs.
-                            State sourceState = (State) anArc.getFromState();
-                            
+                            final State sourceState = anArc.getFromState();
+
                             if (!sourceState.isVisited())
                             {
-                                
+
                                 // It is only necessary to get the conflicting transitions for this state once?
                                 sourceState.setVisited(true);
-                                
-                                for (Iterator<Arc> outgoingIt = sourceState.outgoingArcsIterator();
+
+                                for (final Iterator<Arc> outgoingIt = sourceState.outgoingArcsIterator();
                                 outgoingIt.hasNext(); )
                                 {
-                                    Arc currArc = (Arc) outgoingIt.next();
-                                    
+                                    final Arc currArc = outgoingIt.next();
+
                                     try
                                     {
-                                        LabeledEvent currArcEvent = currArc.getEvent();    // (LabeledEvent) aut.getEvent(currArc.getEventId());
-                                        Alphabet dummyAlphabet = new Alphabet();
-                                        
+                                        final LabeledEvent currArcEvent = currArc.getEvent();    // (LabeledEvent) aut.getEvent(currArc.getEventId());
+                                        final Alphabet dummyAlphabet = new Alphabet();
+
                                         try
                                         {
                                             dummyAlphabet.addEvent(currArcEvent);
                                             logger.debug("Event " + currArcEvent.getLabel() + " is in conflict with " + theEvent.getLabel());
                                             confAlphabet.union(dummyAlphabet);
                                         }
-                                        catch (Exception ex)
+                                        catch (final Exception ex)
                                         {
-                                            
+
                                             // This should not happen since dummyAlphabet is empty.
                                             logger.error("Failed adding event when computing conflict. " + ex);
                                             logger.debug(ex.getStackTrace());
-                                            
+
                                             return confAlphabet;
                                         }
                                     }
-                                    catch (Exception ex)
+                                    catch (final Exception ex)
                                     {
-                                        
+
                                         // This should not happen since the event exists in the automaton.
                                         logger.error("Failed getting event label. Code generation erroneous. " + ex);
                                         logger.debug(ex.getStackTrace());
-                                        
+
                                         return confAlphabet;
                                     }
                                 }
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
-                        
+
                         // This should not happen since the event exists in the automaton.
                         logger.error("Failed getting event label. Code generation erroneous. " + ex);
                         logger.debug(ex.getStackTrace());
-                        
+
                         return confAlphabet;
                     }
                 }
             }
         }
-        
+
         return confAlphabet;
     }
-    
-    protected void printEventMonitor(Project theProject, Alphabet theAlphabet, PrintWriter pw)
+
+    protected void printEventMonitor(final Project theProject, final Alphabet theAlphabet, final PrintWriter pw)
     {
-        
+
                 /* Step 1. Initialise. Create initial step
                  Now we have to be careful. We should only create an event monitor
                  in the case that there are controllable events in theAlphabet. Perhaps
@@ -502,33 +515,33 @@ public class AutomataToControlBuilderSFC
                  easier to do it here. */
         if (theAlphabet.nbrOfControllableEvents() == 0)
         {
-            
+
             // Nothing to generate.
             return;
         }
-        
+
                 /* OK, there is at least one controllable event in theAlphabet.
                  We have something to generate. */
         int stepCounter = 0;
         boolean firstEvent = true;
-        
+
         transitionCounter = 1;
-        
+
         // eventMonitorCounter++;
         pw.println("SEQUENCE EventMonitor_" + ++eventMonitorCounter + theHelper.getCoord());
         pw.println("SEQINITSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
-        
+
         /* Step 2. For each controllable event e in theAlphabet */
         if (theAlphabet.nbrOfControllableEvents() > 1)
         {
             pw.println("ALTERNATIVESEQ");
         }
-        
-        for (Iterator<LabeledEvent> eventIt = theAlphabet.controllableEventIterator();
+
+        for (final Iterator<LabeledEvent> eventIt = theAlphabet.controllableEventIterator();
         eventIt.hasNext(); )
         {
-            LabeledEvent currEvent = (LabeledEvent) eventIt.next();
-            
+            final LabeledEvent currEvent = eventIt.next();
+
             if (firstEvent)
             {
                 firstEvent = false;
@@ -537,93 +550,93 @@ public class AutomataToControlBuilderSFC
             {
                 pw.println("ALTERNATIVEBRANCH");
             }
-            
+
                         /* (a) Create transition t with t.C = preset() && NOT uncontrollableEvents
                          That is, a controllable event should not be generated when an uncontrollable
                          event in extended conflict has occurred. */
             String transitionCondition = computeGenerationCondition(theProject, theAlphabet, currEvent);
-            
+
             transitionCounter = printEventMonitorTransition(transitionCounter, eventMonitorCounter, transitionCondition, pw);
-            
+
             // (b) Create step with action e
             pw.println("SEQSTEP EM" + eventMonitorCounter + "_" + stepCounter++);
             printEventMonitorAction(currEvent, pw);
-            
+
             // (c) Create transition t' with t'.C = not preset()
             transitionCondition = computeCeaseCondition(theProject, currEvent);
             transitionCounter = printEventMonitorTransition(transitionCounter, eventMonitorCounter, transitionCondition, pw);
         }
-        
+
         if (theAlphabet.nbrOfControllableEvents() > 1)
         {
             pw.println("ENDALTERNATIVE");
         }
-        
+
         pw.println("ENDSEQUENCE\n\n");
         logger.debug("Printing Event Monitor");
     }
-    
-    protected int printEventMonitorTransition(int transitionCounter, int eventMonitorCounter, String transitionCondition, PrintWriter pw)
+
+    protected int printEventMonitorTransition(int transitionCounter, final int eventMonitorCounter, final String transitionCondition, final PrintWriter pw)
     {
         pw.println("SEQTRANSITION EM" + eventMonitorCounter + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + transitionCondition + theHelper.getTransitionConditionSuffix());
-        
+
         return transitionCounter;
     }
-    
-    protected void printEventMonitorAction(LabeledEvent theEvent, PrintWriter pw)
+
+    protected void printEventMonitorAction(final LabeledEvent theEvent, final PrintWriter pw)
     {
         pw.println(theHelper.getActionP1Prefix() + theEvent.getLabel().replace('.', '_') + theHelper.getAssignmentOperator() + "True;" + theHelper.getActionP1Suffix());
         pw.println(theHelper.getActionP0Prefix() + theEvent.getLabel().replace('.', '_') + theHelper.getAssignmentOperator() + "False;" + theHelper.getActionP0Suffix());
     }
-    
-    protected String computeGenerationCondition(Project theProject, Alphabet theExtConfAlphabet, LabeledEvent theEvent)
+
+    protected String computeGenerationCondition(final Project theProject, final Alphabet theExtConfAlphabet, final LabeledEvent theEvent)
     {
-        StringBuilder theCondition = new StringBuilder();
+        final StringBuilder theCondition = new StringBuilder();
         boolean firstAutomaton = true;
         boolean nextAutomaton = false;
-        
+
                 /* We create the uncontrollable disablement condition first.
                    Only the uc events in conflict with theEvent are relevant here. */
         if (theExtConfAlphabet.nbrOfUncontrollableEvents() > 0)
         {
-            String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
-            
+            final String theUcCondition = ucDisablementCondition(theExtConfAlphabet);
+
             theCondition.append(theUcCondition);
         }
-        
+
         /* And then the actual generation condition. */
-        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+        for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
-            Automaton aut = (Automaton) autIt.next();
-            Alphabet theAlphabet = aut.getAlphabet();
-            
+            final Automaton aut = autIt.next();
+            final Alphabet theAlphabet = aut.getAlphabet();
+
             if (theAlphabet.contains(theEvent.getLabel()))
             {
-                
+
                 // The event exists in this automaton
                 logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
-                
+
                 boolean stateFound = false;
                 boolean firstState = true;
-                
-                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+
+                for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                    Arc anArc = (Arc) arcIt.next();
-                    
+                    final Arc anArc = arcIt.next();
+
                     try
                     {
-                        LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
-                        
+                        final LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
+
                         if (arcEvent.getLabel().equals(theEvent.getLabel()))
                         {
-                            
+
                             // The event labels this arc. Get preset (a singleton!).
                             logger.debug("The event labels arc");
-                            
+
                             stateFound = true;
-                            
-                            State sourceState = (State) anArc.getFromState();
-                            
+
+                            final State sourceState = anArc.getFromState();
+
                             if (firstAutomaton)
                             {
                                 firstAutomaton = false;
@@ -631,14 +644,14 @@ public class AutomataToControlBuilderSFC
                             else if (nextAutomaton)
                             {
                                 nextAutomaton = false;
-                                
+
                                 theCondition.append(" AND ");
                             }
-                            
+
                             if (firstState)
                             {
                                 firstState = false;
-                                
+
                                 theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
                                 logger.debug("Current transition condition: " + theCondition);
                             }
@@ -648,17 +661,17 @@ public class AutomataToControlBuilderSFC
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
-                        
+
                         // This should not happen since the event exists in the automaton.
                         logger.error("Failed getting event label. Code generation erroneous. " + ex);
                         logger.debug(ex.getStackTrace());
-                        
+
                         return theCondition.toString();
                     }
                 }
-                
+
                 if (!stateFound)
                 {
                     return "False";
@@ -667,33 +680,33 @@ public class AutomataToControlBuilderSFC
                 {
                     theCondition.append(")");
                 }
-                
+
                 nextAutomaton = true;
             }
         }
-        
+
         return theCondition.toString();
     }
-    
-    protected String ucDisablementCondition(Alphabet theAlphabet)
+
+    protected String ucDisablementCondition(final Alphabet theAlphabet)
     {
-        
+
                 /* We have to compute a conflict set first. Note that this is,
                    in fact, a dynamic property. It may well be the case that
                    statically the rising and falling edge of an input signal
                    is in conflict with an output event. Note in particular that
                    we cannot use all uncontrollable events in the extended conflict.
                    Nevertheless, let's not bother about this now ... */
-        StringBuilder theCondition = new StringBuilder();
+        final StringBuilder theCondition = new StringBuilder();
         boolean firstUcEvent = true;
-        
+
         theCondition.append("NOT (");
-        
-        for (Iterator<LabeledEvent> ucEventIt = theAlphabet.uncontrollableEventIterator();
+
+        for (final Iterator<LabeledEvent> ucEventIt = theAlphabet.uncontrollableEventIterator();
         ucEventIt.hasNext(); )
         {
-            LabeledEvent theUcEvent = (LabeledEvent) ucEventIt.next();
-            
+            final LabeledEvent theUcEvent = ucEventIt.next();
+
             if (firstUcEvent)
             {
                 firstUcEvent = false;
@@ -702,70 +715,70 @@ public class AutomataToControlBuilderSFC
             {
                 theCondition.append(" OR ");
             }
-            
+
             theCondition.append(theUcEvent.getLabel().replace('.', '_'));
         }
-        
+
         theCondition.append(") AND ");
-        
+
         return theCondition.toString();
     }
-    
-    protected String computeCeaseCondition(Project theProject, LabeledEvent theEvent)
+
+    protected String computeCeaseCondition(final Project theProject, final LabeledEvent theEvent)
     {
-        StringBuilder theCondition = new StringBuilder();
+        final StringBuilder theCondition = new StringBuilder();
         boolean firstAutomaton = true;
         boolean nextAutomaton = false;
-        
-        for (Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
+
+        for (final Iterator<Automaton> autIt = theProject.iterator(); autIt.hasNext(); )
         {
-            Automaton aut = (Automaton) autIt.next();
-            Alphabet theAlphabet = aut.getAlphabet();
-            
+            final Automaton aut = autIt.next();
+            final Alphabet theAlphabet = aut.getAlphabet();
+
             if (theAlphabet.contains(theEvent.getLabel()))
             {
-                
+
                 // The event exists in this automaton
                 logger.debug("The event " + theEvent.getLabel() + " exists in " + aut.getName().replace('.', '_'));
-                
+
                 boolean stateFound = false;
                 boolean firstState = true;
-                
-                for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
+
+                for (final Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
                 {
-                    Arc anArc = (Arc) arcIt.next();
-                    
+                    final Arc anArc = arcIt.next();
+
                     try
                     {
-                        LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
-                        
+                        final LabeledEvent arcEvent = anArc.getEvent();    // (LabeledEvent) aut.getEvent(anArc.getEventId());
+
                         if (arcEvent.getLabel().equals(theEvent.getLabel()))
                         {
-                            
+
                             // The event labels this arc. Get preset (a singleton!).
                             logger.debug("The event labels arc");
-                            
+
                             stateFound = true;
-                            
-                            State sourceState = (State) anArc.getFromState();
-                            
+
+                            final State sourceState = anArc.getFromState();
+
                             if (firstAutomaton)
                             {
                                 firstAutomaton = false;
-                                
+
                                 theCondition.append("NOT (");
                             }
                             else if (nextAutomaton)
                             {
                                 nextAutomaton = false;
-                                
+
                                 theCondition.append(" OR ");
                             }
-                            
+
                             if (firstState)
                             {
                                 firstState = false;
-                                
+
                                 theCondition.append("(" + aut.getName().replace('.', '_') + "__" + sourceState.getName() + ".X");
                                 logger.debug("Current transition condition: " + theCondition);
                             }
@@ -775,17 +788,17 @@ public class AutomataToControlBuilderSFC
                             }
                         }
                     }
-                    catch (Exception ex)
+                    catch (final Exception ex)
                     {
-                        
+
                         // This should not happen since the event exists in the automaton.
                         logger.error("Failed getting event label. Code generation erroneous. " + ex);
                         logger.debug(ex.getStackTrace());
-                        
+
                         return theCondition.toString();
                     }
                 }
-                
+
                 if (!stateFound)
                 {
                     return "False";
@@ -794,34 +807,34 @@ public class AutomataToControlBuilderSFC
                 {
                     theCondition.append(")");
                 }
-                
+
                 nextAutomaton = true;
             }
         }
-        
+
         theCondition.append(")");
-        
+
         return theCondition.toString();
     }
-    
-    protected void printSequence(Automaton theAutomaton, State theState, PrintWriter pw)
+
+    protected void printSequence(final Automaton theAutomaton, final State theState, final PrintWriter pw)
     {
         printStep(theAutomaton, theState, pw);
         theState.setVisited(true);
-        
+
         int endAlternativeLevel = 0;
         boolean alternativeEnded = false;
-        
+
         if (theState.nbrOfOutgoingArcs() > 1)
         {
             pw.println("ALTERNATIVESEQ");
-            
+
             endAlternativeLevel = theState.nbrOfOutgoingArcs();
         }
-        
+
         boolean firstArc = true;
-        
-        for (Iterator<Arc> outgoingArcsIt = theState.outgoingArcsIterator();
+
+        for (final Iterator<Arc> outgoingArcsIt = theState.outgoingArcsIterator();
         outgoingArcsIt.hasNext(); )
         {
             if (firstArc)
@@ -831,18 +844,18 @@ public class AutomataToControlBuilderSFC
             else
             {
                 pw.println("ALTERNATIVEBRANCH");
-                
+
                 endAlternativeLevel--;
-                
+
                 // logger.debug("endAlternativeLevel = " + endAlternativeLevel);
             }
-            
-            Arc arc = (Arc) outgoingArcsIt.next();
-            
+
+            final Arc arc = outgoingArcsIt.next();
+
             printTransition(theAutomaton, arc, pw);
-            
-            State nextState = arc.getToState();
-            
+
+            final State nextState = arc.getToState();
+
             if (!nextState.isVisited())
             {
                 printSequence(theAutomaton, nextState, pw);
@@ -854,22 +867,22 @@ public class AutomataToControlBuilderSFC
             else if (endAlternativeLevel == 1)
             {
                 pw.println("ENDALTERNATIVE");    // End of this subsequence
-                
+
                 alternativeEnded = true;
-                
+
                 // logger.debug("EndAlternative");
             }
         }
-        
+
         if ((endAlternativeLevel == 1) &&!alternativeEnded)
         {
             pw.println("ENDALTERNATIVE");    // End of this subsequence
-            
+
             // logger.debug("EndAlternative");
         }
     }
-    
-    protected void printStep(Automaton theAutomaton, State theState, PrintWriter pw)
+
+    protected void printStep(final Automaton theAutomaton, final State theState, final PrintWriter pw)
     {
         if (theState.isInitial())
         {
@@ -880,25 +893,25 @@ public class AutomataToControlBuilderSFC
             pw.println("SEQSTEP " + theAutomaton.getName().replace('.', '_') + "__" + theState.getName());
         }
     }
-    
-    protected void printTransition(Automaton theAutomaton, Arc theArc, PrintWriter pw)
+
+    protected void printTransition(final Automaton theAutomaton, final Arc theArc, final PrintWriter pw)
     {
         try
         {
-            LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
-            
+            final LabeledEvent event = theArc.getEvent();    // theAutomaton.getEvent(theArc.getEventId());
+
             pw.println("SEQTRANSITION " + theAutomaton.getName().replace('.', '_') + "_Tr" + transitionCounter++ + theHelper.getTransitionConditionPrefix() + event.getLabel().replace('.', '_') + theHelper.getTransitionConditionSuffix());
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Failed getting event label. Code generation aborted. " + ex);
             logger.debug(ex.getStackTrace());
-            
+
             return;
         }
     }
-    
-    protected void printFork(Automaton theAutomaton, State theState, PrintWriter pw)
+
+    protected void printFork(final Automaton theAutomaton, final State theState, final PrintWriter pw)
     {
         pw.println("SEQFORK " + theAutomaton.getName().replace('.', '_') + "__" + theState.getName() + " SEQBREAK");
     }

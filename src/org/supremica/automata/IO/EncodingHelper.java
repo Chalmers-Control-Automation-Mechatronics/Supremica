@@ -49,22 +49,19 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
 import org.supremica.gui.ExportFormat;
+
 
 public class EncodingHelper
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(EncodingHelper.class);
-
 	@SuppressWarnings("unused")
 	private static final int FM_DOT = 0;
 	private static final int FM_LT = 1;
 	private static final int FM_GT = 2;
 	private static final int FM_AMP = 3;
 	private static final int FM_QUOTE = 4;
-			
-	private static final String[] DEF_FORMAT_MAP = 
+
+	private static final String[] DEF_FORMAT_MAP =
 	{ ".",	// [FM_DOT] -- this is treated specially (see below), since it is not really a format issue
 	  "<",	// [FM_LT]
 	  ">",	// [FM_GT]
@@ -85,12 +82,12 @@ public class EncodingHelper
 	 * Places line breaks '\n' at as even distances as possible.
 	 * There ought to be a method like this in the JDK somewhere?
 	 */
-	public static String linebreakAdjust(String input)
+	public static String linebreakAdjust(final String input)
 	{
 		return linebreakAdjust(input, 50);
 	}
 
-	public static String linebreakAdjust(String input, int lineWidth)
+	public static String linebreakAdjust(final String input, final int lineWidth)
 	{
 		if (input == null)
 		{
@@ -103,7 +100,7 @@ public class EncodingHelper
 		s = s.replaceAll(" +", " ");
 
 		// Chop up the string
-		int len = s.length();
+		final int len = s.length();
 		int lastBreak = 0;
 
 		while (len - lastBreak > lineWidth)
@@ -150,12 +147,12 @@ public class EncodingHelper
 		if(s == null) return str.toString();
 
 		final int len = s.length();
-		
+
 		final String[] format_map = getFormatMap(format);
-		
+
 		for (int i = 0; i < len; i++)
 		{
-			char ch = s.charAt(i);
+			final char ch = s.charAt(i);
 
 			switch (ch)
 			{
@@ -211,8 +208,8 @@ public class EncodingHelper
 	{
 		return EncodingHelper.normalize(input, format, false);
 	}
-	
-	private static String[] getFormatMap(ExportFormat format)
+
+	private static String[] getFormatMap(final ExportFormat format)
 	{
 		switch(format)
 		{
@@ -224,7 +221,7 @@ public class EncodingHelper
 				return XML_FORMAT_MAP;	// Do we need a special HTML_FORMAT_MAP?
 			default:
 				return DEF_FORMAT_MAP;
-				
+
 		}
 	}
 }

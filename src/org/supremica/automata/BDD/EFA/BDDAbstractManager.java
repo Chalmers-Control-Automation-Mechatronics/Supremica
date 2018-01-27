@@ -1,9 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
 import java.io.BufferedWriter;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +10,7 @@ import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -23,16 +20,22 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.subject.module.IntConstantSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
+
+/**
+ * @author Sajed Miremadi, Zhennan Fei
+ */
 
 public abstract class BDDAbstractManager {
 
-    private static Logger logger = LoggerFactory.createLogger(BDDExtendedManager.class);
+    private static Logger logger = LogManager.getLogger(BDDExtendedManager.class);
     protected BDDFactory factory;
 //    private BDDDomain constantDomain;
     private Map<String, Integer> variableStringToIndexMap;

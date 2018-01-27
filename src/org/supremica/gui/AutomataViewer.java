@@ -35,28 +35,39 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.gui.treeview.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Iterator;
+
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeModel;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.gui.treeview.AutomatonSubTree;
+import org.supremica.gui.treeview.SupremicaTreeCellRenderer;
+import org.supremica.gui.treeview.SupremicaTreeNode;
+
 
 class AutomataViewerPanel
     extends JPanel
-// implements AutomatonListener
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataViewerPanel.class);
-    private Automata automata;
-    private JTree theTree = new JTree();
-    private JScrollPane scrollPanel = new JScrollPane(theTree);
+    private final Automata automata;
+    private final JTree theTree = new JTree();
+    private final JScrollPane scrollPanel = new JScrollPane(theTree);
 
-    public AutomataViewerPanel(Automata automata, boolean showalpha, boolean showstates)
+    public AutomataViewerPanel(final Automata automata, final boolean showalpha, final boolean showstates)
     {
         this.automata = automata;
 
@@ -66,17 +77,17 @@ class AutomataViewerPanel
         theTree.setCellRenderer(new SupremicaTreeCellRenderer());    // EventNodeRenderer());
     }
 
-    public void build(boolean showalpha, boolean showstates)
+    public void build(final boolean showalpha, final boolean showstates)
     {
-        SupremicaTreeNode root = new SupremicaTreeNode();
-        Iterator<Automaton> autit = automata.iterator();
+        final SupremicaTreeNode root = new SupremicaTreeNode();
+        final Iterator<Automaton> autit = automata.iterator();
 
         while (autit.hasNext())
         {
-            root.add(new AutomatonSubTree((Automaton) autit.next(), showalpha, showstates));
+            root.add(new AutomatonSubTree(autit.next(), showalpha, showstates));
         }
 
-        DefaultTreeModel treeModel = new DefaultTreeModel(root);
+        final DefaultTreeModel treeModel = new DefaultTreeModel(root);
 
         theTree.setModel(treeModel);
         theTree.setRootVisible(false);
@@ -98,21 +109,22 @@ public class AutomataViewer
     extends JFrame
 {
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private JMenuBar menuBar = new JMenuBar();
-    private AutomataViewerPanel viewerPanel;
+    private final JPanel contentPane;
+    private final JMenuBar menuBar = new JMenuBar();
+    private final AutomataViewerPanel viewerPanel;
 
-    public AutomataViewer(Automata automata)
+    public AutomataViewer(final Automata automata)
     {
         this(automata, true, true);
     }
 
-    public AutomataViewer(Automata automata, boolean showalpha, boolean showstates)
+    public AutomataViewer(final Automata automata, final boolean showalpha, final boolean showstates)
     {
         setTitle("Automata Viewer");
         addWindowListener(new WindowAdapter()
         {
-            public void windowClosing(WindowEvent e)
+            @Override
+            public void windowClosing(final WindowEvent e)
             {
                 setVisible(false);
             }
@@ -149,11 +161,12 @@ public class AutomataViewer
         setJMenuBar(menuBar);
 
         // File.Close
-        JMenuItem menuFileClose = new JMenuItem();
+        final JMenuItem menuFileClose = new JMenuItem();
         menuFileClose.setText("Close");
         menuFileClose.addActionListener(new ActionListener()
         {
-            public void actionPerformed(ActionEvent e)
+            @Override
+            public void actionPerformed(final ActionEvent e)
             {
                 setVisible(false);
 
@@ -162,7 +175,7 @@ public class AutomataViewer
         });
 
         // File menu
-        JMenu menuFile = new JMenu();
+        final JMenu menuFile = new JMenu();
         menuFile.setText("File");
         menuFile.setMnemonic(KeyEvent.VK_F);
         menuFile.add(menuFileClose);

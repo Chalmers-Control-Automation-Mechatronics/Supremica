@@ -1,37 +1,38 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 /**
- * Different types of partitioning.
+ * <P>Different types of partitioning.</P>
  *
- * For automata without variables, e.g. DFAs, the conjunctive partitioning was
- * implemented using JavaBDD before. Arash implemented the disjunctive
+ * <P>For automata without variables, e.g. DFAs, the conjunctive partitioning
+ * was implemented using JavaBDD before. Arash implemented the disjunctive
  * partitioning technique using JDD. What I did to DFAs is to correct and
  * re-implement Arash's best algorithms and heuristics and improve them (see
  * ICRA11). Besides, combine it with Sajed's guard generation procedure (see
  * ICAART). Regarding EFAs, the disjunctive partitioning which is implemented,
- * is event-based.
+ * is event-based.</P>
  *
- * We may have clock-based partitioning for Timed EFAs (some EFA variables are
- * either global or local clocks). Or, for resource allocation systems,
+ * <P>We may have clock-based partitioning for Timed EFAs (some EFA variables
+ * are either global or local clocks). Or, for resource allocation systems,
  * probably a resource-based partitioning can be made. The class needs to be
  * extended when a new partitioning type is introduced. Now, it has only one,
  * just called "partitioning". Moreover, depending on the chosen partitioning,
- * the corresponding work set is initialized as well.
+ * the corresponding work set is initialised as well.</P>
  *
- * @author zhennan
+ * @author Zhennan Fei
  */
 
 public class BDDPartitionTypeFactory
 {
 
   private static Logger logger =
-    LoggerFactory.createLogger(BDDPartitionTypeFactory.class);
+    LogManager.getLogger(BDDPartitionTypeFactory.class);
 
   /*
    * Private constructor: prevent from instantiating instances of this class.

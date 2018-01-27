@@ -48,11 +48,38 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 
+/**
+ * <P>Main entry point for creating pop-up menus.</P>
+ *
+ * <P>Any component using pop-up menus should use a subclass of this class
+ * and override some of the methods:</P>
+ * <UL>
+ * <LI>{@link #addDefaultMenuItems()}</LI>
+ * <LI>{@link #addItemSpecificMenuItems(Proxy) addItemSpecificMenuItems()}</LI>
+ * <LI>{@link #addCommonMenuItems()}</LI>
+ * </UL>
+ * <P>Then it should register mouse listeners that call {@link
+ * #maybeShowPopup(Component, MouseEvent, Proxy) maybeShowPopup()} to
+ * display the popup menu.</P>
+ *
+ * <P>The actions for the popup menu are provided by an action manager
+ * ({@link WatersPopupActionManager} or subclass). The action manager
+ * can retrieve shared IDE actions or create specific context-sensitive
+ * actions for an item under the cursor.</P>
+ *
+ * @author Robi Malik
+ */
+
 public abstract class PopupFactory
 {
 
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a new popup factory.
+   * @param  master  The action manager that provides the action objects
+   *                 used in the pop-up menu.
+   */
   protected PopupFactory(final WatersPopupActionManager master)
   {
     mMaster = master;

@@ -37,44 +37,55 @@ package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.about.WelcomeScreen;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.gui.logging.IDEAppender;
+import net.sourceforge.waters.gui.logging.IDELogConfigurationFactory;
+import net.sourceforge.waters.gui.logging.LogPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+
 import org.supremica.automata.Project;
-import org.supremica.comm.xmlrpc.Server;
-import org.supremica.gui.InterfaceManager;
-import org.supremica.gui.SupremicaLoggerFactory;
-import org.supremica.gui.Utility;
 import org.supremica.gui.ide.actions.Actions;
 import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.IDEActionInterface;
-import org.supremica.log.Logger;
 import org.supremica.properties.Config;
+import org.supremica.properties.SupremicaProperties;
 import org.supremica.util.ProcessCommandLineArguments;
+
 import org.xml.sax.SAXException;
 
 
@@ -89,19 +100,14 @@ import org.xml.sax.SAXException;
  */
 
 public class IDE
-    extends JFrame
-    implements IDEActionInterface, Observer, Subject
+  extends JFrame
+  implements IDEActionInterface, Observer, Subject,
+             ComponentListener, WindowStateListener
 {
 
   //#########################################################################
   //# Constructors
   public IDE()
-    throws JAXBException, SAXException
-  {
-    this(true);
-  }
-
-  public IDE(final boolean showVersion)
     throws JAXBException, SAXException
   {
     // Instantiate all actions
@@ -118,8 +124,19 @@ public class IDE
     mPopupActionManager = new WatersPopupActionManager(this);
     mModuleNameObserver = new ModuleNameObserver();
 
+    // Set frame size and position from configuration file
+    final Dimension size = new Dimension(Config.GUI_IDE_WIDTH.get(),
+                                         Config.GUI_IDE_HEIGHT.get());
+    setPreferredSize(size);
+    if (Config.GUI_IDE_MAXIMIZED.get()) {
+      setExtendedState(Frame.MAXIMIZED_BOTH);
+    } else {
+      setLocation(Config.GUI_IDE_XPOS.get(), Config.GUI_IDE_YPOS.get());
+    }
+    final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
+    setIconImages(images);
+
     // Create GUI
-    Utility.setupFrame(this, IDEDimensions.mainWindowPreferredSize);
     final BorderLayout layout = new BorderLayout();
     final JPanel contents = (JPanel) getContentPane();
     contents.setLayout(layout);
@@ -128,45 +145,25 @@ public class IDE
     mToolBar = new IDEToolBar(this);
     contents.add(mToolBar, BorderLayout.NORTH);
     mWelcomeScreen = new WelcomeScreen(this);
-    mWelcomeScreen.setPreferredSize(IDEDimensions.mainWindowPreferredSize);
-    mLogPanel = new LogPanel(this, "Logger");
+    mLogPanel = new LogPanel(mPopupActionManager);
     mSplitPaneVertical =
       new JSplitPane(JSplitPane.VERTICAL_SPLIT, mWelcomeScreen, mLogPanel);
     mSplitPaneVertical.setContinuousLayout(false);
     mSplitPaneVertical.setOneTouchExpandable(false);
-    mSplitPaneVertical.setDividerLocation(0.8);
     mSplitPaneVertical.setResizeWeight(1.0);
     contents.add(mSplitPaneVertical, BorderLayout.CENTER);
+    pack();
+    mSplitPaneVertical.setDividerLocation(0.9);
 
     final File startdir = new File(Config.FILE_OPEN_PATH.getAsString());
     mFileChooser = new JFileChooser(startdir);
 
-    // Initialise document managers
+    // Initialise document managers and register listeners
     mDocumentContainerManager = new DocumentContainerManager(this);
     attach(this);
+    addComponentListener(this);
+    addWindowStateListener(this);
     updateWindowTitle();
-
-    if (showVersion) {
-      // Show Version number
-      info(Version.getInstance().toString());
-      // Show memory
-      final int MB = 1024*1024;
-      info("JVM:" + System.getProperty("java.version") +
-           ", Free/Total/Max mem: " +
-           Runtime.getRuntime().freeMemory()/MB + "/" +
-           Runtime.getRuntime().totalMemory()/MB + "/" +
-           Runtime.getRuntime().maxMemory()/MB + " MB");
-    }
-    // Initialise XML_RPC
-    if (Config.XML_RPC_ACTIVE.isTrue()) {
-      try {
-        new Server(this, Config.XML_RPC_PORT.get());
-        info("XML-RPC server running on port " + Config.XML_RPC_PORT.get());
-      } catch (final Exception exception) {
-        warn("Another server already running on port " +
-             Config.XML_RPC_PORT.get() + ". XML-RPC server not started!");
-      }
-    }
   }
 
 
@@ -215,6 +212,11 @@ public class IDE
     return mDocumentContainerManager.getDocumentManager();
   }
 
+  public LogPanel getLogPanel()
+  {
+    return mLogPanel;
+  }
+
   public JFileChooser getFileChooser()
   {
     return mFileChooser;
@@ -249,12 +251,23 @@ public class IDE
     case CONTAINER_SWITCH:
       final DocumentContainer container =
         mDocumentContainerManager.getActiveContainer();
+      final int dividerLocation = mSplitPaneVertical.getDividerLocation();
       if (container == null) {
         mSplitPaneVertical.setTopComponent(mWelcomeScreen);
       } else {
         final Component panel = container.getPanel();
         mSplitPaneVertical.setTopComponent(panel);
       }
+      mSplitPaneVertical.setDividerLocation(dividerLocation);
+      // Sometimes the divider gets set to a strange position. (Why???)
+      // The following delayed call seems to fix it ...
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          mSplitPaneVertical.setDividerLocation(dividerLocation);
+        }
+      });
       mModuleNameObserver.setModule(container);
       updateWindowTitle();
       break;
@@ -288,9 +301,59 @@ public class IDE
     // Just in case they try to register or unregister observers
     // in response to the update ...
     final List<Observer> copy = new LinkedList<Observer>(mObservers);
-    for (final Observer observer : copy)
-    {
+    for (final Observer observer : copy) {
       observer.update(event);
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ComponentListener
+  @Override
+  public void componentResized(final ComponentEvent event)
+  {
+    if (getExtendedState() == Frame.NORMAL) {
+      final boolean changedWidth = Config.GUI_IDE_WIDTH.set(getWidth());
+      final boolean changedHeight = Config.GUI_IDE_HEIGHT.set(getHeight());
+      if (changedWidth || changedHeight) {
+        SupremicaProperties.savePropertiesLater();
+      }
+    }
+  }
+
+  @Override
+  public void componentMoved(final ComponentEvent event)
+  {
+    if (getExtendedState() == Frame.NORMAL) {
+      final boolean changedX = Config.GUI_IDE_XPOS.set(getX());
+      final boolean changedY = Config.GUI_IDE_YPOS.set(getY());
+      if (changedX || changedY) {
+        SupremicaProperties.savePropertiesLater();
+      }
+    }
+  }
+
+  @Override
+  public void componentShown(final ComponentEvent event)
+  {
+  }
+
+  @Override
+  public void componentHidden(final ComponentEvent event)
+  {
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.WindowStateListener
+  @Override
+  public void windowStateChanged(final WindowEvent event)
+  {
+    final int state = event.getNewState();
+    final boolean changed =
+      Config.GUI_IDE_MAXIMIZED.set(state == Frame.MAXIMIZED_BOTH);
+    if (changed) {
+      SupremicaProperties.savePropertiesLater();
     }
   }
 
@@ -311,47 +374,36 @@ public class IDE
   @Override
   public EditorWindowInterface getActiveEditorWindowInterface()
   {
-    return getActiveDocumentContainer().getEditorPanel().getActiveEditorWindowInterface();
+    final DocumentContainer active = getActiveDocumentContainer();
+    if (active == null) {
+      return null;
+    } else {
+      return active.getEditorPanel().getActiveEditorWindowInterface();
+    }
   }
-
 
   public Project getActiveProject()
   {
-    final DocumentContainer active =
-      mDocumentContainerManager.getActiveContainer();
+    final DocumentContainer active = getActiveDocumentContainer();
     return active.getAnalyzerPanel().getVisualProject();
   }
 
 
   //#########################################################################
-  //# Interface org.supremica.gui.ide.IDEReportInterface
-  @Override
-  public void error(final String msg)
+  //# Logging
+  private void initializeLoggers(final boolean showVersionInLogPanel)
   {
-    LOGGER.error(msg);
-  }
-
-  @Override
-  public void error(final String msg, final Throwable t)
-  {
-    LOGGER.error(msg, t);
-  }
-
-  @Override
-  public void info(final String msg)
-  {
-    LOGGER.info(msg);
-  }
-
-  public void warn(final String msg)
-  {
-    LOGGER.warn(msg);
-  }
-
-  @Override
-  public void debug(final String msg)
-  {
-    LOGGER.debug(msg);
+    IDEAppender.configure(mLogPanel);
+    if (showVersionInLogPanel) {
+      final Logger logger = LogManager.getLogger();
+      logger.info(Version.getInstance().toString());
+      final int mb = 1024 * 1024;
+      logger.info("JVM:" + System.getProperty("java.version") +
+                  ", Free/Total/Max mem: " +
+                  Runtime.getRuntime().freeMemory()/mb + "/" +
+                  Runtime.getRuntime().totalMemory()/mb + "/" +
+                  Runtime.getRuntime().maxMemory()/mb + " MiB");
+    }
   }
 
 
@@ -360,29 +412,23 @@ public class IDE
   public static void main(final String args[])
     throws Exception
   {
-    // Process command line arguments
+    // Process command line arguments and load configuration
     final List<File> files = ProcessCommandLineArguments.process(args);
-
-    // Initialise logging
-    SupremicaLoggerFactory.initialiseSupremicaLoggerFactory();
-    LOGGER = SupremicaLoggerFactory.createLogger(IDE.class);
-
-    // Now start the gui...
-    InterfaceManager.getInstance().initLookAndFeel();
-    //WatersDragSourceListener.setup();
+    // Initialise look & feel, load fonts and icons
+    IconAndFontLoader.initialize();
+    // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
-    final boolean showVersion =
-      hasFiles || Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue();
-    final IDE ide = new IDE(showVersion);
+    final IDE ide = new IDE();
     // Open initial module(s)
     if (hasFiles) {
       ide.openFiles(files);
     } else if (Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue()) {
       ide.openEmptyDocument();
     }
-
     // Show!
     ide.setVisible(true);
+    ide.initializeLoggers(hasFiles ||
+                          Config.GUI_EDITOR_DEFAULT_EMPTY_MODULE.isTrue());
   }
 
 
@@ -503,26 +549,16 @@ public class IDE
   private final LogPanel mLogPanel;
   private final JFileChooser mFileChooser;
 
-  // Logger. Must not be initialised until ProcessCommandLineArguments
-  // has finished (or messages WILL disappear).  Try running "IDE -h" and
-  // "IDE", _both_ should give output, to console and log display,
-  // respectively.
-  private static Logger LOGGER = null;
-  public static void setLogger(final Logger aLogger) {
-    LOGGER = aLogger;
-  }
-
 
   //#########################################################################
   //# Static Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -3896438636773221026L;
 
-  static
-  {
-    Locale.setDefault(Locale.ENGLISH);
-    Config.XML_RPC_ACTIVE.set(false);
-    Config.DOT_USE.set(true);
-    Config.LOG_TO_CONSOLE.set(false); // why?
-    Config.LOG_TO_GUI.set(true);
+  static {
+    // Configure loggers in static initialiser,
+    // making sure it happens before logging is used.
+    final ConfigurationFactory factory = new IDELogConfigurationFactory();
+    ConfigurationFactory.setConfigurationFactory(factory);
   }
+
 }

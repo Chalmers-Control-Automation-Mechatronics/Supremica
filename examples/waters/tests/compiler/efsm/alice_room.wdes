@@ -1,0 +1,991 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="alice_room" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<Comment>An EFSM compiler test.
+In this test case, a hash collision occurs between the predicate for the :accepting proposition (true) and that of one of the branches of one of the events (false).</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="PROPOSITION" Name=":forbidden"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==0,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==0,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==1,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==1,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==2,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==2,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{1&lt;=yb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{yb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ad.{yb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==0,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==0,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==1,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==1,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==2,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==2,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{1&lt;=yb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{yb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="al.{yb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==0,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==0,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==1,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==1,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==2,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==2,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{1&lt;=yb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{yb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="ar.{yb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==0,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==0,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==1,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==1,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==2,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==2,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{1&lt;=yb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{yb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="au.{yb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==0,ya==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==1,ya==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==2,ya==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{ya==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xa'==xa}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{1&lt;=xb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==1,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==1,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==2,yb==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==2,yb==1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==2,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{1&lt;=yb}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{yb!=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bl.{yb&lt;=1}"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="alice">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="room">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="bd.{1&lt;=xb}"/>
+<ns2:EventRef Name="bd.{xa'==xa}"/>
+<ns2:EventRef Name="bd.{xb!=1}"/>
+<ns2:EventRef Name="bd.{xb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{ya==0}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="S0" Event="bd.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xa'==xa}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==0,ya==1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==0,yb==2}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==1,ya==1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==1,yb==2}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==2,ya==1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==2,yb==2}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{ya==0}" Target="S0"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="ya">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="ad.{1&lt;=yb}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ad.{yb!=1}"/>
+<ns2:EventRef Name="ad.{yb&lt;=1}"/>
+<ns2:EventRef Name="al.{1&lt;=yb}"/>
+<ns2:EventRef Name="al.{xb==0,yb==0}"/>
+<ns2:EventRef Name="al.{xb==0,yb==1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==2}"/>
+<ns2:EventRef Name="al.{xb==1,yb==0}"/>
+<ns2:EventRef Name="al.{xb==1,yb==1}"/>
+<ns2:EventRef Name="al.{xb==1,yb==2}"/>
+<ns2:EventRef Name="al.{xb==2,yb==0}"/>
+<ns2:EventRef Name="al.{xb==2,yb==1}"/>
+<ns2:EventRef Name="al.{xb==2,yb==2}"/>
+<ns2:EventRef Name="al.{yb!=1}"/>
+<ns2:EventRef Name="al.{yb&lt;=1}"/>
+<ns2:EventRef Name="ar.{1&lt;=yb}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ar.{yb!=1}"/>
+<ns2:EventRef Name="ar.{yb&lt;=1}"/>
+<ns2:EventRef Name="au.{1&lt;=yb}"/>
+<ns2:EventRef Name="au.{xb==0,yb==0}"/>
+<ns2:EventRef Name="au.{xb==0,yb==1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==2}"/>
+<ns2:EventRef Name="au.{xb==1,yb==0}"/>
+<ns2:EventRef Name="au.{xb==1,yb==1}"/>
+<ns2:EventRef Name="au.{xb==1,yb==2}"/>
+<ns2:EventRef Name="au.{xb==2,yb==0}"/>
+<ns2:EventRef Name="au.{xb==2,yb==1}"/>
+<ns2:EventRef Name="au.{xb==2,yb==2}"/>
+<ns2:EventRef Name="au.{yb!=1}"/>
+<ns2:EventRef Name="au.{yb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xa'==xa}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{ya==0}"/>
+<ns2:EventRef Name="bl.{1&lt;=yb}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bl.{yb!=1}"/>
+<ns2:EventRef Name="bl.{yb&lt;=1}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="1"/>
+<ns2:State Name="2"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Event="ad.{1&lt;=yb}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{1&lt;=yb}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{1&lt;=yb}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{1&lt;=yb}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{ya==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{1&lt;=yb}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="1" Event="ad.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{yb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{yb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{yb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{yb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==0,ya==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,ya==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==2,ya==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{yb!=1}" Target="1"/>
+<ns2:Transition Source="2" Event="ad.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{yb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{yb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{yb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{yb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xa'==xa}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{yb&lt;=1}" Target="2"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="xa">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="ad.{1&lt;=xb}"/>
+<ns2:EventRef Name="ad.{xb!=1}"/>
+<ns2:EventRef Name="ad.{xb&lt;=1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==2}"/>
+<ns2:EventRef Name="al.{1&lt;=xb}"/>
+<ns2:EventRef Name="al.{xb!=1}"/>
+<ns2:EventRef Name="al.{xb&lt;=1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==0}"/>
+<ns2:EventRef Name="al.{xb==0,yb==1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==2}"/>
+<ns2:EventRef Name="al.{xb==1,yb==0}"/>
+<ns2:EventRef Name="al.{xb==1,yb==1}"/>
+<ns2:EventRef Name="al.{xb==1,yb==2}"/>
+<ns2:EventRef Name="al.{xb==2,yb==0}"/>
+<ns2:EventRef Name="al.{xb==2,yb==1}"/>
+<ns2:EventRef Name="al.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ar.{1&lt;=xb}"/>
+<ns2:EventRef Name="ar.{xb!=1}"/>
+<ns2:EventRef Name="ar.{xb&lt;=1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==2}"/>
+<ns2:EventRef Name="au.{1&lt;=xb}"/>
+<ns2:EventRef Name="au.{xb!=1}"/>
+<ns2:EventRef Name="au.{xb&lt;=1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==0}"/>
+<ns2:EventRef Name="au.{xb==0,yb==1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==2}"/>
+<ns2:EventRef Name="au.{xb==1,yb==0}"/>
+<ns2:EventRef Name="au.{xb==1,yb==1}"/>
+<ns2:EventRef Name="au.{xb==1,yb==2}"/>
+<ns2:EventRef Name="au.{xb==2,yb==0}"/>
+<ns2:EventRef Name="au.{xb==2,yb==1}"/>
+<ns2:EventRef Name="au.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{1&lt;=xb}"/>
+<ns2:EventRef Name="bd.{xb!=1}"/>
+<ns2:EventRef Name="bd.{xb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bl.{1&lt;=xb}"/>
+<ns2:EventRef Name="bl.{xb!=1}"/>
+<ns2:EventRef Name="bl.{xb&lt;=1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==2}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="1"/>
+<ns2:State Name="2"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Event="ad.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb==0,ya==1}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="1" Event="ad.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,ya==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb!=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="2" Event="ad.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,ya==1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb&lt;=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==2}" Target="2"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="yb">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="ad.{1&lt;=yb}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ad.{yb!=1}"/>
+<ns2:EventRef Name="ad.{yb&lt;=1}"/>
+<ns2:EventRef Name="al.{1&lt;=yb}"/>
+<ns2:EventRef Name="al.{xb==0,yb==0}"/>
+<ns2:EventRef Name="al.{xb==0,yb==1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==2}"/>
+<ns2:EventRef Name="al.{xb==1,yb==0}"/>
+<ns2:EventRef Name="al.{xb==1,yb==1}"/>
+<ns2:EventRef Name="al.{xb==1,yb==2}"/>
+<ns2:EventRef Name="al.{xb==2,yb==0}"/>
+<ns2:EventRef Name="al.{xb==2,yb==1}"/>
+<ns2:EventRef Name="al.{xb==2,yb==2}"/>
+<ns2:EventRef Name="al.{yb!=1}"/>
+<ns2:EventRef Name="al.{yb&lt;=1}"/>
+<ns2:EventRef Name="ar.{1&lt;=yb}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ar.{yb!=1}"/>
+<ns2:EventRef Name="ar.{yb&lt;=1}"/>
+<ns2:EventRef Name="au.{1&lt;=yb}"/>
+<ns2:EventRef Name="au.{xb==0,yb==0}"/>
+<ns2:EventRef Name="au.{xb==0,yb==1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==2}"/>
+<ns2:EventRef Name="au.{xb==1,yb==0}"/>
+<ns2:EventRef Name="au.{xb==1,yb==1}"/>
+<ns2:EventRef Name="au.{xb==1,yb==2}"/>
+<ns2:EventRef Name="au.{xb==2,yb==0}"/>
+<ns2:EventRef Name="au.{xb==2,yb==1}"/>
+<ns2:EventRef Name="au.{xb==2,yb==2}"/>
+<ns2:EventRef Name="au.{yb!=1}"/>
+<ns2:EventRef Name="au.{yb&lt;=1}"/>
+<ns2:EventRef Name="bd.{1&lt;=xb}"/>
+<ns2:EventRef Name="bd.{xa'==xa}"/>
+<ns2:EventRef Name="bd.{xb!=1}"/>
+<ns2:EventRef Name="bd.{xb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{ya==0}"/>
+<ns2:EventRef Name="bl.{1&lt;=yb}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bl.{yb!=1}"/>
+<ns2:EventRef Name="bl.{yb&lt;=1}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+<ns2:State Name="2">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{yb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{yb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{yb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{yb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{yb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{yb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{yb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{yb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==1,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==2,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{yb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{yb&lt;=1}" Target="0"/>
+<ns2:Transition Source="1" Event="ad.{1&lt;=yb}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{yb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{1&lt;=yb}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{yb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{1&lt;=yb}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{yb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{1&lt;=yb}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{yb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{1&lt;=xb}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xa'==xa}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xb!=1}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xb==0,ya==1}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,ya==1}" Target="0"/>
+<ns2:Transition Source="1" Event="bd.{xb==2,ya==1}" Target="0"/>
+<ns2:Transition Source="1" Event="bl.{1&lt;=yb}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==0,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==2,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{yb&lt;=1}" Target="1"/>
+<ns2:Transition Source="2" Event="ad.{1&lt;=yb}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{yb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{1&lt;=yb}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{yb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{1&lt;=yb}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{yb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{1&lt;=yb}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{yb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{xb!=1}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{xb==0,yb==2}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,yb==2}" Target="1"/>
+<ns2:Transition Source="2" Event="bd.{ya==0}" Target="1"/>
+<ns2:Transition Source="2" Event="bl.{1&lt;=yb}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==0,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==1,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{yb!=1}" Target="2"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="xb">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="ad.{1&lt;=xb}"/>
+<ns2:EventRef Name="ad.{xb!=1}"/>
+<ns2:EventRef Name="ad.{xb&lt;=1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==2}"/>
+<ns2:EventRef Name="al.{1&lt;=xb}"/>
+<ns2:EventRef Name="al.{xb!=1}"/>
+<ns2:EventRef Name="al.{xb&lt;=1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==0}"/>
+<ns2:EventRef Name="al.{xb==0,yb==1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==2}"/>
+<ns2:EventRef Name="al.{xb==1,yb==0}"/>
+<ns2:EventRef Name="al.{xb==1,yb==1}"/>
+<ns2:EventRef Name="al.{xb==1,yb==2}"/>
+<ns2:EventRef Name="al.{xb==2,yb==0}"/>
+<ns2:EventRef Name="al.{xb==2,yb==1}"/>
+<ns2:EventRef Name="al.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ar.{1&lt;=xb}"/>
+<ns2:EventRef Name="ar.{xb!=1}"/>
+<ns2:EventRef Name="ar.{xb&lt;=1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==2}"/>
+<ns2:EventRef Name="au.{1&lt;=xb}"/>
+<ns2:EventRef Name="au.{xb!=1}"/>
+<ns2:EventRef Name="au.{xb&lt;=1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==0}"/>
+<ns2:EventRef Name="au.{xb==0,yb==1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==2}"/>
+<ns2:EventRef Name="au.{xb==1,yb==0}"/>
+<ns2:EventRef Name="au.{xb==1,yb==1}"/>
+<ns2:EventRef Name="au.{xb==1,yb==2}"/>
+<ns2:EventRef Name="au.{xb==2,yb==0}"/>
+<ns2:EventRef Name="au.{xb==2,yb==1}"/>
+<ns2:EventRef Name="au.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{1&lt;=xb}"/>
+<ns2:EventRef Name="bd.{xb!=1}"/>
+<ns2:EventRef Name="bd.{xb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bl.{1&lt;=xb}"/>
+<ns2:EventRef Name="bl.{xb!=1}"/>
+<ns2:EventRef Name="bl.{xb&lt;=1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==2}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+<ns2:State Name="2">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Event="ad.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="ad.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="al.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="ar.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="au.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb==0,ya==1}" Target="0"/>
+<ns2:Transition Source="0" Event="bd.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb!=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb&lt;=1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==0}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==1}" Target="0"/>
+<ns2:Transition Source="0" Event="bl.{xb==0,yb==2}" Target="0"/>
+<ns2:Transition Source="1" Event="ad.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ad.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="al.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="ar.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="au.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,ya==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bd.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{1&lt;=xb}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb&lt;=1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==0}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==1}" Target="1"/>
+<ns2:Transition Source="1" Event="bl.{xb==1,yb==2}" Target="1"/>
+<ns2:Transition Source="2" Event="ad.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="ad.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="al.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="ar.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="au.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,ya==1}" Target="2"/>
+<ns2:Transition Source="2" Event="bd.{xb==2,yb==2}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{1&lt;=xb}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb!=1}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==0}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==1}" Target="2"/>
+<ns2:Transition Source="2" Event="bl.{xb==2,yb==2}" Target="2"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="MyRoom">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name=":forbidden"/>
+<ns2:EventRef Name="ad.{1&lt;=xb}"/>
+<ns2:EventRef Name="ad.{1&lt;=yb}"/>
+<ns2:EventRef Name="ad.{xb!=1}"/>
+<ns2:EventRef Name="ad.{xb&lt;=1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ad.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ad.{yb!=1}"/>
+<ns2:EventRef Name="ad.{yb&lt;=1}"/>
+<ns2:EventRef Name="al.{1&lt;=xb}"/>
+<ns2:EventRef Name="al.{1&lt;=yb}"/>
+<ns2:EventRef Name="al.{xb!=1}"/>
+<ns2:EventRef Name="al.{xb&lt;=1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==0}"/>
+<ns2:EventRef Name="al.{xb==0,yb==1}"/>
+<ns2:EventRef Name="al.{xb==0,yb==2}"/>
+<ns2:EventRef Name="al.{xb==1,yb==0}"/>
+<ns2:EventRef Name="al.{xb==1,yb==1}"/>
+<ns2:EventRef Name="al.{xb==1,yb==2}"/>
+<ns2:EventRef Name="al.{xb==2,yb==0}"/>
+<ns2:EventRef Name="al.{xb==2,yb==1}"/>
+<ns2:EventRef Name="al.{xb==2,yb==2}"/>
+<ns2:EventRef Name="al.{yb!=1}"/>
+<ns2:EventRef Name="al.{yb&lt;=1}"/>
+<ns2:EventRef Name="ar.{1&lt;=xb}"/>
+<ns2:EventRef Name="ar.{1&lt;=yb}"/>
+<ns2:EventRef Name="ar.{xb!=1}"/>
+<ns2:EventRef Name="ar.{xb&lt;=1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==0,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==1,yb==2}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==0}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==1}"/>
+<ns2:EventRef Name="ar.{xb==2,yb==2}"/>
+<ns2:EventRef Name="ar.{yb!=1}"/>
+<ns2:EventRef Name="ar.{yb&lt;=1}"/>
+<ns2:EventRef Name="au.{1&lt;=xb}"/>
+<ns2:EventRef Name="au.{1&lt;=yb}"/>
+<ns2:EventRef Name="au.{xb!=1}"/>
+<ns2:EventRef Name="au.{xb&lt;=1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==0}"/>
+<ns2:EventRef Name="au.{xb==0,yb==1}"/>
+<ns2:EventRef Name="au.{xb==0,yb==2}"/>
+<ns2:EventRef Name="au.{xb==1,yb==0}"/>
+<ns2:EventRef Name="au.{xb==1,yb==1}"/>
+<ns2:EventRef Name="au.{xb==1,yb==2}"/>
+<ns2:EventRef Name="au.{xb==2,yb==0}"/>
+<ns2:EventRef Name="au.{xb==2,yb==1}"/>
+<ns2:EventRef Name="au.{xb==2,yb==2}"/>
+<ns2:EventRef Name="au.{yb!=1}"/>
+<ns2:EventRef Name="au.{yb&lt;=1}"/>
+<ns2:EventRef Name="bd.{1&lt;=xb}"/>
+<ns2:EventRef Name="bd.{xa'==xa}"/>
+<ns2:EventRef Name="bd.{xb!=1}"/>
+<ns2:EventRef Name="bd.{xb&lt;=1}"/>
+<ns2:EventRef Name="bd.{xb==0,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,ya==1}"/>
+<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{ya==0}"/>
+<ns2:EventRef Name="bl.{1&lt;=xb}"/>
+<ns2:EventRef Name="bl.{1&lt;=yb}"/>
+<ns2:EventRef Name="bl.{xb!=1}"/>
+<ns2:EventRef Name="bl.{xb&lt;=1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==0}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==1}"/>
+<ns2:EventRef Name="bl.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bl.{yb!=1}"/>
+<ns2:EventRef Name="bl.{yb&lt;=1}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="S1">
+<ns2:EventRefList>
+<ns2:EventRef Name=":forbidden"/>
+</ns2:EventRefList>
+</ns2:State>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="S0" Event="ad.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ad.{1&lt;=yb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ad.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ad.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ad.{xb==0,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==0,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==1,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==1,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==2,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==2,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ad.{yb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ad.{yb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{1&lt;=yb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{xb==0,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==0,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==1,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==1,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==2,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==2,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="al.{yb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="al.{yb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{1&lt;=yb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{xb==0,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==0,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==1,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==1,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==2,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==2,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="ar.{yb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="ar.{yb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{1&lt;=yb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{xb==0,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==0,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==1,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==1,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==2,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==2,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="au.{yb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="au.{yb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xa'==xa}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bd.{xb==0,ya==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==1,ya==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==2,ya==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{ya==0}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{1&lt;=xb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{1&lt;=yb}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{xb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{xb&lt;=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{xb==0,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==0,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==1,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==1,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==2,yb==0}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==2,yb==1}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bl.{yb!=1}" Target="S0"/>
+<ns2:Transition Source="S0" Event="bl.{yb&lt;=1}" Target="S0"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

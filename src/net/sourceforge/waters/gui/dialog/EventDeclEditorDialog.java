@@ -92,7 +92,8 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.FocusPreservingTrigger;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.PropositionIcon;
@@ -241,15 +242,15 @@ public class EventDeclEditorDialog
       mKindGroup = new ButtonGroup();
       mControllableButton =
         new IconRadioButton("Controllable",
-                            IconLoader.ICON_CONTROLLABLE_OBSERVABLE,
-                            mKindGroup);
+                            IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE,
+                            mKindGroup, 'c');
       mUncontrollableButton =
         new IconRadioButton("Uncontrollable",
-                            IconLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
-                            mKindGroup);
+                            IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
+                            mKindGroup, 'u');
       mPropositionButton =
         new IconRadioButton("Proposition", PropositionIcon.getDefaultMarkedIcon(),
-                            mKindGroup);
+                            mKindGroup, 'p');
       mPropositionButton.setEnabled(advanced);
       switch (template.getKind()) {
       case CONTROLLABLE:
@@ -306,6 +307,7 @@ public class EventDeclEditorDialog
       mObservableButton = new JCheckBox("Observable");
       mObservableButton.setRequestFocusEnabled(false);
       mObservableButton.setSelected(template.isObservable());
+      FocusPreservingTrigger.addAccelerator(mObservableButton, 'o');
       final ScopeKind scope = template.getScope();
       mParameterButton = new JCheckBox("Parameter");
       mParameterButton.setRequestFocusEnabled(false);
@@ -317,10 +319,11 @@ public class EventDeclEditorDialog
             updateRequiredEnabled();
           }
         });
-
+      FocusPreservingTrigger.addAccelerator(mParameterButton, 'm');
       mRequiredButton = new JCheckBox("Required");
       mRequiredButton.setRequestFocusEnabled(false);
       mRequiredButton.setSelected(scope != ScopeKind.OPTIONAL_PARAMETER);
+      FocusPreservingTrigger.addAccelerator(mRequiredButton, 'r');
       updateRequiredEnabled();
       mColorDisplay = new JPanel();
       mColorDisplay.setBackground(mChosenColor);

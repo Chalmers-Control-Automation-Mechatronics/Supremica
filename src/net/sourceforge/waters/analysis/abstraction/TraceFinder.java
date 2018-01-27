@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -49,8 +50,11 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.SafetyTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
@@ -73,6 +77,7 @@ public class TraceFinder
   public TraceFinder(final AutomatonProxy aut, final KindTranslator translator)
   {
     try {
+      mAutomaton = aut;
       final Collection<EventProxy> empty = Collections.emptyList();
       mEventEncoding = new EventEncoding(aut, translator, empty,
                                          EventEncoding.FILTER_PROPOSITIONS);
@@ -80,6 +85,8 @@ public class TraceFinder
       mTransitionRelation = new ListBufferTransitionRelation
         (aut, mEventEncoding.clone(), enc,
          ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final ComponentKind kind = translator.getComponentKind(aut);
+      mTransitionRelation.setKind(kind);
       mInitialStates = new ArrayList<SearchRecord>();
       final int numStates = mTransitionRelation.getNumberOfStates();
       for (int state = 0; state < numStates; state++) {
@@ -216,6 +223,59 @@ public class TraceFinder
   }
 
   /**
+   * Determines whether the automaton rejects the given safety trace.
+   * This method determines whether the automaton can reach a state where
+   * the next event from the trace is not enabled. The trace must include
+   * information about the automaton, which is used to track the state in
+   * case of nondeterminism.
+   * @param  trace  The trace to be checked.
+   * @return <CODE>true</CODE> if the remainder of trace is accepted starting
+   *         from the last recorded state for the automaton in the trace,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isRejectingSpec(final SafetyTraceProxy trace)
+  {
+    assert trace.getAutomata().contains(mAutomaton);
+    assert mTransitionRelation.getKind() == ComponentKind.SPEC;
+
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    final int numSteps = steps.size();
+    final int numEvents = numSteps - 1;
+    if (isDeterministic()) {
+      return computeNumberOfAcceptedSteps(trace) < numEvents;
+    }
+
+    final ListIterator<TraceStepProxy> listIter = steps.listIterator(numSteps);
+    StateProxy state = null;
+    while (state == null && listIter.hasPrevious()) {
+      final TraceStepProxy step = listIter.previous();
+      state = step.getStateMap().get(mAutomaton);
+    }
+    if (state == null) {
+      return computeNumberOfAcceptedSteps(trace) < numEvents;
+    }
+
+    listIter.next();
+    final TransitionIterator transIter =
+      mTransitionRelation.createSuccessorsReadOnlyIterator();
+    int s = mStateEncoding.getStateCode(state);
+    while (listIter.hasNext()) {
+      final TraceStepProxy step = listIter.next();
+      final EventProxy event = step.getEvent();
+      final int e = mEventEncoding.getEventCode(event);
+      if (e >= 0) {
+        transIter.reset(s, e);
+        if (!transIter.advance()) {
+          return true;
+        }
+        s = transIter.getCurrentTargetState();
+      }
+    }
+    return false;
+  }
+
+
+  /**
    * Gets the number of steps computed from the last call to
    * {@link #computeNumberOfAcceptedSteps(TraceProxy)
    * computeNumberOfAcceptedSteps()}.
@@ -283,6 +343,7 @@ public class TraceFinder
 
   //#########################################################################
   //# Data Members
+  private AutomatonProxy mAutomaton;
   private final EventEncoding mEventEncoding;
   private final StateEncoding mStateEncoding;
   private final ListBufferTransitionRelation mTransitionRelation;

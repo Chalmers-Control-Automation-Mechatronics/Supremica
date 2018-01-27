@@ -55,6 +55,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.apache.logging.log4j.LogManager;
+
 /**
  * <P>A BDD implementation of a standard conflict checker.</P>
  *
@@ -185,7 +187,7 @@ public class BDDConflictChecker
   public boolean run()
     throws AnalysisException
   {
-    getLogger().debug("BDDConflictChecker.run(): " +
+    LogManager.getLogger().debug("BDDConflictChecker.run(): " +
                       getModel().getName() + " ...");
     try {
       setUp();
@@ -253,7 +255,7 @@ public class BDDConflictChecker
       }
     } finally {
       tearDown();
-      getLogger().debug("BDDConflictChecker.run(): " +
+      LogManager.getLogger().debug("BDDConflictChecker.run(): " +
                         getModel().getName() + " done.");
     }
   }

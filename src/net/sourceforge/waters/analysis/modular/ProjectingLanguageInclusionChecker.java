@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.analysis.trcomp.TRLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
@@ -42,9 +43,14 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+ * Old implementation of the projecting language inclusion check algorithm.
+ * This class does not fully support nondeterminism and is superseded by
+ * {@link TRLanguageInclusionChecker}.
+ *
  * @author Robi Malik
  */
 
+@Deprecated
 public class ProjectingLanguageInclusionChecker
   extends ProjectingSafetyVerifier
   implements LanguageInclusionChecker

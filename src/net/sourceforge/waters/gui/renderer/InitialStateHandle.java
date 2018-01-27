@@ -33,12 +33,14 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.geom.Point2D;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
-import java.awt.Graphics2D;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
+import java.awt.geom.Point2D;
+
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.module.GeometryTools;
 
 import org.supremica.properties.Config;
@@ -88,6 +90,7 @@ class InitialStateHandle
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.InitialStateHandle
+  @Override
   public HandleType getType()
   {
     return HandleType.INITIAL;
@@ -96,6 +99,7 @@ class InitialStateHandle
 
   //#########################################################################
   //# Drawing
+  @Override
   public GeneralPath getShape()
   {
     return mShape;
@@ -109,14 +113,14 @@ class InitialStateHandle
   }
 
   @Override
-  public boolean isClicked(final int x, final int y)
+  public boolean isClicked(final Point point)
   {
     final int radius = Config.GUI_EDITOR_NODE_RADIUS.get() + 1;
-    final double distSq = mLine.ptSegDistSq(x, y);
+    final double distSq = mLine.ptSegDistSq(point);
     final Point2D center = GeometryTools.getPosition(mNode);
     return
       distSq < CLICK_TOLERANCE_SQ &&
-      center.distanceSq(x, y) > radius * radius;
+      center.distanceSq(point) > radius * radius;
   }
 
 

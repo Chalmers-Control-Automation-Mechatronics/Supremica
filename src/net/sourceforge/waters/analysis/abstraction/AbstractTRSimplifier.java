@@ -42,7 +42,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.ProxyTools;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public abstract class AbstractTRSimplifier
@@ -435,7 +436,7 @@ public abstract class AbstractTRSimplifier
   protected Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 

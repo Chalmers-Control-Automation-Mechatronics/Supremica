@@ -69,7 +69,7 @@ public class InsertInfo
   /**
    * Creates a new insert information record.
    * @param  proxy    The item inserted.
-   * @param  inspos   An object that specfies how and where to insert the
+   * @param  inspos   An object that specifies how and where to insert the
    *                  item.
    */
   public InsertInfo(final Proxy proxy, final Object inspos)
@@ -93,7 +93,7 @@ public class InsertInfo
   /**
    * Gets the position for the item inserted. The type of the insert
    * position is application-specific, as it depends on the operation how
-   * excatly to specify an insertion. The default, <CODE>null</CODE> is
+   * exactly to specify an insertion. The default, <CODE>null</CODE> is
    * used if the insert position can already be determined from the item
    * inserted, e.g., when inserting into a sorted list.
    */

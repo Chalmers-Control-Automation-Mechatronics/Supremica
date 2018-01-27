@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Shape;
 import java.awt.geom.Arc2D;
@@ -107,15 +108,16 @@ class TieEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.RendererShape
-  public boolean isClicked(final int x, final int y)
+  @Override
+  public boolean isClicked(final Point point)
   {
-    if (getClickedHandle(x, y) != null) {
+    if (getClickedHandle(point) != null) {
       return true;
-    } else if (!isInClickBounds(x, y)) {
+    } else if (!isInClickBounds(point)) {
       return false;
     } else {
       final Rectangle rect =
-        new Rectangle(x - CLICK_TOLERANCE, y - CLICK_TOLERANCE,
+        new Rectangle(point.x - CLICK_TOLERANCE, point.y - CLICK_TOLERANCE,
                       2 * CLICK_TOLERANCE, 2 * CLICK_TOLERANCE);
       return mTie.intersects(rect) && !mTie.contains(rect);
     }
@@ -124,36 +126,43 @@ class TieEdgeProxyShape
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.renderer.EdgeProxyShape
+  @Override
   Shape getCurve()
   {
     return mTie;
   }
 
+  @Override
   Point2D getStartPoint()
   {
     return mStart;
   }
 
+  @Override
   Point2D getEndPoint()
   {
     return mEnd;
   }
 
+  @Override
   Point2D getTurningPoint()
   {
     return mControl;
   }
 
+  @Override
   Point2D getMidDirection()
   {
     return mMidDirection;
   }
 
+  @Override
   Point2D getInnerArrowTipPoint()
   {
     return mInnerArrowTipPoint;
   }
 
+  @Override
   Point2D getEndDirection()
   {
     final Point2D start = mArc.getStartPoint();

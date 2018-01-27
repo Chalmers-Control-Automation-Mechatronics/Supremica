@@ -35,14 +35,31 @@
 
 package org.supremica.gui;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
-import org.supremica.log.*;
+
 
 public class SelectEventDialog
 	extends JDialog
@@ -54,7 +71,7 @@ public class SelectEventDialog
 	@SuppressWarnings("unused")
 	private Automaton theAutomaton = null;
 
-	public SelectEventDialog(Frame owner, Automaton theAutomaton)
+	public SelectEventDialog(final Frame owner, final Automaton theAutomaton)
 		throws Exception
 	{
 		super(owner, "Select event", true);
@@ -66,13 +83,13 @@ public class SelectEventDialog
 		contentPane.setLayout(new BorderLayout());
 		setSize(400, 300);
 
-		JLabel introText = new JLabel("Select an event. If necessary, create the event first");
+		final JLabel introText = new JLabel("Select an event. If necessary, create the event first");
 
 		contentPane.add(introText, BorderLayout.NORTH);
 
-		Box horizBox1 = Box.createHorizontalBox();
-		JButton okButton = new JButton("OK");
-		JButton cancelButton = new JButton("Cancel");
+		final Box horizBox1 = Box.createHorizontalBox();
+		final JButton okButton = new JButton("OK");
+		final JButton cancelButton = new JButton("Cancel");
 
 		horizBox1.add(Box.createGlue());
 		horizBox1.add(okButton);
@@ -81,23 +98,25 @@ public class SelectEventDialog
 		horizBox1.add(Box.createGlue());
 		contentPane.add(horizBox1, BorderLayout.SOUTH);
 
-		Box horizBox2 = Box.createHorizontalBox();
-		AlphabetPanel alphabetPanel = new AlphabetPanel(theAlphabet);
-		CreateEventPanel createEventPanel = new CreateEventPanel(theAlphabet);
+		final Box horizBox2 = Box.createHorizontalBox();
+		final AlphabetPanel alphabetPanel = new AlphabetPanel(theAlphabet);
+		final CreateEventPanel createEventPanel = new CreateEventPanel(theAlphabet);
 
 		horizBox2.add(alphabetPanel);
 		horizBox2.add(createEventPanel);
 		contentPane.add(horizBox2, BorderLayout.CENTER);
 		okButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				setVisible(false);
 			}
 		});
 		cancelButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
 				selectedEvent = null;
 
@@ -106,8 +125,8 @@ public class SelectEventDialog
 		});
 
 		// Center the window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		Dimension frameSize = getSize();
+		final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		final Dimension frameSize = getSize();
 
 		if (frameSize.height > screenSize.height)
 		{
@@ -138,18 +157,18 @@ class AlphabetPanel
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unused")
-	private Alphabet theAlphabet;
+	private final Alphabet theAlphabet;
 
 	// private JList theEventList = new JList();
-	private JLabel test1 = new JLabel("test1");
+	private final JLabel test1 = new JLabel("test1");
 
-	public AlphabetPanel(Alphabet theAlphabet)
+	public AlphabetPanel(final Alphabet theAlphabet)
 	{
 		this.theAlphabet = theAlphabet;
 
 		add(test1, BorderLayout.CENTER);
 
-		Border border = BorderFactory.createTitledBorder("Select event");
+		final Border border = BorderFactory.createTitledBorder("Select event");
 
 		setBorder(border);
 
@@ -161,24 +180,24 @@ class CreateEventPanel
 	extends JPanel
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(CreateEventPanel.class);
+	private static Logger logger = LogManager.getLogger(CreateEventPanel.class);
 	private Alphabet theAlphabet;
 	private JTextField labelField;
 	private JCheckBox controllableCheckBox;
 	private JCheckBox prioritizedCheckBox;
 	private JButton createEventButton;
 
-	public CreateEventPanel(Alphabet theAlphabet)
+	public CreateEventPanel(final Alphabet theAlphabet)
 		throws Exception
 	{
 		this.theAlphabet = theAlphabet;
 
 		// setLayout(Box.createHorizontalBox());
-		Border border = BorderFactory.createTitledBorder("Create event");
+		final Border border = BorderFactory.createTitledBorder("Create event");
 
 		setBorder(border);
 
-		Box vertBox = Box.createVerticalBox();
+		final Box vertBox = Box.createVerticalBox();
 
 		add(vertBox);
 		vertBox.add(new JLabel("Label"));
@@ -202,10 +221,11 @@ class CreateEventPanel
 		vertBox.add(createEventButton);
 		createEventButton.addActionListener(new ActionListener()
 		{
-			public void actionPerformed(ActionEvent e)
+			@Override
+      public void actionPerformed(final ActionEvent e)
 			{
-				Alphabet alph = getAlphabet();
-				String currLabel = labelField.getText();
+				final Alphabet alph = getAlphabet();
+				final String currLabel = labelField.getText();
 
 				if (alph.contains(currLabel))
 				{
@@ -213,14 +233,14 @@ class CreateEventPanel
 				}
 				else    //it does not contain an event with this label, just add it
 				{
-					LabeledEvent newEvent = new LabeledEvent(currLabel);
+					final LabeledEvent newEvent = new LabeledEvent(currLabel);
 
 					// newEvent.setId(alph.getUniqueId("e"));
 					try
 					{
 						alph.addEvent(newEvent);
 					}
-					catch (Exception ex)
+					catch (final Exception ex)
 					{
 						logger.error("Exception in Alphabet.addEvent", ex);
 						logger.debug(ex.getStackTrace());
@@ -237,7 +257,8 @@ class CreateEventPanel
 		return theAlphabet;
 	}
 
-	public void setVisible(boolean visible)
+	@Override
+  public void setVisible(final boolean visible)
 	{
 		labelField.setText("");
 		controllableCheckBox.setSelected(true);

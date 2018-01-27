@@ -17,7 +17,10 @@
   <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
   <property name="jaxb-jxc.jar" location="${supremica.lib}/jaxb-jxc.jar"/>
   <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
-  <property name="log4j.jar" location="${supremica.lib}/log4j.jar"/>
+  <property name="log4j-api.jar"
+            location="${supremica.lib}/log4j-api-2.9.0.jar"/>
+  <property name="log4j-core.jar"
+            location="${supremica.lib}/log4j-core-2.9.0.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
 
@@ -63,7 +66,8 @@
     <path refid="jaxb.classpath"/>
     <pathelement location="${jaxb.jar}"/>
     <pathelement location="${javabdd.jar}"/>
-    <pathelement location="${log4j.jar}"/>
+    <pathelement location="${log4j-api.jar}"/>
+    <pathelement location="${log4j-core.jar}"/>
     <pathelement location="${trove.jar}"/>
   </path>
 
@@ -86,7 +90,7 @@
     <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
       <classpath>
         <path refid="jaxb.classpath"/>
-          <pathelement location="${jaxb-xjc.jar}"/>
+        <pathelement location="${jaxb-xjc.jar}"/>
       </classpath>
     </taskdef>
     <delete dir="${tmp}" quiet="true"/>
@@ -126,7 +130,7 @@
     <jar jarfile="${jaxb.jar}">
       <fileset dir="${waters.classes}">
         <include name="net/sourceforge/waters/xsd/**/*.class"/>
-       </fileset>
+      </fileset>
       <fileset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*.properties"/>
         <include name="net/sourceforge/waters/xsd/**/*.ser"/>

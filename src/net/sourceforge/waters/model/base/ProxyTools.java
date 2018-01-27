@@ -96,7 +96,22 @@ public class ProxyTools
 
 
   //#########################################################################
-  //# Class Names
+  //# String Conversion
+  /**
+   * Returns a textual representation of the given object even if it is
+   * <CODE>null</CODE>.
+   * @return Either <CODE>&quot;null&quot;</CODE> or the result of
+   *         the object's {@link #toString()} method.
+   */
+  public static String toString(final Object object)
+  {
+    if (object == null) {
+      return "null";
+    } else {
+      return object.toString();
+    }
+  }
+
   public static String getContainerName(final Object container)
   {
     final StringBuilder builder = new StringBuilder();

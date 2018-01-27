@@ -49,37 +49,38 @@
  */
 package org.supremica.automata.IO;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
+import org.supremica.automata.Project;
+
 
 public class AutomataToControlBuilderST
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataToControlBuilderST.class);
 	private AutomataToIEC1131 theExporter = null;
 	private ControlBuilderHelper theHelper = null;
 
-	public AutomataToControlBuilderST(Project theProject)
+	public AutomataToControlBuilderST(final Project theProject)
 		throws Exception
 	{
 		theHelper = (ControlBuilderHelper) ControlBuilderHelper.getInstance();
 		theExporter = new AutomataToIEC1131(theProject, theHelper);
 	}
 
-	public void serializeApp(File theFile, String filename)
+	public void serializeApp(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		theExporter.serializeStructuredText(theWriter);
 		theWriter.close();
 	}
 
-	public void serializePrj(File theFile, String filename)
+	public void serializePrj(final File theFile, final String filename)
 		throws Exception
 	{
-		PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
+		final PrintWriter theWriter = new PrintWriter(new FileWriter(theFile));
 
 		theHelper.printPrj(theWriter, filename);
 		theWriter.close();

@@ -58,7 +58,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -257,7 +258,7 @@ class TRAbstractionStepCertainConflicts
                                                  final boolean onlyAlwaysEnabled)
       throws AnalysisException
     {
-      final Logger logger = mLanguageInclusionChecker.getLogger();
+      final Logger logger = LogManager.getLogger();
       mMaxLevel = level;
       final int config =
         mLanguageInclusionChecker.getPreferredInputConfiguration();
@@ -392,7 +393,7 @@ class TRAbstractionStepCertainConflicts
 
     //#######################################################################
     //# Data Members
-    private final TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
+    private final TRLanguageInclusionChecker mLanguageInclusionChecker;
     private final EventProxy mCertainConflictsEvent;
     private final TRAutomatonProxy mPropertyAutomaton;
     private List<LanguageInclusionAutomaton> mLanguageInclusionAutomata;

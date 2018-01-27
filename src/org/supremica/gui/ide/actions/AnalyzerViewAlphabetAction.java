@@ -35,16 +35,20 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.gui.AlphabetViewer;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
 
 /**
  * View alphabet action.
@@ -52,14 +56,11 @@ import org.supremica.log.*;
 public class AnalyzerViewAlphabetAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerViewAlphabetAction(List<IDEAction> actionList)
+    public AnalyzerViewAlphabetAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -73,7 +74,8 @@ public class AnalyzerViewAlphabetAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/Alphabet16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -81,11 +83,12 @@ public class AnalyzerViewAlphabetAction
     /**
      * Opens an alphabet viewer window.
      */
+    @Override
     public void doAction()
     {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
-        Alphabet alphabetSubset = selectedAutomata.getUnionAlphabet();
-        Automata allAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Alphabet alphabetSubset = selectedAutomata.getUnionAlphabet();
+        final Automata allAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
@@ -96,10 +99,10 @@ public class AnalyzerViewAlphabetAction
         // automata object?? Use AutomataViewer instead!
         try
         {
-            AlphabetViewer alphabetViewer = new AlphabetViewer(allAutomata, alphabetSubset);
+            final AlphabetViewer alphabetViewer = new AlphabetViewer(allAutomata, alphabetSubset);
             alphabetViewer.setVisible(true);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             // logger.error("Exception in AlphabetViewer", ex);
             logger.error("Exception in AutomataViewer: " + ex);

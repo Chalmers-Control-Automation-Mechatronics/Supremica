@@ -49,13 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
+
 
 public final class SynthesizerOptions
 {
-    private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
+    private static Logger logger = LogManager.getLogger(SynthesizerOptions.class);
 
     private boolean dialogOK = false;
     private SynthesisType synthesisType;
@@ -69,8 +71,6 @@ public final class SynthesizerOptions
     private boolean localizeSupervisors;
     private boolean rememberDisabledUncontrollableEvents;
 	private boolean supervisorsAsPlants;
-
-    private boolean bddExtractSupervisor;
 
     public boolean oneEventAtATime = false;
     public boolean addOnePlantAtATime = false;
@@ -90,8 +90,7 @@ public final class SynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
             Config.SYNTHESIS_LOCALIZE_SUPERVISORS.get(),
-			Config.SYNTHESIS_SUP_AS_PLANT.get(),
-            Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get());
+			Config.SYNTHESIS_SUP_AS_PLANT.get());
     }
 
     /**
@@ -103,7 +102,7 @@ public final class SynthesizerOptions
     private SynthesizerOptions(final SynthesisType synthesisType, final SynthesisAlgorithm synthesisAlgorithm,
     		final boolean purge, final boolean rename, final boolean removeUnnecessarySupervisors, final boolean maximallyPermissive,
     		final boolean maximallyPermissiveIncremental, final boolean reduceSupervisors,
-    		final boolean localizeSupervisors, final boolean supervisorsAsPlants, final boolean bddExtractSupervisor)
+    		final boolean localizeSupervisors, final boolean supervisorsAsPlants)
     {
         this.synthesisType = synthesisType;
         this.synthesisAlgorithm = synthesisAlgorithm;
@@ -115,7 +114,6 @@ public final class SynthesizerOptions
         this.reduceSupervisors = reduceSupervisors;
         this.localizeSupervisors = localizeSupervisors;
 		this.supervisorsAsPlants = supervisorsAsPlants;
-        this.bddExtractSupervisor = bddExtractSupervisor;
     }
 
     public boolean isValid()
@@ -137,16 +135,6 @@ public final class SynthesizerOptions
             return "Unknown synthesis type.";
         }*/
 		assert(synthesisType != null);
-
-        if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
-        {
-            if ((synthesisType != SynthesisType.NONBLOCKING_CONTROLLABLE) &&
-                (synthesisType != SynthesisType.CONTROLLABLE) &&
-                (synthesisType != SynthesisType.NONBLOCKING))
-            {
-                return("BDD algorithms currently only support supNB+C synthesis.");
-            }
-        }
 
         if (synthesisAlgorithm == SynthesisAlgorithm.MONOLITHICBDD)
         {
@@ -204,7 +192,7 @@ public final class SynthesizerOptions
 	{
 		return rename;
 	}
-	
+
     public void setRememberDisabledUncontrollableEvents(final boolean remember)
     {
         rememberDisabledUncontrollableEvents = remember;
@@ -223,16 +211,6 @@ public final class SynthesizerOptions
     public boolean getRemoveUnecessarySupervisors()
     {
         return removeUnnecessarySupervisors;
-    }
-
-    public void setExtractSupervisor(final boolean extract)
-    {
-        bddExtractSupervisor = extract;
-    }
-
-    public boolean doExtractSupervisor()
-    {
-        return bddExtractSupervisor;
     }
 
     public void setMaximallyPermissive(final boolean bool)
@@ -295,7 +273,6 @@ public final class SynthesizerOptions
         Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
         Config.SYNTHESIS_LOCALIZE_SUPERVISORS.set(localizeSupervisors);
 		Config.SYNTHESIS_SUP_AS_PLANT.set(supervisorsAsPlants);
-        Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
     }
 
     /**
@@ -303,17 +280,16 @@ public final class SynthesizerOptions
      */
     public static SynthesizerOptions getDefaultSynthesizerOptions()
     {
-        return new SynthesizerOptions(SynthesisType.CONTROLLABLE, 
+        return new SynthesizerOptions(SynthesisType.CONTROLLABLE,
 									  SynthesisAlgorithm.MODULAR,
                                       true,		// SYNTHESIS_PURGE
 									  false,	// SYNTHESIS_RENAME
-									  true,		// SYNTHESIS_OPTIMIZE		
+									  true,		// SYNTHESIS_OPTIMIZE
 									  true,		// SYNTHESIS_MAXIMALLY_PERMISSIVE
-									  true,		// SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL 
+									  true,		// SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL
 									  true,		// SYNTHESIS_REDUCE_SUPERVISORS
 									  true,		// SYNTHESIS_LOCALIZE_SUPERVISORS
-									  false,	// SYNTHESIS_SUP_AS_PLANT
-									  false);	// BDD_SYNTHESIS_EXTRACT_AUTOMATON
+									  false);	// SYNTHESIS_SUP_AS_PLANT
     }
 
 //    public static SynthesizerOptions getDefaultSynthesizerOptionsS()

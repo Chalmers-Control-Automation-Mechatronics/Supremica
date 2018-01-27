@@ -55,7 +55,7 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -94,7 +94,7 @@ public class IDECutAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_T);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_CUT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_CUT);
     setEnabled(false);
   }
 
@@ -154,7 +154,8 @@ public class IDECutAction
           WatersDataFlavor.canCopy(selection) &&
           watersOwner.canDelete(selection);
       } else if (swingOwner != null) {
-        enabled = swingOwner.getSelectedText() != null;
+        enabled =
+          swingOwner.isEditable() && swingOwner.getSelectedText() != null;
       } else {
         enabled = false;
       }

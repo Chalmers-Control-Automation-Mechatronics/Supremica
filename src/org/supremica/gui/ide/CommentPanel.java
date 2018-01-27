@@ -36,7 +36,6 @@
 package org.supremica.gui.ide;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
@@ -58,6 +57,7 @@ import net.sourceforge.waters.gui.command.EditModuleNameCommand;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.CharacterDocumentFilter;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -87,7 +87,7 @@ class CommentPanel extends JPanel
     final JTextPane titlePane = new JTextPane();
     titlePane.setBorder(titleBorder);
     titlePane.setBackground(EditorColor.BACKGROUNDCOLOR);
-    titlePane.setFont(new Font(null, Font.BOLD, 14));
+    titlePane.setFont(IconAndFontLoader.FONT_TITLE);
     add(BorderLayout.NORTH, titlePane);
     mTitleHandler = new TitlePaneHandler(titlePane);
     mTitleHandler.loadPane();
@@ -98,7 +98,7 @@ class CommentPanel extends JPanel
     final JTextPane commentPane = new JTextPane();
     commentPane.setBorder(commentBorder);
     commentPane.setBackground(EditorColor.BACKGROUNDCOLOR);
-    commentPane.setFont(new Font(null, Font.PLAIN, 12));
+    commentPane.setFont(IconAndFontLoader.FONT_NORMAL);
     final JScrollPane scroll = new JScrollPane(commentPane);
     scroll.setHorizontalScrollBarPolicy
       (ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

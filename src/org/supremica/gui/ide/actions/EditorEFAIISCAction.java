@@ -35,6 +35,8 @@
 
 package org.supremica.gui.ide.actions;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,21 +51,20 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.algorithms.IISCT.IISCT;
 import org.supremica.automata.algorithms.IISCT.SMTSolver.Z3Solver;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
-import gnu.trove.set.hash.THashSet;
 
 /**
  * Editor class of the Transition Projection method.
- * <p/>
+ *
  * @author Mohammad Reza Shoaei (shoaei@chalmers.se)
- * @version %I%, %G%
- * @since 1.0
  */
+
 public class EditorEFAIISCAction
  extends IDEAction
 {
@@ -131,6 +132,6 @@ public class EditorEFAIISCAction
 
   //#########################################################################
   //# Class Constants
-  private static final Logger logger = LoggerFactory.createLogger(IDE.class);
+  private static final Logger logger = LogManager.getLogger(IDE.class);
   private static final long serialVersionUID = -4108158304486885027L;
 }

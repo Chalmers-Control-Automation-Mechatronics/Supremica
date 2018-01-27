@@ -35,20 +35,25 @@
 
 package org.supremica.gui.useractions;
 
-import java.awt.event.*;
-import javax.swing.*;
-import java.util.*;
-import org.supremica.log.*;
-import org.supremica.automata.*;
-import org.supremica.gui.Gui;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+
+import javax.swing.AbstractAction;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.automata.Automaton;
 import org.supremica.gui.ActionMan;
+import org.supremica.gui.Gui;
 
 public class SaturateAction
 	extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LoggerFactory.createLogger(SaturateAction.class);
+	private static Logger logger = LogManager.getLogger(SaturateAction.class);
 	private Automata new_automata = new Automata();
 
 	public SaturateAction()
@@ -58,27 +63,28 @@ public class SaturateAction
 		putValue(SHORT_DESCRIPTION, "Saturate selected automata (experimental)");
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 		logger.debug("SaturateAction::actionPerformed");
 
-		Gui gui = ActionMan.getGui();
-		Automata automata = gui.getSelectedAutomata();
+		final Gui gui = ActionMan.getGui();
+		final Automata automata = gui.getSelectedAutomata();
 
 		// Iterate over all automata
-		for (Iterator<Automaton> aut_it = automata.iterator(); aut_it.hasNext(); )
+		for (final Iterator<Automaton> aut_it = automata.iterator(); aut_it.hasNext(); )
 		{
-			Automaton aut = (Automaton) aut_it.next();
+			final Automaton aut = aut_it.next();
 
-			Automaton sat_dump = new Automaton(aut);	// make two copies, one...
-			boolean b1 = sat_dump.saturateDump();
+			final Automaton sat_dump = new Automaton(aut);	// make two copies, one...
+			final boolean b1 = sat_dump.saturateDump();
 			logger.debug("sat_dump.saturateDump() did " + (b1 ? "something" : "nothing"));
 			sat_dump.setComment("sat_dump(" + sat_dump.getName() + ")");
 			sat_dump.setName(null);
 			new_automata.addAutomaton(sat_dump);
 
-			Automaton sat_loop = new Automaton(aut);	// two
-			boolean b2 = sat_loop.saturateLoop();
+			final Automaton sat_loop = new Automaton(aut);	// two
+			final boolean b2 = sat_loop.saturateLoop();
 			logger.debug("sat_loop.saturateLoop() did " + (b2 ? "something" : "nothing"));
 			sat_loop.setComment("sat_loop(" + sat_loop.getName() + ")");
 			sat_loop.setName(null);
@@ -93,7 +99,7 @@ public class SaturateAction
 			i = ActionMan.gui.addAutomata(new_automata);
 			new_automata = new Automata();	// else the garbage collector won't do its job
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.debug("SaturateAction::actionPerformed() -- ", ex);
 			logger.debug(ex.getStackTrace());

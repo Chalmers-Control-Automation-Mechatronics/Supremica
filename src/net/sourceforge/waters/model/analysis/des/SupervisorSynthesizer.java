@@ -87,6 +87,20 @@ public interface SupervisorSynthesizer
   public EventProxy getConfiguredDefaultMarking();
 
   /**
+   * <P>Sets whether the synthesiser allows nondeterministic input.</P>
+   * <P>Although most synthesisers implicitly support nondeterminism, it is
+   * not always clear how to interpret the result of synthesis when the
+   * input is nondeterministic. If nondeterminism is disabled (the default),
+   * the synthesiser must throw {@link NondeterministicDESException} when
+   * encountering a nondeterministic automaton in the input. Otherwise it
+   * may synthesise, although it may depend on the algorithm how to interpret
+   * the result.</P>
+   * <P>The method {@link #supportsNondeterminism()} should return whether
+   * nondeterminism is enabled is disabled by this method.</P>
+   */
+  public void setNondeterminismEnabled(boolean enable);
+
+  /**
    * <P>Sets whether synthesis should use supervisor reduction.</P>
    * <P>If enabled, every synthesised supervisor component may be replaced by
    * a single smaller automaton.</P>

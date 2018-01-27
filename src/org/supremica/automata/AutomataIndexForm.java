@@ -54,8 +54,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class AutomataIndexForm
 {
@@ -116,19 +116,19 @@ public final class AutomataIndexForm
     // <automaton> -> <max state index in current automaton>
     private int[] automatonStateMaxIndex;
     private Automata theAutomata = null;
-    private static Logger logger = LoggerFactory.createLogger(AutomataIndexForm.class);
+    private static Logger logger = LogManager.getLogger(AutomataIndexForm.class);
 
     /** Handles the mappings between automata/events/states and corresponding indices */
     private AutomataIndexMap indexMap;
 
     /**
-     * @param  theAutomata The automata to be synchronized.
-     * @param  theAutomaton The synchronized automaton.
+     * @param  theAutomata The automata to be synchronised.
+     * @param  theAutomaton The synchronised automaton.
 	 * @param sups_as_plants Defines whether we are to regard supervisors as plants or not
 	 * @param unobs_events_sync Determines whether unobservable non-tau events synch or not
      * @exception  Exception Description of the Exception
      */
-    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton, 
+    public AutomataIndexForm(final Automata theAutomata, final Automaton theAutomaton,
 							 final boolean sups_as_plants, final boolean unobs_events_sync)
     throws Exception
     {
@@ -177,9 +177,9 @@ public final class AutomataIndexForm
 	{
 		this(theAutomata, theAutomaton, sups_as_plants, false);
 	}
-	
+
 	/** Copy constructors **/
-	
+
     public AutomataIndexForm(final AutomataIndexForm indexForm)
     {
         this(indexForm, false);
@@ -684,7 +684,7 @@ public final class AutomataIndexForm
 
             controllableEventsTable[i] = currEvent.isControllable();
             immediateEventsTable[i] = currEvent.isImmediate();
-			
+
 			/* MF - July 2017
 			 * It turns out to be unclear whether unobservable events do synchronize or not
 			 * epsilon events (aka tau events) do not synch, that is clear, but in DESUMA
@@ -694,7 +694,7 @@ public final class AutomataIndexForm
 			**/
 			// The original line which made all unobservable events synch
             // epsilonEventsTable[i] = !currEvent.isObservable();	// An event is epsilon if (and only if) it is unobservable
-			
+
 			// The new (July 2017) code that makes the synch of non-tau unobs events user settable
 			epsilonEventsTable[i] = (!currEvent.isObservable() && !unobs_events_sync) || currEvent.isTauEvent();
 		}

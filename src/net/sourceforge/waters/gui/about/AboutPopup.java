@@ -34,14 +34,15 @@
 package net.sourceforge.waters.gui.about;
 
 import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.config.Version;
-
-import org.supremica.gui.ide.IDEReportInterface;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 
 /**
@@ -57,19 +58,24 @@ public class AboutPopup
 
   //#########################################################################
   //# Constructor
-  public AboutPopup(final IDEReportInterface ide)
+  public AboutPopup(final JFrame owner)
   {
-    super(ide.getFrame(), "About " + Version.getInstance().getTitle());
-    final AboutPanel panel = new AboutPanel(ide);
+    super(owner, "About " + Version.getInstance().getTitle());
+    final AboutPanel panel = new AboutPanel();
     final Border border = BorderFactory.createEmptyBorder(2, 4, 2, 1);
     panel.setBorder(border);
-    panel.setSize(TEXT_WIDTH, Integer.MAX_VALUE);
+    final int scaledWidth =
+      Math.round(TEXT_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    final int screenWidth = (int) screenSize.getWidth();
+    final int textWidth = Math.min(scaledWidth, screenWidth);
+    panel.setSize(textWidth, Integer.MAX_VALUE);
     final int textHeight = panel.getPreferredSize().height;
-    final Dimension panelSize = new Dimension(TEXT_WIDTH, textHeight);
+    final Dimension panelSize = new Dimension(textWidth, textHeight);
     panel.setPreferredSize(panelSize);
     add(panel);
     pack();
-    setLocationRelativeTo(ide.getFrame());
+    setLocationRelativeTo(owner);
     setResizable(false);
   }
 

@@ -46,7 +46,8 @@ import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -299,7 +300,7 @@ public abstract class AbstractModuleAnalyzer implements ModuleAnalyzer
   public Logger getLogger()
   {
     final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
+    return LogManager.getLogger(clazz);
   }
 
 

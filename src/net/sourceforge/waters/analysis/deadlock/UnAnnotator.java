@@ -68,8 +68,13 @@ public class UnAnnotator
   }
 
   public AutomatonProxy run(final ProductDESProxyFactory factory,
-                            final ProductDESProxy des)
+                            final ProductDESProxy des, final EventProxy[] eventsToHide)
   {
+    mTransitionRelation.removeUnnecessaryTauEvents();
+
+
+    if(eventsToHide !=null)
+    removePropWithEvent(eventsToHide);
 
     final Set<EventProxy> desEvents = des.getEvents();
     final Set<EventProxy> desProps = new HashSet<EventProxy>();
@@ -83,8 +88,12 @@ public class UnAnnotator
       new THashMap<TIntHashSet,TIntArrayList>();
     final List<TransitionProxy> newTransitions =
       new ArrayList<TransitionProxy>();
-    final List<StateProxy> nextStates = new ArrayList<StateProxy>();
+  //  final List<StateProxy> nextStates = new ArrayList<StateProxy>();
+    final StateProxy[] nextStates = new StateProxy[mTransitionRelation.numberOfStates()];
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      if(! mTransitionRelation.hasPredecessors(s))
+         continue;
+
       final Set<TIntHashSet> annotations =
         mTransitionRelation.getAnnotation(s);
       if (annotations == null) {
@@ -105,6 +114,8 @@ public class UnAnnotator
     final Collection<EventProxy> eventsset = mTransitionRelation.getEvents();
     int statenum = 0;
     for (int s = 0; s < mTransitionRelation.numberOfStates(); s++) {
+      if(! mTransitionRelation.hasPredecessors(s))
+        continue;
       final TIntArrayList states = new TIntArrayList();
       states.add(statenum);
       newStates.put(s, states);
@@ -122,12 +133,12 @@ public class UnAnnotator
 
       // get props for this state
       final Set<EventProxy> stateProp = new HashSet<EventProxy>();
-       final Set<TIntHashSet> annotations =
+       Set<TIntHashSet> annotations =
         mTransitionRelation.getAnnotation(s);
-    /*  if (annotations == null) {
+      if (annotations == null) {
       //  continue;
         annotations = new HashSet<TIntHashSet>();
-     }*/
+     }
       for (final TIntHashSet ann : annotations) {
         for (final EventProxy ep : desProps) {
           final String[] tokens = ep.getName().split(":");
@@ -152,9 +163,10 @@ public class UnAnnotator
       final boolean isInitial = mTransitionRelation.isInitial(s);
       final StateProxy sp =
         new AnnotatedMemStateProxy(statenum, stateProp, isInitial);
-      nextStates.add(sp);
+      //nextStates.add(sp);
+      nextStates[s]= sp;
       statenum++;
-      assert (statenum == nextStates.size());
+      //assert (statenum == nextStates.size());
     }
 
     /*
@@ -180,9 +192,11 @@ public class UnAnnotator
       final int s = t[0];
       final int e = t[1];
       final int ot = t[2];
-      final StateProxy source = nextStates.get(s);
+//      final StateProxy source = nextStates.get(s);
+      final StateProxy source = nextStates[s];
       final EventProxy event = mTransitionRelation.getEvent(e);
-      final StateProxy target = nextStates.get(ot);
+      //final StateProxy target = nextStates.get(ot);
+      final StateProxy target = nextStates[ot];
       newTransitions
         .add(factory.createTransitionProxy(source, event, target));
     }
@@ -203,10 +217,36 @@ public class UnAnnotator
      * factory.createAutomatonProxy(mTransitionRelation.getName(),
      * ComponentKind.PLANT, eventsset, nextStates, newTransitions);
      */
+    final List<StateProxy> nextStates1 = new ArrayList<StateProxy>();
+    for (int i=0; i<nextStates.length; i++) {
+      if(nextStates[i] != null)
+          nextStates1.add(nextStates[i]);
+    }
     final AutomatonProxy aut =
       factory.createAutomatonProxy("after", ComponentKind.PLANT, eventsset,
-                                   nextStates, newTransitions);
+                                   nextStates1, newTransitions);
 
     return aut;
   }
+
+
+  public void removePropWithEvent(final EventProxy[] events) {
+    //final EventProxy event = this.getEvent(index);
+    for (int i=0; i<events.length; i++){
+    final EventProxy event = events[i];
+    if(event == null)
+      continue;
+    for (final EventProxy ep : mTransitionRelation.getEvents()) {
+      if(ep ==null)
+        continue;
+      if (ep.getKind()==EventKind.PROPOSITION) {
+        final String[] tokens = ep.getName().split(":");
+        if (Arrays.asList(tokens).contains(event.getName())) {
+          mTransitionRelation.removeEvent(mTransitionRelation.eventToInt(ep));
+        }
+      }
+    }
+    }
+  }
+
 }

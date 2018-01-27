@@ -59,6 +59,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
+import org.apache.logging.log4j.LogManager;
+
 import gnu.trove.set.hash.THashSet;
 
 
@@ -461,7 +463,7 @@ public abstract class AbstractCompositionalModelVerifier
   private TraceProxy expandTrace(final TraceProxy trace)
     throws AnalysisException
   {
-    getLogger().debug("Property NOT satisfied --- expanding trace ...");
+    LogManager.getLogger().debug("Property NOT satisfied --- expanding trace ...");
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
     final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =

@@ -69,7 +69,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JViewport;
 import javax.swing.ListSelectionModel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -79,9 +82,8 @@ import org.supremica.automata.AutomatonListener;
 import org.supremica.automata.CompositeState;
 import org.supremica.automata.LabelTrace;
 import org.supremica.automata.State;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
+
 
 /**
  * This class is responsible for the "exploreStates"-window. But only for single automaton
@@ -94,7 +96,7 @@ public class AutomatonExplorer
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.createLogger(AutomatonExplorer.class);
+	private static final Logger logger = LogManager.getLogger(AutomatonExplorer.class);
     private final Automaton theAutomaton;
     private final BorderLayout layout = new BorderLayout();
     private final JPanel contentPane;
@@ -153,7 +155,7 @@ public class AutomatonExplorer
 
     public void initialize()
     {
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         stateViewer.initialize();
     }
@@ -286,7 +288,7 @@ class StateViewer
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.createLogger(StateViewer.class);
+	private static final Logger logger = LogManager.getLogger(StateViewer.class);
     private final Automaton theAutomaton;
     private State currState;
     private final EventList forwardEvents;
@@ -549,7 +551,7 @@ class EventList
                     {
                         theList.setSelectedIndex(index);
                     }
-				}				
+				}
 			}
         });
     }
@@ -596,7 +598,7 @@ class EventListModel
 {
     private static final long serialVersionUID = 1L;
     @SuppressWarnings("unused")
-	private static final Logger logger = LoggerFactory.createLogger(EventListModel.class);
+	private static final Logger logger = LogManager.getLogger(EventListModel.class);
     private State currState;
     //private ArrayList currArcs = new ArrayList();
 
@@ -918,7 +920,7 @@ class ExplorerController
     extends JPanel
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(ExplorerController.class);
+    private static Logger logger = LogManager.getLogger(ExplorerController.class);
     private final StateViewer stateViewer;
     private final Automaton theAutomaton;
     private final JButton undoButton;

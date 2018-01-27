@@ -48,6 +48,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Project;
@@ -67,19 +70,14 @@ public class AnalyzerPanel
 
     private final DocumentContainer mDocumentContainer;
     private final VisualProject mVisualProject = new VisualProject();
-	
+
     public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
-        setPreferredSize(IDEDimensions.mainPanelPreferredSize);
-        setMinimumSize(IDEDimensions.mainPanelMinimumSize);
 
         mDocumentContainer = moduleContainer;
 
         automataPanel = new AnalyzerAutomataPanel(this, moduleContainer);
-        automataPanel.setPreferredSize(IDEDimensions.leftAnalyzerPreferredSize);
-        automataPanel.setMinimumSize(IDEDimensions.leftAnalyzerMinimumSize);
-
         automatonViewerPanel = getEmptyRightPanel();
 		setLeftComponent(automataPanel);
 		setRightComponent(automatonViewerPanel);
@@ -139,8 +137,9 @@ public class AnalyzerPanel
       final Project supremicaProject = builder.build(des);
       final List<String> warnings = builder.getWarnings();
       if (!warnings.isEmpty()) {
+        final Logger logger = LogManager.getLogger();
         for (final String warning : warnings) {
-          ide.warn(warning);
+          logger.warn(warning);
         }
       }
       addProject(supremicaProject);

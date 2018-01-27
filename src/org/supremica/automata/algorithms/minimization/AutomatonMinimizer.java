@@ -67,6 +67,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
 import org.supremica.automata.Arc;
@@ -87,8 +90,6 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.automata.algorithms.standard.Determinizer;
 import org.supremica.gui.ActionMan;
 import org.supremica.gui.ExecutionDialog;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 import org.supremica.util.SupremicaException;
 
@@ -100,7 +101,7 @@ public class AutomatonMinimizer
     implements Abortable
 {
     int l=0;
-    private static Logger logger = LoggerFactory.createLogger(AutomatonMinimizer.class);
+    private static Logger logger = LogManager.getLogger(AutomatonMinimizer.class);
 
     // Stoppable stuff
     private ExecutionDialog executionDialog = null;
@@ -197,12 +198,9 @@ public class AutomatonMinimizer
         final int before = theAutomaton.nbrOfStates();
         final int epsilons = theAutomaton.nbrOfEpsilonTransitions();
         final int total = theAutomaton.nbrOfTransitions();
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            logger.info("Minimizing " + theAutomaton + " with " + before +
-                " states and " + epsilons + " epsilon transitions (" +
-                Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
-        }
+        logger.debug("Minimizing " + theAutomaton + " with " + before +
+                    " states and " + epsilons + " epsilon transitions (" +
+                    Math.round(100*(((double) epsilons)*100/total))/100.0 + "%).");
 
         // Are the options valid?
         if (!options.isValid())
@@ -223,7 +221,7 @@ public class AutomatonMinimizer
 //                    st2.add(s);
 //                }
 //            }
-//            logger.info("Accepting states "+st2+" the automaton name is "+theAutomaton.getName());
+//            logger.debug("Accepting states "+st2+" the automaton name is "+theAutomaton.getName());
 //            final AutomatonSynthesizer synth = new AutomatonSynthesizer(theAutomaton, synthOptions);
 //            synth.doReachable(true);
             final LinkedList<State> toBeRemoved = new LinkedList<State>();
@@ -232,7 +230,7 @@ public class AutomatonMinimizer
                 final State state = it.next();
                 if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
                 {
-                    logger.verbose("The state " + state + " will be removed since it is not reachable.");
+                    logger.debug("The state " + state + " will be removed since it is not reachable.");
                     toBeRemoved.add(state);
                 }
 
@@ -326,7 +324,7 @@ public class AutomatonMinimizer
             {
 
                 mergeTriviallyObservationEquivalentStatesSynthesis(theAutomaton);
-//                logger.info("mergetrivially the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
+//                logger.debug("mergetrivially the name "+ theAutomaton.getName()+"nbrofStates "+theAutomaton.nbrOfStates());
             }
             mergeEpsilonLoopsSynthesis(theAutomaton);
 
@@ -374,14 +372,14 @@ public class AutomatonMinimizer
                     final EquivalenceClass currEquivClass = (EquivalenceClass) equivClassIt.next();
                     // Merge states in partitions (the partitions are separated by -1)!
                     while(currEquivClass.size()>0){
-                        //logger.info("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
+                        //logger.debug("part[" + i + "] = " + part[i] + ", " + states[part[i]].getName());
                         if (blob == null)
                         {
                             blob = currEquivClass.remove();
                         }
                         else
                         {
-                            //logger.info("Merging " + blob + " and " + states[part[i]]);
+                            //logger.debug("Merging " + blob + " and " + states[part[i]]);
                             blob = MinimizationHelper.mergeSynthesisStates(theAutomaton, blob, currEquivClass.remove(), useShortNames);
                         }
 
@@ -431,18 +429,15 @@ public class AutomatonMinimizer
             */
 
             // Message
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                final int after = theAutomaton.nbrOfStates();
-                logger.info("There were " + before + " states before and " + after +
-                    " states after the minimization. Reduction: " +
-                    Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
-            }
+            final int after = theAutomaton.nbrOfStates();
+            logger.debug("There were " + before + " states before and " + after +
+                        " states after the minimization. Reduction: " +
+                        Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
             // Start listening again
             theAutomaton.endTransaction();
 
-            logger.verbose("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
+            logger.debug("Halfway synthesis: " + countHWS + ", bisimulation equivalence: " + countBSE);
 
             totalHWS += countHWS;
             totalBSE += countBSE;
@@ -481,24 +476,22 @@ public class AutomatonMinimizer
             {
 
                 final int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
-                //logger.info("trivial count: "+trivialCount);
-                // logger.info("oes:"+totalOES);
+                //logger.debug("trivial count: "+trivialCount);
+                // logger.debug("oes:"+totalOES);
 
                 if (trivialCount > 0)
                 {
-                    logger.verbose("Removed " + trivialCount + " trivially equivalent states " +
-                        "before running the partitioning.");
+                    logger.debug("Removed " + trivialCount + " trivially equivalent states " +
+                                "before running the partitioning.");
                 }
                 final int loopCount = mergeEpsilonLoops(theAutomaton);
-//                logger.info("loop count: "+loopCount);
+//                logger.debug("loop count: "+loopCount);
                 if (loopCount > 0)
                 {
-                    logger.verbose("Removed " + loopCount + " states involved in silent loops " +
-                        "before running the partitioning.");
+                    logger.debug("Removed " + loopCount + " states involved in silent loops " +
+                                "before running the partitioning.");
                 }
-
                 totalOES = totalOES + trivialCount + loopCount;
-
             }
 
             ////////////
@@ -507,8 +500,8 @@ public class AutomatonMinimizer
 
             // Adjust marking based on epsilon transitions
             final int countD = rulePropagateMarking(theAutomaton);
-            //logger.info("countD: "+countD);
-            //logger.info(totalOES);
+            //logger.debug("countD: "+countD);
+            //logger.debug(totalOES);
             totalD += countD;
 
             if (abortRequested)
@@ -549,8 +542,8 @@ public class AutomatonMinimizer
                 final int count = runConflictEquivalenceRules(theAutomaton);
                 if (count > 0)
                 {
-                    logger.verbose("Removed " + count + " states based on conflict equivalence " +
-                        "before running the partitioning.");
+                    logger.debug("Removed " + count + " states based on conflict equivalence " +
+                                "before running the partitioning.");
                 }
             }
 
@@ -569,7 +562,7 @@ public class AutomatonMinimizer
         }
         // Do the partitioning!
         final int statesBefore = theAutomaton.nbrOfStates();
-//       logger.info("nbr of states before"+statesBefore);
+//       logger.debug("nbr of states before"+statesBefore);
         if (BisimulationEquivalenceMinimizer.libraryLoaded()&& equivalenceRelation != EquivalenceRelation.SYNTHESISABSTRACTION)
         {
             // Partition using native methods
@@ -615,11 +608,11 @@ public class AutomatonMinimizer
         }
         final int diffSize = statesBefore - theAutomaton.nbrOfStates();
         totalOES += diffSize;
-        //logger.info("oes:"+totalOES);
+        //logger.debug("oes:"+totalOES);
         if (diffSize > 0)
         {
-            logger.verbose("Removed " + diffSize + " states based on partitioning with " +
-                "respect to observation equivalence.");
+            logger.debug("Removed " + diffSize + " states based on partitioning with " +
+                        "respect to observation equivalence.");
         }
 
         if (abortRequested)
@@ -637,8 +630,8 @@ public class AutomatonMinimizer
             final int count = runConflictEquivalenceRules(theAutomaton);
             if (count > 0)
             {
-                logger.verbose("Removed " + count + " states based on conflict equivalence " +
-                    "after running partitioning.");
+                logger.debug("Removed " + count + " states based on conflict equivalence " +
+                            "after running partitioning.");
             }
         }
 
@@ -654,31 +647,10 @@ public class AutomatonMinimizer
 
         removeUnusedEpsilonEvents(theAutomaton);
         // Message
-        if (Config.VERBOSE_MODE.isTrue())
-        {
-            final int after = theAutomaton.nbrOfStates();
-            logger.info("There were " + before + " states before and " + after +
-                " states after the minimization. Reduction: " +
-                Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
-        }
-
-        // Start listening again
-
-//            for (final Iterator<Arc> arcIt = theAutomaton.arcIterator(); arcIt.hasNext(); )
-//            {
-//
-//                final Arc arc = arcIt.next();
-//                if (arc.getEvent().isUnobservable())
-//                {
-//                   LabeledEvent orig = ((TauEvent)arc.getEvent()).getOriginalEvent();
-//                   arc.setEvent(orig);
-//                   if(!theAutomaton.getAlphabet().contains(orig)){
-//                   theAutomaton.getAlphabet().addEvent(orig);}
-//
-//                }
-//            }
-
-
+        final int after = theAutomaton.nbrOfStates();
+        logger.debug("There were " + before + " states before and " + after +
+                    " states after the minimization. Reduction: " +
+                    Math.round(100*(((double) (before-after))*100/before))/100.0 + "%.");
 
         // Return the result of the minimization!
         return theAutomaton;
@@ -713,7 +685,7 @@ public class AutomatonMinimizer
                 {
                     // A loop!
                     count++;
-                    //logger.info(one);
+                    //logger.debug(one);
                 }
             }
         }
@@ -855,7 +827,7 @@ public class AutomatonMinimizer
 
         if (ordinaryStates.size() > 0)
         {
-//            logger.info("the ordinary class "+ordinaryStates);
+//            logger.debug("the ordinary class "+ordinaryStates);
             equivClasses.add(ordinaryStates);
         }
 
@@ -863,11 +835,11 @@ public class AutomatonMinimizer
         {
             equivClasses.add(forbiddenStates);
         }
-//        logger.info("initial partitioning base on marking "+equivClasses);
+//        logger.debug("initial partitioning base on marking "+equivClasses);
 //        for(StateSet cl:equivClasses){
 //        for(State st:cl){
-////            logger.info("the State "+st);
-////            logger.info("class "+st.getStateSet());
+////            logger.debug("the State "+st);
+////            logger.debug("class "+st.getStateSet());
 //        }
 //    }
         return equivClasses;
@@ -898,9 +870,9 @@ public class AutomatonMinimizer
         newAutomaton.setType(theAutomaton.getType());
         newAutomaton.getAlphabet().union(theAutomaton.getAlphabet()); // Odd... but it works.
 
-//        logger.info("State automaton"+state);
+//        logger.debug("State automaton"+state);
         // Associate one state with each equivalence class
-        //logger.info("eqclass"+equivClasses);
+        //logger.debug("eqclass"+equivClasses);
         Iterator<?> equivClassIt = equivClasses.iterator();
         while (equivClassIt.hasNext())
         {
@@ -908,7 +880,7 @@ public class AutomatonMinimizer
 
 
 
-            //logger.info("stateto bemerged"+currEquivClass);
+            //logger.debug("stateto bemerged"+currEquivClass);
             final State currState = currEquivClass.getSingleStateRepresentation();
             if (currEquivClass.hasInitialState())
             {
@@ -999,8 +971,8 @@ public class AutomatonMinimizer
 //
 //                        checkEvent.put(currEvent, false);
 //
-////                        logger.info(newArc);
-////                        logger.info(checkToBeRemoved.containsKey(newArc));
+////                        logger.debug(newArc);
+////                        logger.debug(checkToBeRemoved.containsKey(newArc));
 //                        if(checkToBeRemoved.containsValue(currEvent)){
 //
 //                            toBeRemoved.removeAll(checkToBeRemoved.keySet());
@@ -1062,7 +1034,7 @@ public class AutomatonMinimizer
         {
 
 
-            //logger.info("OEEEEEEE        eq"+equivClasses);
+            //logger.debug("OEEEEEEE        eq"+equivClasses);
             refined = false;
 
             if (executionDialog != null)
@@ -1075,7 +1047,7 @@ public class AutomatonMinimizer
 
             for (int i=0; i<array.length; i++)
             {
-                //logger.info("array"+l+i+array[i]);
+                //logger.debug("array"+l+i+array[i]);
                 if (abortRequested)
                 {
                     return;
@@ -1102,8 +1074,8 @@ public class AutomatonMinimizer
     private boolean partition(final EquivalenceClasses equivClasses, final EquivalenceClass equivClass, final EquivalenceRelation equivalenceRelation)
     {
         boolean refined = false;
-     //logger.info("eqq"+equivClasses);
-//        logger.info(theAutomaton.getAlphabet());
+     //logger.debug("eqq"+equivClasses);
+//        logger.debug(theAutomaton.getAlphabet());
         for (final Iterator<?> eventIt = theAutomaton.getAlphabet().iterator(); eventIt.hasNext(); )
         {
             if (abortRequested)
@@ -1177,7 +1149,7 @@ public class AutomatonMinimizer
        }
 
         // Do the states in equivClass have different behaviour on 'e'?
-//        logger.info("class holder in partintion "+newEquivClassHolder);
+//        logger.debug("class holder in partintion "+newEquivClassHolder);
         if (newEquivClassHolder.size() > 1)
         {
             // Throw old class away!
@@ -1292,13 +1264,13 @@ public class AutomatonMinimizer
 
     private EquivalenceClassHolder splitSynthesisACUo(final StateSet eqClass, final State currstate, final State next, final LabeledEvent e)
     {
-//   logger.info("eqClass "+eqClass);
-//   logger.info("event "+e);
+//   logger.debug("eqClass "+eqClass);
+//   logger.debug("event "+e);
 //        for(State st:eqClass){
-//            logger.info("the State "+st);
-//            logger.info("eqvalence calss "+st.getStateSet());
+//            logger.debug("the State "+st);
+//            logger.debug("eqvalence calss "+st.getStateSet());
 //        }
-//        logger.info("next "+next);
+//        logger.debug("next "+next);
         final EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
         final Iterator<State> stateIt = eqClass.iterator();
         final EquivalenceClass curreq=(EquivalenceClass)currstate.getStateSet();
@@ -1330,7 +1302,7 @@ public class AutomatonMinimizer
 //
                 extraCheck=true;
              }
-//          logger.info("nextState "+ nextStates);
+//          logger.debug("nextState "+ nextStates);
             final EquivalenceClass nextClass = new EquivalenceClass();
             // Since we dont include the currState in nextStates, the corresponding
             // equivalnce class should be added to nextClass.
@@ -1344,12 +1316,12 @@ public class AutomatonMinimizer
                 final EquivalenceClass thisNextClass = (EquivalenceClass) nextState.getStateSet();
                 // If this state is selected it means it has been reached by a local controllable event.
                 // So it must be in the same class as the the currState or the state that is reached by the currState.
-//               logger.info("nextState "+nextState);
-//                logger.info("thisNextClass "+thisNextClass);
+//               logger.debug("nextState "+nextState);
+//                logger.debug("thisNextClass "+thisNextClass);
                 if(extraCheck&&nextState.isSelected()){
                     if(nexteq.equals(thisNextClass)|| classCurr.equals(thisNextClass) ){
                         nextClass.addAll(thisNextClass);
-//                  logger.info("nextClass "+nextClass);
+//                  logger.debug("nextClass "+nextClass);
                     }
                     // if it is not the above case break and dont add anything to nextclass.
                     else{
@@ -1359,12 +1331,12 @@ public class AutomatonMinimizer
                 // if it is not reached by a controllable local transition then non of those extra check is neede.
                 else{
                     nextClass.addAll(thisNextClass);
-//                 logger.info("nextClass "+nextClass);
+//                 logger.debug("nextClass "+nextClass);
                 }
             }
             newEquivalenceClassHolder.addState(currState, nextClass);
         }
-//    logger.info("after CUO "+newEquivalenceClassHolder);
+//    logger.debug("after CUO "+newEquivalenceClassHolder);
         return newEquivalenceClassHolder;
     }
 
@@ -1378,8 +1350,8 @@ public class AutomatonMinimizer
      */
      private EquivalenceClassHolder splitSynthesisA(final StateSet eqClass,final LabeledEvent e)
     {
-//        logger.info("eqClass "+eqClass);
-//        logger.info("event "+e);
+//        logger.debug("eqClass "+eqClass);
+//        logger.debug("event "+e);
 
         final EquivalenceClassHolder newEquivalenceClassHolder = new EquivalenceClassHolder();
         final Iterator<State> stateIt = eqClass.iterator();
@@ -1394,7 +1366,7 @@ public class AutomatonMinimizer
 
             final State currState = stateIt.next();
             StateSet nextStates1;
-//            logger.info("currstate "+currState);
+//            logger.debug("currstate "+currState);
             if (e.isControllable())
             {
                 if(e.isObservable()){
@@ -1421,7 +1393,7 @@ public class AutomatonMinimizer
                 }
 
             }
-//            logger.info("nextState1"+ nextStates1);
+//            logger.debug("nextState1"+ nextStates1);
             final EquivalenceClass nextClass = new EquivalenceClass();
 
             for (final Iterator<State> nextIt = nextStates1.iterator(); nextIt.hasNext(); )
@@ -1432,12 +1404,12 @@ public class AutomatonMinimizer
                     final EquivalenceClass thisNextClass = (EquivalenceClass) nextState.getStateSet();
                      nextClass.addAll(thisNextClass);
                 }
-//            logger.info("nextClass "+nextClass);
+//            logger.debug("nextClass "+nextClass);
 
             newEquivalenceClassHolder.addState(currState, nextClass);
 
         }
-//        logger.info("newEquivalenceClassHolder "+newEquivalenceClassHolder);
+//        logger.debug("newEquivalenceClassHolder "+newEquivalenceClassHolder);
         return newEquivalenceClassHolder;
     }
 
@@ -1507,12 +1479,12 @@ public class AutomatonMinimizer
                             statesToExamine.add(epsilonArc.getFromState());
                         }
                     }
-                    //logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
+                    //logger.debug("I merged " + one + " and " + two + " since I thought they were OE.");
                     continue loop; // Get next "one" from stack
                 }
             }
         }
-        //logger.info("trivially:"+count);
+        //logger.debug("trivially:"+count);
         return count;
     }
 //################################################################################################
@@ -1571,7 +1543,7 @@ public class AutomatonMinimizer
                             statesToExamine.add(epsilonArc.getFromState());
                         }
                     }
-                    //logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
+                    //logger.debug("I merged " + one + " and " + two + " since I thought they were OE.");
                     continue loop; // Get next "one" from stack
                 }
             }
@@ -1616,12 +1588,12 @@ public class AutomatonMinimizer
                         (!arcIt.hasNext() && arc.getEvent().isUnobservable()&& arc.getEvent().isControllable() &&  !arc.isSelfLoop()&&!containsUncontrollble(two));
                 final boolean markingOK = options.getIgnoreMarking() || (one.isAccepting(true) && two.isAccepting(true));
                 arcIt = null;
-//                logger.info("the event"+arc.getEvent());
-//                logger.info("one"+one);
-//                logger.info("two"+two);
-//                logger.info("markOk"+markingOK);
-//                logger.info("arcOk1" + one.isAccepting(true));
-//                logger.info((two.isAccepting()));
+//                logger.debug("the event"+arc.getEvent());
+//                logger.debug("one"+one);
+//                logger.debug("two"+two);
+//                logger.debug("markOk"+markingOK);
+//                logger.debug("arcOk1" + one.isAccepting(true));
+//                logger.debug((two.isAccepting()));
 
 
                 if (arcOK && markingOK)
@@ -1643,8 +1615,8 @@ public class AutomatonMinimizer
 
                     final State state = MinimizationHelper.mergeSynthesisStates(aut, one, two, useShortNames);
 
-//                    logger.info(one);
-//                    logger.info(two);
+//                    logger.debug(one);
+//                    logger.debug(two);
                     statesToExamine.add(state);
                     // Add states that may have changed to stack
                     for (final Iterator<Arc> it = state.incomingArcsIterator(); it.hasNext(); )
@@ -1655,7 +1627,7 @@ public class AutomatonMinimizer
                             statesToExamine.add(epsilonArc.getFromState());
                         }
                     }
-                    //logger.info("I merged " + one + " and " + two + " since I thought they were OE.");
+                    //logger.debug("I merged " + one + " and " + two + " since I thought they were OE.");
                     continue loop; // Get next "one" from stack
                 }
             }
@@ -2010,7 +1982,7 @@ public class AutomatonMinimizer
                     {
                         final State merge = MinimizationHelper.mergeStates(aut, one.getState(), two.getState(), useShortNames);
                         one.setState(merge);
-                        //logger.info("Merging " + one.getState() + " and " + two.getState() + " into " + merge + ".");
+                        //logger.debug("Merging " + one.getState() + " and " + two.getState() + " into " + merge + ".");
                         toBeRemoved.add(two);
                         count++;
                     }
@@ -2088,7 +2060,7 @@ public class AutomatonMinimizer
                 {
                     // Merge states!
                     State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
-                    logger.info("Merging " + old.getState() + " and " + info.getState() + " info " + merge + ".");
+                    logger.debug("Merging " + old.getState() + " and " + info.getState() + " info " + merge + ".");
                     count++;
                     // Use the old entry in the list but with the new state!
                     old.setState(merge);
@@ -2289,7 +2261,7 @@ public class AutomatonMinimizer
                 if (info.equivalentTo(old))
                 {
                     // Merge states!
-                    //logger.info("Merging " + old.getState() + " and " + info.getState() + ".");
+                    //logger.debug("Merging " + old.getState() + " and " + info.getState() + ".");
                     State merge = MinimizationHelper.mergeStates(aut, old.getState(), info.getState(), useShortNames);
                     count++;
                     // Use the old entry in the list but with the new state!
@@ -2361,7 +2333,7 @@ public class AutomatonMinimizer
                         if (currState.isInitial())
                         {
                             // We know that the system is blocking!
-                            logger.verbose("The system was found to be blocking.");
+                            logger.debug("The system was found to be blocking.");
 
                             // Do nothing...
                             //continue;
@@ -2698,9 +2670,9 @@ public class AutomatonMinimizer
     public static void logStatistics(final MinimizationOptions options)
     {
         if (options.getMinimizationType() == EquivalenceRelation.CONFLICTEQUIVALENCE)
-            logger.info("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
+            logger.debug("Reduction statistics: activeEvent: " + totalAE + ", silentCont: " + totalSC + ", certainConf: " + totalCC + ", onlySilentIn: " + totalOSI + ", onlySilentOut: " + totalOSO + ", D: " + totalD + ", OES: " + totalOES + ", OET: " + totalOET + ".");
         else if (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
-            logger.info("Reduction statistics: halfway Synthesis: " + totalHWS + ", bisimulation equivalence " + totalBSE);
+            logger.debug("Reduction statistics: halfway Synthesis: " + totalHWS + ", bisimulation equivalence " + totalBSE);
     }
 
     public static String getStatisticsLaTeX()
@@ -3048,7 +3020,7 @@ public class AutomatonMinimizer
         int i=0;
         arcLoop: for (Iterator<Arc> arcIt = aut.arcIterator(); arcIt.hasNext(); )
         {
-            logger.info("" + ++i);
+            logger.debug("" + ++i);
             Arc arc = arcIt.next();
 
             // Using Elorantas notation... (a, s1, s2 and (not exactly) s3)... but not her method...
@@ -3098,7 +3070,7 @@ public class AutomatonMinimizer
             }
         }
          */
-        //logger.info("redandunt arcs "+toBeRemoved);
+        //logger.debug("redandunt arcs "+toBeRemoved);
         while (toBeRemoved.size() > 0)
         {
             aut.removeArc(toBeRemoved.remove(0));
@@ -3152,7 +3124,7 @@ public class AutomatonMinimizer
     public static int halfWaySynthesis(final Automaton aut)
     throws Exception
     {
-        //logger.info("Halfway-synthesis on " + aut);
+        //logger.debug("Halfway-synthesis on " + aut);
         final int before = aut.nbrOfStates();
 
         // Loop
@@ -3163,7 +3135,7 @@ public class AutomatonMinimizer
             final SynthesizerOptions synthOptions = SynthesizerOptions.getDefaultSynthesizerOptions();
             final AutomatonSynthesizer synth = new AutomatonSynthesizer(aut, synthOptions);
             final StateSet blockingStates = synth.doCoreachable();
-            //logger.info("Blocking: " + blockingStates);
+            //logger.debug("Blocking: " + blockingStates);
             // Remove outgoing arcs from blocking states
             for (final State state : blockingStates)
             {
@@ -3186,7 +3158,7 @@ public class AutomatonMinimizer
                 final int newSize = blockingStates.size();
                 innerChange = (oldSize < newSize);
             }
-            //logger.info("Blocking + tau_u-uncontrollable: " + blockingStates);
+            //logger.debug("Blocking + tau_u-uncontrollable: " + blockingStates);
 
 //            if (stopRequested)
 //            {
@@ -3241,7 +3213,7 @@ public class AutomatonMinimizer
             final State state = it.next();
             if ((state.getCost() == State.MAX_COST) && !state.isForbidden())
             {
-                logger.verbose("The state " + state + " will be removed since it is not reachable.");
+                logger.debug("The state " + state + " will be removed since it is not reachable.");
                 toBeRemoved.add(state);
             }
 

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -54,9 +56,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.TIntHashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -274,7 +275,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);

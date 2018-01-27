@@ -55,8 +55,6 @@ import javax.swing.SwingUtilities;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.actions.SimulationAutoStepAction;
-import net.sourceforge.waters.gui.flexfact.LocalServer;
-import net.sourceforge.waters.gui.flexfact.LocalSocket;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.PropositionIcon;
@@ -83,9 +81,11 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
 
 
 public class Simulation implements ModelObserver, Observer
@@ -251,8 +251,8 @@ public class Simulation implements ModelObserver, Observer
         ModuleContext.getEventKindToolTip(ekind, true) + ' ' + event.getName() +
         " is disabled by " + ModuleContext.getComponentKindToolTip(akind) +
         ' ' + disabling.getName() + '.';
-      final IDE ide = mModuleContainer.getIDE();
-      ide.error(msg);
+      final Logger logger = LogManager.getLogger();
+      logger.error(msg);
     } else {
       step(steps);
     }
@@ -308,31 +308,6 @@ public class Simulation implements ModelObserver, Observer
   {
 
     final SimulatorState nextState = step.getNextSimulatorState();
-    if(Config.INCLUDE_FLEXFACT.isTrue()) {
-      String event = nextState.getEvent().getName();
-      if(event.length() >= 4){
-        int ind = event.lastIndexOf("_east");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+5, "+").toString();
-        }
-        ind = event.lastIndexOf("_west");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+5, "-").toString();
-        }
-        ind = event.lastIndexOf("_south");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+6, "+").toString();
-        }
-        ind = event.lastIndexOf("_north");
-        if(ind >= 0) {
-          event = new StringBuilder(event).replace(ind, ind+6, "-").toString();
-        }
-        if(LocalServer.events.contains(event))
-        {
-          LocalSocket.SendEvent(event);
-        }
-      }
-    }
     removeFutureSteps();
     addNewSimulatorState(nextState);
     mCurrentTime++;
@@ -355,43 +330,33 @@ public class Simulation implements ModelObserver, Observer
     final int numEvents = getEnabledSteps().size();
 
     // Get controllable events from current possible events.
+    final List<SimulatorStep> steps = getEnabledSteps();
     final List<SimulatorStep> possibleControllableEvents = new ArrayList<SimulatorStep>();
-    for(final SimulatorStep s : getEnabledSteps()){
-      if(s.getEvent().getKind() == EventKind.CONTROLLABLE)
+    for(final SimulatorStep s : steps){
+      if (s.getEvent().getKind() == EventKind.CONTROLLABLE) {
         possibleControllableEvents.add(s);
+      }
     }
     // If there's at least one controllable event
     if (!possibleControllableEvents.isEmpty()){
       final Random rand = new Random();
-
       //Get random controllable event. If list is size of 1, get the first element.
       final SimulatorStep c = possibleControllableEvents.get(possibleControllableEvents.size() == 1 ? 0 : rand.nextInt(possibleControllableEvents.size()));
-      if(Config.INCLUDE_FLEXFACT.isTrue()){
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
-            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c))
-             step(c);
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          try {
+            Thread.sleep(1000);
+          } catch (final InterruptedException exception) {
+            exception.printStackTrace();
           }
-        });
-      }
-      else{
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
-            try {
-              Thread.sleep(1000);
-            } catch (final InterruptedException exception) {
-              exception.printStackTrace();
-            }
-            if(getEnabledSteps().size() == numEvents && getEnabledSteps().contains(c)){
-             step(c);
-            }
+          final List<SimulatorStep> steps = getEnabledSteps();
+          if (steps.size() == numEvents && steps.contains(c)){
+            step(c);
           }
-        });
-      }
+        }
+      });
     }
   }
 
@@ -402,6 +367,7 @@ public class Simulation implements ModelObserver, Observer
   {
     moveSafely(false);
   }
+
   /**
    * Moves the simulation state forward one step, without changing the trace.
    * If the trace is a loopTrace, if that trace hasn't been invalidated by the
@@ -410,26 +376,23 @@ public class Simulation implements ModelObserver, Observer
    */
   public void replayStep()
   {
-    if (mTrace != null)
-    {
-      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated)
-      {
-        if (mCurrentTime == mStateHistory.size() - 1)
-        {
-          mModuleContainer.getIDE().info(": Looping to start of control loop");
-          while (mCurrentTime != ((LoopTraceProxy)mTrace).getLoopIndex() + 1)
-          {
+    if (mTrace != null) {
+      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated) {
+        if (mCurrentTime == mStateHistory.size() - 1) {
+          final Logger logger = LogManager.getLogger();
+          logger.info(": Looping to start of control loop");
+          while (mCurrentTime != ((LoopTraceProxy) mTrace).getLoopIndex() + 1) {
             stepBack();
           }
-        }
-        else
+        } else {
           moveSafely(true);
-      }
-      else
+        }
+      } else {
         moveSafely(true);
-    }
-    else
+      }
+    } else {
       moveSafely(true);
+    }
   }
 
   public void switchToTraceMode(final TraceProxy trace)
@@ -782,8 +745,8 @@ public class Simulation implements ModelObserver, Observer
         }
       }
       buffer.append('.');
-      final IDE ide = mModuleContainer.getIDE();
-      ide.warn(buffer.toString());
+      final Logger logger = LogManager.getLogger();
+      logger.warn(buffer.toString());
     }
   }
 
@@ -1086,8 +1049,8 @@ public class Simulation implements ModelObserver, Observer
   {
     if (forward) {
       if (mCurrentTime == mStateHistory.size() - 1) {
-        final IDE ide = mModuleContainer.getIDE();
-        ide.error("No future events in simulation history!");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No future events in simulation history!");
         return false;
       } else {
         mCurrentTime++;
@@ -1095,8 +1058,8 @@ public class Simulation implements ModelObserver, Observer
       }
     } else {
       if (mCurrentTime == 0) {
-        final IDE ide = mModuleContainer.getIDE();
-        ide.error("No previous event in simulation history!");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No previous event in simulation history!");
         return false;
       } else {
         mCurrentTime--;

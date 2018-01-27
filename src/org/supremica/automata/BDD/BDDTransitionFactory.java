@@ -50,26 +50,27 @@
 
 package org.supremica.automata.BDD;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
 
 
 public class BDDTransitionFactory
 {
-    private static Logger logger = LoggerFactory.createLogger(BDDTransitionFactory.class);
-    
+    private static Logger logger = LogManager.getLogger(BDDTransitionFactory.class);
+
     BDDAutomata bddAutomata;
-    
-    public BDDTransitionFactory(BDDAutomata bddAutomata)
+
+    public BDDTransitionFactory(final BDDAutomata bddAutomata)
     {
         this.bddAutomata = bddAutomata;
     }
-    
+
     public BDDTransitions createTransitions()
     {
-        BDDPartitioningType partitioningType = BDDPartitioningType.fromDescription(Config.BDD2_PARTITIONING.getAsString());
-        
+        final BDDPartitioningType partitioningType = BDDPartitioningType.fromDescription(Config.BDD2_PARTITIONING.getAsString());
+
         if (partitioningType == BDDPartitioningType.MONOLITHIC)
         {
             logger.debug("Creating monolithic transitions");

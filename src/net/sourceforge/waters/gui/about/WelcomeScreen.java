@@ -53,7 +53,7 @@ import javax.swing.border.AbstractBorder;
 import javax.swing.border.Border;
 
 import net.sourceforge.waters.config.Version;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
@@ -122,6 +122,7 @@ public class WelcomeScreen
     removeAll();
     createContents();
     revalidate();
+    repaint();
   }
 
   @Override
@@ -153,6 +154,7 @@ public class WelcomeScreen
     removeAll();
     createContents();
     revalidate();
+    repaint();
   }
 
 
@@ -161,19 +163,22 @@ public class WelcomeScreen
   private void createContents()
   {
     // Create the about box with the version information
-    mAboutPanel = new AboutPanel(mIDE);
+    mAboutPanel = new AboutPanel();
     final Border border = new AboutBoxBorder();
     mAboutPanel.setBorder(border);
-    mAboutPanel.setSize(TEXT_WIDTH, Integer.MAX_VALUE);
+    final float maxWidth = IconAndFontLoader.GLOBAL_SCALE_FACTOR * MAX_WIDTH;
+    final float relativeWidth = RELATIVE_WIDTH* mIDE.getWidth();
+    final int scaledWidth = Math.round(Math.min(maxWidth, relativeWidth));
+    mAboutPanel.setSize(scaledWidth, Integer.MAX_VALUE);
     final int textHeight = mAboutPanel.getPreferredSize().height;
-    final Dimension size = new Dimension(TEXT_WIDTH, textHeight);
+    final Dimension size = new Dimension(scaledWidth, textHeight);
     mAboutPanel.setPreferredSize(size);
 
     // Is there enough space for the images also
     final int fullHeight =
       VERTICAL_SPACE + LOGO_SUPREMICA.getIconHeight() +
       Math.max(LOGO_SUPREMICA.getIconHeight(), textHeight);
-    final int fullWidth = LOGO_WATERS.getIconWidth() + TEXT_WIDTH;
+    final int fullWidth = LOGO_WATERS.getIconWidth() + scaledWidth;
     final boolean showingLogos =
       fullHeight <= mIDE.getHeight() * 3 / 4 &&
       fullWidth <= mIDE.getWidth() * 7 / 8;
@@ -270,15 +275,16 @@ public class WelcomeScreen
   //#########################################################################
   //# Class Constants
   private static final int VERTICAL_SPACE = 24;
-  private static final int TEXT_WIDTH = 512;
   private static final int BORDER_WIDTH = 6;
+  private static final int MAX_WIDTH = 720;
+  private static final float RELATIVE_WIDTH = 0.625f;
 
   private static final ImageIcon LOGO_SUPREMICA =
-    IconLoader.loadImage("greeter", "supremica");
+    IconAndFontLoader.loadImage("greeter", "supremica");
   private static final ImageIcon LOGO_WATERS =
-    IconLoader.loadImage("greeter", "waters");
+    IconAndFontLoader.loadImage("greeter", "waters");
   private static final ImageIcon BACKGROUND =
-    IconLoader.loadImage("greeter", "waves");
+    IconAndFontLoader.loadImage("greeter", "waves");
 
   private static final Color BORDER_BRIGHT_COLOR = new Color(232, 232, 255);
   private static final Color BORDER_DARK_COLOR = new Color(120, 120, 136);

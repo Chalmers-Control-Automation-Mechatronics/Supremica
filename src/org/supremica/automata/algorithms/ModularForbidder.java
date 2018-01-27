@@ -52,14 +52,16 @@ package org.supremica.automata.algorithms;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.supremica.log.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Arc;
-import org.supremica.automata.State;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.automata.Project;
 import org.supremica.automata.LabeledEvent;
+import org.supremica.automata.Project;
+import org.supremica.automata.State;
 
 /**
  * For forbidding of undesirable sub-states
@@ -75,7 +77,7 @@ import org.supremica.automata.LabeledEvent;
  */
 public class ModularForbidder
 {
-    private static Logger logger = LoggerFactory.createLogger(ModularForbidder.class);
+    private static Logger logger = LogManager.getLogger(ModularForbidder.class);
 
     private Project project;
 

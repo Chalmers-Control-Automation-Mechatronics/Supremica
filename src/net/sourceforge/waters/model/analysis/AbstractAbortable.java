@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 
 
@@ -82,22 +82,13 @@ public abstract class AbstractAbortable implements Abortable
     throws AnalysisAbortException, OverflowException
   {
     if (mIsAborting) {
-      getLogger().debug("Abort request received - aborting ...");
+      LogManager.getLogger().debug("Abort request received - aborting ...");
       throw new AnalysisAbortException();
     }
   }
 
 
   //#########################################################################
-  //# Logging
-  public Logger getLogger()
-  {
-    final Class<?> clazz = getClass();
-    return Logger.getLogger(clazz);
-  }
-
-
- //#########################################################################
   //# Data Members
   private boolean mIsAborting;
 

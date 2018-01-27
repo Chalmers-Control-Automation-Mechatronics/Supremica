@@ -50,6 +50,9 @@ import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
 import net.sourceforge.waters.subject.base.ProxySubject;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
@@ -253,10 +256,10 @@ public class BackgroundCompiler
     } else if (hasObserver && !succeeded) {
       mDialog.setEvalException(mEvalException, mObserver.getVerb());
     } else if (!hasObserver && !succeeded) {
-      final IDE ide = mModuleContainer.getIDE();
       for (final EvalException ex : mEvalException.getAll()) {
         if (!(ex.getLocation() instanceof ProxySubject)) {
-          ide.error(ex.getMessage());
+          final Logger logger = LogManager.getLogger();
+          logger.error(ex.getMessage());
         }
       }
     }

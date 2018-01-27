@@ -1,12 +1,73 @@
 package org.supremica.softplc.CompILer.CodeGen;
 
-import org.supremica.softplc.CompILer.CodeGen.Datatypes.*;
-import org.supremica.softplc.CompILer.CodeGen.Constants.*;
-import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
-import org.supremica.log.Logger;
-import de.fub.bytecode.generic.*;
-import java.util.*;
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IlJumpOperator;
+import org.supremica.softplc.CompILer.CodeGen.Constants.IllegalOperatorException;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.HelpMethods;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECDirectVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.IECSymbolicVariable;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeANY;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeANY_ELEMENTARY;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeANY_NUM;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeBOOL;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeConstant;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeFUNCTION_BLOCK;
+import org.supremica.softplc.CompILer.CodeGen.Datatypes.TypeWSTRING;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTboolean_literal;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTcharacter_string;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTderived_function_block_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTelementary_type_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTfb_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTfield_selector;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTfunction_block_body;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTfunction_block_declaration;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_call_operator;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_expression;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_fb_call;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_jump_operation;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_jump_operator;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_operand_list;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_param_list;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_simple_instruction;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTil_simple_operation;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTinput_output_declarations;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTio_var_declarations;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTjava_block_declaration;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTlabel;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTlocated_var_decl;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTlocated_var_declarations;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTlocated_var_spec_init;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTlocation;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTmulti_element_variable;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTnumeric_literal;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTother_var_declarations;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTprogram_declaration;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTprogram_type_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTrecord_variable;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTsimple_instr_list;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTsimple_spec_init;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTsimple_specification;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTsimple_type_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTstructured_variable;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTtemp_var_decl;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar1_declaration;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar1_init_decl;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar1_list;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar_declaration;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar_declarations;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvar_init_decl;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvariable;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.ASTvariable_name;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.Node;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.SimpleNode;
+
+import de.fub.bytecode.generic.BranchInstruction;
 
 /**
  * This class is the main component for generating java bytecode from an
@@ -32,7 +93,7 @@ import java.io.File;
  *
  * Abbreviations used later on in the documentation of this class
  * <pre>
- * POU - Program Organization Unit (eg. program, function block etc.
+ * POU - Program Organisation Unit (eg. program, function block etc.
  *       as defined by IEC 6-1131)
  * TOS - Top Of Stack, refers to the top of the stack in Java bytecode.
  * </pre>
@@ -56,8 +117,8 @@ public class JavaBytecodeGenerator
 	/**
 	 * Logger prints nice error, info, warning and debug messages in the Supremica console
 	 */
-	private Logger logger;
-	private boolean debug;    //only used when not started within Supremica
+	private final Logger logger;
+	private final boolean debug;    //only used when not started within Supremica
 
 	/*
 	 * errorsPresent is used to make sure no code is written before
@@ -70,7 +131,7 @@ public class JavaBytecodeGenerator
 	/**
 	 * output directory for generated class files
 	 */
-	private String outDir;
+	private final String outDir;
 
 	/**
 	 * constructs a new JavaBytecodeGenerator object
@@ -81,13 +142,16 @@ public class JavaBytecodeGenerator
 	 * @param debug if true debug messages will be written at standard output if no
 	 *              logger is supplied
 	 */
-	public JavaBytecodeGenerator(SimpleNode abstractSyntaxTreeRoot, String outputDir, Logger logger, boolean debug)
+	public JavaBytecodeGenerator(final SimpleNode abstractSyntaxTreeRoot,
+	                             final String outputDir,
+	                             final Logger logger,
+	                             final boolean debug)
 	{
 		this.logger = logger;
 		this.debug = debug;
 		outDir = outputDir;
 
-		Node[] children = abstractSyntaxTreeRoot.getChildren();
+		final Node[] children = abstractSyntaxTreeRoot.getChildren();
 
 		visitChildren(0, children);
 	}
@@ -96,7 +160,7 @@ public class JavaBytecodeGenerator
 	 * takes care of debug messages.
 	 * @param message a message to be displayed.
 	 */
-	void debug(Object message)
+	void debug(final Object message)
 	{
 		if (logger != null)
 		{
@@ -113,7 +177,7 @@ public class JavaBytecodeGenerator
 	 * After calling this method calls to dumpCode() has no effect.
 	 * @param message a message to be displayed.
 	 */
-	void error(Object message)
+	void error(final Object message)
 	{
 		if (logger != null)
 		{
@@ -131,7 +195,7 @@ public class JavaBytecodeGenerator
 	 * takes care of info messages.
 	 * @param message a message to be displayed.
 	 */
-	void info(Object message)
+	void info(final Object message)
 	{
 		if (logger != null)
 		{
@@ -149,7 +213,7 @@ public class JavaBytecodeGenerator
 	 */
 
 	//XXX fråga knut hur denna fungerar
-	void warn(Object message)
+	void warn(final Object message)
 	{
 		if (logger != null)
 		{
@@ -168,13 +232,13 @@ public class JavaBytecodeGenerator
 	 *                     but not the ones before (0 to visit all nodes)
 	 * @param children the array with nodes to visit
 	 */
-	void visitChildren(int startAtChild, Node[] children)
+	void visitChildren(final int startAtChild, final Node[] children)
 	{
 		if (children != null)
 		{
 			for (int i = startAtChild; i < children.length; i++)
 			{
-				SimpleNode c = (SimpleNode) children[i];
+				final SimpleNode c = (SimpleNode) children[i];
 
 				if (c != null)
 				{
@@ -192,7 +256,8 @@ public class JavaBytecodeGenerator
 		 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 	 * @return nothing
 		 */
-	public Object visitStandard(SimpleNode n, Object o)
+	@Override
+  public Object visitStandard(final SimpleNode n, final Object o)
 	{
 		debug(n.toString());
 		warn("You might have used an unsupported IL construct. " + o);
@@ -206,11 +271,12 @@ public class JavaBytecodeGenerator
 		 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 	 * @return nothing
 		 */
-	public Object visitSIMPLE_INSTR_LIST(ASTsimple_instr_list n, Object o)
+	@Override
+  public Object visitSIMPLE_INSTR_LIST(final ASTsimple_instr_list n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		visitChildren(0, children);
 
@@ -223,12 +289,13 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_SIMPLE_INSTRUCTION(ASTil_simple_instruction n, Object o)
+	@Override
+  public Object visitIL_SIMPLE_INSTRUCTION(final ASTil_simple_instruction n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		SimpleNode c = (SimpleNode) children[0];
+		final Node[] children = n.getChildren();
+		final SimpleNode c = (SimpleNode) children[0];
 
 		if (c != null)
 		{
@@ -244,13 +311,14 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_SIMPLE_OPERATION(ASTil_simple_operation n, Object o)
+	@Override
+  public Object visitIL_SIMPLE_OPERATION(final ASTil_simple_operation n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		Object arg = ((SimpleNode) children[0]).visit(this, null);
-		String operator = n.getName();
+		final Node[] children = n.getChildren();
+		final Object arg = ((SimpleNode) children[0]).visit(this, null);
+		final String operator = n.getName();
 
 		if (arg != null)
 		{
@@ -266,12 +334,13 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_EXPRESSION(ASTil_expression n, Object o)
+	@Override
+  public Object visitIL_EXPRESSION(final ASTil_expression n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		String operator = n.getName();
+		final Node[] children = n.getChildren();
+		final String operator = n.getName();
 
 		if (children.length == 0)
 		{
@@ -283,21 +352,21 @@ public class JavaBytecodeGenerator
 		{
 			try
 			{
-				ASTsimple_instr_list simInstrList = (ASTsimple_instr_list) children[0];
+				final ASTsimple_instr_list simInstrList = (ASTsimple_instr_list) children[0];
 
 				builder.emitStackSpace(1);
 				simInstrList.visit(this, null);
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
-				Object arg = ((SimpleNode) children[0]).visit(this, null);
+				final Object arg = ((SimpleNode) children[0]).visit(this, null);
 
 				builder.emitLoad(arg);    // opens new IL scope and loads arg
 			}
 		}
 		else
 		{    /* children.length == 2*/
-			Object arg = ((SimpleNode) children[0]).visit(this, null);
+			final Object arg = ((SimpleNode) children[0]).visit(this, null);
 
 			builder.emitLoad(arg);    // opens new IL scope and loads arg
 			((SimpleNode) children[1]).visit(this, null);
@@ -317,13 +386,14 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_JUMP_OPERATION(ASTil_jump_operation n, Object o)
+	@Override
+  public Object visitIL_JUMP_OPERATION(final ASTil_jump_operation n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		IlJumpOperator op = (IlJumpOperator) ((SimpleNode) children[0]).visit(this, null);
-		String label = (String) ((SimpleNode) children[1]).visit(this, new String());
+		final Node[] children = n.getChildren();
+		final IlJumpOperator op = (IlJumpOperator) ((SimpleNode) children[0]).visit(this, null);
+		final String label = (String) ((SimpleNode) children[1]).visit(this, new String());
 
 		builder.emitIL_JUMP_OPERATION(op, label);
 
@@ -335,7 +405,8 @@ public class JavaBytecodeGenerator
 	 * @param n an ASTil_jump_operator node
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a jump operator*/
-	public Object visitIL_JUMP_OPERATOR(ASTil_jump_operator n, Object o)
+	@Override
+  public Object visitIL_JUMP_OPERATOR(final ASTil_jump_operator n, final Object o)
 	{
 		debug(n.toString());
 
@@ -345,7 +416,7 @@ public class JavaBytecodeGenerator
 		{
 			op = IlJumpOperator.getOperator(n.getName());
 		}
-		catch (IllegalOperatorException e)
+		catch (final IllegalOperatorException e)
 		{
 			error("Illegal jump operator: " + n.getName());
 
@@ -361,11 +432,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a numeric literal
 		 */
-	public Object visitNUMERIC_LITERAL(ASTnumeric_literal n, Object o)
+	@Override
+  public Object visitNUMERIC_LITERAL(final ASTnumeric_literal n, final Object o)
 	{
 		debug(n.toString());
 
-		TypeANY_NUM p = HelpMethods.parseANY_NUM(n.getName());
+		final TypeANY_NUM p = HelpMethods.parseANY_NUM(n.getName());
 
 		if (p == null)
 		{
@@ -380,7 +452,8 @@ public class JavaBytecodeGenerator
 	 * @param n an ASTboolean_literal node
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a boolean literal*/
-	public Object visitBOOLEAN_LITERAL(ASTboolean_literal n, Object o)
+	@Override
+  public Object visitBOOLEAN_LITERAL(final ASTboolean_literal n, final Object o)
 	{
 		debug(n.toString());
 
@@ -393,7 +466,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a variable
 		 */
-	public Object visitVARIABLE(ASTvariable n, Object o)
+	@Override
+  public Object visitVARIABLE(final ASTvariable n, final Object o)
 	{
 		debug(n.toString());
 
@@ -426,7 +500,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return variable name
 		 */
-	public Object visitVARIABLE_NAME(ASTvariable_name n, Object o)
+	@Override
+  public Object visitVARIABLE_NAME(final ASTvariable_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -439,11 +514,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitFIELD_SELECTOR(ASTfield_selector n, Object o)
+	@Override
+  public Object visitFIELD_SELECTOR(final ASTfield_selector n, final Object o)
 	{
 		debug(n.toString());
 
-		//error("Found fieldselector"); 
+		//error("Found fieldselector");
 		/*should never happen in CodeGenerator only in the checker*/
 		return null;
 	}
@@ -454,7 +530,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a type constant
 		 */
-	public Object visitELEMENTARY_TYPE_NAME(ASTelementary_type_name n, Object o)
+	@Override
+  public Object visitELEMENTARY_TYPE_NAME(final ASTelementary_type_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -467,7 +544,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return object describing the simple type name
 		 */
-	public Object visitSIMPLE_TYPE_NAME(ASTsimple_type_name n, Object o)
+	@Override
+  public Object visitSIMPLE_TYPE_NAME(final ASTsimple_type_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -494,7 +572,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return program name
 		 */
-	public Object visitPROGRAM_TYPE_NAME(ASTprogram_type_name n, Object o)
+	@Override
+  public Object visitPROGRAM_TYPE_NAME(final ASTprogram_type_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -508,7 +587,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return derived function block name
 		 */
-	public Object visitDERIVED_FUNCTION_BLOCK_NAME(ASTderived_function_block_name n, Object o)
+	@Override
+  public Object visitDERIVED_FUNCTION_BLOCK_NAME(final ASTderived_function_block_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -522,7 +602,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return function block name
 		 */
-	public Object visitFB_NAME(ASTfb_name n, Object o)
+	@Override
+  public Object visitFB_NAME(final ASTfb_name n, final Object o)
 	{
 		debug(n.toString());
 
@@ -536,11 +617,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitFUNCTION_BLOCK_BODY(ASTfunction_block_body n, Object o)
+	@Override
+  public Object visitFUNCTION_BLOCK_BODY(final ASTfunction_block_body n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		builder.emitStackSpace(1);    // open new scope
 		visitChildren(0, children);
@@ -555,12 +637,13 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitPROGRAM_DECLARATION(ASTprogram_declaration n, Object o)
+	@Override
+  public Object visitPROGRAM_DECLARATION(final ASTprogram_declaration n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		String programname = (String) ((SimpleNode) children[0]).visit(this, null);
+		final Node[] children = n.getChildren();
+		final String programname = (String) ((SimpleNode) children[0]).visit(this, null);
 
 		builder = new ProgramBuilder(programname, outDir, logger, debug);
 
@@ -585,12 +668,13 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitFUNCTION_BLOCK_DECLARATION(ASTfunction_block_declaration n, Object o)
+	@Override
+  public Object visitFUNCTION_BLOCK_DECLARATION(final ASTfunction_block_declaration n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		String fbName = (String) ((SimpleNode) children[0]).visit(this, null);
+		final Node[] children = n.getChildren();
+		final String fbName = (String) ((SimpleNode) children[0]).visit(this, null);
 
 		builder = new FunctionBlockBuilder(fbName, outDir, logger, debug);
 
@@ -615,7 +699,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitJAVA_BLOCK_DECLARATION(ASTjava_block_declaration n, Object o)
+	@Override
+  public Object visitJAVA_BLOCK_DECLARATION(final ASTjava_block_declaration n, final Object o)
 	{
 		debug(n.toString());
 
@@ -631,11 +716,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitOTHER_VAR_DECLARATIONS(ASTother_var_declarations n, Object o)
+	@Override
+  public Object visitOTHER_VAR_DECLARATIONS(final ASTother_var_declarations n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		visitChildren(0, children);
 
@@ -649,11 +735,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitVAR_DECLARATIONS(ASTvar_declarations n, Object o)
+	@Override
+  public Object visitVAR_DECLARATIONS(final ASTvar_declarations n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		visitChildren(0, children);
 
@@ -667,12 +754,13 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitVAR_INIT_DECL(ASTvar_init_decl n, Object o)
+	@Override
+  public Object visitVAR_INIT_DECL(final ASTvar_init_decl n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		SimpleNode c = (SimpleNode) children[0];
+		final Node[] children = n.getChildren();
+		final SimpleNode c = (SimpleNode) children[0];
 
 		if (c != null)
 		{
@@ -691,11 +779,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitLOCATED_VAR_DECLARATIONS(ASTlocated_var_declarations n, Object o)
+	@Override
+  public Object visitLOCATED_VAR_DECLARATIONS(final ASTlocated_var_declarations n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		visitChildren(0, children);
 
@@ -709,20 +798,21 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitLOCATED_VAR_DECL(ASTlocated_var_decl n, Object o)
+	@Override
+  public Object visitLOCATED_VAR_DECL(final ASTlocated_var_decl n, final Object o)
 	{
 		debug(n.toString());
 
 		int base = 0;
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		if (children.length == 3)
 		{    // always 2 or 3, and in case of 3
 			base = 1;    // we don't care about varname anyway
 		}
 
-		IECDirectVariable location = (IECDirectVariable) ((SimpleNode) children[base]).visit(this, null);
-		Object type = ((SimpleNode) children[base + 1]).visit(this, null);
+		final IECDirectVariable location = (IECDirectVariable) ((SimpleNode) children[base]).visit(this, null);
+		final Object type = ((SimpleNode) children[base + 1]).visit(this, null);
 
 		if (type instanceof TypeConstant)
 		{
@@ -731,14 +821,14 @@ public class JavaBytecodeGenerator
 			// but left here as a precaution
 			if (!((TypeConstant) type == TypeConstant.T_BOOL))
 			{
-				error("Direct variables only implemented " + "for BOOL. Not for " + (TypeConstant) type);
+				error("Direct variables only implemented " + "for BOOL. Not for " + type);
 			}
 		}
 		else if (type instanceof TypeANY_ELEMENTARY)
 		{
 			if (((TypeANY_ELEMENTARY) type).getType() == TypeConstant.T_BOOL)
 			{
-				TypeBOOL value = (TypeBOOL) type;
+				final TypeBOOL value = (TypeBOOL) type;
 
 				builder.emitDirectInit(location, value);
 			}
@@ -763,11 +853,12 @@ public class JavaBytecodeGenerator
 		 * @return type constant or object describing initial value.
 		 *          See also returns for {@link #visitSIMPLE_SPEC_INIT}.
 		 */
-	public Object visitLOCATED_VAR_SPEC_INIT(ASTlocated_var_spec_init n, Object o)
+	@Override
+  public Object visitLOCATED_VAR_SPEC_INIT(final ASTlocated_var_spec_init n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();    /* should always be of length 1*/
+		final Node[] children = n.getChildren();    /* should always be of length 1*/
 
 		if (children[0] instanceof ASTsimple_spec_init)
 		{
@@ -788,7 +879,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a direct variable
 		 */
-	public Object visitLOCATION(ASTlocation n, Object o)
+	@Override
+  public Object visitLOCATION(final ASTlocation n, final Object o)
 	{
 		debug(n.toString());
 
@@ -804,11 +896,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIO_VAR_DECLARATIONS(ASTio_var_declarations n, Object o)
+	@Override
+  public Object visitIO_VAR_DECLARATIONS(final ASTio_var_declarations n, final Object o)
 	{
 		debug(n.toString());
 
-		SimpleNode child = (SimpleNode) (n.getChildren())[0];    // n always has exactly one child
+		final SimpleNode child = (SimpleNode) (n.getChildren())[0];    // n always has exactly one child
 
 		if (child instanceof ASTinput_output_declarations)
 		{
@@ -832,11 +925,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitINPUT_OUTPUT_DECLARATIONS(ASTinput_output_declarations n, Object o)
+	@Override
+  public Object visitINPUT_OUTPUT_DECLARATIONS(final ASTinput_output_declarations n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		visitChildren(0, children);
 
@@ -850,11 +944,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitVAR_DECLARATION(ASTvar_declaration n, Object o)
+	@Override
+  public Object visitVAR_DECLARATION(final ASTvar_declaration n, final Object o)
 	{
 		debug(n.toString());
 
-		Node child = (n.getChildren())[0];    /* always one child*/
+		final Node child = (n.getChildren())[0];    /* always one child*/
 
 		((SimpleNode) child).visit(this, null);
 
@@ -868,7 +963,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitTEMP_VAR_DECL(ASTtemp_var_decl n, Object o)
+	@Override
+  public Object visitTEMP_VAR_DECL(final ASTtemp_var_decl n, final Object o)
 	{
 		debug(n.toString());
 		((SimpleNode) n.getChildren()[0]).visit(this, null);
@@ -885,15 +981,16 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitVAR1_INIT_DECL(ASTvar1_init_decl n, Object o)
+	@Override
+  public Object visitVAR1_INIT_DECL(final ASTvar1_init_decl n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 		/* Get varNames from var1_list node */
-		String[] varNames = (String[]) ((SimpleNode) children[0]).visit(this, null);
+		final String[] varNames = (String[]) ((SimpleNode) children[0]).visit(this, null);
 		/* Get type (and initialisation) from simple_spec_init node */
-		Object type = ((SimpleNode) children[1]).visit(this, null);
+		final Object type = ((SimpleNode) children[1]).visit(this, null);
 
 		if ((type instanceof TypeConstant) || (type instanceof TypeANY_ELEMENTARY) || (type instanceof TypeFUNCTION_BLOCK))
 		{
@@ -921,15 +1018,16 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitVAR1_DECLARATION(ASTvar1_declaration n, Object o)
+	@Override
+  public Object visitVAR1_DECLARATION(final ASTvar1_declaration n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 		/* Get varNames from var1_list node */
-		String[] varNames = (String[]) ((SimpleNode) children[0]).visit(this, null);
+		final String[] varNames = (String[]) ((SimpleNode) children[0]).visit(this, null);
 		/* Get type (and initialisation) from simple_spec_init node */
-		Object type = ((SimpleNode) children[1]).visit(this, null);
+		final Object type = ((SimpleNode) children[1]).visit(this, null);
 
 		if ((type instanceof TypeConstant) || (type instanceof TypeFUNCTION_BLOCK))
 		{
@@ -957,7 +1055,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return array of names (String[])
 		 */
-	public Object visitVAR1_LIST(ASTvar1_list n, Object o)
+	@Override
+  public Object visitVAR1_LIST(final ASTvar1_list n, final Object o)
 	{
 		debug(n.toString());
 
@@ -971,19 +1070,20 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return type constant or object describing an intial value
 		 */
-	public Object visitSIMPLE_SPEC_INIT(ASTsimple_spec_init n, Object o)
+	@Override
+  public Object visitSIMPLE_SPEC_INIT(final ASTsimple_spec_init n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
-		Object type = ((SimpleNode) children[0]).visit(this, null);
+		final Node[] children = n.getChildren();
+		final Object type = ((SimpleNode) children[0]).visit(this, null);
 
 		if (type instanceof TypeConstant)
 		{
 			/* type anything but derived*/
 			try
 			{
-				TypeANY init = (TypeANY) ((SimpleNode) children[1]).visit(this, null);
+				final TypeANY init = (TypeANY) ((SimpleNode) children[1]).visit(this, null);
 
 				if (init.getType() == (TypeConstant) type)
 				{
@@ -994,7 +1094,7 @@ public class JavaBytecodeGenerator
 					error("Error: Nonconsistent types in : " + type + " and " + init.getType());
 				}
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				return type;    // no init just a type => return the type
 			}
@@ -1018,11 +1118,12 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return either return value from {@link #visitSIMPLE_TYPE_NAME} or {@link #visitELEMENTARY_TYPE_NAME}
 		 */
-	public Object visitSIMPLE_SPECIFICATION(ASTsimple_specification n, Object o)
+	@Override
+  public Object visitSIMPLE_SPECIFICATION(final ASTsimple_specification n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 
 		/*
 		 * Simple_specification has either a simple_type_name or an
@@ -1039,7 +1140,8 @@ public class JavaBytecodeGenerator
 		 * @return if visited via il_jump_operation (i.e. the label is used as a
 		 *         jump target) a label name; else nothing
 		 */
-	public Object visitLABEL(ASTlabel n, Object o)
+	@Override
+  public Object visitLABEL(final ASTlabel n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1064,7 +1166,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return a character string constant
 		 */
-	public Object visitCHARACTER_STRING(ASTcharacter_string n, Object o)
+	@Override
+  public Object visitCHARACTER_STRING(final ASTcharacter_string n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1078,22 +1181,23 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_FB_CALL(ASTil_fb_call n, Object o)
+	@Override
+  public Object visitIL_FB_CALL(final ASTil_fb_call n, final Object o)
 	{
 		debug(n.toString());
 
-		Node[] children = n.getChildren();
+		final Node[] children = n.getChildren();
 		/* get operator */
-		IlCallOperator op = (IlCallOperator) ((SimpleNode) children[0]).visit(this, null);
-		String fbName = (String) ((SimpleNode) children[1]).visit(this, null);
-		String fbTypeName = ((ASTfb_name) children[1]).getTypeName();
+		final IlCallOperator op = (IlCallOperator) ((SimpleNode) children[0]).visit(this, null);
+		final String fbName = (String) ((SimpleNode) children[1]).visit(this, null);
+		final String fbTypeName = ((ASTfb_name) children[1]).getTypeName();
 		if (children.length == 3 /* is there any arguments */)
 		{
 			error("The Checker has not done its job properly. Wrong " + "number of arguments to IL_FB_CALL");
 		}
 		else
 		{    // no arguments
-			BranchInstruction callCondition = builder.emitIL_FB_CALL_Start(op);
+			final BranchInstruction callCondition = builder.emitIL_FB_CALL_Start(op);
 
 			// check callCondition
 			builder.emitIL_FB_CALL_Run(fbName, fbTypeName);
@@ -1111,17 +1215,18 @@ public class JavaBytecodeGenerator
 		 * @return an IL call operator
 		 *  {@link org.supremica.softplc.CompILer.CodeGen.Constants.IlCallOperator}
 		 */
-	public Object visitIL_CALL_OPERATOR(ASTil_call_operator n, Object o)
+	@Override
+  public Object visitIL_CALL_OPERATOR(final ASTil_call_operator n, final Object o)
 	{
 		debug(n.toString());
 
 		try
 		{
-			IlCallOperator op = IlCallOperator.getOperator(n.getName());
+			final IlCallOperator op = IlCallOperator.getOperator(n.getName());
 
 			return op;
 		}
-		catch (IllegalOperatorException e)
+		catch (final IllegalOperatorException e)
 		{
 			error("Illegal call operator: " + n.getName());
 
@@ -1136,7 +1241,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return the children of n
 		 */
-	public Object visitIL_OPERAND_LIST(ASTil_operand_list n, Object o)
+	@Override
+  public Object visitIL_OPERAND_LIST(final ASTil_operand_list n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1150,7 +1256,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitMULTI_ELEMENT_VARIABLE(ASTmulti_element_variable n, Object o)
+	@Override
+  public Object visitMULTI_ELEMENT_VARIABLE(final ASTmulti_element_variable n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1164,7 +1271,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitRECORD_VARIABLE(ASTrecord_variable n, Object o)
+	@Override
+  public Object visitRECORD_VARIABLE(final ASTrecord_variable n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1178,7 +1286,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitSTRUCTURED_VARIABLE(ASTstructured_variable n, Object o)
+	@Override
+  public Object visitSTRUCTURED_VARIABLE(final ASTstructured_variable n, final Object o)
 	{
 		debug(n.toString());
 
@@ -1192,7 +1301,8 @@ public class JavaBytecodeGenerator
 	 * @param o an argument (in most cases not used in JavaBytecodeGenerator)
 		 * @return nothing
 		 */
-	public Object visitIL_PARAM_LIST(ASTil_param_list n, Object o)
+	@Override
+  public Object visitIL_PARAM_LIST(final ASTil_param_list n, final Object o)
 	{
 		debug(n.toString());
 

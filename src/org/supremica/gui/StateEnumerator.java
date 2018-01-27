@@ -35,19 +35,18 @@
 
 package org.supremica.gui;
 
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-import org.supremica.automata.algorithms.EnumerateStates;
+import java.awt.event.ActionEvent;
+
+import javax.swing.AbstractAction;
+
 import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.EnumerateStates;
+
 
 public class StateEnumerator
     extends AbstractAction
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(StateEnumerator.class);
 
     public StateEnumerator()
     {
@@ -56,7 +55,7 @@ public class StateEnumerator
     }
 
 	@Override
-    public void actionPerformed(ActionEvent event)
+    public void actionPerformed(final ActionEvent event)
     {
         // Get the selected automata
         final Automata automata = ActionMan.getGui().getSelectedAutomata();

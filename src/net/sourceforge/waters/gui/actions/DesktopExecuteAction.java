@@ -37,7 +37,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -66,7 +66,7 @@ public class DesktopExecuteAction extends WatersDesktopAction
       putValue(Action.NAME, "Execute Transition");
     }
     putValue(Action.SHORT_DESCRIPTION, "Execute this transition");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_STEP);
     setEnabled(true);
   }
 

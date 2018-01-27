@@ -41,7 +41,7 @@ import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.simulator.AutomatonStatus;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -104,9 +104,9 @@ public class SimulationDisableAutomatonAction
     putValue(Action.SHORT_DESCRIPTION,
              operation + "this automaton for simulation");
     if (enable) {
-      putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
+      putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
     } else {
-      putValue(Action.SMALL_ICON, IconLoader.ICON_TABLE_DISABLED_PROPERTY);
+      putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TABLE_DISABLED_PROPERTY);
     }
     updateEnabledStatus();
   }

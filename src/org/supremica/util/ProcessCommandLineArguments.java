@@ -52,8 +52,8 @@ import org.supremica.automata.IO.HISCUnmarshaller;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.automata.IO.UMDESUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
+
 import org.xml.sax.SAXException;
 
 
@@ -73,7 +73,7 @@ public class ProcessCommandLineArguments
   public static List<File> process(final String[] args)
   {
     boolean quit = false;
-    boolean verbose = false;
+    final boolean verbose = false;
     final List<File> filesToOpen = new LinkedList<File>();
 
     for (int i = 0; i < args.length; i++) {
@@ -81,22 +81,14 @@ public class ProcessCommandLineArguments
           || args[i].equals("--help") || args[i].equals("--usage")) {
         // Print usage
         printUsage();
-
         // Quit after this
         quit = true;
       }
-      if (args[i].equals("--verbose")) {
-        System.out.println("Verbose mode");
-        Config.VERBOSE_MODE.set(true);
-
-        // Print usage
-        verbose = true;
-      } else if (args[i].equals("-p") || args[i].equals("--properties")) {
+      if (args[i].equals("-p") || args[i].equals("--properties")) {
         // Load properties
         if (++i < args.length) {
           final String fileName = args[i];
           final File propFile = new File(fileName);
-
           try {
             if (!propFile.exists()) {
               System.out.println("Creating property file: "
@@ -105,9 +97,6 @@ public class ProcessCommandLineArguments
             }
 
             SupremicaProperties.loadProperties(propFile);
-            if (verbose) {
-              Config.VERBOSE_MODE.set(true);
-            }
           } catch (final Exception e) {
             System.err.println("Error reading properties file: "
                                + propFile.getAbsolutePath());

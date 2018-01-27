@@ -35,9 +35,14 @@
 
 package org.supremica.gui.ide.actions;
 
-import java.util.List;
-import javax.swing.Action;
 import java.awt.event.ActionEvent;
+import java.util.List;
+
+import javax.swing.Action;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.simulator.SimulatorExecuter;
 
@@ -52,7 +57,7 @@ public class SimulatorLaunchSimulatorAction
     /**
      * Constructor.
      */
-    public SimulatorLaunchSimulatorAction(List<IDEAction> actionList)
+    public SimulatorLaunchSimulatorAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -66,7 +71,8 @@ public class SimulatorLaunchSimulatorAction
         //putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -74,27 +80,29 @@ public class SimulatorLaunchSimulatorAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        VisualProject project = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        final Logger logger = LogManager.getLogger();
+        final VisualProject project = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
         project.clearSimulationData();
 
         // We can not simulate nondeterministic processes properly just yet...
         if (!project.isDeterministic())
         {
-            ide.error("The current project is nondeterministic. Simulation of nondeterminism is currently not supported.");
+            logger.error("The current project is nondeterministic. Simulation of nondeterminism is currently not supported.");
         }
 
         try
         {
             if (!project.hasAnimation())
             {
-                ide.info("No simulation present");
+                logger.info("No simulation present");
 
                 return;
             }
 
-            SimulatorExecuter simulator = project.getSimulator();
+            final SimulatorExecuter simulator = project.getSimulator();
 
             if (simulator != null)
             {
@@ -102,10 +110,10 @@ public class SimulatorLaunchSimulatorAction
                 simulator.initialize();
             }
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
-            ide.error("Exception in Simulator", ex);
-            ide.debug(ex.getStackTrace().toString());
+            logger.error("Exception in Simulator", ex);
+            logger.debug(ex.getStackTrace().toString());
         }
     }
 }

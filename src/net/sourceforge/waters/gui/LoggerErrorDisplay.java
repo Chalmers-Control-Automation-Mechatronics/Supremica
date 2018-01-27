@@ -33,14 +33,14 @@
 
 package net.sourceforge.waters.gui;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
- * A simple error display that sends all messages to Supremica's loggers.
- * The messages should show in the log window window at the bottom of
- * the IDE.
+ * A simple error display that sends all messages to LOG4J.
+ * Depending on the configuration, the messages will show in the log window
+ * window at the bottom of the IDE and/or on the console.
  *
  * @author Robi Malik
  */
@@ -50,21 +50,25 @@ public class LoggerErrorDisplay implements ErrorDisplay
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.ErrorDisplay
+  @Override
   public void displayError(final String msg)
   {
     LOGGER.error(msg);
   }
 
+  @Override
   public void displayWarning(final String msg)
   {
     LOGGER.warn(msg);
   }
 
+  @Override
   public void displayMessage(final String msg)
   {
     LOGGER.info(msg);
   }
 
+  @Override
   public void clearDisplay()
   {
   }
@@ -73,6 +77,6 @@ public class LoggerErrorDisplay implements ErrorDisplay
   //#########################################################################
   //# Static Class Constants
   private static final Logger LOGGER =
-    LoggerFactory.createLogger(LoggerErrorDisplay.class);
+    LogManager.getLogger(LoggerErrorDisplay.class);
 
 }

@@ -58,7 +58,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -92,7 +92,7 @@ public class EventJTree
       (TreeSelectionModel.SINGLE_TREE_SELECTION);
     setRootVisible(false);
     final int height =
-      Math.max(MIN_ROW_HEIGHT, IconLoader.getWatersIconHeight());
+      Math.max(MIN_ROW_HEIGHT, IconAndFontLoader.getWatersIconSize());
     setRowHeight(height);
     setShowsRootHandles(true);
     setAutoscrolls(true);

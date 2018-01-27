@@ -36,19 +36,24 @@
 package org.supremica.gui.useractions;
 
 import java.awt.event.ActionEvent;
+
 import javax.swing.AbstractAction;
-import org.supremica.log.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.gui.ActionMan;
 import org.supremica.gui.VisualProject;
 import org.supremica.workbench.Workbench;
+
 
 public class WorkbenchAction
 	extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LoggerFactory.createLogger(WorkbenchAction.class);
+	private static Logger logger = LogManager.getLogger(WorkbenchAction.class);
 	private Workbench wb;
 
 	public WorkbenchAction()
@@ -59,25 +64,26 @@ public class WorkbenchAction
 	}
 
 	// Note, we avoid (short-circut) the ActionMan here... should we?
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 		// ActionMan.workbench_actionPerformed(ActionMan.getGui());
 
-		VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
-		Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
+		final VisualProject theProject = ActionMan.getGui().getVisualProjectContainer().getActiveProject();
+		final Automata selectedAutomata = ActionMan.getGui().getSelectedAutomata();
 
 		try
 		{
 			execute(theProject, selectedAutomata);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception in Workbench. ", ex);
 			logger.debug(ex.getStackTrace());
 		}
 	}
 
-	public void execute(VisualProject theProject, Automata theAutomata)
+	public void execute(final VisualProject theProject, final Automata theAutomata)
 		throws Exception
 	{
 		if (!theAutomata.sanityCheck(ActionMan.getGui().getComponent(), 1, true, true, true, true))

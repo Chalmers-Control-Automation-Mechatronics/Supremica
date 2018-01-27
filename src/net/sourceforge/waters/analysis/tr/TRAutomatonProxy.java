@@ -248,6 +248,11 @@ public class TRAutomatonProxy
     mStateNames = null;
   }
 
+  public void setKind(final ComponentKind kind)
+  {
+    mTransitionRelation.setKind(kind);
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.AutomatonProxy

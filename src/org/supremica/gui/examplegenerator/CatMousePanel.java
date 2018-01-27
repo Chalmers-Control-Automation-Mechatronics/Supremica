@@ -44,13 +44,15 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Project;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.testcases.CatMouse;
 
-class CatMousePanel extends JPanel implements TestCase, ActionListener 
+
+class CatMousePanel extends JPanel implements TestCase, ActionListener
 {
 	private static final long serialVersionUID = 1L;
 	protected final IntegerField int_num = new IntegerField("1", 6);
@@ -62,11 +64,10 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	private final JPanel steps;
 	protected final Box theBox;
 	protected final JPanel numberOfInstances;
-	// private final Util util = new Util();
-	private static final Logger logger = LoggerFactory
-			.createLogger(CatMousePanel.class);
 
-	public CatMousePanel() 
+	private static final Logger logger = LogManager.getLogger(CatMousePanel.class);
+
+	public CatMousePanel()
 	{
 		// super(new GridLayout(2, 1, 10, 10));
 		super();
@@ -79,11 +80,11 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 		final JPanel multiplePanel = new JPanel();
 		multiplePanel.add(selfloops);
 		multiplePanel.add(multiple);
-		
+
 		selfloops.setToolTipText("Use forbidden self-loops instead of room specs");
 
 		multiple.addActionListener(this);
-		
+
 		steps = new JPanel();
 		steps
 				.add(
@@ -98,7 +99,7 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 				BorderLayout.NORTH);
 		numberOfInstances.add(int_numberOfInstances, BorderLayout.SOUTH);
 		int_numberOfInstances.setEnabled(false);
-		
+
 		theBox = Box.createVerticalBox();
 		theBox.add(num_users);
 		theBox.add(multiplePanel);
@@ -108,20 +109,20 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	}
 
 	@Override
-	public void synthesizeSupervisor(IDE ide) throws Exception {
+	public void synthesizeSupervisor(final IDE ide) throws Exception {
 		// TODO: implement this one
 		logger.warn("Not implemented");
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) 
+	public void actionPerformed(final ActionEvent e)
 	{
-		if (multiple.isSelected()) 
+		if (multiple.isSelected())
 		{
 			int_step_cats.setEnabled(true);
 			int_numberOfInstances.setEnabled(true);
-		} 
-		else 
+		}
+		else
 		{
 			int_step_cats.setEnabled(false);
 			int_numberOfInstances.setEnabled(false);
@@ -129,12 +130,12 @@ class CatMousePanel extends JPanel implements TestCase, ActionListener
 	}
 
 	@Override
-	public Project generateAutomata() throws Exception 
+	public Project generateAutomata() throws Exception
 	{
 		final CatMouse cm = new CatMouse(int_num.get(), selfloops.isSelected());
 		return cm.getProject();
 	}
-	
+
 	// For debug only
 	public static void main(final String[] args)
 	{

@@ -96,8 +96,9 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.util.Args;
 
 public class ExtendedAutomaton {
@@ -128,7 +129,7 @@ public class ExtendedAutomaton {
     private final Set<VariableComponentProxy> usedTargetVariables;
     private final HashSet<SimpleExpressionProxy> allGuards;
     private final HashSet<BinaryExpressionProxy> allActions;
-    private final Logger logger = LoggerFactory.createLogger(ExtendedAutomaton.class);
+    private final Logger logger = LogManager.getLogger(ExtendedAutomaton.class);
 
     @Deprecated
     public ExtendedAutomaton(final String name, final ExtendedAutomata automata, final boolean acceptingStates)

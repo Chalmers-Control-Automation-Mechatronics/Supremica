@@ -69,8 +69,8 @@ public class ModuleRenderingContext
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
   @Override
-  public ColorInfo getColorInfo(final GraphProxy graph,
-                                final SimpleNodeProxy node)
+  public ColorInfo getMarkingColorInfo(final GraphProxy graph,
+                                       final SimpleNodeProxy node)
   {
     return mModuleContext.guessPropositionColors(graph, node);
   }

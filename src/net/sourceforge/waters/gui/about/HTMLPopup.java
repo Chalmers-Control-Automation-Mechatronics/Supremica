@@ -36,19 +36,31 @@ package net.sourceforge.waters.gui.about;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.net.URL;
 
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
  * A dialog window that can display arbitrary HTML contents.
+ * The font size is scaled according to the IDE configuration.
  * A scrollbar is included if necessary.
  * This is used by the {@link AboutPanel} to display the license information.
  *
@@ -56,7 +68,6 @@ import javax.swing.JScrollPane;
  */
 public class HTMLPopup
   extends JDialog
-  implements PropertyChangeListener
 {
 
   //#########################################################################
@@ -66,50 +77,76 @@ public class HTMLPopup
   {
     super(owner, title);
     setBackground(Color.WHITE);
+    final HTMLDocument doc = createContents(url);
+    final JEditorPane panel = new JEditorPane();
+    panel.setContentType("text/html");
+    panel.setOpaque(true);
+    panel.setEditable(false);
+    panel.setDocument(doc);
+    final int scaledWidth =
+      Math.round(TEXT_WIDTH * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
     final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     final int screenWidth = (int) screenSize.getWidth();
-    final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
-    mPanel = new JEditorPane();
-    mPanel.setEditable(false);
-    mPanel.setSize(textWidth, Integer.MAX_VALUE);
-    mPanel.addPropertyChangeListener("page", this);
-    mPanel.setPage(url);
-    // The data is loaded asynchronously by another thread.
-    // We can only query and adjust the panel size after loading,
-    // hence the propertyChange() listener below completes the display.
-  }
-
-
-  //#########################################################################
-  //# Interface java.beans.PropertyChangeListener
-  @Override
-  public void propertyChange(final PropertyChangeEvent event)
-  {
-    mPanel.removePropertyChangeListener(this);
-    final JScrollPane scroll = new JScrollPane(mPanel);
-    final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    final int screenWidth = (int) screenSize.getWidth();
+    final int textWidth = Math.min(scaledWidth, screenWidth);
+    panel.setSize(textWidth, Integer.MAX_VALUE);
     final int screenHeight = (int) screenSize.getHeight();
-    final int textWidth = Math.min(TEXT_WIDTH, screenWidth);
-    final int textHeight =
-      Math.min(mPanel.getPreferredSize().height, screenHeight * 7 / 8);
-    final Dimension size = new Dimension(textWidth, textHeight);
-    mPanel.setPreferredSize(size);
+    final int textHeight = panel.getPreferredSize().height;
+    final int scrollHeight = Math.min(screenHeight * 7 / 8, textHeight);
+    final Dimension scrollSize = new Dimension(textWidth, scrollHeight);
+    panel.setPreferredSize(scrollSize);
+    final JScrollPane scroll = new JScrollPane(panel);
     add(scroll);
     pack();
-    setLocationRelativeTo(getOwner());
+    setLocationRelativeTo(owner);
     setVisible(true);
   }
 
 
   //#########################################################################
-  //# Data Members
-  private final JEditorPane mPanel;
+  //# Auxiliary Methods
+  private HTMLDocument createContents(final URL url)
+    throws IOException
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("<HTML><BODY STYLE=\"font-size: ");
+    builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+    builder.append("px; font-family: serif;\">");
+    final InputStream stream = url.openStream();
+    try {
+      final InputStreamReader reader = new InputStreamReader(stream);
+      final char[] buffer = new char[BUFFER_SIZE];
+      int numChars = reader.read(buffer);
+      while (numChars > 0) {
+        for (int i = 0; i < numChars; i++) {
+          builder.append(buffer[i]);
+        }
+        numChars = reader.read(buffer);
+      }
+    } finally {
+      stream.close();
+    }
+    builder.append("</BODY></HTML>");
+
+    final Reader reader = new StringReader(builder.toString());
+    final HTMLEditorKit htmlKit = new HTMLEditorKit();
+    final HTMLDocument doc = (HTMLDocument) htmlKit.createDefaultDocument();
+    try {
+      htmlKit.read(reader, doc, 0);
+    } catch (final BadLocationException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+    final MutableAttributeSet attribs = new SimpleAttributeSet();
+    StyleConstants.setSpaceAbove(attribs, 0);
+    StyleConstants.setSpaceBelow(attribs, 4);
+    doc.setParagraphAttributes(0, doc.getLength(), attribs, false);
+    return doc;
+  }
 
 
   //#########################################################################
   //# Class Constants
   private static final int TEXT_WIDTH = 640;
+  private static final int BUFFER_SIZE = 1024;
 
   private static final long serialVersionUID = -5901475634903492023L;
 

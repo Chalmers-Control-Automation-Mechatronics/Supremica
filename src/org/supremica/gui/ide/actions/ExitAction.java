@@ -37,68 +37,49 @@ package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.actions.ToolsFlexfactAction;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
-public class ExitAction
-    extends net.sourceforge.waters.gui.actions.IDEAction
+public class ExitAction extends net.sourceforge.waters.gui.actions.IDEAction
 {
 
-    //#######################################################################
-    //# Constructor
-    ExitAction(final IDE ide)
-    {
-        super(ide);
-        putValue(Action.NAME, "Exit");
-        putValue(Action.SHORT_DESCRIPTION, "Exit the IDE");
-        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
-        putValue(Action.ACCELERATOR_KEY,
-                 KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
-        putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_EXIT);
+  //#########################################################################
+  //# Constructor
+  ExitAction(final IDE ide)
+  {
+    super(ide);
+    putValue(Action.NAME, "Exit");
+    putValue(Action.SHORT_DESCRIPTION, "Exit the IDE");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.ALT_MASK));
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_EXIT);
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    final IDE ide = getIDE();
+    final DocumentContainerManager manager =
+      ide.getDocumentContainerManager();
+    if (manager.closeAllContainers()) {
+      System.exit(0);
     }
+  }
 
 
-    //#######################################################################
-    //# Interface java.awt.event.ActionListener
-    @Override
-    public void actionPerformed(final ActionEvent event)
-    {
-        final IDE ide = getIDE();
-        final DocumentContainerManager manager =
-            ide.getDocumentContainerManager();
-        if (manager.closeAllContainers())
-        {
-          if(Config.INCLUDE_FLEXFACT.isTrue()){
-            if(System.getProperty("os.name").toLowerCase().contains("linux")){
-            final String[] args1 = new String[] {"/bin/bash", "-c", "pkill -f flexfact"};
-            try {
-              new ProcessBuilder(args1).start();
-            } catch (final IOException exception) {
-              exception.printStackTrace();
-            }
-            }
-            if(System.getProperty("os.name").toLowerCase().contains("windows")){
-              if(ToolsFlexfactAction.proc != null)
-              ToolsFlexfactAction.proc.destroy();
-            }
-          }
-            System.exit(0);
-        }
-    }
-
-
-	//#######################################################################
-    //# Class Constants
-	private static final long serialVersionUID = 1L;
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -3311943800086338851L;
 
 }

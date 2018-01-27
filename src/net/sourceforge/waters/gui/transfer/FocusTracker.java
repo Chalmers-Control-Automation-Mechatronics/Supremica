@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -43,6 +44,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.text.JTextComponent;
@@ -61,8 +63,9 @@ import net.sourceforge.waters.gui.observer.Subject;
  * supported components, or to the window focus of the entire application,
  * and any changes of the selection in the component that has the keyboard
  * focus. All these changes are remapped to editor events of type {@link
- * net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind#SELECTION_CHANGED}, and interested components
- * can register listeners through the {@link Subject} interface.</P>
+ * net.sourceforge.waters.gui.observer.EditorChangedEvent.Kind#SELECTION_CHANGED},
+ * and interested components can register listeners through the {@link Subject}
+ * interface.</P>
  *
  * <P>This implementation supports two types of focus-owning components,
  * <UL>
@@ -84,9 +87,10 @@ public class FocusTracker
   //# Constructors
   public FocusTracker(final Window window)
   {
-    mObservers = new LinkedList<Observer>();
+    mObservers = new LinkedList<>();
     mSelectionOwner = null;
     mWatersSelectionOwner = null;
+    mLastWatersSelectionOwner = null;
     mSwingSelectionOwner = null;
     final KeyboardFocusManager manager =
       KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -97,11 +101,30 @@ public class FocusTracker
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Returns the current {@link SelectionOwner} that owns the keyboard
+   * focus, or <CODE>null</CODE> if the current focus owner is not a
+   * {@link SelectionOwner}.
+   */
   public SelectionOwner getWatersSelectionOwner()
   {
     return mWatersSelectionOwner;
   }
 
+  /**
+   * Returns the last known {@link SelectionOwner} that owned the keyboard
+   * focus. That component may no longer be the focus owner.
+   */
+  public SelectionOwner getLastWatersSelectionOwner()
+  {
+    return mLastWatersSelectionOwner;
+  }
+
+  /**
+   * Returns the current {@link JTextComponent} that owns the keyboard
+   * focus, or <CODE>null</CODE> if the current focus owner is not a
+   * {@link JTextComponent}.
+   */
   public JTextComponent getSwingSelectionOwner()
   {
     return mSwingSelectionOwner;
@@ -115,25 +138,26 @@ public class FocusTracker
   {
     final String prop = event.getPropertyName();
     if ("permanentFocusOwner".equals(prop)) {
-      final Object newvalue = event.getNewValue();
+      final Object newValue = event.getNewValue();
       // System.err.println
       //   ("FocusTracker: " +
-      //    (newvalue == null ? "null" : newvalue.getClass().getName()));
-      if (mSelectionOwner != newvalue) {
+      //    (newValue == null ? "null" : ProxyTools.getShortClassName(newValue)));
+      if (mSelectionOwner != newValue) {
         if (mWatersSelectionOwner != null) {
           mWatersSelectionOwner.detach(this);
         } else if (mSwingSelectionOwner != null) {
           mSwingSelectionOwner.removeCaretListener(this);
         }
-        if (newvalue instanceof SelectionOwner) {
-          mSelectionOwner = newvalue;
-          mWatersSelectionOwner = (SelectionOwner) newvalue;
+        if (newValue instanceof SelectionOwner) {
+          mSelectionOwner = newValue;
+          mWatersSelectionOwner = (SelectionOwner) newValue;
+          mLastWatersSelectionOwner = mWatersSelectionOwner;
           mSwingSelectionOwner = null;
           mWatersSelectionOwner.attach(this);
-        } else if (newvalue instanceof JTextComponent) {
-          mSelectionOwner = newvalue;
+        } else if (newValue instanceof JTextComponent) {
+          mSelectionOwner = newValue;
           mWatersSelectionOwner = null;
-          mSwingSelectionOwner = (JTextComponent) newvalue;
+          mSwingSelectionOwner = (JTextComponent) newValue;
           mSwingSelectionOwner.addCaretListener(this);
         } else if (mSelectionOwner != null) {
           mSelectionOwner = null;
@@ -209,6 +233,31 @@ public class FocusTracker
 
 
   //#########################################################################
+  //# Public Static Methods
+  /**
+   * Requests the focus for the given component.
+   * This method checks whether the given component is the current focus
+   * owner, and if it is not, issues a (delayed) request to transfer focus
+   * to that component.
+   */
+  public static void requestFocusFor(final Component component)
+  {
+    if (!component.isFocusOwner()) {
+      SwingUtilities.invokeLater(new Runnable() {
+        @Override
+        public void run()
+        {
+          // System.err.println
+          //   ("FocusTracker: request focus for " +
+          //    ProxyTools.getShortClassName(component));
+          component.requestFocusInWindow();
+        }
+      });
+    }
+  }
+
+
+  //#########################################################################
   //# Auxiliary Methods
   private void fireSelectionChanged()
   {
@@ -223,6 +272,7 @@ public class FocusTracker
 
   private Object mSelectionOwner;
   private SelectionOwner mWatersSelectionOwner;
+  private SelectionOwner mLastWatersSelectionOwner;
   private JTextComponent mSwingSelectionOwner;
 
 }

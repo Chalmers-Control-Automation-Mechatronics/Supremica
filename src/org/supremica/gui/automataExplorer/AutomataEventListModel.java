@@ -35,18 +35,23 @@
 
 package org.supremica.gui.automataExplorer;
 
-import org.supremica.automata.algorithms.*;
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
-import org.supremica.log.*;
+import org.supremica.automata.algorithms.AutomataSynchronizerExecuter;
+import org.supremica.automata.algorithms.AutomataSynchronizerHelper;
+
 
 public class AutomataEventListModel
         extends AbstractListModel<Object>
 {
  	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LoggerFactory.createLogger(AutomataEventListModel.class);
+	private static Logger logger = LogManager.getLogger(AutomataEventListModel.class);
 
     private int[] currState;
 
@@ -124,11 +129,13 @@ public class AutomataEventListModel
          */
     }
 
+    @Override
     public int getSize()
     {
         return eventAmount;
     }
 
+    @Override
     public Object getElementAt(final int index)
     {
         org.supremica.automata.LabeledEvent currEvent;

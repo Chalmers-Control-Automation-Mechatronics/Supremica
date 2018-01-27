@@ -66,6 +66,9 @@ import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.gui.ide.DocumentContainer;
@@ -111,6 +114,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
   public void doAction()
   {
     if (ide.getActiveDocumentContainer().getEditorPanel() != null) {
+      final Logger logger = LogManager.getLogger();
       final DocumentContainer container = ide.getActiveDocumentContainer();
       final EditorPanel panel = container.getEditorPanel();
       final ModuleContext context = panel.getModuleContext();
@@ -137,8 +141,8 @@ public class AnalyzerSendToEditorAction extends IDEAction
           final InsertInfo info = new InsertInfo(comp, inspos);
           components.add(info);
         } catch (final ParseException exception) {
-          ide.getIDE().error("Could not add automaton " + aut.getName() +
-                             " to editor: " + exception.getMessage());
+          logger.error("Could not add automaton " + aut.getName() +
+                       " to editor: " + exception.getMessage());
           continue;
         }
         // Import new event declarations if needed ...
@@ -154,8 +158,8 @@ public class AnalyzerSendToEditorAction extends IDEAction
                 decls.add(info);
               }
             } catch (final ParseException exception) {
-              ide.getIDE().error("Could not add event " + event.getName() +
-                                 " to editor: " + exception.getMessage());
+              logger.error("Could not add event " + event.getName() +
+                           " to editor: " + exception.getMessage());
               continue;
             }
           }
@@ -192,7 +196,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
         }
       }
       if (problem) {
-        ide.getIDE().warn
+        logger.warn
           ("There is a problem in the back-translation of parametrised events.");
       }
     }

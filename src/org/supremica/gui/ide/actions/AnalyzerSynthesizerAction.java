@@ -47,15 +47,12 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.SynthesizerDialog;
 import org.supremica.gui.ide.IDE;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 public class AnalyzerSynthesizerAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     public AnalyzerSynthesizerAction(final List<IDEAction> actionList)
     {

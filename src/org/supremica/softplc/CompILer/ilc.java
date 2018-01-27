@@ -1,20 +1,27 @@
-
-/** ilc is a compiler for parts of the IEC Instruction List language.
- * @author Anders Röding
- */
 package org.supremica.softplc.CompILer;
 
-import org.supremica.softplc.CompILer.CodeGen.*;
-import org.supremica.softplc.CompILer.Parser.SyntaxTree.*;
-import org.supremica.softplc.CompILer.Checker.*;
-import org.supremica.log.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.softplc.CompILer.Checker.VariableChecker;
+import org.supremica.softplc.CompILer.CodeGen.JavaBytecodeGenerator;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.SimpleNode;
+import org.supremica.softplc.CompILer.Parser.SyntaxTree.parser;
+
+/**
+ * ilc is a compiler for parts of the IEC Instruction List language.
+ *
+ * @author Anders Röding
+ */
 
 public class ilc
 {
 	private static parser p;
 
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
 		if (args.length != 2)
 		{
@@ -26,16 +33,16 @@ public class ilc
 		new ilc(args[0], args[1]);
 	}
 
-	public ilc(String ilFile, String outDir)
+	public ilc(final String ilFile, final String outDir)
 	{
 		this(ilFile, outDir, null, false);
 	}
 
-	public ilc(String ilFile, String outDir, Logger logger, boolean debug)
+	public ilc(final String ilFile, final String outDir, final Logger logger, final boolean debug)
 	{
 		try
 		{
-			BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
+			final BufferedReader ilReader = new BufferedReader(new FileReader(new File(ilFile)));
 
 			if (logger != null)
 			{
@@ -57,8 +64,8 @@ public class ilc
 
 			try
 			{
-				SimpleNode n = parser.Start();
-				VariableChecker v = new VariableChecker(n);
+				final SimpleNode n = parser.Start();
+				final VariableChecker v = new VariableChecker(n);
 
 				//XXX new VaribleChecker(n,logger);
 				if (v.check())
@@ -70,7 +77,7 @@ public class ilc
 					System.err.println("VariableChecker failed");
 				}
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				if (logger != null)
 				{
@@ -84,7 +91,7 @@ public class ilc
 				e.printStackTrace();
 			}
 		}
-		catch (Throwable e)
+		catch (final Throwable e)
 		{
 			if (logger != null)
 			{

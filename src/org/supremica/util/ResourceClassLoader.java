@@ -49,29 +49,34 @@
 
 package org.supremica.util;
 
-import org.supremica.log.*;
 import java.net.URL;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 /**
- * This is used to load xml files that can either be in a jar file or on disk
+ * This is used to load XML files that can either be in a jar file or on disk
  **/
+
 public class ResourceClassLoader
 	extends ClassLoader
 {
-	private static Logger logger = LoggerFactory.createLogger(ResourceClassLoader.class);
+	private static Logger logger = LogManager.getLogger(ResourceClassLoader.class);
 
 	public ResourceClassLoader()
 	{
 		super();
 	}
 
-	public ResourceClassLoader(ClassLoader parent)
+	public ResourceClassLoader(final ClassLoader parent)
 	{
 		super(parent);
 	}
 
 
-	public URL getResource(String resource)
+	@Override
+  public URL getResource(final String resource)
 	{
 		logger.info("getResource: " + resource);
 		return super.getResource(resource);

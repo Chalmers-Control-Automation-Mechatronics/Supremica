@@ -102,9 +102,11 @@ public abstract class WatersActionManager implements Observer
     addAction(new InsertParameterBindingAction(ide));
     addAction(new InsertSimpleComponentAction(ide));
     addAction(new InsertVariableAction(ide));
+    addAction(new InstantiateModuleAction(ide));
+    addAction(new LogClearAction(ide));
+    addAction(new LogTestAction(ide));
     addAction(new RecompileAction(ide));
     addAction(new ShowGraphAction(ide));
-    addAction(new InstantiateModuleAction(ide));
     addAction(new ShowModuleCommentAction(ide));
     addAction(new SimulationBackToStartAction(ide));
     addAction(new SimulationCascadeAction(ide));
@@ -120,7 +122,6 @@ public abstract class WatersActionManager implements Observer
     addAction(new ToolGroupNodeAction(ide));
     addAction(new ToolNodeAction(ide));
     addAction(new ToolSelectAction(ide));
-    addAction(new ToolsFlexfactAction(ide));
     addAction(new WatersRedoAction(ide));
     addAction(new WatersUndoAction(ide));
     ide.attach(this);

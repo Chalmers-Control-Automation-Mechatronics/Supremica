@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="hiding_14" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A test for hiding an event from a generalised transition relation that already contains the silent event :tau.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="a"/>
+        <EventDecl Kind="CONTROLLABLE" Name="b"/>
+        <EventDecl Kind="PROPOSITION" Name="ann:b">
+            <ColorGeometry>
+                <Color Red="204" Green="0" Blue="204"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name="ann:">
+            <ColorGeometry>
+                <Color Red="153" Green="255" Blue="153"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="PROPOSITION" Name="ann:a">
+            <ColorGeometry>
+                <Color Red="0" Green="0" Blue="255"/>
+            </ColorGeometry>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name=":tau"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="before">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:a"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="176" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:a"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="240" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:b"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="176" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-17"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="278" Y="120"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="after">
+            <Graph Deterministic="false">
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S0">
+                        <PointGeometry>
+                            <Point X="176" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S1">
+                        <PointGeometry>
+                            <Point X="240" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S2">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:b"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="176" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S3">
+                        <EventList>
+                            <SimpleIdentifier Name="ann:"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="112" Y="144"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S0" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-42" Y="-11"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="10" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S0" Target="S2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name=":tau"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

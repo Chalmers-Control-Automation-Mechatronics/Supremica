@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.map.hash.TObjectByteHashMap;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -67,6 +71,7 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -76,11 +81,8 @@ import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.map.hash.TObjectByteHashMap;
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -865,7 +867,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   protected void runCompositionalMinimisation()
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final AnalysisResult result = getAnalysisResult();
     // If simplify() returns true, the global system has been trivially
     // verified, and there is nothing left to do.
@@ -917,7 +919,7 @@ public abstract class AbstractCompositionalModelAnalyzer
               lastOverflow = null;
             }
           } catch (final OutOfMemoryError error) {
-            getLogger().debug("<out of memory>");
+            LogManager.getLogger().debug("<out of memory>");
             lastOverflow = new OverflowException(error);
             cancheck = false;
           } catch (final OverflowException overflow) {
@@ -1164,7 +1166,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   protected void reportMonolithicAnalysis(final ProductDESProxy des)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       final Collection<AutomatonProxy> automata1 = des.getAutomata();
       double estimate = 1.0;
@@ -1208,6 +1210,9 @@ public abstract class AbstractCompositionalModelAnalyzer
           }
           // fall through ...
         case PLANT:
+          if (!supportsNondeterminism()) {
+            AutomatonTools.checkDeterministic(aut);
+          }
           mCurrentAutomata.add(aut);
           addEventsToAutomata(aut);
           mDirtyAutomata.add(aut);
@@ -1407,7 +1412,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   //# Logging
   protected void showDebugLog(final ListBufferTransitionRelation rel)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("Simplifying " + rel.getName() + " ...");
       logger.debug(rel.getNumberOfReachableStates() + " states, " +
@@ -1419,7 +1424,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private void showRemovedEvents(final String msg,
                                  final Set<EventProxy> removed)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && !removed.isEmpty()) {
       final StringBuilder builder = new StringBuilder();
       final List<EventProxy> ordered = new ArrayList<>(removed);
@@ -2010,7 +2015,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     } catch (final OutOfMemoryError error) {
       System.gc();
-      getLogger().debug("<out of memory>");
+      LogManager.getLogger().debug("<out of memory>");
       throw new OverflowException(error);
     }
     if (steps.isEmpty()) {
@@ -2217,7 +2222,7 @@ public abstract class AbstractCompositionalModelAnalyzer
 
   private void reportEventRemoval(final AutomatonProxy aut)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       final String msg =
         aut.getName() + " reduced to " + aut.getStates().size() +

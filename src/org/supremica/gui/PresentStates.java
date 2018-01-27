@@ -53,16 +53,21 @@ import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.State;
 import org.supremica.automata.algorithms.Forbidder;
 import org.supremica.automata.algorithms.Remover;
 import org.supremica.automata.algorithms.SearchStates;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
-//-- owner: MF
+
+/**
+ * @author Martin Fabian
+ */
+
 class PresentStatesTableModel
 	extends DefaultTableModel    // AbstractTableModel
 {
@@ -122,7 +127,7 @@ class PresentStatesTable
 	extends JTable
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.createLogger(PresentStatesTable.class);
+	private static final Logger logger = LogManager.getLogger(PresentStatesTable.class);
 	private SelectionListener listener;
 	private final VisualProject theVisualProject;
 	private final SearchStates searchStates;
@@ -232,7 +237,7 @@ class PresentStatesFrame
 	implements SelectionListener    // listens to selection events, en/disables the RouteButton, ForbidButton
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.createLogger(PresentStatesFrame.class);
+	private static final Logger logger = LogManager.getLogger(PresentStatesFrame.class);
 
 	private final SearchStates search_states;
 	private final Automata automata;
@@ -279,7 +284,7 @@ class PresentStatesFrame
 	private class RemoveButton extends JButton
 	{
 		private static final long serialVersionUID = 1L;
-		
+
 		public RemoveButton()
 		{
 			super("Remove");
@@ -291,7 +296,7 @@ class PresentStatesFrame
 				{
 					action(e);
 				}
-			});			
+			});
 		}
 		void action(final ActionEvent e)
 		{
@@ -300,7 +305,7 @@ class PresentStatesFrame
 			dispose();
 		}
 	}
-	
+
 	private class ForbidButton
 		extends JButton
 	{
@@ -422,7 +427,7 @@ class PresentStatesFrame
 //              panel.add(route_button);
 		panel.add(remove_button = new RemoveButton());
 		remove_button.setEnabled(false);
-		
+
 		final Container contentPane = getContentPane();
 
 		contentPane.add(new WhiteScrollPane(table), BorderLayout.CENTER);

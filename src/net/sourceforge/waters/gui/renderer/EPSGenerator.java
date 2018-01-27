@@ -66,9 +66,8 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import org.supremica.automata.Project;
 import org.supremica.automata.IO.SupremicaUnmarshaller;
 import org.supremica.gui.ide.DefaultAttributeFactory;
-import org.supremica.log.LoggerFactory;
-import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
+
 import org.xml.sax.SAXException;
 
 
@@ -123,14 +122,6 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
           names.add(arg);
         }
       }
-
-      final LoggerFactory loggerFactory = LoggerFactory.getInstance();
-      if (verbose) {
-        loggerFactory.logToStream(System.err);
-      } else {
-        loggerFactory.logToNull();
-      }
-      Config.VERBOSE_MODE.set(verbose);
 
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final JAXBModuleMarshaller moduleUnmarshaller =

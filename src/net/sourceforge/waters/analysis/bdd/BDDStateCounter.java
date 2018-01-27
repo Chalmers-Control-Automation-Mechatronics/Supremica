@@ -43,6 +43,8 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.apache.logging.log4j.LogManager;
+
 /**
  * <P>A BDD implementation of a state counter.</P>
  *
@@ -90,7 +92,7 @@ public class BDDStateCounter
   public boolean run()
     throws AnalysisException
   {
-    getLogger().debug("BDDSafetyVerifier.run(): " +
+    LogManager.getLogger().debug("BDDSafetyVerifier.run(): " +
                       getModel().getName() + " ...");
     try {
       setUp();
@@ -117,7 +119,7 @@ public class BDDStateCounter
       }
     } finally {
       tearDown();
-      getLogger().debug("BDDStateCounter.run(): " +
+      LogManager.getLogger().debug("BDDStateCounter.run(): " +
                         getModel().getName() + " done.");
     }
   }

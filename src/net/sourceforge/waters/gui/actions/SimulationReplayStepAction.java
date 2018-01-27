@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -60,7 +60,7 @@ public class SimulationReplayStepAction
     super(ide);
     putValue(Action.NAME, "Replay Step");
     putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_REPLAY);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
     updateEnabledStatus();

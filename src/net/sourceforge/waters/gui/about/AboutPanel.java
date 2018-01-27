@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
@@ -58,9 +59,12 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 import net.sourceforge.waters.config.Version;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
-import org.supremica.gui.ide.IDEReportInterface;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
 
 
@@ -79,9 +83,8 @@ public class AboutPanel
 
   //#########################################################################
   //# Constructor
-  public AboutPanel(final IDEReportInterface ide)
+  public AboutPanel()
   {
-    mIDE = ide;
     final HTMLDocument doc = createContents();
     setContentType("text/html");
     setDocument(doc);
@@ -97,7 +100,7 @@ public class AboutPanel
   @Override
   public void hyperlinkUpdate(final HyperlinkEvent event)
   {
-    if(event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+    if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
       final Element element = event.getSourceElement();
       final Document doc = element.getDocument();
       final int start = element.getStartOffset();
@@ -110,12 +113,13 @@ public class AboutPanel
       }
       final String name = event.getDescription();
       final URL url = Version.class.getResource(name);
-      final JFrame owner = mIDE.getFrame();
+      final JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
       try {
         @SuppressWarnings("unused")
         final HTMLPopup popup = new HTMLPopup(title, url, owner);
       } catch (final IOException exception) {
-        mIDE.error("Could not find licence file " + url);
+        final Logger logger = LogManager.getLogger();
+        logger.error("Could not find licence file " + url);
       }
     }
   }
@@ -136,7 +140,9 @@ public class AboutPanel
   {
     final Version version = Version.getInstance();
     final StringBuilder builder = new StringBuilder();
-    builder.append("<HTML><BODY STYLE=\"font-size: 10px; font-family: serif;\">");
+    builder.append("<HTML><BODY STYLE=\"font-size: ");
+    builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+    builder.append("px; font-family: serif;\">");
     builder.append("<H1 STYLE=\"text-align: center; color: #00008d; font-style: italic;\">");
     builder.append(version.getTitle());
     builder.append("</H1>");
@@ -189,7 +195,7 @@ public class AboutPanel
     }
     builder.append("Maximum available memory: ");
     builder.append(Runtime.getRuntime().maxMemory() / 0x100000L);
-    builder.append(" MB</P>");
+    builder.append(" MiB</P>");
     builder.append("</BODY></HTML>");
 
     final Reader reader = new StringReader(builder.toString());
@@ -297,11 +303,6 @@ public class AboutPanel
     private String mVersionInfo = null;
 
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final IDEReportInterface mIDE;
 
 
   //#########################################################################

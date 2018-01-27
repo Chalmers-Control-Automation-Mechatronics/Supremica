@@ -33,10 +33,11 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.RenderingHints;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.BasicStroke;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.Rectangle2D;
 
 
@@ -46,6 +47,7 @@ public abstract class AbstractRendererShape
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.renderer.RendererShape
+  @Override
   public void draw(final Graphics2D g, final RenderingInformation status)
   {
     g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -64,14 +66,16 @@ public abstract class AbstractRendererShape
     g.draw(getShape());
   }
 
+  @Override
   public Rectangle2D getBounds2D()
   {
     return getShape().getBounds2D();
   }
 
-  public boolean isClicked(final int x, final int y)
+  @Override
+  public boolean isClicked(final Point point)
   {
-    return getShape().contains(x, y);
+    return getShape().contains(point);
   }
 
 

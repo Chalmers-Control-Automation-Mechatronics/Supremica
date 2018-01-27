@@ -236,7 +236,7 @@ public class PropositionIcon implements Icon
 
   //#########################################################################
   //# Static Class Constants
-  private static final int SIZE = IconLoader.ICON_EVENT.getIconHeight();
+  private static final int SIZE = IconAndFontLoader.ICON_EVENT.getIconHeight();
   private static final int OFFSET = SIZE >> 2;
   private static final int DIAMETER = SIZE - OFFSET - OFFSET;
 

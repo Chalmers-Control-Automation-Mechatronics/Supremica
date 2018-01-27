@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -215,23 +214,27 @@ public class ProductDESImporter
       final String name = aut.getName();
       final ComponentKind kind = aut.getKind();
       mCurrentEvents = aut.getEvents();
-      mCurrentBlockedEvents = new HashSet<EventProxy>(mCurrentEvents);
+      mCurrentBlockedEvents = new THashSet<EventProxy>(mCurrentEvents);
       final Set<StateProxy> states = aut.getStates();
       final int numstates = states.size();
       final Collection<SimpleNodeProxy> nodes =
         new ArrayList<SimpleNodeProxy>(numstates);
       mCurrentNodeMap = new HashMap<StateProxy,SimpleNodeProxy>(numstates);
+      int numInit = 0;
       for (final StateProxy state : states) {
         final SimpleNodeProxy node = importNode(state);
         nodes.add(node);
         mCurrentNodeMap.put(state, node);
+        if (node.isInitial()) {
+          numInit++;
+        }
       }
+      boolean deterministic = numInit == 1;
       final Collection<TransitionProxy> transitions = aut.getTransitions();
       final int numtrans = transitions.size();
       final Map<NodePair,Set<EventProxy>> transmap =
         new HashMap<NodePair,Set<EventProxy>>(numtrans);
       final Set<StateEventPair> dettest = new THashSet<StateEventPair>();
-      boolean deterministic = true;
       for (final TransitionProxy trans : transitions) {
         final StateProxy source = trans.getSource();
         final SimpleNodeProxy sourcenode = getCurrentNode(source);
@@ -291,7 +294,8 @@ public class ProductDESImporter
                                   nodes, edges);
       final SimpleIdentifierProxy ident =
         mFactory.createSimpleIdentifierProxy(name);
-      return mFactory.createSimpleComponentProxy(ident, kind, graph);
+      final Map<String,String> attribs = aut.getAttributes();
+      return mFactory.createSimpleComponentProxy(ident, kind, graph, attribs);
     } finally {
       mCurrentAutomaton = null;
       mCurrentEvents = null;

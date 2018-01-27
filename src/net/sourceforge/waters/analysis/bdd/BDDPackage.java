@@ -46,11 +46,11 @@ public enum BDDPackage
   BUDDY(true),
   CUDD(true),
   //CAL(false),
-  J(false),
-  JAVA(false),
-  JDD(false),
-  TEST(false),
-  TYPED(false);
+  //J(false),
+  JAVA(false);
+  //JDD(false),
+  //TEST(false),
+  //TYPED(false);
 
 
   //#########################################################################
@@ -64,12 +64,12 @@ public enum BDDPackage
 
   //#########################################################################
   //# Simple Access
-  String getBDDPackageName()
+  public String getBDDPackageName()
   {
     return mName;
   }
 
-  boolean isReorderingSupported()
+  public boolean isReorderingSupported()
   {
     return mIsReorderingSupported;
   }

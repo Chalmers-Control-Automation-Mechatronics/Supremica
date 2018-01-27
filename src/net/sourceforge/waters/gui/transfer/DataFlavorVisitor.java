@@ -267,7 +267,7 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
   throws VisitorException
   {
     final List<Proxy> list = block.getEventIdentifierList();
-    if(list.isEmpty()){
+    if (list.isEmpty()) {
       return LIST_GRAPH;
     }
     final List<WatersDataFlavor> flavors = visitEventListExpressionProxy(block);
@@ -371,6 +371,7 @@ class DataFlavorVisitor extends DefaultModuleProxyVisitor
     Arrays.asList(new WatersDataFlavor[]{WatersDataFlavor.LABEL_GEOMETRY,
                                          WatersDataFlavor.GRAPH});
   private static final List<WatersDataFlavor> LIST_PARAMETER_BINDING =
-    Collections.singletonList(WatersDataFlavor.PARAMETER_BINDING);
+    Arrays.asList(new WatersDataFlavor[]{WatersDataFlavor.PARAMETER_BINDING,
+                                         WatersDataFlavor.IDENTIFIER});
 
 }

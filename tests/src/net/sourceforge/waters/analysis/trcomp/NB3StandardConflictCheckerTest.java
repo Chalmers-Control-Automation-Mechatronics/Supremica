@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
 
 public class NB3StandardConflictCheckerTest
@@ -70,7 +70,7 @@ public class NB3StandardConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB3w);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.NB3);
     checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustL);
     checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinE);
     checker.setInternalStateLimit(5000);
@@ -82,7 +82,7 @@ public class NB3StandardConflictCheckerTest
     checker.setAlwaysEnabledEventsEnabled(true);
     checker.setPruningDeadlocks(true);
     checker.setCounterExampleEnabled(true);
-    checker.setTraceCheckingEnabled(true);
+    checker.setOutputCheckingEnabled(true);
     return checker;
   }
 

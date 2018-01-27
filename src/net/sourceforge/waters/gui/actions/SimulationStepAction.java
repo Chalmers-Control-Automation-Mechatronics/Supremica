@@ -41,7 +41,10 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.simulator.SimulatorStep;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 
@@ -57,7 +60,7 @@ public class SimulationStepAction
     super(ide);
     putValue(Action.NAME, "Step");
     putValue(Action.SHORT_DESCRIPTION, "Execute an event");
-    putValue(Action.SMALL_ICON, IconLoader.ICON_SIMULATOR_STEP);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_STEP);
     updateEnabledStatus();
   }
 
@@ -72,7 +75,8 @@ public class SimulationStepAction
       final Simulation sim = panel.getSimulation();
       final List<SimulatorStep> possibleEvents = sim.getEnabledSteps();
       if (possibleEvents.isEmpty()) {
-        getIDE().error("No events are enabled.");
+        final Logger logger = LogManager.getLogger();
+        logger.error("No events are enabled.");
       } else {
         sim.step(possibleEvents);
       }

@@ -41,6 +41,9 @@ import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.AutomataSynchronizer;
@@ -95,7 +98,7 @@ public class AutomataSynchronizerWorker
                 JOptionPane.showMessageDialog(ide.getFrame(), e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 
                 // logger.error(e.getMessage());
-                ide.error(e.getMessage());
+                LOGGER.error(e.getMessage());
 
                 return;
             }
@@ -116,7 +119,7 @@ public class AutomataSynchronizerWorker
             catch (final Exception ex)
             {
                 timer.stop();
-                ide.error("Exception while executing AutomataSynchronizer", ex);
+                LOGGER.error("Exception while executing AutomataSynchronizer", ex);
                 // logger.error("Exception while executing AutomataSynchronizer");
                 // logger.debug(ex.getStackTrace());
                 return;
@@ -134,7 +137,7 @@ public class AutomataSynchronizerWorker
                     timer.stop();
 
                     // -- MF -- logger.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
-                    ide.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
+                    LOGGER.error("Exception in AutomatonSynchronizer while getting the automaton" + ex);
                     ex.printStackTrace();
 
                     // logger.debug(ex.getStackTrace());
@@ -154,7 +157,7 @@ public class AutomataSynchronizerWorker
 
                 // logger.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
                 // workbench.info("Execution completed after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds.");
-                ide.info("Execution completed after " + timer.toString());
+                LOGGER.info("Execution completed after " + timer.toString());
             }
             else
             {
@@ -163,7 +166,7 @@ public class AutomataSynchronizerWorker
 
                 // logger.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
                 // workbench.info("Execution stopped after " + (endDate.getTime() - startDate.getTime()) / 1000.0 + " seconds!");
-                ide.info("Execution stopped after " + timer.toString());
+                LOGGER.info("Execution stopped after " + timer.toString());
             }
 
             theSynchronizer.displayInfo();
@@ -184,8 +187,7 @@ public class AutomataSynchronizerWorker
             {
                 // logger.error("Could not add the new automaton after synchronization");
                 // logger.debug(ex.getStackTrace());
-                ide.error("Could not add the new automaton after synchronization");
-
+                LOGGER.error("Could not add the new automaton after synchronization");
                 return;
             }
         }
@@ -207,4 +209,6 @@ public class AutomataSynchronizerWorker
     public void resetAbort(){
       abortRequested = false;
     }
+
+    private static final Logger LOGGER = LogManager.getLogger();
 }

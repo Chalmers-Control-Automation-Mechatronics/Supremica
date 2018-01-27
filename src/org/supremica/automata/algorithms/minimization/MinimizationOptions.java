@@ -49,15 +49,17 @@
  */
 package org.supremica.automata.algorithms.minimization;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.algorithms.EquivalenceRelation;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
+
 
 public final class MinimizationOptions
 {
-    private static Logger logger = LoggerFactory.createLogger(MinimizationOptions.class);
+    private static Logger logger = LogManager.getLogger(MinimizationOptions.class);
 
     private boolean dialogOK = false;
     /**

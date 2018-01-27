@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,10 +67,10 @@ import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.EventOnlyKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -77,17 +79,15 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
- * <P>A general compositional model analyser to be subclassed for different
- * algorithms.</P>
+ * <P>An abstract base class for compositional analysis algorithms based on
+ * the {@link TRAutomatonProxy} representation of automata.</P>
  *
  * <P>This model analyser implements compositional minimisation
  * of the input model, and leaves it to the subclasses to decide what is
@@ -113,7 +113,7 @@ import gnu.trove.set.hash.THashSet;
  */
 
 public abstract class AbstractTRCompositionalAnalyzer
-  extends AbstractModelAnalyzer
+  extends AbstractTRAnalyzer
   implements ModelAnalyzer
 {
 
@@ -123,7 +123,7 @@ public abstract class AbstractTRCompositionalAnalyzer
                                          final KindTranslator translator,
                                          final ModelAnalyzer mono)
   {
-    super(model, ProductDESElementFactory.getInstance(), translator);
+    super(model, translator);
     mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
     mPreselectionHeuristic = getPreselectionHeuristicFactory().getDefaultValue();
     final SelectionHeuristic<TRCandidate> heu =
@@ -166,63 +166,23 @@ public abstract class AbstractTRCompositionalAnalyzer
     return Math.max(limit1, limit2);
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return true;
-  }
-
-  @Override
-  public CompositionalAnalysisResult getAnalysisResult()
-  {
-    return (CompositionalAnalysisResult) super.getAnalysisResult();
-  }
-
-  @Override
-  public CompositionalAnalysisResult createAnalysisResult()
-  {
-    return new CompositionalAnalysisResult(getClass());
-  }
-
 
   //#########################################################################
   //# Configuration
-  /**
-   * Gets the factory to obtain transition relation simplifiers for this
-   * compositional analyser. The objects returned by this factory can be
-   * passed to the {@link #setSimplifierCreator(TRToolCreator)
-   * setSimplifierCreator()} method.
-   */
-  public abstract EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
-    getTRSimplifierFactory();
-
-  /**
-   * Sets the tool that creates the transition relation simplifier that
-   * defines the abstraction chain. Possible arguments for this method
-   * can be obtained from the factory returned by {@link
-   * #getTRSimplifierFactory()}.
-   */
+  @Override
   public void setSimplifierCreator
     (final TRToolCreator<TransitionRelationSimplifier> creator)
   {
     mTRSimplifierCreator = creator;
   }
 
-  /**
-   * Gets the tool that creates the transition relation simplifier that
-   * defines the abstraction chain.
-   */
+  @Override
   public TRToolCreator<TransitionRelationSimplifier> getSimplifierCreator()
   {
     return mTRSimplifierCreator;
   }
 
-  /**
-   * Gets the factory to obtain preselection heuristics for this
-   * compositional analyser. The objects returned by this factory can be
-   * passed to the {@link #setPreselectionHeuristic(TRPreselectionHeuristic)
-   * setPreselectionHeuristic()} method.
-   */
+  @Override
   public EnumFactory<TRPreselectionHeuristic> getPreselectionHeuristicFactory()
   {
     return
@@ -239,31 +199,19 @@ public abstract class AbstractTRCompositionalAnalyzer
     };
   }
 
-  /**
-   * Sets the preselection heuristic to create the possible candidates for
-   * composition. Possible arguments for this method can be obtained from the
-   * factory returned by {@link #getPreselectionHeuristicFactory()}.
-   */
+  @Override
   public void setPreselectionHeuristic(final TRPreselectionHeuristic heu)
   {
     mPreselectionHeuristic = heu;
   }
 
-  /**
-   * Gets the preselection heuristic used to create the possible candidates
-   * for composition.
-   */
+  @Override
   public TRPreselectionHeuristic getPreselectionHeuristic()
   {
     return mPreselectionHeuristic;
   }
 
-  /**
-   * Gets the factory to obtain selection heuristics for this
-   * compositional analyser. The objects returned by this factory can be
-   * passed to the {@link #setPreselectionHeuristic(TRPreselectionHeuristic)
-   * setPreselectionHeuristic()} method.
-   */
+  @Override
   public EnumFactory<SelectionHeuristic<TRCandidate>> getSelectionHeuristicFactory()
   {
     return
@@ -285,204 +233,149 @@ public abstract class AbstractTRCompositionalAnalyzer
     };
   }
 
-  /**
-   * Sets the selection heuristic to choose a candidates for composition from
-   * the collection returned by the preselection heuristic. Possible arguments
-   * for this method can be obtained from the factory returned by {@link
-   * #getSelectionHeuristicFactory()}.
-   */
+  @Override
   public void setSelectionHeuristic(final SelectionHeuristic<TRCandidate> heu)
   {
     mSelectionHeuristic = heu.createDecisiveHeuristic();
   }
 
-  /**
-   * Gets the selection heuristic used to choose a candidates for composition
-   * from the collection returned by the preselection heuristic.
-   */
+  @Override
   public SelectionHeuristic<TRCandidate> getSelectionHeuristic()
   {
     return mSelectionHeuristic;
   }
 
+  @Override
   public void setMonolithicAnalyzer(final ModelAnalyzer mono)
   {
     mMonolithicAnalyzer = mono;
   }
 
+  @Override
   public ModelAnalyzer getMonolithicAnalyzer()
   {
     return mMonolithicAnalyzer;
   }
 
 
+  @Override
   public int getInternalStateLimit()
   {
     return mInternalStateLimit;
   }
 
+  @Override
   public void setInternalStateLimit(final int limit)
   {
     mInternalStateLimit = limit > 0 ? limit : Integer.MAX_VALUE;
   }
 
+  @Override
   public int getMonolithicStateLimit()
   {
     return super.getNodeLimit();
   }
 
+  @Override
   public void setMonolithicStateLimit(final int limit)
   {
     super.setNodeLimit(limit);
   }
 
+  @Override
   public int getInternalTransitionLimit()
   {
     return mInternalTransitionLimit;
   }
 
+  @Override
   public void setInternalTransitionLimit(final int limit)
   {
     mInternalTransitionLimit = limit > 0 ? limit : Integer.MAX_VALUE;
   }
 
+  @Override
   public int getMonolithicTransitionLimit()
   {
     return super.getTransitionLimit();
   }
 
+  @Override
   public void setMonolithicTransitionLimit(final int limit)
   {
     super.setTransitionLimit(limit);
   }
 
-  /**
-   * Sets whether blocked events are to be considered in abstraction.
-   * @see #isBlockedEventsEnabled()
-   */
+  @Override
   public void setBlockedEventsEnabled(final boolean enable)
   {
     mBlockedEventsEnabled = enable;
   }
 
-  /**
-   * Returns whether blocked events are considered in abstraction.
-   * Blocked events are events that are disabled in all reachable states of
-   * some automaton. If supported, this will remove all transitions with
-   * blocked events from the model.
-   * @see #setBlockedEventsEnabled(boolean) setBlockedEventsEnabled()
-   */
+  @Override
   public boolean isBlockedEventsEnabled()
   {
     return mBlockedEventsEnabled;
   }
 
-  /**
-   * Sets whether failing events are to be considered in abstraction.
-   * @see #isFailingEventsEnabled()
-   */
+  @Override
   public void setFailingEventsEnabled(final boolean enable)
   {
     mFailingEventsEnabled = enable;
   }
 
-  /**
-   * Returns whether failing events are considered in abstraction.
-   * Failing events are events that always lead to a dump state in some
-   * automaton. If supported, this will redirect failing events in other
-   * automata to dump states.
-   * @see #setFailingEventsEnabled(boolean) setFailingEventsEnabled()
-   */
+  @Override
   public boolean isFailingEventsEnabled()
   {
     return mFailingEventsEnabled;
   }
 
-  /**
-   * Sets whether selfloop-only events are to be considered in abstraction.
-   * @see #isSelfloopOnlyEventsEnabled()
-   */
+  @Override
   public void setSelfloopOnlyEventsEnabled(final boolean enable)
   {
     mSelfloopOnlyEventsEnabled = enable;
   }
 
-  /**
-   * Returns whether selfloop-only events are considered in abstraction.
-   * Selfloop-only events are events that appear only as selfloops in the
-   * entire model or in all but one automaton in the model. Events that
-   * are selfloop-only in the entire model can be removed, while events
-   * that are selfloop-only in all but one automaton can be used to
-   * simplify that automaton.
-   * @see #setSelfloopOnlyEventsEnabled(boolean) setSelfloopOnlyEventsEnabled()
-   */
+  @Override
   public boolean isSelfloopOnlyEventsEnabled()
   {
     return mSelfloopOnlyEventsEnabled;
   }
 
-  /**
-   * Sets whether always enabled events are to be considered in abstraction.
-   * @see #isAlwaysEnabledEventsEnabled()
-   */
+  @Override
   public void setAlwaysEnabledEventsEnabled(final boolean enable)
   {
     mAlwaysEnabledEventsEnabled = enable;
   }
 
-  /**
-   * Returns whether always enabled events are considered in abstraction.
-   * Always enabled events are events that are enabled in all states of the
-   * entire model or of all but one automaton in the model. Always enabled
-   * events can help to simplify automata.
-   * @see #setAlwaysEnabledEventsEnabled(boolean) setAlwaysEnabledEventsEnabled()
-   * @see #isControllabilityConsidered()
-   */
+  @Override
   public boolean isAlwaysEnabledEventsEnabled()
   {
     return mAlwaysEnabledEventsEnabled;
   }
 
-  /**
-   * Sets state and event encodings are to be preserved when copying
-   * input automata of type {@link TRAutomatonProxy}. If set, the input
-   * automata will be used with the exact same encoding, which has to be
-   * compatible with the expectations of the abstraction procedures.
-   * Otherwise, the encoding may change, resulting in counterexamples
-   * with possibly different encoding.
-   */
-  public void setPreservingEncodings(final boolean preserved)
-  {
-    mPreservingEncodings = preserved;
-  }
-
-  /**
-   * Returns whether state and event encodings are to be preserved when
-   * copying input automata of type {@link TRAutomatonProxy}.
-   * @see #setPreservingEncodings(boolean) setPreservingEncodings()
-   */
-  public boolean getPreservingEncodings()
-  {
-    return mPreservingEncodings;
-  }
-
-  /**
-   * Sets a file name to dump abstracted models before monolithic
-   * verification. If set, any abstracted model will be written to this file
-   * before being sent for monolithic verification.
-   */
+  @Override
   public void setMonolithicDumpFileName(final String fileName)
   {
     mMonolithicDumpFileName = fileName;
   }
 
-  /**
-   * Returns the file name abstracted models are written to.
-   * @see #setMonolithicDumpFileName(String) setMonolithicDumpFileName()
-   */
+  @Override
   public String getMonolithicDumpFileName()
   {
     return mMonolithicDumpFileName;
+  }
+
+  @Override
+  public void setOutputCheckingEnabled(final boolean checking)
+  {
+    mOutputCheckingEnabled = checking;
+  }
+
+  @Override
+  public boolean isOutputCheckingEnabled()
+  {
+    return mOutputCheckingEnabled;
   }
 
 
@@ -603,13 +496,14 @@ public abstract class AbstractTRCompositionalAnalyzer
     }
     mSpecialEventsFinder.setAlwaysEnabledEventsDetected(isAlwaysEnabledEventsUsed());
 
-    final KindTranslator translator = getKindTranslator();
     mSynchronousProductBuilder = createSynchronousProductBuilder();
     mSynchronousProductBuilder.setDetailedOutputEnabled(true);
 
     final ModelAnalyzer mono = getMonolithicAnalyzer();
     if (mono != null) {
-      mono.setKindTranslator(translator);
+      final KindTranslator translator = getKindTranslator();
+      final KindTranslator eventOnly = new EventOnlyKindTranslator(translator);
+      mono.setKindTranslator(eventOnly);
       mono.setNodeLimit(getMonolithicStateLimit());
       mono.setTransitionLimit(getMonolithicTransitionLimit());
       final AnalysisResult dummy = mono.createAnalysisResult();
@@ -630,7 +524,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   public boolean run() throws AnalysisException
   {
     try {
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       setUp();
       final AnalysisResult result = getAnalysisResult();
       if (result.isFinished()) {
@@ -765,10 +659,11 @@ public abstract class AbstractTRCompositionalAnalyzer
   protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
+    final KindTranslator eventOnly = new EventOnlyKindTranslator(translator);
     final TRAbstractSynchronousProductBuilder builder =
       new TRSynchronousProductBuilder();
     builder.setDetailedOutputEnabled(true);
-    builder.setKindTranslator(translator);
+    builder.setKindTranslator(eventOnly);
     builder.setRemovingSelfloops(true);
     builder.setNodeLimit(mInternalStateLimit);
     builder.setTransitionLimit(mInternalTransitionLimit);
@@ -813,6 +708,13 @@ public abstract class AbstractTRCompositionalAnalyzer
     return mIntermediateAbstractionSequence;
   }
 
+  @Override
+  protected AbstractTRCompositionalAnalyzer getCompositionalAnalyzer()
+  {
+    return this;
+  }
+
+  @Override
   protected int getPreferredInputConfiguration()
     throws AnalysisConfigurationException
   {
@@ -892,7 +794,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     throws AnalysisException
   {
     // Log ...
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final ListBufferTransitionRelation rel = aut.getTransitionRelation();
     if (logger.isDebugEnabled()) {
       logger.debug("Simplifying " + aut.getName() + " ...");
@@ -960,7 +862,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     (final TRCandidate candidate)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       mStepNo++;
       logger.debug("Composing " + candidate + " (step " + mStepNo +") ...");
@@ -1214,7 +1116,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     case PLANT:
     case SPEC:
       final TRAbstractionStepInput step;
-      if (mPreservingEncodings && aut instanceof TRAutomatonProxy) {
+      if (isPreservingEncodings() && aut instanceof TRAutomatonProxy) {
         final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
         step = new TRAbstractionStepInput(tr);
       } else {
@@ -1224,8 +1126,9 @@ public abstract class AbstractTRCompositionalAnalyzer
       }
       final int config = mTRSimplifier.getPreferredInputConfiguration();
       final TRAutomatonProxy created = step.createOutputAutomaton(config);
+      created.setKind(ComponentKind.PLANT);
       if (!hasInitialState(created)) {
-        final Logger logger = getLogger();
+        final Logger logger = LogManager.getLogger();
         logger.debug("Terminating early as automaton " + aut.getName() +
                      " has no initial state.");
         setSatisfiedResult();
@@ -1272,7 +1175,7 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   protected void dropSubsystem(final TRSubsystemInfo subsys)
   {
-    if (isDetailedOutputEnabled()) {
+    if (subsys != null && isDetailedOutputEnabled()) {
       for (final TRAutomatonProxy aut : subsys.getAutomata()) {
         dropTrivialAutomaton(aut);
       }
@@ -1347,7 +1250,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   void countSpecialEvents(final EventEncoding enc)
   {
     final CompositionalAnalysisResult stats = getAnalysisResult();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     final int numEvents = enc.getNumberOfProperEvents();
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = enc.getProperEventStatus(e);
@@ -1372,14 +1275,14 @@ public abstract class AbstractTRCompositionalAnalyzer
 
   void recordUnsuccessfulComposition(final OverflowException exception)
   {
-    getLogger().debug(exception.getMessage());
+    LogManager.getLogger().debug(exception.getMessage());
     final CompositionalAnalysisResult result = getAnalysisResult();
     result.addUnsuccessfulComposition();
   }
 
   void recordMonolithicAttempt(final ProductDESProxy des)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       double estimate = 1.0;
       final Collection<AutomatonProxy> automata = des.getAutomata();
@@ -1714,8 +1617,8 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mFailingEventsEnabled = false;
   private boolean mSelfloopOnlyEventsEnabled = false;
   private boolean mAlwaysEnabledEventsEnabled = false;
-  private boolean mPreservingEncodings = false;
   private String mMonolithicDumpFileName = null;
+  private boolean mOutputCheckingEnabled = false;
 
   // Tools
   private TRPreselectionHeuristic mPreselectionHeuristic;

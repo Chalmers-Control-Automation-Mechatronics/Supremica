@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -75,15 +81,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
-
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -1328,12 +1325,5 @@ public class ProjectingNonBlockingCheckerB
   private int maxsize = 1000;
   private final int switched = 0;
   private int mTime = 0;
-
-
-  //#########################################################################
-  //# Class Constants
-  @SuppressWarnings("unused")
-  private static final Logger LOGGER =
-    LoggerFactory.createLogger(ProjectingNonBlockingChecker.class);
 
 }

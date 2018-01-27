@@ -49,30 +49,29 @@
  */
 package org.supremica.automata.BDD;
 
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+
 
 public class BDDSynthesizer
 {
-    @SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(BDDSynthesizer.class);
-    
     BDDAutomata bddAutomata;
-    
-    public BDDSynthesizer(Automata theAutomata)
+
+    public BDDSynthesizer(final Automata theAutomata)
     {
         bddAutomata = new BDDAutomata(theAutomata);
     }
-   
-    public void computeSupervisor()
+
+    public void computeSupervisor() throws AnalysisAbortException, OverflowException
     {
         bddAutomata.getReachableAndCoreachableStates();
         //logger.info("Computing Nonblocking Supervisor Guards");
     }
-    
-    public Automaton getSupervisor()
+
+    public Automaton getSupervisor() throws AnalysisAbortException, OverflowException
     {
         return bddAutomata.getSupervisor();
     }
@@ -81,8 +80,8 @@ public class BDDSynthesizer
     {
         if (bddAutomata != null)
         {
-            bddAutomata.done();            
-            bddAutomata = null;            
+            bddAutomata.done();
+            bddAutomata = null;
         }
     }
 }

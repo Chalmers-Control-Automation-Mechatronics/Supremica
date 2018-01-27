@@ -1,22 +1,25 @@
 package org.supremica.automata.algorithms.standard;
 
-import org.supremica.log.*;
-import org.supremica.automata.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automaton;
+
 
 public class ObserverBuilder
 {
-	private static Logger logger = LoggerFactory.createLogger(ObserverBuilder.class);
-	private Determinizer determinizer;
-	private String orgAutomatonName;
+	private static Logger logger = LogManager.getLogger(ObserverBuilder.class);
+	private final Determinizer determinizer;
+	private final String orgAutomatonName;
 
-	public ObserverBuilder(Automaton automaton)
+	public ObserverBuilder(final Automaton automaton)
 	{
 		this(automaton, false);
 	}
 
-	public ObserverBuilder(Automaton automaton, boolean resolve)
+	public ObserverBuilder(final Automaton automaton, final boolean resolve)
 	{
-		EpsilonTester epsilonTester = new ObserverEpsilonTester();
+		final EpsilonTester epsilonTester = new ObserverEpsilonTester();
 
 		this.determinizer = new Determinizer(automaton, epsilonTester);
 
@@ -31,7 +34,7 @@ public class ObserverBuilder
 		determinizer.resolveControlInconsistencies(true);
 		determinizer.execute();
 
-		boolean inconsistent = determinizer.isControlInconsistent();
+		final boolean inconsistent = determinizer.isControlInconsistent();
 
 		logger.info(orgAutomatonName + " is control inconsistent: " + inconsistent);
 	}

@@ -47,7 +47,7 @@ import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 
 import org.supremica.gui.ide.DocumentContainerManager;
@@ -79,7 +79,7 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_OPEN);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPEN);
   }
 
   // #######################################################################

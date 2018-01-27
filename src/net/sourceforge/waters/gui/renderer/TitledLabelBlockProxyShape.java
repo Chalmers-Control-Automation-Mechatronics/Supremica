@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.Rectangle2D;
@@ -85,9 +86,9 @@ public class TitledLabelBlockProxyShape
   }
 
   @Override
-  public boolean isClicked(final int x, final int y)
+  public boolean isClicked(final Point point)
   {
-    return super.isClicked(x, y) || getTitleBounds().contains(x, y);
+    return super.isClicked(point) || getTitleBounds().contains(point);
   }
 
 

@@ -35,15 +35,9 @@
 
 package org.supremica.gui.useractions;
 
-import grafchart.sfc.EditorAPI;
-import grafchart.sfc.GCDocument;
-import grafchart.sfc.GCStep;
-import grafchart.sfc.GCStepInitial;
-import grafchart.sfc.GCTransition;
-import grafchart.sfc.GCTransitionInPort;
-import grafchart.sfc.GCTransitionOutPort;
-import grafchart.sfc.GrafchartStorage;
-import grafchart.sfc.WorkspaceObject;
+import com.nwoods.jgo.JGoLink;
+import com.nwoods.jgo.JGoListPosition;
+import com.nwoods.jgo.JGoPort;
 
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -54,6 +48,9 @@ import java.util.StringTokenizer;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Arc;
@@ -66,19 +63,23 @@ import org.supremica.gui.ActionMan;
 import org.supremica.gui.Supremica;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.VisualProjectContainer;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
-import com.nwoods.jgo.JGoLink;
-import com.nwoods.jgo.JGoListPosition;
-import com.nwoods.jgo.JGoPort;
+import grafchart.sfc.EditorAPI;
+import grafchart.sfc.GCDocument;
+import grafchart.sfc.GCStep;
+import grafchart.sfc.GCStepInitial;
+import grafchart.sfc.GCTransition;
+import grafchart.sfc.GCTransitionInPort;
+import grafchart.sfc.GCTransitionOutPort;
+import grafchart.sfc.GrafchartStorage;
+import grafchart.sfc.WorkspaceObject;
 
 
 public class UpdateFromJGrafchartAction
 	extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(AbstractAction.class);
+	private static Logger logger = LogManager.getLogger(AbstractAction.class);
 
 	public class JGrafchartStepReader
 	{
@@ -95,17 +96,17 @@ public class UpdateFromJGrafchartAction
 			isForbidden = false;
 		}
 
-		public void updateData(GCStep theStep)
+		public void updateData(final GCStep theStep)
 		{
 			reset();
 
 			this.theStep = theStep;
 
-			String stepLabel = theStep.getName();
+			final String stepLabel = theStep.getName();
 
 			// First find the state name
-			int firstParanthesisIndex = stepLabel.indexOf("(");
-			int lastParanthesisIndex = stepLabel.indexOf(")");
+			final int firstParanthesisIndex = stepLabel.indexOf("(");
+			final int lastParanthesisIndex = stepLabel.indexOf(")");
 
 			if (firstParanthesisIndex == -1)
 			{    // No start paranthesis
@@ -124,15 +125,15 @@ public class UpdateFromJGrafchartAction
 			// Here we have arguments
 			theName = stepLabel.substring(0, firstParanthesisIndex);
 
-			//logger.info("step name: " + theName);                 
-			String arguments = stepLabel.substring(firstParanthesisIndex + 1, lastParanthesisIndex);
+			//logger.info("step name: " + theName);
+			final String arguments = stepLabel.substring(firstParanthesisIndex + 1, lastParanthesisIndex);
 
-			//logger.info("step arguments: " + arguments);          
-			StringTokenizer st = new StringTokenizer(arguments, ",");
+			//logger.info("step arguments: " + arguments);
+			final StringTokenizer st = new StringTokenizer(arguments, ",");
 
 			while (st.hasMoreTokens())
 			{
-				String currentParameter = st.nextToken();
+				final String currentParameter = st.nextToken();
 
 				//logger.info("step currentParameter: " + currentParameter);
 				if (currentParameter.equalsIgnoreCase("accepting") || currentParameter.equalsIgnoreCase("marked"))
@@ -170,7 +171,7 @@ public class UpdateFromJGrafchartAction
 			return isForbidden;
 		}
 
-		public void setAttributes(State theState)
+		public void setAttributes(final State theState)
 		{
 
 			// theState.setName(theName); Do not set the name here, it is already set
@@ -210,20 +211,20 @@ public class UpdateFromJGrafchartAction
 			theLabel = "";
 		}
 
-		public void updateData(GCTransition theTransition)
+		public void updateData(final GCTransition theTransition)
 		{
 			theEvents.clear();
 
 			this.theTransition = theTransition;
 
-			String transitionLabel = theTransition.getLabelText();
-			StringTokenizer st = new StringTokenizer(transitionLabel, ",{}");
+			final String transitionLabel = theTransition.getLabelText();
+			final StringTokenizer st = new StringTokenizer(transitionLabel, ",{}");
 
 			while (st.hasMoreTokens())
 			{
 				reset();
 
-				String currentParameter = st.nextToken();
+				final String currentParameter = st.nextToken();
 
 				//logger.info("transition currentParameter: " + currentParameter);
 				int minIndex = 0;
@@ -293,7 +294,7 @@ public class UpdateFromJGrafchartAction
 
 				//logger.info("transition minIndex: " + minIndex);
 				//logger.info("transition currentLabel: " + theLabel);
-				LabeledEvent currEvent = new LabeledEvent(theLabel);
+				final LabeledEvent currEvent = new LabeledEvent(theLabel);
 
 				currEvent.setControllable(isControllable);
 				currEvent.setPrioritized(isPrioritized);
@@ -317,16 +318,16 @@ public class UpdateFromJGrafchartAction
 
 		public JGrafchartWorkbenchReader() {}
 
-		public void updateData(WorkspaceObject theWorkspace)
+		public void updateData(final WorkspaceObject theWorkspace)
 		{
 			theName = "";
 			theType = AutomatonType.SPECIFICATION;
 
-			String workspaceLabel = theWorkspace.getName();
+			final String workspaceLabel = theWorkspace.getName();
 
 			// First find the state name
-			int firstParanthesisIndex = workspaceLabel.indexOf("(");
-			int lastParanthesisIndex = workspaceLabel.indexOf(")");
+			final int firstParanthesisIndex = workspaceLabel.indexOf("(");
+			final int lastParanthesisIndex = workspaceLabel.indexOf(")");
 
 			if (firstParanthesisIndex == -1)
 			{    // No start paranthesis
@@ -345,15 +346,15 @@ public class UpdateFromJGrafchartAction
 			// Here we have arguments
 			theName = workspaceLabel.substring(0, firstParanthesisIndex);
 
-			//logger.info("step name: " + theName);                 
-			String arguments = workspaceLabel.substring(firstParanthesisIndex + 1, lastParanthesisIndex);
+			//logger.info("step name: " + theName);
+			final String arguments = workspaceLabel.substring(firstParanthesisIndex + 1, lastParanthesisIndex);
 
-			//logger.info("step arguments: " + arguments);          
-			StringTokenizer st = new StringTokenizer(arguments, ",");
+			//logger.info("step arguments: " + arguments);
+			final StringTokenizer st = new StringTokenizer(arguments, ",");
 
 			while (st.hasMoreTokens())
 			{
-				String currentParameter = st.nextToken();
+				final String currentParameter = st.nextToken();
 
 				theType = AutomatonType.toType(currentParameter);
 
@@ -382,21 +383,21 @@ public class UpdateFromJGrafchartAction
 		putValue(SHORT_DESCRIPTION, "Update from JGrafchart");
 	}
 
-	public Automaton buildAutomaton(WorkspaceObject theWorkspace)
+	public Automaton buildAutomaton(final WorkspaceObject theWorkspace)
 	{
-		HashMap<GCStep, State> stepToStateMap = new HashMap<GCStep, State>();
-		JGrafchartTransitionReader transitionReader = new JGrafchartTransitionReader();
-		JGrafchartStepReader stepReader = new JGrafchartStepReader();
-		JGrafchartWorkbenchReader workspaceReader = new JGrafchartWorkbenchReader();
+		final HashMap<GCStep, State> stepToStateMap = new HashMap<GCStep, State>();
+		final JGrafchartTransitionReader transitionReader = new JGrafchartTransitionReader();
+		final JGrafchartStepReader stepReader = new JGrafchartStepReader();
+		final JGrafchartWorkbenchReader workspaceReader = new JGrafchartWorkbenchReader();
 
 		workspaceReader.updateData(theWorkspace);
 
-		Automaton currAutomaton = new Automaton(workspaceReader.getName());
-		Alphabet theAlphabet = currAutomaton.getAlphabet();
+		final Automaton currAutomaton = new Automaton(workspaceReader.getName());
+		final Alphabet theAlphabet = currAutomaton.getAlphabet();
 
 		currAutomaton.setType(workspaceReader.getType());
 
-		GCDocument theDocument = theWorkspace.myContentDocument;
+		final GCDocument theDocument = theWorkspace.myContentDocument;
 
 		// First create all states
 		JGoListPosition pos = theDocument.getFirstObjectPos();
@@ -404,13 +405,13 @@ public class UpdateFromJGrafchartAction
 
 		while (pos != null)
 		{
-			Object currObject = theDocument.getObjectAtPos(pos);
+			final Object currObject = theDocument.getObjectAtPos(pos);
 
 			pos = theDocument.getNextObjectPosAtTop(pos);
 
 			if (currObject instanceof GCStep)
 			{
-				GCStep currStep = (GCStep) currObject;
+				final GCStep currStep = (GCStep) currObject;
 
 				stepReader.updateData(currStep);
 
@@ -427,7 +428,7 @@ public class UpdateFromJGrafchartAction
 					while (currAutomaton.containsStateWithName(stateName));
 				}
 
-				State newState = new State(stateName);
+				final State newState = new State(stateName);
 
 				stepReader.setAttributes(newState);
 				currAutomaton.addState(newState);
@@ -456,26 +457,26 @@ public class UpdateFromJGrafchartAction
 
 		while (pos != null)
 		{
-			Object currObject = theDocument.getObjectAtPos(pos);
+			final Object currObject = theDocument.getObjectAtPos(pos);
 
 			pos = theDocument.getNextObjectPosAtTop(pos);
 
 			if (currObject instanceof GCTransition)
 			{
-				GCTransition currTransition = (GCTransition) currObject;
+				final GCTransition currTransition = (GCTransition) currObject;
 
 				transitionReader.updateData(currTransition);
 
 				//String label = currTransition.getLabelText();
-				//logger.info("Found GCTransition: " + label ); 
+				//logger.info("Found GCTransition: " + label );
 				// Find preceding step
 				GCStep precedingStep = null;
-				GCTransitionInPort transInPort = currTransition.getInPort();
+				final GCTransitionInPort transInPort = currTransition.getInPort();
 				JGoListPosition currLinkPos = transInPort.getFirstLinkPos();
 
 				while (currLinkPos != null)
 				{
-					JGoLink currLink = transInPort.getLinkAtPos(currLinkPos);
+					final JGoLink currLink = transInPort.getLinkAtPos(currLinkPos);
 
 					currLinkPos = transInPort.getNextLinkPos(currLinkPos);
 
@@ -484,8 +485,8 @@ public class UpdateFromJGrafchartAction
 						logger.error("Multiple incoming links to a transition is not allowed");
 					}
 
-					JGoPort fromPort = currLink.getOtherPort(transInPort);
-					Object currParent = fromPort.getParent();
+					final JGoPort fromPort = currLink.getOtherPort(transInPort);
+					final Object currParent = fromPort.getParent();
 
 					if (currParent instanceof GCStep)
 					{
@@ -501,13 +502,13 @@ public class UpdateFromJGrafchartAction
 
 				// Find preceding step
 				GCStep succeedingStep = null;
-				GCTransitionOutPort transOutPort = currTransition.getOutPort();
+				final GCTransitionOutPort transOutPort = currTransition.getOutPort();
 
 				currLinkPos = transOutPort.getFirstLinkPos();
 
 				while (currLinkPos != null)
 				{
-					JGoLink currLink = transOutPort.getLinkAtPos(currLinkPos);
+					final JGoLink currLink = transOutPort.getLinkAtPos(currLinkPos);
 
 					currLinkPos = transOutPort.getNextLinkPos(currLinkPos);
 
@@ -516,8 +517,8 @@ public class UpdateFromJGrafchartAction
 						logger.error("Multiple outgoing links from a transition is not allowed");
 					}
 
-					JGoPort toPort = currLink.getOtherPort(transOutPort);
-					Object currParent = toPort.getParent();
+					final JGoPort toPort = currLink.getOtherPort(transOutPort);
+					final Object currParent = toPort.getParent();
 
 					if (currParent instanceof GCStep)
 					{
@@ -531,7 +532,7 @@ public class UpdateFromJGrafchartAction
 					}
 				}
 
-				State precedingState = stepToStateMap.get(precedingStep);
+				final State precedingState = stepToStateMap.get(precedingStep);
 
 				if (precedingState == null)
 				{
@@ -540,7 +541,7 @@ public class UpdateFromJGrafchartAction
 					return null;
 				}
 
-				State succeedingState = stepToStateMap.get(succeedingStep);
+				final State succeedingState = stepToStateMap.get(succeedingStep);
 
 				if (succeedingState == null)
 				{
@@ -549,9 +550,9 @@ public class UpdateFromJGrafchartAction
 					return null;
 				}
 
-				Alphabet theEvents = transitionReader.getEvents();
+				final Alphabet theEvents = transitionReader.getEvents();
 
-				for (Iterator<?> alphIt = theEvents.iterator(); alphIt.hasNext(); )
+				for (final Iterator<?> alphIt = theEvents.iterator(); alphIt.hasNext(); )
 				{
 					LabeledEvent currEvent = (LabeledEvent) alphIt.next();
 
@@ -564,7 +565,7 @@ public class UpdateFromJGrafchartAction
 						currEvent = theAlphabet.getEvent(currEvent.getLabel());
 					}
 
-					Arc newArc = new Arc(precedingState, succeedingState, currEvent);
+					final Arc newArc = new Arc(precedingState, succeedingState, currEvent);
 
 					currAutomaton.addArc(newArc);
 				}
@@ -603,26 +604,26 @@ public class UpdateFromJGrafchartAction
 		return currAutomaton;
 	}
 
-	public Project buildProject(GCDocument theDocument)
+	public Project buildProject(final GCDocument theDocument)
 	{
 
 		// logger.info("Top Workspace (" + theDocument.getNumObjects() +"," + theDocument.workspaces.size() + "): " + theDocument.getName());
-		Project currProject = new Project(theDocument.getName());
+		final Project currProject = new Project(theDocument.getName());
 
 		// Create the automata
 		JGoListPosition pos = theDocument.getFirstObjectPos();
 
 		while (pos != null)
 		{
-			Object currObject = theDocument.getObjectAtPos(pos);
+			final Object currObject = theDocument.getObjectAtPos(pos);
 
 			pos = theDocument.getNextObjectPosAtTop(pos);
 
 //              logger.debug("The class of " + currObject + " is " + currObject.getClass().getName());
 			if (currObject instanceof WorkspaceObject)
 			{
-				WorkspaceObject currWorkspace = (WorkspaceObject) currObject;
-				Automaton currAutomaton = buildAutomaton(currWorkspace);
+				final WorkspaceObject currWorkspace = (WorkspaceObject) currObject;
+				final Automaton currAutomaton = buildAutomaton(currWorkspace);
 
 				currProject.addAutomaton(currAutomaton);
 			}
@@ -646,19 +647,20 @@ public class UpdateFromJGrafchartAction
 		return currProject;
 	}
 
-	public void actionPerformed(ActionEvent e)
+	@Override
+  public void actionPerformed(final ActionEvent e)
 	{
 
 		//ActionMan.updateFromJGrafchart(ActionMan.getGui());
 		VisualProject theProject = null;
 		try
 		{
-			VisualProjectContainer projectContainer = ActionMan.getGui().getVisualProjectContainer();
+			final VisualProjectContainer projectContainer = ActionMan.getGui().getVisualProjectContainer();
 
-			theProject = (VisualProject) projectContainer.getActiveProject();
+			theProject = projectContainer.getActiveProject();
 			theProject.getJGrafchartEditor();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception while getting JGrafchart Editor");
 			logger.debug(ex.getStackTrace());
@@ -666,16 +668,16 @@ public class UpdateFromJGrafchartAction
 			return;
 		}
 
-		//GCDocument workspace1 = theEditor.newWorkspace();                             
+		//GCDocument workspace1 = theEditor.newWorkspace();
 		//fillDocument(workspace1);
 		// Print top level workspaces
-		GrafchartStorage theStorage = EditorAPI.topGrafcharts;
-		ArrayList<?> topLevelWorkspaceList = theStorage.getStorage();
+		final GrafchartStorage theStorage = EditorAPI.topGrafcharts;
+		final ArrayList<?> topLevelWorkspaceList = theStorage.getStorage();
 
-		for (Iterator<?> it = topLevelWorkspaceList.iterator(); it.hasNext(); )
+		for (final Iterator<?> it = topLevelWorkspaceList.iterator(); it.hasNext(); )
 		{
-			GCDocument currDoc = (GCDocument) it.next();
-			Project currProject = buildProject(currDoc);
+			final GCDocument currDoc = (GCDocument) it.next();
+			final Project currProject = buildProject(currDoc);
 
 			theProject.updateAutomata(currProject);
 
@@ -685,22 +687,22 @@ public class UpdateFromJGrafchartAction
 		ActionMan.getGui().show();
 	}
 
-	public void fillDocument(GCDocument doc)
+	public void fillDocument(final GCDocument doc)
 	{
-		GCDocument jgSupervisor = doc;
+		final GCDocument jgSupervisor = doc;
 
 		jgSupervisor.setWorkspaceName("Automata");    // Top level
 		jgSupervisor.setFrameRectangle(new Rectangle(0, 0, 500, 400));
 
-		WorkspaceObject wo = jgSupervisor.createWorkspaceObject(100, 50, "Supervisor(Plant)");
-		GCDocument supervisor = wo.getSubWorkspace();
+		final WorkspaceObject wo = jgSupervisor.createWorkspaceObject(100, 50, "Supervisor(Plant)");
+		final GCDocument supervisor = wo.getSubWorkspace();
 
 		// Create Grafcet
-		int xpos = 100;
-		GCStepInitial s1 = supervisor.createInitialStep(xpos, 100, "s1(accepting)", "");
-		GCTransition t1 = supervisor.createTransition(xpos, 200, "{e1,e2}");
-		GCStep s2 = supervisor.createStep(xpos, 300, "s2", "");
-		GCTransition t2 = supervisor.createTransition(xpos, 400, "{!e2,e3}");
+		final int xpos = 100;
+		final GCStepInitial s1 = supervisor.createInitialStep(xpos, 100, "s1(accepting)", "");
+		final GCTransition t1 = supervisor.createTransition(xpos, 200, "{e1,e2}");
+		final GCStep s2 = supervisor.createStep(xpos, 300, "s2", "");
+		final GCTransition t2 = supervisor.createTransition(xpos, 400, "{!e2,e3}");
 
 		supervisor.connect(s1, t1);
 		supervisor.connect(t1, s2);

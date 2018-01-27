@@ -60,7 +60,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -174,7 +175,6 @@ public class ModularControllabilitySynthesizer
     return mRemovesUnnecessarySupervisors;
   }
 
-
   public Collection<EventProxy> getDisabledEvents()
   {
     return mDisabledEvents;
@@ -193,6 +193,12 @@ public class ModularControllabilitySynthesizer
   public EventProxy getConfiguredDefaultMarking()
   {
     return mMonolithicSynthesizer.getConfiguredDefaultMarking();
+  }
+
+  @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    mMonolithicSynthesizer.setNondeterminismEnabled(enable);
   }
 
   @Override
@@ -255,13 +261,27 @@ public class ModularControllabilitySynthesizer
   {
     super.setUp();
     final KindTranslator translator = getKindTranslator();
+    final ProductDESProxy model = getModel();
+
+    for (final AutomatonProxy aut : model.getAutomata()) {
+      switch (translator.getComponentKind(aut)) {
+      case PLANT:
+        if (supportsNondeterminism()) {
+          continue;
+        }
+        // fall through ...
+      case SPEC:
+        AutomatonTools.checkDeterministic(aut);
+        break;
+      }
+    }
+
     mModularControllabilityChecker.setKindTranslator(translator);
     mModularControllabilityChecker.setNodeLimit(getNodeLimit());
     mModularControllabilityChecker.setTransitionLimit(getTransitionLimit());
     mMonolithicSynthesizer.setKindTranslator(translator);
     mMonolithicSynthesizer.setNodeLimit(getNodeLimit());
     mMonolithicSynthesizer.setTransitionLimit(getTransitionLimit());
-    final ProductDESProxy model = getModel();
     final int numEvents = model.getEvents().size();
     mUncontrollableEventMap = new HashMap<>(numEvents);
     if (mIncludesAllAutomata) {
@@ -339,6 +359,7 @@ public class ModularControllabilitySynthesizer
         new ArrayList<>(numAutomata);
       for (final AutomatonProxy spec : uncontrollableSpecs) {
         checkAbort();
+        AutomatonTools.checkDeterministic(spec);
         final Collection<EventProxy> specUncontrollableEvents =
           getUncontrollableEvents(spec);
         final Collection<EventProxy> uncontrollableEvents =
@@ -448,7 +469,7 @@ public class ModularControllabilitySynthesizer
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);
@@ -463,7 +484,7 @@ public class ModularControllabilitySynthesizer
   @Override
   public boolean supportsNondeterminism()
   {
-    return true;
+    return mMonolithicSynthesizer.supportsNondeterminism();
   }
 
 
@@ -517,7 +538,7 @@ public class ModularControllabilitySynthesizer
   //# Debugging
   private void logSubsystem(final ProductDESProxy des)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       final KindTranslator translator = getKindTranslator();
       final StringBuilder builder =

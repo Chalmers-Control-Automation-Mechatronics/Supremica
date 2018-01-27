@@ -55,7 +55,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * <P>A BDD implementation of the deadlock check algorithm.</P>
@@ -98,7 +99,7 @@ public class BDDDeadlockChecker
   public boolean run()
     throws AnalysisException
   {
-    getLogger().debug("BDDDeadlockChecker.run(): " +
+    LogManager.getLogger().debug("BDDDeadlockChecker.run(): " +
                       getModel().getName() + " ...");
     try {
       setUp();
@@ -138,7 +139,7 @@ public class BDDDeadlockChecker
       }
     } finally {
       tearDown();
-      getLogger().debug("BDDDeadlockChecker.run(): " +
+      LogManager.getLogger().debug("BDDDeadlockChecker.run(): " +
                         getModel().getName() + " done.");
     }
   }
@@ -219,7 +220,7 @@ public class BDDDeadlockChecker
     final List<DisjunctiveConditionBDD> partition =
       mDeadlockPartitioning.getFullPartition();
     final int condCount1 = partition.size();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && condCount0 > condCount1) {
       logger.debug("Merged deadlock conditions: " + condCount0 +
                    " >> " + condCount1);

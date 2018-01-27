@@ -35,16 +35,26 @@
 
 package org.supremica.gui;
 
-import org.supremica.log.*;
-import java.io.*;
-import att.grappa.*;
-import org.supremica.properties.Config;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.IO.AutomataSerializer;
+import org.supremica.properties.Config;
+
+import att.grappa.Graph;
+import att.grappa.Parser;
+
 
 public class DotBuilder
 	extends Thread
 {
-	private static Logger logger = LoggerFactory.createLogger(DotBuilder.class);
+	private static Logger logger = LogManager.getLogger(DotBuilder.class);
 
 	private DotBuilderGraphObserver theGraphObserver = null;
 	private DotBuilderStreamObserver theStreamObserver = null;
@@ -55,10 +65,10 @@ public class DotBuilder
 	private PrintWriter toDotWriter;
 	private InputStream fromDotStream;
 	private Process dotProcess;
-	private String dotArguments;
+	private final String dotArguments;
 	Graph theGraph = null;
 
-	private DotBuilder(DotBuilderStreamObserver theStreamObserver, DotBuilderGraphObserver theGraphObserver, AutomataSerializer theSerializer, String dotArguments)
+	private DotBuilder(final DotBuilderStreamObserver theStreamObserver, final DotBuilderGraphObserver theGraphObserver, final AutomataSerializer theSerializer, final String dotArguments)
 	{
 		this.theStreamObserver = theStreamObserver;
 		this.theGraphObserver = theGraphObserver;
@@ -68,14 +78,15 @@ public class DotBuilder
 		setPriority(Thread.MIN_PRIORITY);
 	}
 
-	public static DotBuilder getDotBuilder(DotBuilderStreamObserver theStreamObserver, DotBuilderGraphObserver theGraphObserver, AutomataSerializer theSerializer, String dotArguments)
+	public static DotBuilder getDotBuilder(final DotBuilderStreamObserver theStreamObserver, final DotBuilderGraphObserver theGraphObserver, final AutomataSerializer theSerializer, final String dotArguments)
 	{
-		DotBuilder dotBuilder = new DotBuilder(theStreamObserver, theGraphObserver, theSerializer, dotArguments);
+		final DotBuilder dotBuilder = new DotBuilder(theStreamObserver, theGraphObserver, theSerializer, dotArguments);
 		dotBuilder.start();
 		return dotBuilder;
 	}
 
-	public void run()
+	@Override
+  public void run()
 	{
 		if (mode == BUILD)
 		{
@@ -84,7 +95,7 @@ public class DotBuilder
 			{
 				internalBuild();
 			}
-			catch (Exception ex)
+			catch (final Exception ex)
 			{
 				logger.error("Cannot display object.");
 				logger.debug(ex.getStackTrace());
@@ -130,7 +141,7 @@ public class DotBuilder
 		{
 			initializeStreams(dotArguments);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			toDotWriter.close();
 			logger.debug(ex.getStackTrace());
@@ -143,7 +154,7 @@ public class DotBuilder
 		{
 			theSerializer.serialize(toDotWriter);
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception while serializing ", ex);
 			logger.debug(ex.getStackTrace());
@@ -165,16 +176,16 @@ public class DotBuilder
 		}
 	}
 
-	private void parseResponse(InputStream inputStream)
+	private void parseResponse(final InputStream inputStream)
 	{
 		// Parse the response from dot
-		Parser parser = new Parser(inputStream);
+		final Parser parser = new Parser(inputStream);
 
 		try
 		{
 			parser.parse();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception while parsing dot file", ex);
 			logger.debug(ex.getStackTrace());
@@ -186,7 +197,7 @@ public class DotBuilder
 			{
 				inputStream.close();
 			}
-			catch (IOException ex)
+			catch (final IOException ex)
 			{
 				logger.error("Exception while closing input stream", ex);
 				logger.debug(ex.getStackTrace());
@@ -198,7 +209,7 @@ public class DotBuilder
 		{
 			theGraph = parser.getGraph();
 		}
-		catch (Exception ex)
+		catch (final Exception ex)
 		{
 			logger.error("Exception while getting dot graph", ex);
 			logger.debug(ex.getStackTrace());
@@ -206,22 +217,22 @@ public class DotBuilder
 		}
 	}
 
-	private void initializeStreams(String arguments)
+	private void initializeStreams(final String arguments)
 	{
 		final String dot_cmd = Config.DOT_EXECUTE_COMMAND.get() + " " + arguments;
-		
+
 		try
 		{
 			dotProcess = Runtime.getRuntime().exec(dot_cmd);
 		}
-		catch (IOException ex)
+		catch (final IOException ex)
 		{
 			logger.error("Cannot run (" + dot_cmd + "). Is dot in the path?", ex);
 			return;
 		}
 
-		OutputStream pOut = dotProcess.getOutputStream();
-		BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
+		final OutputStream pOut = dotProcess.getOutputStream();
+		final BufferedOutputStream pBuffOut = new BufferedOutputStream(pOut);
 
 		toDotWriter = new PrintWriter(pBuffOut);
 		fromDotStream = dotProcess.getInputStream();

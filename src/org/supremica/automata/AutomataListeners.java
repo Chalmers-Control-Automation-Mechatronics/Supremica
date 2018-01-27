@@ -49,26 +49,23 @@
  */
 package org.supremica.automata;
 
-import java.util.*;
-import org.supremica.log.*;
+import java.util.Iterator;
+
 
 public class AutomataListeners
 	extends Listeners
 {
-	@SuppressWarnings("unused")
-	private static Logger logger = LoggerFactory.createLogger(AutomataListeners.class);
-
 	public static final int MODE_AUTOMATON_ADDED = 1;
 	public static final int MODE_AUTOMATON_REMOVED = 2;
 	public static final int MODE_AUTOMATON_RENAMED = 3;
 	public static final int MODE_ACTIONS_OR_CONTROLS_CHANGED = 4;
 
-	public AutomataListeners(Automata owner)
+	public AutomataListeners(final Automata owner)
 	{
 		super(owner);
 	}
 
-	public void notifyListeners(int mode, Automaton a)
+	public void notifyListeners(final int mode, final Automaton a)
 	{
 
 		// logger.debug("AutomataListeners.notifyListeners Start");
@@ -82,10 +79,10 @@ public class AutomataListeners
 			{
 
 				// logger.debug("AutomataListeners.notifyListeners notifying");
-				for (Iterator<Listener> listenerIt = listeners.iterator();
+				for (final Iterator<Listener> listenerIt = listeners.iterator();
 						listenerIt.hasNext(); )
 				{
-					AutomataListener currListener = (AutomataListener) listenerIt.next();
+					final AutomataListener currListener = (AutomataListener) listenerIt.next();
 
 					if (mode == MODE_AUTOMATON_ADDED)
 					{

@@ -52,18 +52,18 @@ import javax.swing.Action;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.IO.EFAToNuSMV;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 
 /**
- *
- * @author voronov
+ * @author Alexey Voronov
  */
 public class AnalyzerSMVAction extends IDEAction {
     private static final long serialVersionUID = -5526955419215441122L;
-    private static Logger logger = LoggerFactory.createLogger(AnalyzerSMVAction.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerSMVAction.class);
 
     public AnalyzerSMVAction(final List<IDEAction> actionList){
         super(actionList);

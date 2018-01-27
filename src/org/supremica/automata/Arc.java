@@ -51,18 +51,23 @@
 package org.supremica.automata;
 
 import java.io.Serializable;
-import org.supremica.util.Args;
-import org.supremica.log.*;
 import java.util.Comparator;
+
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.util.Args;
+
+
 public class Arc
     implements TransitionProxy
 {
-    private static Logger logger = LoggerFactory.createLogger(Arc.class);
+    private static Logger logger = LogManager.getLogger(Arc.class);
     private LabeledEvent event;
     private final State fromState;
     private State toState;
@@ -89,6 +94,7 @@ public class Arc
         this.toState = other.toState;
     }
 
+    @Override
     public TransitionProxy clone()
     {
         try
@@ -102,6 +108,7 @@ public class Arc
         }
     }
 
+    @Override
     public LabeledEvent getEvent()
     {
         return event;
@@ -122,6 +129,7 @@ public class Arc
         this.toState = toState;
     }
 
+    @Override
     public State getTarget()
     {
         return getToState();
@@ -132,6 +140,7 @@ public class Arc
         return fromState;
     }
 
+    @Override
     public State getSource()
     {
         return getFromState();
@@ -163,6 +172,7 @@ public class Arc
         }
     }
 
+    @Override
     public boolean equals(final Object object)
     {
         if (object instanceof Arc)
@@ -173,6 +183,7 @@ public class Arc
         return false;
     }
 
+    @Override
     public int hashCode()
     {
         return toState.hashCode() + fromState.hashCode() + event.hashCode();
@@ -182,6 +193,7 @@ public class Arc
      * Returns a string representation of the arc as an ordered triple,
      * with from-state, to-state and event.
      */
+    @Override
     public String toString()
     {
         final StringBuilder sbuf = new StringBuilder();
@@ -201,6 +213,7 @@ public class Arc
      * Compares this arc to another arc. The event is compared first,
      * then the toState and last the fromState.
      */
+    @Override
     public int compareTo(final TransitionProxy trans)
     {
         final int compsource = getSource().compareTo(trans.getSource());
@@ -224,7 +237,8 @@ public class Arc
     {
 		private static final long serialVersionUID = 1L;
 
-		public int compare(final Arc one, final Arc two)
+		@Override
+    public int compare(final Arc one, final Arc two)
         {
             return one.getEvent().compareTo(two.getEvent());
         }
@@ -233,11 +247,13 @@ public class Arc
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
     public Class<TransitionProxy> getProxyInterface()
     {
         return TransitionProxy.class;
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
         throws VisitorException
     {

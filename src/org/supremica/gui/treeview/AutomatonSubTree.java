@@ -38,7 +38,7 @@ package org.supremica.gui.treeview;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Automaton;
 
@@ -47,9 +47,9 @@ public class AutomatonSubTree
 {
     private static final long serialVersionUID = 1L;
 
-    private static ImageIcon plantIcon = IconLoader.ICON_PLANT;
-    private static ImageIcon specificationIcon = IconLoader.ICON_SPEC;
-    private static ImageIcon supervisorIcon = IconLoader.ICON_SUPERVISOR;
+    private static ImageIcon plantIcon = IconAndFontLoader.ICON_PLANT;
+    private static ImageIcon specificationIcon = IconAndFontLoader.ICON_SPEC;
+    private static ImageIcon supervisorIcon = IconAndFontLoader.ICON_SUPERVISOR;
 
     public AutomatonSubTree(final Automaton automaton, final boolean includeAlphabet, final boolean includeStates)
     {

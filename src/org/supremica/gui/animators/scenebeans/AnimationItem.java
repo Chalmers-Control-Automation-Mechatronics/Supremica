@@ -36,17 +36,20 @@
 package org.supremica.gui.animators.scenebeans;
 
 import java.net.URL;
-import uk.ac.ic.doc.scenebeans.animation.parse.*;
-import org.supremica.log.*;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import uk.ac.ic.doc.scenebeans.animation.parse.XMLAnimationParser;
 
 public class AnimationItem
 {
-    private static Logger logger = LoggerFactory.createLogger(AnimationItem.class);
+    private static Logger logger = LogManager.getLogger(AnimationItem.class);
 
-    private String description;
-    private URL url;
+    private final String description;
+    private final URL url;
 
-    public AnimationItem(String description, URL url)
+    public AnimationItem(final String description, final URL url)
     {
         this.description = description;
         this.url = url;
@@ -69,7 +72,7 @@ public class AnimationItem
         return AnimationItem.createInstance(url);
     }
 
-    public static Animator createInstance(URL url)
+    public static Animator createInstance(final URL url)
     throws Exception
     {
         logger.debug("createInstance url: " + url);
@@ -84,13 +87,13 @@ public class AnimationItem
 
                         }
                         */
-            XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
+            final XMLAnimationParser parser = new XMLAnimationParser(url, view._canvas);
 
             view.setAnimation(parser.parseAnimation());
 
             return view;
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             System.err.println(ex);
             ex.printStackTrace();

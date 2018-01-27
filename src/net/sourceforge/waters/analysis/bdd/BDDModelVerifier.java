@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.bdd;
 
+import gnu.trove.iterator.TObjectIntIterator;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,10 +68,8 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * An abstract base class for all BDD-based model verifiers.
@@ -257,7 +258,7 @@ public abstract class BDDModelVerifier
         if (numNodes > getNodeLimit()) {
           final OverflowException exception =
             new OverflowException(OverflowKind.NODE, getNodeLimit());
-          getLogger().debug(exception.getMessage() + " - aborting ...");
+          LogManager.getLogger().debug(exception.getMessage() + " - aborting ...");
           throw exception;
         }
       }
@@ -504,7 +505,7 @@ public abstract class BDDModelVerifier
     final List<TransitionPartitionBDD> bdds =
       mTransitionPartitioning.getFullPartition();
     final int transcount1 = bdds.size();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && transcount0 > transcount1) {
       logger.debug("Merged transitions: " + transcount0 + " >> " + transcount1);
     }
@@ -574,7 +575,7 @@ public abstract class BDDModelVerifier
       part.buildForwardCubes(mAutomatonBDDs, mBDDFactory);
     }
     mTransitionPartitioning.startIteration();
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
     final boolean multiPart =
@@ -642,7 +643,7 @@ public abstract class BDDModelVerifier
       current = endset.and(restriction);
       endset.free();
     }
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     int level = 0;
     List<TransitionPartitionBDD> group =
       mTransitionPartitioning.startIteration();
@@ -1064,7 +1065,7 @@ public abstract class BDDModelVerifier
   @SuppressWarnings("unused")
   private void showOrder(final Collection<AutomatonProxy> ordering)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       logger.debug("AUTOMATON ORDERING:");
       for (final AutomatonProxy aut : ordering) {

@@ -48,7 +48,7 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -91,7 +91,7 @@ public class IDEDeleteAction
     }
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_DELETE);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_DELETE);
     updateEnabledStatus();
   }
 

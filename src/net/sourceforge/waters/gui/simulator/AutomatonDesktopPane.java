@@ -61,7 +61,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.supremica.gui.ide.IDE;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -152,9 +154,9 @@ public class AutomatonDesktopPane
             fireFrameOpenedEvent(aut, newFrame);
             newFrame.setVisible(true);
           } catch (final GeometryAbsentException exception) {
-            final IDE ide = container.getIDE();
+            final Logger logger = LogManager.getLogger();
             final String msg = exception.getMessage(comp);
-            ide.error(msg);
+            logger.error(msg);
           }
         }
       }

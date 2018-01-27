@@ -12,21 +12,21 @@
  */
 package org.supremica.automata.algorithms;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.AutomatonType;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 
 /**
- *
- * @author Fabian
+ * @author Martin Fabian
  */
 public class Plantifier
 {
 	final static String PLANTIFY_PREFIX = "p:";
-    private static Logger logger = LoggerFactory.createLogger(Plantifier.class);
+    private static Logger logger = LogManager.getLogger(Plantifier.class);
 
 	private final Automata the_automata; // holds the automata to work with
 	private final Automata the_plants;   // holds the  plantified automata when done

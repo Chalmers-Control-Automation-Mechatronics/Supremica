@@ -49,13 +49,15 @@
  */
 package org.supremica.automata.algorithms;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
+
 
 public final class EditorSynthesizerOptions
 {
-    private static Logger logger = LoggerFactory.createLogger(SynthesizerOptions.class);
+    private static Logger logger = LogManager.getLogger(SynthesizerOptions.class);
 
     private boolean dialogOK = false;
     private SynthesisType synthesisType;
@@ -67,7 +69,6 @@ public final class EditorSynthesizerOptions
     private boolean reduceSupervisors;
     private boolean printGuard;
     private boolean addGuards;
-    private boolean createAutVars;
     private boolean saveInFile;
     private boolean saveIDDInFile;
     private boolean compHeuristic;
@@ -78,8 +79,6 @@ public final class EditorSynthesizerOptions
     private boolean optimization;
     private long globalClockDomain = 0;
 
-    private boolean bddExtractSupervisor;
-
     public boolean oneEventAtATime = false;
     public boolean addOnePlantAtATime = false;
 
@@ -88,7 +87,7 @@ public final class EditorSynthesizerOptions
     private String event;
     private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
 
-    //Optimization options
+    //Optimisation options
     private String optVariable;
     private boolean typeOfVarOpt = true;
 
@@ -105,10 +104,8 @@ public final class EditorSynthesizerOptions
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
             Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
             Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
-            Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.get(),
             Config.SYNTHESIS_PRINT_GUARD.get(),
             Config.SYNTHESIS_ADD_GUARDS.get(),
-            Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.get(),
             Config.SYNTHESIS_SAVE_IN_FILE.get(),
             Config.SYNTHESIS_REACHABILITY.get(),
             Config.SYNTHESIS_PEAKBDD.get(),
@@ -128,10 +125,8 @@ public final class EditorSynthesizerOptions
                                      final boolean maximallyPermissive,
                                      final boolean maximallyPermissiveIncremental,
                                      final boolean reduceSupervisors,
-                                     final boolean bddExtractSupervisor,
                                      final boolean computePrintGuard,
                                      final boolean addGuards,
-                                     final boolean createAutVars,
                                      final boolean saveInFile,
                                      final boolean reachability,
                                      final boolean peakBDD,
@@ -144,10 +139,8 @@ public final class EditorSynthesizerOptions
         this.maximallyPermissive = maximallyPermissive;
         this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
         this.reduceSupervisors = reduceSupervisors;
-        this.bddExtractSupervisor = bddExtractSupervisor;
         this.printGuard = computePrintGuard;
         this.addGuards = addGuards;
-        this.createAutVars = createAutVars;
         this.saveInFile = saveInFile;
         this.reachability = reachability;
         this.peakBDD = peakBDD;
@@ -261,16 +254,6 @@ public final class EditorSynthesizerOptions
         return removeUnnecessarySupervisors;
     }
 
-    public void setExtractSupervisor(final boolean extract)
-    {
-        bddExtractSupervisor = extract;
-    }
-
-    public boolean doExtractSupervisor()
-    {
-        return bddExtractSupervisor;
-    }
-
     public void setMaximallyPermissive(final boolean bool)
     {
         maximallyPermissive = bool;
@@ -319,16 +302,6 @@ public final class EditorSynthesizerOptions
     public void setAddGuards(final boolean bool)
     {
         addGuards = bool;
-    }
-
-    public boolean getCreateAutVars()
-    {
-        return createAutVars;
-    }
-
-    public void setCreateAutVars(final boolean bool)
-    {
-        createAutVars = bool;
     }
 
     public boolean getSaveInFile()
@@ -425,10 +398,8 @@ public final class EditorSynthesizerOptions
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
 //        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
-        Config.BDD_SYNTHESIS_EXTRACT_AUTOMATON.set(bddExtractSupervisor);
         Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
         Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
-        Config.SYNTHESIS_CREATE_AUTOMATON_VARIABLES.set(createAutVars);
         Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
         Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
         Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
@@ -442,13 +413,11 @@ public final class EditorSynthesizerOptions
     public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
     {
         return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
-                                            SynthesisAlgorithm.BDD,
+                                            SynthesisAlgorithm.MONOLITHIC_WATERS,
                                             true,
                                             true,
                                             true,
                                             true,
-                                            true,
-                                            false,
                                             true,
                                             true,
                                             false,
@@ -456,31 +425,6 @@ public final class EditorSynthesizerOptions
                                             true,
                                             true,
                                             false);
-    }
-
-    /**
-     * Returns the default options for synthesis.
-     */
-    public static EditorSynthesizerOptions getDefaultMonolithicCNBSynthesizerOptions()
-    {
-        final EditorSynthesizerOptions options = getDefaultSynthesizerOptions();
-		options.synthesisType = SynthesisType.NONBLOCKING_CONTROLLABLE;
-        options.synthesisAlgorithm = SynthesisAlgorithm.BDD;
-        options.removeUnnecessarySupervisors = false;
-        options.reduceSupervisors = false;
-        options.printGuard = true;
-        options.addGuards = true;
-        options.createAutVars = false;
-        options.saveInFile = false;
-        options.reachability = true;
-        options.saveIDDInFile = false;
-        options.compHeuristic = true;
-        options.indpHeuristic = true;
-
-        options.setExpressionType(2);
-		options.setEvent("");
-
-        return options;
     }
 
     //Guard options

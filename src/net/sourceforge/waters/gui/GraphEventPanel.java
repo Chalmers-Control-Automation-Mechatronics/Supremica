@@ -90,7 +90,7 @@ import net.sourceforge.waters.gui.transfer.ListInsertPosition;
 import net.sourceforge.waters.gui.transfer.ReplaceInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
@@ -388,8 +388,7 @@ public class GraphEventPanel
   public boolean canPaste(final Transferable transferable)
   {
     try {
-      if (transferable
-        .isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         @SuppressWarnings("unchecked")
         final List<Proxy> data =
           (List<Proxy>) transferable
@@ -799,7 +798,7 @@ public class GraphEventPanel
     final int width1 = calculateWidth1();
 
     final TableColumn column0 = getColumnModel().getColumn(0);
-    final int minwidth0 = IconLoader.ICON_EVENT.getIconWidth();
+    final int minwidth0 = IconAndFontLoader.ICON_EVENT.getIconWidth();
     final int width0 = minwidth0 + 4;
     column0.setMinWidth(minwidth0);
     column0.setPreferredWidth(width0);

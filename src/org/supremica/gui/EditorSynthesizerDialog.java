@@ -87,7 +87,6 @@ class EditorSynthesizerDialogStandardPanel
 
     private final JCheckBox printGuardBox;
     private final JCheckBox addGuardsBox;
-    private final JCheckBox createAutVarsBox;
     private final JCheckBox saveEventGuardInFileBox;
     private final JCheckBox saveIDDInFileBox;
 
@@ -293,21 +292,15 @@ class EditorSynthesizerDialogStandardPanel
         // Guard Representation options
         genGuardComputeSupBox = Box.createVerticalBox();
 
-        printGuardBox = new JCheckBox("Print the guards");
+        printGuardBox = new JCheckBox("Print the computed guards");
         printGuardBox.setToolTipText("Compute and print the guards.");
 
         printGuardBox.addActionListener(this);
 
         addGuardsBox = new JCheckBox("Add guards to the model");
-        addGuardsBox.setToolTipText("Compute and add the guards to the model.");
+        addGuardsBox.setToolTipText("Add computed guards to the model; variables of automata are created and updates are added.");
 
         addGuardsBox.addActionListener(this);
-
-        createAutVarsBox = new JCheckBox("Create automaton variables and add updates");
-        createAutVarsBox.setToolTipText("Create automaton variables mentioned in the generated guards; add updates"
-          + "to the automaton transitions");
-
-        createAutVarsBox.addActionListener(this);
 
         saveEventGuardInFileBox = new JCheckBox("Save the result in a file");
         saveEventGuardInFileBox.setToolTipText("Compute and write the event-guard pairs in a file.");
@@ -324,7 +317,6 @@ class EditorSynthesizerDialogStandardPanel
         representationPanel.setLayout(new GridLayout(5, 1));
         representationPanel.add(printGuardBox);
         representationPanel.add(addGuardsBox);
-        representationPanel.add(createAutVarsBox);
         representationPanel.add(saveEventGuardInFileBox);
         representationPanel.add(saveIDDInFileBox);
 
@@ -470,7 +462,6 @@ class EditorSynthesizerDialogStandardPanel
         synthesizerOptions.setSynthesisAlgorithm(algorithmSelector.getAlgorithm());
         synthesizerOptions.setPrintGuard(printGuardBox.isSelected());
         synthesizerOptions.setAddGuards(addGuardsBox.isSelected());
-        synthesizerOptions.setCreateAutVars(createAutVarsBox.isSelected());
         synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
         synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
         synthesizerOptions.setReachability(reachableBox.isSelected());

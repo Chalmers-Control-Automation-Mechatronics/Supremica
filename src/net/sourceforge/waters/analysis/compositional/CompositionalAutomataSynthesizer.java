@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.iterator.TObjectByteIterator;
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,10 +67,8 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.log4j.Logger;
-
-import gnu.trove.iterator.TObjectByteIterator;
-import gnu.trove.set.hash.THashSet;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -290,7 +291,7 @@ public class CompositionalAutomataSynthesizer
           result.close(factory, getOutputName());
         }
       }
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       logger.debug("CompositionalSynthesizer done.");
       result.setNumberOfRenamings(mDistinguisherInfoList.size());
       return result.isSatisfied();
@@ -468,7 +469,7 @@ public class CompositionalAutomataSynthesizer
       automaton = automata.get(0);
       break;
     default:
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       if (logger.isDebugEnabled()) {
         double estimate = 1.0;
         for (final AutomatonProxy aut : automata) {
@@ -899,7 +900,7 @@ public class CompositionalAutomataSynthesizer
   void reportAbstractionResult(final AutomatonProxy aut,
                                final AutomatonProxy dist)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       /*
        * final boolean nonblocking = AnalysisTools.isNonBlocking(aut); final
@@ -919,7 +920,7 @@ public class CompositionalAutomataSynthesizer
   void reportSupervisor(final String kind,
                         final ListBufferTransitionRelation sup)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
         "Got " + kind + " supervisor '" + sup.getName() + "' with " +

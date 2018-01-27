@@ -33,8 +33,9 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Shape;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
 
 
@@ -47,6 +48,6 @@ public interface RendererShape
 
   public Rectangle2D getBounds2D();
 
-  public boolean isClicked(int x, int y);
+  public boolean isClicked(Point point);
 
 }

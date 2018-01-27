@@ -35,30 +35,29 @@
 
 package org.supremica.gui.ide.actions;
 
+import java.awt.event.ActionEvent;
 import java.util.List;
+
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import java.awt.event.ActionEvent;
-import org.supremica.automata.Automata;
-import org.supremica.gui.VisualProject;
-import org.supremica.gui.FindStates;
-import org.supremica.gui.ide.IDE;
-import org.supremica.log.*;
 
-/**
- * A new action
- */
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.automata.Automata;
+import org.supremica.gui.FindStates;
+import org.supremica.gui.VisualProject;
+import org.supremica.gui.ide.IDE;
+
+
 public class AnalyzerFindStatesAction
     extends IDEAction
 {
-    private Logger logger = LoggerFactory.createLogger(IDE.class);
+    private final Logger logger = LogManager.getLogger(IDE.class);
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Constructor.
-     */
-    public AnalyzerFindStatesAction(List<IDEAction> actionList)
+    public AnalyzerFindStatesAction(final List<IDEAction> actionList)
     {
         super(actionList);
 
@@ -72,7 +71,8 @@ public class AnalyzerFindStatesAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Find16.gif")));
     }
 
-    public void actionPerformed(ActionEvent e)
+    @Override
+    public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
@@ -80,18 +80,19 @@ public class AnalyzerFindStatesAction
     /**
      * The code that is run when the action is invoked.
      */
+    @Override
     public void doAction()
     {
-        VisualProject theProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final VisualProject theProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
         // gui.info("Nbr of selected automata: " + selectedAutomata.size());
-        FindStates find_states = new FindStates();
+        final FindStates find_states = new FindStates();
 
         try
         {
             find_states.execute(theProject, selectedAutomata);
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             logger.error("Exception in Find States. ", ex);
             logger.debug(ex.getStackTrace());

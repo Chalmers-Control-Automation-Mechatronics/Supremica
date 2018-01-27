@@ -68,16 +68,16 @@ public class IntegerProperty
         final int value,
         final String comment)
     {
-        this(type, key, value, comment, false);
+        this(type, key, value, comment, true);
     }
 
     public IntegerProperty(final PropertyType type,
         final String key,
         final int value,
         final String comment,
-        final boolean immutable)
+        final boolean editable)
     {
-        this(type, key, value, comment, immutable,
+        this(type, key, value, comment, editable,
             Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
@@ -85,21 +85,21 @@ public class IntegerProperty
         final String key,
         final int value,
         final String comment,
-        final boolean immutable,
+        final boolean editable,
         final int min)
     {
-        this(type, key, value, comment, immutable, min, Integer.MAX_VALUE);
+        this(type, key, value, comment, editable, min, Integer.MAX_VALUE);
     }
 
     public IntegerProperty(final PropertyType type,
         final String key,
         final int value,
         final String comment,
-        final boolean immutable,
+        final boolean editable,
         final int min,
         final int max)
     {
-        this(type, key, value, comment, immutable,
+        this(type, key, value, comment, editable,
             Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
     }
 
@@ -107,12 +107,12 @@ public class IntegerProperty
         final String key,
         final int value,
         final String comment,
-        final boolean immutable,
+        final boolean editable,
         final int min,
         final int max,
         final int tick)
     {
-        super(type, key, comment, immutable);
+        super(type, key, comment, editable);
         mDefaultValue = value;
         mValue = value;
         mMin = min;
@@ -124,16 +124,19 @@ public class IntegerProperty
 
     //#######################################################################
     //# Overrides for Abstract Base Class Property
+    @Override
     public void set(final String value)
     {
         set(Integer.parseInt(value));
     }
 
+    @Override
     public String getAsString()
     {
         return Integer.toString(mValue);
     }
 
+    @Override
     public boolean currentValueDifferentFromDefaultValue()
     {
         return mDefaultValue != mValue;
@@ -162,14 +165,16 @@ public class IntegerProperty
         return mTick;
     }
 
-    public void set(final int value)
+    public boolean set(final int value)
     {
       if (mValue != value) {
-        checkMutable();
         checkValid(value);
         final String oldvalue = getAsString();
         mValue = value;
         firePropertyChanged(oldvalue);
+        return true;
+      } else {
+        return false;
       }
     }
 

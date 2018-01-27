@@ -35,35 +35,34 @@
 
 package org.supremica.gui.ide.actions;
 
-import javax.swing.Action;
-import javax.swing.ImageIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-
-import org.supremica.gui.ide.DocumentContainer;
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.gui.VerificationDialog;
-import org.supremica.gui.AutomataVerificationWorker;
-
 import java.net.URI;
 import java.util.List;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.model.module.ModuleProxy;
 
-import org.supremica.automata.*;
-import org.supremica.automata.algorithms.*;
-import org.supremica.automata.algorithms.minimization.*;
+import org.supremica.automata.Automata;
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.VerificationOptions;
+import org.supremica.automata.algorithms.VerificationType;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.gui.AutomataVerificationWorker;
+import org.supremica.gui.VerificationDialog;
+import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.ModuleContainer;
 
-import org.supremica.log.*;
 
 public class AnalyzerVerifierAction
     extends IDEAction
 {
     private static final long serialVersionUID = 1L;
-    @SuppressWarnings("unused")
-	private final Logger logger = LoggerFactory.createLogger(IDE.class);
 
     public AnalyzerVerifierAction(final List<IDEAction> actionList)
     {
@@ -78,19 +77,21 @@ public class AnalyzerVerifierAction
         putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/verify16.gif")));
     }
 
+    @Override
     public void actionPerformed(final ActionEvent e)
     {
         doAction();
     }
 
+    @Override
     public void doAction()
     {
+      final JFrame owner = ide.getFrame();
       // Retrieve the selected automata and make a sanity check
       final DocumentContainer container = ide.getActiveDocumentContainer();
       final Automata selectedAutomata =
         container.getAnalyzerPanel().getSelectedAutomata();
-      if (!selectedAutomata.sanityCheck(ide.getFrame(), 1,
-                                        true, false, true, true)) {
+      if (!selectedAutomata.sanityCheck(owner, 1, true, false, true, true)) {
         return;
       }
       if (container instanceof ModuleContainer) {
@@ -116,7 +117,7 @@ public class AnalyzerVerifierAction
       final SynchronizationOptions sOptions =
         SynchronizationOptions.getDefaultVerificationOptions();
       // Work!
-      new AutomataVerificationWorker(ide.getIDE(), selectedAutomata,
+      new AutomataVerificationWorker(owner, selectedAutomata,
                                      vOptions, sOptions, mOptions);
     }
 }

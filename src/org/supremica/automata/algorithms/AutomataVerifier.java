@@ -49,8 +49,6 @@
  */
 package org.supremica.automata.algorithms;
 
-import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +59,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -70,6 +69,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Alphabet;
 import org.supremica.automata.AlphabetHelpers;
@@ -88,28 +90,23 @@ import org.supremica.automata.algorithms.minimization.MinimizationHelper;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
-import org.supremica.gui.ActionMan;
 import org.supremica.gui.AutomataVerificationWorker;
 import org.supremica.gui.ExecutionDialog;
 import org.supremica.gui.ExecutionDialogMode;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
-import org.supremica.util.SupremicaException;
-import org.supremica.util.BDD.Options;
 
 
 /**
  * For performing verification. Uses AutomataSynchronizerExecuter for much of the actual verification work.
  *
- * @author  ka
+ * @author  Knut &Aring;kesson
  * @since  November 28, 2001
  * @see  AutomataSynchronizerExecuter
  */
 public class AutomataVerifier
     implements Abortable
 {
-    private static Logger logger = LoggerFactory.createLogger(AutomataVerifier.class);
+    private static Logger logger = LogManager.getLogger(AutomataVerifier.class);
     private Automata theAutomata;
 
     // MF Started puting in all these timer.start/stop but...
@@ -124,6 +121,7 @@ public class AutomataVerifier
     private AutomataSynchronizerHelper synchHelper;
     private final ArrayList<AutomataSynchronizerExecuter> synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>();
     private StateMemorizer potentiallyUncontrollableStates;
+    private BDDVerifier bddVerifier;
 
     // Used by findUncontrollableStates
     private AutomataSynchronizerHelper uncontrollabilityCheckHelper;
@@ -230,120 +228,103 @@ public class AutomataVerifier
     /**
      * This is an attempt to clean up this interface.
      */
-    public boolean verify()
-      throws UnsupportedOperationException
-    {
-      try {
-        // Find out what should be done and do it!
-        final VerificationType vtype =
-          verificationOptions.getVerificationType();
-        switch (vtype) {
-        case CONTROLLABILITY:
-        case INVERSECONTROLLABILITY:
-        case LANGUAGEINCLUSION:
-          // All of these verification types use the same algorithm. Just need to do some preparation first...
-          // Inverse controllability? Invert controllability!
-          if (vtype == VerificationType.INVERSECONTROLLABILITY)
-          {
-            // Invert controllability and plant/spec status
-            prepareForInverseControllability();
-          }
-          else if (vtype == VerificationType.LANGUAGEINCLUSION)
-          {
-            // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
-            prepareForLanguageInclusion(verificationOptions.getInclusionAutomata());
-          }
-          // We're gonna do some synchronization! Initialize a synchronization helper!
-          // Only some of the below algorithms use this helper?
-          synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
+  public boolean verify() throws UnsupportedOperationException, AnalysisAbortException
+  {
+    try {
+      // Find out what should be done and do it!
+      final VerificationType vtype =
+        verificationOptions.getVerificationType();
+      switch (vtype) {
+      case CONTROLLABILITY:
+      case INVERSECONTROLLABILITY:
+      case LANGUAGEINCLUSION:
+        // All of these verification types use the same algorithm. Just need to do some preparation first...
+        // Inverse controllability? Invert controllability!
+        if (vtype == VerificationType.INVERSECONTROLLABILITY) {
+          // Invert controllability and plant/spec status
+          prepareForInverseControllability();
+        } else if (vtype == VerificationType.LANGUAGEINCLUSION) {
+          // Treat the unselected automata as plants (and the rest as supervisors, implicitly)
+          prepareForLanguageInclusion(verificationOptions
+            .getInclusionAutomata());
+        }
+        // We're gonna do some synchronization! Initialize a synchronization helper!
+        // Only some of the below algorithms use this helper?
+        synchHelper =
+          new AutomataSynchronizerHelper(theAutomata, synchronizationOptions,
+                                         false);
+        synchHelper.setExecutionDialog(executionDialog);
+        // Work!
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHIC) {
+          return monolithicControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MODULAR) {
+          return modularControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+                   || verificationOptions
+                     .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalControllabilityVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.SAT) {
+          return true; // Alexey add a call to your code here
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
+        }
+      case CONTROLLABILITYNONBLOCKING:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+            || verificationOptions
+              .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalControllabilityNonblockingVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
+        }
+      case NONBLOCKING:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHIC) {
+          // We're gonna do some serious synchronization! Initialize a synchronization helper!
+          synchronizationOptions.setForbidUncontrollableStates(false);
+          synchronizationOptions.setExpandForbiddenStates(true);
+          synchHelper =
+            new AutomataSynchronizerHelper(theAutomata,
+                                           synchronizationOptions, false);
           synchHelper.setExecutionDialog(executionDialog);
           // Work!
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-          {
-            return monolithicControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MODULAR)
-          {
-            return modularControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalControllabilityVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-          {
-            return BDDControllabilityVerification(theAutomata);
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.SAT)
-          {
-            return true; // Alexey add a call to your code here
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case CONTROLLABILITYNONBLOCKING:
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalControllabilityNonblockingVerification();
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case NONBLOCKING:
-          if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHIC)
-          {
-            // We're gonna do some serious synchronization! Initialize a synchronization helper!
-            synchronizationOptions.setForbidUncontrollableStates(false);
-            synchronizationOptions.setExpandForbiddenStates(true);
-            synchHelper = new AutomataSynchronizerHelper(theAutomata, synchronizationOptions, false);
-            synchHelper.setExecutionDialog(executionDialog);
-            // Work!
-            return monolithicNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD)
-          {
-            return monolithicBDDNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BDD)
-          {
-            return BDDNonblockingVerification();
-          }
-          else if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL ||
-              verificationOptions.getAlgorithmType() == VerificationAlgorithm.COMBINED)
-          {
-            return compositionalNonblockingVerification();
-          }
-          else
-          {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
-          }
-        case OP:
-            return observerPropertyVerification();
-        case DIAGNOSABILITY:
-            if (verificationOptions.getAlgorithmType() == VerificationAlgorithm.BBSD)
-        {
-            return BBSDDiagnosabilityVerification();
+          return monolithicNonblockingVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.MONOLITHICBDD) {
+          return monolithicBDDNonblockingVerification();
+        } else if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.COMPOSITIONAL
+                   || verificationOptions
+                     .getAlgorithmType() == VerificationAlgorithm.COMBINED) {
+          return compositionalNonblockingVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
         }
-        else
-        {
-            throw new UnsupportedOperationException("The selected algorithm is not implemented");
+      case OP:
+        return observerPropertyVerification();
+      case DIAGNOSABILITY:
+        if (verificationOptions
+          .getAlgorithmType() == VerificationAlgorithm.BBSD) {
+          return BBSDDiagnosabilityVerification();
+        } else {
+          throw new UnsupportedOperationException("The selected algorithm is not implemented");
         }
-        default:
-          throw new UnsupportedOperationException
-            ("The selected type of verification is not implemented!");
-        }
+      default:
+        throw new UnsupportedOperationException("The selected type of verification is not implemented!");
       }
-      catch (final Exception e)
-      {
-        e.printStackTrace();
-        logger.error("Exception in AutomataVerifier: " + e);
-        throw new RuntimeException(e);    // Try change this later
-      }
+    } catch (final AnalysisAbortException exception) {
+      logger.info("Verification aborted.");
+      throw new RuntimeException(exception);
+    } catch (final Exception e) {
+      e.printStackTrace();
+      logger.error("Exception in AutomataVerifier", e);
+      throw new RuntimeException(e); // Try change this later
     }
+  }
 
     /**
      * Prepares the helper and the automataindexform for inverse controllability...
@@ -644,19 +625,14 @@ public class AutomataVerifier
         // The name of the "synchronized" automata
         StringBuilder automataNames = new StringBuilder();
 
-        if (Config.VERBOSE_MODE.isTrue())
+        for (final Iterator<?> autIt = selectedAutomata.iterator();
+             autIt.hasNext(); )
         {
-            // For printing the names of the automata in selectedAutomata
-            for (final Iterator<?> autIt = selectedAutomata.iterator();
-            autIt.hasNext(); )
-            {
-                automataNames = automataNames.append(((Automaton) autIt.next()).getName());
-
-                if (autIt.hasNext())
-                {
-                    automataNames = automataNames.append("||");
-                }
-            }
+          automataNames = automataNames.append(((Automaton) autIt.next()).getName());
+          if (autIt.hasNext())
+          {
+            automataNames = automataNames.append("||");
+          }
         }
 
         // Was the result uncontrollable?
@@ -674,47 +650,33 @@ public class AutomataVerifier
                 automataIndices[i++] = indexMap.getAutomatonIndex(autIt.next());
             }
 
-            if (Config.VERBOSE_MODE.isTrue())
+            String states;
+            final int size = potentiallyUncontrollableStates.size(automataIndices);
+            if (size == 1)
             {
-                String states;
-                final int size = potentiallyUncontrollableStates.size(automataIndices);
-
-                if (size == 1)
-                {
-                    states = "one state";
-                }
-                else if (size == 2)
-                {
-                    states = "two states";
-                }
-                else
-                {
-                    states = size + " states";
-                }
-
-                logger.info("'" + automataNames + "' has " + states + " that might be uncontrollable...");
+              states = "one state";
             }
+            else if (size == 2)
+            {
+              states = "two states";
+            }
+            else
+            {
+              states = size + " states";
+            }
+            logger.info("'" + automataNames + "' has " + states + " that might be uncontrollable...");
 
             // Get a sorted array of indexes of automata with similar alphabets
             int[] similarAutomata = findSimilarAutomata(theAutomata, selectedAutomata);
             if (similarAutomata == null)
             {
                 // This never happens?
-
                 // There are no similar automata, this module must be uncontrollable
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    // Print the uncontrollable state(s)...
-                    synchHelper.printUncontrollableStates(automataIndices);
-                }
-
+                synchHelper.printUncontrollableStates(automataIndices);
                 return false;
             }
 
-            if (Config.VERBOSE_MODE.isTrue())
-            {
-                logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
-            }
+            logger.info("There are " + similarAutomata.length + " automata with similar alphabets...");
 
             // Make nbrOfAttempts attempts on proving controllability and
             // uncontrollability alternatingly and then give up
@@ -732,11 +694,7 @@ public class AutomataVerifier
                     if (moreSimilarAutomata != null)
                     {
                         final int[] newSimilarAutomata = new int[similarAutomata.length + moreSimilarAutomata.length];
-                        if (Config.VERBOSE_MODE.isTrue())
-                        {
-                            logger.info("All similar automata are already added, trying to add some more...");
-                        }
-
+                        logger.info("All similar automata are already added, trying to add some more...");
                         System.arraycopy(similarAutomata, 0, newSimilarAutomata, 0, similarAutomata.length);
                         System.arraycopy(moreSimilarAutomata, 0, newSimilarAutomata, similarAutomata.length, moreSimilarAutomata.length);
 
@@ -744,24 +702,10 @@ public class AutomataVerifier
                     }
                     else
                     {
-                        if (Config.VERBOSE_MODE.isTrue())
-                        {
-                            logger.info("All similar automata are already added, " +
-                                "no chance for controllability.");
-
-                            // CAN'T BE DONE... TRACE NOT REMEMBERED...
-                            // Print the uncontrollable state(s)...
-                            //synchHelper.printUncontrollableStates();
-
-                            // Print event trace reaching uncontrollable state
-                            //if (verificationOptions.showBadTrace())
-                            //{
-                            //	synchHelper.displayTrace();
-                            //}
-                        }
-
-                        return false;
+                      logger.info("All similar automata are already added, " +
+                                  "no chance for controllability.");
                     }
+                    return false;
                 }
 
                 // Add the similar automata in hope of removing uncontrollable
@@ -778,18 +722,15 @@ public class AutomataVerifier
                 {
                     if (!verificationOptions.getSkipUncontrollabilityCheck())
                     {
-                        logger.verbose("Couldn't prove controllability, " +
-                            "trying to prove uncontrollability...");
+                        logger.info("Couldn't prove controllability, " +
+                                    "trying to prove uncontrollability...");
 
                         // Try to prove remaining states in the stateMemorizer as being uncontrollable
                         if (findUncontrollableStates(automataIndices))
                         {
                             // Uncontrollable state found!
-                            if (Config.VERBOSE_MODE.isTrue() || verificationOptions.showBadTrace())
-                            {
-                                // Print the uncontrollable state(s)...
-                                uncontrollabilityCheckHelper.printUncontrollableStates();
-                            }
+                            // Print the uncontrollable state(s)...
+                            uncontrollabilityCheckHelper.printUncontrollableStates();
                             if (verificationOptions.showBadTrace())
                             {
                                 // Print event trace reaching uncontrollable state
@@ -801,7 +742,7 @@ public class AutomataVerifier
                     }
                     else
                     {
-                        logger.verbose("Skipped uncontrollability check!");
+                        logger.info("Skipped uncontrollability check!");
                     }
                 }
                 else
@@ -818,20 +759,15 @@ public class AutomataVerifier
                 // controllable or uncontrollable. We now have no idea what so ever on the
                 // controllability so... we chicken out and give up.
                 // Print remaining suspected uncontrollable state(s)
-                if (Config.VERBOSE_MODE.isTrue())
-                {
-                    logger.info("Unfortunately the following states might be uncontrollable...");
-                    synchHelper.printUncontrollableStates(automataIndices);
-                }
-
+                logger.info("Unfortunately the following states might be uncontrollable...");
+                synchHelper.printUncontrollableStates(automataIndices);
                 failure = true;
-
                 return false;
             }
         }
 
         // Nothing bad has happened. Very nice!
-        logger.verbose("'" + automataNames + "' is controllable.");
+        logger.info("'" + automataNames + "' is controllable.");
 
         return true;
     }
@@ -1022,7 +958,7 @@ public class AutomataVerifier
             stateAmountLimit = stateAmountLimit * 5;
         }
 
-        logger.verbose("stateAmountLimit: " + stateAmountLimit + ".");
+        logger.info("stateAmountLimit: " + stateAmountLimit + ".");
 
         synchHelper.clear();
 
@@ -1109,42 +1045,37 @@ public class AutomataVerifier
 		}
 		 */
 
-                logger.verbose("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
+                logger.info("Worst-case state amount: " + stateAmount + ", real state amount: " + stateCount + ".");
 
                 stateAmount = stateCount;
 
                 // Remove states in the stateMemorizer that are not represented in the new
-                // automaton and therefore can't be reached in the total synchronization.
+                // automaton and therefore can't be reached in the total synchronisation.
                 // Reachable states are marked with potentiallyUncontrollableStates.find() above.
                 potentiallyUncontrollableStates.clean(automataIndices);
 
                 // Print result
                 final int statesLeft = potentiallyUncontrollableStates.size(automataIndices);
-                if (Config.VERBOSE_MODE.isTrue())
+                String message;
+                switch (statesLeft)
                 {
-                    String message;
+                case 0 :
+                  message = "No uncontrollable states ";
+                  break;
 
-                    switch (statesLeft)
-                    {
-                        case 0 :
-                            message = "No uncontrollable states ";
-                            break;
+                case 1 :
+                  message = "Still one state ";
+                  break;
 
-                        case 1 :
-                            message = "Still one state ";
-                            break;
+                case 2 :
+                  message = "Still two states ";
+                  break;
 
-                        case 2 :
-                            message = "Still two states ";
-                            break;
-
-                        default :
-                            message = "Still " + statesLeft + " states ";
-                    }
-
-                    logger.info(message + "left after adding" + addedAutomata + ".");
+                default :
+                  message = "Still " + statesLeft + " states ";
                 }
 
+                logger.info(message + "left after adding" + addedAutomata + ".");
                 // Are we ready?
                 if (statesLeft == 0)
                 {
@@ -1262,170 +1193,31 @@ public class AutomataVerifier
     }
 
     /**
-     * Answers YES/NO to the language inclusion problem
-     *
-     * @see org.supremica.util.BDD.BDDAutomata
-     * @see AutomataBDDVerifier
-     */
-    @SuppressWarnings("unused")
-	private boolean BDDLanguageInclusionVerification()
-    	throws Exception
-    {
-        final Automata unselected = ActionMan.getGui().getUnselectedAutomata();
-
-        // we already know the answer: L(P) = \Sigma^*
-        if (unselected.size() < 1)
-        {
-            return true;
-        }
-
-        final Automata selected = new Automata(theAutomata, true);    /* <-- MUST BE SHALLOW COPY ... */
-
-        selected.removeAutomata(unselected);    /* .. OR THIS REMOVE WONT WORK !!! */
-
-        boolean ret = false;
-        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDLanguageInclusionVerification");
-
-        switch (Options.inclusion_algorithm)
-        {
-
-            case Options.INCLUSION_ALGO_MONOLITHIC :
-                final AutomataBDDVerifier abf = new AutomataBDDVerifier(selected, unselected);
-
-                ret = abf.passLanguageInclusion();
-
-                abf.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_MODULAR :
-                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(selected, unselected);
-
-                ret = mli.passLanguageInclusion();
-
-                mli.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_INCREMENTAL :
-                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(selected, unselected);
-
-                ret = ili.passLanguageInclusion();
-
-                ili.cleanup();
-                break;
-
-            default :
-                throw new SupremicaException("Unknown BDD/language containment algorithm!");
-        }
-
-        if (Options.profile_on)
-        {
-            timer.report("total execution time", true);
-        }
-
-        Options.out.flush();
-
-        return ret;
-    }
-
-    /**
-     * Answers YES/NO to the controllability problem
-     *
-     * @return  true if the system is controllable
-     * @see org.supremica.util.BDD.BDDAutomata
-     * @see AutomataBDDVerifier
-     */
-    private boolean BDDControllabilityVerification(final Automata theAutomata)
-    throws Exception
-    {
-        boolean ret;
-
-        // why compute when we already know the answer: L(P) = \Sigma^*  ?
-        if (theAutomata.hasNoPlants())
-        {
-            return true;
-        }
-
-        final org.supremica.util.BDD.Timer timer = new org.supremica.util.BDD.Timer("BDDControllabilityVerification");
-
-        switch (Options.inclusion_algorithm)
-        {
-            case Options.INCLUSION_ALGO_MONOLITHIC :
-                final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
-
-                ret = abf.isControllable();
-
-                abf.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_MODULAR :
-                final org.supremica.util.BDD.li.ModularLI mli = new org.supremica.util.BDD.li.ModularLI(theAutomata);
-
-                ret = mli.isControllable();
-
-                mli.cleanup();
-                break;
-
-            case Options.INCLUSION_ALGO_INCREMENTAL :
-                final org.supremica.util.BDD.li.IncrementalLI ili = new org.supremica.util.BDD.li.IncrementalLI(theAutomata);
-
-                ret = ili.isControllable();
-
-                ili.cleanup();
-                break;
-
-            default :
-                throw new SupremicaException("Unknown BDD/language containment algorithm!");
-        }
-
-        if (Options.profile_on)
-        {
-            timer.report("total execution time", true);
-        }
-
-        Options.out.flush();
-
-        return ret;
-    }
-
-    /**
      * Answers YES/NO to the NONBLOCKING problem
      *
      *@return  true if the system is nonblocking
      */
-    private boolean monolithicBDDNonblockingVerification()
-    throws Exception
-    {
-        final BDDVerifier bddVerifier = new BDDVerifier(theAutomata);
-        final boolean isNonblocking = bddVerifier.isNonblocking();
-        logger.info("Number of reachable state: " + bddVerifier.numberOfReachableStates());
-        logger.info("Number of coreachable states: " + bddVerifier.numberOfCoreachableStates());
-        logger.info("Number of blocking states: " + bddVerifier.numberOfBlockingStates());
-        bddVerifier.done();
-        return isNonblocking;
+  private boolean monolithicBDDNonblockingVerification()
+  throws Exception
+  {
+    bddVerifier = new BDDVerifier(theAutomata);
+    boolean isNonblocking = false;
+    try {
+      isNonblocking = bddVerifier.isNonblocking();
+      logger.info("Number of reachable state: "
+                  + bddVerifier.numberOfReachableStates());
+      logger.info("Number of coreachable states: "
+                  + bddVerifier.numberOfCoreachableStates());
+      logger.info("Number of blocking states: "
+                  + bddVerifier.numberOfBlockingStates());
+    } catch (final Exception ex) {
+      requestAbort();
+      throw ex;
+    } finally {
+      bddVerifier.done();
     }
-
-    /**
-     * Answers YES/NO to the NONBLOCKING problem
-     *
-     *@return  true if the system is nonblocking
-     *@see org.supremica.util.BDD.BDDAutomata
-     *@see AutomataBDDVerifier
-     */
-    private boolean BDDNonblockingVerification()
-    throws Exception
-    {
-
-        // timer.start();
-        final AutomataBDDVerifier abf = new AutomataBDDVerifier(theAutomata);
-        final boolean ret = abf.isNonblocking();
-
-        abf.cleanup();
-
-        // timer.stop();
-        Options.out.flush();
-
-        return ret;
-    }
+    return isNonblocking;
+  }
 
     /**
      * Examines controllability by synchronizing all automata in the system and in each state check if some
@@ -1874,16 +1666,6 @@ public class AutomataVerifier
         final OPSearchAutomatonSimplifier simp =
                 new OPSearchAutomatonSimplifier(aut, hidden, factory, translator);
         simp.setOperationMode(OPSearchAutomatonSimplifier.Mode.VERIFY);
-        if (Config.VERBOSE_MODE.isTrue()) {
-            try {
-                final File wmod = theAutomata.getFileLocation();
-                final File dir = wmod.getParentFile();
-                final File log = new File(dir, "op.log");
-                simp.setLogFile(log);
-            } catch (final MalformedURLException exception) {
-                // No file - no logging
-            }
-        }
         return simp.run();
     }
 
@@ -1937,7 +1719,7 @@ public class AutomataVerifier
     @Override
     public void requestAbort()
     {
-        logger.debug("AutomataVerifier requested to stop.");
+        logger.debug("AutomataVerifier is requested to stop.");
 
         abortRequested = true;
 
@@ -1945,6 +1727,11 @@ public class AutomataVerifier
         for (int i = 0; i < synchronizationExecuters.size(); i++)
         {
             synchronizationExecuters.get(i).requestStop();
+        }
+
+        if (bddVerifier != null)
+        {
+          bddVerifier.requestAbort();
         }
 
         if (threadToAbort != null)

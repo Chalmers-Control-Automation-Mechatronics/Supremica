@@ -45,7 +45,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.plain.module.ForeachElement;
 import net.sourceforge.waters.plain.module.SimpleIdentifierElement;
@@ -74,7 +74,7 @@ public class InsertForeachAction
     putValue(Action.NAME, "New Foreach Block ...");
     putValue(Action.SHORT_DESCRIPTION, "Add a foreach block to the module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_F);
-    putValue(Action.SMALL_ICON, IconLoader.ICON_NEW_FOREACH);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_NEW_FOREACH);
   }
 
 

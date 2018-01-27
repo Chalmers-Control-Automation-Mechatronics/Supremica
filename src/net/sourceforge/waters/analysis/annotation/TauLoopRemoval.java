@@ -33,13 +33,13 @@
 
 package net.sourceforge.waters.analysis.annotation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 
 public class TauLoopRemoval

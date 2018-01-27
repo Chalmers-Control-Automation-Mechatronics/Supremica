@@ -73,6 +73,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.Automata;
 import org.supremica.automata.AutomataListener;
 import org.supremica.automata.Automaton;
@@ -82,8 +85,6 @@ import org.supremica.automata.algorithms.FreeformMatcher;
 import org.supremica.automata.algorithms.SearchStates;
 import org.supremica.automata.algorithms.StateMatcher;
 import org.supremica.automata.algorithms.StateMatcherOptions;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.properties.Config;
 
 // ----------------------------------------------------------------------------------
@@ -107,7 +108,7 @@ class FindStatesTableModel
 	implements AutomataListener    // could usefully inherit from AutomataTableModel or something like that
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.createLogger(FindStatesTableModel.class);
+	private static final Logger logger = LogManager.getLogger(FindStatesTableModel.class);
 
 	// private Pattern[] patterns = null;
 	// private PatternCompiler comp = null;
@@ -418,7 +419,7 @@ class FindStatesTable
 	extends JTable
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.createLogger(FindStatesTable.class);
+	private static final Logger logger = LogManager.getLogger(FindStatesTable.class);
 	private Automata automata;
 	private FindStatesFrame frame;
 	@SuppressWarnings("unused")
@@ -1053,8 +1054,8 @@ class FindStatesFrame
 	extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.createLogger(FindStatesFrame.class);
-	
+	private static final Logger logger = LogManager.getLogger(FindStatesFrame.class);
+
 	private final FindStatesTable table;
 	private final Automata automata;
 	private final JTabbedPane tabbedPane;
@@ -1115,7 +1116,7 @@ class FindStatesFrame
 //	{
 //		remove_button.setEnabled(b);
 //	}
-	
+
 	private Automata getAutomata()
 	{
 		return automata;
@@ -1129,7 +1130,7 @@ class FindStatesFrame
 	class RemoveButton extends JButton
 	{
 		private static final long serialVersionUID = 1L;
-		
+
 		public RemoveButton()
 		{
 			super("Remove");
@@ -1139,7 +1140,7 @@ class FindStatesFrame
 				@Override
 				public void actionPerformed(final ActionEvent e)
 				{
-					
+
 				}
 			});
 		}
@@ -1292,7 +1293,7 @@ public class FindStates
 	extends AbstractAction
 {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = LoggerFactory.createLogger(FindStates.class);
+	private static Logger logger = LogManager.getLogger(FindStates.class);
 
 	public FindStates()
 	{

@@ -900,14 +900,14 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         final ModuleProxy module =
           mDocumentManager.load(uri, filename, ModuleProxy.class);
         mContext = new ModuleBindingContext(module, fullname, info);
-        mNameSpace = new CompiledNameSpace(suffix, mNameSpace);
+        mNameSpace = mNameSpace.getOrAddChildNameSpace(suffix);
         mCompilationInfo.setExceptions(new MultiEvalException());
         return visitModuleProxy(module);
 
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof EvalException &&
-          !(cause instanceof EvalAbortException)) {
+            !(cause instanceof EvalAbortException)) {
           mCompilationInfo.setExceptions(oldExceptions);
           final EvalException evalCause = (EvalException) cause;
           for (final EvalException ex : evalCause.getAll()) {
@@ -1115,62 +1115,70 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final VariableComponentProxy var)
     throws VisitorException
   {
-    // Variable components are processed in the first pass.
-    if (!m1stPass) return null;
-
     try {
       checkAbort();
       if (mHISCCompileMode == HISCCompileMode.HISC_LOW) {
         return null;
       }
-      mHasEFAElements = true;
       final IdentifierProxy ident = var.getIdentifier();
       final IdentifierProxy suffix = mNameCompiler.compileName(ident);
-      final IdentifierProxy fullname =
-        mNameSpace.getPrefixedIdentifier(suffix, mFactory);
-      mCompilationInfo.add(fullname, ident);
-      final BindingContext context = new SinglePrefixingContext(suffix);
-      final SimpleExpressionProxy expr = var.getType();
-      final SimpleExpressionProxy value =
-        mSimpleExpressionCompiler.eval(expr, mContext);
-      mSimpleExpressionCompiler.getRangeValue(value);
-      final SimpleExpressionProxy oldinit = var.getInitialStatePredicate();
-      final SimpleExpressionProxy newinit =
-        mSimpleExpressionCompiler.simplify(oldinit, context);
-      final List<VariableMarkingProxy> oldmarkings = var.getVariableMarkings();
-      final List<VariableMarkingProxy> newmarkings =
-        new LinkedList<VariableMarkingProxy>();
-      for (final VariableMarkingProxy oldmarking : oldmarkings) {
-        final IdentifierProxy prop = oldmarking.getProposition();
-        final CompiledEvent events =
-          (CompiledEvent) visitIdentifierProxy(prop);
-        final SimpleExpressionProxy oldpred = oldmarking.getPredicate();
-        final SimpleExpressionProxy newpred =
-          mSimpleExpressionCompiler.simplify(oldpred, context);
-        final Iterable<SingleEventOutput> outputs =
-          new EventOutputIterable(events, mCompilationInfo);
-        for (final SingleEventOutput output : outputs) {
-          final CompiledSingleEvent event = output.getEvent();
-          if (event.getKind() != EventKind.PROPOSITION) {
-            final int mask = event.getKindMask();
-            final EventKindException exception =
-              new EventKindException(event, mask);
-            exception.provideLocation(prop);
-            throw exception;
+      if (m1stPass) {
+        // Variables are compiled first so that their ranges are available
+        // to simplify guard/action blocks
+        mHasEFAElements = true;
+        final IdentifierProxy fullName =
+          mNameSpace.getPrefixedIdentifier(suffix, mFactory);
+        mCompilationInfo.add(fullName, ident);
+        final BindingContext context = new SinglePrefixingContext(suffix);
+        final SimpleExpressionProxy expr = var.getType();
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.eval(expr, mContext);
+        mSimpleExpressionCompiler.getRangeValue(value);
+        final SimpleExpressionProxy oldInit = var.getInitialStatePredicate();
+        final SimpleExpressionProxy newInit =
+          mSimpleExpressionCompiler.simplify(oldInit, context);
+        final List<VariableMarkingProxy> oldMarkings = var.getVariableMarkings();
+        final List<VariableMarkingProxy> newMarkings =
+          new LinkedList<VariableMarkingProxy>();
+        for (final VariableMarkingProxy oldMarking : oldMarkings) {
+          final IdentifierProxy prop = oldMarking.getProposition();
+          final CompiledEvent events =
+            (CompiledEvent) visitIdentifierProxy(prop);
+          final SimpleExpressionProxy oldPred = oldMarking.getPredicate();
+          final SimpleExpressionProxy newPred =
+            mSimpleExpressionCompiler.simplify(oldPred, context);
+          final Iterable<SingleEventOutput> outputs =
+            new EventOutputIterable(events, mCompilationInfo);
+          for (final SingleEventOutput output : outputs) {
+            final CompiledSingleEvent event = output.getEvent();
+            if (event.getKind() != EventKind.PROPOSITION) {
+              final int mask = event.getKindMask();
+              final EventKindException exception =
+                new EventKindException(event, mask);
+              exception.provideLocation(prop);
+              throw exception;
+            }
+            final IdentifierProxy newIdent = getSingleEvent(output);
+            final VariableMarkingProxy newMarking =
+              mFactory.createVariableMarkingProxy(newIdent, newPred);
+            newMarkings.add(newMarking);
           }
-          final IdentifierProxy newident = getSingleEvent(output);
-          final VariableMarkingProxy newmarking =
-            mFactory.createVariableMarkingProxy(newident, newpred);
-          newmarkings.add(newmarking);
         }
+        final VariableComponentProxy newVar =
+          mFactory.createVariableComponentProxy(fullName, value,
+                                                newInit, newMarkings);
+        mNameSpace.addComponent(suffix, newVar);
+        mCompilationInfo.add(newVar, var);
+        return newVar;
+      } else {
+        // Although variables are compiled in a first pass, they are
+        // added to the output in the second pass only, so that the
+        // ordering reflects the input more closely
+        final VariableComponentProxy newVar =
+          (VariableComponentProxy) mNameSpace.getComponent(suffix);
+        mCompiledComponents.add(newVar);
+        return newVar;
       }
-      final VariableComponentProxy newvar =
-        mFactory.createVariableComponentProxy(fullname, value,
-                                              newinit, newmarkings);
-      mNameSpace.addComponent(suffix, newvar);
-      mCompiledComponents.add(newvar);
-      mCompilationInfo.add(newvar, var);
-      return newvar;
     } catch (final EvalException exception) {
       exception.provideLocation(var);
       throw wrap(exception);

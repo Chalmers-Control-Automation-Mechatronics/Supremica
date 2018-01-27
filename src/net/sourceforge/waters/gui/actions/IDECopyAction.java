@@ -46,12 +46,13 @@ import javax.swing.KeyStroke;
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.JTextComponent;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.observer.ClipboardChangedEvent;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 
 import org.supremica.gui.ide.IDE;
@@ -85,7 +86,7 @@ public class IDECopyAction
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_C);
     putValue(Action.ACCELERATOR_KEY,
              KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_COPY);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_COPY);
     setEnabled(false);
   }
 
@@ -101,8 +102,9 @@ public class IDECopyAction
     if (watersOwner != null) {
       final List<? extends Proxy> selection =
         watersOwner.getCurrentSelection();
+      final ModuleContext context = getActiveModuleContext();
       final Transferable transferable =
-        WatersDataFlavor.createTransferable(selection);
+        WatersDataFlavor.createTransferable(selection, context, true);
       final Clipboard clipboard =
         Toolkit.getDefaultToolkit().getSystemClipboard();
       clipboard.setContents(transferable, this);

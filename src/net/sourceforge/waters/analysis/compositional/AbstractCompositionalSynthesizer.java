@@ -56,7 +56,8 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -112,6 +113,15 @@ public abstract class AbstractCompositionalSynthesizer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
+  @Override
+  public void setNondeterminismEnabled(final boolean enable)
+  {
+    mNondeterminismEnabled = enable;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
   @Override
   public void setOutputName(final String name)
@@ -144,6 +154,12 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return mNondeterminismEnabled;
+  }
+
   @Override
   public CompositionalSynthesisResult getAnalysisResult()
   {
@@ -284,7 +300,7 @@ public abstract class AbstractCompositionalSynthesizer
   void reportAbstractionResult(final AutomatonProxy aut,
                                final AutomatonProxy dist)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled()) {
       /*
        * final boolean nonblocking = AnalysisTools.isNonBlocking(aut); final
@@ -303,7 +319,7 @@ public abstract class AbstractCompositionalSynthesizer
   void reportSupervisor(final String kind,
                         final ListBufferTransitionRelation sup)
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     if (logger.isDebugEnabled() && sup != null) {
       final String msg =
         "Got " + kind + " supervisor '" + sup.getName() + "' with " +
@@ -360,6 +376,7 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
+  private boolean mNondeterminismEnabled = false;
   private String mOutputName;
 
 }

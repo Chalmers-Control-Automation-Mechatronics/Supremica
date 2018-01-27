@@ -300,20 +300,17 @@ public class SynthesizerDialog
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
         algorithmSelector.addSelectable(SynthesisAlgorithm.MODULAR);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKING) {
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHICBDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE) {
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC);
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL);
-        algorithmSelector.addSelectable(SynthesisAlgorithm.BDD);
         algorithmSelector.addSelectable(SynthesisAlgorithm.COMPOSITIONAL_WATERS);
       } else if (typeSelector.getType() == SynthesisType.NONBLOCKING_CONTROLLABLE_NORMAL) {
         algorithmSelector.addSelectable(SynthesisAlgorithm.MONOLITHIC_WATERS);

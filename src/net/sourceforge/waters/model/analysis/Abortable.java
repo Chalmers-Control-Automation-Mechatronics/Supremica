@@ -44,10 +44,19 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * can request the operation to be aborted. When such a request is
  * made, it is up to the operation to stop at the next convenient time.</P>
  *
- * <P>Every {@link ModelAnalyzer} should support abort requests, but
- * this interface is kept separate to facilitate its implementation by
- * subroutines that are not model analysers.</P>
+ * <P>A {@link ModelAnalyzer} or other class that contains an abortable
+ * algorithm should implement this interface. Its user can request the
+ * algorithm to abort by calling {@link #requestAbort()}, which is typically
+ * done from a separate thread. The running algorithm then should stop by
+ * throwing an {@link AnalysisAbortException} at the next convenient time.
+ * This usually means that the algorithm must check periodically whether an
+ * abort request has been received.</P>
  *
+ * <P>The easiest way to implement this behaviour is by extending the helper
+ * class {@link AbstractAbortable} and making the algorithm call {@link
+ * AbstractAbortable#checkAbort() checkAbort()} periodically.</P>
+ *
+ * @see AbstractAbortable
  * @see AnalysisAbortException
  * @author Robi Malik
  */

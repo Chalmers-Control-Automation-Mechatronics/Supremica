@@ -50,6 +50,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 
+import org.supremica.properties.Config;
+
 
 public class Renderer
 {
@@ -83,7 +85,8 @@ public class Renderer
     for (final NodeProxy proxy : mGraph.getNodes()) {
       addToQueue(proxy);
       if (proxy instanceof SimpleNodeProxy) {
-        addToQueue(((SimpleNodeProxy) proxy).getLabelGeometry());
+        final SimpleNodeProxy simple = (SimpleNodeProxy) proxy;
+        addToQueue(simple.getLabelGeometry(), ColorGroup.NODE_LABEL);
       }
     }
 
@@ -96,28 +99,26 @@ public class Renderer
 
       if (edge.getGuardActionBlock() != null) {
         addToQueue(edge.getGuardActionBlock());
-        for (final BinaryExpressionProxy action : edge.getGuardActionBlock().getActions()) {
-          addToQueue(action, EditorColor.ACTIONCOLOR);
+        for (final BinaryExpressionProxy action :
+             edge.getGuardActionBlock().getActions()) {
+          addToQueue(action, ColorGroup.ACTION);
         }
-        final List<SimpleExpressionProxy> guards = edge.getGuardActionBlock().getGuards();
-        // A naive solution for showing the added guards (after synthesis) with different color.
-        if(guards.size() == 1)
-        {
-          addToQueue(guards.get(0), EditorColor.GUARDCOLOR); //there should be only one guard.
-        }
-        else if(guards.size() == 2)
-        {
-          addToQueue(guards.get(0), EditorColor.ADDEDGUARDCOLOR);
-        }
-        else if(guards.size() == 3)
-        {
-          for(int i= 1;i<guards.size();i++)
-          {
-            Color guardColor = EditorColor.GUARDCOLOR;
-            if(i==2)
-              guardColor = EditorColor.ADDEDGUARDCOLOR;
-
-            addToQueue(guards.get(i), guardColor); //Change color
+        final List<SimpleExpressionProxy> guards =
+          edge.getGuardActionBlock().getGuards();
+        // A naive solution for showing the added guards (after synthesis)
+        // with different colour.
+        if (guards.size() == 1) {
+          //there should be only one guard.
+          addToQueue(guards.get(0), ColorGroup.NORMAL_GUARD);
+        } else if (guards.size() == 2) {
+          addToQueue(guards.get(0), ColorGroup.ADDED_GUARD);
+        } else if (guards.size() == 3) {
+          for (int i = 1; i < guards.size(); i++) {
+            ColorGroup guardColor = ColorGroup.NORMAL_GUARD;
+            if (i == 2) {
+              guardColor = ColorGroup.ADDED_GUARD;
+            }
+            addToQueue(guards.get(i), guardColor); //Change colour
           }
         }
       }
@@ -178,8 +179,13 @@ public class Renderer
     mQueue.offer(new ShapeToRender(shape, info));
   }
 
-  protected void addToQueue(final Proxy proxy, final Color color)
+  protected void addToQueue(final Proxy proxy, final ColorGroup group)
   {
+    final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
+    final Color color = layout.getColor(group);
+    if (color == null) {
+      return;
+    }
     final Color shadow = EditorColor.shadow(color);
     final RenderingContext context =
       mProxyShapeProducer.getRenderingContext();

@@ -96,7 +96,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -118,6 +119,7 @@ import org.apache.log4j.Logger;
  *
  * @author Robi Malik
  */
+
 public class TRCompositionalConflictChecker
   extends AbstractTRCompositionalVerifier
   implements ConflictChecker
@@ -343,7 +345,7 @@ public class TRCompositionalConflictChecker
   protected boolean earlyTerminationCheck(final TRSubsystemInfo subsys)
     throws AnalysisException
   {
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     boolean allAutomataOmega = true;
     TRAutomatonProxy omegaBlocker = null;
     for (final TRAutomatonProxy aut : subsys.getAutomata()) {
@@ -459,7 +461,7 @@ public class TRCompositionalConflictChecker
         monolithicResult = mono.getAnalysisResult();
         combinedResult.addMonolithicAnalysisResult(monolithicResult);
       }
-      final Logger logger = getLogger();
+      final Logger logger = LogManager.getLogger();
       if (monolithicResult.isSatisfied()) {
         if (mConfiguredPreconditionMarking == null) {
           logger.debug("Subsystem is nonblocking.");
@@ -611,14 +613,14 @@ public class TRCompositionalConflictChecker
     if (mConfiguredPreconditionMarking == null) {
       return createDropSteps(subsys);
     }
-    final Logger logger = getLogger();
+    final Logger logger = LogManager.getLogger();
     logger.debug("Checking subsystem for reachable precondition-marked state ...");
-    final TRCompositionalLanguageInclusionChecker checker =
+    final TRLanguageInclusionChecker checker =
       getLanguageInclusionChecker();
     final TRToolCreator<TransitionRelationSimplifier> creator =
       checker.getSimplifierCreator();
     final TransitionRelationSimplifier simplifier =
-      creator.create(mLanguageInclusionChecker);
+      creator.create(mLanguageInclusionChecker.getCompositionalAnalyzer());
     final int config = simplifier.getPreferredInputConfiguration();
     final int numAutomata = subsys.getNumberOfAutomata();
     final List<TRAutomatonProxy> langAutomata = new ArrayList<>(numAutomata + 1);
@@ -1311,10 +1313,10 @@ public class TRCompositionalConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  TRCompositionalLanguageInclusionChecker getLanguageInclusionChecker()
+  TRLanguageInclusionChecker getLanguageInclusionChecker()
   {
     if (mLanguageInclusionChecker == null) {
-      mLanguageInclusionChecker = new TRCompositionalLanguageInclusionChecker();
+      mLanguageInclusionChecker = new TRLanguageInclusionChecker();
       mLanguageInclusionChecker.
         setInternalStateLimit(getInternalStateLimit());
       mLanguageInclusionChecker.
@@ -1493,7 +1495,7 @@ public class TRCompositionalConflictChecker
   // Auxiliary events, status, and tools
   private EventProxy mUsedDefaultMarking;
   private EventProxy mUsedPreconditionMarking;
-  private TRCompositionalLanguageInclusionChecker mLanguageInclusionChecker;
+  private TRLanguageInclusionChecker mLanguageInclusionChecker;
 
   // For language inclusion check for generalised nonblocking
   private EventProxy mPreconditionEvent;

@@ -35,12 +35,17 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
+
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 
@@ -76,6 +81,7 @@ public class ShowGraphAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleWindowInterface root = getActiveModuleWindowInterface();
@@ -84,15 +90,16 @@ public class ShowGraphAction
     try {
       root.showEditor(comp);
     } catch (final GeometryAbsentException exception) {
-      final IDE ide = getIDE();
+      final Logger logger = LogManager.getLogger();
       final String msg = exception.getMessage(comp);
-      ide.error(msg);
+      logger.error(msg);
     }
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
   public void update(final EditorChangedEvent event)
   {
     if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {

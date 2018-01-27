@@ -43,7 +43,7 @@ import java.util.List;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
@@ -73,7 +73,7 @@ public class ImportAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.NAME, "Import ...");
     putValue(Action.SHORT_DESCRIPTION, "Import modules");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
-    putValue(Action.SMALL_ICON, IconLoader.ICON_TOOL_IMPORT);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_IMPORT);
     mCurrentSource = null;
     mCurrentTarget = null;
   }

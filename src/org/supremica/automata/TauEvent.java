@@ -1,24 +1,27 @@
-/************************* TauEvent.java ************************************
- * Legalities, blah, blah, blah... you know the drill
- * NOTE: Experimental still
- * NOTE: I have NO idea about EventProxy, TauEvent is only to be used in Analyzer
- *
- * A TauEvent always preserves controllability and is never a proposition
- * A TauEvent keeps track of the original LabeledEvent that it replaced
- */
 
 package org.supremica.automata;
 
 import java.util.HashMap;
 
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
+import net.sourceforge.waters.model.des.EventProxy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.properties.Config;
 
 
 /**
- * @author Fabian and Sahar
+ * <P>A TauEvent always preserves controllability and is never a proposition.
+ * A TauEvent keeps track of the original LabeledEvent that it replaced.</P>
+ *
+ * <P><STRONG>NOTE:</STRONG> Experimental still.</P>
+ * <P><STRONG>NOTE:</STRONG> I have NO idea about {@link EventProxy},
+ * TauEvent is only to be used in Analyser.</P> *
+ *
+ * @author Martin Fabian, Sahar Mohajerani
  */
+
 public class TauEvent extends LabeledEvent
 {
     private static final boolean NO_PROPOSITION = false;
@@ -31,7 +34,7 @@ public class TauEvent extends LabeledEvent
 
     //*** static stuff ***
 
-    private static Logger logger = LoggerFactory.createLogger(TauEvent.class);
+    private static Logger logger = LogManager.getLogger(TauEvent.class);
     private static int count = 1; // class global counter
     static HashMap <String,LabeledEvent> toOriginalMap = new HashMap <String,LabeledEvent>();
 
@@ -83,6 +86,7 @@ public class TauEvent extends LabeledEvent
       this.orig_event = tevent.orig_event;
     }
 
+    @Override
     public TauEvent clone()
     {
       return new TauEvent(this);
@@ -93,6 +97,7 @@ public class TauEvent extends LabeledEvent
       return orig_event;
     }
 
+    @Override
     public  boolean isTauEvent()
     {
       return tauEvent;  // should not this always return true?

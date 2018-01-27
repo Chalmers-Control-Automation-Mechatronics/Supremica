@@ -54,7 +54,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.gui.util.IconLoader;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Arc;
 import org.supremica.automata.AutomataIndexFormHelper;
@@ -73,8 +76,6 @@ import org.supremica.automata.execution.Condition;
 import org.supremica.automata.execution.Controls;
 import org.supremica.gui.VisualProject;
 import org.supremica.gui.animators.scenebeans.Animator;
-import org.supremica.log.Logger;
-import org.supremica.log.LoggerFactory;
 import org.supremica.util.SupremicaException;
 
 import uk.ac.ic.doc.scenebeans.animation.Animation;
@@ -82,12 +83,13 @@ import uk.ac.ic.doc.scenebeans.animation.CommandException;
 import uk.ac.ic.doc.scenebeans.event.AnimationEvent;
 import uk.ac.ic.doc.scenebeans.event.AnimationListener;
 
+
 public class SimulatorExecuter
     extends JFrame
     implements AutomatonListener, AnimationListener
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LoggerFactory.createLogger(SimulatorExecuter.class);
+    private static Logger logger = LogManager.getLogger(SimulatorExecuter.class);
     private final BorderLayout layout = new BorderLayout();
     private final JPanel contentPane;
     private final JMenuBar menuBar = new JMenuBar();
@@ -209,7 +211,7 @@ public class SimulatorExecuter
 
     public void initialize()
     {
-        final List<Image> images = IconLoader.ICONLIST_APPLICATION;
+        final List<Image> images = IconAndFontLoader.ICONLIST_APPLICATION;
         setIconImages(images);
         stateViewer.initialize();
     }

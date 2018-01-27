@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -90,7 +91,8 @@ class NodeLabelDataFlavor extends ModuleDataFlavor
   }
 
   @Override
-  List<Proxy> createExportData(final Collection<? extends Proxy> data)
+  List<Proxy> createExportData(final Collection<? extends Proxy> data,
+                               final ModuleContext context)
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final int size = data.size();
