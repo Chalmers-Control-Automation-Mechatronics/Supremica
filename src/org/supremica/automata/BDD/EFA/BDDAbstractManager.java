@@ -179,37 +179,46 @@ public abstract class BDDAbstractManager {
         return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
     }
 
-    public BDD action2BDD(final BinaryExpressionProxy expr) {
-        final String leftVarName = ((SimpleIdentifierProxy) expr.getLeft()).getName();
-        final int varIndex = bddExAutomata.theIndexMap.getVariableIndexByName(leftVarName);
-        final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varIndex);
-        ResultOverflows rightSide = null;
+    public BDD action2BDD(final BinaryExpressionProxy expr) 
+	{
+		try // to hunt down this bug
+		{
+			final String leftVarName = ((SimpleIdentifierProxy) expr.getLeft()).getName();
+			final int varIndex = bddExAutomata.theIndexMap.getVariableIndexByName(leftVarName);
+			final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(varIndex);
+			ResultOverflows rightSide = null;
 
-        if(bddExAutomata.orgExAutomata.getNonIntegerVarNameSet().contains(leftVarName)) {
+			if(bddExAutomata.orgExAutomata.getNonIntegerVarNameSet().contains(leftVarName)) {
 
-          final String mapedInstanceValue = bddExAutomata.orgExAutomata
-            .getNonIntVar2InstanceIntMap().get(leftVarName).get(expr.getRight().toString());
+			  final String mapedInstanceValue = bddExAutomata.orgExAutomata
+				.getNonIntVar2InstanceIntMap().get(leftVarName).get(expr.getRight().toString());
 
-          final IntConstantProxy mapedIntProxy = new IntConstantSubject(Integer.parseInt(mapedInstanceValue));
-          rightSide = expr2BDDBitVec(mapedIntProxy, false);
+			  final IntConstantProxy mapedIntProxy = new IntConstantSubject(Integer.parseInt(mapedInstanceValue));
+			  rightSide = expr2BDDBitVec(mapedIntProxy, false);
 
-        }else {
-          rightSide = expr2BDDBitVec(expr.getRight(), false);
-        }
+			}else {
+			  rightSide = expr2BDDBitVec(expr.getRight(), false);
+			}
 
-        BDD overflow = getZeroBDD();
-        final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
-        if (expr.getOperator().equals(cot.getIncrementOperator())) {
-            overflow = rightSide.getOverflows().id();
-            rightSide = bddExAutomata.getBDDBitVecSource(varIndex).addConsideringOverflows(rightSide.getResult());
-        }
+			BDD overflow = getZeroBDD();
+			final CompilerOperatorTable cot = CompilerOperatorTable.getInstance();
+			if (expr.getOperator().equals(cot.getIncrementOperator())) {
+				overflow = rightSide.getOverflows().id();
+				rightSide = bddExAutomata.getBDDBitVecSource(varIndex).addConsideringOverflows(rightSide.getResult());
+			}
 
-        if (expr.getOperator().equals(cot.getDecrementOperator())) {
-            overflow = rightSide.getOverflows().id();
-            rightSide = bddExAutomata.getBDDBitVecSource(varIndex).subConsideringOverflows(rightSide.getResult());
-        }
+			if (expr.getOperator().equals(cot.getDecrementOperator())) {
+				overflow = rightSide.getOverflows().id();
+				rightSide = bddExAutomata.getBDDBitVecSource(varIndex).subConsideringOverflows(rightSide.getResult());
+			}
 
-        return leftSide.equ(rightSide.getResult()).and((rightSide.getOverflows().or(overflow)).not());
+			return leftSide.equ(rightSide.getResult()).and((rightSide.getOverflows().or(overflow)).not());
+		}
+		catch(final Exception excp)
+		{
+			logger.debug("Exception! expr is " + expr.toString());
+			throw excp;
+		}
     }
 
     ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr, final boolean guardAction) {
@@ -352,11 +361,14 @@ public abstract class BDDAbstractManager {
             final String varName = ((SimpleIdentifierProxy) expr).getName();
             return new ResultOverflows(
                     bddExAutomata.getBDDBitVecSource(bddExAutomata.theIndexMap.getVariableIndexByName(varName)), getZeroBDD());
-        } else if (expr instanceof IntConstantProxy) {
-            if (guardAction) {
-                SupremicaBDDBitVector tmp = null;
+        } 
+		else if (expr instanceof IntConstantProxy) 
+		{
+            if (guardAction) 
+			{
+                // SupremicaBDDBitVector tmp = null;
 //                if(constantDomain ==null)
-                tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0).copy();
+                SupremicaBDDBitVector tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0).copy();
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),0).copy();
 //                else
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, constantDomain.varNum(),0).copy();
