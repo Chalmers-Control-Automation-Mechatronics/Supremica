@@ -75,15 +75,15 @@ public class AutomatonToDsx
 		pw.println("number of events: " + aut.nbrOfEvents());
 
 		// Print all states
-		final Iterator<State> states = aut.stateIterator();
+		final Iterator<State> states_it = aut.stateIterator();
 
-		while (states.hasNext())
+		while (states_it.hasNext())
 		{
-			State state = (State) states.next();
+			State state = (State) states_it.next();
 
 			pw.print(state.getName());
 
-			if (states.hasNext())
+			if (states_it.hasNext())
 			{
 				pw.print(", ");
 			}
@@ -123,7 +123,7 @@ public class AutomatonToDsx
 		}
 
 		// Print all transitions
-		states = aut.stateIterator();
+		final Iterator<State> states = aut.stateIterator();
 
 		while (states.hasNext())
 		{

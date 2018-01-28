@@ -73,7 +73,7 @@ public class AutomataSynchronizerWorker
 
         //// Order this thread to begin execution; the Jvm calls the run method of this thread.
         // this.start();	// This is bad practice, probably works in this case, but if someone sub-classes AutomataSynchronizerWorker all hell breaks loose
-							// The proper way is that the caller starts (see AnalyzerSynchronizerAction.java)
+							// The proper way is that the caller starts (see org.supremica.gui.ide.actions.AnalyzerSynchronizerAction.java)
     }
 
     @Override
@@ -206,7 +206,8 @@ public class AutomataSynchronizerWorker
     }
 
     @Override
-    public void resetAbort(){
+    public void resetAbort()
+	{
       abortRequested = false;
     }
 

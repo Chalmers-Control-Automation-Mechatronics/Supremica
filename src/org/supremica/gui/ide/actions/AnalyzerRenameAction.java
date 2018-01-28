@@ -62,8 +62,8 @@ public class AnalyzerRenameAction
         setEditorActiveRequired(false);
         setAnalyzerActiveRequired(true);
 
-        putValue(Action.NAME, "Rename");
-        putValue(Action.SHORT_DESCRIPTION, "Rename");
+        putValue(Action.NAME, "Rename automaton...");
+        putValue(Action.SHORT_DESCRIPTION, "Rename automaton");
 //        putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_A));
 //        putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
 //        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/general/Icon.gif")));

@@ -98,7 +98,9 @@ public class AnalyzerPanel
     }
 
     /**
-     * Gets the selected automata.
+     * Gets the selected automata. Returns a new list of the selected automata, changes to the selection
+	 * are not reflected into this list after it has been returned. This is very contrary to the below
+	 * getAllAutomata, which does NOT return a new list, but simply a reference to the VisualProject
      */
     public Automata getSelectedAutomata()
     {
@@ -117,6 +119,13 @@ public class AnalyzerPanel
         return automataPanel.getUnselectedAutomata();
     }
 
+	/*
+	 * This does NOT give you a list of all automata currently in the panel,
+	 * It gives you a reference to the visualProject. So for instance, the
+	 * number of automata before and after adding one or more CANNOT be determined
+	 * from storing the Automata returned from this method (took me three days of
+	 * bughunting to find out!) -- MF
+	*/
     public Automata getAllAutomata()
     {
         return automataPanel.getAllAutomata();
