@@ -247,7 +247,7 @@ public class AutomataVerificationWorker
             }
 
             automataVerifier.displayInfo();
-            logger.info("Execution completed after " + timer.toString());
+            logger.info("Verification completed after " + timer.toString());
         }
         else
         {

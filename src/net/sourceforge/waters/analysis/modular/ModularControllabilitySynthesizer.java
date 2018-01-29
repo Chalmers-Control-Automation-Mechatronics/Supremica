@@ -70,7 +70,7 @@ import org.apache.logging.log4j.Logger;
  * <P>This synthesis algorithm produces a least restrictive supervisor
  * that ensures controllability, but not necessarily nonblocking.
  * For each specification, it takes into account all plants containing
- * the controllable events disabled by the specification and possibly
+ * the uncontrollable events disabled by the specification and possibly
  * further plants as needed, to produce a supervisor component ensuring
  * controllability of that specification.</P>
  *
