@@ -54,112 +54,10 @@ import net.sourceforge.waters.model.analysis.Abortable;
 import org.supremica.automata.AutomataListener;
 import org.supremica.automata.AutomataListeners;
 import org.supremica.automata.Listener;
+import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.ide.AnalyzerPanel;
 // import org.supremica.selectedAautomata.algorithms.AutomatonSplit;
-
-/*
- * This is the Listener that takes care of things once the synchronized result has been added
- * For now it just prints the name of the added automaton
- * Note that we only expect automatonAdded to be called, and no other notificatino
-*/
-class InterleaveListener implements AutomataListener
-{
-
-	@Override
-	public void automatonAdded(Automata automata, Automaton automaton)
-	{
-		System.out.println("Automaton: " + automaton.getName() + " added!");
-		
-		// We wait for just this one, so remove us now that we're done
-		final AutomataListeners listeners = automata.getListeners();
-		listeners.removeListener(this);
-	}
-
-	@Override
-	public void automatonRemoved(Automata automata, Automaton automaton)
-	{
-		throw new UnsupportedOperationException("InterleaveListener: automatonRemoved not supported");
-	}
-
-	@Override
-	public void automatonRenamed(Automata automata, Automaton automaton)
-	{
-		throw new UnsupportedOperationException("InterleaveListener: automatonRenamed not supported");
-	}
-
-	@Override
-	public void actionsOrControlsChanged(Automata automata)
-	{
-		throw new UnsupportedOperationException("InterleaveListener: actionsOrControlsChanged not supported");
-	}
-
-	@Override
-	public void updated(Object o)
-	{
-		throw new UnsupportedOperationException("InterleaveListener: updated not supported");
-	}
-	
-}
-
-class AnalyzerAddAutomatonJustForExperiment 
-	extends Thread 
-	implements Abortable
-{
-	private static final Logger logger = LogManager.getLogger(AnalyzerAddAutomatonJustForExperiment.class);
-    private static final long serialVersionUID = 1L;
-	
-	private boolean abortRequested;
-	private final IDEActionInterface IDE;
-	private final AnalyzerPanel analyzerPanel;
-	
-	public AnalyzerAddAutomatonJustForExperiment(final IDEActionInterface ide)
-	{
-		this.IDE = ide;
-		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
-	}
-	
-	@Override
-	public void run()
-	{
-//		try
-//		{
-//			System.out.println("Going to sleep for 1000 ms ...");
-//			Thread.sleep(1000);
-			System.out.println("Adding automaton...");
-			final Automaton new_auto = new Automaton("Mxyzptlk");
-			final boolean done = analyzerPanel.addAutomaton(new_auto);	// Does indeed return true!
-			System.out.println("Added automaton: " + done);
-//			System.out.println("\nGoing to sleep again for 1000 ms ...");
-//			Thread.sleep(1000);			
-//			System.out.println("Just woke up...");
-//		}
-//		catch(InterruptedException excp) // May be thrown by sleep
-//		{
-//			// Apparently this is the way to do it 
-//			// See http://www.yegor256.com/2015/10/20/interrupted-exception.html
-//			Thread.currentThread().interrupt();
-//			throw new RuntimeException(excp);
-//		}	
-	}
-	
-    @Override
-    public void requestAbort()
-    {
-		abortRequested = true;
-    }
-
-    @Override
-    public boolean isAborting()
-    {
-        return abortRequested;
-    }
-
-    @Override
-    public void resetAbort()
-	{
-      abortRequested = false;
-    }	
-}
 
 /* This is a first try of doing proper interleave -- MF
  * It turns out that this can be done by using actions already available. It goes like this:
@@ -168,94 +66,122 @@ class AnalyzerAddAutomatonJustForExperiment
    3. Set the obervability property back of all events touched under 1 above
    4. Do language preserving minimization		
  **/
-class AnalyzerInterleaveWorker extends Thread implements Abortable
+
+/*
+ * This is the Listener that takes care of things once the synchronized result has been added
+ * For now it just prints the name of the added automaton
+ * Note that we only expect automatonAdded to be called, and no other notificatino
+*/
+class InterleaveListener implements AutomataListener
 {
-	private boolean abortRequested;
+	private static final Logger logger = LogManager.getLogger(InterleaveListener.class);
+    private static final long serialVersionUID = 1L;
+	
 	private final IDEActionInterface IDE;
 	private final AnalyzerPanel analyzerPanel;
+	private final Alphabet changedAlphas;
 	
-	public AnalyzerInterleaveWorker(final IDEActionInterface ide)
+	private int currentMode;
+	private static final int FIRST_MODE = 0x4F;	// In the first mode we do synch
+	private static final int SECOND_MODE = 0xFAB1A4E;	// In the second mode we do lang eq minimization
+	
+	public InterleaveListener(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
-		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
-	}
+		this.analyzerPanel = this.IDE.getActiveDocumentContainer().getAnalyzerPanel();
+		this.currentMode = FIRST_MODE;
 	
-	@Override
-	public void run() 
-	{
-		final int nbrAutomataBefore = analyzerPanel.getAllAutomata().nbrOfAutomata();
-        final Automata selectedAutomata = analyzerPanel.getSelectedAutomata();
-		
+	    final Automata selectedAutomata = this.analyzerPanel.getSelectedAutomata();
 		final Alphabet alpha = selectedAutomata.getUnionAlphabet();
-		final Alphabet changed_alpha = new Alphabet();	// Here we store the ones we change
+		this.changedAlphas = new Alphabet();	// Here we store the ones we change
 
 		for(final LabeledEvent event : alpha)
 		{	
 			if(event.isObservable())	// If this event is obs, set it un-obs and remember to set it back
 			{
 				event.setObservable(false);
-				changed_alpha.add(event);
+				changedAlphas.add(event);
 			}
 		}
 
-		// Now synchronize
-		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();	// Make sure unobs non-tau events do NOT synch!
-		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(IDE.getIDE(), selectedAutomata, "", synchronizationOptions);
-		if(asw != null)
-		{
-			asw.start();	// Start this thread and wait for it to finish
-
-			while(asw.isAlive())
-			{
-				try
-				{
-					asw.join(); // Wait for it to finish
-				}
-				catch (InterruptedException excp) 
-				{
-					// Apparently this is the way to do it 
-					// See http://www.yegor256.com/2015/10/20/interrupted-exception.html
-					Thread.currentThread().interrupt();
-					throw new RuntimeException(excp);
-				}					
-			}
-		}
-
-		// Now, somehow get the newly created automaton, the synch result
-		// Fo rnow we just check that something was added, as we expect
-		final int nbrAutomataAfter = analyzerPanel.getAllAutomata().nbrOfAutomata();
-		// The diff between nbrAutomataBefore and nbrAutomataAfter shoudl be a single automaton, the one we look for
-		final int num = nbrAutomataAfter - nbrAutomataBefore;
-		System.out.println("Num all automata before: " + nbrAutomataBefore);
-		System.out.println("Num all automata after: " + nbrAutomataAfter);
-		if(num != 1)
-		{
-			// Something is seriously wrong, either no automaton or more than one was created by the synch...
-			throw new RuntimeException("Experiment error! " + num + " number of automata was created, we expected one, and only one!");
-		}
+		// Add the listener that is to do the work once the synchronized automaton has been added 
+		final Automata allAutomata = this.analyzerPanel.getAllAutomata(); // This really returns the visualProject
+		allAutomata.addListener(this);
 		
-		// If all is fine, a single automaton was added as we expected it to, set the observability back for all the events that were changed
+		// Now synchronize
+		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+		// Make sure unobs non-tau events do NOT synch!!
+		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
+
+		asw.start();	// Start the synch thread and just let it roam		
 	}
 	
-    @Override
-    public void requestAbort()
-    {
-        abortRequested = true;
-    }
-
-    @Override
-    public boolean isAborting()
-    {
-        return abortRequested;
-    }
-
-    @Override
-    public void resetAbort()
+	@Override
+	public void automatonAdded(Automata automata, Automaton automaton)
 	{
-      abortRequested = false;
-    }
-	
+		logger.debug("Automaton: " + automaton.getName() + " added!");
+		
+		if(this.currentMode == FIRST_MODE)
+		{
+			// We wait for just this one, so remove us now that we're done
+			final AutomataListeners listeners = automata.getListeners();
+			listeners.removeListener(this);
+		
+			// Now reset the observability of the events that were previously changed
+			for(final LabeledEvent event : this.changedAlphas)
+			{
+				event.setObservable(true);
+			}
+		
+			// Now we gonna do Language Eq Minimization on this automaton
+			// Probably have to do the same thing as we did for synchronizing
+			final MinimizationOptions options = new MinimizationOptions();
+			options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
+			options.setAlsoTransitions(true);
+			options.setKeepOriginal(false);
+			options.setIgnoreMarking(false);
+			
+			this.currentMode = SECOND_MODE;
+		}
+		
+	}
+
+	@Override
+	public void automatonRemoved(Automata automata, Automaton automaton)
+	{
+		// We did not expect this one, so remove us and report error
+		final AutomataListeners listeners = automata.getListeners();
+		listeners.removeListener(this);
+		logger.error("InterleaveListener: automatonRemoved not supported");
+	}
+
+	@Override
+	public void automatonRenamed(Automata automata, Automaton automaton)
+	{
+		// We did not expect this one, so remove us and report error
+		final AutomataListeners listeners = automata.getListeners();
+		listeners.removeListener(this);
+		logger.error("InterleaveListener: automatonRenamed not supported");
+	}
+
+	@Override
+	public void actionsOrControlsChanged(Automata automata)
+	{
+		// We did not expect this one, so remove us and report error
+		final AutomataListeners listeners = automata.getListeners();
+		listeners.removeListener(this);
+		logger.error("InterleaveListener: actionsOrControlsChanged not supported");
+	}
+
+	@Override
+	public void updated(Object o)
+	{
+		// Have no clue how to handle this, don't even know what the Object is
+		throw new UnsupportedOperationException("InterleaveListener: updated not supported"); 
+	}
 }
+
+
 /******************************************************************
  * A new action
  */
@@ -312,9 +238,12 @@ public class AnalyzerExperimentAction
 	*/
 	void interleaveExperiment()	//-- MF
 	{
+		new InterleaveListener(ide);
+		
+	/**************** Try to let the InterleaveListener do all teh work	
 		final AnalyzerPanel analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
-		final Automata allAutomata = analyzerPanel.getAllAutomata(); // THis really returns the visualProject
-		final int nbrAutomataBefore = allAutomata.nbrOfAutomata();
+		final Automata allAutomata = analyzerPanel.getAllAutomata(); // This really returns the visualProject
+		// final int nbrAutomataBefore = allAutomata.nbrOfAutomata();
         final Automata selectedAutomata = analyzerPanel.getSelectedAutomata();
 		
 		final Alphabet alpha = selectedAutomata.getUnionAlphabet();
@@ -329,15 +258,17 @@ public class AnalyzerExperimentAction
 			}
 		}
 
-		// Add the listener that is to do the work once the synchronized automaton has been added
-		final InterleaveListener inlistener = new InterleaveListener();
-		allAutomata.addListener(inlistener);
+		// Add the listener that is to do the work once the synchronized automaton has been added 
+		final AutomataListener inlisten = new InterleaveListener(ide, analyzerPanel, changed_alpha);
+		allAutomata.addListener(inlisten);
 		
 		// Now synchronize
 		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();	// Make sure unobs non-tau events do NOT synch!
 		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
 
 		asw.start();	// Start the synch thread and wait for it to finish
+		* **********************************************************************/
+	/************** We don't need this, just let asw roam free and we get informed when the synch result has been added
 		while(asw.isAlive())
 		{
 			try
@@ -352,8 +283,8 @@ public class AnalyzerExperimentAction
 				throw new RuntimeException(excp);
 			}					
 		}
-
-
+		* *************************************************************/
+/******************************** this is not the way to do it!
 		// Now, somehow get the newly created automaton, the synch result
 		// For now we just check that something was added, as we expect
 		final int nbrAutomataAfter = analyzerPanel.getAllAutomata().nbrOfAutomata();
@@ -370,8 +301,10 @@ public class AnalyzerExperimentAction
 		// The above does not work correctly, the automaton is added by the synch worker, but apparently AFTER
 		// the join() has happened, so the num of automata before and after are always(?) the same
 		// Probably some race condition - have to rethink this
-
+********************************/
 	}
+	
+	
 	/*
 	 * So justAddAutomatonExperiment finally works as expected. Now let's try the threaded variant
 	 * Also this seems now to work fine
@@ -477,4 +410,158 @@ public class AnalyzerExperimentAction
 	
 	}		 
 	* **************/	
+}
+
+/* These were used for all kinds of experimentation when I (MF) thought that the bug was in my code when it really was
+ * in AnalyzerPanel.getAllAutomata().
+*/
+class AnalyzerAddAutomatonJustForExperiment 
+	extends Thread 
+	implements Abortable
+{
+	private static final Logger logger = LogManager.getLogger(AnalyzerAddAutomatonJustForExperiment.class);
+    private static final long serialVersionUID = 1L;
+	
+	private boolean abortRequested;
+	private final IDEActionInterface IDE;
+	private final AnalyzerPanel analyzerPanel;
+	
+	public AnalyzerAddAutomatonJustForExperiment(final IDEActionInterface ide)
+	{
+		this.IDE = ide;
+		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
+	}
+	
+	@Override
+	public void run()
+	{
+//		try
+//		{
+//			System.out.println("Going to sleep for 1000 ms ...");
+//			Thread.sleep(1000);
+			System.out.println("Adding automaton...");
+			final Automaton new_auto = new Automaton("Mxyzptlk");
+			final boolean done = analyzerPanel.addAutomaton(new_auto);	// Does indeed return true!
+			System.out.println("Added automaton: " + done);
+//			System.out.println("\nGoing to sleep again for 1000 ms ...");
+//			Thread.sleep(1000);			
+//			System.out.println("Just woke up...");
+//		}
+//		catch(InterruptedException excp) // May be thrown by sleep
+//		{
+//			// Apparently this is the way to do it 
+//			// See http://www.yegor256.com/2015/10/20/interrupted-exception.html
+//			Thread.currentThread().interrupt();
+//			throw new RuntimeException(excp);
+//		}	
+	}
+	
+    @Override
+    public void requestAbort()
+    {
+		abortRequested = true;
+    }
+
+    @Override
+    public boolean isAborting()
+    {
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort()
+	{
+      abortRequested = false;
+    }	
+}
+
+//==============================================================
+
+class AnalyzerInterleaveWorker extends Thread implements Abortable
+{
+	private boolean abortRequested;
+	private final IDEActionInterface IDE;
+	private final AnalyzerPanel analyzerPanel;
+	
+	public AnalyzerInterleaveWorker(final IDEActionInterface ide)
+	{
+		this.IDE = ide;
+		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
+	}
+	
+	@Override
+	public void run() 
+	{
+		final int nbrAutomataBefore = analyzerPanel.getAllAutomata().nbrOfAutomata();
+        final Automata selectedAutomata = analyzerPanel.getSelectedAutomata();
+		
+		final Alphabet alpha = selectedAutomata.getUnionAlphabet();
+		final Alphabet changed_alpha = new Alphabet();	// Here we store the ones we change
+
+		for(final LabeledEvent event : alpha)
+		{	
+			if(event.isObservable())	// If this event is obs, set it un-obs and remember to set it back
+			{
+				event.setObservable(false);
+				changed_alpha.add(event);
+			}
+		}
+
+		// Now synchronize
+		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();	// Make sure unobs non-tau events do NOT synch!
+		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(IDE.getIDE(), selectedAutomata, "", synchronizationOptions);
+		if(asw != null)
+		{
+			asw.start();	// Start this thread and wait for it to finish
+
+			while(asw.isAlive())
+			{
+				try
+				{
+					asw.join(); // Wait for it to finish
+				}
+				catch (InterruptedException excp) 
+				{
+					// Apparently this is the way to do it 
+					// See http://www.yegor256.com/2015/10/20/interrupted-exception.html
+					Thread.currentThread().interrupt();
+					throw new RuntimeException(excp);
+				}					
+			}
+		}
+
+		// Now, somehow get the newly created automaton, the synch result
+		// Fo rnow we just check that something was added, as we expect
+		final int nbrAutomataAfter = analyzerPanel.getAllAutomata().nbrOfAutomata();
+		// The diff between nbrAutomataBefore and nbrAutomataAfter shoudl be a single automaton, the one we look for
+		final int num = nbrAutomataAfter - nbrAutomataBefore;
+		System.out.println("Num all automata before: " + nbrAutomataBefore);
+		System.out.println("Num all automata after: " + nbrAutomataAfter);
+		if(num != 1)
+		{
+			// Something is seriously wrong, either no automaton or more than one was created by the synch...
+			throw new RuntimeException("Experiment error! " + num + " number of automata was created, we expected one, and only one!");
+		}
+		
+		// If all is fine, a single automaton was added as we expected it to, set the observability back for all the events that were changed
+	}
+	
+    @Override
+    public void requestAbort()
+    {
+        abortRequested = true;
+    }
+
+    @Override
+    public boolean isAborting()
+    {
+        return abortRequested;
+    }
+
+    @Override
+    public void resetAbort()
+	{
+      abortRequested = false;
+    }
+	
 }
