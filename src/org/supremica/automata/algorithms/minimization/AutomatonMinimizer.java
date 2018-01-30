@@ -187,11 +187,13 @@ public class AutomatonMinimizer
         final boolean preserveControllability = (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
                 ||(options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION);
 
-        if (options.getMinimizationType() ==
-                EquivalenceRelation.SYNTHESISABSTRACTION) {
+        if (options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION) 
+		{
             theAutomaton.synthesisHide(hideThese, preserveControllability);
-        } else {
-        theAutomaton.hide(hideThese, preserveControllability);
+        } 
+		else 
+		{
+			theAutomaton.hide(hideThese, preserveControllability);
         }
         // Message
 

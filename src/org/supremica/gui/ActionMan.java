@@ -1542,7 +1542,8 @@ public class ActionMan
         }
 
 		final Project currProject = gui.getVisualProjectContainer().getActiveProject();
-        new AutomataMinimizationWorker(gui.getFrame(), selectedAutomata, currProject, options);
+        final AutomataMinimizationWorker amw = new AutomataMinimizationWorker(gui.getFrame(), selectedAutomata, currProject, options);
+		amw.start();
     }
 
     /*

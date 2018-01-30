@@ -66,7 +66,7 @@ public class AutomataMinimizationWorker
     extends Thread
     implements Abortable
 {
-    private static Logger logger = LogManager.getLogger(AutomataMinimizationWorker.class);
+    private static final Logger logger = LogManager.getLogger(AutomataMinimizationWorker.class);
 
     private final Frame frame;
     private final Automata theAutomata;
@@ -85,7 +85,7 @@ public class AutomataMinimizationWorker
         this.theProject = theProject;
         this.options = options;
 
-        this.start();
+        // this.start();	// Bad practice! Let the one who constructs us also start us
     }
 
     @Override

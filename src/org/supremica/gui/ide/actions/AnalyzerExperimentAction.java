@@ -55,7 +55,9 @@ import org.supremica.automata.AutomataListener;
 import org.supremica.automata.AutomataListeners;
 import org.supremica.automata.Listener;
 import org.supremica.automata.algorithms.EquivalenceRelation;
+import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
+import org.supremica.gui.AutomataMinimizationWorker;
 import org.supremica.gui.ide.AnalyzerPanel;
 // import org.supremica.selectedAautomata.algorithms.AutomatonSplit;
 
@@ -82,14 +84,14 @@ class InterleaveListener implements AutomataListener
 	private final Alphabet changedAlphas;
 	
 	private int currentMode;
-	private static final int FIRST_MODE = 0x4F;	// In the first mode we do synch
-	private static final int SECOND_MODE = 0xFAB1A4E;	// In the second mode we do lang eq minimization
+	private static final int SYNC_MODE = 0x4F;	// In the first mode we do synch
+	private static final int MIN_MODE = 0xFAB1A4E;	// In the second mode we do lang eq minimization
 	
 	public InterleaveListener(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
 		this.analyzerPanel = this.IDE.getActiveDocumentContainer().getAnalyzerPanel();
-		this.currentMode = FIRST_MODE;
+		this.currentMode = SYNC_MODE;
 	
 	    final Automata selectedAutomata = this.analyzerPanel.getSelectedAutomata();
 		final Alphabet alpha = selectedAutomata.getUnionAlphabet();
@@ -119,14 +121,10 @@ class InterleaveListener implements AutomataListener
 	@Override
 	public void automatonAdded(Automata automata, Automaton automaton)
 	{
-		logger.debug("Automaton: " + automaton.getName() + " added!");
+		logger.debug("InterleaveListener: Automaton " + automaton.getName() + " added!");
 		
-		if(this.currentMode == FIRST_MODE)
+		if(this.currentMode == SYNC_MODE)
 		{
-			// We wait for just this one, so remove us now that we're done
-			final AutomataListeners listeners = automata.getListeners();
-			listeners.removeListener(this);
-		
 			// Now reset the observability of the events that were previously changed
 			for(final LabeledEvent event : this.changedAlphas)
 			{
@@ -138,21 +136,40 @@ class InterleaveListener implements AutomataListener
 			final MinimizationOptions options = new MinimizationOptions();
 			options.setMinimizationType(EquivalenceRelation.LANGUAGEEQUIVALENCE);
 			options.setAlsoTransitions(true);
-			options.setKeepOriginal(false);
 			options.setIgnoreMarking(false);
+			options.setKeepOriginal(false);	// true keeps SYNC_MODE result in addition to adding MIN_MODE result
+											// false replaces SYNC_MODE result with MIN_MODE result
 			
-			this.currentMode = SECOND_MODE;
+			this.currentMode = MIN_MODE;
+			
+			final Automata selectedAutomata = new Automata();
+			selectedAutomata.addAutomaton(automaton);
+			// Start the worker thread and let it roam free
+			final AutomataMinimizationWorker amw = new AutomataMinimizationWorker(IDE.getFrame(), selectedAutomata, analyzerPanel.getVisualProject(), options);
+			amw.start();
 		}
-		
+		else if(this.currentMode == MIN_MODE)
+		{	
+			/*
+			 * We assume that with keepOriginal == false, we get notified in the following order:
+			 * synchronization result added in SYNC_MODE
+			 * synchronization result removed in MIN_MODE
+			 * minimization result added in MIN_MODE
+			*/
+			
+			// We wait for just this one, so remove us now that we're done
+			final AutomataListeners listeners = automata.getListeners();
+			listeners.removeListener(this);		
+			
+		}
 	}
 
 	@Override
 	public void automatonRemoved(Automata automata, Automaton automaton)
 	{
-		// We did not expect this one, so remove us and report error
-		final AutomataListeners listeners = automata.getListeners();
-		listeners.removeListener(this);
-		logger.error("InterleaveListener: automatonRemoved not supported");
+		assert this.currentMode == MIN_MODE : "InterleaveListener expected automatonRemoved notification only in MIN_MODE!";
+
+		logger.debug("InterleaveListener: automaton " + automaton.getName() + " removed");
 	}
 
 	@Override
