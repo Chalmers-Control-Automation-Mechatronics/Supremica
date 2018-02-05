@@ -138,9 +138,9 @@ public class AutomataMinimizationWorker
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
 
-                // Do we have to care about the original?
-            //    if (options.getKeepOriginal())
-                {
+                // Do we have to care about the original?	// Something strange happens here when there
+            //    if (options.getKeepOriginal())			// are no unobs events and !keepOriginal.
+                {											// To fix this strange thing, alwyas copy -- MF
                     // We need a copy since we might need to fiddle with the original
                     currAutomaton = new Automaton(currAutomaton);
                 }
