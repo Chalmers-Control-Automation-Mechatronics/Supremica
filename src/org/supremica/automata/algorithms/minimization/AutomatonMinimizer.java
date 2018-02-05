@@ -316,10 +316,8 @@ public class AutomatonMinimizer
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         //Abstraction base on synthesis abstraction(DCDS2011).
-        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
-
-
-
+        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
+		{
             // Merge the states that only have one local outgoing transition.
 //            theAutomaton.endTransaction();
             if (theAutomaton.getAlphabet().size() > 1)

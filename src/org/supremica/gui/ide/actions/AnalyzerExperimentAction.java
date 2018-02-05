@@ -70,24 +70,24 @@ import org.supremica.gui.ide.AnalyzerPanel;
  **/
 
 /*
- * This is the Listener that takes care of things once the synchronized result has been added
- * For now it just prints the name of the added automaton
- * Note that we only expect automatonAdded to be called, and no other notificatino
-*/
-class InterleaveListener implements AutomataListener
+ * This is the worker that takes care of things once the synchronized result has been added
+ * Note that it does not work the same way as the other Automata*Worker, as this one is really only
+ * a listener, that reacts to what it hears.
+**/
+class AutomataInterleaveWorker implements AutomataListener
 {
-	private static final Logger logger = LogManager.getLogger(InterleaveListener.class);
+	private static final Logger logger = LogManager.getLogger(AutomataInterleaveWorker.class);
     private static final long serialVersionUID = 1L;
 	
 	private final IDEActionInterface IDE;
 	private final AnalyzerPanel analyzerPanel;
 	private final Alphabet changedAlphas;
-	
+			
 	private int currentMode;
 	private static final int SYNC_MODE = 0x4F;	// In the first mode we do synch
 	private static final int MIN_MODE = 0xFAB1A4E;	// In the second mode we do lang eq minimization
 	
-	public InterleaveListener(final IDEActionInterface ide)
+	public AutomataInterleaveWorker(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
 		this.analyzerPanel = this.IDE.getActiveDocumentContainer().getAnalyzerPanel();
@@ -112,16 +112,17 @@ class InterleaveListener implements AutomataListener
 		
 		// Now synchronize
 		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-		// Make sure unobs non-tau events do NOT synch!!
+		synchronizationOptions.setUnobsEventsSynch(false); // Make sure unobs non-tau events do NOT synch!!
+		synchronizationOptions.setUseShortStateNames(true); // No need to have teh long names, is there...?
+		
 		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
-
 		asw.start();	// Start the synch thread and just let it roam		
 	}
 	
 	@Override
 	public void automatonAdded(Automata automata, Automaton automaton)
 	{
-		logger.debug("InterleaveListener: Automaton " + automaton.getName() + " added!");
+		logger.debug("AutomataInterleaveWorker: Automaton " + automaton.getName() + " added!");
 		
 		if(this.currentMode == SYNC_MODE)
 		{
@@ -167,9 +168,9 @@ class InterleaveListener implements AutomataListener
 	@Override
 	public void automatonRemoved(Automata automata, Automaton automaton)
 	{
-		assert this.currentMode == MIN_MODE : "InterleaveListener expected automatonRemoved notification only in MIN_MODE!";
+		assert this.currentMode == MIN_MODE : "AutomataInterleaveWorker expected automatonRemoved notification only in MIN_MODE!";
 
-		logger.debug("InterleaveListener: automaton " + automaton.getName() + " removed");
+		logger.debug("AutomataInterleaveWorker: automaton " + automaton.getName() + " removed");
 	}
 
 	@Override
@@ -178,7 +179,7 @@ class InterleaveListener implements AutomataListener
 		// We did not expect this one, so remove us and report error
 		final AutomataListeners listeners = automata.getListeners();
 		listeners.removeListener(this);
-		logger.error("InterleaveListener: automatonRenamed not supported");
+		logger.error("AutomataInterleaveWorker: automatonRenamed not expected");
 	}
 
 	@Override
@@ -187,14 +188,14 @@ class InterleaveListener implements AutomataListener
 		// We did not expect this one, so remove us and report error
 		final AutomataListeners listeners = automata.getListeners();
 		listeners.removeListener(this);
-		logger.error("InterleaveListener: actionsOrControlsChanged not supported");
+		logger.error("AutomataInterleaveWorker: actionsOrControlsChanged not expected");
 	}
 
 	@Override
 	public void updated(Object o)
 	{
 		// Have no clue how to handle this, don't even know what the Object is
-		throw new UnsupportedOperationException("InterleaveListener: updated not supported"); 
+		throw new UnsupportedOperationException("AutomataInterleaveWorker: updated not supported"); 
 	}
 }
 
@@ -255,7 +256,13 @@ public class AnalyzerExperimentAction
 	*/
 	void interleaveExperiment()	//-- MF
 	{
-		new InterleaveListener(ide);
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+		if(!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, false, false))
+		{
+			return;
+		}
+		// Input is sane, go ahwad just do it...
+		new AutomataInterleaveWorker(ide);
 		
 	/**************** Try to let the InterleaveListener do all teh work	
 		final AnalyzerPanel analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();

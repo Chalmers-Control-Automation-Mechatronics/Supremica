@@ -124,6 +124,8 @@ public class AutomataMinimizationWorker
         // not (just minimise the components individually).
         if (!options.getCompositionalMinimization())
         {
+			logger.debug("AutomataMinimizationWorker: non-compositional minimization");
+			
             if (theAutomata.size() > 1)
             {
                 executionDialog.initProgressBar(0, theAutomata.size());
@@ -137,7 +139,7 @@ public class AutomataMinimizationWorker
                 Automaton currAutomaton = (Automaton) autIt.next();
 
                 // Do we have to care about the original?
-                if (options.getKeepOriginal())
+            //    if (options.getKeepOriginal())
                 {
                     // We need a copy since we might need to fiddle with the original
                     currAutomaton = new Automaton(currAutomaton);
@@ -153,15 +155,13 @@ public class AutomataMinimizationWorker
                         minimizer.setExecutionDialog(executionDialog);
                     }
                     threadsToAbort.add(minimizer);
-                    final Automaton newAutomaton =
-                        minimizer.getMinimizedAutomaton(options);
+                    final Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
                     threadsToAbort.remove(minimizer);
                     if (abortRequested)
                     {
                         break;
                     }
-                    newAutomaton.setComment
-                        ("min(" + newAutomaton.getName() + ")");
+                    newAutomaton.setComment("min(" + newAutomaton.getName() + ")");
                     newAutomaton.setName(null);
                     // Update execution dialog
                     if (executionDialog != null)
@@ -181,15 +181,19 @@ public class AutomataMinimizationWorker
                                ": " + exception.getMessage());
                   logger.debug(exception.getStackTrace());
                 }
-                if (!options.getKeepOriginal())
-                {
-                    theProject.removeAutomaton(currAutomaton);
-                }
+				
+				// This should not be done before the minimized one has been added, 
+				// else we might remove the old one while not adding the new minimized one
+//                if (!options.getKeepOriginal())
+//                {
+//                    theProject.removeAutomaton(currAutomaton);
+//                }
             }
         }
         else
-        {
+        {	
             // Compositional minimization!
+			logger.debug("AutomataMinimizationWorker: compositional minimization");
             try
             {
                 // Do we have to care about the original?
@@ -220,10 +224,12 @@ public class AutomataMinimizationWorker
                 requestAbort();
             }
 
-            if (!options.getKeepOriginal())
-            {
-                theProject.removeAutomata(theAutomata);
-            }
+			// This should not be done before the minimized one has been added, 
+			// else we might remove the old one while not adding the new minimized one
+//            if (!options.getKeepOriginal())
+//            {
+//                theProject.removeAutomata(theAutomata);
+//            }
         }
 
         // Timer
@@ -251,6 +257,10 @@ public class AutomataMinimizationWorker
             try
             {
                 theProject.addAutomata(result);
+				if(!options.getKeepOriginal())
+				{
+					theProject.removeAutomata(theAutomata);
+				}
             }
             catch (final Exception ex)
             {
