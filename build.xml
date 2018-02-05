@@ -24,21 +24,12 @@
     <property name="help" value="help"/>
     <property name="lib" value="lib"/>
     <property name="unjared" value="unjared"/>
-    
-    <property name="xmlrpc_basepackage" value="helma"/>
-    <property name="xmlrpc_basedir" value="helma"/>
-    
+     
     <property name="resources" value="resources"/>
     
     <property name="supremica_basepackage" value="org.supremica"/>
     <property name="supremica_basedir" value="org/supremica"/>
     
-    <!--property name="jgrafchart_basepackage" value="org.jgrafchart"/>
-    <property name="jgrafchart_basedir" value="org/jgrafchart"/-->
-    
-    <property name="project.name" value="Supremica"/>
-    <property name="backup.dir" value="../backup"/>
-    <property name="installer.dir" value="C:\Supremica Installer"/>
     <property name="javalibs.dir" value="lib/unjared"/>
     
     <property name="logs" location="logs"/>
@@ -68,11 +59,21 @@
         <pathelement location="${jaxb-impl.jar}"/>
     </path>
 
-    <!-- Build Instructions -->
-    <path id="supremica.classpath">
-        <pathelement location="${dist}/SupremicaLib.jar"/>
+    <!-- LOG4J2 -->
+    <property name="log4j2.api.jar" value="log4j-api-2.9.0.jar"/>
+    <property name="log4j2.core.jar" value="log4j-core-2.9.0.jar"/>
+
+    <!-- Class paths -->
+    <path id="other.jars.classpath">
+        <pathelement location="${dist}/${log4j2.api.jar}"/>
+        <pathelement location="${dist}/${log4j2.core.jar}"/>
     </path>
     
+    <path id="supremica.classpath">
+        <pathelement location="${dist}/SupremicaLib.jar"/>
+        <path refid="other.jars.classpath"/>
+    </path>
+
     <patternset id="all_nested_classfiles.patternset">
         <include name="**/*.class"/>
     </patternset>
@@ -83,17 +84,8 @@
         </classpath>
     </taskdef>
     
-    <!-- test if abtlib works -->
-    <!--<target name="test-ant-contrib"> 
-    
-        <echo message="Testing ant-contrib is working by looping through a list of letters."/>
-        <for list="a,b,c,d,e" param="letter">
-            <sequential>
-                <echo>Letter @{letter}</echo>
-            </sequential>
-        </for>
 
-    </target>-->
+    <!-- Build Instructions -->
     <!-- 
 *       Build this target after checking out the sources for the
 *       first time. 
@@ -124,7 +116,6 @@
         <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/log4j.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
@@ -138,7 +129,7 @@
         <!-- <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
         <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>   
+        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->
@@ -176,14 +167,6 @@
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 
-        <!-- Ant 1.6.0 is not able to unjar empty jar files -->
-        <!--
-        <mkdir dir="${lib}/licensed"/>
-        <touch file="${lib}/licensed/JGo.jar"/> 
-        <touch file="${lib}/licensed/JGoLayout.jar"/>
-        <unjar src="${lib}/licensed/JGo.jar" dest="${lib}/${unjared}"/> 
-        <unjar src="${lib}/licensed/JGoLayout.jar" dest="${lib}/${unjared}"/>
-        -->
         <!-- JAXB -->
         <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
         <unjar src="${jaxb-core.jar}" dest="${lib}/${unjared}"/>
@@ -204,16 +187,15 @@
         <delete dir="${dist}"/>
         <mkdir dir="${dist}"/>
         <delete dir="${src}/org/w3"/>
-        <mkdir dir="${src}/org/w3"/>        
+        <mkdir dir="${src}/org/w3"/>
         <delete dir="${doc}/api"/>
-        <mkdir dir="${doc}/api"/>               
+        <mkdir dir="${doc}/api"/>
         <delete dir="${lib}/${unjared}"/>
-        <mkdir dir="${lib}/${unjared}"/>        
+        <mkdir dir="${lib}/${unjared}"/>
         <delete dir="${resources}"/>
         <mkdir dir="${resources}"/>
         <delete dir="${lib}/${unjared}/META-INF"/>
         <mkdir dir="${lib}/${unjared}/META-INF"/>
-        <delete dir="${src}/net/sourceforge/waters/external/promela/parser"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -232,24 +214,6 @@
         </tstamp>
     </target>
             
-    <target name="backup" depends="-init,clean">
-        <tar tarfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar" 
-             basedir="../${project.name}"
-             excludes="rsync/**,put,get,lib/unjared/**"/>
-        <gzip zipfile="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar.gz"
-              src="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
-        <delete file="${backup.dir}/${project.name}_${DSTAMP}_${TSTAMP}.tar"/>
-    </target>
-    
-    <target name="backup_src" depends="-init,clean">
-        <tar tarfile="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar" 
-             basedir="../${project.name}/src"
-             excludes="rsync/**,put,get"/>
-        <gzip zipfile="${backup.dir}/${project.name}_onlysrc_${DSTAnet/sourceforge/waters/configMP}_${TSTAMP}.tar.gz"
-              src="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
-        <delete file="${backup.dir}/${project.name}_onlysrc_${DSTAMP}_${TSTAMP}.tar"/>
-    </target>
-    
     <target name="version" depends="-init,detect_arch">
         <delete quiet="true" file="${src}/${supremica_basedir}/Version.java"/>
         <property name="version.dir" value="net/sourceforge/waters/config"/>
@@ -280,9 +244,7 @@
                fork="true"
                includeantruntime="false"
                memoryMaximumSize="512M">
-            <classpath>    
-                <pathelement location="${lib}/${unjared}"/>
-            </classpath>
+            <classpath refid="supremica.classpath"/>    
         </javac>
     </target>
     
@@ -354,41 +316,15 @@
                deprecation="false"
                verbose="false"
                includeantruntime="false"
-               encoding="ISO-8859-15"
-        >
+               encoding="ISO-8859-15">
             <classpath> 
                 <pathelement location="${build}"/>
-                <pathelement path="${lib}/${unjared}"/>
+                <path refid="supremica.classpath"/>
             </classpath>
         </javac>
     </target>
     
     <!-- Compile:
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
-    <!-- 
-<target name="compile_jgrafchart">
-        <javac
-                debug="on"
-                debuglevel="source"
-                srcdir="${src}"
-                destdir="${build}"
-                classpath="${lib}/${unjared}"
-                includeJavaRuntime="yes"
-                deprecation="false"
-                verbose="false"
-                includeantruntime="false"
-                excludes="${supremica_basedir}/**,
-                        ${jgrafchart_basedir}/external/**,              
-                        ${jgrafchart_basedir}/io/**,
-                        ${xmlrpc_basedir}/**"   
-        />
-
-</target>
--->
-    
-    <!-- Compile Runtime
 *       Reuses existing class files, but recompiles those
 *       source files that have changed.
     -->
@@ -402,7 +338,6 @@
             encoding="ISO-8859-15"
             includeantruntime="false">
         </javac>
-        
     </target>
         
     <target name="build" depends="compile,-jar_supremica,-startfiles_supremica" description=
@@ -418,6 +353,8 @@
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>
         </jar>
+	<copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
+	<copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
     </target>
     
     <target name="downloads_supremica">
@@ -437,6 +374,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy todir="${build}/net/sourceforge/waters/model/marshaller">
             <fileset dir="${waters.xsd}" includes="*.xsd"/>
         </copy>
+	<copy file="${templates}/log4j2.xml" todir="${build}"/>
         <copy todir="${build}/net/sourceforge/waters/samples/maze">
             <fileset dir="${waters.examples}/maze" includes="*.wmod"/>
         </copy>
@@ -589,13 +527,6 @@ Class-Path: ${manifest.pathlist}</echo>
 
     
     <target name="-startfiles_local_supremica">
-        <!--
-        <copy file="${templates}/SupremicaJGrafchartLocal" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaJGrafchartLocal" perm="644"/>
-        <copy file="${templates}/SupremicaJGrafchartLocal.cmd" todir="${dist}"/>
-        <chmod file="${dist}/SupremicaJGrafchartLocal.cmd" perm="644"/>
--->
-
         <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/verifyRACLocal.cmd" perm="644"/>
         <copy file="${templates}/verifyRAC.cmd" todir="${dist}"/>
@@ -675,15 +606,6 @@ Class-Path: ${manifest.pathlist}</echo>
         -->
     </target>
 
-    <!--
-<target name="-startfiles_jgrafchart">
-        <copy file="${templates}/JGrafChart" todir="${dist}"/>  
-        <chmod file="${dist}/JGrafChart" perm="755"/>   
-        <copy file="${templates}/JGrafChart.cmd" todir="${dist}"/>      
-        <chmod file="${dist}/JGrafChart.cmd" perm="644"/>
-</target>
--->
-   
     <target name="-run_tests" depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
         <delete>
@@ -986,12 +908,13 @@ Class-Path: ${manifest.pathlist}</echo>
             <arg value="dist/SupremicaProperties.cfg"/>
             <classpath>
                 <pathelement location="${dist}/Supremica.jar" />
-                <pathelement location="${dist}/SupremicaLib.jar" />
+                <path refid="supremica.classpath"/>
                 <pathelement path="${java.class.path}" />
             </classpath>
             <jvmarg value="-Xms128M"/>
             <jvmarg value="-Xmx1024M" />  
-        </java>                
+            <sysproperty key="java.library.path" file="${dist}"/>
+       </java>                
     </target>
     
     <target name="runLocal">
@@ -1003,108 +926,14 @@ Class-Path: ${manifest.pathlist}</echo>
                 <pathelement location="lib/unjared" />
                 <pathelement location="images" />
                 <pathelement location="examples" />
+                <path refid="other.jars.classpath"/>
                 <pathelement path="${java.class.path}" />
             </classpath>            
             <jvmarg value="-Xms128M"/>
             <jvmarg value="-Xmx1024M" />
-            <jvmarg value="-Djava.library.path=${dist}"/>
+            <sysproperty key="java.library.path" file="${dist}"/>
         </java>
-    </target>
-    
-    <target name="runSupremica">
-        <java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
-            <arg value="-p"/>
-            <arg value="dist/SupremicaProperties.cfg"/>
-            <classpath>
-                <pathelement location="${dist}/Supremica.jar" />
-                <pathelement location="${dist}/SupremicaLib.jar" />
-                <pathelement path="${java.class.path}" />
-            </classpath>
-            <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx2048M" />  
-        </java>                
-    </target>
-    
-    <target name="runSupremicaLocal">
-        <java classname="${supremica_basepackage}.apps.Supremica" fork="yes">
-            <arg value="-p"/>
-            <arg value="dist/SupremicaProperties.cfg"/>
-            <classpath>
-                <pathelement location="build" />
-                <pathelement location="lib/unjared" />
-                <pathelement location="images" />
-                <pathelement location="examples" />
-                <pathelement path="${java.class.path}" />
-            </classpath>            
-            <jvmarg value="-Xms128M"/>
-            <jvmarg value="-Xmx2048M" />       
-        </java>
-    </target>
-    
-    <target name="run_fbruntime">
-        <java classname="${supremica_basepackage}.apps.FBRuntime" fork="yes">
-            <classpath>
-                <pathelement location="${build}" />
-                <pathelement location="${dist}/Supremica.jar" />
-                <pathelement location="${dist}/SupremicaLib.jar" />
-                <pathelement path="${java.class.path}" />
-            </classpath>
-            <arg value="Kulbana_composit.sys"/>
-            <arg value="${examples}/functionblocks/FBRuntime"/>
-        </java>
-    </target>
-        
-    <target name="deploy" depends="deployWeb">
-    </target>
-    
-    <target name="deployLocal">
-        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
-        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
-        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
-        <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
-        <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
-        <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
-        <chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>   
-        <chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
-        <exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
-            <arg value="C:\Supremica Installer\SupremicaDist.iss"/>
-        </exec>
-    </target>
-    
-    <target name="deployWeb">
-        <copy file="${dist}/Supremica.jar" todir="W:\public_html\Supremica\updates\noarch"/>    
-        <copy file="${dist}/SupremicaLib.jar" todir="W:\public_html\Supremica\updates\noarch"/> 
-        <copy file="${dist}/Supremica.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>        
-        <copy file="${dist}/SupremicaLib.jar" todir="C:\Supremica Installer\Input\Runtime\NoArch"/>     
-        <copy file="${platform}/win.x86/lib/buddy.dll" todir="${installer.dir}\Input"/> 
-        <chmod file="${installer.dir}\Input\buddy.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/BisimulationEquivalence.dll" todir="${installer.dir}\Input"/>       
-        <chmod file="${installer.dir}\Input\BisimulationEquivalence.dll" perm="644"/>
-        <copy file="${platform}/win.x86/lib/21100280.LIC" todir="${installer.dir}\Input"/>      
-        <chmod file="${installer.dir}\Input\21100280.LIC" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libbuddy.so" todir="${installer.dir}\Input"/>     
-        <chmod file="${installer.dir}\Input\libbuddy.so" perm="644"/>
-        <copy file="${platform}/linux.x86/lib/libBisimulationEquivalence.so" todir="${installer.dir}\Input"/>   
-        <chmod file="${installer.dir}\Input\libBisimulationEquivalence.so" perm="644"/>
-        <exec executable="C:\Progra~1\INNOSE~1\iscc.exe">
-            <arg value="C:\Supremica Installer\SupremicaDist.iss"/>
-        </exec>
-        <copy file="C:\Supremica Installer\Output\setup.exe" todir="W:\public_html\Supremica\distributions\windows"/>   
-    </target>
-    
-    <!-- Don't use this. This is used by the automated builder at supremica.s2.chalmers.se to
-    send dialy build results. This target will only work for the automated build script --> 
-    <target name="mail_buildlog">
-        <mail mailhost="mail.medic.chalmers.se" mailport="25" subject="Supremica Build" encoding="plain" files="/tmp/supremica_buildlog_tail,/tmp/supremica_buildlog">
-            <from address="ka@s2.chalmers.se"/>
-            <to address="ka@s2.chalmers.se"/>
-            <message>The daily build has completed</message>
-        </mail>
-    </target>
+    </target>        
     
     <!-- Run the different BDD algorithms for cpmputing RAS unsafe states-->
     

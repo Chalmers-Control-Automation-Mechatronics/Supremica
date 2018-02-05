@@ -97,6 +97,7 @@ public class AnalyzerMinimizeAction
             return;
         }
         final Project currProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-        new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
+        final AutomataMinimizationWorker amw = new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
+		amw.start();
     }
 }

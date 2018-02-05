@@ -53,9 +53,9 @@ import java.util.*;
 
 public class FileFormats
 {
-	private static List<FileFormats> collection = new LinkedList<FileFormats>();
-	private static List<FileFormats> inputs = new LinkedList<FileFormats>();
-	private static List<FileFormats> outputs = new LinkedList<FileFormats>();
+	private static final List<FileFormats> collection = new LinkedList<>();
+	private static final List<FileFormats> inputs = new LinkedList<>();
+	private static final List<FileFormats> outputs = new LinkedList<>();
 
 	// Both input and output
 	public static final FileFormats XML = new FileFormats(true, true, "XML", ".xml", "XML files (*.xml)");
@@ -67,7 +67,7 @@ public class FileFormats
 	// Output only
 	public static final FileFormats RCP = new FileFormats(false, true, "RCP", ".rcp", "RCP files (*.rcp)");
 	public static final FileFormats DSX = new FileFormats(false, true, "DSX", ".dsx", "Desco files (*.dsx)");
-	public static final FileFormats SMC = new FileFormats(false, true, "SMC", ".smc", "SMC files (*.smc)");
+	public static final FileFormats SMC = new FileFormats(false, true, "SMC", ".sm", "SMC files (*.sm)");
 	public static final FileFormats DOT = new FileFormats(false, true, "DOT", ".dot", "Graphviz files (*.dot)");
 	public static final FileFormats EPS = new FileFormats(false, true, "EPS", ".eps", "Encapsulated Postscript (*.eps)");
 	public static final FileFormats PNG = new FileFormats(false, true, "PNG", ".png", "PNG files (*.png)");
@@ -94,9 +94,9 @@ public class FileFormats
 
 	// Neither input nor output
 	public static final FileFormats Directory = new FileFormats(false, false, "Directory", "", "Directory");
-	private String identifier;
-	private String extension;
-	private String description;
+	private final String identifier;
+	private final String extension;
+	private final String description;
 //	private boolean input = false;
 //	private boolean output = false;
 
@@ -136,6 +136,7 @@ public class FileFormats
 		return outputs.iterator();
 	}
 
+	@Override
 	public String toString()
 	{
 		return identifier;

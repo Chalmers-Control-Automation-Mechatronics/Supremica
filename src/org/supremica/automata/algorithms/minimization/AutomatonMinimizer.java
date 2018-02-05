@@ -187,11 +187,13 @@ public class AutomatonMinimizer
         final boolean preserveControllability = (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
                 ||(options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION);
 
-        if (options.getMinimizationType() ==
-                EquivalenceRelation.SYNTHESISABSTRACTION) {
+        if (options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION) 
+		{
             theAutomaton.synthesisHide(hideThese, preserveControllability);
-        } else {
-        theAutomaton.hide(hideThese, preserveControllability);
+        } 
+		else 
+		{
+			theAutomaton.hide(hideThese, preserveControllability);
         }
         // Message
 
@@ -314,10 +316,8 @@ public class AutomatonMinimizer
         //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         //Abstraction base on synthesis abstraction(DCDS2011).
-        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION){
-
-
-
+        else if(equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
+		{
             // Merge the states that only have one local outgoing transition.
 //            theAutomaton.endTransaction();
             if (theAutomaton.getAlphabet().size() > 1)

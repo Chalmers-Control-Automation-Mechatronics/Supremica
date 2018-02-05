@@ -61,13 +61,13 @@ public class AutomatonToDsx
 {
 	private final Automaton aut;
 
-	public AutomatonToDsx(Automaton aut)
+	public AutomatonToDsx(final Automaton aut)
 	{
 		this.aut = aut;
 	}
 
 	@Override
-	public void serialize(PrintWriter pw)
+	public void serialize(final PrintWriter pw)
 		throws Exception
 	{
 		pw.println("STATESPACE;");
@@ -75,15 +75,15 @@ public class AutomatonToDsx
 		pw.println("number of events: " + aut.nbrOfEvents());
 
 		// Print all states
-		Iterator<State> states = aut.stateIterator();
+		final Iterator<State> states_it = aut.stateIterator();
 
-		while (states.hasNext())
+		while (states_it.hasNext())
 		{
-			State state = (State) states.next();
+			State state = (State) states_it.next();
 
 			pw.print(state.getName());
 
-			if (states.hasNext())
+			if (states_it.hasNext())
 			{
 				pw.print(", ");
 			}
@@ -94,7 +94,7 @@ public class AutomatonToDsx
 		}
 
 		// Print all events
-		Iterator<LabeledEvent> events = aut.eventIterator();
+		final Iterator<LabeledEvent> events = aut.eventIterator();
 
 		while (events.hasNext())
 		{
@@ -123,11 +123,11 @@ public class AutomatonToDsx
 		}
 
 		// Print all transitions
-		states = aut.stateIterator();
+		final Iterator<State> states = aut.stateIterator();
 
 		while (states.hasNext())
 		{
-			State sourceState = (State) states.next();
+			final State sourceState = (State) states.next();
 
 			pw.print(sourceState.getName());
 
@@ -148,13 +148,13 @@ public class AutomatonToDsx
 
 			pw.print(":");
 
-			Iterator<Arc> outgoingArcs = sourceState.outgoingArcsIterator();
+			final Iterator<Arc> outgoingArcs = sourceState.outgoingArcsIterator();
 
 			while (outgoingArcs.hasNext())
 			{
-				Arc arc = (Arc) outgoingArcs.next();
-				State destState = arc.getToState();
-				LabeledEvent event = arc.getEvent();
+				final Arc arc = (Arc) outgoingArcs.next();
+				final State destState = arc.getToState();
+				final LabeledEvent event = arc.getEvent();
 
 				// pw.print(" " + destState.getName() + ":" + aut.getAlphabet().getEventWithId(arc.getEventId()).getLabel());
 				pw.print(" " + destState.getName() + ":" + event.getLabel());
