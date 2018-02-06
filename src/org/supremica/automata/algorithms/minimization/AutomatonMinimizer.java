@@ -447,10 +447,9 @@ public class AutomatonMinimizer
         }
 
         //######################################################################
-
-
-        // All the below relations use partitioning with respect to
-        // observation equivalence!
+        // All the below relations use partitioning with respect to observation equivalence!
+		
+		//**** LANGUAGEEQUIVALENCE ****
         else if (equivalenceRelation == EquivalenceRelation.LANGUAGEEQUIVALENCE)
         {
             // Is this automaton nondeterministic?
@@ -465,16 +464,14 @@ public class AutomatonMinimizer
 
             // Now we're ready for partitioning!
         }
-
+		//**** OBSERVATIONEQUIVALENCE, CONFLICTEQUIVALENCE ****
         else if (equivalenceRelation == EquivalenceRelation.OBSERVATIONEQUIVALENCE ||
             equivalenceRelation == EquivalenceRelation.CONFLICTEQUIVALENCE)
-
         {
             // Merge silent loops and other obvious OE stuff (to save computation later)...
             // Don't bother if there is only one event in alphabet (epsilon or not)
             if (theAutomaton.getAlphabet().size() > 1)
             {
-
                 final int trivialCount = mergeTriviallyObservationEquivalentStates(theAutomaton);
                 //logger.debug("trivial count: "+trivialCount);
                 // logger.debug("oes:"+totalOES);
@@ -549,8 +546,6 @@ public class AutomatonMinimizer
 
             // Now we're ready for partitioning!
         }
-
-
         else
         {
             throw new Exception("Unknown equivalence relation(" + equivalenceRelation.toString() + ")");
@@ -562,23 +557,15 @@ public class AutomatonMinimizer
         }
         // Do the partitioning!
         final int statesBefore = theAutomaton.nbrOfStates();
-//       logger.debug("nbr of states before"+statesBefore);
-        if (BisimulationEquivalenceMinimizer.libraryLoaded()&& equivalenceRelation != EquivalenceRelation.SYNTHESISABSTRACTION)
+
+        if (BisimulationEquivalenceMinimizer.libraryLoaded() && equivalenceRelation != EquivalenceRelation.SYNTHESISABSTRACTION)
         {
             // Partition using native methods
+			logger.debug("AutomatonMinimizer: using BisimulationEquivalenceMinimizer");
             BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
-
         }
-//        if (BisimulationEquivalenceMinimizer.libraryLoaded()&& equivalenceRelation == EquivalenceRelation.SYNTHESISABSTRACTION)
-//        {
-//            // Partition using native methods
-//            BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, true);
-//
-//        }
-
         else
         {
-
             // Partition using naive methods (pun intended)
             EquivalenceClasses equivClasses = new EquivalenceClasses();
 
@@ -588,23 +575,21 @@ public class AutomatonMinimizer
                 equivClasses = findInitialPartitioning(theAutomaton);
                 // Partition
                 findCoarsestPartitioning(equivClasses, equivalenceRelation);
-            } catch (final Exception ex) {
+            } 
+			catch (final Exception ex) 
+			{
                 requestAbort();
                 throw ex;
             }
-
 
             if (abortRequested)
             {
                 return null;
             }
-             theAutomaton.beginTransaction();
+            theAutomaton.beginTransaction();
 
             // Build the minimized automaton based on the partitioning in equivClasses
             theAutomaton = buildAutomaton(equivClasses);
-
-
-
         }
         final int diffSize = statesBefore - theAutomaton.nbrOfStates();
         totalOES += diffSize;

@@ -139,7 +139,8 @@ public class AutomataMinimizationWorker
                 Automaton currAutomaton = (Automaton) autIt.next();
 
                 // Do we have to care about the original?	// Something strange happens here when there
-            //    if (options.getKeepOriginal())			// are no unobs events and !keepOriginal.
+            //	if (options.getKeepOriginal())				// are no unobs events and !keepOriginal and
+															// BismulationEquivalenceMinimizer is used!
                 {											// To fix this strange thing, alwyas copy -- MF
                     // We need a copy since we might need to fiddle with the original
                     currAutomaton = new Automaton(currAutomaton);
@@ -198,7 +199,7 @@ public class AutomataMinimizationWorker
             {
                 // Do we have to care about the original?
                 Automata task = theAutomata;
-                if (options.getKeepOriginal())
+                if (options.getKeepOriginal())	// Maybe the same issue heras above (at line 142)?
                 {
                     // We need a copy since we might need to fiddle with the original
                     task = new Automata(theAutomata);
