@@ -43,16 +43,16 @@ import javax.swing.Action;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.supremica.automata.Alphabet;
 
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
-import org.supremica.automata.Automaton;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.gui.AutomataSynchronizerWorker;
 import net.sourceforge.waters.model.analysis.Abortable;
 import org.supremica.automata.AutomataListener;
 import org.supremica.automata.AutomataListeners;
+import org.supremica.automata.Automaton;
 import org.supremica.automata.Listener;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
@@ -114,6 +114,7 @@ class AutomataInterleaveWorker implements AutomataListener
 		final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
 		synchronizationOptions.setUnobsEventsSynch(false); // Make sure unobs non-tau events do NOT synch!!
 		synchronizationOptions.setUseShortStateNames(true); // No need to have teh long names, is there...?
+		synchronizationOptions.setForbidUncontrollableStates(false); // Do not mark any states as forbidden
 		
 		final AutomataSynchronizerWorker asw = new AutomataSynchronizerWorker(ide.getIDE(), selectedAutomata, "", synchronizationOptions);
 		asw.start();	// Start the synch thread and just let it roam		
@@ -208,10 +209,7 @@ public class AnalyzerExperimentAction
 {
     private static final Logger logger = LogManager.getLogger(AnalyzerExperimentAction.class);
     private static final long serialVersionUID = 1L;
-	
-    /**
-     * Constructor.
-     */
+
     public AnalyzerExperimentAction(final List<IDEAction> actionList)
     {
         super(actionList);
@@ -239,6 +237,7 @@ public class AnalyzerExperimentAction
     public void doAction()
     {
         logger.info("Experiment started...");
+
 		/*************************************/
 		
 		// splitExperiment();	// not by MF, see below
@@ -414,8 +413,6 @@ public class AnalyzerExperimentAction
 	 * enough to get a menu option of its own...
 	void splitExperiment()
 	{
-
-		
             // "DECOMPOSE" INDIVUDUAL AUTOMATA
             for (final Automaton automaton: selectedAautomata)
             {
@@ -431,7 +428,7 @@ public class AnalyzerExperimentAction
                     logger.debug(ex.getStackTrace());
                 }
             }
-	
+
 	}		 
 	* **************/	
 }
