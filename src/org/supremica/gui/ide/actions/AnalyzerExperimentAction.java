@@ -54,6 +54,7 @@ import org.supremica.automata.AutomataListener;
 import org.supremica.automata.AutomataListeners;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.Listener;
+import org.supremica.automata.algorithms.EnumerateStates;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
@@ -163,6 +164,11 @@ class AutomataInterleaveWorker implements AutomataListener
 			final AutomataListeners listeners = automata.getListeners();
 			listeners.removeListener(this);		
 			
+			// Enumerate all states as q0, q1 etc, with q0 being the initial state
+			final Automata selectedAutomata = new Automata();
+			selectedAutomata.addAutomaton(automaton);
+			final EnumerateStates enumerateStates = new EnumerateStates(selectedAutomata, "q");
+			enumerateStates.execute();
 		}
 	}
 

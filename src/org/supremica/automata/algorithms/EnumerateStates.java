@@ -46,16 +46,16 @@ public class EnumerateStates
     private void enumerate(final Automaton automaton)
     {
         automaton.beginTransaction();
-        prefix.append("0");
-        
-        final State init = automaton.getInitialState();
-        
-        if (init != null)
-        {
-            init.setName(prefix.toString());
-        }
-        
-        prefix.setLength(prefixlen);
+//        prefix.append("0");
+//        
+//        final State init = automaton.getInitialState();
+//        
+//        if (init != null)
+//        {
+//            init.setName(prefix.toString());
+//        }
+//        
+//        prefix.setLength(prefixlen);
         
         int num = 1;
         final Iterator<State> stateit = automaton.stateIterator();
@@ -63,7 +63,7 @@ public class EnumerateStates
         {
             final State state = stateit.next();
             
-            if (!state.isInitial())
+            // if (!state.isInitial())	// No need to check this every time, just enumerate all and fix the initial state at the end
             {
                 prefix.append(num);
                 state.setName(prefix.toString());
@@ -73,7 +73,15 @@ public class EnumerateStates
                 prefix.setLength(prefixlen);
             }
         }
-        
+		
+		// Now take care of the iniitial state, name it <prfx>0
+        final State init = automaton.getInitialState();
+        if (init != null)
+        {        
+			prefix.append("0");
+            init.setName(prefix.toString());
+        }
+		
         automaton.invalidate();
         automaton.endTransaction();
     }
