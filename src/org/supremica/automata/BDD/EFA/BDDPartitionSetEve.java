@@ -26,6 +26,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+import net.sourceforge.waters.subject.module.EdgeSubject;
 
 import org.supremica.automata.ExtendedAutomaton;
 
@@ -260,6 +261,9 @@ public class BDDPartitionSetEve extends BDDPartitionSet
       backwardVarDependencyMap = new TIntObjectHashMap<TIntHashSet>(size);
 
       final int[] eventIndexArray = event2AutomatonsEdges.keys();
+
+      assert eventIndexArray.length == 1;
+
       for (int i = 0; i < eventIndexArray.length; i++) {
         final int iEventIndex = eventIndexArray[i];
         final HashSet<String> updatedVars =
@@ -308,20 +312,28 @@ public class BDDPartitionSetEve extends BDDPartitionSet
               final ExtendedAutomaton currAut = entry.getKey();
               for (final EdgeProxy anEdge : entry.getValue()) {
                 final NodeProxy targetLocation = anEdge.getTarget();
-                for (final EdgeProxy anOutgoingEdge : currAut
-                  .getLocationToOutgoingEdgesMap().get(targetLocation)) {
-                  for (final Proxy anEventProxy : anOutgoingEdge
-                    .getLabelBlock().getEventIdentifierList()) {
-                    final String eventName =
-                      ((SimpleIdentifierProxy) anEventProxy).getName();
-                    final EventDeclProxy anDeclEvent = bddExAutomata
-                      .getExtendedAutomata().eventIdToProxy(eventName);
-                    if (!forwardEveDependencyMap.containsKey(eventIndex)) {
-                      forwardEveDependencyMap.put(eventIndex,
-                                                  new TIntHashSet());
+                final ArrayList<EdgeSubject> outGoingEdges =
+                  currAut.getLocationToOutgoingEdgesMap().get(targetLocation);
+                if (outGoingEdges.isEmpty()) {
+                  final TIntHashSet singleton = new TIntHashSet();
+                  singleton.add(eventIndex);
+                  forwardEveDependencyMap.put(eventIndex, singleton);
+                } else {
+                  for (final EdgeProxy anOutgoingEdge : currAut
+                    .getLocationToOutgoingEdgesMap().get(targetLocation)) {
+                    for (final Proxy anEventProxy : anOutgoingEdge
+                      .getLabelBlock().getEventIdentifierList()) {
+                      final String eventName =
+                        ((SimpleIdentifierProxy) anEventProxy).getName();
+                      final EventDeclProxy anDeclEvent = bddExAutomata
+                        .getExtendedAutomata().eventIdToProxy(eventName);
+                      if (!forwardEveDependencyMap.containsKey(eventIndex)) {
+                        forwardEveDependencyMap.put(eventIndex,
+                                                    new TIntHashSet());
+                      }
+                      forwardEveDependencyMap.get(eventIndex)
+                        .add(theIndexMap.getEventIndex(anDeclEvent));
                     }
-                    forwardEveDependencyMap.get(eventIndex)
-                      .add(theIndexMap.getEventIndex(anDeclEvent));
                   }
                 }
               }
@@ -350,20 +362,28 @@ public class BDDPartitionSetEve extends BDDPartitionSet
               final ExtendedAutomaton currAut = entry.getKey();
               for (final EdgeProxy anEdge : entry.getValue()) {
                 final NodeProxy sourceLocation = anEdge.getSource();
-                for (final EdgeProxy anIngoingEdge : currAut
-                  .getLocationToIngoingEdgesMap().get(sourceLocation)) {
-                  for (final Proxy anEventProxy : anIngoingEdge
-                    .getLabelBlock().getEventIdentifierList()) {
-                    final String eventName =
-                      ((SimpleIdentifierProxy) anEventProxy).getName();
-                    final EventDeclProxy anDeclEvent = bddExAutomata
-                      .getExtendedAutomata().eventIdToProxy(eventName);
-                    if (!backwardEveDependencyMap.containsKey(eventIndex)) {
-                      backwardEveDependencyMap.put(eventIndex,
-                                                   new TIntHashSet());
+                final ArrayList<EdgeSubject> inComingEdges =
+                  currAut.getLocationToIngoingEdgesMap().get(sourceLocation);
+                if (inComingEdges.isEmpty()) {
+                  final TIntHashSet singleton = new TIntHashSet();
+                  singleton.add(eventIndex);
+                  backwardEveDependencyMap.put(eventIndex, singleton);
+                } else {
+                  for (final EdgeProxy anIngoingEdge : currAut
+                    .getLocationToIngoingEdgesMap().get(sourceLocation)) {
+                    for (final Proxy anEventProxy : anIngoingEdge
+                      .getLabelBlock().getEventIdentifierList()) {
+                      final String eventName =
+                        ((SimpleIdentifierProxy) anEventProxy).getName();
+                      final EventDeclProxy anDeclEvent = bddExAutomata
+                        .getExtendedAutomata().eventIdToProxy(eventName);
+                      if (!backwardEveDependencyMap.containsKey(eventIndex)) {
+                        backwardEveDependencyMap.put(eventIndex,
+                                                     new TIntHashSet());
+                      }
+                      backwardEveDependencyMap.get(eventIndex)
+                        .add(theIndexMap.getEventIndex(anDeclEvent));
                     }
-                    backwardEveDependencyMap.get(eventIndex)
-                      .add(theIndexMap.getEventIndex(anDeclEvent));
                   }
                 }
               }
