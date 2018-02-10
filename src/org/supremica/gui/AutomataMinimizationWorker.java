@@ -66,7 +66,7 @@ public class AutomataMinimizationWorker
     extends Thread
     implements Abortable
 {
-    private static Logger logger = LogManager.getLogger(AutomataMinimizationWorker.class);
+    private static final Logger logger = LogManager.getLogger(AutomataMinimizationWorker.class);
 
     private final Frame frame;
     private final Automata theAutomata;
@@ -85,7 +85,7 @@ public class AutomataMinimizationWorker
         this.theProject = theProject;
         this.options = options;
 
-        this.start();
+        // this.start();	// Bad practice! Let the one who constructs us also start us
     }
 
     @Override
@@ -124,6 +124,8 @@ public class AutomataMinimizationWorker
         // not (just minimise the components individually).
         if (!options.getCompositionalMinimization())
         {
+			logger.debug("AutomataMinimizationWorker: non-compositional minimization");
+			
             if (theAutomata.size() > 1)
             {
                 executionDialog.initProgressBar(0, theAutomata.size());
@@ -136,9 +138,10 @@ public class AutomataMinimizationWorker
             {
                 Automaton currAutomaton = (Automaton) autIt.next();
 
-                // Do we have to care about the original?
-                if (options.getKeepOriginal())
-                {
+                // Do we have to care about the original?	// Something strange happens here when there
+            //	if (options.getKeepOriginal())				// are no unobs events and !keepOriginal and
+															// BismulationEquivalenceMinimizer is used!
+                {											// To fix this strange thing, alwyas copy -- MF
                     // We need a copy since we might need to fiddle with the original
                     currAutomaton = new Automaton(currAutomaton);
                 }
@@ -153,15 +156,13 @@ public class AutomataMinimizationWorker
                         minimizer.setExecutionDialog(executionDialog);
                     }
                     threadsToAbort.add(minimizer);
-                    final Automaton newAutomaton =
-                        minimizer.getMinimizedAutomaton(options);
+                    final Automaton newAutomaton = minimizer.getMinimizedAutomaton(options);
                     threadsToAbort.remove(minimizer);
                     if (abortRequested)
                     {
                         break;
                     }
-                    newAutomaton.setComment
-                        ("min(" + newAutomaton.getName() + ")");
+                    newAutomaton.setComment("min(" + newAutomaton.getName() + ")");
                     newAutomaton.setName(null);
                     // Update execution dialog
                     if (executionDialog != null)
@@ -181,20 +182,24 @@ public class AutomataMinimizationWorker
                                ": " + exception.getMessage());
                   logger.debug(exception.getStackTrace());
                 }
-                if (!options.getKeepOriginal())
-                {
-                    theProject.removeAutomaton(currAutomaton);
-                }
+				
+				// This should not be done before the minimized one has been added, 
+				// else we might remove the old one while not adding the new minimized one
+//                if (!options.getKeepOriginal())
+//                {
+//                    theProject.removeAutomaton(currAutomaton);
+//                }
             }
         }
         else
-        {
+        {	
             // Compositional minimization!
+			logger.debug("AutomataMinimizationWorker: compositional minimization");
             try
             {
                 // Do we have to care about the original?
                 Automata task = theAutomata;
-                if (options.getKeepOriginal())
+                if (options.getKeepOriginal())	// Maybe the same issue heras above (at line 142)?
                 {
                     // We need a copy since we might need to fiddle with the original
                     task = new Automata(theAutomata);
@@ -220,10 +225,12 @@ public class AutomataMinimizationWorker
                 requestAbort();
             }
 
-            if (!options.getKeepOriginal())
-            {
-                theProject.removeAutomata(theAutomata);
-            }
+			// This should not be done before the minimized one has been added, 
+			// else we might remove the old one while not adding the new minimized one
+//            if (!options.getKeepOriginal())
+//            {
+//                theProject.removeAutomata(theAutomata);
+//            }
         }
 
         // Timer
@@ -251,6 +258,10 @@ public class AutomataMinimizationWorker
             try
             {
                 theProject.addAutomata(result);
+				if(!options.getKeepOriginal())
+				{
+					theProject.removeAutomata(theAutomata);
+				}
             }
             catch (final Exception ex)
             {

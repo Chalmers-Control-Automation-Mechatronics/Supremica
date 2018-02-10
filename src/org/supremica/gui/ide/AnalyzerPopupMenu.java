@@ -91,7 +91,7 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerPlantifyAction.getMenuItem());
         add(ide.getActions().analyzerEventHiderAction.getMenuItem());
         add(ide.getActions().analyzerPurgeAction.getMenuItem());
-        // add(ide.getActions().analyzerEnumerateAction.getMenuItem());
+        add(ide.getActions().analyzerEnumerateAction.getMenuItem());	// Why was this one removed?
         addSeparator();
         add(ide.getActions().analyzerExploreStatesAction.getMenuItem());
         add(ide.getActions().analyzerFindStatesAction.getMenuItem());

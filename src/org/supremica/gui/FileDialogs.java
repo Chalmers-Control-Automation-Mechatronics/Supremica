@@ -73,6 +73,7 @@ public class FileDialogs
     private FileFilter hybFilter = null;
     private FileFilter hiscFilter = null;
     private FileFilter dsxFilter = null;
+	private FileFilter smcFilter = null;
     private FileFilter dotFilter = null;
     private FileFilter epsFilter = null;
     private FileFilter pngFilter = null;
@@ -88,7 +89,7 @@ public class FileDialogs
     private FileFilter stnFilter = null;
 
 
-    private static FileDialogs fd = new FileDialogs();
+    private static final FileDialogs fd = new FileDialogs();
 
     private FileDialogs()
     {}

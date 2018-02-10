@@ -53,13 +53,15 @@ public class ExportDialog
 	private static final String pcgString = "pcg";
 	private static final String sspcString = "sspc";
     private static final String stsString = "sts";
+	private static final String smcString = "smc";
 	private static final Object[] possibleValues = { xmlString, spString,
 	dotString, dsxString,
 	fsmString,
 	htmlString,
 	pcgString,
 	sspcString,
-    stsString};
+    stsString,
+	smcString};
 	private JOptionPane pane = null;
 	private JDialog dialog = null;
 	private JCheckBox checkbox = null;
@@ -184,7 +186,11 @@ public class ExportDialog
 		{
 			return ExportFormat.SSPC;    // no debugview here (multiple files)
 		}
-
+		else if(selectedValue == smcString)
+		{
+			return (checkbox.isSelected()) ? ExportFormat.SMC_DEBUG : ExportFormat.SMC;
+		}
+		
 		else
 		{
 			return ExportFormat.UNKNOWN;
