@@ -262,8 +262,6 @@ public class BDDPartitionSetEve extends BDDPartitionSet
 
       final int[] eventIndexArray = event2AutomatonsEdges.keys();
 
-      assert eventIndexArray.length == 1;
-
       for (int i = 0; i < eventIndexArray.length; i++) {
         final int iEventIndex = eventIndexArray[i];
         final HashSet<String> updatedVars =

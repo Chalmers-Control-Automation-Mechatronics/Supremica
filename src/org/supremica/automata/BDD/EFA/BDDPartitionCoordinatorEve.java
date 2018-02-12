@@ -1,15 +1,13 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
+
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.procedure.TIntObjectProcedure;
 import gnu.trove.set.hash.TIntHashSet;
 
 import net.sf.javabdd.BDD;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Regarding the event-based partitioning technique, exclusively for extended
@@ -22,7 +20,6 @@ import org.apache.logging.log4j.Logger;
 public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
 {
 
-  private static final Logger logger = LogManager.getLogger(BDDPartitionCoordinatorEve.class);
   /**
    * At the beginning, special actions need performing.
    */
@@ -81,7 +78,6 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
     }
     choice = learner.choose(candidateEventIndexSet.toArray(),
                             candidateEventIndexSet.size());
-    logger.debug("choice index: " + choice);
     return choice;
   }
 
@@ -108,23 +104,10 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
     candidateEventIndexSet.clear();
     selectEventIndiceWithLargestDepSet(firstCandidateEventIndexSet,
                                        eventIndex2DepEventIndexSetMap);
-    logger.debug("activeEventIndexSet size on first selection: " + this.activeEventIndexSet.size());
-    final int [] arr = this.activeEventIndexSet.toArray();
-    for(int i = 0; i < arr.length; i++)
-    {
-      logger.debug(arr[i]);
-    }
   }
 
   private void buildSubsequentCandidates(final boolean forForward)
   {
-    final int [] arr = this.activeEventIndexSet.toArray();
-    logger.debug("print the active event indexes");
-    for(int i = 0; i < arr.length; i++)
-    {
-      logger.debug(arr[i]);
-    }
-
     TIntObjectHashMap<TIntHashSet> eventIndex2DepEventIndexSetMap;
     if (forForward) {
       eventIndex2DepEventIndexSetMap =
@@ -144,7 +127,6 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
     for (final TIntIterator compItr = compIndexSet.iterator(); compItr
       .hasNext();) {
       final int eventIndex = compItr.next();
-      logger.debug("the event index is: " + eventIndex);
       final int eventDepSize =
         eventIndex2DepEventIndexSetMap.get(eventIndex).size();
       if (eventDepSize > maxDepSize) {
@@ -183,12 +165,6 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
           partitions.getBackwardDependentComponentMap();
       }
 
-      assert choice == 0;
-      final int[] arr = eventIndex2DepEventIndexSetMap.get(choice).toArray();
-      for (int i = 0; i < arr.length; i++) {
-        logger.debug(choice + " depe event indexes " + arr[i]);
-      }
-
       // update activeEventIndexSet
       for (final TIntIterator eventItr =
         eventIndex2DepEventIndexSetMap.get(choice).iterator(); eventItr
@@ -200,7 +176,6 @@ public final class BDDPartitionCoordinatorEve extends BDDPartitionCoordinator
         firstCandidateEventIndexSet.remove(choice);
       }
     }
-    logger.debug("After recording, the size of activeEventIndexSet is" + this.activeEventIndexSet.size());
   }
 
   @Override
