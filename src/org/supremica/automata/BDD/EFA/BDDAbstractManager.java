@@ -179,7 +179,7 @@ public abstract class BDDAbstractManager {
         return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
     }
 
-    public BDD action2BDD(final BinaryExpressionProxy expr) 
+    public BDD action2BDD(final BinaryExpressionProxy expr)
 	{
 		try // to hunt down this bug
 		{
@@ -189,14 +189,21 @@ public abstract class BDDAbstractManager {
 			ResultOverflows rightSide = null;
 
 			if(bddExAutomata.orgExAutomata.getNonIntegerVarNameSet().contains(leftVarName)) {
-
-			  final String mapedInstanceValue = bddExAutomata.orgExAutomata
-				.getNonIntVar2InstanceIntMap().get(leftVarName).get(expr.getRight().toString());
-
-			  final IntConstantProxy mapedIntProxy = new IntConstantSubject(Integer.parseInt(mapedInstanceValue));
-			  rightSide = expr2BDDBitVec(mapedIntProxy, false);
-
-			}else {
+			  final Map<String, String> leftVarInstanceIntMap =
+			    bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(leftVarName);
+			  final String rhs = expr.getRight().toString();
+			  // case 1: the right hand side can be one of leftVarName's values
+			  if (leftVarInstanceIntMap.containsKey(rhs)) {
+			    final String mappedInstanceValue = leftVarInstanceIntMap.get(rhs);
+			    final IntConstantProxy leftVarMappedIntProxy =
+			      new IntConstantSubject(Integer.parseInt(mappedInstanceValue));
+			    rightSide = expr2BDDBitVec(leftVarMappedIntProxy, false);
+			  }
+			  // case 2: the right hand side can be another variable
+			  else {
+			    rightSide = expr2BDDBitVec(expr.getRight(), false);
+			  }
+			} else {
 			  rightSide = expr2BDDBitVec(expr.getRight(), false);
 			}
 
@@ -358,17 +365,41 @@ public abstract class BDDAbstractManager {
             //Currently, I don't have time to do that... maybe in the future (BTW it is not too much work).
 
         } else if (expr instanceof SimpleIdentifierProxy) {
-            final String varName = ((SimpleIdentifierProxy) expr).getName();
-            return new ResultOverflows(
-                    bddExAutomata.getBDDBitVecSource(bddExAutomata.theIndexMap.getVariableIndexByName(varName)), getZeroBDD());
-        } 
-		else if (expr instanceof IntConstantProxy) 
+            final String varNameOrInstValue = ((SimpleIdentifierProxy) expr).getName();
+            final Map<String, Integer> varToIndexMap = bddExAutomata.theIndexMap.variableStringToIndexMap;
+            if (varToIndexMap.containsKey(varNameOrInstValue)) {
+              final Integer index = varToIndexMap.get(varNameOrInstValue);
+              return new ResultOverflows(bddExAutomata.getBDDBitVecSource(index), getZeroBDD());
+            }
+            else {
+              final Map<String, Map<String, String>> nonIntVar2InstIntMap =
+                bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap();
+              String recentInstanceInt = "";  // to determine if the integer for the instance is unique
+              for (final Map.Entry<String,Map<String, String>> entry: nonIntVar2InstIntMap.entrySet()) {
+                final Map<String, String> instanceToIntMap = entry.getValue();
+                if (instanceToIntMap.containsKey(varNameOrInstValue)) {
+                  final String instanceInt = instanceToIntMap.get(varNameOrInstValue);
+                  if (recentInstanceInt.isEmpty()) {
+                    recentInstanceInt = instanceInt;
+                  } else {
+                    if (!recentInstanceInt.equals(instanceInt))
+                      throw new RuntimeException("The index of instance " + varNameOrInstValue +
+                                                 " is not unique in variable definitions");
+                  }
+                }
+              }
+              final IntConstantProxy mappedIntProxy =
+                new IntConstantSubject(Integer.parseInt(recentInstanceInt));
+              return expr2BDDBitVec(mappedIntProxy, false);
+            }
+        }
+		else if (expr instanceof IntConstantProxy)
 		{
-            if (guardAction) 
+            if (guardAction)
 			{
                 // SupremicaBDDBitVector tmp = null;
 //                if(constantDomain ==null)
-                SupremicaBDDBitVector tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0).copy();
+                final SupremicaBDDBitVector tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0).copy();
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),0).copy();
 //                else
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, constantDomain.varNum(),0).copy();
