@@ -90,7 +90,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 
-
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
     private final ModuleSubjectFactory factory;
@@ -244,13 +243,14 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
                 final String varName = var.getName();
                 final String range = var.getType().toString();
+
                 int lowerBound = 0;
                 int upperBound = 0;
 
                 if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
                     lowerBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getLeft().toString());
                     upperBound = Integer.parseInt(((BinaryExpressionProxy) var.getType()).getRight().toString());
-                } else if (range.contains(",")) { // non-integer variable
+                } else if (range.contains("[") && range.contains("]")) { // non-integer variable;
                     nonIntegerVariables.add(varName);
                     final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
                     final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
