@@ -35,12 +35,13 @@
 
 package org.supremica.gui;
 
-import javax.swing.filechooser.*;
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
-import org.supremica.properties.Config;
+
 import org.supremica.automata.IO.FileFormats;
+import org.supremica.properties.Config;
 
 
 public class FileDialogs
@@ -73,7 +74,8 @@ public class FileDialogs
     private FileFilter hybFilter = null;
     private FileFilter hiscFilter = null;
     private FileFilter dsxFilter = null;
-	private FileFilter smcFilter = null;
+    @SuppressWarnings("unused")
+    private final FileFilter smcFilter = null;
     private FileFilter dotFilter = null;
     private FileFilter epsFilter = null;
     private FileFilter pngFilter = null;
@@ -96,9 +98,9 @@ public class FileDialogs
 
 
 
-    public static JFileChooser getSaveAsFileChooser(FileFormats fileType)
+    public static JFileChooser getSaveAsFileChooser(final FileFormats fileType)
     {
-        JFileChooser fileSaveAs = fd.getFileSaveAs();
+        final JFileChooser fileSaveAs = fd.getFileSaveAs();
 
         fileSaveAs.resetChoosableFileFilters();
         fileSaveAs.setFileFilter(fd.getFilter(fileType));
@@ -106,9 +108,9 @@ public class FileDialogs
         return fileSaveAs;
     }
 
-    public static JFileChooser getExportFileChooser(FileFormats fileType)
+    public static JFileChooser getExportFileChooser(final FileFormats fileType)
     {
-        JFileChooser fileExport = fd.getFileExporter();
+        final JFileChooser fileExport = fd.getFileExporter();
 
         fileExport.resetChoosableFileFilters();
         fileExport.setFileFilter(fd.getFilter(fileType));
@@ -148,9 +150,9 @@ public class FileDialogs
         return fileImport;
     }
 
-    public static JFileChooser getImportFileChooser(FileFormats fileType)
+    public static JFileChooser getImportFileChooser(final FileFormats fileType)
     {
-        JFileChooser fileImport = fd.getFileImporter();
+        final JFileChooser fileImport = fd.getFileImporter();
 
         fileImport.resetChoosableFileFilters();
         fileImport.setFileFilter(fd.getFilter(fileType));
@@ -160,7 +162,7 @@ public class FileDialogs
 
     public static JFileChooser getXMLFileSaveAs()
     {
-        JFileChooser fileSaveAs = fd.getFileSaveAs();
+        final JFileChooser fileSaveAs = fd.getFileSaveAs();
 
         fileSaveAs.resetChoosableFileFilters();
         fileSaveAs.setFileFilter(fd.getXMLFilter());
@@ -170,7 +172,7 @@ public class FileDialogs
 
     public static JFileChooser getXMLFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.setFileFilter(fd.getXMLFilter());
@@ -180,7 +182,7 @@ public class FileDialogs
 
     public static JFileChooser getSPFileSaveAs()
     {
-        JFileChooser fileSaveAs = fd.getFileSaveAs();
+        final JFileChooser fileSaveAs = fd.getFileSaveAs();
 
         fileSaveAs.resetChoosableFileFilters();
         fileSaveAs.setFileFilter(fd.getSPFilter());
@@ -190,7 +192,7 @@ public class FileDialogs
 
     public static JFileChooser getSPFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.setFileFilter(fd.getSPFilter());
@@ -200,7 +202,7 @@ public class FileDialogs
 
     public static JFileChooser getSPFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSPFilter());
@@ -210,7 +212,7 @@ public class FileDialogs
 
     public static JFileChooser getVALIDFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.addChoosableFileFilter(fd.getDGRFFilter());
@@ -222,7 +224,7 @@ public class FileDialogs
 
     public static JFileChooser getWatersFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.setFileFilter(fd.getWMODFilter());
@@ -232,7 +234,7 @@ public class FileDialogs
 
     public static JFileChooser getHYBFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.addChoosableFileFilter(fd.getHYBFilter());
@@ -243,7 +245,7 @@ public class FileDialogs
 
     public static JFileChooser getHISCFileImporter()
     {
-        JFileChooser fileImporter = fd.getFileImporter();
+        final JFileChooser fileImporter = fd.getFileImporter();
 
         fileImporter.resetChoosableFileFilters();
         fileImporter.addChoosableFileFilter(fd.getHISCFilter());
@@ -254,7 +256,7 @@ public class FileDialogs
 
     public static JFileChooser getRCPFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getRCPFilter());
@@ -264,7 +266,7 @@ public class FileDialogs
 
     public static JFileChooser getXMLFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getXMLFilter());
@@ -274,7 +276,7 @@ public class FileDialogs
 
     public static JFileChooser getSTSFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSTSFilter());
@@ -284,7 +286,7 @@ public class FileDialogs
 
     public static JFileChooser getDSXFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getDSXFilter());
@@ -294,7 +296,7 @@ public class FileDialogs
 
     public static JFileChooser getDOTFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getDOTFilter());
@@ -304,7 +306,7 @@ public class FileDialogs
 
     public static JFileChooser getEPSFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getEPSFilter());
@@ -314,7 +316,7 @@ public class FileDialogs
 
     public static JFileChooser getMIFFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getMIFFilter());
@@ -324,7 +326,7 @@ public class FileDialogs
 
     public static JFileChooser getPNGFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getPNGFilter());
@@ -334,7 +336,7 @@ public class FileDialogs
 
     public static JFileChooser getSVGFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSVGFilter());
@@ -344,7 +346,7 @@ public class FileDialogs
 
     public static JFileChooser getGIFFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getGIFFilter());
@@ -354,7 +356,7 @@ public class FileDialogs
 
     public static JFileChooser getSFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSFilter());
@@ -364,7 +366,7 @@ public class FileDialogs
 
     public static JFileChooser getPRJFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getPRJFilter());
@@ -374,7 +376,7 @@ public class FileDialogs
 
     public static JFileChooser getSTFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getSTFilter());
@@ -384,7 +386,7 @@ public class FileDialogs
 
     public static JFileChooser getILFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getILFilter());
@@ -394,7 +396,7 @@ public class FileDialogs
 
     public static JFileChooser getNQCFileExporter()
     {
-        JFileChooser fileExporter = fd.getFileExporter();
+        final JFileChooser fileExporter = fd.getFileExporter();
 
         fileExporter.resetChoosableFileFilters();
         fileExporter.setFileFilter(fd.getNQCFilter());
@@ -404,7 +406,7 @@ public class FileDialogs
 
     public static JFileChooser getAutFileImporter()
     {
-        JFileChooser autFileImporter = fd.getFileImporter();
+        final JFileChooser autFileImporter = fd.getFileImporter();
 
         autFileImporter.resetChoosableFileFilters();
         autFileImporter.setFileFilter(fd.getAutFilter());
@@ -414,7 +416,7 @@ public class FileDialogs
 
     public static JFileChooser getRobotStudioStationFileImporter()
     {
-        JFileChooser stationFileImporter = fd.getFileImporter();
+        final JFileChooser stationFileImporter = fd.getFileImporter();
 
         stationFileImporter.resetChoosableFileFilters();
         stationFileImporter.setFileFilter(fd.getSTNFilter());
@@ -424,7 +426,7 @@ public class FileDialogs
 
     public static JFileChooser getRobotCellFileImporter()
     {
-        JFileChooser cellFileImporter = fd.getFileImporter();
+        final JFileChooser cellFileImporter = fd.getFileImporter();
 
         cellFileImporter.resetChoosableFileFilters();
         cellFileImporter.setFileFilter(fd.getSTNFilter());    // RobotStudio
@@ -481,7 +483,7 @@ public class FileDialogs
         return new StandardExtensionFileFilter(description, ext);
     }
 
-    private FileFilter getFilter(FileFormats fileType)
+    private FileFilter getFilter(final FileFormats fileType)
     {
         return makeFileFilter(fileType.getExtension(), fileType.getDescription());
     }

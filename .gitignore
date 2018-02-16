@@ -13,6 +13,7 @@
 /src/org/supremica/manufacturingTables/xsd/vr/
 /arch.properties
 /.supremica
+SupremicaProperties.cfg
 
 # generic files to ignore
 *~
