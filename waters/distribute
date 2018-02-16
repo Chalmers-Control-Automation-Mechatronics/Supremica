@@ -92,7 +92,14 @@ chmod 644 $W_DIST_TMP/README.$RSUFFIX
 install -m 644 $SUP_SRC/platform/$PLATFORM/lib/* $W_DIST_TMP
 install -m 644 Supremica.jar $W_DIST_TMP
 install -m 644 $SUP_DIST/SupremicaLib.jar $W_DIST_TMP
+install -m 644 $SUP_DIST/log4j-api-2.9.0.jar $W_DIST_TMP
+install -m 644 $SUP_DIST/log4j-core-2.9.0.jar $W_DIST_TMP
 install -m 644 $W_IN/waters.properties $W_DIST_TMP
+
+if [ "$1" = "552" ]
+then
+  cat $W_IN/student.properties >> $W_DIST_TMP/waters.properties
+fi
 
 #############################################################################
 
@@ -134,7 +141,7 @@ then
     rm -rf $INST_DIR/waters
   fi
   (cd $INST_DIR ; tar zxf $WWW/$ARCHIVE_PREFIX.linux.amd64.tar.gz)
-  cat $W_IN/dot226.properties >> $INST_DIR/waters/waters.properties
+# cat $W_IN/dot226.properties >> $INST_DIR/waters/waters.properties
 
 fi
 

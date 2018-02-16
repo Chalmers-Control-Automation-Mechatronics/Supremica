@@ -144,7 +144,9 @@ public final class Config
     public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
     public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
-    public static final BooleanProperty GENERAL_STUDENT_VERSION = new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion", false, "Student version (requires restart)");
+    public static final BooleanProperty GENERAL_STUDENT_VERSION =
+      new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion",
+                          false, "Student version", false);
     public static final BooleanProperty INCLUDE_EXPERIMENTAL_ALGORITHMS = new BooleanProperty(PropertyType.GENERAL, "includeExperimentalAlgorithms", false, "Include experimental algorithms (requires restart)");
 
     // GENERAL_LOG

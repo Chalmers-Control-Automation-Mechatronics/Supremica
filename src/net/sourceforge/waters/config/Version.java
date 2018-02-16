@@ -45,12 +45,14 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * Version information.
- * This class contains details loaded from a property file
+ * <P>Version information.</P>
+ *
+ * <P>This class contains details loaded from a property file
  * <CODE>Version.properties</CODE> located in the same package as this
  * class. The information in that file is generated at compile time
  * by the main <CODE>build.xml</CODE> script and copied directly into
- * the JAR.
+ * the JAR. The version number can be changed by through the file
+ * <CODE>{<I>supremica</I>}/templates/Version.properties</CODE>.</P>
  *
  * @author Robi Malik
  */
@@ -148,7 +150,66 @@ public class Version
     return text;
   }
 
-  public int getWordSize()
+  public boolean checkOSType()
+  {
+    final String os = System.getProperty("os.name");
+    final String part1 = getOSPrefix(os);
+    if (part1 == null) {
+      return false;
+    }
+    final String part2 = getOSSuffix();
+    if (part2 == null) {
+      return mOSType.startsWith(part1 + ".");
+    } else {
+      return mOSType.equals(part1 + "." + part2);
+    }
+  }
+
+  public void appendUnsupportedOSExplanation(final StringBuilder builder)
+  {
+    final String os = System.getProperty("os.name");
+    final String prefix = getOSPrefix(os);
+    final String suffix = getOSSuffix();
+    boolean canUse = false;
+    if (prefix == null) {
+      builder.append("Your operating system, ");
+      builder.append(os);
+      builder.append(", is not supported. ");
+    } else if (!mOSType.startsWith(prefix + ".")) {
+      builder.append("You are running a ");
+      builder.append(getCommonOSName(mOSType));
+      builder.append("version of ");
+      builder.append(mTitle);
+      builder.append(" on a ");
+      builder.append(getCommonOSName(os));
+      builder.append(" system. ");
+      canUse = true;
+    } else if (suffix == null) {
+      builder.append("The pre-compiled binaries could not be loaded correctly. ");
+    } else if (!mOSType.endsWith("." + suffix)) {
+      builder.append("You are running a ");
+      builder.append(getExpectedWordSize());
+      builder.append("-bit version of ");
+      builder.append(mTitle);
+      builder.append(" in a ");
+      builder.append(getWordSize());
+      builder.append("-bit Java virtual machine. ");
+      canUse = true;
+    }
+    if (canUse) {
+      builder.append("Please download a ");
+      builder.append(getWordSize());
+      builder.append("-bit ");
+      builder.append(getCommonOSName(os));
+      builder.append(" version instead.");
+    } else {
+      builder.append("You cannot use ");
+      builder.append(mTitle);
+      builder.append(" on this computer.");
+    }
+  }
+
+  public static int getWordSize()
   {
     try {
       final String text = System.getProperty("sun.arch.data.model");
@@ -158,29 +219,48 @@ public class Version
     }
   }
 
-  public boolean checkOSType()
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private int getExpectedWordSize()
   {
-    final String os = System.getProperty("os.name");
-    final String part1;
-    if (os.startsWith("Linux")) {
-      part1 = "linux";
-    } else if (os.startsWith("Windows")) {
-      part1 = "win32";
+    if (mOSType.endsWith(".x86")) {
+      return 32;
     } else {
-      return false;  // Unknown or unsupported OS
+      return 64;
     }
-    final String part2;
+  }
+
+  private static String getOSPrefix(final String os)
+  {
+    if (os.startsWith("Linux")) {
+      return "linux";
+    } else if (os.startsWith("Windows")) {
+      return "win32";
+    } else {
+      return null;
+    }
+  }
+
+  private static String getOSSuffix()
+  {
     switch (getWordSize()) {
     case 32:
-      part2 = "x86";
-      break;
+      return "x86";
     case 64:
-      part2 = "amd64";
-      break;
+      return "amd64";
     default:
-      return true;  // Word size unknown - can't be sure ...
+      return null;
     }
-    return mOSType.equals(part1 + "." + part2);
+  }
+
+  private static String getCommonOSName(final String os)
+  {
+    if (os.startsWith("Linux") || os.startsWith("linux")) {
+      return "Linux";
+    } else {
+      return "Windows";
+    }
   }
 
 

@@ -416,6 +416,8 @@ public class IDE
     final List<File> files = ProcessCommandLineArguments.process(args);
     // Initialise look & feel, load fonts and icons
     IconAndFontLoader.initialize();
+    // If student version: make sure Waters library is loadable
+    // AboutPanel.performStudentVersionCheck();
     // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
     final IDE ide = new IDE();

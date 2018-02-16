@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -80,6 +81,32 @@ public class AboutPanel
   extends JEditorPane
   implements HyperlinkListener
 {
+
+  //#########################################################################
+  //# Static Methods
+  public static void performStudentVersionCheck()
+  {
+    if (Config.GENERAL_STUDENT_VERSION.isTrue()) {
+      try {
+        System.loadLibrary("waters");
+      } catch (final UnsatisfiedLinkError error) {
+        final Version version = Version.getInstance();
+        final StringBuilder builder = new StringBuilder();
+        builder.append("<HTML><BODY><P STYLE=\"font-size: ");
+        builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+        builder.append("px; width: ");
+        builder.append((int) Math.ceil(320 * IconAndFontLoader.GLOBAL_SCALE_FACTOR));
+        builder.append("px;\">");
+        version.appendUnsupportedOSExplanation(builder);
+        builder.append("</P></BODY></HTML>");
+        JOptionPane.showMessageDialog(null, builder.toString(),
+                                      "Failed to load library",
+                                      JOptionPane.ERROR_MESSAGE);
+        System.exit(1);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Constructor
