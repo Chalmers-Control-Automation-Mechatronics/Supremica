@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -290,8 +291,21 @@ public abstract class BDDAbstractManager {
                             bddExAutomata.getSourceLocationDomain(autName));
                     tmp.setBit(0, locBDD);
                 } else {
-                    final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                    final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                    final SimpleExpressionProxy left = bexpr.getLeft();
+                    final SimpleExpressionProxy right = bexpr.getRight();
+                    final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
+                    final ResultOverflows roLeft = expr2BDDBitVec(left, false);
+                    ResultOverflows roRight = null;
+                    if (nonIntegerVarNameSet.contains(left.toString()) &&
+                        !nonIntegerVarNameSet.contains(right.toString())) {
+                      final Map<String, String> var2InstIntMap =
+                        bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
+                      final IntConstantProxy mappedIntProxy =
+                        new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      roRight = expr2BDDBitVec(mappedIntProxy, false);
+                    } else {
+                      roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                    }
                     tmp = roLeft.getResult().copy();
                     tmp.setBit(0, tmp.equ(roRight.getResult()));
                     leftOverflows = roLeft.getOverflows();
@@ -311,8 +325,21 @@ public abstract class BDDAbstractManager {
                             bddExAutomata.getSourceLocationDomain(autName)).not();
                     tmp.setBit(0, locBDD);
                 } else {
-                    final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                    final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                    final SimpleExpressionProxy left = bexpr.getLeft();
+                    final SimpleExpressionProxy right = bexpr.getRight();
+                    final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
+                    final ResultOverflows roLeft = expr2BDDBitVec(left, false);
+                    ResultOverflows roRight = null;
+                    if (nonIntegerVarNameSet.contains(left.toString()) &&
+                        !nonIntegerVarNameSet.contains(right.toString())) {
+                      final Map<String, String> var2InstIntMap =
+                        bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
+                      final IntConstantProxy mappedIntProxy =
+                        new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      roRight = expr2BDDBitVec(mappedIntProxy, false);
+                    } else {
+                      roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                    }
                     tmp = roLeft.getResult().copy();
                     tmp.setBit(0, tmp.neq(roRight.getResult()));
                     leftOverflows = roLeft.getOverflows();
@@ -367,31 +394,8 @@ public abstract class BDDAbstractManager {
         } else if (expr instanceof SimpleIdentifierProxy) {
             final String varNameOrInstValue = ((SimpleIdentifierProxy) expr).getName();
             final Map<String, Integer> varToIndexMap = bddExAutomata.theIndexMap.variableStringToIndexMap;
-            if (varToIndexMap.containsKey(varNameOrInstValue)) {
-              final Integer index = varToIndexMap.get(varNameOrInstValue);
-              return new ResultOverflows(bddExAutomata.getBDDBitVecSource(index), getZeroBDD());
-            }
-            else {
-              final Map<String, Map<String, String>> nonIntVar2InstIntMap =
-                bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap();
-              String recentInstanceInt = "";  // to determine if the integer for the instance is unique
-              for (final Map.Entry<String,Map<String, String>> entry: nonIntVar2InstIntMap.entrySet()) {
-                final Map<String, String> instanceToIntMap = entry.getValue();
-                if (instanceToIntMap.containsKey(varNameOrInstValue)) {
-                  final String instanceInt = instanceToIntMap.get(varNameOrInstValue);
-                  if (recentInstanceInt.isEmpty()) {
-                    recentInstanceInt = instanceInt;
-                  } else {
-                    if (!recentInstanceInt.equals(instanceInt))
-                      throw new RuntimeException("The index of instance " + varNameOrInstValue +
-                                                 " is not unique in variable definitions");
-                  }
-                }
-              }
-              final IntConstantProxy mappedIntProxy =
-                new IntConstantSubject(Integer.parseInt(recentInstanceInt));
-              return expr2BDDBitVec(mappedIntProxy, false);
-            }
+            final Integer index = varToIndexMap.get(varNameOrInstValue);
+            return new ResultOverflows(bddExAutomata.getBDDBitVecSource(index), getZeroBDD());
         }
 		else if (expr instanceof IntConstantProxy)
 		{
