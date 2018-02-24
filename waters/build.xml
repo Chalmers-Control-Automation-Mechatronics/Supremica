@@ -343,7 +343,6 @@
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
-          <exclude name="net/sourceforge/waters/analysis/deadlock/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSynthesizerNormalityTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
