@@ -59,6 +59,7 @@ import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.EditorWindowInterface;
+import net.sourceforge.waters.gui.about.AboutPanel;
 import net.sourceforge.waters.gui.about.WelcomeScreen;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.logging.IDEAppender;
@@ -417,7 +418,7 @@ public class IDE
     // Initialise look & feel, load fonts and icons
     IconAndFontLoader.initialize();
     // If student version: make sure Waters library is loadable
-    // AboutPanel.performStudentVersionCheck();
+    AboutPanel.performStudentVersionCheck();
     // Start the GUI
     final boolean hasFiles = (files != null && files.size() > 0);
     final IDE ide = new IDE();

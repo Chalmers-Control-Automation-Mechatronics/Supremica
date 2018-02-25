@@ -178,7 +178,7 @@ public class Version
     } else if (!mOSType.startsWith(prefix + ".")) {
       builder.append("You are running a ");
       builder.append(getCommonOSName(mOSType));
-      builder.append("version of ");
+      builder.append(" version of ");
       builder.append(mTitle);
       builder.append(" on a ");
       builder.append(getCommonOSName(os));

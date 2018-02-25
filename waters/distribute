@@ -4,7 +4,7 @@
 
 if [ "$1" = "552" ]
 then
-  WWW=$HOME/public_html/comp552-17a
+  WWW=$HOME/public_html/comp552-18a
   INST_DIR=/home/comp452/lib
 else
   WWW=$HOME/public_html/download_waters
@@ -15,7 +15,7 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside231
+ARCHIVE_PREFIX=waterside232
 
 #############################################################################
 
@@ -29,14 +29,14 @@ fi
 mkdir $JAR_TMP
 (cd $JAR_TMP ; jar xf $SUP_DIST/Supremica.jar)
 rm -rf $JAR_TMP/dummy
-rm -rf $JAR_TMP/META-INF
+rm -rf $JAR_TMP/META-INF/MANIFEST.MF
 rm -rf $JAR_TMP/Thumbs.db
 rm -rf $JAR_TMP/manifest.txt
 
 if [ "$1" = "552" ]
 then
   rm -rf $JAR_TMP/includeInJarFile
-  rm -rf $JAR_TMP/net/sourceforge/waters/analysis/bdd
+  find $JAR_TMP/net/sourceforge/waters/analysis/bdd -name \*.class ! -name BDDPackage.class -exec rm -rf {} \;
   rm -rf $JAR_TMP/net/sourceforge/waters/analysis/comp552
   rm -rf $JAR_TMP/net/sourceforge/waters/analysis/compositional
 # net/sourceforge/waters/analysis/hisc is needed by compiler.
