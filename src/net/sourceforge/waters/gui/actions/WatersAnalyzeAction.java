@@ -35,8 +35,6 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -44,12 +42,13 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
+import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
-import net.sourceforge.waters.gui.dialog.MultilineLabel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -188,7 +187,8 @@ public abstract class WatersAnalyzeAction
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
   protected abstract ModelVerifier getModelVerifier
-    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory) throws AnalysisConfigurationException;
+    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException;
 
 
   //#########################################################################
@@ -200,13 +200,12 @@ public abstract class WatersAnalyzeAction
     public AnalyzerDialog(final ProductDESProxy des)
     {
       super(getIDE());
-      setLocationAndSize();
-      setVisible(true);
       setTitle(getCheckName() + " Check");
       mRunner = new AnalyzerThread();
       mBottomPanel = new JPanel();
-      mInformationLabel =
-        new MultilineLabel(getCheckName() + " Check is running...");
+      mInformationLabel = new JLabel();
+      mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
+      setInformationText(" Check is running...");
       final Border outer = BorderFactory.createRaisedBevelBorder();
       final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
       final Border border = BorderFactory.createCompoundBorder(outer, inner);
@@ -224,6 +223,8 @@ public abstract class WatersAnalyzeAction
       final Container pane = getContentPane();
       pane.add(mInformationLabel, BorderLayout.CENTER);
       pane.add(mBottomPanel, BorderLayout.SOUTH);
+      setLocationAndSize();
+      setVisible(true);
       mVerifier = getModelVerifier();
       mVerifier.setModel(des);
       mRunner.setPriority(Thread.MIN_PRIORITY);
@@ -236,8 +237,7 @@ public abstract class WatersAnalyzeAction
     {
       final ProductDESProxy des = mVerifier.getModel();
       final String name = des.getName();
-      mInformationLabel.setText
-        ("Model " + name + " " + getSuccessDescription() + ".");
+      setInformationText("Model " + name + " " + getSuccessDescription() + ".");
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
       mExitButton.addActionListener(new ActionListener(){
@@ -247,7 +247,7 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      repaint();
+      setLocationAndSize();
     }
 
     public void fail()
@@ -290,17 +290,16 @@ public abstract class WatersAnalyzeAction
         final String name = des.getName();
         comment = "Model " + name + " " + getFailureDescription() + ".";
       }
-      mInformationLabel.setText(comment);
-      repaint();
+      setInformationText(comment);
+      setLocationAndSize();
     }
 
     public void error(final Throwable exception)
     {
       if (exception instanceof OutOfMemoryError) {
-        mInformationLabel.setText("ERROR: Out of Memory");
+        setInformationText("ERROR: Out of Memory");
       } else {
-        mInformationLabel.setText("ERROR: " + exception.getMessage());
-        pack();
+        setInformationText("ERROR: " + exception.getMessage());
       }
       mExitButton.setText("OK");
       mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
@@ -311,19 +310,22 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      repaint();
+      setLocationAndSize();
     }
 
     //#######################################################################
     //# Auxiliary Methods
     private void setLocationAndSize()
     {
-      final Rectangle bounds = getIDE().getBounds();
-      final int x = bounds.x + (bounds.width - DEFAULT_DIALOG_SIZE.width) / 2;
-      final int y = bounds.y + (bounds.height - DEFAULT_DIALOG_SIZE.height) / 2;
-      setLocation(x, y);
-      setSize(DEFAULT_DIALOG_SIZE);
+      pack();
+      setLocationRelativeTo(getIDE());
     }
+
+    private void setInformationText(final String text)
+    {
+      HTMLPrinter.setLabelText(mInformationLabel, text, DEFAULT_WIDTH);
+    }
+
 
     //#######################################################################
     //# Inner Class AnalyzerThread
@@ -384,7 +386,7 @@ public abstract class WatersAnalyzeAction
     private final JPanel mBottomPanel;
     private final JButton mExitButton;
     private JButton traceButton;
-    private final MultilineLabel mInformationLabel;
+    private final JLabel mInformationLabel;
 
     //#######################################################################
     //# Class Constants
@@ -396,6 +398,6 @@ public abstract class WatersAnalyzeAction
   //# Class Constants
   private static final long serialVersionUID = -3797986885054648213L;
 
-  private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
+  private static final int DEFAULT_WIDTH = 290;
 
 }

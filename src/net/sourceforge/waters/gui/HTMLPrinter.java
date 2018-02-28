@@ -38,6 +38,9 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
+import javax.swing.JLabel;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -84,6 +87,23 @@ public class HTMLPrinter
     } catch (final IOException exception) {
       throw new WatersRuntimeException(exception);
     }
+  }
+
+  public static void setLabelText(final JLabel label,
+                                  final String text,
+                                  final int width)
+  {
+    final StringBuilder builder = new StringBuilder();
+    builder.append("<HTML><P STYLE=\"text-align: center; font-size: ");
+    builder.append(IconAndFontLoader.HTML_FONT_SIZE);
+    builder.append("px; width: ");
+    final int scaledWidth =
+      (int) Math.ceil(width * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+    builder.append(scaledWidth);
+    builder.append("px;\">");
+    builder.append(HTMLPrinter.encodeInHTML(text));
+    builder.append("</P></HTML>");
+    label.setText(builder.toString());
   }
 
 

@@ -35,7 +35,6 @@ package net.sourceforge.waters.gui.compiler;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -43,10 +42,11 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.gui.dialog.MultilineLabel;
+import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.model.expr.EvalException;
 
 import org.supremica.gui.ide.IDE;
@@ -71,9 +71,10 @@ public class CompilationDialog extends JDialog
   {
     super(ide, "Compilation");
     setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    setSize(DEFAULT_DIALOG_SIZE);
     setLocationRelativeTo(ide);
-    mInformationLabel = new MultilineLabel("Compiling...");
+    mInformationLabel = new JLabel();
+    mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
+    HTMLPrinter.setLabelText(mInformationLabel, "Compiler ...", DEFAULT_WIDTH);
     final Border outer = BorderFactory.createRaisedBevelBorder();
     final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     final Border border = BorderFactory.createCompoundBorder(outer, inner);
@@ -95,6 +96,8 @@ public class CompilationDialog extends JDialog
     final Container pane = getContentPane();
     pane.add(mInformationLabel, BorderLayout.CENTER);
     pane.add(exitPanel, BorderLayout.SOUTH);
+    pack();
+    setLocationRelativeTo(getParent());
     setVisible(true);
   }
 
@@ -120,20 +123,23 @@ public class CompilationDialog extends JDialog
       sb.append(all.length);
       sb.append(" errors.");
     }
-    mInformationLabel.setText(sb.toString());
+    HTMLPrinter.setLabelText(mInformationLabel, sb.toString(), DEFAULT_WIDTH);
     mExitButton.setText("OK");
+    pack();
+    setLocationRelativeTo(getParent());
   }
 
 
   //##########################################################################
   //# Data Members
   private final JButton mExitButton;
-  private final MultilineLabel mInformationLabel;
+  private final JLabel mInformationLabel;
 
 
   //##########################################################################
   //# Class Constants
-  private static final Dimension DEFAULT_DIALOG_SIZE = new Dimension(290, 160);
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -561416722989926299L;
+
+  private static final int DEFAULT_WIDTH = 290;
 
 }
