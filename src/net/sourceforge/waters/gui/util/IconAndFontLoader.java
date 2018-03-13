@@ -145,6 +145,13 @@ public class IconAndFontLoader
     return ICON_PLANT.getIconHeight();
   }
 
+  public static int getPreferredTableRowHeight()
+  {
+    final int iconSize = getWatersIconSize();
+    final int absoluteGap = Math.round(TABLE_ROW_GAP * iconSize);
+    return iconSize + absoluteGap;
+  }
+
   public static ImageIcon loadImage(final String subdir, final String name)
   {
     return getWatersIcon(subdir, name);
@@ -449,6 +456,8 @@ public class IconAndFontLoader
   public static final List<ImageIcon> ICONLIST_SPEC = getIconList(NAME_SPEC);
   public static final List<ImageIcon> ICONLIST_SUPERVISOR =
     getIconList(NAME_SUPERVISOR);
+
+  public static final float TABLE_ROW_GAP = 0.1f;
 
 
   //#########################################################################

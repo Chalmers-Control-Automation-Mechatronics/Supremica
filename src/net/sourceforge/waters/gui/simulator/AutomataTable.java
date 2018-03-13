@@ -79,14 +79,14 @@ class AutomataTable extends JTable
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
     final int iconSize = IconAndFontLoader.getWatersIconSize();
-    final int absoluteGap = Math.round(RELATIVE_GAP * iconSize);
-    final int iconSizePlusGap = iconSize + absoluteGap;
-    setRowHeight(iconSizePlusGap);
+    final int absoluteGap =
+      Math.round(IconAndFontLoader.TABLE_ROW_GAP * iconSize);
+    setRowHeight(iconSize + absoluteGap);
     final int columnCount = columnModel.getColumnCount();
     if (columnCount != 0) {
       final TableColumn column0 = columnModel.getColumn(0);
-      column0.setMinWidth(iconSizePlusGap);
-      column0.setMaxWidth(iconSizePlusGap);
+      column0.setMinWidth(rowHeight);
+      column0.setMaxWidth(rowHeight);
       final BufferedImage img =
         new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
       final Graphics2D g2d = img.createGraphics();
@@ -272,8 +272,6 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Class Constants
-  private static final float RELATIVE_GAP = 0.1f;
-
   private static final long serialVersionUID = -9036493474591272655L;
 
 }
