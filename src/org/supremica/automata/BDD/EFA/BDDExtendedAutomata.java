@@ -1248,15 +1248,16 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return coreachableStatesBDD;
     }
 
-    public BDD mForbiddenStates = (new BDDExtendedManager()).getZeroBDD();
-
     public BDD getNonblockingControllableStates(final boolean reachable) {
         if (nonblockingControllableStatesBDD == null) {
             if (synType.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
                  nonblockingControllableStatesBDD = manager.nonblockingControllable(manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()), reachable);
                 // nonblockingControllableStatesBDD = manager.onTheFlySynthesis(getInitialState(), manager.getInitiallyUncontrollableStates().or(getForbiddenLocations()));
             } else {
-                nonblockingControllableStatesBDD = manager.disjunctiveNonblockingControllable(manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations().orWith(mForbiddenStates)), reachable);
+                final BDD initialForbiddenStates =
+                  manager.getDisjunctiveInitiallyUncontrollableStates().or(getForbiddenLocations());
+                nonblockingControllableStatesBDD =
+                  manager.disjunctiveNonblockingControllable(initialForbiddenStates, reachable);
             }
 
             System.err.println("Nonblocking and controllable states computed!");
