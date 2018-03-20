@@ -52,12 +52,8 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
     final ComponentKind kind = mAutomaton.getKind();
     final String kindName = ModuleContext.getComponentKindToolTip(kind);
     final String compName = mAutomaton.getName();
-    String name = null;
-    if (compName.length() <= 32) {
-      name = kindName + " " + compName;
-    }
-    if (name.length() <= 32) {
-      putValue(Action.NAME, "Close " + name);
+    if (compName.length() + kindName.length() <= 32) {
+      putValue(Action.NAME, "Close " + kindName + " " + compName);
     } else {
       putValue(Action.NAME, "Close " + kindName);
     }
