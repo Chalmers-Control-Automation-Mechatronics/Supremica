@@ -36,11 +36,6 @@ package net.sourceforge.waters.gui;
 import java.awt.Color;
 import java.awt.Font;
 
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.GroupNodeProxy;
-import net.sourceforge.waters.model.module.LabelGeometryProxy;
-import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
 
 /**
  * A collection of all the colours used in the editor.
@@ -54,65 +49,12 @@ public class EditorColor
   //#########################################################################
   //# Colour Selection
   /**
-   * Returns the appropriate colour for painting this object.
-   */
-  public static Color getColor(final Proxy o,
-                               final GraphPanel.DragOverStatus dragOver,
-                               final boolean selected,
-                               final boolean error,
-                               final boolean hasfocus)
-  {
-    // In order of importance
-    if (dragOver != GraphPanel.DragOverStatus.NOTDRAG) {
-      if (dragOver == GraphPanel.DragOverStatus.CANDROP) {
-        return CANDROPCOLOR;
-      } else if (dragOver == GraphPanel.DragOverStatus.CANTDROP) {
-        return CANTDROPCOLOR;
-      }
-    } else if (selected) {
-      if (hasfocus) {
-        return GRAPH_SELECTED_FOCUSSED;
-      } else {
-        return GRAPH_SELECTED_NOTFOCUSSED;
-      }
-    } else if (error) {
-      if (o instanceof SimpleNodeProxy) {
-        return ERRORCOLOR_NODE;
-      } else {
-        return ERRORCOLOR;
-      }
-    }
-    // Defaults
-    if (o instanceof GroupNodeProxy) {
-      return DEFAULTCOLOR_NODEGROUP;
-    } else if (o instanceof LabelGeometryProxy) {
-      return NODE_LABEL_COLOR;
-    } else {
-      return DEFAULTCOLOR;
-    }
-  }
-
-  /**
-   * Returns a lighter shade of the color of the object for drawing a "shadow".
-   */
-  public static Color getShadowColor
-    (final Proxy o,
-     final GraphPanel.DragOverStatus dragOver,
-     final boolean selected,
-     final boolean error,
-     final boolean hasfocus)
-  {
-    final Color color = getColor(o, dragOver, selected, error, hasfocus);
-    return shadow(color);
-  }
-
-  /**
    * Returns a transparent variant of the supplied colour. The
-   * alpha-value is changed to {@link #SHADOWALPHA}.
+   * alpha-value is changed to {@link #SHADOW_ALPHA}.
    */
   public static Color shadow(final Color color)
   {
-    return shadow(color, SHADOWALPHA);
+    return shadow(color, SHADOW_ALPHA);
   }
 
   /**
@@ -258,7 +200,7 @@ public class EditorColor
   //#########################################################################
   //# Private Class Constants
   /** The alpha value of the shadow-colours. */
-  private static final int SHADOWALPHA = 48;
+  private static final int SHADOW_ALPHA = 48;
 
 
 }

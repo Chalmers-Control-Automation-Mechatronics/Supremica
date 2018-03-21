@@ -38,19 +38,9 @@ import java.awt.Color;
 
 public class RenderingInformation
 {
-  private final boolean mIsSelected;
-  private final boolean mShowHandles;
-  private final Color mColor;
-  private final Color mShadowColor;
-  private final boolean mIsUnderlined;
-  private final boolean mIsFocused;
-  private final int mPriority;
 
-  /*
-   * public RenderingInformation(EditorObject o) { this(false, false, false,
-   * EditorObject.NOTDRAG, o); }
-   */
-
+  //#######################################################################
+  //# Constructor
   public RenderingInformation(final boolean isSelected,
                               final boolean showHandles,
                               final boolean isUnderlined,
@@ -66,6 +56,9 @@ public class RenderingInformation
     mPriority = priority;
   }
 
+
+  //#######################################################################
+  //# Simple Access
   public boolean isSelected()
   {
     return mIsSelected;
@@ -91,6 +84,11 @@ public class RenderingInformation
     return mColor;
   }
 
+  public void setColor(final Color color)
+  {
+    mColor = color;
+  }
+
   public Color getShadowColor()
   {
     return mShadowColor;
@@ -100,4 +98,16 @@ public class RenderingInformation
   {
     return mPriority;
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private final boolean mIsSelected;
+  private final boolean mShowHandles;
+  private Color mColor;
+  private final Color mShadowColor;
+  private final boolean mIsUnderlined;
+  private final boolean mIsFocused;
+  private final int mPriority;
+
 }

@@ -46,12 +46,16 @@ import net.sourceforge.waters.gui.EditorColor;
  * @author Robi Malik
  */
 
-enum ColorGroup
+public enum ColorGroup
 {
   /**
-   * A regular graphical item such as a node or edge, but not a group node.
+   * A regular graphical item such an edge, but not a node.
    */
   GRAPH_ITEM,
+  /**
+   * A simple node.
+   */
+  SIMPLE_NODE,
   /**
    * A group node.
    */
