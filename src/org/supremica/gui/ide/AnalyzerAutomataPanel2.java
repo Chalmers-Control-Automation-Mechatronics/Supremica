@@ -65,15 +65,15 @@ import org.supremica.gui.WhiteScrollPane;
 import org.supremica.properties.Config;
 
 
-public class AnalyzerAutomataPanel
+public class AnalyzerAutomataPanel2
     extends WhiteScrollPane
     implements TableModelListener
 {
     private static final long serialVersionUID = 1L;
 
-    private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel.class);
+    private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel2.class);
 
-    private final AnalyzerPanel analyzerPanel;
+    private final AnalyzerPanel2 analyzerPanel2;
     private final DocumentContainer moduleContainer;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
@@ -87,9 +87,9 @@ public class AnalyzerAutomataPanel
 
     private static final float PREFERRED_WIDTH = 0.4f;
 
-    AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
+    AnalyzerAutomataPanel2(final AnalyzerPanel2 analyzerPanel, final DocumentContainer moduleContainer)
     {
-      this.analyzerPanel = analyzerPanel;
+      this.analyzerPanel2 = analyzerPanel;
       this.moduleContainer = moduleContainer;
       initialize();
       final int width =
@@ -222,7 +222,7 @@ public class AnalyzerAutomataPanel
 
                                 try
                                 {
-                                    analyzerPanel.getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                                    analyzerPanel2.getVisualProject().getAutomatonViewer(currAutomaton.getName());
                                 }
                                 catch (final Exception ex)
                                 {
@@ -237,7 +237,7 @@ public class AnalyzerAutomataPanel
                             {
                                 final Automaton selectedAutomaton = selectedAutomata.getFirstAutomaton();
                                 final AnalyzerAutomatonViewerPanel automatonPanel = new AnalyzerAutomatonViewerPanel("Dot View", selectedAutomaton);
-                                analyzerPanel.setRightComponent(automatonPanel);
+                                analyzerPanel2.setRightComponent(automatonPanel);
                             }
                             /*
                             else
@@ -324,7 +324,7 @@ public class AnalyzerAutomataPanel
                         theAutomatonTable.setRowSelectionInterval(currRow, currRow);
                     }
 		    final Frame root =
-		      (Frame) analyzerPanel.getTopLevelAncestor();
+		      (Frame) analyzerPanel2.getTopLevelAncestor();
 		    final JPopupMenu popup =
 		      new AnalyzerPopupMenu(root, moduleContainer.getIDE());
                     popup.show(e.getComponent(), e.getX(), e.getY());
@@ -337,7 +337,7 @@ public class AnalyzerAutomataPanel
 
     private VisualProject getActiveProject()
     {
-        return analyzerPanel.getVisualProject();
+        return analyzerPanel2.getVisualProject();
     }
 
     public void valueChanged(final ListSelectionEvent e)

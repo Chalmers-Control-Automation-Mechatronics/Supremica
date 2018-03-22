@@ -301,6 +301,10 @@ public final class Config
       new BooleanProperty(PropertyType.GUI_ANALYZER,
                           "includeBoundedUnconTools", false,
                           "Include unbounded controllability tools");
+    public static final BooleanProperty USER_NEW_ANALYZER =
+      new BooleanProperty(PropertyType.GUI_ANALYZER,
+                          "useNewAnalyzer", false,
+                          "Use new analyzer window");
 
     // GUI_SIMULATOR
     public static final BooleanProperty INCLUDE_WATERS_SIMULATOR =

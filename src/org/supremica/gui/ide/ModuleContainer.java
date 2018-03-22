@@ -115,6 +115,7 @@ public class ModuleContainer
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
     mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+    mAnalyzerPanel2 = new AnalyzerPanel2(this, "Analyzer");
     mTabPanel.add(mEditorPanel);
     mSimulatorPropertyChangeListener =
       new SimulatorPropertyChangeListener();
@@ -123,7 +124,12 @@ public class ModuleContainer
     if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
       mTabPanel.add(mSimulatorPanel);
     }
-    mTabPanel.add(mAnalyzerPanel);
+    if(Config.USER_NEW_ANALYZER.isTrue()) {
+      mTabPanel.add(mAnalyzerPanel2);
+    }
+    else {
+      mTabPanel.add(mAnalyzerPanel);
+    }
     mEditorPanel.showComment();
 
     module.addModelObserver(this);
@@ -702,6 +708,7 @@ public class ModuleContainer
   private final EditorPanel mEditorPanel;
   private final SimulatorPanel mSimulatorPanel;
   private final AnalyzerPanel mAnalyzerPanel;
+  private final AnalyzerPanel2 mAnalyzerPanel2;
 
   private final Map<SimpleComponentSubject,ComponentEditorPanel>
     mComponentToPanelMap =
