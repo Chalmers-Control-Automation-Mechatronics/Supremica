@@ -53,6 +53,7 @@ import javax.swing.undo.CannotUndoException;
 import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UndoableCommand;
@@ -114,21 +115,20 @@ public class ModuleContainer
     mTabPanel = new CompilingTabbedPane();
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
-    mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
-    mAnalyzerPanel2 = new AnalyzerPanel2(this, "Analyzer");
+    mSupremicaAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+    mWatersAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
     mTabPanel.add(mEditorPanel);
     mSimulatorPropertyChangeListener =
       new SimulatorPropertyChangeListener();
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
-    (mSimulatorPropertyChangeListener);
+      (mSimulatorPropertyChangeListener);
     if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
       mTabPanel.add(mSimulatorPanel);
     }
-    if(Config.USER_NEW_ANALYZER.isTrue()) {
-      mTabPanel.add(mAnalyzerPanel2);
-    }
-    else {
-      mTabPanel.add(mAnalyzerPanel);
+    if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+      mTabPanel.add(mWatersAnalyzerPanel);
+    } else {
+      mTabPanel.add(mSupremicaAnalyzerPanel);
     }
     mEditorPanel.showComment();
 
@@ -193,7 +193,7 @@ public class ModuleContainer
   @Override
   public AnalyzerPanel getAnalyzerPanel()
   {
-    return mAnalyzerPanel;
+    return mSupremicaAnalyzerPanel;
   }
 
   @Override
@@ -674,8 +674,8 @@ public class ModuleContainer
     public void compilationSucceeded(final ProductDESProxy compiledDES)
     {
       try {
-        if (mSelected == mAnalyzerPanel) {
-          mAnalyzerPanel.updateAutomata(compiledDES);
+        if (mSelected == mSupremicaAnalyzerPanel) {
+          mSupremicaAnalyzerPanel.updateAutomata(compiledDES);
         }
         final int index = indexOfComponent(mSelected);
         setSelectedIndexImpl(index);
@@ -707,8 +707,8 @@ public class ModuleContainer
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
   private final SimulatorPanel mSimulatorPanel;
-  private final AnalyzerPanel mAnalyzerPanel;
-  private final AnalyzerPanel2 mAnalyzerPanel2;
+  private final AnalyzerPanel mSupremicaAnalyzerPanel;
+  private final WatersAnalyzerPanel mWatersAnalyzerPanel;
 
   private final Map<SimpleComponentSubject,ComponentEditorPanel>
     mComponentToPanelMap =
