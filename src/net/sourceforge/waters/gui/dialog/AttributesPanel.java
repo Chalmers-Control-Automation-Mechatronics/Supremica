@@ -79,6 +79,7 @@ import javax.swing.table.TableModel;
 
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.model.base.AttributeFactory;
 import net.sourceforge.waters.model.base.Proxy;
@@ -117,6 +118,8 @@ public class AttributesPanel extends JPanel
     mTable = new NonTypingTable(model);
     mTable.setTableHeader(null);
     mTable.setShowGrid(false);
+    final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
+    mTable.setRowHeight(rowHeight);
     mTable.setSurrendersFocusOnKeystroke(true);
     mTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
     mTable.setFillsViewportHeight(true);

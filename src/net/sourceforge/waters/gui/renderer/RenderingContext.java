@@ -63,8 +63,16 @@ public interface RenderingContext
    * The rendering information provides the colours and highlighting status
    * for an item to be displayed. This method is <I>not</I> required to
    * return the same result when called multiply with the same input.
+   * @param  proxy   The item to be displayed.
+   * @param  group   The colour group for the item. The colour group
+   *                 provides additional context, e.g., to determine whether
+   *                 an expression is rendered as an event label or as part
+   *                 of a guard/action block.
+   * @return The rendering context to be used,
+   *         or <CODE>null</CODE> to suppress rendering of the item.
    */
-  public RenderingInformation getRenderingInformation(Proxy proxy);
+  public RenderingInformation getRenderingInformation(Proxy proxy,
+                                                      ColorGroup group);
 
   /**
    * Gets colour information for the display of the given simple node in

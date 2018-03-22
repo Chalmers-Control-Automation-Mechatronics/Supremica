@@ -368,6 +368,8 @@ public class EventDeclEditorDialog
       mIndexTable = new NonTypingTable(mIndexModel);
       mIndexTable.setTableHeader(null);
       mIndexTable.setShowGrid(false);
+      final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
+      mIndexTable.setRowHeight(rowHeight);
       mIndexTable.setSurrendersFocusOnKeystroke(true);
       mIndexTable.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
       mIndexTable.setFillsViewportHeight(true);

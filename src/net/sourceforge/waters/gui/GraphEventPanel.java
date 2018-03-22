@@ -167,7 +167,8 @@ public class GraphEventPanel
     mObservers = null;
     setModel(mModel);
     setTableHeader(null);
-    setRowHeight(22);
+    final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
+    setRowHeight(rowHeight);
     setShowGrid(false);
     setIntercellSpacing(ispacing);
     setAutoResizeMode(AUTO_RESIZE_LAST_COLUMN);

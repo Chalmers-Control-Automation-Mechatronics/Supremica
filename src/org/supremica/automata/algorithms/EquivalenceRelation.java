@@ -70,9 +70,10 @@ public enum EquivalenceRelation
   /** Synthesis abstraction. */
   SYNTHESISABSTRACTION("Synthesis abstraction"),
   /** Observation equivalence (aka Weak bisimulation equivalence). */
-  OBSERVATIONEQUIVALENCE("Observation equivalence"),
-  /** Bisimulation equivalence (aka Strong bisimulation equivalence). */
+  OBSERVATIONEQUIVALENCE("Observation equivalence");
+  /* Bisimulation equivalence (aka Strong bisimulation equivalence).
   BISIMULATIONEQUIVALENCE("Bisimulation equivalence");
+  */
 
 
   //#########################################################################
@@ -92,6 +93,7 @@ public enum EquivalenceRelation
 
   //#########################################################################
   //# Data Members
+  @Override
   public String toString()
   {
     return mDescription;

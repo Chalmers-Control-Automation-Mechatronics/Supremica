@@ -187,11 +187,11 @@ public class AutomatonMinimizer
         final boolean preserveControllability = (options.getMinimizationType() == EquivalenceRelation.SUPERVISIONEQUIVALENCE)
                 ||(options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION);
 
-        if (options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION) 
+        if (options.getMinimizationType() == EquivalenceRelation.SYNTHESISABSTRACTION)
 		{
             theAutomaton.synthesisHide(hideThese, preserveControllability);
-        } 
-		else 
+        }
+		else
 		{
 			theAutomaton.hide(hideThese, preserveControllability);
         }
@@ -254,30 +254,7 @@ public class AutomatonMinimizer
 
         // Find out what to do
         final EquivalenceRelation equivalenceRelation = options.getMinimizationType();
-        if (equivalenceRelation == EquivalenceRelation.BISIMULATIONEQUIVALENCE)
-        {
-            // Check if the library with the native methods is ok
-            if (!BisimulationEquivalenceMinimizer.libraryLoaded())
-            {
-                logger.error("Library BisimulationEquivalence not in library path.");
-                requestAbort();
-                return null;
-            }
-
-            // Partition using native methods
-
-            BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, true);
-
-            theAutomaton.setComment("min(" + theAutomaton.getName() + ")");
-            theAutomaton.setName("");
-
-            // Start listening again
-            theAutomaton.endTransaction();
-
-            // Finished!
-            return theAutomaton;
-        }
-        else if (equivalenceRelation == EquivalenceRelation.OP)
+        if (equivalenceRelation == EquivalenceRelation.OP)
         {
           final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
@@ -336,15 +313,7 @@ public class AutomatonMinimizer
 
             halfWaySynthesis(theAutomaton);
 
-            if (BisimulationEquivalenceMinimizer.libraryLoaded())
-            {
-                // Partition using native methods
-                BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames,true);
-
-            }
-//            // Applying synthesis abstraction
-
-
+            // Applying synthesis abstraction
             EquivalenceClasses equivClasses = new EquivalenceClasses();
 
                 try
@@ -448,7 +417,7 @@ public class AutomatonMinimizer
 
         //######################################################################
         // All the below relations use partitioning with respect to observation equivalence!
-		
+
 		//**** LANGUAGEEQUIVALENCE ****
         else if (equivalenceRelation == EquivalenceRelation.LANGUAGEEQUIVALENCE)
         {
@@ -558,39 +527,23 @@ public class AutomatonMinimizer
         // Do the partitioning!
         final int statesBefore = theAutomaton.nbrOfStates();
 
-        if (BisimulationEquivalenceMinimizer.libraryLoaded() && equivalenceRelation != EquivalenceRelation.SYNTHESISABSTRACTION)
-        {
-            // Partition using native methods
-			logger.debug("AutomatonMinimizer: using BisimulationEquivalenceMinimizer");
-            BisimulationEquivalenceMinimizer.minimize(theAutomaton, useShortNames, false);
+        EquivalenceClasses equivClasses = new EquivalenceClasses();
+        try {
+          // Find initial partitioning (based on marking, basically)
+          equivClasses = findInitialPartitioning(theAutomaton);
+          // Partition
+          findCoarsestPartitioning(equivClasses, equivalenceRelation);
+        } catch (final Exception exception) {
+          requestAbort();
+          throw exception;
         }
-        else
-        {
-            // Partition using naive methods (pun intended)
-            EquivalenceClasses equivClasses = new EquivalenceClasses();
-
-            try
-            {
-                // Find initial partitioning (based on marking, basically)
-                equivClasses = findInitialPartitioning(theAutomaton);
-                // Partition
-                findCoarsestPartitioning(equivClasses, equivalenceRelation);
-            } 
-			catch (final Exception ex) 
-			{
-                requestAbort();
-                throw ex;
-            }
-
-            if (abortRequested)
-            {
-                return null;
-            }
-            theAutomaton.beginTransaction();
-
-            // Build the minimized automaton based on the partitioning in equivClasses
-            theAutomaton = buildAutomaton(equivClasses);
+        if (abortRequested) {
+          return null;
         }
+        theAutomaton.beginTransaction();
+        // Build the minimised automaton based on the partitioning in equivClasses
+        theAutomaton = buildAutomaton(equivClasses);
+
         final int diffSize = statesBefore - theAutomaton.nbrOfStates();
         totalOES += diffSize;
         //logger.debug("oes:"+totalOES);

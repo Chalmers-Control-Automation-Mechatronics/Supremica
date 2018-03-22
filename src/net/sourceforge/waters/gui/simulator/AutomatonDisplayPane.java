@@ -55,8 +55,8 @@ import java.util.Map;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.GraphPanel;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.renderer.ColorGroup;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
@@ -582,7 +582,8 @@ public class AutomatonDisplayPane
     }
 
     @Override
-    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    public RenderingInformation getRenderingInformation(final Proxy proxy,
+                                                        final ColorGroup group)
     {
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
@@ -591,7 +592,7 @@ public class AutomatonDisplayPane
         // *** BUG? ***
         // Identifiers have no original, this may cause failure to
         // highlight them while spring embedding.
-        return super.getRenderingInformation(proxy);
+        return super.getRenderingInformation(proxy, group);
       } else {
         final RenderingStatus status;
         if (orig instanceof LabelGeometrySubject) {
@@ -602,13 +603,10 @@ public class AutomatonDisplayPane
           status = getRenderingStatus(orig);
         }
         if (status == null) {
-          final Color foreground = EditorColor.SIMULATION_INVALID;
-          final Color shadow =
-            EditorColor.getShadowColor(orig, GraphPanel.DragOverStatus.NOTDRAG,
-                                       false, false, false);
-          final int prio = getPriority(orig);
-          return new RenderingInformation
-            (false, false, false, false, foreground, shadow, prio);
+          final RenderingInformation info =
+            super.getRenderingInformation(orig, group);
+          info.setColor(EditorColor.SIMULATION_INVALID);
+          return info;
         } else {
           final boolean selected;
           if (orig == mFocusedItem) {
@@ -635,7 +633,7 @@ public class AutomatonDisplayPane
             return new RenderingInformation
               (false, false, false, true, foreground, shadow, prio);
           } else {
-            return super.getRenderingInformation(orig);
+            return super.getRenderingInformation(orig, group);
           }
         }
       }

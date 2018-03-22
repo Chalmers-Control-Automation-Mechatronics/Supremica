@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.renderer;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.util.List;
 
@@ -57,6 +58,8 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
+
+import org.supremica.properties.Config;
 
 
 /**
@@ -89,15 +92,19 @@ public class DefaultRenderingContext
   }
 
   @Override
-  public RenderingInformation getRenderingInformation(final Proxy proxy)
+  public RenderingInformation getRenderingInformation(final Proxy proxy,
+                                                      final ColorGroup group)
   {
+    final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
+    final Color color = layout.getColor
+      (group, GraphPanel.DragOverStatus.NOTDRAG, false, false, false);
+    if (color == null) {
+      return null;
+    }
+    final Color shadow = EditorColor.shadow(color);
+    final int priority = getPriority(proxy);
     return new RenderingInformation
-      (false, false, false, false,
-       EditorColor.getColor
-         (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
-       EditorColor.getShadowColor
-         (proxy, GraphPanel.DragOverStatus.NOTDRAG, false, false, true),
-       getPriority(proxy));
+      (false, false, false, false, color, shadow, priority);
   }
 
   @Override

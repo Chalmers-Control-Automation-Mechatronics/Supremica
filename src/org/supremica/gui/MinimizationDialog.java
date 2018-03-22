@@ -65,7 +65,6 @@ import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.EquivalenceRelation;
-import org.supremica.automata.algorithms.minimization.BisimulationEquivalenceMinimizer;
 import org.supremica.automata.algorithms.minimization.MinimizationHeuristic;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
@@ -74,6 +73,7 @@ import org.supremica.automata.algorithms.minimization.MinimizationStrategy;
 public class MinimizationDialog
     implements ActionListener
 {
+    @SuppressWarnings("unused")
     private static Logger logger = LogManager.getLogger(MinimizationDialog.class);
 
     private final JButton okButton;
@@ -201,13 +201,6 @@ public class MinimizationDialog
             minimizationTypeBox =
               new JComboBox<EquivalenceRelation>(EquivalenceRelation.enabledValues());
             minimizationTypeBox.addActionListener(this);
-
-            // Disable bisimulation equivalence if library is missing!
-            if (!BisimulationEquivalenceMinimizer.libraryLoaded())
-            {
-                logger.warn("LibraryBisimulationEquivalence not found (not in path? 32/64-bit problem?), using Java implementation.");
-                minimizationTypeBox.removeItem(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
-            }
 
             alsoTransitions = new JCheckBox("Also minimize number of transitions");
             alsoTransitions.setToolTipText("Make sure that the number of the transitions is the minimal number (with respect to observation equivalence))");

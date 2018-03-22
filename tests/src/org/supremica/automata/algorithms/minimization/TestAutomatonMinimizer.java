@@ -197,50 +197,6 @@ public class TestAutomatonMinimizer
         }
     }
 
-    public void testBisimulationEquivalenceMinimization()
-    {
-        // Check if the library with the native methods is ok
-        if (!BisimulationEquivalenceMinimizer.libraryLoaded())
-        {
-            System.err.println("Library BisimulationEquivalence not in library path, test skipped.");
-            return;
-        }
-
-        try
-        {
-            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            final Project theProject = builder.build(TestFiles.getFile(TestFiles.BisimulationEquivalence));
-            final MinimizationOptions options = MinimizationOptions.getDefaultMinimizationOptions();
-            options.setMinimizationType(EquivalenceRelation.BISIMULATIONEQUIVALENCE);
-            options.setAlsoTransitions(true);
-            options.setKeepOriginal(true);
-
-            AutomatonMinimizer minimizer;
-            Automaton min;
-
-            //System.err.println("Fernandez");
-            // Test bisimulation equivalence minimization
-            minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Fernandez)"));
-            min = minimizer.getMinimizedAutomaton(options);
-            assertTrue((min.nbrOfStates() == 3) &&
-                (min.nbrOfTransitions() == 3) &&
-                (min.getStateWithName("2,0,1").nbrOfOutgoingArcs() == 2));
-
-            //System.err.println("Westin");
-            // Test bisimulation equivalence minimization
-            minimizer = new AutomatonMinimizer(theProject.getAutomaton("Test (from Westin)"));
-            min = minimizer.getMinimizedAutomaton(options);
-            assertTrue((min.nbrOfStates() == 4) &&
-                (min.nbrOfTransitions() == 4) &&
-                (min.getStateWithName("q2,q1,p1").nbrOfOutgoingArcs() == 2));
-        }
-        catch (final Exception ex)
-        {
-            ex.printStackTrace();
-            assertTrue(false);
-        }
-    }
-
     public void testConflictEquivalenceMinimization()
     {
         try

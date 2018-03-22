@@ -92,12 +92,8 @@ public class SimulationDisableAutomatonAction
     final ComponentKind kind = mAutomaton.getKind();
     final String kindName = ModuleContext.getComponentKindToolTip(kind);
     final String compName = mAutomaton.getName();
-    String name = null;
-    if (compName.length() <= 32) {
-      name = kindName + " " + compName;
-    }
-    if (name.length() <= 32) {
-      putValue(Action.NAME, operation + name);
+    if (compName.length() + kindName.length() <= 32) {
+      putValue(Action.NAME, operation + kindName + " " + compName);
     } else {
       putValue(Action.NAME, operation + kindName);
     }
