@@ -36,10 +36,8 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
-import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -68,6 +66,7 @@ public class WatersAnalyzerPanel extends MainPanel
 
   private void setupAutomata()
   {
+    /*
     //mAutomataTable = new WatersAnalyzerAutomataTable(mWatersAnalyzer, mDesktop);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     //mAutomataPanel.setLayout(new BorderLayout());
@@ -79,15 +78,17 @@ public class WatersAnalyzerPanel extends MainPanel
     pane.setPreferredSize(mAutomataTable.getPreferredSize());
     mAutomataPanel.add("Automata", pane);
     //mTabbedPane.addTab("Automata", pane);
+    */
   }
 
   private final ModuleContainer mModuleContainer;
   //private JTabbedPane mTabbedPane = new JTabbedPane();
   //private WatersAnalyzerAutomatonDesktopPane mDesktop;
+  @SuppressWarnings("unused")
   private final JPanel mAutomataPanel = new JPanel();
   //private final WatersAnalyzer mWatersAnalyzer;
   private JTable mAutomataTable;
 
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 8731351995076903210L;
 }
