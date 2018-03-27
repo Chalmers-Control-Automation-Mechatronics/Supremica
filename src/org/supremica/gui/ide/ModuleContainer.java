@@ -40,12 +40,10 @@ import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -68,7 +66,6 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -370,42 +367,6 @@ public class ModuleContainer
     (final SimpleComponentSubject comp)
   {
     return mComponentToPanelMap.get(comp);
-  }
-
-  public ComponentViewPanel getComponentViewPanel
-    (final SimpleComponentSubject comp)
-  {
-    ComponentViewPanel panel = mComponentToViewPanelMap.get(comp);
-    if (panel == null) {
-      final AnalyzerPanel analyzerPanel = getAnalyzerPanel();
-      final JComponent right = analyzerPanel.getRightComponent();
-      final Dimension oldsize = right.getSize();
-      try {
-        panel = new ComponentViewPanel(this, comp, oldsize);
-        mComponentToViewPanelMap.put(comp, panel);
-      } catch (final GeometryAbsentException exception) {
-        JOptionPane.showMessageDialog(getIDE(), exception.getMessage());
-      }
-    }
-    return panel;
-  }
-
-  public ComponentViewPanel getComponentViewPanel(final String name)
-  {
-    final List<Proxy> components = getModule().getComponentList();
-    for (final Proxy proxy : components) {
-      if (proxy instanceof NamedProxy) {
-        final NamedProxy namedProxy = (NamedProxy) proxy;
-        if (name.equals(namedProxy.getName())) {
-          if (proxy instanceof SimpleComponentSubject) {
-            return getComponentViewPanel(((SimpleComponentSubject)proxy));
-          } else {
-            return null;
-          }
-        }
-      }
-    }
-    return null;
   }
 
   public void switchToTraceMode(final TraceProxy trace)
@@ -723,7 +684,7 @@ public class ModuleContainer
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7629950668427771146L;
   }
 
 
@@ -738,9 +699,6 @@ public class ModuleContainer
   private final Map<SimpleComponentSubject,ComponentEditorPanel>
     mComponentToPanelMap =
     new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
-  private final Map<SimpleComponentSubject,ComponentViewPanel>
-    mComponentToViewPanelMap =
-    new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
   private final ModuleContext mModuleContext;
   private final BackgroundCompiler mBackgroundCompiler;
