@@ -87,8 +87,8 @@ public class AnalyzerStatisticsAction
     public void doAction()
     {
         final Logger logger = LogManager.getLogger();
-        final int nbrOfAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().nbrOfAutomata();
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final int nbrOfAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject().nbrOfAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, true))
         {
             return;

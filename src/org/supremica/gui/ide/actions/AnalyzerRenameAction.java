@@ -81,7 +81,7 @@ public class AnalyzerRenameAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -95,11 +95,11 @@ public class AnalyzerRenameAction
 
             try
             {
-                final String newName = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
+                final String newName = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getNewAutomatonName("Enter a new name for " + currAutomatonName, currAutomatonName);
 
                 if (newName != null)
                 {
-                    ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().renameAutomaton(currAutomaton, newName);
+                    ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject().renameAutomaton(currAutomaton, newName);
                 }
             }
             catch (final Exception ex)

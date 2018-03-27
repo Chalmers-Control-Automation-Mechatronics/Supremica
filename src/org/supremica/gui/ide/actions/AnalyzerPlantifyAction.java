@@ -86,7 +86,7 @@ public class AnalyzerPlantifyAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         // MinimizationHelper.plantify(selectedAutomata);
 		final Plantifier p = new Plantifier(selectedAutomata);
 		p.plantify();
@@ -94,7 +94,7 @@ public class AnalyzerPlantifyAction
 
 		try
 		{
-			ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(a, true);
+			ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(a, true);
 			// ide.getIDE().repaint();
 		}
 		catch (final Exception ex)

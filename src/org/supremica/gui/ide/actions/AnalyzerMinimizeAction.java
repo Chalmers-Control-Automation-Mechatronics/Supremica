@@ -82,7 +82,7 @@ public class AnalyzerMinimizeAction
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
             return;
@@ -96,7 +96,7 @@ public class AnalyzerMinimizeAction
         {
             return;
         }
-        final Project currProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        final Project currProject = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
         final AutomataMinimizationWorker amw = new AutomataMinimizationWorker(ide.getFrame(), selectedAutomata, currProject, options);
 		amw.start();
     }

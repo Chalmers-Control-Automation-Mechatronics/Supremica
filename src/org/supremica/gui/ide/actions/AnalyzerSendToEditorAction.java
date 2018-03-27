@@ -123,7 +123,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
         module.getComponentListModifiable();
       int compInsPos = compTarget.size();
       final Automata selectedAutomata =
-          container.getAnalyzerPanel().getSelectedAutomata();
+          container.getSupremicaAnalyzerPanel().getSelectedAutomata();
       final ProductDESImporter importer =
           new ProductDESImporter(ModuleSubjectFactory.getInstance());
       final List<InsertInfo> components = new LinkedList<InsertInfo>();

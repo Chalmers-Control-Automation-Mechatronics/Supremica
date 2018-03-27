@@ -85,7 +85,7 @@ public class AnalyzerViewModularStructureAction
     @Override
     public void doAction()
     {
-       final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+       final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         // Sanity check
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, false, false, true, false))

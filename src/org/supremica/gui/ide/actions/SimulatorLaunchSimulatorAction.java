@@ -84,7 +84,7 @@ public class SimulatorLaunchSimulatorAction
     public void doAction()
     {
         final Logger logger = LogManager.getLogger();
-        final VisualProject project = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        final VisualProject project = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
         project.clearSimulationData();
 
         // We can not simulate nondeterministic processes properly just yet...

@@ -83,7 +83,7 @@ public class AnalyzerSynchronizerAction
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, true, true))
         {
             return;

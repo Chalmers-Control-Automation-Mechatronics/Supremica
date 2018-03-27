@@ -83,8 +83,8 @@ public class AnalyzerFindStatesAction
     @Override
     public void doAction()
     {
-        final VisualProject theProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final VisualProject theProject = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         // gui.info("Nbr of selected automata: " + selectedAutomata.size());
         final FindStates find_states = new FindStates();
 

@@ -123,7 +123,7 @@ public abstract class DocumentContainer
 
   public abstract EditorPanel getEditorPanel();
 
-  public abstract AnalyzerPanel getAnalyzerPanel();
+  public abstract SupremicaAnalyzerPanel getSupremicaAnalyzerPanel();
 
   public abstract Component getActivePanel();
 

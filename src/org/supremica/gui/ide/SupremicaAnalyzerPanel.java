@@ -60,7 +60,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 
 
-public class AnalyzerPanel
+public class SupremicaAnalyzerPanel
     extends MainPanel
 {
     private static final long serialVersionUID = 1L;
@@ -71,7 +71,7 @@ public class AnalyzerPanel
     private final DocumentContainer mDocumentContainer;
     private final VisualProject mVisualProject = new VisualProject();
 
-    public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
+    public SupremicaAnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
 

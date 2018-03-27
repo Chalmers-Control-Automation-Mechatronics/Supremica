@@ -180,7 +180,7 @@ public class AutomataSynchronizerWorker
                 if (theAutomaton != null)
                 {
 					// If an automaton with the same name already exists, this silently throws away the result. Not good.
-                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(theAutomaton);
+                    ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomaton(theAutomaton);
                 }
             }
             catch (final Exception ex)

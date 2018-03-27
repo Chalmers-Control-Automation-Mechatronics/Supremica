@@ -657,7 +657,7 @@ public class Simulation implements ModelObserver, Observer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.subject.base.Observer
+  //# Interface net.sourceforge.waters.gui.observer.Observer
   // This event is received when a new tab has been activated in a
   // module container, after recompiling the module. If the activated
   // tab was the simulator, it is now safe to get an updated compiled

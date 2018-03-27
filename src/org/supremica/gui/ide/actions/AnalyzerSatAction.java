@@ -60,7 +60,7 @@ public class AnalyzerSatAction extends IDEAction {
 
     @Override
     public void doAction() {
-        Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         if (!selectedAutomata.sanityCheck(ide.getFrame(), 1, true, false, true, true))
         {
             return;

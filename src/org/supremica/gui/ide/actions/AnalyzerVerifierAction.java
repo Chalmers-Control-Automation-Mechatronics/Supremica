@@ -90,7 +90,7 @@ public class AnalyzerVerifierAction
       // Retrieve the selected automata and make a sanity check
       final DocumentContainer container = ide.getActiveDocumentContainer();
       final Automata selectedAutomata =
-        container.getAnalyzerPanel().getSelectedAutomata();
+        container.getSupremicaAnalyzerPanel().getSelectedAutomata();
       if (!selectedAutomata.sanityCheck(owner, 1, true, false, true, true)) {
         return;
       }
@@ -112,7 +112,7 @@ public class AnalyzerVerifierAction
       }
       if (vOptions.getVerificationType() ==
           VerificationType.LANGUAGEINCLUSION) {
-        vOptions.setInclusionAutomata(container.getAnalyzerPanel().getUnselectedAutomata());
+        vOptions.setInclusionAutomata(container.getSupremicaAnalyzerPanel().getUnselectedAutomata());
       }
       final SynchronizationOptions sOptions =
         SynchronizationOptions.getDefaultVerificationOptions();

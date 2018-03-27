@@ -78,6 +78,6 @@ public class AnalyzerDeleteAllAutomataAction
      */
     public void doAction()
     {
-        ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata()));
+        ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata()));
     }
 }

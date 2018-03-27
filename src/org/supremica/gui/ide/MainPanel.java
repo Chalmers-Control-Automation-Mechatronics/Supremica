@@ -53,7 +53,7 @@ import org.supremica.gui.WhiteScrollPane;
  *
  * <P>The main panel consists of a {@link JSplitPane}, which is common to
  * all module views. Subclasses implement the specifics for {@link EditorPanel},
- * {@link SimulatorPanel}, and {@link AnalyzerPanel}.</P>
+ * {@link SimulatorPanel}, and {@link SupremicaAnalyzerPanel}.</P>
  *
  * @author Knut &Aring;kesson, Robi Malik
  */

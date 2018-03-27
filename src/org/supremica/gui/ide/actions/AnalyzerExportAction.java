@@ -99,7 +99,7 @@ public class AnalyzerExportAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {
@@ -130,7 +130,7 @@ public class AnalyzerExportAction
     // OO was invented just to avoid the type of code below. It's a maintenance nightmare!!
     private void automataExport(final ExportFormat exportMode)
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1))
         {

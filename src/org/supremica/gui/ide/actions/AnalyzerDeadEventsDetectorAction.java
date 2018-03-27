@@ -77,7 +77,7 @@ public class AnalyzerDeadEventsDetectorAction
     public void doAction()
     {
         // Retrieve the selected automata and make a sanity check
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         // logger.info("Before action");
 

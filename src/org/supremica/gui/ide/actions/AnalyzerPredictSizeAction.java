@@ -84,7 +84,7 @@ public class AnalyzerPredictSizeAction
     @Override
     public void doAction()
     {
-        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         // Calculate predicted synchronisation size
         final int prediction = (int) GeneticAlgorithms.predictSynchronizationSize(automata);

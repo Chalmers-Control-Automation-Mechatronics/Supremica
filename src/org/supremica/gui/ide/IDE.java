@@ -386,7 +386,7 @@ public class IDE
   public Project getActiveProject()
   {
     final DocumentContainer active = getActiveDocumentContainer();
-    return active.getAnalyzerPanel().getVisualProject();
+    return active.getSupremicaAnalyzerPanel().getVisualProject();
   }
 
 

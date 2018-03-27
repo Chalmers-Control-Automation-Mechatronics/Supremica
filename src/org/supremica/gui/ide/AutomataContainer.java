@@ -50,7 +50,7 @@ public class AutomataContainer
     public AutomataContainer(final IDE ide, final Project project)
     {
         super(ide, project);
-        mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
+        mAnalyzerPanel = new SupremicaAnalyzerPanel(this, "Analyzer");
         mAnalyzerPanel.addProject(project);
     }
 
@@ -71,7 +71,7 @@ public class AutomataContainer
     }
 
     @Override
-    public AnalyzerPanel getAnalyzerPanel()
+    public SupremicaAnalyzerPanel getSupremicaAnalyzerPanel()
     {
         return mAnalyzerPanel;
     }
@@ -122,7 +122,7 @@ public class AutomataContainer
 
     //#######################################################################
     //# Data Members
-    private final AnalyzerPanel mAnalyzerPanel;
+    private final SupremicaAnalyzerPanel mAnalyzerPanel;
     //private SimulatorPanel simulatorPanel = null;
 
 

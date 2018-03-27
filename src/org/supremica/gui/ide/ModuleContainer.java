@@ -112,8 +112,6 @@ public class ModuleContainer
     mTabPanel = new CompilingTabbedPane();
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
-    mSupremicaAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
-    mWatersAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
     mTabPanel.add(mEditorPanel);
     mSimulatorPropertyChangeListener =
       new SimulatorPropertyChangeListener();
@@ -127,10 +125,11 @@ public class ModuleContainer
     Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
     (mWatersAnalyzerPropertyChangeListener);
     if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
-      mTabPanel.add(mWatersAnalyzerPanel);
+      mAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
     } else {
-      mTabPanel.add(mSupremicaAnalyzerPanel);
+      mAnalyzerPanel = new SupremicaAnalyzerPanel(this, "Analyzer");
     }
+    mTabPanel.add(mAnalyzerPanel);
     mEditorPanel.showComment();
 
     module.addModelObserver(this);
@@ -194,9 +193,13 @@ public class ModuleContainer
   }
 
   @Override
-  public AnalyzerPanel getAnalyzerPanel()
+  public SupremicaAnalyzerPanel getSupremicaAnalyzerPanel()
   {
-    return mSupremicaAnalyzerPanel;
+    if (mAnalyzerPanel instanceof SupremicaAnalyzerPanel) {
+      return (SupremicaAnalyzerPanel) mAnalyzerPanel;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -541,21 +544,28 @@ public class ModuleContainer
     }
   }
 
+
   //#########################################################################
   //# Inner Class WatersAnalyzerPropertyChangeListener
   private class WatersAnalyzerPropertyChangeListener
       implements SupremicaPropertyChangeListener
   {
-
     @Override
     public void propertyChanged(final SupremicaPropertyChangeEvent event)
     {
+      final int index = mTabPanel.indexOfComponent(mAnalyzerPanel);
+      final boolean selected = mTabPanel.getSelectedIndex() == index;
+      mTabPanel.removeTabAt(index);
       if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
-        mTabPanel.add(mWatersAnalyzerPanel, 2);
-        mTabPanel.remove(mSupremicaAnalyzerPanel);
+        mAnalyzerPanel =
+          new WatersAnalyzerPanel(ModuleContainer.this, "Analyzer");
       } else {
-        mTabPanel.add(mSupremicaAnalyzerPanel, 2);
-        mTabPanel.remove(mWatersAnalyzerPanel);
+        mAnalyzerPanel =
+          new SupremicaAnalyzerPanel(ModuleContainer.this, "Analyzer");
+      }
+      mTabPanel.add(mAnalyzerPanel, index);
+      if (selected) {
+        mTabPanel.setSelectedIndex(index);
       }
     }
   }
@@ -660,8 +670,9 @@ public class ModuleContainer
     public void compilationSucceeded(final ProductDESProxy compiledDES)
     {
       try {
-        if (mSelected == mSupremicaAnalyzerPanel) {
-          mSupremicaAnalyzerPanel.updateAutomata(compiledDES);
+        if (mSelected instanceof SupremicaAnalyzerPanel) {
+          final SupremicaAnalyzerPanel panel = (SupremicaAnalyzerPanel) mSelected;
+          panel.updateAutomata(compiledDES);
         }
         final int index = indexOfComponent(mSelected);
         setSelectedIndexImpl(index);
@@ -693,8 +704,7 @@ public class ModuleContainer
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
   private final SimulatorPanel mSimulatorPanel;
-  private final AnalyzerPanel mSupremicaAnalyzerPanel;
-  private final WatersAnalyzerPanel mWatersAnalyzerPanel;
+  private MainPanel mAnalyzerPanel;
 
   private final Map<SimpleComponentSubject,ComponentEditorPanel>
     mComponentToPanelMap =

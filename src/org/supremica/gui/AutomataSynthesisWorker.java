@@ -188,7 +188,7 @@ public class AutomataSynthesisWorker
             {
                 try
                 {
-                    ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+                    ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(result);
                 }
                 catch (final Exception ex)
                 {

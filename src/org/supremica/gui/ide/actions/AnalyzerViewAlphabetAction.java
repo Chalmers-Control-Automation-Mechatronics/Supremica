@@ -86,9 +86,9 @@ public class AnalyzerViewAlphabetAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         final Alphabet alphabetSubset = selectedAutomata.getUnionAlphabet();
-        final Automata allAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+        final Automata allAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {

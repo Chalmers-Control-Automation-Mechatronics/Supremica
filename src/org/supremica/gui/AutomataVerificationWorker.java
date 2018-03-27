@@ -212,7 +212,7 @@ public class AutomataVerificationWorker
             final Automata result = BBSDDiagnosabilityVerification.getFinalAutomata();
             if (result != null && mOwner instanceof IDE) {
               final IDE ide = (IDE) mOwner;
-              ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(result);
+              ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(result);
             }
         }
 

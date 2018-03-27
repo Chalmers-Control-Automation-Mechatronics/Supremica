@@ -84,7 +84,7 @@ public class AnalyzerViewAutomatonAction
     {
         // gui.debug("ActionMan to the rescue!");
         // Retrieve the selected automata and make a sanity check
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, true, false, false, false))
         {
@@ -95,7 +95,7 @@ public class AnalyzerViewAutomatonAction
         {
             try
             {
-                ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject().getAutomatonViewer(currAutomaton.getName());
+                ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject().getAutomatonViewer(currAutomaton.getName());
             }
             catch (final Exception ex)
             {

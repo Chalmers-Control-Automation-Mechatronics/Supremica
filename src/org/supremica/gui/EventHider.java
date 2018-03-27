@@ -191,7 +191,7 @@ class EventHiderDialog
 
         try
         {
-            ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(newAutomata);
+            ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(newAutomata);
         }
         catch (final Exception ex)
         {
@@ -222,7 +222,7 @@ public class EventHider
         final Automata automata = ActionMan.getGui().getSelectedAutomata();
 
         // Throw up the dialog, let the user select the alphabet
-        new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
+        new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
 
     public void doAction(final Automata theAutomata, final Alphabet othersAlphabet)

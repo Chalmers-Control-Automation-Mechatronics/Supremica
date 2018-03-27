@@ -78,7 +78,7 @@ public class SimulatorClearSimulationData
      */
     public void doAction()
     {
-        VisualProject project = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        VisualProject project = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
         project.clearSimulationData();
     }
 }

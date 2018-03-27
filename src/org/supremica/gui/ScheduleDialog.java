@@ -123,7 +123,7 @@ public class ScheduleDialog
 
         this.ide = ide;
 //        selectedAutomata = getSelectedAutomata();
-        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        selectedAutomata = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         /******** Base components of the dialog ***********/
         okButton = new JButton("Schedule");
@@ -337,14 +337,14 @@ public class ScheduleDialog
                 final VelocityBalancer vb = new VelocityBalancer(selectedAutomata);
                 for (int i = 0; i < vb.getOptimalSubPlants().size(); i++)
                 {
-                    ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
+                    ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomaton(vb.getOptimalSubPlants().getAutomatonAt(i));
                 }
 
                 //temp
                 final Automata subControllers = vb.getSubControllers();
                 for (int i = 0; i < subControllers.size(); i++)
                 {
-                    ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(subControllers.getAutomatonAt(i));
+                    ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomaton(subControllers.getAutomatonAt(i));
                 }
 
                 close();
@@ -538,9 +538,9 @@ public class ScheduleDialog
                         ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager().openContainer(currFile);
                         // Switch to the analyzer panel
                         ((JTabbedPane)ide.getActiveDocumentContainer().getPanel()).setSelectedComponent(
-                                ide.getActiveDocumentContainer().getAnalyzerPanel());
+                                ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel());
                         // Select all the automata
-                        selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+                        selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 
                         // Schedule using the chosen settings
                         doit();
@@ -616,7 +616,7 @@ public class ScheduleDialog
             String scheduleName = "";
             while (scheduleName != null && scheduleName.trim().equals(""))
             {
-                scheduleName = getIde().getActiveDocumentContainer().getAnalyzerPanel().getNewAutomatonName(
+                scheduleName = getIde().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getNewAutomatonName(
                         "Enter a name for the schedule", "Schedule");
             }
 
@@ -624,7 +624,7 @@ public class ScheduleDialog
             if (scheduleName != null)
             {
                 scheduleAuto.setName(scheduleName);
-                ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(scheduleAuto);
+                ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomaton(scheduleAuto);
 
                 // The following part should be somewhere else, but unfortunately the communication between the editor
                 // and the analyzer are not automatic in the IDE, tuff luck...

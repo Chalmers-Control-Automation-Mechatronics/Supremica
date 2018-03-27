@@ -77,13 +77,13 @@ public class AnalyzerEventHiderAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
             return;
         }
         final EventHider eventHider = new EventHider(ide.getIDE());
-        eventHider.doAction(selectedAutomata, ide.getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
+        eventHider.doAction(selectedAutomata, ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
 }

@@ -90,7 +90,7 @@ public class AnalyzerModularForbidderAction
     {
         logger.info("ModularForbidder started...");
 
-        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         // MODULAR FORBIDDER!
         try
@@ -113,7 +113,7 @@ public class AnalyzerModularForbidderAction
             }
 
             final ModularForbidder mf = new ModularForbidder(mfi, ide.getIDE().getActiveProject());
-            ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(mf.execute());
+            ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(mf.execute());
         }
         catch (final Exception ex)
         {

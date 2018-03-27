@@ -86,7 +86,7 @@ public class SimulatorLaunchAnimatorAction
         final Logger logger = LogManager.getLogger();
         try
         {
-            final VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+            final VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
 
             if (!currProject.hasAnimation())
             {

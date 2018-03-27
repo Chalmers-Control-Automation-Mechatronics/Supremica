@@ -73,7 +73,7 @@ public class AnalyzerAutomataPanel
 
     private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel.class);
 
-    private final AnalyzerPanel analyzerPanel;
+    private final SupremicaAnalyzerPanel analyzerPanel;
     private final DocumentContainer moduleContainer;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
@@ -87,7 +87,7 @@ public class AnalyzerAutomataPanel
 
     private static final float PREFERRED_WIDTH = 0.4f;
 
-    AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
+    AnalyzerAutomataPanel(final SupremicaAnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
     {
       this.analyzerPanel = analyzerPanel;
       this.moduleContainer = moduleContainer;

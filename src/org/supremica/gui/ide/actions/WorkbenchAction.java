@@ -86,8 +86,8 @@ public class WorkbenchAction
         final Logger logger = LogManager.getLogger();
         try
         {
-            final VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-            final Automata selection = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+            final VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
+            final Automata selection = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
             if (selection.size() <= 0)
             {

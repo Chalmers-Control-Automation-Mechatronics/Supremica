@@ -104,7 +104,7 @@ public class Actions extends WatersActionManager
           final Component active = container.getActivePanel();
           if (active == container.getEditorPanel()) {
             editorActive = true;
-          } else if (active == container.getAnalyzerPanel()) {
+          } else if (active == container.getSupremicaAnalyzerPanel()) {
             analyzerActive = true;
           }
         }

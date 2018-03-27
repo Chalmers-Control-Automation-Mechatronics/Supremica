@@ -83,7 +83,7 @@ public class AnalyzerViewStatesAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         if (!selectedAutomata.sanityCheck(ide.getIDE(), 1, false, false, true, false))
         {
