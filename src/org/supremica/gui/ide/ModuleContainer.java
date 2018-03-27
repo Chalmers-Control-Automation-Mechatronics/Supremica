@@ -125,6 +125,10 @@ public class ModuleContainer
     if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
       mTabPanel.add(mSimulatorPanel);
     }
+    mWatersAnalyzerPropertyChangeListener =
+      new WatersAnalyzerPropertyChangeListener();
+    Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
+    (mWatersAnalyzerPropertyChangeListener);
     if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
       mTabPanel.add(mWatersAnalyzerPanel);
     } else {
@@ -175,6 +179,8 @@ public class ModuleContainer
     mEditorPanel.close();
     Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
       (mSimulatorPropertyChangeListener);
+    Config.INCLUDE_WATERS_ANALYZER.removePropertyChangeListener
+      (mWatersAnalyzerPropertyChangeListener);
     mBackgroundCompiler.terminate();
   }
 
@@ -574,6 +580,25 @@ public class ModuleContainer
     }
   }
 
+  //#########################################################################
+  //# Inner Class WatersAnalyzerPropertyChangeListener
+  private class WatersAnalyzerPropertyChangeListener
+      implements SupremicaPropertyChangeListener
+  {
+
+    @Override
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+        mTabPanel.add(mWatersAnalyzerPanel, 2);
+        mTabPanel.remove(mSupremicaAnalyzerPanel);
+      } else {
+        mTabPanel.add(mSupremicaAnalyzerPanel, 2);
+        mTabPanel.remove(mWatersAnalyzerPanel);
+      }
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class UpdateGraphPanelVisitor
@@ -723,8 +748,8 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
 
-  private final SupremicaPropertyChangeListener
-    mSimulatorPropertyChangeListener;
+  private final SupremicaPropertyChangeListener mSimulatorPropertyChangeListener;
+  private final SupremicaPropertyChangeListener mWatersAnalyzerPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;

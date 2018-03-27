@@ -35,24 +35,59 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
 public class WatersAnalyzerPanel extends MainPanel
 {
-  private static final long serialVersionUID = 1L;
-
-  @SuppressWarnings("unused")
-  private final ModuleContainer mModuleContainer;
-
   public WatersAnalyzerPanel(final ModuleContainer moduleContainer,
                              final String name)
   {
     super(name);
-
+    //mWatersAnalyzer = new WatersAnalyzer(moduleContainer);
     mModuleContainer = moduleContainer;
-    // mModuleContainer.getCompiledDES();
+    //setupDesktop();
+    //mTabbedPane = new JTabbedPane();
+    setupAutomata();
+    mModuleContainer.getCompiledDES();
+    setLeftComponent(mAutomataTable);
+
   }
 
+  /*private void setupDesktop()
+  {
+    mDesktop = null;
+    setRightComponent(mDesktop);
+  }*/
+
+  private void setupAutomata()
+  {
+    //mAutomataTable = new WatersAnalyzerAutomataTable(mWatersAnalyzer, mDesktop);
+    final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    //mAutomataPanel.setLayout(new BorderLayout());
+    //mAutomataPanel.add(scroll, BorderLayout.CENTER);
+    final JPanel buttonPanel = new JPanel();
+    //mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
+    final WhiteScrollPane pane = new WhiteScrollPane(mAutomataTable);
+    //pane.setPreferredSize(mAutomataTable.getPreferredSize());
+    pane.setPreferredSize(mAutomataTable.getPreferredSize());
+    mAutomataPanel.add("Automata", pane);
+    //mTabbedPane.addTab("Automata", pane);
+  }
+
+  private final ModuleContainer mModuleContainer;
+  //private JTabbedPane mTabbedPane = new JTabbedPane();
+  //private WatersAnalyzerAutomatonDesktopPane mDesktop;
+  private final JPanel mAutomataPanel = new JPanel();
+  //private final WatersAnalyzer mWatersAnalyzer;
+  private JTable mAutomataTable;
+
+
+  private static final long serialVersionUID = 1L;
 }
