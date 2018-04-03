@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -89,6 +91,65 @@ public class LocalizedSupervisorReductionTRSimplifier
         mStateOutputs[s] = StateOutput.ENABLE;
       }
     }
+
+    //to avoid having to loop through the entire matrix to assume each state pair is compatible,
+    //we will just reverse interpretation of the entire matrix
+    final boolean[][] incompatibilityMatrix = new boolean[numStates][];
+    for (int x = 0; x < numStates; x++) {
+      incompatibilityMatrix[x]= new boolean[numStates];
+      final StateOutput outputX = mStateOutputs[x];
+
+      //if this state doesn't care about supervisor event, skip all its pairs
+      if (outputX.equals(StateOutput.IGNORE)) { continue; }
+
+      for (int y = 0; y < x; y++) {
+
+        //if we have already established this pair is incompatible, skip
+        if (incompatibilityMatrix[x][y]) { continue; }
+
+        final StateOutput outputY = mStateOutputs[y];
+        if (outputY.equals(StateOutput.IGNORE)) { continue; }
+
+        if (!outputX.equals(outputY)) {
+          //not compatible
+          final THashSet<StatePair> incompatiblesToMark = new THashSet<StatePair>();
+          incompatiblesToMark.add(new StatePair(x, y));
+
+          while (!incompatiblesToMark.isEmpty()) {
+            //get an arbitrary state pair from the set
+            final StatePair pairToMark = incompatiblesToMark.iterator().next();
+
+            //mark the pair and its reverse as incompatible
+            incompatibilityMatrix[pairToMark.x][pairToMark.y] = true;
+            incompatibilityMatrix[pairToMark.y][pairToMark.x] = true;
+
+            final TIntSet sharedEvents = getPredecessorEvents(pairToMark.y);
+
+            //take the intersection of events from x and y
+            sharedEvents.retainAll(getPredecessorEvents(pairToMark.x));
+
+            final TIntIterator eventIter = sharedEvents.iterator();
+            while (eventIter.hasNext()) {
+              final int event = eventIter.next();
+              final TIntSet xPredecessors = getPredecessorStates(x, event);
+              final TIntSet yPredecessors = getPredecessorStates(y, event);
+
+              final TIntIterator xIter = xPredecessors.iterator();
+              while (xIter.hasNext()) {
+                final int xPred = xIter.next();
+                final TIntIterator yIter = yPredecessors.iterator();
+                while (yIter.hasNext()) {
+                  final int yPred = yIter.next();
+                  if (!incompatibilityMatrix[xPred][yPred]) {
+                    incompatiblesToMark.add(new StatePair(xPred, yPred));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -102,6 +163,34 @@ public class LocalizedSupervisorReductionTRSimplifier
     ENABLE,
     DISABLE,
     IGNORE
+  }
+
+  private class StatePair {
+    private final int x, y;
+
+    public StatePair(final int x, final int y) {
+      this.x = x;
+      this.y = y;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      //using http://szudzik.com/ElegantPairing.pdf
+      //we can't map 2 x 32 bit ints to an int without collisions (need a long for perfect)
+      return x >= y ? x * x + x + y : x + y * y;
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+      if (obj == this) { return true; }
+      if (!(obj instanceof StatePair)) { return false; }
+
+      final StatePair pair = (StatePair)obj;
+
+      return pair.x == x && pair.y == y;
+    }
   }
 
   private int getSuccessorState(final int source, final int event)
