@@ -33,20 +33,24 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * @author Jordan Schroder
  */
-public class LocalisedSupervisorReductionTRSimplifier
+public class LocalizedSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
 {
-  public LocalisedSupervisorReductionTRSimplifier()
+  public LocalizedSupervisorReductionTRSimplifier()
   {
   }
 
-  public LocalisedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
+  public LocalizedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -68,6 +72,23 @@ public class LocalisedSupervisorReductionTRSimplifier
     super.setUp();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mNumProperEvents = rel.getNumberOfProperEvents();
+
+    final int dumpState = rel.getDumpStateIndex();
+    final int supervisedEvent = getSupervisedEvent();
+
+    final int numStates = rel.getNumberOfStates();
+    mStateOutputs = new StateOutput[numStates];
+
+    for (int s = 0; s < numStates; s++) {
+      final int successorState = getSuccessorState(s, supervisedEvent);
+      if (successorState == -1) {
+        mStateOutputs[s] = StateOutput.IGNORE;
+      } else if (successorState == dumpState) {
+        mStateOutputs[s] = StateOutput.DISABLE;
+      } else {
+        mStateOutputs[s] = StateOutput.ENABLE;
+      }
+    }
   }
 
   @Override
@@ -77,7 +98,50 @@ public class LocalisedSupervisorReductionTRSimplifier
     return false;
   }
 
+  private enum StateOutput {
+    ENABLE,
+    DISABLE,
+    IGNORE
+  }
+
+  private int getSuccessorState(final int source, final int event)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    iter.reset(source, event);
+    if (iter.advance()) {
+      return iter.getCurrentTargetState();
+    } else {
+      return -1;
+    }
+  }
+
+  private TIntSet getPredecessorStates(final int source, final int event) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
+    iter.reset(source, event);
+
+    final TIntHashSet predecessors = new TIntHashSet();
+    while (iter.advance()) {
+      predecessors.add(iter.getCurrentTargetState());
+    }
+    return predecessors;
+  }
+
+  private TIntSet getPredecessorEvents(final int source) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
+    iter.resetState(source);
+
+    final TIntHashSet predecessors = new TIntHashSet();
+    while (iter.advance()) {
+      predecessors.add(iter.getCurrentEvent());
+    }
+    return predecessors;
+  }
+
   //#########################################################################
   //# Data Members
   private int mNumProperEvents;
+  private StateOutput[] mStateOutputs;
 }
