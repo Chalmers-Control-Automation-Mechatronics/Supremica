@@ -231,6 +231,7 @@ public class LocalizedSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  @SuppressWarnings("unused")
   private int mNumProperEvents;
   private StateOutput[] mStateOutputs;
 }
