@@ -34,9 +34,10 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.list.array.TIntArrayList;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -72,8 +73,12 @@ public class LocalizedSupervisorReductionTRSimplifier
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumProperEvents = rel.getNumberOfProperEvents();
+    final TransitionIterator predIter = rel.createPredecessorsReadOnlyIterator();
+    final TransitionIterator sucIter = rel.createSuccessorsReadOnlyIterator();
+
+    //mNumProperEvents = rel.getNumberOfProperEvents();
 
     final int dumpState = rel.getDumpStateIndex();
     final int supervisedEvent = getSupervisedEvent();
@@ -82,7 +87,7 @@ public class LocalizedSupervisorReductionTRSimplifier
     mStateOutputs = new StateOutput[numStates];
 
     for (int s = 0; s < numStates; s++) {
-      final int successorState = getSuccessorState(s, supervisedEvent);
+      final int successorState = getSuccessorState(sucIter, s, supervisedEvent);
       if (successorState == -1) {
         mStateOutputs[s] = StateOutput.IGNORE;
       } else if (successorState == dumpState) {
@@ -112,33 +117,28 @@ public class LocalizedSupervisorReductionTRSimplifier
 
         if (!outputX.equals(outputY)) {
           //not compatible
-          final THashSet<StatePair> incompatiblesToMark = new THashSet<StatePair>();
-          incompatiblesToMark.add(new StatePair(x, y));
+          final Deque<StatePair> incompatiblesToMark = new ArrayDeque<StatePair>();
+          incompatiblesToMark.push(new StatePair(x, y));
 
           while (!incompatiblesToMark.isEmpty()) {
             //get an arbitrary state pair from the set
-            final StatePair pairToMark = incompatiblesToMark.iterator().next();
+            final StatePair pairToMark = incompatiblesToMark.pop();
 
             //mark the pair and its reverse as incompatible
             incompatibilityMatrix[pairToMark.x][pairToMark.y] = true;
             incompatibilityMatrix[pairToMark.y][pairToMark.x] = true;
 
-            final TIntSet sharedEvents = getPredecessorEvents(pairToMark.y);
+            final TIntArrayList sharedEvents = getPredecessorEvents(predIter, pairToMark.y);
 
             //take the intersection of events from x and y
-            sharedEvents.retainAll(getPredecessorEvents(pairToMark.x));
+            sharedEvents.retainAll(getPredecessorEvents(predIter, pairToMark.x));
 
-            final TIntIterator eventIter = sharedEvents.iterator();
-            while (eventIter.hasNext()) {
+            for (final TIntIterator eventIter = sharedEvents.iterator(); eventIter.hasNext();) {
               final int event = eventIter.next();
-              final TIntSet xPredecessors = getPredecessorStates(x, event);
-              final TIntSet yPredecessors = getPredecessorStates(y, event);
 
-              final TIntIterator xIter = xPredecessors.iterator();
-              while (xIter.hasNext()) {
+              for (final TIntIterator xIter = getPredecessorStates(predIter, x, event).iterator(); xIter.hasNext();) {
                 final int xPred = xIter.next();
-                final TIntIterator yIter = yPredecessors.iterator();
-                while (yIter.hasNext()) {
+                for (final TIntIterator yIter = getPredecessorStates(predIter, y, event).iterator(); yIter.hasNext();) {
                   final int yPred = yIter.next();
                   if (!incompatibilityMatrix[xPred][yPred]) {
                     incompatiblesToMark.add(new StatePair(xPred, yPred));
@@ -193,10 +193,8 @@ public class LocalizedSupervisorReductionTRSimplifier
     }
   }
 
-  private int getSuccessorState(final int source, final int event)
+  private int getSuccessorState(final TransitionIterator iter, final int source, final int event)
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
     iter.reset(source, event);
     if (iter.advance()) {
       return iter.getCurrentTargetState();
@@ -205,32 +203,29 @@ public class LocalizedSupervisorReductionTRSimplifier
     }
   }
 
-  private TIntSet getPredecessorStates(final int source, final int event) {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.reset(source, event);
+  private TIntArrayList getPredecessorStates(final TransitionIterator predIter, final int source, final int event) {
+    predIter.reset(source, event);
 
-    final TIntHashSet predecessors = new TIntHashSet();
-    while (iter.advance()) {
-      predecessors.add(iter.getCurrentTargetState());
+    final TIntArrayList predecessors = new TIntArrayList();
+    while (predIter.advance()) {
+      predecessors.add(predIter.getCurrentTargetState());
     }
     return predecessors;
   }
 
-  private TIntSet getPredecessorEvents(final int source) {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    iter.resetState(source);
+  private TIntArrayList getPredecessorEvents(final TransitionIterator predIter, final int source) {
+    predIter.resetState(source);
 
-    final TIntHashSet predecessors = new TIntHashSet();
-    while (iter.advance()) {
-      predecessors.add(iter.getCurrentEvent());
+    final TIntArrayList predecessors = new TIntArrayList();
+    while (predIter.advance()) {
+      predecessors.add(predIter.getCurrentEvent());
     }
     return predecessors;
   }
 
   //#########################################################################
   //# Data Members
-  private int mNumProperEvents;
+  //private int mNumProperEvents;
+
   private StateOutput[] mStateOutputs;
 }
