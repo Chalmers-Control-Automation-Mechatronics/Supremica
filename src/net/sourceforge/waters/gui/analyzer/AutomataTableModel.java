@@ -33,14 +33,16 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+
+import org.supremica.gui.ide.ModuleContainer;
 
 
 class AutomataTableModel
@@ -49,12 +51,15 @@ class AutomataTableModel
 
   //#########################################################################
   //# Constructor
-  AutomataTableModel(final ProductDESProxy DESList)
+  AutomataTableModel(final ModuleContainer ModContainer)
   {
     super();
-    mDESList = DESList;
+    mCompiledDES = ModContainer.getCompiledDES();
+    if(mCompiledDES != null)
+      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
+    else
+      mAutomataList = new ArrayList<>();
     //desktop.attach(this);
-    //mComparator = new AutomatonTableComparator();
   }
 
 
@@ -67,28 +72,19 @@ class AutomataTableModel
    */
   AutomatonProxy getAutomaton(final int index)
   {
-    //final WatersAnalyzer sim = getWatersAnalyzer();
-    //final String finder = (String)mRawData.get(index).get(1);
-    @SuppressWarnings("unused")
-    final Set<AutomatonProxy> APSet = mDESList.getAutomata();
-    //final AutomatonProxy AP = A
-    return null;
+    return mAutomataList.get(index);
   }
 
   int getIndex(final AutomatonProxy aut)
   {
     for (int looper = 0; looper < this.getRowCount(); looper++) {
-      if (((String) mRawData.get(looper).get(1)).compareTo(aut.getName()) == 0) {
+      if ((mAutomataList.get(looper).getName()).compareTo(aut.getName()) == 0) {
         return looper;
       }
     }
     return -1;
-  }
 
-  //AutomatonTableComparator getComparator()
-  //{
-  //  return mComparator;
-  //}
+  }
 
 
   //#########################################################################
@@ -102,8 +98,7 @@ class AutomataTableModel
   @Override
   public int getRowCount()
   {
-    final Set<AutomatonProxy> APSet = mDESList.getAutomata();
-    return APSet.size();
+    return mAutomataList.size();
   }
 
   @Override
@@ -129,12 +124,21 @@ class AutomataTableModel
   @Override
   public Object getValueAt(final int row, final int col)
   {
-    final Set<AutomatonProxy> APSet = mDESList.getAutomata();
-    final Object APArray[] = APSet.toArray();
-    try {
-      return APArray[row];
-    } catch (final NullPointerException np) {
-      return null;
+    final AutomatonProxy currentAutomaton = mAutomataList.get(row);
+    switch(col) {
+    case 0:
+      return currentAutomaton.getKind();
+    case 1:
+      return currentAutomaton.getName();
+    case 2:
+      return currentAutomaton.getStates().size();
+    case 3:
+      return currentAutomaton.getEvents().size();
+    case 4:
+      return currentAutomaton.getTransitions().size();
+    default:
+      throw new ArrayIndexOutOfBoundsException(
+          "Bad column number for markings table model!");
     }
   }
 
@@ -159,8 +163,8 @@ class AutomataTableModel
 
   //#########################################################################
   //# Data Members
-  private List<List<Object>> mRawData;
-  private final ProductDESProxy mDESList;
+  private final ProductDESProxy mCompiledDES;
+  private final List<AutomatonProxy> mAutomataList;
 
 
   //#########################################################################

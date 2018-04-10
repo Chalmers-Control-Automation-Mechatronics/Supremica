@@ -41,6 +41,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,6 +59,7 @@ import javax.swing.table.TableColumnModel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -66,12 +70,11 @@ class AutomataTable extends JTable implements Observer
 
   //#########################################################################
   //# Constructor
-  AutomataTable(final ProductDESProxy DESList,
-                final ModuleContainer ModContainer)
+  AutomataTable(final ModuleContainer ModContainer)
   {
-    super(new AutomataTableModel(DESList));
-    mDESList = DESList;
-    mModContainer = ModContainer;
+    super(new AutomataTableModel(ModContainer));
+    mModuleContainer = ModContainer;
+    mCompiledDES = mModuleContainer.getCompiledDES();
     final TableCellRenderer iconRenderer = new IconCellRenderer();
     setDefaultRenderer(ImageIcon.class, iconRenderer);
     setDefaultRenderer(Icon.class, iconRenderer);
@@ -169,6 +172,7 @@ class AutomataTable extends JTable implements Observer
     private static final long serialVersionUID = 7455415810847160716L;
   }
 
+
   //#########################################################################
   //# Inner Class TableHeaderMouseListener
   private class TableHeaderMouseListener extends MouseAdapter
@@ -190,20 +194,32 @@ class AutomataTable extends JTable implements Observer
   }
 
   //#########################################################################
-  //# Observer override methods
+  //# Updating
   @Override
   public void update(final EditorChangedEvent event)
   {
-    // TODO Auto-generated method stub
+    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH
+        && mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
+      updateCompiledDES();
+    }
+  }
 
+  private void updateCompiledDES()
+  {
+    final ProductDESProxy newDES = mModuleContainer.getCompiledDES();
+    if (newDES != mCompiledDES) {
+      mCompiledDES = newDES;
+      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
+      Collections.sort(mAutomataList);
+      //fireTableDataChanged();
+    }
   }
 
   //#########################################################################
   //# Data Members
-  @SuppressWarnings("unused")
-  private final ProductDESProxy mDESList;
-  @SuppressWarnings("unused")
-  private final ModuleContainer mModContainer;
+  private final ModuleContainer mModuleContainer;
+  private ProductDESProxy mCompiledDES;
+  private List<AutomatonProxy> mAutomataList;
 
   //#########################################################################
   //# Class Constants

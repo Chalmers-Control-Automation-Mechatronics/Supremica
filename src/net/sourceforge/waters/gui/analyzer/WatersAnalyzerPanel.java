@@ -36,6 +36,7 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import org.supremica.gui.ide.MainPanel;
@@ -51,11 +52,10 @@ public class WatersAnalyzerPanel extends MainPanel
     //mWatersAnalyzer = new WatersAnalyzer(moduleContainer);
     mModuleContainer = moduleContainer;
     //setupDesktop();
-    //mTabbedPane = new JTabbedPane();
-    setupAutomata();
+    mAutomataTable = new AutomataTable(moduleContainer);
+    final JScrollPane scroll = new JScrollPane(mAutomataTable);
     mModuleContainer.getCompiledDES();
-    setLeftComponent(mAutomataTable);
-
+    setLeftComponent(scroll);
   }
 
   /*private void setupDesktop()
@@ -64,30 +64,13 @@ public class WatersAnalyzerPanel extends MainPanel
     setRightComponent(mDesktop);
   }*/
 
-  private void setupAutomata()
-  {
-    /*
-    //mAutomataTable = new WatersAnalyzerAutomataTable(mWatersAnalyzer, mDesktop);
-    final JScrollPane scroll = new JScrollPane(mAutomataTable);
-    //mAutomataPanel.setLayout(new BorderLayout());
-    //mAutomataPanel.add(scroll, BorderLayout.CENTER);
-    final JPanel buttonPanel = new JPanel();
-    //mAutomataPanel.add(buttonPanel, BorderLayout.SOUTH);
-    final WhiteScrollPane pane = new WhiteScrollPane(mAutomataTable);
-    //pane.setPreferredSize(mAutomataTable.getPreferredSize());
-    pane.setPreferredSize(mAutomataTable.getPreferredSize());
-    mAutomataPanel.add("Automata", pane);
-    //mTabbedPane.addTab("Automata", pane);
-    */
-  }
-
   private final ModuleContainer mModuleContainer;
   //private JTabbedPane mTabbedPane = new JTabbedPane();
   //private WatersAnalyzerAutomatonDesktopPane mDesktop;
   @SuppressWarnings("unused")
   private final JPanel mAutomataPanel = new JPanel();
   //private final WatersAnalyzer mWatersAnalyzer;
-  private JTable mAutomataTable;
+  private final JTable mAutomataTable;
 
 
   private static final long serialVersionUID = 8731351995076903210L;
