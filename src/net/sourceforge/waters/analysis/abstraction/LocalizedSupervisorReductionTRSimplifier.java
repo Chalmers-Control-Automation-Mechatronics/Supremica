@@ -35,12 +35,17 @@ package net.sourceforge.waters.analysis.abstraction;
 
 
 import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -79,7 +84,7 @@ public class LocalizedSupervisorReductionTRSimplifier
 
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
-    mPredecessorIterator = rel.createSuccessorsReadOnlyIterator();
+    mSuccessorIterator = rel.createSuccessorsReadOnlyIterator();
 
     //mNumProperEvents = rel.getNumberOfProperEvents();
 
@@ -88,8 +93,17 @@ public class LocalizedSupervisorReductionTRSimplifier
 
     mNumStates = rel.getNumberOfStates();
     mStateOutputs = new StateOutput[mNumStates];
+    mInitialStates = new TIntArrayList();
+    mReducedSupervisor = new ArrayList<>();
 
     for (int s = 0; s < mNumStates; s++) {
+      //set the reduced supervisor to the current set of states
+      mReducedSupervisor.add(new TIntArrayList(new int[] {s}));
+
+      if (rel.isInitial(s)) {
+        mInitialStates.add(s);
+      }
+
       final int successorState = getSuccessorState(s, supervisedEvent);
       if (successorState == -1) {
         mStateOutputs[s] = StateOutput.IGNORE;
@@ -107,8 +121,44 @@ public class LocalizedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    // TODO Auto-generated method stub
+    if (mInitialStates.size() == 0) {
+      return false;
+    }
+
+    //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
+    final List<TIntList> initialCompatibles = getCoversOf(mInitialStates);
+    for (final TIntList initialCompatible : initialCompatibles) {
+      reduce(initialCompatible);
+    }
     return false;
+  }
+
+  private void reduce(final TIntList initialCompatible) {
+    final List<TIntList> compatibles = new ArrayList<TIntList>();
+    compatibles.add(initialCompatible);
+    reduce(compatibles, getNeighboursOf(initialCompatible));
+  }
+
+  private void reduce(final List<TIntList> compatibles, final Deque<TIntList> compatibleDependencies) {
+    if (compatibles.size() >= mReducedSupervisor.size()) {
+      return;
+    }
+
+    if (compatibleDependencies.isEmpty()) {
+      //if we got here we know our solution is better
+      mReducedSupervisor = compatibles;
+      return;
+    }
+
+    final TIntList nextCompatible = compatibleDependencies.pop();
+    final List<TIntList> covers = getCoversOf(nextCompatible);
+    for (final Iterator<TIntList> coversIterator = covers.iterator(); coversIterator.hasNext();) {
+      final TIntList cover = coversIterator.next();
+      @SuppressWarnings("unused")
+      final Deque<TIntList> dependents = getNeighboursOf(cover);
+      //TODO: decide how to some-what efficient determine which dependents are not covered by anything in compatibleDependencies already
+      //reduce(compatibles + cover, compatibleDependencies + that)
+    }
   }
 
   private enum StateOutput {
@@ -117,27 +167,89 @@ public class LocalizedSupervisorReductionTRSimplifier
     IGNORE
   }
 
-  private ArrayList<TIntSet> BronKerbosch(final TIntSet clique, final TIntSet possibleInclusions, final TIntSet alreadyChecked) {
-    return new ArrayList<TIntSet>();
+  private List<TIntList> BronKerbosch(final TIntList clique, final TIntList possibleInclusions, final TIntList alreadyChecked) {
+    final List<TIntList> cliques = new ArrayList<>();
+
+    //if we have exhausted all possibilities, we have no more work to do
+    if (possibleInclusions.isEmpty() && alreadyChecked.isEmpty()) {
+      cliques.add(clique);
+      return cliques;
+    }
+
+    //create a copy in case removing items from possibleInclusions affects the iterator mid-way through
+    final TIntList originalPossibleInclusions = new TIntArrayList(possibleInclusions);
+
+    for (final TIntIterator inclusionIterator = originalPossibleInclusions.iterator(); inclusionIterator.hasNext();) {
+      final int vertex = inclusionIterator.next();
+      final TIntList neighbours = getNeighboursOf(vertex);
+
+      //create a copy
+      final TIntList newClique = new TIntArrayList(clique);
+      newClique.add(vertex);
+
+      //create a copy
+      final TIntList newPossibleInclusions = new TIntArrayList(possibleInclusions);
+      newPossibleInclusions.retainAll(neighbours);
+
+      final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked);
+
+      cliques.addAll(BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked));
+
+      possibleInclusions.remove(vertex);
+      alreadyChecked.add(vertex);
+    }
+
+    return cliques;
   }
 
-  private ArrayList<TIntSet> getCovers(final TIntSet cover) {
-    final TIntSet possibleInclusions = new TIntHashSet();
+  private List<TIntList> getCoversOf(final TIntList compatible) {
+    final TIntList possibleInclusions = new TIntArrayList();
+    //start with all the states as possible inclusions to BronKerbosch
     for (int s = 0; s < mNumStates; s++) {
       possibleInclusions.add(s);
     }
-    for (final TIntIterator coverIterator = cover.iterator(); coverIterator.hasNext();) {
-      possibleInclusions.retainAll(getNeighbours(coverIterator.next()));
+
+    //keep restricting the possible inclusions to just include neighbours of states in the compatible
+    for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+      possibleInclusions.retainAll(getNeighboursOf(compatibleIterator.next()));
     }
-    return BronKerbosch(cover, possibleInclusions, new TIntHashSet());
+    return BronKerbosch(compatible, possibleInclusions, new TIntArrayList());
   }
 
-  private TIntSet getNeighbours(final int state) {
-    final TIntSet neighbours = new TIntHashSet();
+  private TIntList getNeighboursOf(final int vertex) {
+    final TIntList neighbours = new TIntArrayList();
     for (int s = 0; s < mNumStates; s++) {
-      if (mIncompatibilityRelation[state][s] && s != state) {
+      //if the two states are compatible and not the same state, add to neighbours
+      if (mIncompatibilityRelation[vertex][s] && s != vertex) {
         neighbours.add(s);
       }
+    }
+    return neighbours;
+  }
+
+  private Deque<TIntList> getNeighboursOf(final TIntList compatible) {
+    final Deque<TIntList> neighbours = new ArrayDeque<>();
+    final TIntSet enabledEvents = new TIntHashSet();
+
+    //get the union of enabled events across states in the compatible
+    for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+      enabledEvents.addAll(getSuccessorEvents(compatibleIterator.next()));
+    }
+
+    //for each event, we see what compatible is generated by taking that event from each state in the original compatible
+    for (final TIntIterator eventIterator = enabledEvents.iterator(); eventIterator.hasNext();) {
+      final int event = eventIterator.next();
+      final TIntList reachableCompatible = new TIntArrayList();
+
+      //for each state in original compatible, retrieve the target state which forms part of a compatible
+      for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+        final int targetState = getSuccessorState(compatibleIterator.next(), event);
+        //if the target exists
+        if (targetState != -1) {
+          reachableCompatible.add(targetState);
+        }
+      }
+      neighbours.add(reachableCompatible);
     }
     return neighbours;
   }
@@ -190,7 +302,7 @@ public class LocalizedSupervisorReductionTRSimplifier
             incompatibilityRelation[markX][markY] = true;
             incompatibilityRelation[markY][markX] = true;
 
-            final TIntArrayList sharedEvents = getPredecessorEvents(markY);
+            final TIntList sharedEvents = getPredecessorEvents(markY);
 
             //take the intersection of events from x and y
             sharedEvents.retainAll(getPredecessorEvents(markX));
@@ -238,24 +350,35 @@ public class LocalizedSupervisorReductionTRSimplifier
     }
   }
 
-  private TIntArrayList getPredecessorStates(final int source, final int event) {
+  private TIntList getPredecessorStates(final int source, final int event) {
     mPredecessorIterator.reset(source, event);
 
-    final TIntArrayList predecessors = new TIntArrayList();
+    final TIntList predecessors = new TIntArrayList();
     while (mPredecessorIterator.advance()) {
       predecessors.add(mPredecessorIterator.getCurrentTargetState());
     }
     return predecessors;
   }
 
-  private TIntArrayList getPredecessorEvents(final int source) {
+  private TIntList getPredecessorEvents(final int source) {
     mPredecessorIterator.resetState(source);
 
-    final TIntArrayList predecessors = new TIntArrayList();
+    final TIntList predecessorEvents = new TIntArrayList();
     while (mPredecessorIterator.advance()) {
-      predecessors.add(mPredecessorIterator.getCurrentEvent());
+      predecessorEvents.add(mPredecessorIterator.getCurrentEvent());
     }
-    return predecessors;
+    return predecessorEvents;
+  }
+
+  private TIntList getSuccessorEvents(final int source) {
+    mSuccessorIterator.resetState(source);
+
+    final TIntList successorEvents = new TIntArrayList();
+    while (mSuccessorIterator.advance()) {
+      successorEvents.add(mSuccessorIterator.getCurrentEvent());
+    }
+
+    return successorEvents;
   }
 
   //#########################################################################
@@ -264,6 +387,8 @@ public class LocalizedSupervisorReductionTRSimplifier
   private boolean[][] mIncompatibilityRelation;
   private TransitionIterator mPredecessorIterator;
   private TransitionIterator mSuccessorIterator;
+  private TIntList mInitialStates;
   private int mNumStates;
   private StateOutput[] mStateOutputs;
+  private List<TIntList> mReducedSupervisor;
 }
