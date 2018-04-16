@@ -3,12 +3,12 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.abstraction.LocalizedSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-public class MonolithicLocalizedSupervisorReductionTest
+public class MonolithicCliqueBasedSupervisorReductionTest
   extends AbstractSupervisorSynthesizerTest
 {
 
@@ -28,8 +28,7 @@ public class MonolithicLocalizedSupervisorReductionTest
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionSimplifier(new LocalizedSupervisorReductionTRSimplifier());
-    synthesizer.setSupervisorReductionEnabled(true);
+    synthesizer.setSupervisorReductionSimplifier(new CliqueBasedSupervisorReductionTRSimplifier());
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
@@ -40,7 +39,7 @@ public class MonolithicLocalizedSupervisorReductionTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicLocalizedSupervisorReductionTest.class);
+      new TestSuite(MonolithicCliqueBasedSupervisorReductionTest.class);
     return testSuite;
   }
 

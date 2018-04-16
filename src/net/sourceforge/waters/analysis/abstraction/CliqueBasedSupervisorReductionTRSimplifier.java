@@ -46,6 +46,8 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -54,14 +56,14 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 /**
  * @author Jordan Schroder
  */
-public class LocalizedSupervisorReductionTRSimplifier
+public class CliqueBasedSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
 {
-  public LocalizedSupervisorReductionTRSimplifier()
+  public CliqueBasedSupervisorReductionTRSimplifier()
   {
   }
 
-  public LocalizedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
+  public CliqueBasedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -83,8 +85,6 @@ public class LocalizedSupervisorReductionTRSimplifier
     super.setUp();
 
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mPredecessorIterator = rel.createPredecessorsReadOnlyIterator();
-    mSuccessorIterator = rel.createSuccessorsReadOnlyIterator();
 
     //mNumProperEvents = rel.getNumberOfProperEvents();
 
@@ -92,86 +92,100 @@ public class LocalizedSupervisorReductionTRSimplifier
     final int supervisedEvent = getSupervisedEvent();
 
     mNumStates = rel.getNumberOfStates();
-    mStateOutputs = new StateOutput[mNumStates];
-    mInitialStates = new TIntArrayList();
+    final StateOutput[] stateOutputs = new StateOutput[mNumStates];
+    mInitialCompatible = new TreeSet<Integer>();
     mReducedSupervisor = new ArrayList<>();
 
     for (int s = 0; s < mNumStates; s++) {
       //set the reduced supervisor to the current set of states
-      mReducedSupervisor.add(new TIntArrayList(new int[] {s}));
+      final TreeSet<Integer> oneStateCompatible = new TreeSet<>();
+      oneStateCompatible.add(s);
+      mReducedSupervisor.add(oneStateCompatible);
 
       if (rel.isInitial(s)) {
-        mInitialStates.add(s);
+        mInitialCompatible.add(s);
       }
 
       final int successorState = getSuccessorState(s, supervisedEvent);
       if (successorState == -1) {
-        mStateOutputs[s] = StateOutput.IGNORE;
+        stateOutputs[s] = StateOutput.IGNORE;
       } else if (successorState == dumpState) {
-        mStateOutputs[s] = StateOutput.DISABLE;
+        stateOutputs[s] = StateOutput.DISABLE;
       } else {
-        mStateOutputs[s] = StateOutput.ENABLE;
+        stateOutputs[s] = StateOutput.ENABLE;
       }
     }
 
-    mIncompatibilityRelation = getIncompatibilityRelation();
+    mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
   }
 
 
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    if (mInitialStates.size() == 0) {
+    if (mInitialCompatible.size() == 0) {
       return false;
     }
 
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
-    final List<TIntList> initialCompatibles = getCoversOf(mInitialStates);
-    for (final TIntList initialCompatible : initialCompatibles) {
+    final List<SortedSet<Integer>> initialCompatibles = getCoversOf(mInitialCompatible);
+    for (final SortedSet<Integer> initialCompatible : initialCompatibles) {
       reduce(initialCompatible);
     }
     return false;
   }
 
-  private void reduce(final TIntList initialCompatible) {
-    final List<TIntList> compatibles = new ArrayList<TIntList>();
+  private void reduce(final SortedSet<Integer> initialCompatible) {
+    final List<SortedSet<Integer>> compatibles = new ArrayList<SortedSet<Integer>>();
     compatibles.add(initialCompatible);
     reduce(compatibles, getNeighboursOf(initialCompatible));
   }
 
-  private void reduce(final List<TIntList> compatibles, final Deque<TIntList> compatibleDependencies) {
-    if (compatibles.size() >= mReducedSupervisor.size()) {
+  private void reduce(final List<SortedSet<Integer>> currentSolution, final Deque<SortedSet<Integer>> compatibleDependencies) {
+    if (currentSolution.size() >= mReducedSupervisor.size()) {
       return;
     }
 
     if (compatibleDependencies.isEmpty()) {
       //if we got here we know our solution is better
-      mReducedSupervisor = compatibles;
+      mReducedSupervisor = currentSolution;
       return;
     }
 
-    final TIntList nextCompatible = compatibleDependencies.pop();
-    final List<TIntList> covers = getCoversOf(nextCompatible);
-    for (final Iterator<TIntList> coversIterator = covers.iterator(); coversIterator.hasNext();) {
-      final TIntList cover = coversIterator.next();
-      @SuppressWarnings("unused")
-      final Deque<TIntList> dependents = getNeighboursOf(cover);
-      //TODO: decide how to some-what efficient determine which dependents are not covered by anything in compatibleDependencies already
-      //reduce(compatibles + cover, compatibleDependencies + that)
+    //get the next compatible we need to add
+    final SortedSet<Integer> nextCompatible = compatibleDependencies.pop();
+    //get all (maximal) cliques covering this compatible
+    final List<SortedSet<Integer>> covers = getCoversOf(nextCompatible);
+    for (final Iterator<SortedSet<Integer>> coversIterator = covers.iterator(); coversIterator.hasNext();) {
+      //try to add this cover of the the compatible we want to add
+      final SortedSet<Integer> cover = coversIterator.next();
+
+      //adding this means our supervisor has to cover its successor compatibles
+      final Deque<SortedSet<Integer>> dependents = getNeighboursOf(cover);
+
+      //copy the current solution and add the candidate
+      final List<SortedSet<Integer>> newSolution = new ArrayList<SortedSet<Integer>>(currentSolution);
+      newSolution.add(cover);
+
+      final List<SortedSet<Integer>> coverSet = new ArrayList<>();
+      coverSet.addAll(compatibleDependencies);
+      coverSet.addAll(newSolution);
+
+      final Deque<SortedSet<Integer>> newCompatibleDependencies = new ArrayDeque<>(compatibleDependencies);
+      newCompatibleDependencies.addAll(getUncoveredCompatibles(dependents.iterator(), coverSet.iterator()));
+
+      reduce(newSolution, newCompatibleDependencies);
     }
   }
 
-  private enum StateOutput {
-    ENABLE,
-    DISABLE,
-    IGNORE
+  private List<SortedSet<Integer>> BronKerbosch(final SortedSet<Integer> clique, final TIntList possibleInclusions, final TIntList alreadyChecked) {
+    return BronKerbosch(clique, possibleInclusions, alreadyChecked, new ArrayList<SortedSet<Integer>>());
   }
 
-  private List<TIntList> BronKerbosch(final TIntList clique, final TIntList possibleInclusions, final TIntList alreadyChecked) {
-    final List<TIntList> cliques = new ArrayList<>();
-
+  private List<SortedSet<Integer>> BronKerbosch(final SortedSet<Integer> clique, final TIntList possibleInclusions, final TIntList alreadyChecked, final List<SortedSet<Integer>> cliques) {
     //if we have exhausted all possibilities, we have no more work to do
     if (possibleInclusions.isEmpty() && alreadyChecked.isEmpty()) {
+      //add this maximal clique
       cliques.add(clique);
       return cliques;
     }
@@ -183,17 +197,18 @@ public class LocalizedSupervisorReductionTRSimplifier
       final int vertex = inclusionIterator.next();
       final TIntList neighbours = getNeighboursOf(vertex);
 
-      //create a copy
-      final TIntList newClique = new TIntArrayList(clique);
+      //create a copy with the new vertex
+      final SortedSet<Integer> newClique = new TreeSet<Integer>(clique);
       newClique.add(vertex);
 
-      //create a copy
+      //create a copy with a restricted set of neighbours
       final TIntList newPossibleInclusions = new TIntArrayList(possibleInclusions);
       newPossibleInclusions.retainAll(neighbours);
 
       final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked);
 
-      cliques.addAll(BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked));
+      //find any maximal cliques based on newCliques and add them to the object referenced by cliques
+      BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked, cliques);
 
       possibleInclusions.remove(vertex);
       alreadyChecked.add(vertex);
@@ -202,7 +217,7 @@ public class LocalizedSupervisorReductionTRSimplifier
     return cliques;
   }
 
-  private List<TIntList> getCoversOf(final TIntList compatible) {
+  private List<SortedSet<Integer>> getCoversOf(final SortedSet<Integer> compatible) {
     final TIntList possibleInclusions = new TIntArrayList();
     //start with all the states as possible inclusions to BronKerbosch
     for (int s = 0; s < mNumStates; s++) {
@@ -210,7 +225,7 @@ public class LocalizedSupervisorReductionTRSimplifier
     }
 
     //keep restricting the possible inclusions to just include neighbours of states in the compatible
-    for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+    for (final Iterator<Integer> compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
       possibleInclusions.retainAll(getNeighboursOf(compatibleIterator.next()));
     }
     return BronKerbosch(compatible, possibleInclusions, new TIntArrayList());
@@ -220,29 +235,29 @@ public class LocalizedSupervisorReductionTRSimplifier
     final TIntList neighbours = new TIntArrayList();
     for (int s = 0; s < mNumStates; s++) {
       //if the two states are compatible and not the same state, add to neighbours
-      if (mIncompatibilityRelation[vertex][s] && s != vertex) {
+      if (!mIncompatibilityRelation[vertex][s] && s != vertex) {
         neighbours.add(s);
       }
     }
     return neighbours;
   }
 
-  private Deque<TIntList> getNeighboursOf(final TIntList compatible) {
-    final Deque<TIntList> neighbours = new ArrayDeque<>();
+  private Deque<SortedSet<Integer>> getNeighboursOf(final SortedSet<Integer> compatible) {
+    final Deque<SortedSet<Integer>> neighbours = new ArrayDeque<>();
     final TIntSet enabledEvents = new TIntHashSet();
 
     //get the union of enabled events across states in the compatible
-    for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+    for (final Iterator<Integer> compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
       enabledEvents.addAll(getSuccessorEvents(compatibleIterator.next()));
     }
 
     //for each event, we see what compatible is generated by taking that event from each state in the original compatible
     for (final TIntIterator eventIterator = enabledEvents.iterator(); eventIterator.hasNext();) {
       final int event = eventIterator.next();
-      final TIntList reachableCompatible = new TIntArrayList();
+      final SortedSet<Integer> reachableCompatible = new TreeSet<Integer>();
 
       //for each state in original compatible, retrieve the target state which forms part of a compatible
-      for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
+      for (final Iterator<Integer> compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
         final int targetState = getSuccessorState(compatibleIterator.next(), event);
         //if the target exists
         if (targetState != -1) {
@@ -254,17 +269,17 @@ public class LocalizedSupervisorReductionTRSimplifier
     return neighbours;
   }
 
-  private boolean[][] getIncompatibilityRelation() {
+  private boolean[][] getIncompatibilityRelation(final StateOutput[] stateOutputs) {
     //to avoid having to loop through the entire matrix to assume each state pair is compatible,
     //we will just reverse interpretation of the entire matrix
 
-    final boolean[][] incompatibilityRelation = new boolean[mNumStates][];
-    for (int x = 0; x < mNumStates; x++) {
-      if (incompatibilityRelation[x] == null) {
-        incompatibilityRelation[x]= new boolean[mNumStates];
-      }
+    final boolean[][] incompatibilityRelation = new boolean[mNumStates][mNumStates];
+    final TransitionIterator xPredecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
+    final TransitionIterator yPredecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
 
-      final StateOutput outputX = mStateOutputs[x];
+    for (int x = 0; x < mNumStates; x++) {
+
+      final StateOutput outputX = stateOutputs[x];
 
       //if this state doesn't care about supervisor event, skip all its pairs
       if (outputX.equals(StateOutput.IGNORE)) { continue; }
@@ -274,7 +289,7 @@ public class LocalizedSupervisorReductionTRSimplifier
         //if we have already established this pair is incompatible, skip
         if (incompatibilityRelation[x][y]) { continue; }
 
-        final StateOutput outputY = mStateOutputs[y];
+        final StateOutput outputY = stateOutputs[y];
         if (outputY.equals(StateOutput.IGNORE)) { continue; }
 
         if (!outputX.equals(outputY)) {
@@ -290,33 +305,21 @@ public class LocalizedSupervisorReductionTRSimplifier
             final int markX = getXFromStatePair(pairToMark);
             final int markY = getYFromStatePair(pairToMark);
 
-            //make sure these rows exist in the matrix exists
-            if (incompatibilityRelation[markX] == null) {
-              incompatibilityRelation[markX] = new boolean[mNumStates];
-            }
-            if (incompatibilityRelation[markY] == null) {
-              incompatibilityRelation[markY] = new boolean[mNumStates];
-            }
-
             //mark the pair and its reverse as incompatible
             incompatibilityRelation[markX][markY] = true;
             incompatibilityRelation[markY][markX] = true;
 
-            final TIntList sharedEvents = getPredecessorEvents(markY);
+            yPredecessorIterator.resetState(markY);
 
-            //take the intersection of events from x and y
-            sharedEvents.retainAll(getPredecessorEvents(markX));
+            while (yPredecessorIterator.advance()) {
+              final int event = yPredecessorIterator.getCurrentEvent();
+              xPredecessorIterator.reset(markX, event);
 
-            for (final TIntIterator eventIter = sharedEvents.iterator(); eventIter.hasNext();) {
-              final int event = eventIter.next();
-
-              for (final TIntIterator xIter = getPredecessorStates(x, event).iterator(); xIter.hasNext();) {
-                final int xPred = xIter.next();
-                for (final TIntIterator yIter = getPredecessorStates(y, event).iterator(); yIter.hasNext();) {
-                  final int yPred = yIter.next();
-                  if (!incompatibilityRelation[xPred][yPred]) {
-                    incompatiblesToMark.push(createStatePair(xPred, yPred));
-                  }
+              while (xPredecessorIterator.advance()) {
+                final int predY = yPredecessorIterator.getCurrentSourceState();
+                final int predX = xPredecessorIterator.getCurrentSourceState();
+                if (!incompatibilityRelation[predX][predY]) {
+                  incompatiblesToMark.push(createStatePair(predX, predY));
                 }
               }
             }
@@ -327,68 +330,93 @@ public class LocalizedSupervisorReductionTRSimplifier
     return incompatibilityRelation;
   }
 
+  private List<SortedSet<Integer>> getUncoveredCompatibles(final Iterator<SortedSet<Integer>> candidateIterator, final Iterator<SortedSet<Integer>> existingCompatibleIterator) {
+    final List<SortedSet<Integer>> uncoveredCompatibles = new ArrayList<>();
+    while (candidateIterator.hasNext()) {
+      final SortedSet<Integer> candidate = candidateIterator.next();
+      boolean isCovered = false;
+      while (existingCompatibleIterator.hasNext() && !isCovered) {
+        final SortedSet<Integer> existingCompatible = existingCompatibleIterator.next();
+        if (existingCompatible.containsAll(candidate)) {
+          isCovered = true;
+        }
+      }
+      if (!isCovered) {
+        uncoveredCompatibles.add(candidate);
+      }
+    }
+    return uncoveredCompatibles;
+  }
+
   private long createStatePair(final int x, final int y) {
-    final long val = x << 32;
-    return val + y;
+    return (((long)x << 32) | y) & 0xFFFFFFFF;
   }
 
   private int getXFromStatePair(final long statePair) {
-    return (int)(statePair >> 32);
+    return (int)(statePair >>> 32);
   }
 
   private int getYFromStatePair(final long statePair) {
-    return (int)statePair;
+    return (int)(statePair & 0xFFFFFFFF);
   }
 
   private int getSuccessorState(final int source, final int event)
   {
-    mSuccessorIterator.reset(source, event);
-    if (mSuccessorIterator.advance()) {
-      return mSuccessorIterator.getCurrentTargetState();
+    final TransitionIterator successorIterator = getTransitionRelation().createSuccessorsReadOnlyIterator();
+    successorIterator.reset(source, event);
+
+    if (successorIterator.advance()) {
+      return successorIterator.getCurrentTargetState();
     } else {
       return -1;
     }
   }
 
-  private TIntList getPredecessorStates(final int source, final int event) {
-    mPredecessorIterator.reset(source, event);
+  /*private TIntList getPredecessorStates(final int source, final int event) {
+    final TransitionIterator predecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
+    predecessorIterator.reset(source, event);
 
     final TIntList predecessors = new TIntArrayList();
-    while (mPredecessorIterator.advance()) {
-      predecessors.add(mPredecessorIterator.getCurrentTargetState());
+    while (predecessorIterator.advance()) {
+      predecessors.add(predecessorIterator.getCurrentTargetState());
     }
     return predecessors;
-  }
+  }*/
 
-  private TIntList getPredecessorEvents(final int source) {
-    mPredecessorIterator.resetState(source);
+  /*private TIntList getPredecessorEvents(final int source) {
+    final TransitionIterator predecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
+    predecessorIterator.resetState(source);
 
     final TIntList predecessorEvents = new TIntArrayList();
-    while (mPredecessorIterator.advance()) {
-      predecessorEvents.add(mPredecessorIterator.getCurrentEvent());
+    while (predecessorIterator.advance()) {
+      predecessorEvents.add(predecessorIterator.getCurrentEvent());
     }
     return predecessorEvents;
-  }
+  }*/
 
   private TIntList getSuccessorEvents(final int source) {
-    mSuccessorIterator.resetState(source);
+    final TransitionIterator successorIterator = getTransitionRelation().createSuccessorsReadOnlyIterator();
+    successorIterator.resetState(source);
 
     final TIntList successorEvents = new TIntArrayList();
-    while (mSuccessorIterator.advance()) {
-      successorEvents.add(mSuccessorIterator.getCurrentEvent());
+    while (successorIterator.advance()) {
+      successorEvents.add(successorIterator.getCurrentEvent());
     }
 
     return successorEvents;
+  }
+
+  private enum StateOutput {
+    ENABLE,
+    DISABLE,
+    IGNORE
   }
 
   //#########################################################################
   //# Data Members
   //private int mNumProperEvents;
   private boolean[][] mIncompatibilityRelation;
-  private TransitionIterator mPredecessorIterator;
-  private TransitionIterator mSuccessorIterator;
-  private TIntList mInitialStates;
+  private TreeSet<Integer> mInitialCompatible;
   private int mNumStates;
-  private StateOutput[] mStateOutputs;
-  private List<TIntList> mReducedSupervisor;
+  private List<SortedSet<Integer>> mReducedSupervisor;
 }
