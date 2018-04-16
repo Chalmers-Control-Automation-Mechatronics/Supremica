@@ -43,8 +43,10 @@ import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -138,7 +140,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private void reduce(final SortedSet<Integer> initialCompatible) {
     final List<SortedSet<Integer>> compatibles = new ArrayList<SortedSet<Integer>>();
     compatibles.add(initialCompatible);
-    reduce(compatibles, getNeighboursOf(initialCompatible));
+    final Deque<SortedSet<Integer>> dependents = getNeighboursOf(initialCompatible);
+    final Deque<SortedSet<Integer>> uncoveredDependents = getUncoveredCompatibles(dependents, compatibles);
+    reduce(compatibles, uncoveredDependents);
   }
 
   private void reduce(final List<SortedSet<Integer>> currentSolution, final Deque<SortedSet<Integer>> compatibleDependencies) {
@@ -172,7 +176,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       coverSet.addAll(newSolution);
 
       final Deque<SortedSet<Integer>> newCompatibleDependencies = new ArrayDeque<>(compatibleDependencies);
-      newCompatibleDependencies.addAll(getUncoveredCompatibles(dependents.iterator(), coverSet.iterator()));
+      newCompatibleDependencies.addAll(getUncoveredCompatibles(dependents, coverSet));
 
       reduce(newSolution, newCompatibleDependencies);
     }
@@ -330,12 +334,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return incompatibilityRelation;
   }
 
-  private List<SortedSet<Integer>> getUncoveredCompatibles(final Iterator<SortedSet<Integer>> candidateIterator, final Iterator<SortedSet<Integer>> existingCompatibleIterator) {
-    final List<SortedSet<Integer>> uncoveredCompatibles = new ArrayList<>();
-    while (candidateIterator.hasNext()) {
+  private Deque<SortedSet<Integer>> getUncoveredCompatibles(final Collection<SortedSet<Integer>> candidates, final Collection<SortedSet<Integer>> existingCompatibles) {
+    //use a linked hashset to retain order and ensure no duplicates are found
+    final LinkedHashSet<SortedSet<Integer>> uncoveredCompatibles = new LinkedHashSet<>();
+    for (final Iterator<SortedSet<Integer>> candidateIterator = candidates.iterator(); candidateIterator.hasNext();) {
       final SortedSet<Integer> candidate = candidateIterator.next();
       boolean isCovered = false;
-      while (existingCompatibleIterator.hasNext() && !isCovered) {
+      for (final Iterator<SortedSet<Integer>> existingCompatibleIterator = existingCompatibles.iterator(); existingCompatibleIterator.hasNext() && !isCovered;) {
         final SortedSet<Integer> existingCompatible = existingCompatibleIterator.next();
         if (existingCompatible.containsAll(candidate)) {
           isCovered = true;
@@ -345,7 +350,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         uncoveredCompatibles.add(candidate);
       }
     }
-    return uncoveredCompatibles;
+    return new ArrayDeque<SortedSet<Integer>>(uncoveredCompatibles);
   }
 
   private long createStatePair(final int x, final int y) {

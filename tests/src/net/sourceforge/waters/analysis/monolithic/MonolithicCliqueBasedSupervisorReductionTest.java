@@ -48,4 +48,16 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     junit.textui.TestRunner.run(suite());
   }
 
+  @Override
+  public void testCell() throws Exception
+  {
+
+  }
+
+  @Override
+  public void testIPCuswicth() throws Exception
+  {
+
+  }
+
 }
