@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -183,13 +185,35 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             if (successorCompatible.containsAll(mReducedSupervisor.get(successorCompatibleIndex))) { break; }
           }
 
+          //TODO: do I need to add a dump state and have transitions to it from each state for each event in the original automaton that's not enabled by that state?
           transitionBuffer.addTransition(state, event, successorState);
         }
       }
 
+      final ListBufferTransitionRelation relation = getTransitionRelation();
+      final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
+      relation.reset(supervisorSize, transitionBuffer.size(),  getPreferredInputConfiguration());
+      relation.setInitial(0, true);
 
-      //each event possible among states in our
-      return true;
+      for (int state = 0; state < supervisorSize; state++) {
+        final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
+        final SortedSet<Integer> compatible = mReducedSupervisor.get(compatibleIndex);
+        long newStateMarkings = relation.createMarkings();
+
+        for (final Iterator<Integer> compatibleStateIterator = compatible.iterator(); compatibleStateIterator.hasNext();) {
+          final int compatibleState = compatibleStateIterator.next();
+          final long oldStateMarkings = oldStateBuffer.getAllMarkings(compatibleState);
+          newStateMarkings = relation.mergeMarkings(newStateMarkings, oldStateMarkings);
+        }
+        relation.setAllMarkings(state, newStateMarkings);
+      }
+
+      relation.removeRedundantPropositions();
+      relation.removeEvent(EventEncoding.TAU);
+      transitionBuffer.addOutgoingTransitions(relation);
+
+      //TODO: change to true
+      return false;
     }
   }
 
