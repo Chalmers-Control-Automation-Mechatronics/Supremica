@@ -38,7 +38,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -125,12 +124,27 @@ class AutomataTable extends JTable
   @Override
   public String getToolTipText(final MouseEvent event)
   {
-    final Point point = event.getPoint();
-    final int row = rowAtPoint(point);
-    final AutomataTableModel tableModel = getModel();
-    final AutomatonProxy aut = tableModel.getAutomaton(row);
-    final ToolTipVisitor visitor = mSimulation.getToolTipVisitor();
-    return visitor.getToolTip(aut, true);
+    final AutomatonProxy aut = getAutomaton(event);
+    if (aut != null) {
+      final ToolTipVisitor visitor = mSimulation.getToolTipVisitor();
+      return visitor.getToolTip(aut, true);
+    } else {
+      return null;
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private AutomatonProxy getAutomaton(final MouseEvent event)
+  {
+    final int row = rowAtPoint(event.getPoint());
+    if (row >= 0) {
+      final AutomataTableModel model = getModel();
+      return model.getAutomaton(row);
+    } else {
+      return null;
+    }
   }
 
 
@@ -228,19 +242,6 @@ class AutomataTable extends JTable
       final AutomatonProxy aut = getAutomaton(event);
       if (aut != null) {
         mPopupFactory.maybeShowPopup(AutomataTable.this, event, aut);
-      }
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private AutomatonProxy getAutomaton(final MouseEvent event)
-    {
-      final int row = rowAtPoint(event.getPoint());
-      if (row >= 0) {
-        final AutomataTableModel model = getModel();
-        return model.getAutomaton(row);
-      } else {
-        return null;
       }
     }
   }

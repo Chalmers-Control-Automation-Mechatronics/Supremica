@@ -43,7 +43,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -71,8 +70,7 @@ class AutomataTable extends JTable
     //mModuleContainer = ModContainer;
     //mCompiledDES = mModuleContainer.getCompiledDES();
     final TableCellRenderer iconRenderer = new IconCellRenderer();
-    setDefaultRenderer(ImageIcon.class, iconRenderer);
-    setDefaultRenderer(Icon.class, iconRenderer);
+    setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
 
