@@ -45,6 +45,8 @@ import org.supremica.gui.ide.ModuleContainer;
 
 public class WatersAnalyzerPanel extends MainPanel
 {
+
+
   public WatersAnalyzerPanel(final ModuleContainer moduleContainer,
                              final String name)
   {
@@ -53,9 +55,16 @@ public class WatersAnalyzerPanel extends MainPanel
     mModuleContainer = moduleContainer;
     //setupDesktop();
     mAutomataTable = new AutomataTable(moduleContainer);
+    //try {
+    //  mAutomataDisplayPane = new AutomatonDisplayPane(null,null,mModuleContainer);
+    //} catch (final GeometryAbsentException exception) {
+    //  exception.printStackTrace();
+    //}
+    mAutomatonDesktopPane = new AutomatonDesktopPane(moduleContainer);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
+    setRightComponent(mAutomatonDesktopPane);
   }
 
   /*private void setupDesktop()
@@ -71,6 +80,9 @@ public class WatersAnalyzerPanel extends MainPanel
   private final JPanel mAutomataPanel = new JPanel();
   //private final WatersAnalyzer mWatersAnalyzer;
   private final JTable mAutomataTable;
+  @SuppressWarnings("unused")
+  private AutomatonDisplayPane mAutomataDisplayPane;
+  private final AutomatonDesktopPane mAutomatonDesktopPane;
 
 
   private static final long serialVersionUID = 8731351995076903210L;

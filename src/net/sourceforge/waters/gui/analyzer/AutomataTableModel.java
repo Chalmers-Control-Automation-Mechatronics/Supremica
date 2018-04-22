@@ -34,19 +34,23 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import javax.swing.Icon;
 import javax.swing.table.AbstractTableModel;
 
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
 class AutomataTableModel
   extends AbstractTableModel
+  implements Observer
 {
 
   //#########################################################################
@@ -54,7 +58,10 @@ class AutomataTableModel
   AutomataTableModel(final ModuleContainer ModContainer)
   {
     super();
+    mModuleContainer = ModContainer;
+    mModuleContainer.attach(this);
     mCompiledDES = ModContainer.getCompiledDES();
+    updateCompiledDES();
     if(mCompiledDES != null)
       mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
     else
@@ -106,15 +113,15 @@ class AutomataTableModel
   {
     switch (column) {
     case 0:
-      return Icon.class;
+      return ComponentKind.class;
     case 1:
       return String.class;
     case 2:
-      return String.class;
+      return int.class;
     case 3:
-      return String.class;
+      return int.class;
     case 4:
-      return String.class;
+      return int.class;
     default:
       throw new ArrayIndexOutOfBoundsException(
           "Bad column number for markings table model!");
@@ -151,20 +158,46 @@ class AutomataTableModel
     case 1:
       return "Automaton";
     case 2:
-      return "States";
+      return "|Q|";
     case 3:
-      return "Events";
+      return "|\u03a3|";
     case 4:
-      return "Transitions";
+      return "|\u2192|";
     default:
-      return "Invalid";
+      throw new ArrayIndexOutOfBoundsException
+      ("Bad column number for automata table model!");
+    }
+  }
+
+
+
+  //#########################################################################
+  //# Updating
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH
+        && mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
+      updateCompiledDES();
+    }
+  }
+
+  private void updateCompiledDES()
+  {
+    final ProductDESProxy newDES = mModuleContainer.getCompiledDES();
+    if (newDES != mCompiledDES) {
+      mCompiledDES = newDES;
+      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
+      Collections.sort(mAutomataList);
+      fireTableDataChanged();
     }
   }
 
   //#########################################################################
   //# Data Members
-  private final ProductDESProxy mCompiledDES;
-  private final List<AutomatonProxy> mAutomataList;
+  private ProductDESProxy mCompiledDES;
+  private List<AutomatonProxy> mAutomataList;
+  private final ModuleContainer mModuleContainer;
 
 
   //#########################################################################

@@ -41,9 +41,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -56,16 +53,14 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTable extends JTable implements Observer
+class AutomataTable extends JTable
 {
 
   //#########################################################################
@@ -73,8 +68,8 @@ class AutomataTable extends JTable implements Observer
   AutomataTable(final ModuleContainer ModContainer)
   {
     super(new AutomataTableModel(ModContainer));
-    mModuleContainer = ModContainer;
-    mCompiledDES = mModuleContainer.getCompiledDES();
+    //mModuleContainer = ModContainer;
+    //mCompiledDES = mModuleContainer.getCompiledDES();
     final TableCellRenderer iconRenderer = new IconCellRenderer();
     setDefaultRenderer(ImageIcon.class, iconRenderer);
     setDefaultRenderer(Icon.class, iconRenderer);
@@ -161,7 +156,8 @@ class AutomataTable extends JTable implements Observer
       final JLabel cell =
         (JLabel) super.getTableCellRendererComponent(table, value, selected,
                                                      false, row, column);
-      final Icon icon = (Icon) value;
+      final ComponentKind kind = (ComponentKind) value;
+      final Icon icon = ModuleContext.getComponentKindIcon(kind);
       cell.setIcon(icon);
       cell.setText(null);
       return cell;
@@ -194,32 +190,7 @@ class AutomataTable extends JTable implements Observer
   }
 
   //#########################################################################
-  //# Updating
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH
-        && mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
-      updateCompiledDES();
-    }
-  }
-
-  private void updateCompiledDES()
-  {
-    final ProductDESProxy newDES = mModuleContainer.getCompiledDES();
-    if (newDES != mCompiledDES) {
-      mCompiledDES = newDES;
-      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
-      Collections.sort(mAutomataList);
-      //fireTableDataChanged();
-    }
-  }
-
-  //#########################################################################
   //# Data Members
-  private final ModuleContainer mModuleContainer;
-  private ProductDESProxy mCompiledDES;
-  private List<AutomatonProxy> mAutomataList;
 
   //#########################################################################
   //# Class Constants
