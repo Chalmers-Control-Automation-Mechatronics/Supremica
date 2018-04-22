@@ -38,9 +38,9 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
@@ -78,10 +78,9 @@ class AutomataTable extends JTable
 
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
-    final int iconSize = IconAndFontLoader.getWatersIconSize();
-    final int absoluteGap =
-      Math.round(IconAndFontLoader.TABLE_ROW_GAP * iconSize);
-    setRowHeight(iconSize + absoluteGap);
+    final int columnGap = IconAndFontLoader.getTableColumnGap();
+    final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
+    setRowHeight(rowHeight);
     final int columnCount = columnModel.getColumnCount();
     if (columnCount != 0) {
       final TableColumn column0 = columnModel.getColumn(0);
@@ -95,10 +94,10 @@ class AutomataTable extends JTable
         final String title = tableModel.getColumnName(i);
         final int width = fm.stringWidth(title);
         final TableColumn column = columnModel.getColumn(i);
-        column.setMinWidth(width + absoluteGap);
+        column.setMinWidth(width + columnGap);
         final Class<?> clazz = tableModel.getColumnClass(i);
         if (Icon.class.isAssignableFrom(clazz)) {
-          column.setMaxWidth(width + absoluteGap);
+          column.setMaxWidth(width + columnGap);
         } else if (String.class.isAssignableFrom(clazz)) {
           column.setPreferredWidth(2 * width);
         }
@@ -112,23 +111,6 @@ class AutomataTable extends JTable
     addMouseListener(new AutomatonMouseListener());
     getTableHeader().addMouseListener(new TableHeaderMouseListener());
     mPopupFactory = new SimulatorPopupFactory(sim);
-    addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(final MouseEvent event)
-      {
-        // Do nothing
-      }
-
-      @Override
-      public void mouseMoved(final MouseEvent event)
-      {
-        final int row = rowAtPoint(event.getPoint());
-        final AutomatonProxy aut = tableModel.getAutomaton(row);
-        final ToolTipVisitor visitor = sim.getToolTipVisitor();
-        final String tooltip = visitor.getToolTip(aut, true);
-        setToolTipText(tooltip);
-      }
-    });
   }
 
 
@@ -140,9 +122,25 @@ class AutomataTable extends JTable
     return (AutomataTableModel) super.getModel();
   }
 
+  @Override
+  public String getToolTipText(final MouseEvent event)
+  {
+    final Point point = event.getPoint();
+    final int row = rowAtPoint(point);
+    final AutomataTableModel tableModel = getModel();
+    final AutomatonProxy aut = tableModel.getAutomaton(row);
+    final ToolTipVisitor visitor = mSimulation.getToolTipVisitor();
+    return visitor.getToolTip(aut, true);
+  }
+
 
   //#########################################################################
   //# Inner Class TextCellRenderer
+  /**
+   * A text renderer for the simulator's automata table.
+   * This renderer displays text without the focus rectangle, and changes the
+   * font to bold if the automaton is open on the simulator's desktop.
+   */
   private class TextCellRenderer extends DefaultTableCellRenderer
   {
     //#######################################################################
@@ -169,7 +167,11 @@ class AutomataTable extends JTable
 
 
   //#########################################################################
-  //# Inner Class TextCellRenderer
+  //# Inner Class IconCellRenderer
+  /**
+   * An icon renderer for the simulator's automata table. This renderer
+   * displays an icon without text and without the focus rectangle.
+   */
   private class IconCellRenderer extends DefaultTableCellRenderer
   {
     //#######################################################################

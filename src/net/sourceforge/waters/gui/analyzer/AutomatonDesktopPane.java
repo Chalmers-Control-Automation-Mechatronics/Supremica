@@ -163,7 +163,6 @@ public class AutomatonDesktopPane
   //# Data Members
   @SuppressWarnings("unused")
   private final ArrayList<String> order;
-  @SuppressWarnings("unused")
   private final ModuleContainer mContainer;
 
 
