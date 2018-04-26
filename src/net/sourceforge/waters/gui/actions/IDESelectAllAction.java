@@ -93,9 +93,7 @@ public class IDESelectAllAction
       final List<? extends Proxy> all = watersOwner.getAllSelectableItems();
       watersOwner.replaceSelection(all);
     } else if (swingOwner != null) {
-      final int len = swingOwner.getText().length();
-      swingOwner.setCaretPosition(0);
-      swingOwner.moveCaretPosition(len);
+      swingOwner.selectAll();
     }
   }
 
