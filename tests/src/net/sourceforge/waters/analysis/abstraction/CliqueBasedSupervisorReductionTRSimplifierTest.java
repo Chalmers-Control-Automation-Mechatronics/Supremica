@@ -38,6 +38,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -95,12 +96,6 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
     final EventEncoding encoding = new EventEncoding(aut, translator);
     encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
                               (byte) ~EventStatus.STATUS_CONTROLLABLE);
-    if (encoding.getNumberOfProperEvents() >= 2 &&
-        EventStatus.isControllableEvent(encoding.getProperEventStatus(1))) {
-      mSupervisedEvent = 1;
-    } else {
-      mSupervisedEvent = 0;
-    }
     return encoding;
   }
 
@@ -110,7 +105,13 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
     super.configureTransitionRelationSimplifier();
     final CliqueBasedSupervisorReductionTRSimplifier simplifier =
       getTransitionRelationSimplifier();
-    simplifier.setSupervisedEvent(mSupervisedEvent);
+    final ListBufferTransitionRelation rel = simplifier.getTransitionRelation();
+    if (rel.getNumberOfProperEvents() >= 2 &&
+        EventStatus.isControllableEvent(rel.getProperEventStatus(1))) {
+      simplifier.setSupervisedEvent(1);
+    } else {
+      simplifier.setSupervisedEvent(0);
+    }
   }
 
 
@@ -193,10 +194,5 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
     test_supred_01();
     test_supred_01();
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private int mSupervisedEvent;
 
 }
