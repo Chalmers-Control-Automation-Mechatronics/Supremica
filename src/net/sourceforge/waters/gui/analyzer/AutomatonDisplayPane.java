@@ -44,6 +44,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -52,8 +53,7 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AutomatonDisplayPane
-  extends BackupGraphPanel
+public class AutomatonDisplayPane extends BackupGraphPanel
 {
   //#########################################################################
   //# Constructors
@@ -67,12 +67,12 @@ public class AutomatonDisplayPane
     mContainer = container;
     @SuppressWarnings("unused")
     final ModuleSubject module = container.getModule();
-    //final RenderingContext context = new SimulatorRenderingContext();
+    //final RenderingContext context = new RenderingCon
     final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
-    @SuppressWarnings("unused")
     final SourceInfo info = infoMap.get(aut);
     //final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
-    //final BindingContext bindings = info.getBindingContext();
+    @SuppressWarnings("unused")
+    final BindingContext bindings = info.getBindingContext();
     //final ProxyShapeProducer producer =
     //  new SubjectShapeProducer(graph, module, context, compiler, bindings);
     //setShapeProducer(producer);
@@ -91,7 +91,6 @@ public class AutomatonDisplayPane
     setPreferredSize(new Dimension(width, height));
   }
 
-
   //#########################################################################
   //# Simple Access
   public Rectangle2D getMinimumBoundingRectangle()
@@ -109,7 +108,6 @@ public class AutomatonDisplayPane
   {
     super.close();
   }
-
 
   //#########################################################################
   //# Painting and Transforming
@@ -132,6 +130,7 @@ public class AutomatonDisplayPane
     transform.translate(-imageRect.getX(), -imageRect.getY());
     return transform;
   }
+
 
   //#########################################################################
   //# Inner Class RenderingStatus
@@ -180,12 +179,10 @@ public class AutomatonDisplayPane
     private Proxy mAutomatonItem;
   }
 
-
   //#########################################################################
   //# Data Members
   private final AutomatonProxy mAutomaton;
   private final ModuleContainer mContainer;
-
 
   //#########################################################################
   //# Class Constants

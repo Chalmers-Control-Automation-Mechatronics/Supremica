@@ -48,9 +48,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTableModel
-  extends AbstractTableModel
-  implements Observer
+class AutomataTableModel extends AbstractTableModel implements Observer
 {
 
   //#########################################################################
@@ -62,19 +60,20 @@ class AutomataTableModel
     mModuleContainer.attach(this);
     mCompiledDES = ModContainer.getCompiledDES();
     updateCompiledDES();
-    if(mCompiledDES != null)
+    if (mCompiledDES != null)
       mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
     else
       mAutomataList = new ArrayList<>();
     //desktop.attach(this);
   }
 
-
   //#########################################################################
   //# Simple Access
   /**
    * Gets the automaton represented by the index-th row of the sorted table.
-   * @param  index   The index of the row of the table.
+   *
+   * @param index
+   *          The index of the row of the table.
    * @return The automaton represented at that index.
    */
   AutomatonProxy getAutomaton(final int index)
@@ -85,14 +84,14 @@ class AutomataTableModel
   int getIndex(final AutomatonProxy aut)
   {
     for (int looper = 0; looper < this.getRowCount(); looper++) {
-      if ((mAutomataList.get(looper).getName()).compareTo(aut.getName()) == 0) {
+      if ((mAutomataList.get(looper).getName())
+        .compareTo(aut.getName()) == 0) {
         return looper;
       }
     }
     return -1;
 
   }
-
 
   //#########################################################################
   //# Interface javax.swing.table.TableModel
@@ -123,8 +122,7 @@ class AutomataTableModel
     case 4:
       return int.class;
     default:
-      throw new ArrayIndexOutOfBoundsException(
-          "Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException("Bad column number for markings table model!");
     }
   }
 
@@ -132,7 +130,7 @@ class AutomataTableModel
   public Object getValueAt(final int row, final int col)
   {
     final AutomatonProxy currentAutomaton = mAutomataList.get(row);
-    switch(col) {
+    switch (col) {
     case 0:
       return currentAutomaton.getKind();
     case 1:
@@ -144,8 +142,7 @@ class AutomataTableModel
     case 4:
       return currentAutomaton.getTransitions().size();
     default:
-      throw new ArrayIndexOutOfBoundsException(
-          "Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException("Bad column number for markings table model!");
     }
   }
 
@@ -164,12 +161,9 @@ class AutomataTableModel
     case 4:
       return "|\u2192|";
     default:
-      throw new ArrayIndexOutOfBoundsException
-      ("Bad column number for automata table model!");
+      throw new ArrayIndexOutOfBoundsException("Bad column number for automata table model!");
     }
   }
-
-
 
   //#########################################################################
   //# Updating
@@ -198,7 +192,6 @@ class AutomataTableModel
   private ProductDESProxy mCompiledDES;
   private List<AutomatonProxy> mAutomataList;
   private final ModuleContainer mModuleContainer;
-
 
   //#########################################################################
   //# Class Constants

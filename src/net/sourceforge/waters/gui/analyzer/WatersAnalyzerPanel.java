@@ -35,9 +35,22 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.awt.Color;
+import java.util.Map;
+
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
@@ -46,44 +59,49 @@ import org.supremica.gui.ide.ModuleContainer;
 public class WatersAnalyzerPanel extends MainPanel
 {
 
-
   public WatersAnalyzerPanel(final ModuleContainer moduleContainer,
                              final String name)
   {
     super(name);
-    //mWatersAnalyzer = new WatersAnalyzer(moduleContainer);
     mModuleContainer = moduleContainer;
-    //setupDesktop();
-    mAutomataTable = new AutomataTable(moduleContainer);
+    mAutomataTable = new AutomataTable(moduleContainer, this);
     //try {
     //  mAutomataDisplayPane = new AutomatonDisplayPane(null,null,mModuleContainer);
     //} catch (final GeometryAbsentException exception) {
     //  exception.printStackTrace();
     //}
-    mAutomatonDesktopPane = new AutomatonDesktopPane(moduleContainer);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
-    setRightComponent(mAutomatonDesktopPane);
+    setRightComponent(mAutomataPanel);
   }
 
-  /*private void setupDesktop()
+  public void displaySelectedAutomata(final AutomatonProxy aut)
   {
-    mDesktop = null;
-    setRightComponent(mDesktop);
-  }*/
+    final Map<Object,SourceInfo> infomap =
+      mModuleContainer.getSourceInfoMap();
+    final Proxy source = infomap.get(aut).getSourceObject();
+    if (source instanceof SimpleComponentSubject) {
+      final SimpleComponentSubject comp = (SimpleComponentSubject) source;
+      final GraphSubject graph = comp.getGraph();
+      try {
+        mAutomataDisplayPane =
+          new AutomatonDisplayPane(aut, graph, mModuleContainer);
+        setRightComponent(mAutomataDisplayPane);
+      } catch (final GeometryAbsentException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage(comp);
+        logger.error(msg);
+      }
+    }
+  }
 
   private final ModuleContainer mModuleContainer;
-  //private JTabbedPane mTabbedPane = new JTabbedPane();
-  //private WatersAnalyzerAutomatonDesktopPane mDesktop;
-  @SuppressWarnings("unused")
   private final JPanel mAutomataPanel = new JPanel();
-  //private final WatersAnalyzer mWatersAnalyzer;
   private final JTable mAutomataTable;
   @SuppressWarnings("unused")
   private AutomatonDisplayPane mAutomataDisplayPane;
-  private final AutomatonDesktopPane mAutomatonDesktopPane;
-
 
   private static final long serialVersionUID = 8731351995076903210L;
 }

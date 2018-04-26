@@ -39,7 +39,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
@@ -47,13 +46,13 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -64,11 +63,16 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Constructor
-  AutomataTable(final ModuleContainer ModContainer)
+  AutomataTable(final ModuleContainer ModContainer,
+                final WatersAnalyzerPanel Parent)
   {
     super(new AutomataTableModel(ModContainer));
     //mModuleContainer = ModContainer;
     //mCompiledDES = mModuleContainer.getCompiledDES();
+    mParent = Parent;
+    final TableCellRenderer textRenderer = new TextCellRenderer();
+    setDefaultRenderer(String.class, textRenderer);
+    setDefaultRenderer(int.class, textRenderer);
     final TableCellRenderer iconRenderer = new IconCellRenderer();
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
@@ -76,10 +80,9 @@ class AutomataTable extends JTable
 
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
-    final int iconSize = IconAndFontLoader.getWatersIconSize();
-    final int absoluteGap =
-      Math.round(IconAndFontLoader.TABLE_ROW_GAP * iconSize);
-    setRowHeight(iconSize + absoluteGap);
+    final int columnGap = IconAndFontLoader.getTableColumnGap();
+    final int rowHeight = IconAndFontLoader.getPreferredTableRowHeight();
+    setRowHeight(rowHeight);
     final int columnCount = columnModel.getColumnCount();
     if (columnCount != 0) {
       final TableColumn column0 = columnModel.getColumn(0);
@@ -89,17 +92,15 @@ class AutomataTable extends JTable
         new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
       final Graphics2D g2d = img.createGraphics();
       final FontMetrics fm = g2d.getFontMetrics(getFont());
-      for (int i = 1; i < columnCount; i++) {
-        final String title = tableModel.getColumnName(i);
-        final int width = fm.stringWidth(title);
+      final String titleName = tableModel.getColumnName(1);
+      final int widthName = fm.stringWidth(titleName);
+      final TableColumn column1 = columnModel.getColumn(1);
+      column1.setMinWidth(widthName + columnGap);
+      column1.setPreferredWidth(2 * widthName);
+      for (int i = 2; i < columnCount; i++) {
         final TableColumn column = columnModel.getColumn(i);
-        column.setMinWidth(width + absoluteGap);
-        final Class<?> clazz = tableModel.getColumnClass(i);
-        if (Icon.class.isAssignableFrom(clazz)) {
-          column.setMaxWidth(width + absoluteGap);
-        } else if (String.class.isAssignableFrom(clazz)) {
-          column.setPreferredWidth(2 * width);
-        }
+        column.setMinWidth(40);
+        column.setMaxWidth(45);
       }
       g2d.dispose();
     }
@@ -107,25 +108,7 @@ class AutomataTable extends JTable
     final ListSelectionModel listModel = getSelectionModel();
     listModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-    getTableHeader().addMouseListener(new TableHeaderMouseListener());
-    //mPopupFactory = new SimulatorPopupFactory(sim);
-    addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(final MouseEvent event)
-      {
-        // Do nothing
-      }
-
-      @Override
-      public void mouseMoved(final MouseEvent event)
-      {
-        //final int row = rowAtPoint(event.getPoint());
-        //final AutomatonProxy aut = tableModel.getAutomaton(row);
-        //final ToolTipVisitor visitor = wAnalyzer.getToolTipVisitor();
-        //final String tooltip = visitor.getToolTip(aut, true);
-        //setToolTipText(tooltip);
-      }
-    });
+    this.addMouseListener(new TableMouseListener());
   }
 
   //#########################################################################
@@ -136,9 +119,67 @@ class AutomataTable extends JTable
     return (AutomataTableModel) super.getModel();
   }
 
+  @Override
+  public String getToolTipText(final MouseEvent event)
+  {
+    final AutomatonProxy aut = getAutomaton(event);
+    final ComponentKind kind = aut.getKind();
+    if (aut != null) {
+      String Tooltip = ModuleContext.getComponentKindToolTip(kind);
+      Tooltip += (" " + aut.getName());
+      return Tooltip;
+    } else {
+      return null;
+    }
+  }
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private AutomatonProxy getAutomaton(final MouseEvent event)
+  {
+    final int row = rowAtPoint(event.getPoint());
+    if (row >= 0) {
+      final AutomataTableModel model = getModel();
+      return model.getAutomaton(row);
+    } else {
+      return null;
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class TextCellRenderer
+  /**
+   * A text renderer for the simulator's automata table. This renderer
+   * displays text without the focus rectangle, and changes the font to bold
+   * if the automaton is open on the simulator's desktop.
+   */
+  private class TextCellRenderer extends DefaultTableCellRenderer
+  {
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    @Override
+    public Component getTableCellRendererComponent(final JTable table,
+                                                   final Object value,
+                                                   final boolean selected,
+                                                   final boolean focused,
+                                                   final int row,
+                                                   final int column)
+    {
+      final Component cell =
+        super.getTableCellRendererComponent(table, value, selected, false,
+                                            row, column);
+      return cell;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 2739259938102695664L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class IconCellRenderer
   private class IconCellRenderer extends DefaultTableCellRenderer
   {
     //#######################################################################
@@ -169,26 +210,26 @@ class AutomataTable extends JTable
 
   //#########################################################################
   //# Inner Class TableHeaderMouseListener
-  private class TableHeaderMouseListener extends MouseAdapter
+  private class TableMouseListener extends MouseAdapter
   {
     //#######################################################################
     //# Interface java.awt.event.MouseListener
     @Override
     public void mouseClicked(final MouseEvent event)
     {
-      if (event.getButton() == MouseEvent.BUTTON1) {
-        final JTableHeader header = getTableHeader();
-        @SuppressWarnings("unused")
-        final int column = header.columnAtPoint(event.getPoint());
-        @SuppressWarnings("unused")
-        final AutomataTableModel model = getModel();
-        //model.addSortingMethod(column);
+      if (event.getButton() == MouseEvent.BUTTON1
+          && event.getClickCount() == 2) {
+        final AutomatonProxy aut = getAutomaton(event);
+        if (aut != null) {
+          mParent.displaySelectedAutomata(aut);
+        }
       }
     }
   }
 
   //#########################################################################
   //# Data Members
+  final WatersAnalyzerPanel mParent;
 
   //#########################################################################
   //# Class Constants
