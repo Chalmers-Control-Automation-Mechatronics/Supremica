@@ -111,7 +111,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Configuration
   /**
    * Enables or disables reordering of states based on distance to decision
-   * states. This experimental optimisation by Fanqian Qiu only works with
+   * states. This experimental optimisation by Fangqian Qiu only works with
    * supervisor localisation, i.e., when a supervised event is configured.
    * Otherwise, the setting has no effect.
    * @param experimentalMode <CODE>true</CODE> to enable reordering.
