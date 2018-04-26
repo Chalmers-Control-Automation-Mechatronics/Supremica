@@ -180,9 +180,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           //map this successorCompatible to its index in our list of compatibles
           int successorState = 0;
           for (; successorState < supervisorSize; successorState++) {
-            if (successorState == state) { continue; }
+            //if (successorState == state) { continue; }
             final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
-            if (successorCompatible.containsAll(mReducedSupervisor.get(successorCompatibleIndex))) { break; }
+            if (mReducedSupervisor.get(successorCompatibleIndex).containsAll(successorCompatible)) {
+              break;
+            }
           }
 
           //TODO: do I need to add a dump state and have transitions to it from each state for each event in the original automaton that's not enabled by that state?
@@ -213,7 +215,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       transitionBuffer.addOutgoingTransitions(relation);
 
       //TODO: change to true
-      return false;
+      return true;
     }
   }
 
