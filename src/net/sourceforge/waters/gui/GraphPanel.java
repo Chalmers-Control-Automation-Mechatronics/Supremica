@@ -89,6 +89,7 @@ public class GraphPanel
     mGraph = graph;
     mModule = module;
     mModuleContext = context;
+    registerSupremicaPropertyChangeListeners();
   }
 
 
@@ -175,6 +176,12 @@ public class GraphPanel
 
   //#########################################################################
   //# Repaint Support
+  public void close()
+  {
+    mShapeProducer.close();
+    unregisterSupremicaPropertyChangeListeners();
+  }
+
   public void registerSupremicaPropertyChangeListeners()
   {
     Config.GUI_EDITOR_BACKGROUND_COLOR.addPropertyChangeListener(this);
@@ -195,6 +202,7 @@ public class GraphPanel
   @Override
   public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
+    setBackground(Config.GUI_EDITOR_BACKGROUND_COLOR.get());
     getShapeProducer().clear();
     repaint();
   }

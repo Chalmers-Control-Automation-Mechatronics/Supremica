@@ -100,10 +100,10 @@ public class ColorProperty
     (final Component comp)
   {
     comp.setBackground(mValue);
-    final SupremicaPropertyChangeListener Listener =
+    final SupremicaPropertyChangeListener listener =
       new BackgroundListener(comp);
-    addPropertyChangeListener(Listener);
-    return Listener;
+    addPropertyChangeListener(listener);
+    return listener;
   }
 
 

@@ -33,18 +33,18 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.util.Map;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
+import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.gui.renderer.RenderingContext;
+import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -56,58 +56,34 @@ import org.supremica.gui.ide.ModuleContainer;
 public class AutomatonDisplayPane extends BackupGraphPanel
 {
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public AutomatonDisplayPane(final AutomatonProxy aut,
                               final GraphSubject graph,
-                              final ModuleContainer container)
+                              final WatersAnalyzerPanel parent)
     throws GeometryAbsentException
   {
-    super(graph, container.getModule());
-    mAutomaton = aut;
-    mContainer = container;
-    @SuppressWarnings("unused")
+    super(graph, parent.getModule());
+    mParent = parent;
+    final ModuleContainer container = parent.getModuleContainer();
     final ModuleSubject module = container.getModule();
-    //final RenderingContext context = new RenderingCon
-    final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
+    final RenderingContext renderingContext = createRenderingContext();
+    final Map<Object,SourceInfo> infoMap = container.getSourceInfoMap();
+    final SimpleExpressionCompiler compiler = parent.getSimpleExpressionCompiler();
     final SourceInfo info = infoMap.get(aut);
-    //final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
-    @SuppressWarnings("unused")
     final BindingContext bindings = info.getBindingContext();
-    //final ProxyShapeProducer producer =
-    //  new SubjectShapeProducer(graph, module, context, compiler, bindings);
-    //setShapeProducer(producer);
-    final int width;
-    final int height;
-    final float scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
-    if (ensureGeometryExists()) {
-      // Spring embedder is running, guessing window size ...
-      final int numStates = aut.getStates().size();
-      width = height = Math.round(scaleFactor * (128 + 32 * numStates));
-    } else {
-      final Rectangle2D imageRect = getMinimumBoundingRectangle();
-      width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
-      height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
-    }
-    setPreferredSize(new Dimension(width, height));
+    final ProxyShapeProducer producer =
+      new SubjectShapeProducer(graph, module, renderingContext, compiler, bindings);
+    setShapeProducer(producer);
   }
+
 
   //#########################################################################
   //# Simple Access
-  public Rectangle2D getMinimumBoundingRectangle()
+  public ModuleContainer getModuleContainer()
   {
-    return getShapeProducer().getMinimumBoundingRectangle();
+    return mParent.getModuleContainer();
   }
 
-  public AutomatonProxy getAutomaton()
-  {
-    return mAutomaton;
-  }
-
-  @Override
-  public void close()
-  {
-    super.close();
-  }
 
   //#########################################################################
   //# Painting and Transforming
@@ -116,6 +92,7 @@ public class AutomatonDisplayPane extends BackupGraphPanel
   {
   }
 
+  /*
   @Override
   protected AffineTransform createTransform()
   {
@@ -130,61 +107,23 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     transform.translate(-imageRect.getX(), -imageRect.getY());
     return transform;
   }
+  */
 
-
-  //#########################################################################
-  //# Inner Class RenderingStatus
-  @SuppressWarnings("unused")
-  private static class RenderingStatus
+  protected RenderingContext createRenderingContext()
   {
-    //#######################################################################
-    //# Constructor
-    private RenderingStatus(final Proxy proxy)
-    {
-      mCount = 1;
-      mAutomatonItem = proxy;
-    }
-
-    //#######################################################################
-    //# Simple Access
-
-    private int getCount()
-    {
-      return mCount;
-    }
-
-    private Proxy getAutomatonItem()
-    {
-      return mAutomatonItem;
-    }
-
-    private void addStatus(final boolean active, final boolean enabled)
-    {
-      mCount++;
-      mAutomatonItem = null;
-    }
-
-    //#######################################################################
-    //# Data Members
-    /**
-     * The number of automaton transitions compiled from this graph element.
-     * This is used when generating tooltips, to identify a label as an
-     * &quot;event group&quot;.
-     */
-    private int mCount;
-    /**
-     * The unique item in the automaton corresponding to this graph element,
-     * or <CODE>null</CODE> if more than one item has been created from it.
-     */
-    private Proxy mAutomatonItem;
+    final ModuleContainer container = getModuleContainer();
+    final ModuleContext moduleContext = container.getModuleContext();
+    return new ModuleRenderingContext(moduleContext);
   }
+
 
   //#########################################################################
   //# Data Members
-  private final AutomatonProxy mAutomaton;
-  private final ModuleContainer mContainer;
+  private final WatersAnalyzerPanel mParent;
+
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 3795116331859621382L;
+
 }

@@ -100,8 +100,6 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class AutomatonDisplayPane
@@ -109,7 +107,7 @@ public class AutomatonDisplayPane
   implements SimulationObserver
 {
   //#########################################################################
-  //# Constructors
+  //# Constructor
   public AutomatonDisplayPane(final AutomatonProxy aut,
                               final GraphSubject graph,
                               final ModuleContainer container,
@@ -147,14 +145,11 @@ public class AutomatonDisplayPane
       height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
     }
     setPreferredSize(new Dimension(width, height));
-    mBackgroundListener =
-      Config.GUI_EDITOR_BACKGROUND_COLOR.addBackgroundListener(this);
     sim.attach(this);
     final MouseHandler handler = new MouseHandler();
     addMouseListener(handler);
     addMouseMotionListener(handler);
     addComponentListener(new ResizeHandler());
-    registerSupremicaPropertyChangeListeners();
   }
 
 
@@ -255,8 +250,6 @@ public class AutomatonDisplayPane
   @Override
   public void close()
   {
-    Config.GUI_EDITOR_BACKGROUND_COLOR.
-      removePropertyChangeListener(mBackgroundListener);
     mSim.detach(this);
     super.close();
   }
@@ -861,7 +854,6 @@ public class AutomatonDisplayPane
   private final ModuleContainer mContainer;
   private final DisplayPanePopupFactory mPopupFactory;
   private final GraphToolTipVisitor mToolTipVisitor;
-  private final SupremicaPropertyChangeListener mBackgroundListener;
 
   private Proxy mFocusedItem;
   private Map<Proxy,RenderingStatus> mRenderingStatusMap;

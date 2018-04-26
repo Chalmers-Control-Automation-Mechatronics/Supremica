@@ -44,9 +44,14 @@ import javax.swing.JTable;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
@@ -56,20 +61,24 @@ import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
+/**
+ * @author George Hewlett
+ */
+
 public class WatersAnalyzerPanel extends MainPanel
 {
 
+  //#########################################################################
+  //# Constructor
   public WatersAnalyzerPanel(final ModuleContainer moduleContainer,
                              final String name)
   {
     super(name);
     mModuleContainer = moduleContainer;
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
-    //try {
-    //  mAutomataDisplayPane = new AutomatonDisplayPane(null,null,mModuleContainer);
-    //} catch (final GeometryAbsentException exception) {
-    //  exception.printStackTrace();
-    //}
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
@@ -77,7 +86,28 @@ public class WatersAnalyzerPanel extends MainPanel
     setRightComponent(mAutomataPanel);
   }
 
-  public void displaySelectedAutomata(final AutomatonProxy aut)
+
+  //#########################################################################
+  //# Simple Access
+  ModuleContainer getModuleContainer()
+  {
+    return mModuleContainer;
+  }
+
+  ModuleSubject getModule()
+  {
+    return mModuleContainer.getModule();
+  }
+
+  SimpleExpressionCompiler getSimpleExpressionCompiler()
+  {
+    return mSimpleExpressionCompiler;
+  }
+
+
+  //#########################################################################
+  //# Callbacks
+  void displaySelectedAutomata(final AutomatonProxy aut)
   {
     final Map<Object,SourceInfo> infomap =
       mModuleContainer.getSourceInfoMap();
@@ -86,8 +116,7 @@ public class WatersAnalyzerPanel extends MainPanel
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
       final GraphSubject graph = comp.getGraph();
       try {
-        mAutomataDisplayPane =
-          new AutomatonDisplayPane(aut, graph, mModuleContainer);
+        mAutomataDisplayPane = new AutomatonDisplayPane(aut, graph, this);
         setRightComponent(mAutomataDisplayPane);
       } catch (final GeometryAbsentException exception) {
         final Logger logger = LogManager.getLogger();
@@ -97,11 +126,19 @@ public class WatersAnalyzerPanel extends MainPanel
     }
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final ModuleContainer mModuleContainer;
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+
   private final JPanel mAutomataPanel = new JPanel();
   private final JTable mAutomataTable;
-  @SuppressWarnings("unused")
   private AutomatonDisplayPane mAutomataDisplayPane;
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = 8731351995076903210L;
+
 }
