@@ -45,6 +45,7 @@ import javax.swing.JTable;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -109,14 +110,18 @@ public class WatersAnalyzerPanel extends MainPanel
   //# Callbacks
   void displaySelectedAutomata(final AutomatonProxy aut)
   {
-    final Map<Object,SourceInfo> infomap =
+    final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
-    final Proxy source = infomap.get(aut).getSourceObject();
+    final SourceInfo info = infoMap.get(aut);
+    final Proxy source = info.getSourceObject();
     if (source instanceof SimpleComponentSubject) {
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
       final GraphSubject graph = comp.getGraph();
+      final BindingContext bindings = info.getBindingContext();
       try {
-        mAutomataDisplayPane = new AutomatonDisplayPane(aut, graph, this);
+        mAutomataDisplayPane =
+          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                                   mSimpleExpressionCompiler);
         setRightComponent(mAutomataDisplayPane);
       } catch (final GeometryAbsentException exception) {
         final Logger logger = LogManager.getLogger();

@@ -52,6 +52,7 @@ import javax.swing.plaf.basic.BasicInternalFrameUI;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -68,16 +69,18 @@ public class AutomatonInternalFrame
 
   //#########################################################################
   //# Constructor
-  public AutomatonInternalFrame(final AutomatonProxy aut,
-                                final GraphSubject graph,
-                                final AutomatonDesktopPane parent,
+  public AutomatonInternalFrame(final GraphSubject graph,
+                                final AutomatonProxy aut,
+                                final BindingContext bindings,
                                 final ModuleContainer container,
-                                final Simulation sim)
+                                final Simulation sim,
+                                final AutomatonDesktopPane parent)
     throws GeometryAbsentException
   {
     super(aut.getName(), true, true, false, true);
     mParent = parent;
-    mDisplayPane = new AutomatonDisplayPane(aut, graph, container, sim, this);
+    mDisplayPane =
+      new AutomatonDisplayPane(graph, aut, bindings, container, sim, this);
     setContentPane(mDisplayPane);
     addComponentListener(new PreserveAspectComponentListener());
     setVisible(true);

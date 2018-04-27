@@ -34,7 +34,6 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import java.awt.Graphics;
-import java.util.Map;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -45,8 +44,6 @@ import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
@@ -57,20 +54,16 @@ public class AutomatonDisplayPane extends BackupGraphPanel
 {
   //#########################################################################
   //# Constructor
-  public AutomatonDisplayPane(final AutomatonProxy aut,
-                              final GraphSubject graph,
-                              final WatersAnalyzerPanel parent)
+  public AutomatonDisplayPane(final GraphSubject graph,
+                              final BindingContext bindings,
+                              final ModuleContainer container,
+                              final SimpleExpressionCompiler compiler)
     throws GeometryAbsentException
   {
-    super(graph, parent.getModule());
-    mParent = parent;
-    final ModuleContainer container = parent.getModuleContainer();
+    super(graph, container.getModule());
+    mModuleContainer = container;
     final ModuleSubject module = container.getModule();
     final RenderingContext renderingContext = createRenderingContext();
-    final Map<Object,SourceInfo> infoMap = container.getSourceInfoMap();
-    final SimpleExpressionCompiler compiler = parent.getSimpleExpressionCompiler();
-    final SourceInfo info = infoMap.get(aut);
-    final BindingContext bindings = info.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, renderingContext, compiler, bindings);
     setShapeProducer(producer);
@@ -81,7 +74,7 @@ public class AutomatonDisplayPane extends BackupGraphPanel
   //# Simple Access
   public ModuleContainer getModuleContainer()
   {
-    return mParent.getModuleContainer();
+    return mModuleContainer;
   }
 
 
@@ -92,34 +85,16 @@ public class AutomatonDisplayPane extends BackupGraphPanel
   {
   }
 
-  /*
-  @Override
-  protected AffineTransform createTransform()
-  {
-    final ProxyShapeProducer producer = getShapeProducer();
-    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
-    final Dimension panelSize = getSize();
-    final double scaleX = panelSize.getWidth() / imageRect.getWidth();
-    final double scaleY = panelSize.getHeight() / imageRect.getHeight();
-    final double min = Math.min(scaleX, scaleY);
-    final AffineTransform transform = new AffineTransform();
-    transform.scale(min, min);
-    transform.translate(-imageRect.getX(), -imageRect.getY());
-    return transform;
-  }
-  */
-
   protected RenderingContext createRenderingContext()
   {
-    final ModuleContainer container = getModuleContainer();
-    final ModuleContext moduleContext = container.getModuleContext();
+    final ModuleContext moduleContext = mModuleContainer.getModuleContext();
     return new ModuleRenderingContext(moduleContext);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final WatersAnalyzerPanel mParent;
+  private final ModuleContainer mModuleContainer;
 
 
   //#########################################################################

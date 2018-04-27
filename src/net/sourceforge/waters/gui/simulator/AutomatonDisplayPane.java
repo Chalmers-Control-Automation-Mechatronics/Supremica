@@ -108,8 +108,9 @@ public class AutomatonDisplayPane
 {
   //#########################################################################
   //# Constructor
-  public AutomatonDisplayPane(final AutomatonProxy aut,
-                              final GraphSubject graph,
+  public AutomatonDisplayPane(final GraphSubject graph,
+                              final AutomatonProxy aut,
+                              final BindingContext bindings,
                               final ModuleContainer container,
                               final Simulation sim,
                               final AutomatonInternalFrame parent)
@@ -124,10 +125,7 @@ public class AutomatonDisplayPane
     mFocusedItem = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
-    final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(aut);
     final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
-    final BindingContext bindings = info.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
     mPopupFactory = new DisplayPanePopupFactory(sim, this);
