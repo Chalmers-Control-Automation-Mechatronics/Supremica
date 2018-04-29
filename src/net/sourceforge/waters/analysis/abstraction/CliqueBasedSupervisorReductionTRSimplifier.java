@@ -93,7 +93,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     //mNumProperEvents = rel.getNumberOfProperEvents();
 
-    final int dumpState = rel.getDumpStateIndex();
+    mDumpStateIndex = rel.getDumpStateIndex();
     final int supervisedEvent = getSupervisedEvent();
 
     mNumStates = rel.getNumberOfStates();
@@ -115,7 +115,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final int successorState = getSuccessorState(s, supervisedEvent);
       if (successorState == -1) {
         stateOutputs[s] = StateOutput.IGNORE;
-      } else if (successorState == dumpState) {
+      } else if (successorState == mDumpStateIndex) {
         stateOutputs[s] = StateOutput.DISABLE;
       } else {
         stateOutputs[s] = StateOutput.ENABLE;
@@ -139,9 +139,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       reduce(initialCompatible);
     }
 
-    if (mReducedSupervisor.size() == mNumStates) {
+    //account for the dump state which is included in the initial automaton but not in our compatibles
+    if (mReducedSupervisor.size() + 1 >= mNumStates) {
       return false;
     }
+
     else {
       //we managed to reduce the supervisor
       final int supervisorSize = mReducedSupervisor.size();
@@ -179,11 +181,18 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
           //map this successorCompatible to its index in our list of compatibles
           int successorState = 0;
-          for (; successorState < supervisorSize; successorState++) {
-            //if (successorState == state) { continue; }
-            final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
-            if (mReducedSupervisor.get(successorCompatibleIndex).containsAll(successorCompatible)) {
-              break;
+
+          //map the dump state to a special state index
+          if (successorCompatible.size() == 1 && successorCompatible.contains(mDumpStateIndex)) {
+            successorState = supervisorSize;
+          }
+          else {
+            for (; successorState < supervisorSize; successorState++) {
+              //if (successorState == state) { continue; }
+              final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
+              if (mReducedSupervisor.get(successorCompatibleIndex).containsAll(successorCompatible)) {
+                break;
+              }
             }
           }
 
@@ -191,11 +200,16 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           transitionBuffer.addTransition(state, event, successorState);
         }
       }
-
       final ListBufferTransitionRelation relation = getTransitionRelation();
       final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
-      relation.reset(supervisorSize, transitionBuffer.size(),  getPreferredInputConfiguration());
+
+      //explicitly identify the dump state
+      relation.reset(supervisorSize + 1, supervisorSize, transitionBuffer.size(), getPreferredInputConfiguration());
       relation.setInitial(0, true);
+
+      relation.removeRedundantPropositions();
+      relation.removeEvent(EventEncoding.TAU);
+      transitionBuffer.addOutgoingTransitions(relation);
 
       for (int state = 0; state < supervisorSize; state++) {
         final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
@@ -210,11 +224,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         relation.setAllMarkings(state, newStateMarkings);
       }
 
-      relation.removeRedundantPropositions();
-      relation.removeEvent(EventEncoding.TAU);
-      transitionBuffer.addOutgoingTransitions(relation);
+      relation.removeProperSelfLoopEvents();
 
-      //TODO: change to true
       return true;
     }
   }
@@ -307,7 +318,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final TIntList possibleInclusions = new TIntArrayList();
     //start with all the states as possible inclusions to BronKerbosch
     for (int s = 0; s < mNumStates; s++) {
-      possibleInclusions.add(s);
+        possibleInclusions.add(s);
     }
 
     //keep restricting the possible inclusions to just include neighbours of states in the compatible
@@ -465,28 +476,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  /*private TIntList getPredecessorStates(final int source, final int event) {
-    final TransitionIterator predecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
-    predecessorIterator.reset(source, event);
-
-    final TIntList predecessors = new TIntArrayList();
-    while (predecessorIterator.advance()) {
-      predecessors.add(predecessorIterator.getCurrentTargetState());
-    }
-    return predecessors;
-  }*/
-
-  /*private TIntList getPredecessorEvents(final int source) {
-    final TransitionIterator predecessorIterator = getTransitionRelation().createPredecessorsReadOnlyIterator();
-    predecessorIterator.resetState(source);
-
-    final TIntList predecessorEvents = new TIntArrayList();
-    while (predecessorIterator.advance()) {
-      predecessorEvents.add(predecessorIterator.getCurrentEvent());
-    }
-    return predecessorEvents;
-  }*/
-
   private TIntList getSuccessorEvents(final int source) {
     final TransitionIterator successorIterator = getTransitionRelation().createSuccessorsReadOnlyIterator();
     successorIterator.resetState(source);
@@ -508,6 +497,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //#########################################################################
   //# Data Members
   private int mNumProperEvents;
+  private int mDumpStateIndex;
   private boolean[][] mIncompatibilityRelation;
   private TreeSet<Integer> mInitialCompatible;
   private int mNumStates;
