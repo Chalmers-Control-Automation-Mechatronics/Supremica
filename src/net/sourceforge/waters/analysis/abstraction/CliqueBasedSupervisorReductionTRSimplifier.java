@@ -159,6 +159,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //in doing so, we build up a transition relation. We will use the index of the compatible in mReducedSupervisor to denote its index in the transition buffer
       //however we want the initial state to have index 0 so we will offset all values by that amount
       final PreTransitionBuffer transitionBuffer = new PreTransitionBuffer(mNumProperEvents);
+      boolean hasExplicitDumpState = false;
 
       for (int state = 0; state < supervisorSize; state++) {
         final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
@@ -185,6 +186,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           //map the dump state to a special state index
           if (successorCompatible.size() == 1 && successorCompatible.contains(mDumpStateIndex)) {
             successorState = supervisorSize;
+            hasExplicitDumpState = true;
           }
           else {
             for (; successorState < supervisorSize; successorState++) {
@@ -205,6 +207,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
       //explicitly identify the dump state
       relation.reset(supervisorSize + 1, supervisorSize, transitionBuffer.size(), getPreferredInputConfiguration());
+      //set the dump state as reachable only if there is actually a transition to it from our cliques
+      relation.setReachable(supervisorSize, hasExplicitDumpState);
+
       relation.setInitial(0, true);
 
       relation.removeRedundantPropositions();
