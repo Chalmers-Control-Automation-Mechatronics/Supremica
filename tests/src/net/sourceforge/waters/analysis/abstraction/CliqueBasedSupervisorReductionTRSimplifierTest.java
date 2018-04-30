@@ -39,8 +39,6 @@ import junit.framework.TestSuite;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -92,8 +90,7 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
                                               final AutomatonProxy aut)
     throws OverflowException
   {
-    final KindTranslator translator = IdenticalKindTranslator.getInstance();
-    final EventEncoding encoding = new EventEncoding(aut, translator);
+    final EventEncoding encoding = super.createEventEncoding(des, aut);
     encoding.sortProperEvents((byte) ~EventStatus.STATUS_LOCAL,
                               (byte) ~EventStatus.STATUS_CONTROLLABLE);
     return encoding;

@@ -2204,7 +2204,8 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * @param event
    *          The ID of the event to be tested.
    * @return <CODE>true</CODE> if the given event is selflooped in every
-   *         state, and appears on no other transitions.
+   *         reachable state except for the dump state, and appears on no
+   *         other transitions.
    */
   public boolean isProperSelfloopEvent(final int event)
   {
@@ -2217,8 +2218,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
       throw createNoBufferException();
     }
     final int numStates = getNumberOfStates();
+    final int dump = getDumpStateIndex();
     for (int state = 0; state < numStates; state++) {
-      if (isReachable(state)) {
+      if (isReachable(state) && state != dump) {
         iter.reset(state, event);
         if (iter.advance()) {
           do {
@@ -2237,23 +2239,26 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   /**
    * Determines whether the given event is selflooped in all non-deadlock
    * states of this transition relation. A deadlock state is a state that is
-   * not marked and has no outgoing transitions. This method uses the
-   * successor transition buffer to check for outgoing transitions and can
-   * only be called if the transition relation is configured for successors.
+   * not marked and has no outgoing transitions, including the dump state.
+   * This method uses the successor transition buffer to check for outgoing
+   * transitions and can only be called if the transition relation is
+   * configured for successors.
    * @param event
    *          The ID of the event to be tested.
    * @param prop
    *          The proposition to determine whether a state is marked.
    *          If the transition relation does not use this proposition,
-   *          then there are no deadlock states; otherwise states marked
-   *          with this proposition cannot be deadlock states.
+   *          then the dump state is the only deadlock state; otherwise states
+   *          marked with this proposition cannot be deadlock states.
    * @return <CODE>true</CODE> if the given event appears on at least one
    *         transition and is selflooped in every non-deadlock state,
    *         and appears on no other transitions.
    */
   public boolean isProperSelfloopEvent(final int event, final int prop)
   {
-    if (mSuccessorBuffer != null) {
+    if (!isPropositionUsed(prop)) {
+      return isProperSelfloopEvent(event);
+    } else if (mSuccessorBuffer != null) {
       final TransitionIterator iter = mSuccessorBuffer.createReadOnlyIterator();
       final int numStates = getNumberOfStates();
       boolean hasTransition = false;
@@ -2571,8 +2576,9 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   /**
    * Attempts to simplify the automaton by removing redundant selfloop events.
    * This method searches for any non-tau events that appear only as selfloops
-   * and are selflooped in all states of the transition relation, marks such
-   * events as unused, and removes the selfloops from the transition relation.
+   * and are selflooped in all states of the transition relation except for
+   * the dump state, marks such events as unused, and removes the selfloops
+   * from the transition relation.
    *
    * @return <CODE>true</CODE> if at least one event was removed,
    *         <CODE>false</CODE> otherwise.
@@ -2603,8 +2609,8 @@ public class ListBufferTransitionRelation implements EventStatusProvider
    * @param prop
    *          The proposition to determine whether a state is marked.
    *          If the transition relation does not use this proposition,
-   *          then there are no deadlock states; otherwise states marked
-   *          with this proposition cannot be deadlock states.
+   *          then the only deadlock state is the dump state; otherwise states
+   *          marked with this proposition cannot be deadlock states.
    * @return <CODE>true</CODE> if at least one event was removed,
    *         <CODE>false</CODE> otherwise.
    */
