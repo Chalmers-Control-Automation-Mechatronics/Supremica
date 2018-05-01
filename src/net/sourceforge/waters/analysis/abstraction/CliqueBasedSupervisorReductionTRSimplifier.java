@@ -240,16 +240,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     compatibles.add(initialCompatible);
     final Deque<SortedSet<Integer>> dependents = getNeighboursOf(initialCompatible);
     final Deque<SortedSet<Integer>> uncoveredDependents = getUncoveredCompatibles(dependents, compatibles);
-    reduce(compatibles, uncoveredDependents);
+
+    if (compatibles.size() + uncoveredDependents.size() < mReducedSupervisor.size()) {
+      reduce(compatibles, uncoveredDependents);
+    }
   }
 
   private void reduce(final List<SortedSet<Integer>> currentSolution, final Deque<SortedSet<Integer>> compatibleDependencies) {
-    if (currentSolution.size() >= mReducedSupervisor.size()) {
-      return;
-    }
+    //we can assume our solution is not worst than the current best if we get here
 
     if (compatibleDependencies.isEmpty()) {
-      //if we got here we know our solution is better
+    //if we got here we know our solution is better than the current best
       mReducedSupervisor = currentSolution;
       return;
     }
@@ -276,7 +277,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final Deque<SortedSet<Integer>> newCompatibleDependencies = new ArrayDeque<>(compatibleDependencies);
       newCompatibleDependencies.addAll(getUncoveredCompatibles(dependents, coverSet));
 
-      reduce(newSolution, newCompatibleDependencies);
+      if (newSolution.size() + newCompatibleDependencies.size() < mReducedSupervisor.size()) {
+        reduce(newSolution, newCompatibleDependencies);
+      }
     }
   }
 
