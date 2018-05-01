@@ -191,7 +191,7 @@ public abstract class AbstractTRCompositionalVerifier
       }
       final long stop = System.currentTimeMillis();
       result.setCounterExample(trace);
-      result.setCounterExampleTime(stop -start);
+      result.setCounterExampleTime(stop - start);
       return trace;
     } else {
       return null;
