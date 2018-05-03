@@ -116,11 +116,11 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     case 1:
       return String.class;
     case 2:
-      return int.class;
+      return Integer.class;
     case 3:
-      return int.class;
+      return Integer.class;
     case 4:
-      return int.class;
+      return Integer.class;
     default:
       throw new ArrayIndexOutOfBoundsException("Bad column number for markings table model!");
     }

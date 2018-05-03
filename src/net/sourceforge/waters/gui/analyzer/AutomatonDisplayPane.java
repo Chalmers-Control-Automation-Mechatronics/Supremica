@@ -63,7 +63,8 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     super(graph, container.getModule());
     mModuleContainer = container;
     final ModuleSubject module = container.getModule();
-    final RenderingContext renderingContext = createRenderingContext();
+    final ModuleContext moduleContext = container.getModuleContext();
+    final RenderingContext renderingContext = new ModuleRenderingContext(moduleContext);
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, renderingContext, compiler, bindings);
     setShapeProducer(producer);
