@@ -47,7 +47,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
@@ -235,16 +234,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private void reduce(final Compatible initialCompatible) {
-    final List<Compatible> compatibles = new ArrayList<Compatible>();
-    compatibles.add(initialCompatible);
+    final List<Compatible> currentSolution = new ArrayList<Compatible>();
+    currentSolution.add(initialCompatible);
 
     final Deque<Compatible> dependents = new ArrayDeque<>();
     getSuccessorCompatiblesOf(initialCompatible, dependents);
 
-    final Deque<Compatible> uncoveredDependents = getUncoveredCompatibles(dependents, compatibles);
+    final Deque<Compatible> uncoveredDependents = new ArrayDeque<>();
+    fillUncoveredCompatibles(dependents, currentSolution, uncoveredDependents);
 
-    if (compatibles.size() + uncoveredDependents.size() < mReducedSupervisor.size()) {
-      reduce(compatibles, uncoveredDependents);
+    if (currentSolution.size() + uncoveredDependents.size() < mReducedSupervisor.size()) {
+      reduce(currentSolution, uncoveredDependents);
     }
   }
 
@@ -264,6 +264,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     final Collection<Compatible> dependents = new ArrayDeque<>();
     final Collection<Compatible> coverSet = new ArrayList<>();
+
     for (final Iterator<Compatible> coversIterator = covers.iterator(); coversIterator.hasNext();) {
       //try to add this cover of the the compatible we want to add
       final Compatible cover = coversIterator.next();
@@ -281,7 +282,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       coverSet.addAll(newSolution);
 
       final Deque<Compatible> newCompatibleDependencies = new ArrayDeque<>(compatibleDependencies);
-      newCompatibleDependencies.addAll(getUncoveredCompatibles(dependents, coverSet));
+      fillUncoveredCompatibles(dependents, coverSet, newCompatibleDependencies);
 
       if (newSolution.size() + newCompatibleDependencies.size() < mReducedSupervisor.size()) {
         reduce(newSolution, newCompatibleDependencies);
@@ -294,7 +295,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private List<Compatible> BronKerbosch(final Compatible clique, final TIntList possibleInclusions, final TIntList alreadyChecked, final List<Compatible> cliques) {
-    //if we have exhausted all possibilities, we have no more work to do
+    //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleInclusions.isEmpty() && alreadyChecked.isEmpty()) {
       //add this maximal clique
       cliques.add(clique);
@@ -306,7 +307,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     for (final TIntIterator inclusionIterator = originalPossibleInclusions.iterator(); inclusionIterator.hasNext();) {
       final int vertex = inclusionIterator.next();
-      final TIntList neighbours = getNeighboursOf(vertex);
 
       //create a copy with the new vertex
       final Compatible newClique = new Compatible(clique);
@@ -393,9 +393,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private Deque<Compatible> getUncoveredCompatibles(final Collection<Compatible> candidates, final Collection<Compatible> existingCompatibles) {
-    //use a linked hashset to retain order and ensure no duplicates are found
-    final LinkedHashSet<Compatible> uncoveredCompatibles = new LinkedHashSet<>();
+  private void fillUncoveredCompatibles(final Collection<Compatible> candidates, final Collection<Compatible> existingCompatibles, final Collection<Compatible> uncoveredCompatibles) {
     for (final Iterator<Compatible> candidateIterator = candidates.iterator(); candidateIterator.hasNext();) {
       final Compatible candidate = candidateIterator.next();
       boolean isCovered = false;
@@ -409,7 +407,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         uncoveredCompatibles.add(candidate);
       }
     }
-    return new ArrayDeque<Compatible>(uncoveredCompatibles);
   }
 
   private void getEnabledEventsOf(final Compatible compatible, final TIntSet eventSetToFill) {
