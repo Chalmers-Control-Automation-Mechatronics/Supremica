@@ -1,23 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="Diag_2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="notDiag_10" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Test for diagnosability check.
 
-Diagnosable.
+Not diagnosable.
 
 Nicholas Mcgrath
-
 </ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
-        <EventDecl Kind="CONTROLLABLE" Name="c"/>
-        <EventDecl Kind="CONTROLLABLE" Name="d"/>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="f">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="FAULT" Value="1"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="e"/>
+        <EventDecl Kind="CONTROLLABLE" Name="c"/>
+        <EventDecl Kind="CONTROLLABLE" Name="d"/>
     </EventDeclList>
     <ComponentList>
         <SimpleComponent Kind="PLANT" Name="diag">
@@ -25,7 +23,7 @@ Nicholas Mcgrath
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point X="96" Y="192"/>
+                            <Point X="64" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -33,7 +31,7 @@ Nicholas Mcgrath
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point X="192" Y="112"/>
+                            <Point X="160" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -41,7 +39,7 @@ Nicholas Mcgrath
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point X="192" Y="256"/>
+                            <Point X="272" Y="128"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -49,7 +47,7 @@ Nicholas Mcgrath
                     </SimpleNode>
                     <SimpleNode Name="S3">
                         <PointGeometry>
-                            <Point X="320" Y="112"/>
+                            <Point X="160" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -57,31 +55,7 @@ Nicholas Mcgrath
                     </SimpleNode>
                     <SimpleNode Name="S4">
                         <PointGeometry>
-                            <Point X="320" Y="256"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S5">
-                        <PointGeometry>
-                            <Point X="448" Y="112"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S6">
-                        <PointGeometry>
-                            <Point X="448" Y="256"/>
-                        </PointGeometry>
-                        <LabelGeometry Anchor="NW">
-                            <Point X="0" Y="10"/>
-                        </LabelGeometry>
-                    </SimpleNode>
-                    <SimpleNode Name="S7">
-                        <PointGeometry>
-                            <Point X="576" Y="112"/>
+                            <Point X="272" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="0" Y="10"/>
@@ -91,65 +65,50 @@ Nicholas Mcgrath
                 <EdgeList>
                     <Edge Source="S0" Target="S1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="f"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="S0" Target="S2">
-                        <LabelBlock>
                             <SimpleIdentifier Name="a"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="S2" Target="S4">
+                    <Edge Source="S1" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="b"/>
                         </LabelBlock>
                     </Edge>
                     <Edge Source="S1" Target="S3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="a"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="S3" Target="S5">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="b"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-10" Y="11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="S4" Target="S5">
-                        <LabelBlock>
                             <SimpleIdentifier Name="f"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="10" Y="2"/>
+                                <Point X="-18" Y="-10"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="S4" Target="S6">
+                    <Edge Source="S3" Target="S4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="c"/>
+                            <SimpleIdentifier Name="b"/>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="S5" Target="S7">
+                    <Edge Source="S4" Target="S4">
                         <LabelBlock>
                             <SimpleIdentifier Name="c"/>
-                        </LabelBlock>
-                    </Edge>
-                    <Edge Source="S7" Target="S7">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="e"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="2" Y="-15"/>
+                                <Point X="11" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="S6" Target="S6">
+                    <Edge Source="S2" Target="S2">
                         <LabelBlock>
                             <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="7" Y="-11"/>
+                                <Point X="5" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                    </Edge>
+                    <Edge Source="S3" Target="S3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="f"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="165" Y="3"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>

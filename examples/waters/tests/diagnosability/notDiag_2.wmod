@@ -14,7 +14,7 @@ C. Cassandras, S. Lafortune. Introduction to Discrete Event Systems.</ns2:Commen
         <EventDecl Kind="CONTROLLABLE" Name="g"/>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="ed">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="FAILURE 1"/>
+                <ns2:Attribute Name="FAULT" Value="1"/>
             </ns2:AttributeMap>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="u"/>
