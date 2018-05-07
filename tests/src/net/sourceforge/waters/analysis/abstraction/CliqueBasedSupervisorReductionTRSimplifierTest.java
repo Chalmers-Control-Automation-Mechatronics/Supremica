@@ -191,5 +191,4 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
     test_supred_01();
     test_supred_01();
   }
-
 }

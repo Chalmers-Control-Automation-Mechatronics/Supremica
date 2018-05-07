@@ -47,4 +47,95 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   {
     junit.textui.TestRunner.run(suite());
   }
+
+  @Override
+  public void testCatMouseUnsup1() throws Exception
+  {
+  }
+
+  @Override
+  public void testCatMouseUnsup2() throws Exception
+  {
+  }
+
+  @Override
+  public void testTrafficlights() throws Exception
+  {
+
+  }
+
+  @Override
+  public void testTransferLine2() throws Exception
+  {
+  }
+
+  @Override
+  public void testTransferLine3() throws Exception
+  {
+  }
+
+  @Override
+  public void test2LinkAltBatch() throws Exception
+  {
+  }
+
+  @Override
+  public void testDosingUnit() throws Exception
+  {
+  }
+
+  @Override
+  public void testCell() throws Exception
+  {
+  }
+
+  @Override
+  public void testCellSwitch() throws Exception
+  {
+  }
+
+  @Override
+  public void testIPC() throws Exception
+  {
+  }
+
+  @Override
+  public void testIPCcswitch() throws Exception
+  {
+  }
+
+  @Override
+  public void testIPClswitch() throws Exception
+  {
+  }
+
+  @Override
+  public void testIPCuswicth() throws Exception
+  {
+  }
+
+  @Override
+  public void testTictactoe() throws Exception
+  {
+  }
+
+  @Override
+  public void testCT3() throws Exception
+  {
+  }
+
+  @Override
+  public void testRobotAssemblyCell() throws Exception
+  {
+  }
+
+  @Override
+  public void test2LinkAlt() throws Exception
+  {
+  }
+
+  @Override
+  public void testManufacturingSystem() throws Exception
+  {
+  }
 }

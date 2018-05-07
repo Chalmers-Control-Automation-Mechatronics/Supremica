@@ -45,8 +45,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
@@ -58,6 +58,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * @author Jordan Schroder
+ */
+/**
+ * @author Pwnbot
  */
 public class CliqueBasedSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
@@ -98,7 +101,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mNumProperEvents = rel.getNumberOfProperEvents();
     final StateOutput[] stateOutputs = new StateOutput[mNumStates];
     mInitialCompatible = new Compatible();
-    mReducedSupervisor = new ArrayList<>();
+    mReducedSupervisor = new ParetoCompatibleSet();
 
     for (int s = 0; s < mNumStates; s++) {
       //set the reduced supervisor to the current set of states
@@ -134,7 +137,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final List<Compatible> initialCompatibles = getCoversOf(mInitialCompatible);
     for (final Compatible initialCompatible : initialCompatibles) {
-      reduce(initialCompatible);
+      final ParetoCompatibleSet dependencies = new ParetoCompatibleSet();
+      dependencies.add(initialCompatible);
+      reduce(new ParetoCompatibleSet(), dependencies);
     }
 
     //account for the dump state which is included in the initial automaton but not in our compatibles
@@ -144,12 +149,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     else {
       //we managed to reduce the supervisor
-      final int supervisorSize = mReducedSupervisor.size();
+
+      final Compatible[] reducedSupervisor = mReducedSupervisor.toArray();
+      final int supervisorSize = reducedSupervisor.length;
+
       //we have the set of compatibles, now we need to construct a new automaton based off them
       //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
       int startStateIndexOffset = 0;
       for (; startStateIndexOffset < supervisorSize; startStateIndexOffset++) {
-        final Compatible currentCompatible = mReducedSupervisor.get(startStateIndexOffset);
+        final Compatible currentCompatible = reducedSupervisor[startStateIndexOffset];
         if (currentCompatible.containsAll(mInitialCompatible)) { break; }
       }
 
@@ -162,7 +170,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
       for (int state = 0; state < supervisorSize; state++) {
         final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
-        final Compatible compatible = mReducedSupervisor.get(compatibleIndex);
+        final Compatible compatible = reducedSupervisor[compatibleIndex];
 
         //get the union of all events among the compatible's states (from the original automaton definition)
         enabledEvents.clear();
@@ -191,7 +199,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           else {
             for (; successorState < supervisorSize; successorState++) {
               final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
-              if (mReducedSupervisor.get(successorCompatibleIndex).containsAll(successorCompatible)) {
+              if (reducedSupervisor[successorCompatibleIndex].containsAll(successorCompatible)) {
                 break;
               }
             }
@@ -210,13 +218,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
       relation.setInitial(0, true);
 
+      transitionBuffer.addOutgoingTransitions(relation);
       relation.removeRedundantPropositions();
       relation.removeEvent(EventEncoding.TAU);
-      transitionBuffer.addOutgoingTransitions(relation);
+      relation.removeProperSelfLoopEvents();
 
       for (int state = 0; state < supervisorSize; state++) {
         final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
-        final Compatible compatible = mReducedSupervisor.get(compatibleIndex);
+        final Compatible compatible = reducedSupervisor[compatibleIndex];
         long newStateMarkings = relation.createMarkings();
 
         for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
@@ -227,28 +236,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         relation.setAllMarkings(state, newStateMarkings);
       }
 
-      relation.removeProperSelfLoopEvents();
-
       return true;
     }
   }
 
-  private void reduce(final Compatible initialCompatible) {
-    final List<Compatible> currentSolution = new ArrayList<Compatible>();
-    currentSolution.add(initialCompatible);
-
-    final Deque<Compatible> dependents = new ArrayDeque<>();
-    getSuccessorCompatiblesOf(initialCompatible, dependents);
-
-    final Deque<Compatible> uncoveredDependents = new ArrayDeque<>();
-    fillUncoveredCompatibles(dependents, currentSolution, uncoveredDependents);
-
-    if (currentSolution.size() + uncoveredDependents.size() < mReducedSupervisor.size()) {
-      reduce(currentSolution, uncoveredDependents);
-    }
-  }
-
-  private void reduce(final List<Compatible> currentSolution, final Deque<Compatible> compatibleDependencies) {
+  private void reduce(final ParetoCompatibleSet currentSolution, final ParetoCompatibleSet compatibleDependencies) {
     //we can assume our solution is not worst than the current best if we get here
 
     if (compatibleDependencies.isEmpty()) {
@@ -263,8 +255,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final List<Compatible> covers = getCoversOf(nextCompatible);
 
     final Collection<Compatible> dependents = new ArrayDeque<>();
-    final Collection<Compatible> coverSet = new ArrayList<>();
-
     for (final Iterator<Compatible> coversIterator = covers.iterator(); coversIterator.hasNext();) {
       //try to add this cover of the the compatible we want to add
       final Compatible cover = coversIterator.next();
@@ -274,15 +264,18 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       getSuccessorCompatiblesOf(cover, dependents);
 
       //copy the current solution and add the candidate
-      final List<Compatible> newSolution = new ArrayList<Compatible>(currentSolution);
+      final ParetoCompatibleSet newSolution = new ParetoCompatibleSet(currentSolution);
       newSolution.add(cover);
 
-      coverSet.clear();
-      coverSet.addAll(compatibleDependencies);
-      coverSet.addAll(newSolution);
+      final ParetoCompatibleSet newCompatibleDependencies = new ParetoCompatibleSet(compatibleDependencies);
 
-      final Deque<Compatible> newCompatibleDependencies = new ArrayDeque<>(compatibleDependencies);
-      fillUncoveredCompatibles(dependents, coverSet, newCompatibleDependencies);
+      for (final Iterator<Compatible> dependentIterator = dependents.iterator(); dependentIterator.hasNext();) {
+        final Compatible dependent = dependentIterator.next();
+        //if this compatible isn't dominated by anything in the archive, attempt to add it to the updated list of dependents
+        if (newSolution.undominatedByAll(dependent)) {
+          newCompatibleDependencies.add(dependent);
+        }
+      }
 
       if (newSolution.size() + newCompatibleDependencies.size() < mReducedSupervisor.size()) {
         reduce(newSolution, newCompatibleDependencies);
@@ -334,13 +327,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private List<Compatible> getCoversOf(final Compatible compatible) {
+
     final TIntList possibleInclusions = new TIntArrayList();
+
     if (compatible.size() > 0) {
+
+      //find neighbours of the first state in the compatible - we know possibleInclusions must contain a subset of these in the end since we are taking intersections
       final TIntList neighbours = getNeighboursOf(compatible.iterator().next());
       for (final TIntIterator neighbourIterator = neighbours.iterator(); neighbourIterator.hasNext();) {
         final int neighbour = neighbourIterator.next();
+
+        //skip the first compatible because we have dealt with it above
         final TIntIterator stateIterator = compatible.iterator();
         stateIterator.next();
+
         boolean allNeighbours = true;
         while (stateIterator.hasNext()) {
           final int state = stateIterator.next();
@@ -393,22 +393,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void fillUncoveredCompatibles(final Collection<Compatible> candidates, final Collection<Compatible> existingCompatibles, final Collection<Compatible> uncoveredCompatibles) {
-    for (final Iterator<Compatible> candidateIterator = candidates.iterator(); candidateIterator.hasNext();) {
-      final Compatible candidate = candidateIterator.next();
-      boolean isCovered = false;
-      for (final Iterator<Compatible> existingCompatibleIterator = existingCompatibles.iterator(); existingCompatibleIterator.hasNext() && !isCovered;) {
-        final Compatible existingCompatible = existingCompatibleIterator.next();
-        if (existingCompatible.containsAll(candidate)) {
-          isCovered = true;
-        }
-      }
-      if (!isCovered) {
-        uncoveredCompatibles.add(candidate);
-      }
-    }
-  }
-
   private void getEnabledEventsOf(final Compatible compatible, final TIntSet eventSetToFill) {
     //get the union of enabled events across states in the compatible
     final TIntList successorEvents = new TIntArrayList();
@@ -419,64 +403,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private class Compatible {
-    private final TIntSet stateSet;
-
-    public Compatible() {
-      stateSet = new TIntHashSet();
-    }
-
-    public Compatible(final Compatible existingCompatible) {
-      this();
-      stateSet.addAll(existingCompatible.stateSet);
-    }
-
-    public boolean add(final int state) {
-      return stateSet.add(state);
-    }
-
-    public boolean contains(final int state) {
-      return stateSet.contains(state);
-    }
-
-    public boolean containsAll(final Compatible otherCompatible) {
-      return stateSet.containsAll(otherCompatible.stateSet);
-    }
-
-    public int size() {
-      return stateSet.size();
-    }
-
-    public TIntIterator iterator() {
-      return stateSet.iterator();
-    }
-
-    @Override
-    public boolean equals(final Object obj)
-    {
-      if (obj == null || getClass() != obj.getClass()) {
-        return false;
-      }
-
-      final Compatible otherCompatible = (Compatible)obj;
-      return stateSet.equals(otherCompatible.stateSet);
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return  347 * stateSet.hashCode();
-    }
-
-    @Override
-    public String toString()
-    {
-      final int[] sortedStateBuffer = new int[stateSet.size()];
-      stateSet.toArray(sortedStateBuffer);
-      Arrays.sort(sortedStateBuffer);
-      return sortedStateBuffer.toString();
-    }
-  }
 
   private boolean[][] getIncompatibilityRelation(final StateOutput[] stateOutputs) {
     //to avoid having to loop through the entire matrix to assume each state pair is compatible,
@@ -572,6 +498,161 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
+
+  private class Compatible {
+    private final TIntSet stateSet;
+
+    public Compatible() {
+      stateSet = new TIntHashSet();
+    }
+
+    public Compatible(final Compatible existingCompatible) {
+      this();
+      stateSet.addAll(existingCompatible.stateSet);
+    }
+
+    public boolean add(final int state) {
+      return stateSet.add(state);
+    }
+
+    public boolean contains(final int state) {
+      return stateSet.contains(state);
+    }
+
+    public boolean containsAll(final Compatible otherCompatible) {
+      return stateSet.containsAll(otherCompatible.stateSet);
+    }
+
+    public int size() {
+      return stateSet.size();
+    }
+
+    public TIntIterator iterator() {
+      return stateSet.iterator();
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+      if (obj == null || getClass() != obj.getClass()) {
+        return false;
+      }
+
+      final Compatible otherCompatible = (Compatible)obj;
+      return stateSet.equals(otherCompatible.stateSet);
+    }
+
+    @Override
+    public int hashCode()
+    {
+      return  419 * stateSet.hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+      //always display in sorted order
+      final int[] sortedStateBuffer = new int[stateSet.size()];
+      stateSet.toArray(sortedStateBuffer);
+      Arrays.sort(sortedStateBuffer);
+      return Arrays.toString(sortedStateBuffer);
+    }
+  }
+
+  private class ParetoCompatibleSet {
+    private final LinkedHashSet<Compatible> archive;
+
+    public ParetoCompatibleSet() {
+      archive = new LinkedHashSet<>();
+    }
+
+    public ParetoCompatibleSet(final ParetoCompatibleSet compatibleSet) {
+      this();
+      if (compatibleSet != null) {
+        archive.addAll(compatibleSet.archive);
+      }
+    }
+
+    public int size() {
+      return archive.size();
+    }
+
+    public boolean isEmpty() {
+      return archive.isEmpty();
+    }
+
+    public Iterator<Compatible> iterator() {
+      return archive.iterator();
+    }
+
+    public Compatible pop() {
+      final Iterator<Compatible> iterator = iterator();
+      if (iterator.hasNext()) {
+        final Compatible popped = iterator.next();
+        iterator.remove();
+        return popped;
+      }
+      return null;
+    }
+
+    public boolean add(final Compatible applicant) {
+      if (size() == 0) {
+        archive.add(applicant);
+        return true;
+      }
+
+      if (!undominatedByAll(applicant)) { return false; }
+
+      //not dominated by any existing members, we want to add it.
+      //now kick out any members the applicant dominates
+      for (final Iterator<Compatible> compatibleIterator = iterator(); compatibleIterator.hasNext();) {
+        if (dominates(applicant, compatibleIterator.next())) { compatibleIterator.remove(); }
+      }
+
+      archive.add(applicant);
+      return true;
+    }
+
+    public boolean undominatedByAll(final Compatible x) {
+      for (final Iterator<Compatible> compatibleIterator = iterator(); compatibleIterator.hasNext();) {
+        if (dominates(compatibleIterator.next(), x)) { return false; }
+      }
+      return true;
+    }
+
+    public Compatible[] toArray() {
+      return archive.toArray(new Compatible[archive.size()]);
+    }
+
+    private boolean dominates(final Compatible x, final Compatible y) {
+      return x.containsAll(y);
+    }
+
+    @Override
+    public boolean equals(final Object obj)
+    {
+      if (obj == null || getClass() != obj.getClass()) {
+        return false;
+      }
+
+      final ParetoCompatibleSet otherSet = (ParetoCompatibleSet)obj;
+      return archive.equals(otherSet.archive);
+    }
+
+    @Override
+    public int hashCode()
+    {
+      return 547 * archive.hashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+      final Compatible[] compatibleBuffer = new Compatible[size()];
+      return Arrays.toString(archive.toArray(compatibleBuffer));
+    }
+  }
+
   private enum StateOutput {
     ENABLE,
     DISABLE,
@@ -585,5 +666,5 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private boolean[][] mIncompatibilityRelation;
   private Compatible mInitialCompatible;
   private int mNumStates;
-  private List<Compatible> mReducedSupervisor;
+  private ParetoCompatibleSet mReducedSupervisor;
 }
