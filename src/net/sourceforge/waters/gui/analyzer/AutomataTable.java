@@ -37,10 +37,16 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -51,14 +57,20 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.transfer.InsertInfo;
+import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTable extends JTable
+class AutomataTable extends JTable implements SelectionOwner
 {
 
   //#########################################################################
@@ -67,12 +79,12 @@ class AutomataTable extends JTable
                 final WatersAnalyzerPanel Parent)
   {
     super(new AutomataTableModel(ModContainer));
-    //mModuleContainer = ModContainer;
+    mModuleContainer = ModContainer;
     //mCompiledDES = mModuleContainer.getCompiledDES();
     mParent = Parent;
     final TableCellRenderer textRenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textRenderer);
-    setDefaultRenderer(int.class, textRenderer);
+    setDefaultRenderer(Integer.class, textRenderer);
     final TableCellRenderer iconRenderer = new IconCellRenderer();
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
@@ -228,8 +240,211 @@ class AutomataTable extends JTable
   }
 
   //#########################################################################
+  //# Copy and Paste methods
+  @Override
+  public void attach(final Observer o)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void detach(final Observer o)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void fireEditorChangedEvent(final EditorChangedEvent e)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public UndoInterface getUndoInterface(final Action action)
+  {
+    // TODO Auto-generated method stub
+
+    return null;
+  }
+
+  @Override
+  public boolean hasNonEmptySelection()
+  {
+    // TODO Auto-generated method stub
+    return getSelectedRow() > 0;
+  }
+
+  @Override
+  public boolean canSelectMore()
+  {
+    // TODO Auto-generated method stub
+    return getSelectedRowCount() < getRowCount();
+  }
+
+  @Override
+  public boolean isSelected(final Proxy proxy)
+  {
+    // TODO Auto-generated method stub
+    final String name = proxy.getClass().getName();
+    if (getSelectedRowCount() != 0) {
+      for (int i = 0; i < getSelectedRowCount(); i++) {
+        final Object o = getValueAt(getSelectedRows()[i], 1);
+        if (name.equalsIgnoreCase(o.toString()))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public List<? extends Proxy> getCurrentSelection()
+  {
+    // TODO Auto-generated method stub
+    //final List<? extends Proxy> output = new ArrayList<Proxy>();
+    //for(final int i : this.getSelectedRows()) {
+    //   //mModuleContainer.getCompiledDES().getAutomata().
+    //}
+    return null;
+  }
+
+  @Override
+  public List<? extends Proxy> getAllSelectableItems()
+  {
+    // TODO Auto-generated method stub
+    return this.getAllSelectableItems();
+  }
+
+  @Override
+  public Proxy getSelectionAnchor()
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Proxy getSelectableAncestor(final Proxy item)
+  {
+    // TODO Auto-generated method stub
+    return this.getSelectionAnchor();
+  }
+
+  @Override
+  public void clearSelection(final boolean propagate)
+  {
+    // TODO Auto-generated method stub
+    if(propagate) {
+      clearSelection();
+    }
+  }
+
+  @Override
+  public void replaceSelection(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addToSelection(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+    final List<Proxy> addingList = new ArrayList<Proxy>();
+    for (final Proxy p : items) {
+      boolean existsAlready = false;
+      for (final int i : getSelectedRows()) {
+        if (this.getValueAt(i, 1).toString()
+          .equalsIgnoreCase(p.getClass().getName())) {
+          existsAlready = true;
+          break;
+        }
+      }
+      if(!existsAlready) {
+        addingList.add(p);
+      }
+    }
+    addToSelection(addingList);
+  }
+
+  @Override
+  public void removeFromSelection(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public boolean canPaste(final Transferable transferable)
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public List<InsertInfo> getInsertInfo(final Transferable transferable)
+    throws IOException, UnsupportedFlavorException
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean canDelete(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void insertItems(final List<InsertInfo> inserts)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void deleteItems(final List<InsertInfo> deletes)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void scrollToVisible(final List<? extends Proxy> items)
+  {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void activate()
+  {
+    // TODO Auto-generated method stub
+    requestFocusInWindow();
+  }
+
+  @Override
+  public void close()
+  {
+    // TODO Auto-generated method stub
+    //final AutomataTableModel model = (AutomataTableModel) getModel();
+    //model.Close();
+
+  }
+
+  //#########################################################################
   //# Data Members
   final WatersAnalyzerPanel mParent;
+  final ModuleContainer mModuleContainer;
 
   //#########################################################################
   //# Class Constants

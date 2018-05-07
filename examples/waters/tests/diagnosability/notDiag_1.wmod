@@ -14,7 +14,7 @@ T.Yoo, S.Lafortune. Polynomial-Time Verification of Diagnosability of Partially 
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="f">
             <ns2:AttributeMap>
-                <ns2:Attribute Name="FAILURE 1"/>
+                <ns2:Attribute Name="FAULT" Value="1"/>
             </ns2:AttributeMap>
         </EventDecl>
     </EventDeclList>

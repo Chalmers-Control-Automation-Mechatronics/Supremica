@@ -81,10 +81,11 @@ public class WatersAnalyzerPanel extends MainPanel
     mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
     scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
-    setRightComponent(mAutomataPanel);
+    setRightComponent(scrollDisplay);
   }
 
 
@@ -122,7 +123,8 @@ public class WatersAnalyzerPanel extends MainPanel
         mAutomataDisplayPane =
           new AutomatonDisplayPane(graph, bindings, mModuleContainer,
                                    mSimpleExpressionCompiler);
-        setRightComponent(mAutomataDisplayPane);
+        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+        setRightComponent(scroll);
       } catch (final GeometryAbsentException exception) {
         final Logger logger = LogManager.getLogger();
         final String msg = exception.getMessage(comp);
