@@ -81,6 +81,11 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     return mAutomataList.get(index);
   }
 
+  List<AutomatonProxy> getAutomatonList()
+  {
+    return mAutomataList;
+  }
+
   int getIndex(final AutomatonProxy aut)
   {
     for (int looper = 0; looper < this.getRowCount(); looper++) {

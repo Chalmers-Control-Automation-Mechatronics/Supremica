@@ -62,8 +62,10 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -156,6 +158,26 @@ class AutomataTable extends JTable implements SelectionOwner
     } else {
       return null;
     }
+  }
+
+  private boolean containsEqualIdentifier(final Proxy proxy)
+  {
+    /*
+     * final AutomataTableModel model = getModel();
+    if (proxy instanceof IdentifierSubject) {
+      final IdentifierSubject ident = (IdentifierSubject) proxy;
+      return model.containsEqualIdentifier(ident);
+    } else if (proxy instanceof IdentifierProxy) {
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      final IdentifierSubject ident =
+        (IdentifierSubject) cloner.getClone(proxy);
+      return model.containsEqualIdentifier(ident);
+    } else {
+      return false;
+    }
+    */
+    return false;
   }
 
 
@@ -266,120 +288,127 @@ class AutomataTable extends JTable implements SelectionOwner
   public UndoInterface getUndoInterface(final Action action)
   {
     // TODO Auto-generated method stub
-
-    return null;
+    return mModuleContainer;
   }
 
   @Override
   public boolean hasNonEmptySelection()
   {
-    // TODO Auto-generated method stub
     return getSelectedRow() > 0;
   }
 
   @Override
   public boolean canSelectMore()
   {
-    // TODO Auto-generated method stub
     return getSelectedRowCount() < getRowCount();
   }
 
   @Override
   public boolean isSelected(final Proxy proxy)
   {
-    // TODO Auto-generated method stub
-    final String name = proxy.getClass().getName();
-    if (getSelectedRowCount() != 0) {
-      for (int i = 0; i < getSelectedRowCount(); i++) {
-        final Object o = getValueAt(getSelectedRows()[i], 1);
-        if (name.equalsIgnoreCase(o.toString()))
-          return true;
-      }
+    if(proxy instanceof AutomatonProxy) {
+      final AutomatonProxy aut = (AutomatonProxy) proxy;
+      final AutomataTableModel model = getModel();
+      return this.isRowSelected(model.getIndex(aut));
     }
     return false;
   }
 
   @Override
-  public List<? extends Proxy> getCurrentSelection()
+  public List<AutomatonProxy> getCurrentSelection()
   {
-    // TODO Auto-generated method stub
-    //final List<? extends Proxy> output = new ArrayList<Proxy>();
-    //for(final int i : this.getSelectedRows()) {
-    //   //mModuleContainer.getCompiledDES().getAutomata().
-    //}
-    return null;
+    final AutomataTableModel model = getModel();
+    final List<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    for(final int i : this.getSelectedRows()) {
+       output.add(model.getAutomaton(i));
+    }
+    return output;
   }
 
   @Override
-  public List<? extends Proxy> getAllSelectableItems()
+  public List<AutomatonProxy> getAllSelectableItems()
   {
-    // TODO Auto-generated method stub
-    return this.getAllSelectableItems();
+    final AutomataTableModel model = getModel();
+    return model.getAutomatonList();
   }
 
   @Override
-  public Proxy getSelectionAnchor()
+  public AutomatonProxy getSelectionAnchor()
   {
-    // TODO Auto-generated method stub
-    return null;
+    final AutomataTableModel model = getModel();
+    return model.getAutomaton(this.getSelectedRow());
   }
 
   @Override
   public Proxy getSelectableAncestor(final Proxy item)
   {
-    // TODO Auto-generated method stub
-    return this.getSelectionAnchor();
+    return item;
   }
 
   @Override
   public void clearSelection(final boolean propagate)
   {
-    // TODO Auto-generated method stub
-    if(propagate) {
-      clearSelection();
-    }
+     clearSelection();
   }
 
   @Override
   public void replaceSelection(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
+    clearSelection();
+    this.addToSelection(items);
 
   }
 
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
-    final List<Proxy> addingList = new ArrayList<Proxy>();
-    for (final Proxy p : items) {
-      boolean existsAlready = false;
-      for (final int i : getSelectedRows()) {
-        if (this.getValueAt(i, 1).toString()
-          .equalsIgnoreCase(p.getClass().getName())) {
-          existsAlready = true;
-          break;
-        }
-      }
-      if(!existsAlready) {
-        addingList.add(p);
+    final AutomataTableModel model = getModel();
+    for(final Proxy p : items) {
+      if(p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        final int position = model.getIndex(aut);
+        addRowSelectionInterval(position, position);
       }
     }
-    addToSelection(addingList);
   }
 
   @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
-
+    final AutomataTableModel model = getModel();
+    for(final Proxy p : items) {
+      if(p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        final int position = model.getIndex(aut);
+        removeRowSelectionInterval(position, position);
+      }
+    }
   }
 
   @Override
   public boolean canPaste(final Transferable transferable)
   {
     // TODO Auto-generated method stub
-    return false;
+    try {
+      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+        @SuppressWarnings("unchecked")
+        final List<Proxy> data =
+          (List<Proxy>) transferable
+            .getTransferData(WatersDataFlavor.IDENTIFIER);
+        for (final Proxy proxy : data) {
+          if (!containsEqualIdentifier(proxy)) {
+            return true;
+          }
+        }
+        return false;
+      } else {
+        return false;
+      }
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final UnsupportedFlavorException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
   @Override
@@ -394,6 +423,16 @@ class AutomataTable extends JTable implements SelectionOwner
   public boolean canDelete(final List<? extends Proxy> items)
   {
     // TODO Auto-generated method stub
+    final AutomataTableModel model = getModel();
+    for(final Proxy p : items) {
+      if(p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        if((model.getIndex(aut) != -1))
+          return true;
+        else
+          return false;
+      }
+    }
     return false;
   }
 
@@ -436,8 +475,9 @@ class AutomataTable extends JTable implements SelectionOwner
   public void close()
   {
     // TODO Auto-generated method stub
-    //final AutomataTableModel model = (AutomataTableModel) getModel();
+    //final AutomataTableModel model = getModel();
     //model.Close();
+
 
   }
 

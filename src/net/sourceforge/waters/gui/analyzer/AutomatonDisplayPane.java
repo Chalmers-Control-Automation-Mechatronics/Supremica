@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -42,8 +44,10 @@ import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 
@@ -57,7 +61,8 @@ public class AutomatonDisplayPane extends BackupGraphPanel
   public AutomatonDisplayPane(final GraphSubject graph,
                               final BindingContext bindings,
                               final ModuleContainer container,
-                              final SimpleExpressionCompiler compiler)
+                              final SimpleExpressionCompiler compiler,
+                              final AutomatonProxy aut)
     throws GeometryAbsentException
   {
     super(graph, container.getModule());
@@ -68,6 +73,19 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, renderingContext, compiler, bindings);
     setShapeProducer(producer);
+    final int width;
+    final int height;
+    final float scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
+    if (ensureGeometryExists()) {
+      // Spring embedder is running, guessing window size ...
+      final int numStates = aut.getStates().size();
+      width = height = Math.round(scaleFactor * (128 + 32 * numStates));
+    } else {
+      final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
+      width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
+      height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
+    }
+    setPreferredSize(new Dimension(width, height));
   }
 
 

@@ -122,7 +122,7 @@ public class WatersAnalyzerPanel extends MainPanel
       try {
         mAutomataDisplayPane =
           new AutomatonDisplayPane(graph, bindings, mModuleContainer,
-                                   mSimpleExpressionCompiler);
+                                   mSimpleExpressionCompiler, aut);
         final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
         setRightComponent(scroll);
       } catch (final GeometryAbsentException exception) {
