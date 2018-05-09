@@ -219,6 +219,13 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
+  public void testBigFactory3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory_3.wmod");
+    runSynthesizer(des, true);
+  }
+
   public void testCatMouse() throws Exception
   {
     final ProductDESProxy des =
