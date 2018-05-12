@@ -69,6 +69,10 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  * <P>Each file should contain a Waters module (<CODE>.wmod</CODE> extension)
  * or a Waters product DES (<CODE>.wdes</CODE> extension).
  *
+ * <P>You are welcome to edit this file,
+ * but please <STRONG>do not change</STRONG> the way how the main class
+ * communicates with the {@link BDDControllabilityChecker} class.</P>
+ *
  * @author Robi Malik
  */
 
@@ -97,6 +101,8 @@ public class BDDControllabilityMain
   public static void main(final String[] args)
   {
     try {
+      QuietLogConfigurationFactory.install();
+
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final ProductDESProxyFactory desFactory =

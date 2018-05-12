@@ -104,6 +104,8 @@ public class ConflictMain
   public static void main(final String[] args)
   {
     try {
+      QuietLogConfigurationFactory.install();
+
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final ProductDESProxyFactory desFactory =
