@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -336,7 +336,10 @@ class AutomataTable extends JTable implements SelectionOwner
   public AutomatonProxy getSelectionAnchor()
   {
     final AutomataTableModel model = getModel();
-    return model.getAutomaton(this.getSelectedRow());
+    if(this.getSelectedRow() != -1)
+      return model.getAutomaton(this.getSelectedRow());
+    else
+      return null;
   }
 
   @Override

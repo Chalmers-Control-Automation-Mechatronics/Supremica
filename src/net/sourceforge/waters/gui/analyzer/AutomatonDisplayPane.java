@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
@@ -44,6 +45,8 @@ import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
+import net.sourceforge.waters.gui.springembedder.EmbedderEvent.EmbedderEventType;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
@@ -65,29 +68,20 @@ public class AutomatonDisplayPane extends BackupGraphPanel
                               final AutomatonProxy aut)
     throws GeometryAbsentException
   {
+
     super(graph, container.getModule());
     mModuleContainer = container;
     final ModuleSubject module = container.getModule();
     final ModuleContext moduleContext = container.getModuleContext();
-    final RenderingContext renderingContext = new ModuleRenderingContext(moduleContext);
+    final RenderingContext renderingContext =
+      new ModuleRenderingContext(moduleContext);
     final ProxyShapeProducer producer =
-      new SubjectShapeProducer(graph, module, renderingContext, compiler, bindings);
+      new SubjectShapeProducer(graph, module, renderingContext, compiler,
+                               bindings);
     setShapeProducer(producer);
-    final int width;
-    final int height;
-    final float scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
-    if (ensureGeometryExists()) {
-      // Spring embedder is running, guessing window size ...
-      final int numStates = aut.getStates().size();
-      width = height = Math.round(scaleFactor * (128 + 32 * numStates));
-    } else {
-      final Rectangle2D imageRect = getShapeProducer().getMinimumBoundingRectangle();
-      width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
-      height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
-    }
-    setPreferredSize(new Dimension(width, height));
+    if (!ensureGeometryExists())
+      adjustSize();
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -96,6 +90,17 @@ public class AutomatonDisplayPane extends BackupGraphPanel
     return mModuleContainer;
   }
 
+  void adjustSize()
+  {
+    final int width;
+    final int height;
+    final float scaleFactor = IconAndFontLoader.GLOBAL_SCALE_FACTOR;
+    final Rectangle2D imageRect =
+      getShapeProducer().getMinimumBoundingRectangle();
+    width = (int) Math.ceil(scaleFactor * imageRect.getWidth());
+    height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
+    setPreferredSize(new Dimension(width, height));
+  }
 
   //#########################################################################
   //# Painting and Transforming
@@ -104,17 +109,39 @@ public class AutomatonDisplayPane extends BackupGraphPanel
   {
   }
 
+  @Override
+  protected AffineTransform createTransform()
+  {
+    final ProxyShapeProducer producer = getShapeProducer();
+    final Rectangle2D imageRect = producer.getMinimumBoundingRectangle();
+    final AffineTransform transform = new AffineTransform();
+    transform.scale(IconAndFontLoader.GLOBAL_SCALE_FACTOR,
+                    IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+    transform.translate(-imageRect.getX(), -imageRect.getY());
+    return transform;
+  }
+
   protected RenderingContext createRenderingContext()
   {
     final ModuleContext moduleContext = mModuleContainer.getModuleContext();
     return new ModuleRenderingContext(moduleContext);
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.springembedder.EmbedderObserver
+  @Override
+  public void embedderChanged(final EmbedderEvent event)
+  {
+    super.embedderChanged(event);
+    if (event.getType() == EmbedderEventType.EMBEDDER_STOP) {
+      adjustSize();
+      revalidate();
+    }
+  }
 
   //#########################################################################
   //# Data Members
   private final ModuleContainer mModuleContainer;
-
 
   //#########################################################################
   //# Class Constants
