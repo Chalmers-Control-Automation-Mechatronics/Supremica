@@ -201,9 +201,13 @@
         <include
            name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
         <include
+           name="net/sourceforge/waters/analysis/comp552/AbstractCounterExampleChecker.class"/>
+        <include
            name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.class"/>
         <include
            name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.class"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/QuietLogConfigurationFactory.class"/>
       </fileset>
     </jar>
   </target>

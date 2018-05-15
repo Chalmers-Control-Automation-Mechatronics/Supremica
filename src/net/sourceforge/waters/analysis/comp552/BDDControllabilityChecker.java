@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -39,6 +39,7 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -52,6 +53,18 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>The {@link #run()} method of this model checker does nothing,
  * and simply claims that every model is controllable.</P>
+ *
+ * <P>You are welcome to edit this file as much as you like,
+ * but please <STRONG>do not change</STRONG> the public interface.
+ * Do not change the signature of the constructor,
+ * or of the {@link #run()} or {@link #getCounterExample()} methods.
+ * You should expect a single constructor call, followed by several calls
+ * to {@link #run()} and {@link #getCounterExample()}, so your code needs
+ * to be reentrant.</P>
+ *
+ * <P><STRONG>WARNING:</STRONG> If you do not comply with these rules, the
+ * automatic tester may fail to run your program, resulting in 0 marks for
+ * your assignment.</P>
  *
  * @see ModelChecker
  *
