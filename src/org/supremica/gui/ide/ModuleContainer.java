@@ -140,6 +140,17 @@ public class ModuleContainer
   //# Overrides for Abstract Base Class
   //# org.supremica.gui.ide.DocumentContainer
   @Override
+  public UndoInterface getActiveUndoInterface()
+  {
+    final MainPanel panel = getActivePanel();
+    if (panel != null && panel instanceof EditorPanel) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public boolean hasUnsavedChanges()
   {
     return mUndoIndex != mUndoCheckPoint;

@@ -39,6 +39,7 @@ import java.awt.Component;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 
@@ -76,6 +77,17 @@ public abstract class DocumentContainer
 
   //#########################################################################
   //# To be Overridden by Subclasses
+  /**
+   * Gets the current undo interface.
+   * @return  An undo interface that can be used to send commands to the
+   *          edited document, or <CODE>null</CODE> if no editor panel is
+   *          currently active.
+   */
+  public UndoInterface getActiveUndoInterface()
+  {
+    return null;
+  }
+
   boolean hasUnsavedChanges()
   {
     return false;
