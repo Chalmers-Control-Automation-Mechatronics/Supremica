@@ -38,6 +38,7 @@ import java.awt.event.MouseEvent;
 import java.util.Collection;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
@@ -67,6 +68,8 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
+
 
 class GraphPopupFactory
   extends PopupFactory
@@ -75,16 +78,17 @@ class GraphPopupFactory
   //#########################################################################
   //# Constructor
   GraphPopupFactory(final WatersPopupActionManager master,
-                    final EditorWindowInterface editor)
+                    final ComponentEditorPanel editor)
   {
     super(master);
     mVisitor = new GraphPopupVisitor();
-    mEditorWindowInterface = editor;
+    mComponentEditorPanel = editor;
   }
 
 
   //#########################################################################
   //# Shared Menu Items
+  @Override
   protected void addDefaultMenuItems()
   {
     final WatersPopupActionManager master = getMaster();
@@ -97,6 +101,7 @@ class GraphPopupFactory
     super.addDefaultMenuItems();
   }
 
+  @Override
   protected void addItemSpecificMenuItems(final Proxy proxy)
   {
     try {
@@ -106,6 +111,7 @@ class GraphPopupFactory
     }
   }
 
+  @Override
   protected void addCommonMenuItems()
   {
     super.addCommonMenuItems();
@@ -127,6 +133,7 @@ class GraphPopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    @Override
     public Object visitProxy(final Proxy proxy)
     {
       addPropertiesAndDeleteMenuItems(proxy);
@@ -135,6 +142,7 @@ class GraphPopupFactory
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    @Override
     public Object visitEdgeProxy(final EdgeProxy edge)
     {
       visitProxy(edge);
@@ -147,6 +155,7 @@ class GraphPopupFactory
       return null;
     }
 
+    @Override
     public Object visitGuardActionBlockProxy(final GuardActionBlockProxy block)
     {
       final WatersPopupActionManager master = getMaster();
@@ -160,6 +169,7 @@ class GraphPopupFactory
       return null;
     }
 
+    @Override
     public Object visitLabelBlockProxy(final LabelBlockProxy block)
     {
       final WatersPopupActionManager master = getMaster();
@@ -176,6 +186,7 @@ class GraphPopupFactory
       return null;
     }
 
+    @Override
     public Object visitLabelGeometryProxy(final LabelGeometryProxy geo)
     {
       final LabelGeometrySubject subject = (LabelGeometrySubject) geo;
@@ -183,6 +194,7 @@ class GraphPopupFactory
       return visitSimpleNodeProxy(node);
     }
 
+    @Override
     public Object visitSimpleNodeProxy(final SimpleNodeProxy node)
     {
       visitProxy(node);
@@ -217,9 +229,9 @@ class GraphPopupFactory
         }
       }
       final ModuleWindowInterface root =
-        mEditorWindowInterface.getModuleWindowInterface();
+        mComponentEditorPanel.getModuleWindowInterface();
       final ModuleContext context = root.getModuleContext();
-      final GraphEventPanel epanel = mEditorWindowInterface.getEventPanel();
+      final GraphEventPanel epanel = mComponentEditorPanel.getEventPanel();
       final EventTableModel emodel = (EventTableModel) epanel.getModel();
       for (int row = 0; row < emodel.getRowCount(); row++) {
         final IdentifierSubject ident = emodel.getIdentifier(row);
@@ -256,6 +268,6 @@ class GraphPopupFactory
   //#######################################################################
   //# Data Members
   private final ModuleProxyVisitor mVisitor;
-  private final EditorWindowInterface mEditorWindowInterface;
+  private final ComponentEditorPanel mComponentEditorPanel;
 
 }

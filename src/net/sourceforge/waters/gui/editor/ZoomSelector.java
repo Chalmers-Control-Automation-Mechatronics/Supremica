@@ -46,7 +46,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -117,7 +116,7 @@ public class ZoomSelector
       final Object item = event.getItem();
        if (item instanceof ZoomOption) {
         final ZoomOption option = (ZoomOption) item;
-        final EditorWindowInterface iface = mIDE.getActiveEditorWindowInterface();
+        final ComponentEditorPanel iface = mIDE.getActiveComponentEditorPanel();
         if (iface != null) {
           final GraphEditorPanel panel = iface.getGraphEditorPanel();
           option.select(panel);
@@ -179,7 +178,7 @@ public class ZoomSelector
     if (editor == null) {
       return null;
     }
-    final ComponentEditorPanel compEditor = editor.getActiveEditorWindowInterface();
+    final ComponentEditorPanel compEditor = editor.getActiveComponentEditorPanel();
     if (compEditor == null) {
       return null;
     }

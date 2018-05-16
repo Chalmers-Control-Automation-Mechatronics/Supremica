@@ -37,8 +37,7 @@ package org.supremica.gui.ide.actions;
 
 import javax.swing.JFrame;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
-
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.IDE;
 
@@ -50,5 +49,5 @@ public interface IDEActionInterface
     public IDE getIDE();
     public Actions getActions();
     public void repaint();
-    public EditorWindowInterface getActiveEditorWindowInterface();
+    public ComponentEditorPanel getActiveComponentEditorPanel();
 }

@@ -58,7 +58,6 @@ import javax.swing.SwingUtilities;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.config.Version;
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.about.AboutPanel;
 import net.sourceforge.waters.gui.about.WelcomeScreen;
 import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
@@ -373,13 +372,13 @@ public class IDE
   }
 
   @Override
-  public EditorWindowInterface getActiveEditorWindowInterface()
+  public ComponentEditorPanel getActiveComponentEditorPanel()
   {
     final DocumentContainer active = getActiveDocumentContainer();
     if (active == null) {
       return null;
     } else {
-      return active.getEditorPanel().getActiveEditorWindowInterface();
+      return active.getEditorPanel().getActiveComponentEditorPanel();
     }
   }
 

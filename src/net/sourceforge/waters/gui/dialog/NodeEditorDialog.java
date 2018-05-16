@@ -404,7 +404,7 @@ public class NodeEditorDialog
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
-        final GraphSubject graph = mModuleContainer.getActiveEditorWindowInterface().getGraphEditorPanel().getGraph();
+        final GraphSubject graph = mModuleContainer.getActiveComponentEditorPanel().getGraphEditorPanel().getGraph();
         if (graph.getNodesModifiable().containsName(text)) {
           throw new ParseException
           ("Node name '" + text + "' is already taken!", 0);

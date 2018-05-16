@@ -77,6 +77,8 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
+
 
 /**
  * <p>A table model for the events pane.</P>
@@ -321,11 +323,11 @@ public class EventTableModel
 
   boolean isDisplayed()
   {
-    final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
-    if (iface == null) {
+    final ComponentEditorPanel panel = mRoot.getActiveComponentEditorPanel();
+    if (panel == null) {
       return false;
     } else {
-      final GraphEditorPanel surface = iface.getGraphEditorPanel();
+      final GraphEditorPanel surface = panel.getGraphEditorPanel();
       return surface.getGraph() == mGraph;
     }
   }

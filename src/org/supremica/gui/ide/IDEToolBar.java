@@ -240,7 +240,7 @@ public class IDEToolBar
         addAction(actions.getAction(InsertSimpleComponentAction.class));
         addAction(actions.getAction(InsertVariableAction.class));
         final EditorPanel editorPanel = (EditorPanel) panel;
-        if (editorPanel.getActiveEditorWindowInterface() != null) {
+        if (editorPanel.getActiveComponentEditorPanel() != null) {
           addSeparator();
           add(mSelectToolButton);
           add(mNodeToolButton);

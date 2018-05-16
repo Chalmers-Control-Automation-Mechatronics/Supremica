@@ -49,7 +49,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
@@ -78,7 +77,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 public class ComponentEditorPanel
     extends JPanel
-    implements EditorWindowInterface, SupremicaPropertyChangeListener
+    implements SupremicaPropertyChangeListener
 {
 
     //########################################################################
@@ -122,32 +121,27 @@ public class ComponentEditorPanel
 
 
     //########################################################################
-    //# Interface net.sourceforge.waters.gui.EditorWindowInterface
-    @Override
+    //# Old EditorWindowInterface
     public SimpleComponentSubject getComponent()
     {
         return mComponent;
     }
 
-    @Override
     public ModuleWindowInterface getModuleWindowInterface()
     {
         return mModuleContainer.getEditorPanel();
     }
 
-    @Override
     public GraphEditorPanel getGraphEditorPanel()
     {
         return mSurface;
     }
 
-    @Override
     public GraphEventPanel getEventPanel()
     {
         return mEventsPane;
     }
 
-    @Override
     public UndoInterface getUndoInterface()
     {
         return mModuleContainer;

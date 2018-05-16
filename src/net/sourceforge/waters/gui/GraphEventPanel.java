@@ -121,6 +121,8 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
+
 
 /**
  * <p>
@@ -143,14 +145,14 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Constructors
-  public GraphEventPanel(final EditorWindowInterface eroot,
+  public GraphEventPanel(final ComponentEditorPanel eroot,
                          final SimpleComponentSubject comp,
                          final WatersPopupActionManager manager)
   {
     this(eroot, comp.getGraph(), manager);
   }
 
-  public GraphEventPanel(final EditorWindowInterface eroot,
+  public GraphEventPanel(final ComponentEditorPanel eroot,
                          final GraphSubject graph,
                          final WatersPopupActionManager manager)
   {
@@ -1491,7 +1493,7 @@ public class GraphEventPanel
 
   //#########################################################################
   //# Data Members
-  private final EditorWindowInterface mRoot;
+  private final ComponentEditorPanel mRoot;
   private final PopupFactory mPopupFactory;
   private final DeleteVisitor mDeleteVisitor;
   private final ReplaceVisitor mReplaceVisitor;

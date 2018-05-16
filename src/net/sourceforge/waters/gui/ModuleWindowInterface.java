@@ -36,10 +36,11 @@ package net.sourceforge.waters.gui;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.model.expr.ExpressionParser;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 
 
@@ -122,7 +123,7 @@ public interface ModuleWindowInterface
   /**
    * Opens a graph editor for the given component.
    */
-  public EditorWindowInterface showEditor(SimpleComponentSubject comp)
+  public ComponentEditorPanel showEditor(SimpleComponentSubject comp)
     throws GeometryAbsentException;
 
   /**
@@ -131,7 +132,7 @@ public interface ModuleWindowInterface
    *         or <CODE>null</CODE> if the component has not yet been
    *         edited.
    */
-  public EditorWindowInterface getEditorWindowInterface
+  public ComponentEditorPanel getComponentEditorPanel
     (SimpleComponentSubject comp);
 
   /**
@@ -139,7 +140,7 @@ public interface ModuleWindowInterface
    * or <CODE>null</CODE>. The returned editor does not necessarily
    * own the keyboard focus.
    */
-  public EditorWindowInterface getActiveEditorWindowInterface();
+  public ComponentEditorPanel getActiveComponentEditorPanel();
 
   /**
    * Shows the comment editor panel for the current module.
