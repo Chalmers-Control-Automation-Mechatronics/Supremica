@@ -45,6 +45,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -150,7 +151,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     else {
       //we managed to reduce the supervisor
 
-      final Compatible[] reducedSupervisor = mReducedSupervisor.toArray();
+      final Compatible[] reducedSupervisor = new Compatible[mReducedSupervisor.size()];
+      mReducedSupervisor.toArray(reducedSupervisor);
       final int supervisorSize = reducedSupervisor.length;
 
       //we have the set of compatibles, now we need to construct a new automaton based off them
@@ -267,7 +269,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final ParetoCompatibleSet newSolution = new ParetoCompatibleSet(currentSolution);
       newSolution.add(cover);
 
+      //copy the things we know we need to add, but remove anything covered by the Compatible we just added to our solution
       final ParetoCompatibleSet newCompatibleDependencies = new ParetoCompatibleSet(compatibleDependencies);
+      newCompatibleDependencies.removeAllDominatedBy(cover);
 
       for (final Iterator<Compatible> dependentIterator = dependents.iterator(); dependentIterator.hasNext();) {
         final Compatible dependent = dependentIterator.next();
@@ -295,10 +299,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return cliques;
     }
 
-    //create a copy in case removing items from possibleInclusions affects the iterator mid-way through
-    final TIntList originalPossibleInclusions = new TIntArrayList(possibleInclusions);
-
-    for (final TIntIterator inclusionIterator = originalPossibleInclusions.iterator(); inclusionIterator.hasNext();) {
+    for (final TIntIterator inclusionIterator = possibleInclusions.iterator(); inclusionIterator.hasNext();) {
       final int vertex = inclusionIterator.next();
 
       //create a copy with the new vertex
@@ -319,7 +320,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //find any maximal cliques based on newCliques and add them to the object referenced by cliques
       BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked, cliques);
 
-      possibleInclusions.remove(vertex);
+      inclusionIterator.remove();
       alreadyChecked.add(vertex);
     }
 
@@ -453,7 +454,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
               while (xPredecessorIterator.advance()) {
                 final int predY = yPredecessorIterator.getCurrentSourceState();
                 final int predX = xPredecessorIterator.getCurrentSourceState();
-                if (!incompatibilityRelation[predX][predY]) {
+                if (predX != predY && !incompatibilityRelation[predX][predY]) {
                   incompatiblesToMark.push(createStatePair(predX, predY));
                 }
               }
@@ -499,90 +500,35 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
 
-  private class Compatible {
-    private final TIntSet stateSet;
+  private class Compatible extends TIntHashSet {
 
     public Compatible() {
-      stateSet = new TIntHashSet();
+      super();
     }
 
-    public Compatible(final Compatible existingCompatible) {
-      this();
-      stateSet.addAll(existingCompatible.stateSet);
+    public Compatible(final TIntSet stateSet) {
+      super(stateSet);
     }
-
-    public boolean add(final int state) {
-      return stateSet.add(state);
-    }
-
-    public boolean contains(final int state) {
-      return stateSet.contains(state);
-    }
-
-    public boolean containsAll(final Compatible otherCompatible) {
-      return stateSet.containsAll(otherCompatible.stateSet);
-    }
-
-    public int size() {
-      return stateSet.size();
-    }
-
-    public TIntIterator iterator() {
-      return stateSet.iterator();
-    }
-
-    @Override
-    public boolean equals(final Object obj)
-    {
-      if (obj == null || getClass() != obj.getClass()) {
-        return false;
-      }
-
-      final Compatible otherCompatible = (Compatible)obj;
-      return stateSet.equals(otherCompatible.stateSet);
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return  419 * stateSet.hashCode();
-    }
-
     @Override
     public String toString()
     {
       //always display in sorted order
-      final int[] sortedStateBuffer = new int[stateSet.size()];
-      stateSet.toArray(sortedStateBuffer);
+      final int[] sortedStateBuffer = this.toArray();
       Arrays.sort(sortedStateBuffer);
       return Arrays.toString(sortedStateBuffer);
     }
   }
 
-  private class ParetoCompatibleSet {
-    private final LinkedHashSet<Compatible> archive;
+  private class ParetoCompatibleSet extends LinkedHashSet<Compatible> {
+
+    private static final long serialVersionUID = -4434294284951063515L;
 
     public ParetoCompatibleSet() {
-      archive = new LinkedHashSet<>();
+      super();
     }
 
-    public ParetoCompatibleSet(final ParetoCompatibleSet compatibleSet) {
-      this();
-      if (compatibleSet != null) {
-        archive.addAll(compatibleSet.archive);
-      }
-    }
-
-    public int size() {
-      return archive.size();
-    }
-
-    public boolean isEmpty() {
-      return archive.isEmpty();
-    }
-
-    public Iterator<Compatible> iterator() {
-      return archive.iterator();
+    public ParetoCompatibleSet(final HashSet<Compatible> compatibleSet) {
+      super(compatibleSet);
     }
 
     public Compatible pop() {
@@ -595,22 +541,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return null;
     }
 
+    @Override
     public boolean add(final Compatible applicant) {
       if (size() == 0) {
-        archive.add(applicant);
-        return true;
+        return super.add(applicant);
       }
 
+      //check if the applicant is a strict subset of any existing members
       if (!undominatedByAll(applicant)) { return false; }
 
       //not dominated by any existing members, we want to add it.
       //now kick out any members the applicant dominates
-      for (final Iterator<Compatible> compatibleIterator = iterator(); compatibleIterator.hasNext();) {
-        if (dominates(applicant, compatibleIterator.next())) { compatibleIterator.remove(); }
-      }
+      removeAllDominatedBy(applicant);
 
-      archive.add(applicant);
-      return true;
+      return super.add(applicant);
     }
 
     public boolean undominatedByAll(final Compatible x) {
@@ -620,36 +564,22 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return true;
     }
 
-    public Compatible[] toArray() {
-      return archive.toArray(new Compatible[archive.size()]);
+    public void removeAllDominatedBy(final Compatible x) {
+      for (final Iterator<Compatible> compatibleIterator = iterator(); compatibleIterator.hasNext();) {
+        if (dominates(x, compatibleIterator.next())) { compatibleIterator.remove(); }
+      }
     }
 
     private boolean dominates(final Compatible x, final Compatible y) {
       return x.containsAll(y);
     }
 
-    @Override
-    public boolean equals(final Object obj)
-    {
-      if (obj == null || getClass() != obj.getClass()) {
-        return false;
-      }
-
-      final ParetoCompatibleSet otherSet = (ParetoCompatibleSet)obj;
-      return archive.equals(otherSet.archive);
-    }
-
-    @Override
-    public int hashCode()
-    {
-      return 547 * archive.hashCode();
-    }
 
     @Override
     public String toString()
     {
       final Compatible[] compatibleBuffer = new Compatible[size()];
-      return Arrays.toString(archive.toArray(compatibleBuffer));
+      return Arrays.toString(this.toArray(compatibleBuffer));
     }
   }
 
