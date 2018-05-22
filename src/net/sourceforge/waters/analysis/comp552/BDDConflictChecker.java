@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+
 import net.sourceforge.waters.model.des.ConflictTraceProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -119,22 +120,21 @@ public class BDDConflictChecker extends ModelChecker
     // Another (faster?) alternative is "cudd".
     mBDDFactory = BDDFactory.init("buddy", 10000, 5000);
     // You can try to increase performance by increasing the cache sizes,
-    // but please be aware of the memory limits. If you
-    // want to push the limits, please test your program inside
-    // 'ulimit -v 1048576 -m 1048576', and pass the -Xmx argument to
-    // the Java VM.
+    // but please be aware of the memory limits.
 
     // Uncomment the following try-catch block to disable disconcerting
-    // debug output.
+    // debug output. This also requires two imports:
+    // import java.lang.reflect.Method;
+    // import net.sourceforge.waters.model.base.WatersRuntimeException;
     /*
     try {
       final Class<?>[] parameterTypes =
         new Class<?>[] {Object.class, Object.class};
       final Method method =
         getClass().getMethod("silentBDDHandler", parameterTypes);
-      bddFactory.registerGCCallback(this, method);
-      bddFactory.registerReorderCallback(this, method);
-      bddFactory.registerResizeCallback(this, method);
+      mBDDFactory.registerGCCallback(this, method);
+      mBDDFactory.registerReorderCallback(this, method);
+      mBDDFactory.registerResizeCallback(this, method);
     } catch (final SecurityException exception) {
       throw new WatersRuntimeException(exception);
     } catch (final NoSuchMethodException exception) {
