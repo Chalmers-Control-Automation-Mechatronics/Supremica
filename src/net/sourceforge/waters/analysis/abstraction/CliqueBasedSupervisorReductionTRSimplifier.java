@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 
+import gnu.trove.TIntCollection;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -48,7 +49,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -124,7 +124,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
+    final boolean[][] incompatibilityRelation = getIncompatibilityRelation(stateOutputs);
+
+    //for each state, a list of states it is compatible with
+    mStateNeighbourLists = new TIntHashSet[mNumStates];
+    for (int x = 0; x < mNumStates; x++) {
+      final TIntHashSet neighbours = new TIntHashSet();
+      for (int y = 0; y < mNumStates; y++) {
+        if (!incompatibilityRelation[x][y] && x != y)
+        {
+          neighbours.add(y);
+        }
+      }
+      mStateNeighbourLists[x] = neighbours;
+    }
   }
 
 
@@ -136,7 +149,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
-    final List<Compatible> initialCompatibles = getCoversOf(mInitialCompatible);
+    final Collection<Compatible> initialCompatibles = getCoversOf(mInitialCompatible);
     for (final Compatible initialCompatible : initialCompatibles) {
       final ParetoCompatibleSet dependencies = new ParetoCompatibleSet();
       dependencies.add(initialCompatible);
@@ -254,7 +267,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //get the next compatible we need to add
     final Compatible nextCompatible = compatibleDependencies.pop();
     //get all (maximal) cliques covering this compatible
-    final List<Compatible> covers = getCoversOf(nextCompatible);
+    final Collection<Compatible> covers = getCoversOf(nextCompatible);
 
     final Collection<Compatible> dependents = new ArrayDeque<>();
     for (final Iterator<Compatible> coversIterator = covers.iterator(); coversIterator.hasNext();) {
@@ -287,11 +300,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private List<Compatible> BronKerbosch(final Compatible clique, final TIntList possibleInclusions, final TIntList alreadyChecked) {
+  private Collection<Compatible> BronKerbosch(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked) {
     return BronKerbosch(clique, possibleInclusions, alreadyChecked, new ArrayList<Compatible>());
   }
 
-  private List<Compatible> BronKerbosch(final Compatible clique, final TIntList possibleInclusions, final TIntList alreadyChecked, final List<Compatible> cliques) {
+  private Collection<Compatible> BronKerbosch(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked, final Collection<Compatible> cliques) {
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleInclusions.isEmpty() && alreadyChecked.isEmpty()) {
       //add this maximal clique
@@ -300,54 +313,58 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     for (final TIntIterator inclusionIterator = possibleInclusions.iterator(); inclusionIterator.hasNext();) {
-      final int vertex = inclusionIterator.next();
+      final int stateToInclude = inclusionIterator.next();
+      final TIntCollection newNeighbours = mStateNeighbourLists[stateToInclude];
 
       //create a copy with the new vertex
       final Compatible newClique = new Compatible(clique);
-      newClique.add(vertex);
+      newClique.add(stateToInclude);
 
       //create a copy with a restricted set of neighbours
-      final TIntList newPossibleInclusions = new TIntArrayList();
-      for (final TIntIterator stateIterator = possibleInclusions.iterator(); stateIterator.hasNext();) {
-        final int state = stateIterator.next();
-        if (isNeighbour(vertex, state)) {
-          newPossibleInclusions.add(state);
+      final TIntCollection newPossibleInclusions = new TIntHashSet();
+      for (final TIntIterator possibleInclusionIterator = possibleInclusions.iterator(); possibleInclusionIterator.hasNext();) {
+        final int possibleInclusion = possibleInclusionIterator.next();
+        if (newNeighbours.contains(possibleInclusion)) {
+          newPossibleInclusions.add(possibleInclusion);
         }
       }
 
-      final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked);
+      final TIntCollection newAlreadyChecked = new TIntHashSet();
+      for (final TIntIterator alreadyCheckedIterator = alreadyChecked.iterator(); alreadyCheckedIterator.hasNext();) {
+        final int checkedState = alreadyCheckedIterator.next();
+        if (newNeighbours.contains(checkedState)) {
+          newAlreadyChecked.add(checkedState);
+        }
+      }
 
       //find any maximal cliques based on newCliques and add them to the object referenced by cliques
       BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked, cliques);
 
       inclusionIterator.remove();
-      alreadyChecked.add(vertex);
+      alreadyChecked.add(stateToInclude);
     }
 
     return cliques;
   }
 
-  private List<Compatible> getCoversOf(final Compatible compatible) {
+  private Collection<Compatible> getCoversOf(final Compatible compatible) {
 
-    final TIntList possibleInclusions = new TIntArrayList();
+    final TIntCollection possibleInclusions = new TIntHashSet();
 
     if (compatible.size() > 0) {
-
       //find neighbours of the first state in the compatible - we know possibleInclusions must contain a subset of these in the end since we are taking intersections
-      final TIntList neighbours = getNeighboursOf(compatible.iterator().next());
-      for (final TIntIterator neighbourIterator = neighbours.iterator(); neighbourIterator.hasNext();) {
+      for (final TIntIterator neighbourIterator = mStateNeighbourLists[compatible.iterator().next()].iterator(); neighbourIterator.hasNext();) {
         final int neighbour = neighbourIterator.next();
+        final TIntCollection neighboursOfNeighbour = mStateNeighbourLists[neighbour];
 
         //skip the first compatible because we have dealt with it above
         final TIntIterator stateIterator = compatible.iterator();
         stateIterator.next();
 
+        //everything else in the compatible should be neighbours with neighbour, so should appear in neighboursOfNeighbour
         boolean allNeighbours = true;
-        while (stateIterator.hasNext()) {
-          final int state = stateIterator.next();
-          if (!isNeighbour(neighbour, state)) {
-            allNeighbours = false;
-          }
+        while (stateIterator.hasNext() && allNeighbours) {
+          allNeighbours = neighboursOfNeighbour.contains(stateIterator.next());
         }
         if (allNeighbours) {
           possibleInclusions.add(neighbour);
@@ -355,22 +372,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    return BronKerbosch(compatible, possibleInclusions, new TIntArrayList());
-  }
-
-  private boolean isNeighbour(final int x, final int y) {
-    return !mIncompatibilityRelation[x][y] && x != y;
-  }
-
-  private TIntList getNeighboursOf(final int x) {
-    final TIntList neighbours = new TIntArrayList();
-    for (int s = 0; s < mNumStates; s++) {
-      //if the two states are compatible and not the same state, add to neighbours
-      if (isNeighbour(x, s)) {
-        neighbours.add(s);
-      }
-    }
-    return neighbours;
+    return BronKerbosch(compatible, possibleInclusions, new TIntHashSet());
   }
 
   private void getSuccessorCompatiblesOf(final Compatible compatible, final Collection<Compatible> successorsToFill) {
@@ -394,13 +396,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getEnabledEventsOf(final Compatible compatible, final TIntSet eventSetToFill) {
+  private void getEnabledEventsOf(final Compatible compatible, final TIntCollection enabledEventsToFill) {
     //get the union of enabled events across states in the compatible
     final TIntList successorEvents = new TIntArrayList();
     for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
       successorEvents.clear();
       getSuccessorEvents(compatibleIterator.next(), successorEvents);
-      eventSetToFill.addAll(successorEvents);
+      enabledEventsToFill.addAll(successorEvents);
     }
   }
 
@@ -490,7 +492,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getSuccessorEvents(final int source, final TIntList successorEventsToFill) {
+  private void getSuccessorEvents(final int source, final TIntCollection successorEventsToFill) {
     final TransitionIterator successorIterator = getTransitionRelation().createSuccessorsReadOnlyIterator();
     successorIterator.resetState(source);
 
@@ -593,8 +595,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //# Data Members
   private int mNumProperEvents;
   private int mDumpStateIndex;
-  private boolean[][] mIncompatibilityRelation;
   private Compatible mInitialCompatible;
   private int mNumStates;
+  private TIntCollection[] mStateNeighbourLists;
   private ParetoCompatibleSet mReducedSupervisor;
 }
