@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -79,6 +79,11 @@ class AutomataTableModel extends AbstractTableModel implements Observer
   AutomatonProxy getAutomaton(final int index)
   {
     return mAutomataList.get(index);
+  }
+
+  List<AutomatonProxy> getAutomatonList()
+  {
+    return mAutomataList;
   }
 
   int getIndex(final AutomatonProxy aut)

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -48,7 +48,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -140,6 +139,17 @@ public class ModuleContainer
   //# Overrides for Abstract Base Class
   //# org.supremica.gui.ide.DocumentContainer
   @Override
+  public UndoInterface getActiveUndoInterface()
+  {
+    final MainPanel panel = getActivePanel();
+    if (panel != null && panel instanceof EditorPanel) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   public boolean hasUnsavedChanges()
   {
     return mUndoIndex != mUndoCheckPoint;
@@ -225,8 +235,8 @@ public class ModuleContainer
   {
     String title = super.getWindowTitle();
     if (getActivePanel() == mEditorPanel) {
-      final EditorWindowInterface editor =
-        mEditorPanel.getActiveEditorWindowInterface();
+      final ComponentEditorPanel editor =
+        mEditorPanel.getActiveComponentEditorPanel();
       if (editor != null) {
         final StringBuilder builder = new StringBuilder(title);
         builder.append(" - ");
@@ -383,9 +393,9 @@ public class ModuleContainer
     return getIDE().getFrame();
   }
 
-  public EditorWindowInterface getActiveEditorWindowInterface()
+  public ComponentEditorPanel getActiveComponentEditorPanel()
   {
-    return getEditorPanel().getActiveEditorWindowInterface();
+    return getEditorPanel().getActiveComponentEditorPanel();
   }
 
 
@@ -585,7 +595,7 @@ public class ModuleContainer
     public void updateGraphPanel(final Proxy proxy)
     {
       try {
-        if (mEditorPanel.getActiveEditorWindowInterface() != null) {
+        if (mEditorPanel.getActiveComponentEditorPanel() != null) {
           proxy.acceptVisitor(this);
         }
       } catch (final VisitorException exception) {
@@ -620,7 +630,7 @@ public class ModuleContainer
       throws VisitorException
     {
       final ComponentEditorPanel panel =
-        mEditorPanel.getActiveEditorWindowInterface();
+        mEditorPanel.getActiveComponentEditorPanel();
       if (panel.getComponent() == simple) {
         mEditorPanel.showComment();
         return simple; //stop iterating children if in a foreach

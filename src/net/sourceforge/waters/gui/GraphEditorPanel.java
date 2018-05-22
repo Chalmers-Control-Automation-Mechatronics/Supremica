@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -175,6 +175,7 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
 import org.supremica.gui.ide.ModuleContainer;
@@ -200,7 +201,7 @@ public class GraphEditorPanel
   public GraphEditorPanel(final GraphSubject graph,
                           final ModuleSubject module,
                           final ModuleContainer moduleContainer,
-                          final EditorWindowInterface root,
+                          final ComponentEditorPanel root,
                           final IDEToolBar toolbar,
                           final WatersPopupActionManager manager)
     throws GeometryAbsentException
@@ -258,7 +259,7 @@ public class GraphEditorPanel
     return mRoot.getUndoInterface();
   }
 
-  public EditorWindowInterface getEditorInterface()
+  public ComponentEditorPanel getComponentEditorPanel()
   {
     return mRoot;
   }
@@ -5698,7 +5699,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Data Members
-  private final EditorWindowInterface mRoot;
+  private final ComponentEditorPanel mRoot;
   private final ModuleContainer mModuleContainer;
   private final IDEToolBar mToolbar;
 

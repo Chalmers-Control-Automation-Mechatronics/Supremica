@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -76,6 +76,8 @@ import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import org.supremica.gui.ide.ComponentEditorPanel;
 
 
 /**
@@ -321,11 +323,11 @@ public class EventTableModel
 
   boolean isDisplayed()
   {
-    final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
-    if (iface == null) {
+    final ComponentEditorPanel panel = mRoot.getActiveComponentEditorPanel();
+    if (panel == null) {
       return false;
     } else {
-      final GraphEditorPanel surface = iface.getGraphEditorPanel();
+      final GraphEditorPanel surface = panel.getGraphEditorPanel();
       return surface.getGraph() == mGraph;
     }
   }

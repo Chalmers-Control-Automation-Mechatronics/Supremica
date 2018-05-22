@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -39,6 +39,7 @@ import java.awt.Component;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.subject.base.DocumentSubject;
 
@@ -76,6 +77,17 @@ public abstract class DocumentContainer
 
   //#########################################################################
   //# To be Overridden by Subclasses
+  /**
+   * Gets the current undo interface.
+   * @return  An undo interface that can be used to send commands to the
+   *          edited document, or <CODE>null</CODE> if no editor panel is
+   *          currently active.
+   */
+  public UndoInterface getActiveUndoInterface()
+  {
+    return null;
+  }
+
   boolean hasUnsavedChanges()
   {
     return false;
