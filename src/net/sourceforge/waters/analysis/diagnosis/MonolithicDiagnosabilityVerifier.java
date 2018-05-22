@@ -112,7 +112,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   {
     try {
       setUp();
-      @SuppressWarnings("unused")
 
       final TRSynchronousProductBuilder spBuilder = new TRSynchronousProductBuilder(getModel());
       if(!spBuilder.run()) {
