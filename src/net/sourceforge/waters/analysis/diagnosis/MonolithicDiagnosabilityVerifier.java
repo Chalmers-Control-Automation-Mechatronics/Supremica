@@ -61,28 +61,17 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
   //#########################################################################
   //# Constructors
-  /**
-   * @param factory
-   * @param translator
-   */
   public MonolithicDiagnosabilityVerifier(final ProductDESProxyFactory factory,
                                           final KindTranslator translator)
   {
     super(factory, translator);
-    // TODO Auto-generated constructor stub
   }
 
-  /**
-   * @param model
-   * @param factory
-   * @param translator
-   */
   public MonolithicDiagnosabilityVerifier(final ProductDESProxy model,
                                           final ProductDESProxyFactory factory,
                                           final KindTranslator translator)
   {
     super(model, factory, translator);
-    // TODO Auto-generated constructor stub
   }
 
 
@@ -99,10 +88,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     throws AnalysisException
   {
     super.setUp();
-
-
   }
-
 
 
   //#########################################################################
@@ -112,7 +98,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   {
     try {
       setUp();
-      @SuppressWarnings("unused")
 
       final TRSynchronousProductBuilder spBuilder = new TRSynchronousProductBuilder(getModel());
       if(!spBuilder.run()) {
@@ -126,7 +111,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
 
-      final int numEvents = spEvents.getNumberOfEvents();
+      final int numEvents = spEvents.getNumberOfProperEvents();
       eventProperties = new int[numEvents];
       final TIntArrayList faultTypes = new TIntArrayList();
       final String key = "FAULT";
@@ -135,7 +120,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       EventProxy event;
       int faultType = 0;
 
-      for(int i=0; i<numEvents; i++){
+      for(int i= EventEncoding.NONTAU; i<numEvents; i++){
         event = spEvents.getProperEvent(i);
         if(event!=null) {
           attrib = event.getAttributes();
@@ -347,6 +332,8 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   private int Qindex = 0;
   private TransitionIterator iterA;
   private TransitionIterator iterB;
+
+
   //#########################################################################
   //# Constants
   final int Msb1 = -2147483648;
