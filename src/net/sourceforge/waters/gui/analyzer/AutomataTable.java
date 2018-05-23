@@ -44,6 +44,9 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Action;
@@ -51,6 +54,8 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -60,6 +65,7 @@ import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -120,9 +126,22 @@ class AutomataTable extends JTable implements SelectionOwner
     }
     getTableHeader().setReorderingAllowed(false);
     final ListSelectionModel listModel = getSelectionModel();
-    listModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    listModel
+      .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
     this.addMouseListener(new TableMouseListener());
+
+    this.getSelectionModel()
+      .addListSelectionListener(new ListSelectionListener() {
+
+        @Override
+        public void valueChanged(final ListSelectionEvent e)
+        {
+          if (!e.getValueIsAdjusting()) {
+            fireEditorChangedEvent(new SelectionChangedEvent(this));
+          }
+        }
+      });
   }
 
   //#########################################################################
@@ -163,20 +182,14 @@ class AutomataTable extends JTable implements SelectionOwner
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
     /*
-     * final AutomataTableModel model = getModel();
-    if (proxy instanceof IdentifierSubject) {
-      final IdentifierSubject ident = (IdentifierSubject) proxy;
-      return model.containsEqualIdentifier(ident);
-    } else if (proxy instanceof IdentifierProxy) {
-      final ModuleProxyCloner cloner =
-        ModuleSubjectFactory.getCloningInstance();
-      final IdentifierSubject ident =
-        (IdentifierSubject) cloner.getClone(proxy);
-      return model.containsEqualIdentifier(ident);
-    } else {
-      return false;
-    }
-    */
+     * final AutomataTableModel model = getModel(); if (proxy instanceof
+     * IdentifierSubject) { final IdentifierSubject ident =
+     * (IdentifierSubject) proxy; return model.containsEqualIdentifier(ident);
+     * } else if (proxy instanceof IdentifierProxy) { final ModuleProxyCloner
+     * cloner = ModuleSubjectFactory.getCloningInstance(); final
+     * IdentifierSubject ident = (IdentifierSubject) cloner.getClone(proxy);
+     * return model.containsEqualIdentifier(ident); } else { return false; }
+     */
     return false;
   }
 
@@ -255,7 +268,12 @@ class AutomataTable extends JTable implements SelectionOwner
           && event.getClickCount() == 2) {
         final AutomatonProxy aut = getAutomaton(event);
         if (aut != null) {
-          mParent.displaySelectedAutomata(aut);
+          if (getSelectedRowCount() > 1) {
+            final AutomataTableModel model = getModel();
+            model.getAutomaton(getSelectedRows()[0]);
+          } else {
+            mParent.displaySelectedAutomata(aut);
+          }
         }
       }
     }
@@ -264,24 +282,34 @@ class AutomataTable extends JTable implements SelectionOwner
   //#########################################################################
   //# Copy and Paste methods
   @Override
-  public void attach(final Observer o)
+  public void attach(final Observer observer)
   {
-    // TODO Auto-generated method stub
-
+    if (mObservers == null) {
+      mObservers = new LinkedList<Observer>();
+    }
+    mObservers.add(observer);
   }
 
   @Override
-  public void detach(final Observer o)
+  public void detach(final Observer observer)
   {
-    // TODO Auto-generated method stub
-
+    if (mObservers != null) {
+      mObservers.remove(observer);
+      if (mObservers.isEmpty()) {
+        mObservers = null;
+      }
+    }
   }
 
   @Override
-  public void fireEditorChangedEvent(final EditorChangedEvent e)
+  public void fireEditorChangedEvent(final EditorChangedEvent event)
   {
-    // TODO Auto-generated method stub
-
+    if (mObservers != null) {
+      final List<Observer> copy = new ArrayList<Observer>(mObservers);
+      for (final Observer observer : copy) {
+        observer.update(event);
+      }
+    }
   }
 
   @Override
@@ -306,7 +334,7 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean isSelected(final Proxy proxy)
   {
-    if(proxy instanceof AutomatonProxy) {
+    if (proxy instanceof AutomatonProxy) {
       final AutomatonProxy aut = (AutomatonProxy) proxy;
       final AutomataTableModel model = getModel();
       return this.isRowSelected(model.getIndex(aut));
@@ -319,8 +347,8 @@ class AutomataTable extends JTable implements SelectionOwner
   {
     final AutomataTableModel model = getModel();
     final List<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
-    for(final int i : this.getSelectedRows()) {
-       output.add(model.getAutomaton(i));
+    for (final int i : this.getSelectedRows()) {
+      output.add(model.getAutomaton(i));
     }
     return output;
   }
@@ -336,7 +364,7 @@ class AutomataTable extends JTable implements SelectionOwner
   public AutomatonProxy getSelectionAnchor()
   {
     final AutomataTableModel model = getModel();
-    if(this.getSelectedRow() != -1)
+    if (this.getSelectedRow() != -1)
       return model.getAutomaton(this.getSelectedRow());
     else
       return null;
@@ -351,7 +379,7 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void clearSelection(final boolean propagate)
   {
-     clearSelection();
+    clearSelection();
   }
 
   @Override
@@ -365,13 +393,40 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
+    /*
+     * final AutomataTableModel model = getModel(); for (final Proxy p :
+     * items) { if (p instanceof AutomatonProxy) { final AutomatonProxy aut =
+     * (AutomatonProxy) p; final int position = model.getIndex(aut);
+     * addRowSelectionInterval(position, position); } }
+     */
     final AutomataTableModel model = getModel();
-    for(final Proxy p : items) {
-      if(p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        final int position = model.getIndex(aut);
-        addRowSelectionInterval(position, position);
+    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        autList.add((AutomatonProxy) p);
       }
+    }
+
+    Collections.sort(autList, new Comparator<AutomatonProxy>() {
+      @Override
+      public int compare(final AutomatonProxy lhs, final AutomatonProxy rhs)
+      {
+        // -1 - less than, 1 - greater than, 0 - equal, all inversed for ascending
+        return rhs.getName().compareTo(lhs.getName());
+      }
+    });
+
+    int start = -1;
+    int end = -1;
+    for (final AutomatonProxy a : autList) {
+      final int position = model.getIndex(a);
+      if (start == -1)
+        start = end = position;
+      else if (position > (end + 1)) {
+        addRowSelectionInterval(start, end);
+        start = end = position;
+      } else
+        end = position;
     }
   }
 
@@ -379,8 +434,8 @@ class AutomataTable extends JTable implements SelectionOwner
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     final AutomataTableModel model = getModel();
-    for(final Proxy p : items) {
-      if(p instanceof AutomatonProxy) {
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
         final int position = model.getIndex(aut);
         removeRowSelectionInterval(position, position);
@@ -395,9 +450,8 @@ class AutomataTable extends JTable implements SelectionOwner
     try {
       if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         @SuppressWarnings("unchecked")
-        final List<Proxy> data =
-          (List<Proxy>) transferable
-            .getTransferData(WatersDataFlavor.IDENTIFIER);
+        final List<Proxy> data = (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
         for (final Proxy proxy : data) {
           if (!containsEqualIdentifier(proxy)) {
             return true;
@@ -427,10 +481,10 @@ class AutomataTable extends JTable implements SelectionOwner
   {
     // TODO Auto-generated method stub
     final AutomataTableModel model = getModel();
-    for(final Proxy p : items) {
-      if(p instanceof AutomatonProxy) {
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
-        if((model.getIndex(aut) != -1))
+        if ((model.getIndex(aut) != -1))
           return true;
         else
           return false;
@@ -442,8 +496,13 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
-    return null;
+    if (items.size() > 0) {
+      final List<InsertInfo> infoList = new ArrayList<InsertInfo>();
+      for (final Proxy p : items)
+        infoList.add(new InsertInfo(p));
+      return infoList;
+    } else
+      return null;
   }
 
   @Override
@@ -463,30 +522,34 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void scrollToVisible(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
-
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        final AutomataTableModel model = getModel();
+        this.scrollRectToVisible(this.getCellRect(model.getIndex(aut), 0,
+                                                  true));
+        break;
+      }
+    }
   }
 
   @Override
   public void activate()
   {
-    // TODO Auto-generated method stub
     requestFocusInWindow();
   }
 
   @Override
   public void close()
   {
-    // TODO Auto-generated method stub
-    //final AutomataTableModel model = getModel();
-    //model.Close();
-
-
+    final AutomataTableModel model = getModel();
+    model.Close();
   }
 
   //#########################################################################
   //# Data Members
   final WatersAnalyzerPanel mParent;
+  private List<Observer> mObservers;
   final ModuleContainer mModuleContainer;
 
   //#########################################################################
