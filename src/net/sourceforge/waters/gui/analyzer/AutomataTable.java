@@ -279,8 +279,9 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
+
   //#########################################################################
-  //# Copy and Paste methods
+  //# Interface net.sourcefore.waters.gui.observer.subject
   @Override
   public void attach(final Observer observer)
   {
@@ -312,17 +313,21 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
+
+  //#########################################################################
+  //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
   @Override
   public UndoInterface getUndoInterface(final Action action)
   {
-    // TODO Auto-generated method stub
-    return mModuleContainer;
+    // NOT using editor's undo queue. May include separate queue for
+    // analyser later, or simply do not support undo in analyser.
+    return null;
   }
 
   @Override
   public boolean hasNonEmptySelection()
   {
-    return getSelectedRow() > 0;
+    return getSelectedRow() >= 0;
   }
 
   @Override
@@ -420,13 +425,14 @@ class AutomataTable extends JTable implements SelectionOwner
     int end = -1;
     for (final AutomatonProxy a : autList) {
       final int position = model.getIndex(a);
-      if (start == -1)
+      if (start == -1) {
         start = end = position;
-      else if (position > (end + 1)) {
+      } else if (position > (end + 1)) {
         addRowSelectionInterval(start, end);
         start = end = position;
-      } else
+      } else {
         end = position;
+      }
     }
   }
 

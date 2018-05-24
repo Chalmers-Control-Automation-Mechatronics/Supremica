@@ -56,19 +56,8 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
-import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -98,7 +87,7 @@ import org.supremica.gui.ide.ModuleContainer;
  *
  * <P>This action pops up a dialog box to edit the currently focused
  * item, if that item is of a supported type. To support this action,
- * components including editable items must implement the {@link
+ * components that hold editable items must implement the {@link
  * SelectionOwner} interface and return the item to be edited through
  * their {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()}
  * method.</P>
@@ -179,8 +168,7 @@ public class IDEPropertiesAction
   //#########################################################################
   //# Inner Class PropertiesVisitor
   private class PropertiesVisitor
-    extends DefaultModuleProxyVisitor
-    implements ProductDESProxyVisitor
+    extends DefaultProductDESAndModuleProxyVisitor
   {
 
     //#######################################################################
@@ -211,73 +199,6 @@ public class IDEPropertiesAction
     public Boolean visitProxy(final Proxy proxy)
     {
       return false;
-    }
-
-    //#########################################################################
-    //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
-    @Override
-    public Object visitAutomatonProxy(final AutomatonProxy proxy)
-      throws VisitorException
-    {
-      return visitNamedProxy(proxy);
-    }
-
-    @Override
-    public Object visitConflictTraceProxy(final ConflictTraceProxy proxy)
-      throws VisitorException
-    {
-      return visitTraceProxy(proxy);
-    }
-
-    @Override
-    public Object visitEventProxy(final EventProxy proxy) throws VisitorException
-    {
-      return visitNamedProxy(proxy);
-    }
-
-    @Override
-    public Object visitLoopTraceProxy(final LoopTraceProxy proxy)
-      throws VisitorException
-    {
-      return visitTraceProxy(proxy);
-    }
-
-    @Override
-    public Object visitProductDESProxy(final ProductDESProxy proxy)
-      throws VisitorException
-    {
-      return visitDocumentProxy(proxy);
-    }
-
-    @Override
-    public Object visitSafetyTraceProxy(final SafetyTraceProxy proxy)
-      throws VisitorException
-    {
-      return visitTraceProxy(proxy);
-    }
-
-    @Override
-    public Object visitStateProxy(final StateProxy proxy) throws VisitorException
-    {
-      return visitNamedProxy(proxy);
-    }
-
-    @Override
-    public Object visitTraceProxy(final TraceProxy proxy) throws VisitorException
-    {
-      return visitDocumentProxy(proxy);
-    }
-
-    @Override
-    public Object visitTraceStepProxy(final TraceStepProxy proxy)
-    {
-      return visitProxy(proxy);
-    }
-
-    @Override
-    public Object visitTransitionProxy(final TransitionProxy proxy)
-    {
-      return visitProxy(proxy);
     }
 
     //#######################################################################
@@ -417,6 +338,6 @@ public class IDEPropertiesAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1213915459887289849L;
 
 }
