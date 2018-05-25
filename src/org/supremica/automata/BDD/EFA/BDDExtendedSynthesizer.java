@@ -245,8 +245,8 @@ public class BDDExtendedSynthesizer
             sep = parser.parse(generatedGuard, Operator.TYPE_BOOLEAN);
           else {
             final String guard = guardBlock.remove(0).toString();
-            sep = parser.parse(String.format("(%s) & %s", generatedGuard,
-                                                          guard));
+            sep = parser.parse(String.format("(%s) & (%s)",
+                                              guard, generatedGuard));
           }
         } catch (final ParseException pe) {
           System.err.println(pe);
