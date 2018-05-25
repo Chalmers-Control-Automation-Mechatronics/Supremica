@@ -18,6 +18,7 @@ import java.util.TreeSet;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -126,6 +127,29 @@ public class BDDExtendedAutomaton {
                 }
                 // Construct "keep BDD"
                 addKeep(currLocation);
+                // Construct the BDD for the edge, used in the guard generation...
+                final Iterator<EdgeSubject> edgeIt =
+                  locationToOutgoingEdgesMap.get(currLocation).iterator();
+                while(edgeIt.hasNext()) {
+                  final EdgeSubject edge = edgeIt.next();
+                  final BDDFactory factory = manager.getFactory();
+                  final int srcLocIndex = bddExAutomata.getLocationIndex(theExAutomaton, edge.getSource());
+                  final BDD srcLocBDD = factory.buildCube(srcLocIndex, sourceLocationDomain.vars());
+                  List<SimpleExpressionProxy> guards = null;
+                  final BDD guardBDD = manager.getOneBDD();
+                  if (edge.getGuardActionBlock() != null)
+                    guards = edge.getGuardActionBlock().getGuards();
+                  if (guards != null && guards.isEmpty())
+                    guardBDD.and(manager.guard2BDD(guards.get(0)));
+                  final Iterator<Proxy> eventIterator = edge.getLabelBlock().getEventIdentifierList().iterator();
+                  while (eventIterator.hasNext()) {
+                    final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
+                    final HashMap<EdgeProxy, BDD> eventsEdge2BDDMap =
+                      bddExAutomata.getEventName2EdgeBDDMap().get(eventName);
+                    eventsEdge2BDDMap.put(edge, srcLocBDD.and(guardBDD));
+                  }
+                  bddExAutomata.getEdge2ExAutomatonMap().put(edge, theExAutomaton);
+                }
             } else {
                 // First create all edges in this automaton
                 for (final Iterator<EdgeSubject> edgeIt = locationToOutgoingEdgesMap.get(currLocation).iterator(); edgeIt.hasNext();) {

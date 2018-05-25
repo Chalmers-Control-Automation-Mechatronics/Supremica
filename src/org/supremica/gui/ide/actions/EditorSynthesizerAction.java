@@ -186,18 +186,6 @@ public class EditorSynthesizerAction extends IDEAction
     // do the work
     bddSynthesizer.synthesize(options);
 
-    // test event name to edges
-    // currently work for the monolithic synthesis, will be
-    // cleaned up after partitioning also works.
-//    for (final Map.Entry<String, HashMap<EdgeProxy, BDD>> entry:
-//      bddSynthesizer.getBDDAutomata().eventName2EdgeBDDsMap.entrySet()) {
-//      logger.debug("Event name: " + entry.getKey());
-//      for (final EdgeProxy edge: entry.getValue().keySet()) {
-//        logger.debug(edge.getSource().getName() + " -> " +
-//                     edge.getTarget().getName());
-//      }
-//    }
-
     logger.info("Synthesis completed after "
                 + bddSynthesizer.getSynthesisTimer().toString() + ".");
     if (options.getOptimization()) {

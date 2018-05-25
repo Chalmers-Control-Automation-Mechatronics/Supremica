@@ -171,9 +171,6 @@ public final class BDDExtendedGuardGenerator {
       computeStatesLeading2ForbiddenStates();
       computeMustAllowedSates();
       computeMustForbiddenSates();
-      computeEdgeMustAllowedStates();
-      computeEdgesMustForbiddenStates();
-      computeEdgesCareStates();
 
     } else if (synAlgo == SynthesisAlgorithm.PARTITIONBDD) {
       disjunctivelyComputeMustAllowedStates();
@@ -181,6 +178,10 @@ public final class BDDExtendedGuardGenerator {
     } else {
       assert false;  // never happens
     }
+
+    computeEdgeMustAllowedStates();
+    computeEdgesMustForbiddenStates();
+    computeEdgesCareStates();
 
     applyComplementHeuristics = options.getCompHeuristic();
     applyIndependentHeuristics = options.getIndpHeuristic();
