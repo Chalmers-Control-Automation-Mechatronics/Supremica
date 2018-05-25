@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.gui;
 
+import gnu.trove.set.hash.THashSet;
+
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -96,10 +99,12 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
+import net.sourceforge.waters.gui.renderer.ColorGroup;
 import net.sourceforge.waters.gui.renderer.GeneralShape;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.Handle;
 import net.sourceforge.waters.gui.renderer.Handle.HandleType;
+import net.sourceforge.waters.gui.renderer.LayoutMode;
 import net.sourceforge.waters.gui.renderer.MiscShape;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
@@ -170,12 +175,11 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.IDEToolBar;
 import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -197,7 +201,7 @@ public class GraphEditorPanel
   public GraphEditorPanel(final GraphSubject graph,
                           final ModuleSubject module,
                           final ModuleContainer moduleContainer,
-                          final EditorWindowInterface root,
+                          final ComponentEditorPanel root,
                           final IDEToolBar toolbar,
                           final WatersPopupActionManager manager)
     throws GeometryAbsentException
@@ -255,7 +259,7 @@ public class GraphEditorPanel
     return mRoot.getUndoInterface();
   }
 
-  public EditorWindowInterface getEditorInterface()
+  public ComponentEditorPanel getComponentEditorPanel()
   {
     return mRoot;
   }
@@ -1605,13 +1609,9 @@ public class GraphEditorPanel
    */
   private Handle getClickedHandle(final ProxySubject item, final Point point)
   {
-    if (isSelected(item)) {
-      final boolean handlesAreShown = getShapeProducer().getRenderingContext()
-            .getRenderingInformation(item).showHandles();
-      if (!handlesAreShown) {
-        return null;
-      }
-      final ProxyShape shape = getShapeProducer().getShape(item);
+    if (isSelected(item) && getCurrentSelection().size() == 1) {
+      final ProxyShapeProducer producer = getShapeProducer();
+      final ProxyShape shape = producer.getShape(item);
       return shape.getClickedHandle(point);
     } else {
       return null;
@@ -1780,41 +1780,47 @@ public class GraphEditorPanel
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
     @Override
-    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    public RenderingInformation getRenderingInformation(final Proxy proxy,
+                                                        final ColorGroup group)
     {
       final ProxySubject item = (ProxySubject) proxy;
       final boolean focused = isRenderedFocused(item);
       final boolean selected = isRenderedSelected(item);
-      final boolean showHandles = getCurrentSelection().size() == 1;
-        //showHandles = mController.canBeSelected(item);
+      final DragOverStatus dragOver;
+      if (focused && mInternalDragAction != null) {
+        dragOver = mInternalDragAction.getExternalDragStatus();
+      } else {
+        dragOver = DragOverStatus.NOTDRAG;
+      }
+      final boolean hasFocus = isTrackedFocusOwner();
+      final ProxySubject orig = getOriginal(item);
+      final ModuleCompilationErrors errors =
+        getModuleContext().getCompilationErrors();
       final boolean overlap = isOverlap(item);
+      final boolean nestedError = mErrorVisitor.isRenderedError(orig);
+      final boolean error = overlap || nestedError;
+
+      final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
+      final Color color =
+        layout.getColor(group, dragOver, selected, error, hasFocus);
+      if (color == null) {
+        return null;
+      }
+      final Color shadow = EditorColor.shadow(color);
+      final boolean showHandles = getCurrentSelection().size() == 1;
+      //showHandles = mController.canBeSelected(item);
+      final boolean underlined = errors.isUnderlined(orig);
       int priority = getPriority(item);
       if (mDontDraw.contains(item)) {
         priority = -1;
       } else if (selected) {
         priority += 6;
       }
-      final DragOverStatus dragover;
-      if (focused && mInternalDragAction != null) {
-        dragover = mInternalDragAction.getExternalDragStatus();
-      } else {
-        dragover = DragOverStatus.NOTDRAG;
-      }
-      final boolean focussed = isTrackedFocusOwner();
-      final ProxySubject orig = getOriginal(item);
-      final ModuleCompilationErrors errors =
-        getModuleContext().getCompilationErrors();
-      final boolean underlined = errors.isUnderlined(orig);
-      final boolean nestedError = mErrorVisitor.isRenderedError(orig);
-      final boolean error = overlap || nestedError;
       return new RenderingInformation
-        (selected, showHandles, underlined, focused,
-         EditorColor.getColor(item, dragover, selected, error, focussed),
-         EditorColor.getShadowColor(item, dragover, selected, error, focussed),
-         priority);
+        (selected, showHandles, underlined, focused, color, shadow, priority);
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private final ErrorVisitor mErrorVisitor;
   }
@@ -5693,7 +5699,7 @@ public class GraphEditorPanel
 
   //#########################################################################
   //# Data Members
-  private final EditorWindowInterface mRoot;
+  private final ComponentEditorPanel mRoot;
   private final ModuleContainer mModuleContainer;
   private final IDEToolBar mToolbar;
 

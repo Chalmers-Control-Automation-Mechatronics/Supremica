@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -145,11 +145,15 @@ public class IconAndFontLoader
     return ICON_PLANT.getIconHeight();
   }
 
-  public static int getPreferredTableRowHeight()
+  public static int getTableColumnGap()
   {
     final int iconSize = getWatersIconSize();
-    final int absoluteGap = Math.round(TABLE_ROW_GAP * iconSize);
-    return iconSize + absoluteGap;
+    return Math.round(TABLE_ROW_GAP * iconSize);
+  }
+
+  public static int getPreferredTableRowHeight()
+  {
+    return getWatersIconSize() + getTableColumnGap();
   }
 
   public static ImageIcon loadImage(final String subdir, final String name)

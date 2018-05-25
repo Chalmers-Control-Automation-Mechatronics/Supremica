@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -53,7 +53,7 @@ import org.supremica.gui.WhiteScrollPane;
  *
  * <P>The main panel consists of a {@link JSplitPane}, which is common to
  * all module views. Subclasses implement the specifics for {@link EditorPanel},
- * {@link SimulatorPanel}, and {@link AnalyzerPanel}.</P>
+ * {@link SimulatorPanel}, and {@link SupremicaAnalyzerPanel}.</P>
  *
  * @author Knut &Aring;kesson, Robi Malik
  */

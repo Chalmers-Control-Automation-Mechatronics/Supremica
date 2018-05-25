@@ -201,9 +201,13 @@
         <include
            name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
         <include
+           name="net/sourceforge/waters/analysis/comp552/AbstractCounterExampleChecker.class"/>
+        <include
            name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.class"/>
         <include
            name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.class"/>
+        <include
+           name="net/sourceforge/waters/analysis/comp552/QuietLogConfigurationFactory.class"/>
       </fileset>
     </jar>
   </target>
@@ -343,6 +347,7 @@
           <include name="net/sourceforge/waters/**/*Test.java"/>
           <exclude name="net/sourceforge/waters/gui/**/*.java"/>
           <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
+          <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicCliqueBasedSupervisorReductionTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSynthesizerNormalityTest.java"/>
           <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>

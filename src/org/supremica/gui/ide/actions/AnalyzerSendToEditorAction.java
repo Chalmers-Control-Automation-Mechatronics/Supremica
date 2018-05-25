@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -123,7 +123,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
         module.getComponentListModifiable();
       int compInsPos = compTarget.size();
       final Automata selectedAutomata =
-          container.getAnalyzerPanel().getSelectedAutomata();
+          container.getSupremicaAnalyzerPanel().getSelectedAutomata();
       final ProductDESImporter importer =
           new ProductDESImporter(ModuleSubjectFactory.getInstance());
       final List<InsertInfo> components = new LinkedList<InsertInfo>();

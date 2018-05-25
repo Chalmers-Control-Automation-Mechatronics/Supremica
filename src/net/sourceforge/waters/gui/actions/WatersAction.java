@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -78,6 +78,7 @@ public abstract class WatersAction
    * only updates the status if the user has switched main panels, enabling
    * the action if the editor is active.
    */
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
@@ -100,6 +101,7 @@ public abstract class WatersAction
    * @return  The current module container,
    *          or <CODE>null</CODE> if no module container is currently active.
    */
+  @Override
   ModuleContainer getActiveModuleContainer()
   {
     final IDE ide = getIDE();
@@ -134,23 +136,23 @@ public abstract class WatersAction
   /**
    * Retrieves a references to undo interface for the currently edited module.
    * @return  An undo interface that can be used to send commands to the
-   *          current module, or <CODE>null</CODE> if no editor panel is
+   *          edited document, or <CODE>null</CODE> if no editor panel is
    *          currently active.
    */
   UndoInterface getActiveUndoInterface()
   {
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
-    if (container instanceof UndoInterface) {
-      return (UndoInterface) container;
-    } else {
+    if (container == null) {
       return null;
+    } else {
+      return container.getActiveUndoInterface();
     }
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -4921817198677668185L;
 
 }

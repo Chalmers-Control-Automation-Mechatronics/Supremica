@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -36,7 +36,6 @@ package net.sourceforge.waters.gui.actions;
 import java.awt.Component;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEventPanel;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
@@ -76,13 +75,14 @@ public abstract class WatersGraphAction
    * only updates the status if the user has switched panels, enabling
    * the action if a graph editor is active.
    */
+  @Override
   public void update(final EditorChangedEvent event)
   {
     switch (event.getKind()) {
     case CONTAINER_SWITCH:
     case MAINPANEL_SWITCH:
     case SUBPANEL_SWITCH:
-      final EditorWindowInterface gui = getActiveComponentEditorPanel();
+      final ComponentEditorPanel gui = getActiveComponentEditorPanel();
       final boolean enabled = gui != null;
       setEnabled(enabled);
       break;
@@ -109,7 +109,7 @@ public abstract class WatersGraphAction
     final Component panel = container.getActivePanel();
     if (panel instanceof EditorPanel) {
       final EditorPanel epanel = (EditorPanel) panel;
-      return epanel.getActiveEditorWindowInterface();
+      return epanel.getActiveComponentEditorPanel();
     } else {
       return null;
     }
@@ -133,7 +133,7 @@ public abstract class WatersGraphAction
    */
   GraphEventPanel getActiveGraphEventPanel()
   {
-    final EditorWindowInterface gui = getActiveComponentEditorPanel();
+    final ComponentEditorPanel gui = getActiveComponentEditorPanel();
     return gui == null ? null : gui.getEventPanel();
   }
 

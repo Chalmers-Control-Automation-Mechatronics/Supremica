@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,34 +33,15 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.GraphPanel.DragOverStatus;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.subject.base.ProxySubject;
+
 
 public class PrintRenderingContext extends ModuleRenderingContext
 {
 
-    public PrintRenderingContext(final ModuleContext context)
+  public PrintRenderingContext(final ModuleContext context)
   {
     super(context);
   }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.renderer.RenderingContext
-    @Override
-    public RenderingInformation getRenderingInformation(final Proxy proxy)
-    {
-      final ProxySubject item = (ProxySubject) proxy;
-      final int priority = getPriority(item);
-      return new RenderingInformation
-        (false, false, false, false,
-         EditorColor.getColor(item, DragOverStatus.NOTDRAG, false,
-                              false, false),
-         EditorColor.getShadowColor(item, DragOverStatus.NOTDRAG, false,
-                                    false, false),
-         priority);
-    }
 
 }

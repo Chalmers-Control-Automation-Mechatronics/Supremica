@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -46,7 +46,6 @@ import java.util.Set;
 
 import javax.swing.JOptionPane;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.language.ProxyNamer;
@@ -82,6 +81,8 @@ import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.supremica.gui.ide.ComponentEditorPanel;
 
 
 /**
@@ -144,14 +145,14 @@ public class EventDeclDeleteVisitor
 
   public void insertItems(final List<InsertInfo> inserts)
   {
-    final EditorWindowInterface iface = mRoot.getActiveEditorWindowInterface();
+    final ComponentEditorPanel panel = mRoot.getActiveComponentEditorPanel();
     final GraphEditorPanel surface;
     final GraphProxy visiblegraph;
-    if (iface == null) {
+    if (panel == null) {
       surface = null;
       visiblegraph = null;
     } else {
-      surface = iface.getGraphEditorPanel();
+      surface = panel.getGraphEditorPanel();
       visiblegraph = surface.getGraph();
     }
     final ModuleSubject module = mRoot.getModuleSubject();
@@ -207,8 +208,8 @@ public class EventDeclDeleteVisitor
           final IdentifierSubject subject = (IdentifierSubject) proxy;
           final SimpleComponentSubject comp =
             SubjectTools.getAncestor(subject, SimpleComponentSubject.class);
-          final EditorWindowInterface iface =
-            mRoot.getEditorWindowInterface(comp);
+          final ComponentEditorPanel iface =
+            mRoot.getComponentEditorPanel(comp);
           if (iface != null) {
             final SelectionOwner panel = iface.getGraphEditorPanel();
             final List<ProxySubject> list = Collections.singletonList(proxy);
@@ -427,7 +428,7 @@ public class EventDeclDeleteVisitor
       try {
         final SimpleComponentSubject comp =
           (SimpleComponentSubject) mComponent;
-        final EditorWindowInterface iface = mRoot.showEditor(comp);
+        final ComponentEditorPanel iface = mRoot.showEditor(comp);
         final SelectionOwner panel = iface.getGraphEditorPanel();
         panel.replaceSelection(oldSelection);
       } catch (final GeometryAbsentException exception) {
@@ -443,7 +444,7 @@ public class EventDeclDeleteVisitor
       try {
         final SimpleComponentSubject comp =
           (SimpleComponentSubject) mComponent;
-        final EditorWindowInterface iface = mRoot.showEditor(comp);
+        final ComponentEditorPanel iface = mRoot.showEditor(comp);
         // Select them ...
         comp.acceptVisitor(this);
         final List<Proxy> selection = findSelection(mDeletionVictims);

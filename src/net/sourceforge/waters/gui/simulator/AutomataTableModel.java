@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -124,8 +124,8 @@ class AutomataTableModel
     case 4:
       return String.class;
     default:
-      throw new ArrayIndexOutOfBoundsException(
-          "Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for automata table model!");
     }
   }
 
@@ -150,12 +150,13 @@ class AutomataTableModel
     case 4:
       return "State";
     default:
-      return "Invalid";
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for automata table model!");
     }
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Interface net.sourceforge.waters.gui.simulator.SimulationObserver
   @Override
   public void simulationChanged(final SimulationChangeEvent event)
@@ -165,7 +166,7 @@ class AutomataTableModel
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Interface InternalFrameObserver
   @Override
   public void onFrameEvent(final InternalFrameEvent event)
@@ -178,7 +179,7 @@ class AutomataTableModel
   }
 
 
-  //##########################################################################
+  //#########################################################################
   //# Sorting
   void addSortingMethod(final int column)
   {
@@ -188,8 +189,8 @@ class AutomataTableModel
   }
 
 
-  // #########################################################################
-  // # Auxiliary Methods
+  //#########################################################################
+  //# Auxiliary Methods
   private void getRawData()
   {
     final ModuleContainer container = getModuleContainer();

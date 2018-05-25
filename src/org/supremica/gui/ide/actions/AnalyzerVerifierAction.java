@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -90,7 +90,7 @@ public class AnalyzerVerifierAction
       // Retrieve the selected automata and make a sanity check
       final DocumentContainer container = ide.getActiveDocumentContainer();
       final Automata selectedAutomata =
-        container.getAnalyzerPanel().getSelectedAutomata();
+        container.getSupremicaAnalyzerPanel().getSelectedAutomata();
       if (!selectedAutomata.sanityCheck(owner, 1, true, false, true, true)) {
         return;
       }
@@ -112,7 +112,7 @@ public class AnalyzerVerifierAction
       }
       if (vOptions.getVerificationType() ==
           VerificationType.LANGUAGEINCLUSION) {
-        vOptions.setInclusionAutomata(container.getAnalyzerPanel().getUnselectedAutomata());
+        vOptions.setInclusionAutomata(container.getSupremicaAnalyzerPanel().getUnselectedAutomata());
       }
       final SynchronizationOptions sOptions =
         SynchronizationOptions.getDefaultVerificationOptions();

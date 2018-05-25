@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,12 +31,12 @@
 //# exception.
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.renderer;
 
 import java.awt.Color;
 
 import net.sourceforge.waters.gui.EditorColor;
+import net.sourceforge.waters.gui.GraphPanel;
 
 import org.supremica.properties.Config;
 
@@ -64,7 +64,7 @@ public enum LayoutMode
    */
   BlackAndWhite {
     @Override
-    Color getColor(final ColorGroup group)
+    public Color getDefaultColor(final ColorGroup group)
     {
       switch (group) {
       case GROUP_NODE:
@@ -89,16 +89,61 @@ public enum LayoutMode
   //#########################################################################
   //# Methods
   /**
-   * Gets the colour to render items of the given type.
+   * Gets the colour to render items of the given type, if it has the
+   * indicated highlighting status.
+   * @param  group    The colour group identifying the type of object to be
+   *                  rendered.
+   * @param  dragOver The state of a drag&amp;drop operation affecting the
+   *                  rendering of the item.
+   * @param  selected Whether or not the item is selected.
+   * @param  error    Whether or not an error is reported for the item.
+   * @param  hasFocus Whether or not the panel displaying the item has
+   *                  the keyboard focus.
+   * @return The colour to be used, or <CODE>null</CODE> to suppress rendering
+   *         of the item.
+   */
+  public Color getColor(final ColorGroup group,
+                        final GraphPanel.DragOverStatus dragOver,
+                        final boolean selected,
+                        final boolean error,
+                        final boolean hasFocus)
+  {
+    // In order of importance
+    if (dragOver != GraphPanel.DragOverStatus.NOTDRAG) {
+      if (dragOver == GraphPanel.DragOverStatus.CANDROP) {
+        return EditorColor.CANDROPCOLOR;
+      } else if (dragOver == GraphPanel.DragOverStatus.CANTDROP) {
+        return EditorColor.CANTDROPCOLOR;
+      }
+    } else if (selected) {
+      if (hasFocus) {
+        return EditorColor.GRAPH_SELECTED_FOCUSSED;
+      } else {
+        return EditorColor.GRAPH_SELECTED_NOTFOCUSSED;
+      }
+    } else if (error) {
+      if (group == ColorGroup.SIMPLE_NODE) {
+        return EditorColor.ERRORCOLOR_NODE;
+      } else {
+        return EditorColor.ERRORCOLOR;
+      }
+    }
+    return getDefaultColor(group);
+  }
+
+  /**
+   * Gets the default colour to render items of the given type, if it does
+   * not have any special status such as selected or highlighted.
    * @param  group  The colour group identifying the type of object to be
    *                rendered.
    * @return The colour to be used, or <CODE>null</CODE> to suppress rendering
    *         of the item.
    */
-  Color getColor(final ColorGroup group)
+  public Color getDefaultColor(final ColorGroup group)
   {
     switch (group) {
     case GRAPH_ITEM:
+    case SIMPLE_NODE:
       return EditorColor.DEFAULTCOLOR;
     case GROUP_NODE:
       return EditorColor.DEFAULTCOLOR_NODEGROUP;

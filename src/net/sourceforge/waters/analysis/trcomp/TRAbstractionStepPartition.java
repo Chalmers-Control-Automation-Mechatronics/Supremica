@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -45,6 +45,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.BFSSearchSpace;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -57,6 +58,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.EventProxy;
 
 import org.apache.logging.log4j.Logger;
@@ -205,6 +207,46 @@ class TRAbstractionStepPartition
 
   //#########################################################################
   //# Inner Class TraceExpander
+  /**
+   * <P>A utility class to run the trace expansion process for a
+   * partition-based abstraction step.</P>
+   *
+   * <P>Trace expansion performs a breadth-first search through the
+   * original automaton (before abstraction) to find a concrete trace accepted
+   * by the original automaton that uses the same non-local events as the
+   * abstract trace, which ends in a state that belongs to the equivalence
+   * class represented by the end state of the abstract trace.</P>
+   *
+   * <P>Special support is built in to support conflict trace expansion.</P>
+   * <UL>
+   * <LI>Trace expansion may end prematurely if a deadlock state is reached.
+   * Here, a deadlock state is a state not marked with the accepting
+   * proposition ({@link AbstractTRCompositionalAnalyzer#DEFAULT_MARKING})
+   * and without outgoing transitions. In the case of generalised nonblocking,
+   * the deadlock state must also be marked with the precondition marking
+   * ({@link AbstractTRCompositionalAnalyzer#PRECONDITION_MARKING}).
+   * If a deadlock state is encountered during the search, expansion stops
+   * immediately, possibly returning a concrete trace that does not accept
+   * all the events found in the abstract trace. This is to support selfloop
+   * removal abstraction, where an event can be removed from an automaton
+   * if it is selflooped in all states except for deadlock states.</LI>
+   * <LI>For generalised nonblocking, it is ensured that the trace ends in
+   * a precondition-marked state. That is, after all non-local events are
+   * consumed and a state in the equivalence class of the end state of the
+   * abstract trace is reached, the search continues using local events until
+   * a precondition-marked state is reached. The set of precondition-marked
+   * states considered for this purpose can restricted through the method
+   * {@link TRAbstractionStepPartition#setRelevantPreconditionMarkings(BitSet)}
+   * to support possible &omega;-Removal ({@link OmegaRemovalTRSimplifier})
+   * abstraction steps.</LI>
+   * </UL>
+   * <P>These special conditions only apply when the invoking model verifier
+   * uses a default marking ({@link
+   * AbstractTRCompositionalAnalyzer#getUsedDefaultMarking()}),
+   * i.e., not for language inclusion checks.</P>
+   *
+   * @author Robi Malik
+   */
   private class TraceExpander
   {
     //#######################################################################
@@ -212,6 +254,7 @@ class TRAbstractionStepPartition
     private TraceExpander(final TRTraceProxy trace,
                           final ListBufferTransitionRelation rel,
                           final AbstractTRCompositionalAnalyzer analyzer)
+       throws EventNotFoundException
     {
       mAnalyzer = analyzer;
       mInputTransitionRelation = rel;
@@ -243,18 +286,15 @@ class TRAbstractionStepPartition
         final int[] clazz = mPartition.getStates(mTargetState);
         mTargetStateClass = new TIntHashSet(clazz);
       }
-      if (rel.isPropositionUsed(TRCompositionalConflictChecker.DEFAULT_MARKING)) {
-        boolean hasDeadlock = false;
+      mHasDeadlockState = false;
+      if (analyzer.getUsedDefaultMarking() != null &&
+          rel.isPropositionUsed(AbstractTRCompositionalAnalyzer.DEFAULT_MARKING)) {
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
-          if (rel.isReachable(s) &&
-              rel.isDeadlockState(s, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
-            hasDeadlock = true;
+          if (rel.isReachable(s) && isDeadlockState(s)) {
+            mHasDeadlockState = true;
             break;
           }
         }
-        mHasDeadlockState = hasDeadlock;
-      } else {
-        mHasDeadlockState = false;
       }
       mSearchSpace = new BFSSearchSpace<>(rel.getNumberOfStates());
       mStartOfNextLevel = mNonDeadlockTarget = null;
@@ -268,7 +308,7 @@ class TRAbstractionStepPartition
       final int numStates = mInputTransitionRelation.getNumberOfStates();
       for (int s = 0; s < numStates; s++) {
         if (mInputTransitionRelation.isInitial(s)) {
-          final TRTraceSearchRecord record = createInitialRecord(s);
+          final SearchRecord record = new SearchRecord(this, s);
           if (processSearchRecord(record)) {
             return record;
           }
@@ -282,7 +322,7 @@ class TRAbstractionStepPartition
         (inner, mEventEncodingBefore, EventStatus.STATUS_LOCAL);
       while (!mSearchSpace.isEmpty()) {
         mAnalyzer.checkAbort();
-        final TRTraceSearchRecord current = mSearchSpace.poll();
+        final SearchRecord current = mSearchSpace.poll();
         if (current == mStartOfNextLevel) {
           if (mNonDeadlockTarget != null) {
             return mNonDeadlockTarget;
@@ -296,7 +336,7 @@ class TRAbstractionStepPartition
           iterEvent.reset(s, e);
           while (iterEvent.advance()) {
             final int t = iterEvent.getCurrentTargetState();
-            final TRTraceSearchRecord next = createNextRecord(t, e, current);
+            final SearchRecord next = new SearchRecord(this, t, current, e);
             if (processSearchRecord(next)) {
               return next;
             }
@@ -306,7 +346,7 @@ class TRAbstractionStepPartition
         while (iterLocal.advance()) {
           final int l = iterLocal.getCurrentEvent();
           final int t = iterLocal.getCurrentTargetState();
-          final TRTraceSearchRecord next = createNextRecord(t, l, current);
+          final SearchRecord next = new SearchRecord(this, t, current, l);
           if (processSearchRecord(next)) {
             return next;
           }
@@ -318,48 +358,16 @@ class TRAbstractionStepPartition
       return mNonDeadlockTarget;
     }
 
-    private TRTraceSearchRecord createInitialRecord(final int state)
+    private boolean processSearchRecord(final SearchRecord record)
     {
-      return createNextRecord(state, -1, null);
-    }
-
-    private TRTraceSearchRecord createNextRecord(final int state,
-                                                 final int event,
-                                                 final TRTraceSearchRecord pred)
-    {
-      // Trick! Search records contain the number of consumed events,
-      // or the number of consumed events plus one, if all events
-      // in the input trace have been consumed and a state equivalent
-      // to the end state of the input trace has been reached.
-      // For generalised nonblocking, the search has to continue towards
-      // precondition-marked state not equivalent to the trace end state.
-      int consumed = 0;
-      if (pred != null) {
-        consumed = pred.getNumberOfConsumedEvents();
-        final byte status = mEventEncodingBefore.getProperEventStatus(event);
-        if (!EventStatus.isLocalEvent(status)) {
-          consumed++;
-        }
-      }
-      if (consumed == mEventSequence.size() && isTraceEndState(state)) {
-        consumed++;
-      }
-      return new TRTraceSearchRecord(state, consumed, event, pred);
-    }
-
-    private boolean processSearchRecord(final TRTraceSearchRecord record)
-    {
-      if (isTargetState(record)) {
+      final int state = record.getState();
+      if (mHasDeadlockState && isDeadlockState(state)) {
+        mNonDeadlockTarget = null;
+        return true;
+      } else if (record.isEndStateReached()) {
+        mNonDeadlockTarget = record;
         if (!mHasDeadlockState) {
           return true;
-        }
-        final int state = record.getState();
-        if (mInputTransitionRelation.isDeadlockState
-              (state, TRCompositionalConflictChecker.DEFAULT_MARKING)) {
-          return true;
-        }
-        if (mNonDeadlockTarget == null) {
-          mNonDeadlockTarget = record;
         }
       }
       if (mSearchSpace.addIfUnvisited(record)) {
@@ -370,7 +378,12 @@ class TRAbstractionStepPartition
       return false;
     }
 
-    private boolean isTraceEndState(final int state)
+    private boolean isTargetState(final int state, final int consumed)
+    {
+      return consumed == mEventSequence.size() && isTargetState(state);
+    }
+
+    private boolean isTargetState(final int state)
     {
       if (mTargetStateClass != null) {
         return mTargetStateClass.contains(state);
@@ -381,18 +394,28 @@ class TRAbstractionStepPartition
       }
     }
 
-    private boolean isTargetState(final TRTraceSearchRecord record)
+    private boolean isDeadlockState(final int state)
     {
-      if (record.getNumberOfConsumedEvents() <= mEventSequence.size()) {
-        return false;
-      } else if (mRelevantPreconditionMarkings != null) {
-        final int state = record.getState();
+      return
+        mInputTransitionRelation.isDeadlockState
+          (state, AbstractTRCompositionalAnalyzer.DEFAULT_MARKING) &&
+        isRelevantPreconditionMarkedState(state);
+    }
+
+    private boolean isRelevantPreconditionMarkedState(final int state)
+    {
+      if (mRelevantPreconditionMarkings != null) {
         return mRelevantPreconditionMarkings.get(state);
       } else {
-        final int state = record.getState();
         return mInputTransitionRelation.isMarked
           (state, AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
       }
+    }
+
+    private boolean isLocalEvent(final int event)
+    {
+      final byte status = mEventEncodingBefore.getProperEventStatus(event);
+      return EventStatus.isLocalEvent(status);
     }
 
 
@@ -415,8 +438,12 @@ class TRAbstractionStepPartition
       EventProxy nextInputEvent = null;
       byte nextInputStatus = EventStatus.STATUS_UNUSED;
       while (true) {
-        if (nextSearchRecord == null && searchRecordIter.hasNext()) {
-          nextSearchRecord = searchRecordIter.next();
+        if (nextSearchRecord == null) {
+          if (searchRecordIter.hasNext()) {
+            nextSearchRecord = searchRecordIter.next();
+          } else if (mNonDeadlockTarget == null) {
+            break;
+          }
         }
         while (nextInputEvent == null && inputEventIter.hasNext()) {
           final EventProxy event = inputEventIter.next();
@@ -462,14 +489,146 @@ class TRAbstractionStepPartition
     //#######################################################################
     //# Data Members
     private final AbstractTRCompositionalAnalyzer mAnalyzer;
+    /**
+     * The automaton before abstraction.
+     */
     private final ListBufferTransitionRelation mInputTransitionRelation;
+    /**
+     * The sequence of non-local event codes to be included in the
+     * concrete trace.
+     */
     private final TIntArrayList mEventSequence;
+    /**
+     * The target state of the concrete trace, or <CODE>-1</CODE>
+     * if unspecified. If the {@link #mTargetStateClass} is <CODE>null</CODE>
+     * and the {@link #mTargetState} is <CODE>-1</CODE>, then any state
+     * can be used as end state.
+     */
     private final int mTargetState;
+    /**
+     * A set of possible target states for the concrete trace, or
+     * <CODE>null</CODE> if unspecified. If specified, this has
+     * precedence of {@link #mTargetState}.
+     */
     private final TIntHashSet mTargetStateClass;
+
+    /**
+     * Whether the original automaton includes a deadlock state. This is used
+     * to avoid checking the deadlock conditions when not needed.
+     */
     private boolean mHasDeadlockState;
-    private final BFSSearchSpace<TRTraceSearchRecord> mSearchSpace;
-    private TRTraceSearchRecord mStartOfNextLevel;
-    private TRTraceSearchRecord mNonDeadlockTarget;
+    /**
+     * Search space used by the breadth-first search.
+     */
+    private final BFSSearchSpace<SearchRecord> mSearchSpace;
+    /**
+     * Record that starts the next level of breadth-first search.
+     */
+    private SearchRecord mStartOfNextLevel;
+    /**
+     * A search record that qualifies to end the search which is not a deadlock
+     * state. If a non-deadlock end state is encountered, the search continues
+     * within the same depth level to find a deadlock state in the hope of
+     * producing a better counterexample. After the search, a <CODE>null</CODE>
+     * value of this variable indicates that a deadlock state has been found
+     * and the concrete trace does not need to include all events in
+     * {@link #mEventSequence}.
+     */
+    private SearchRecord mNonDeadlockTarget;
+  }
+
+
+  //#########################################################################
+  //# Inner Class SearchRecord
+  /**
+   * <P>A search record to facilitate trace expansion for partition-based
+   * abstraction. The search record contains two additional flags to support
+   * the special behaviour needed for conflict trace expansion.</P>
+   * <DL>
+   * <DT>Target state reached</DT>
+   * <DD>to record whether the trace associated with the search record has
+   * passed through a state in the equivalence class of the end state of the
+   * abstract trace after consuming all events.</DD>
+   * <DT>End state reached</DT>
+   * <DD>to record, when a target state is reached, whether the state
+   * associated with the search record has the precondition marking.</DD>
+   * </DL>
+   *
+   * @author Robi Malik
+   */
+  private static class SearchRecord extends TRTraceSearchRecord
+  {
+    //#######################################################################
+    //# Constructors
+    private SearchRecord(final TraceExpander expander,
+                         final int state)
+    {
+      super(state);
+      mTargetClassReached = expander.isTargetState(state, 0);
+      mEndStateReached =
+        mTargetClassReached && expander.isRelevantPreconditionMarkedState(state);
+    }
+
+    private SearchRecord(final TraceExpander expander,
+                         final int state,
+                         final SearchRecord pred,
+                         final int event)
+    {
+      super(state, pred, event, expander.isLocalEvent(event) ? 0 : 1);
+      final int consumed = getNumberOfConsumedEvents();
+      mTargetClassReached =
+        pred.mTargetClassReached || expander.isTargetState(state, consumed);
+      mEndStateReached =
+        mTargetClassReached && expander.isRelevantPreconditionMarkedState(state);
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private boolean isEndStateReached()
+    {
+      return mEndStateReached;
+    }
+
+    //#########################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (super.equals(other)) {
+        final SearchRecord record = (SearchRecord) other;
+        return mTargetClassReached == record.mTargetClassReached;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int result = 5 * super.hashCode();
+      if (mTargetClassReached) {
+        result++;
+      }
+      return result;
+    }
+
+    //#######################################################################
+    //# Data Members
+    /**
+     * Whether the trace associated with the search record has passed through
+     * a state in the equivalence class of the end state of the abstract trace
+     * after consuming all events.
+     */
+    private final boolean mTargetClassReached;
+    /**
+     * Whether the state associated with the search record has the precondition
+     * marking. This flag is <CODE>false</CODE> if {@link #mTargetClassReached}
+     * is <CODE>false</CODE>, otherwise it is <CODE>true</CODE> if and only
+     * if the state has the relevant precondition marking. This flag is
+     * not included in {@link #equals(Object) equals()} or {@link #hashCode()}
+     * because it is functionally dependent on other attributes.
+     */
+    private final boolean mEndStateReached;
   }
 
 

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -73,7 +73,7 @@ public class AnalyzerAutomataPanel
 
     private static Logger logger = LogManager.getLogger(AnalyzerAutomataPanel.class);
 
-    private final AnalyzerPanel analyzerPanel;
+    private final SupremicaAnalyzerPanel analyzerPanel;
     private final DocumentContainer moduleContainer;
     private JTable theAutomatonTable;
     private TableSorter theTableSorter;
@@ -87,7 +87,7 @@ public class AnalyzerAutomataPanel
 
     private static final float PREFERRED_WIDTH = 0.4f;
 
-    AnalyzerAutomataPanel(final AnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
+    AnalyzerAutomataPanel(final SupremicaAnalyzerPanel analyzerPanel, final DocumentContainer moduleContainer)
     {
       this.analyzerPanel = analyzerPanel;
       this.moduleContainer = moduleContainer;
@@ -97,7 +97,6 @@ public class AnalyzerAutomataPanel
       final Dimension size = new Dimension(width, 0);
       setPreferredSize(size);
     }
-
     private void initialize()
     {
         analyzerTableModel = getActiveProject().getAnalyzerTableModel();

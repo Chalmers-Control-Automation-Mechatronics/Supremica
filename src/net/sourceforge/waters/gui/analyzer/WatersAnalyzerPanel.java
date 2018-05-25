@@ -1,0 +1,149 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# Copyright (C) 2004-2018 Robi Malik
+//###########################################################################
+//# This file is part of Waters.
+//# Waters is free software: you can redistribute it and/or modify it under
+//# the terms of the GNU General Public License as published by the Free
+//# Software Foundation, either version 2 of the License, or (at your option)
+//# any later version.
+//# Waters is distributed in the hope that it will be useful, but WITHOUT ANY
+//# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+//# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+//# details.
+//# You should have received a copy of the GNU General Public License along
+//# with Waters. If not, see <http://www.gnu.org/licenses/>.
+//#
+//# Linking Waters statically or dynamically with other modules is making a
+//# combined work based on Waters. Thus, the terms and conditions of the GNU
+//# General Public License cover the whole combination.
+//# In addition, as a special exception, the copyright holders of Waters give
+//# you permission to combine Waters with code included in the standard
+//# release of Supremica under the Supremica Software License Agreement (or
+//# modified versions of such code, with unchanged license). You may copy and
+//# distribute such a system following the terms of the GNU GPL for Waters and
+//# the licenses of the other code concerned.
+//# Note that people who make modified versions of Waters are not obligated to
+//# grant this special exception for their modified versions; it is their
+//# choice whether to do so. The GNU General Public License gives permission
+//# to release a modified version without this exception; this exception also
+//# makes it possible to release a modified version which carries forward this
+//# exception.
+//###########################################################################
+
+package net.sourceforge.waters.gui.analyzer;
+
+import java.awt.Color;
+import java.util.Map;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
+import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import org.supremica.gui.ide.MainPanel;
+import org.supremica.gui.ide.ModuleContainer;
+
+
+/**
+ * @author George Hewlett
+ */
+
+public class WatersAnalyzerPanel extends MainPanel
+{
+
+  //#########################################################################
+  //# Constructor
+  public WatersAnalyzerPanel(final ModuleContainer moduleContainer,
+                             final String name)
+  {
+    super(name);
+    mModuleContainer = moduleContainer;
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
+    mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
+    mAutomataTable = new AutomataTable(moduleContainer, this);
+    final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
+    scroll.getViewport().setBackground(Color.white);
+    mModuleContainer.getCompiledDES();
+    setLeftComponent(scroll);
+    setRightComponent(scrollDisplay);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  ModuleContainer getModuleContainer()
+  {
+    return mModuleContainer;
+  }
+
+  ModuleSubject getModule()
+  {
+    return mModuleContainer.getModule();
+  }
+
+  SimpleExpressionCompiler getSimpleExpressionCompiler()
+  {
+    return mSimpleExpressionCompiler;
+  }
+
+
+  //#########################################################################
+  //# Callbacks
+  void displaySelectedAutomata(final AutomatonProxy aut)
+  {
+    final Map<Object,SourceInfo> infoMap =
+      mModuleContainer.getSourceInfoMap();
+    final SourceInfo info = infoMap.get(aut);
+    final Proxy source = info.getSourceObject();
+    if (source instanceof SimpleComponentSubject) {
+      final SimpleComponentSubject comp = (SimpleComponentSubject) source;
+      final GraphSubject graph = comp.getGraph();
+      final BindingContext bindings = info.getBindingContext();
+      try {
+        mAutomataDisplayPane =
+          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                                   mSimpleExpressionCompiler, aut);
+        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+        setRightComponent(scroll);
+      } catch (final GeometryAbsentException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage(comp);
+        logger.error(msg);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ModuleContainer mModuleContainer;
+  private final SimpleExpressionCompiler mSimpleExpressionCompiler;
+
+  private final JPanel mAutomataPanel = new JPanel();
+  private final JTable mAutomataTable;
+  private AutomatonDisplayPane mAutomataDisplayPane;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 8731351995076903210L;
+
+}

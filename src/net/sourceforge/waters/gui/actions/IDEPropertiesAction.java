@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -57,7 +57,7 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
+import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -87,7 +87,7 @@ import org.supremica.gui.ide.ModuleContainer;
  *
  * <P>This action pops up a dialog box to edit the currently focused
  * item, if that item is of a supported type. To support this action,
- * components including editable items must implement the {@link
+ * components that hold editable items must implement the {@link
  * SelectionOwner} interface and return the item to be edited through
  * their {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()}
  * method.</P>
@@ -168,7 +168,7 @@ public class IDEPropertiesAction
   //#########################################################################
   //# Inner Class PropertiesVisitor
   private class PropertiesVisitor
-    extends DefaultModuleProxyVisitor
+    extends DefaultProductDESAndModuleProxyVisitor
   {
 
     //#######################################################################
@@ -338,6 +338,6 @@ public class IDEPropertiesAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1213915459887289849L;
 
 }

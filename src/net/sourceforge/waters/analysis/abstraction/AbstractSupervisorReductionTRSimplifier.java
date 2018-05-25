@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -51,7 +51,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * <P>To distinguish these three possibilities, the supervisor reduction
  * simplifier checks for each controllable event the states that
  * have an outgoing transition with that event. If the transition's target
- * state is the dump state, then the event must be enabled in the transition's
+ * state is the dump state, then the event must be disabled in the transition's
  * source state; if the transition's target state is not the dump state,
  * then the event must be enabled in the transition's source state. States
  * without any transitions for a controllable event are assumed to be
@@ -70,6 +70,8 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * indicated by the presence of a transition to the dump state. A pure
  * supervisor automaton is obtained by deleting the dump state and
  * associated transitions.</P>
+ *
+ * @see ListBufferTransitionRelation#getDumpStateIndex()
  *
  * @author Robi Malik
  */

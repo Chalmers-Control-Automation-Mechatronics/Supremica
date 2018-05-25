@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -83,8 +83,8 @@ public class AnalyzerFindStatesAction
     @Override
     public void doAction()
     {
-        final VisualProject theProject = ide.getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final VisualProject theProject = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         // gui.info("Nbr of selected automata: " + selectedAutomata.size());
         final FindStates find_states = new FindStates();
 

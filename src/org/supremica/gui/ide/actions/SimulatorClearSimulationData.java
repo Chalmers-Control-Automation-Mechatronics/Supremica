@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -78,7 +78,7 @@ public class SimulatorClearSimulationData
      */
     public void doAction()
     {
-        VisualProject project = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+        VisualProject project = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
         project.clearSimulationData();
     }
 }

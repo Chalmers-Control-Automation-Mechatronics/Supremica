@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -78,6 +78,6 @@ public class AnalyzerDeleteAllAutomataAction
      */
     public void doAction()
     {
-        ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata()));
+        ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata().removeAutomata(new Automata(ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata()));
     }
 }

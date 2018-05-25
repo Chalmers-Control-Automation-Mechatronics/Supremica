@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -404,7 +404,7 @@ public class NodeEditorDialog
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
-        final GraphSubject graph = mModuleContainer.getActiveEditorWindowInterface().getGraphEditorPanel().getGraph();
+        final GraphSubject graph = mModuleContainer.getActiveComponentEditorPanel().getGraphEditorPanel().getGraph();
         if (graph.getNodesModifiable().containsName(text)) {
           throw new ParseException
           ("Node name '" + text + "' is already taken!", 0);

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -86,7 +86,7 @@ public class AnalyzerPlantifyAction
     @Override
     public void doAction()
     {
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
         // MinimizationHelper.plantify(selectedAutomata);
 		final Plantifier p = new Plantifier(selectedAutomata);
 		p.plantify();
@@ -94,7 +94,7 @@ public class AnalyzerPlantifyAction
 
 		try
 		{
-			ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(a, true);
+			ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(a, true);
 			// ide.getIDE().repaint();
 		}
 		catch (final Exception ex)

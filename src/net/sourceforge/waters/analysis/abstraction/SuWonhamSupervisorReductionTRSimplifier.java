@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
+
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -51,11 +56,6 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
-
-import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
 
 
 /**
@@ -111,7 +111,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Configuration
   /**
    * Enables or disables reordering of states based on distance to decision
-   * states. This experimental optimisation by Fanqian Qiu only works with
+   * states. This experimental optimisation by Fangqian Qiu only works with
    * supervisor localisation, i.e., when a supervised event is configured.
    * Otherwise, the setting has no effect.
    * @param experimentalMode <CODE>true</CODE> to enable reordering.
@@ -141,48 +141,43 @@ public class SuWonhamSupervisorReductionTRSimplifier
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
-    try {
-      setUp();
-      final TRPartition partition;
-      if (findBadStates()) {
-        final TIntArrayList enabDisabEvents = new TIntArrayList();
-        final TIntArrayList disabEvents = new TIntArrayList();
-        final int supervisedEvent = getSupervisedEvent();
-        if (supervisedEvent < 0) {
-          // monolithic supervisor reduction
-          setUpClasses();
-          setUpEventList(enabDisabEvents, disabEvents);
-          if (enabDisabEvents.size() == 0) {
-            partition = createOneStateTR(disabEvents);
-          } else {
-            partition = reduceSupervisor(enabDisabEvents);
-          }
+    final TRPartition partition;
+    if (findBadStates()) {
+      final TIntArrayList enabDisabEvents = new TIntArrayList();
+      final TIntArrayList disabEvents = new TIntArrayList();
+      final int supervisedEvent = getSupervisedEvent();
+      if (supervisedEvent < 0) {
+        // monolithic supervisor reduction
+        setUpClasses();
+        setUpEventList(enabDisabEvents, disabEvents);
+        if (enabDisabEvents.size() == 0) {
+          partition = createOneStateTR(disabEvents);
         } else {
-          // supervisor localisation
-          final TIntArrayList singletonList = new TIntArrayList(1);
-          singletonList.add(supervisedEvent);
-          if (mExperimentalMode) {
-            final ListBufferTransitionRelation rel = getTransitionRelation();
-            final int numStates = rel.getNumberOfStates();
-            mStateToClass = new int[numStates];
-            mClasses = new IntListBuffer();
-            partition = reduceSupervisorExperimental(singletonList);
-          } else {
-            setUpClasses();
-            partition = reduceSupervisor(singletonList);
-          }
+          partition = reduceSupervisor(enabDisabEvents);
         }
       } else {
-        partition = createOneStateTR(new TIntArrayList(0));
+        // supervisor localisation
+        final TIntArrayList singletonList = new TIntArrayList(1);
+        singletonList.add(supervisedEvent);
+        if (mExperimentalMode) {
+          final ListBufferTransitionRelation rel = getTransitionRelation();
+          final int numStates = rel.getNumberOfStates();
+          mStateToClass = new int[numStates];
+          mClasses = new IntListBuffer();
+          partition = reduceSupervisorExperimental(singletonList);
+        } else {
+          setUpClasses();
+          partition = reduceSupervisor(singletonList);
+        }
       }
-      setResultPartition(partition);
-      if (partition != null) {
-        applyResultPartitionAutomatically();
-      }
-      return partition != null;
-    } finally {
-      tearDown();
+    } else {
+      partition = createOneStateTR(new TIntArrayList(0));
     }
+    setResultPartition(partition);
+    if (partition != null) {
+      applyResultPartitionAutomatically();
+    }
+    return partition != null;
   }
 
   @Override

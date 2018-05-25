@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -55,8 +55,8 @@ import java.util.Map;
 
 import net.sourceforge.waters.gui.BackupGraphPanel;
 import net.sourceforge.waters.gui.EditorColor;
-import net.sourceforge.waters.gui.GraphPanel;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.renderer.ColorGroup;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShape;
@@ -100,8 +100,6 @@ import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
-import org.supremica.properties.SupremicaPropertyChangeListener;
 
 
 public class AutomatonDisplayPane
@@ -109,9 +107,10 @@ public class AutomatonDisplayPane
   implements SimulationObserver
 {
   //#########################################################################
-  //# Constructors
-  public AutomatonDisplayPane(final AutomatonProxy aut,
-                              final GraphSubject graph,
+  //# Constructor
+  public AutomatonDisplayPane(final GraphSubject graph,
+                              final AutomatonProxy aut,
+                              final BindingContext bindings,
                               final ModuleContainer container,
                               final Simulation sim,
                               final AutomatonInternalFrame parent)
@@ -126,10 +125,7 @@ public class AutomatonDisplayPane
     mFocusedItem = null;
     final ModuleSubject module = container.getModule();
     final RenderingContext context = new SimulatorRenderingContext();
-    final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(aut);
     final SimpleExpressionCompiler compiler = sim.getSimpleExpressionCompiler();
-    final BindingContext bindings = info.getBindingContext();
     final ProxyShapeProducer producer =
       new SubjectShapeProducer(graph, module, context, compiler, bindings);
     mPopupFactory = new DisplayPanePopupFactory(sim, this);
@@ -147,14 +143,11 @@ public class AutomatonDisplayPane
       height = (int) Math.ceil(scaleFactor * imageRect.getHeight());
     }
     setPreferredSize(new Dimension(width, height));
-    mBackgroundListener =
-      Config.GUI_EDITOR_BACKGROUND_COLOR.addBackgroundListener(this);
     sim.attach(this);
     final MouseHandler handler = new MouseHandler();
     addMouseListener(handler);
     addMouseMotionListener(handler);
     addComponentListener(new ResizeHandler());
-    registerSupremicaPropertyChangeListeners();
   }
 
 
@@ -255,8 +248,6 @@ public class AutomatonDisplayPane
   @Override
   public void close()
   {
-    Config.GUI_EDITOR_BACKGROUND_COLOR.
-      removePropertyChangeListener(mBackgroundListener);
     mSim.detach(this);
     super.close();
   }
@@ -582,7 +573,8 @@ public class AutomatonDisplayPane
     }
 
     @Override
-    public RenderingInformation getRenderingInformation(final Proxy proxy)
+    public RenderingInformation getRenderingInformation(final Proxy proxy,
+                                                        final ColorGroup group)
     {
       // The spring embedder modifies a copy of our graph. When it is running,
       // the items being displayed are not in our compiled graph ...
@@ -591,7 +583,7 @@ public class AutomatonDisplayPane
         // *** BUG? ***
         // Identifiers have no original, this may cause failure to
         // highlight them while spring embedding.
-        return super.getRenderingInformation(proxy);
+        return super.getRenderingInformation(proxy, group);
       } else {
         final RenderingStatus status;
         if (orig instanceof LabelGeometrySubject) {
@@ -602,13 +594,10 @@ public class AutomatonDisplayPane
           status = getRenderingStatus(orig);
         }
         if (status == null) {
-          final Color foreground = EditorColor.SIMULATION_INVALID;
-          final Color shadow =
-            EditorColor.getShadowColor(orig, GraphPanel.DragOverStatus.NOTDRAG,
-                                       false, false, false);
-          final int prio = getPriority(orig);
-          return new RenderingInformation
-            (false, false, false, false, foreground, shadow, prio);
+          final RenderingInformation info =
+            super.getRenderingInformation(orig, group);
+          info.setColor(EditorColor.SIMULATION_INVALID);
+          return info;
         } else {
           final boolean selected;
           if (orig == mFocusedItem) {
@@ -635,7 +624,7 @@ public class AutomatonDisplayPane
             return new RenderingInformation
               (false, false, false, true, foreground, shadow, prio);
           } else {
-            return super.getRenderingInformation(orig);
+            return super.getRenderingInformation(orig, group);
           }
         }
       }
@@ -863,7 +852,6 @@ public class AutomatonDisplayPane
   private final ModuleContainer mContainer;
   private final DisplayPanePopupFactory mPopupFactory;
   private final GraphToolTipVisitor mToolTipVisitor;
-  private final SupremicaPropertyChangeListener mBackgroundListener;
 
   private Proxy mFocusedItem;
   private Map<Proxy,RenderingStatus> mRenderingStatusMap;

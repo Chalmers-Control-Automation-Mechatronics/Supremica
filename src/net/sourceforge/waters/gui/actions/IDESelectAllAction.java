@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -93,9 +93,7 @@ public class IDESelectAllAction
       final List<? extends Proxy> all = watersOwner.getAllSelectableItems();
       watersOwner.replaceSelection(all);
     } else if (swingOwner != null) {
-      final int len = swingOwner.getText().length();
-      swingOwner.setCaretPosition(0);
-      swingOwner.moveCaretPosition(len);
+      swingOwner.selectAll();
     }
   }
 

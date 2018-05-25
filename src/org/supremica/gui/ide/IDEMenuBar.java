@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -507,7 +507,7 @@ public class IDEMenuBar extends JMenuBar
       }
 
       // Analyze
-      if (mAnalyzeMenu == null && panel instanceof AnalyzerPanel) {
+      if (mAnalyzeMenu == null && panel instanceof SupremicaAnalyzerPanel) {
         mAnalyzeMenu = new JMenu("Analyze");
         mAnalyzeMenu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
         // View (submenu)
@@ -629,7 +629,7 @@ public class IDEMenuBar extends JMenuBar
         if (mVerifyMenu != null) {
           add(mVerifyMenu);
         }
-      } else if (panel instanceof AnalyzerPanel) {
+      } else if (panel instanceof SupremicaAnalyzerPanel) {
         add(mAnalyzeMenu);
       }
     }

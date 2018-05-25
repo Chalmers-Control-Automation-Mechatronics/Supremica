@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -90,7 +90,7 @@ public class AnalyzerModularForbidderAction
     {
         logger.info("ModularForbidder started...");
 
-        final Automata automata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata automata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
         // MODULAR FORBIDDER!
         try
@@ -113,7 +113,7 @@ public class AnalyzerModularForbidderAction
             }
 
             final ModularForbidder mf = new ModularForbidder(mfi, ide.getIDE().getActiveProject());
-            ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().addAutomata(mf.execute());
+            ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(mf.execute());
         }
         catch (final Exception ex)
         {

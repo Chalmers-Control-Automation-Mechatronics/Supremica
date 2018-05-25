@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -32,6 +32,8 @@
 //###########################################################################
 
 package net.sourceforge.waters.gui;
+
+import gnu.trove.set.hash.THashSet;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -297,7 +299,7 @@ class EditorGraph
       default:
         if (record.hasImplicitChanges()) {
           count ++;
-          modified.add(original);
+          // don't add to modified---not selected after undo
         }
         break;
       }
@@ -339,6 +341,7 @@ class EditorGraph
       if (surface == null) {
         compound = new CompoundCommand(description);
       } else {
+        removeDanglingEdges(modified);
         compound = new UpdateCommand(modified, added, removed,
                                      surface, description, selecting);
       }
@@ -398,6 +401,24 @@ class EditorGraph
     final EditorSimpleNode esn =  new EditorSimpleNode(node1);
     mObserverMap.put(node1, esn);
     new SimpleNodeChangeRecord(node0, node1);
+  }
+
+  @SuppressWarnings("unlikely-arg-type")
+  private void removeDanglingEdges(final Collection<ProxySubject> items)
+  {
+    final Set<ProxySubject> set = new THashSet<>(items);
+    final Iterator<ProxySubject> iter = items.iterator();
+    while (iter.hasNext()) {
+      final ProxySubject item = iter.next();
+      if (item instanceof EdgeProxy) {
+        final EdgeProxy edge = (EdgeProxy) item;
+        if (!set.contains(edge.getLabelBlock()) &&
+            (!set.contains(edge.getSource()) ^
+             !set.contains(edge.getTarget()))) {
+          iter.remove();
+        }
+      }
+    }
   }
 
 
@@ -1196,6 +1217,14 @@ class EditorGraph
       }
     }
 
+    /**
+     * Returns whether the graphical object linked to this change record
+     * is implicitly changed. For example, an edge can be implicitly changed
+     * despite having the status {@link ModelChangeEvent#NO_CHANGE NO_CHANGE}
+     * if its source or target node moves.
+     * @return <CODE>true</CODE> if the object is changed implicitly or
+     *         explicitly, <CODE>false</CODE> otherwise.
+     */
     boolean hasImplicitChanges()
     {
       return getChangeKind() != ModelChangeEvent.NO_CHANGE;

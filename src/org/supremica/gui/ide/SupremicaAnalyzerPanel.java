@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -60,7 +60,7 @@ import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 
 
-public class AnalyzerPanel
+public class SupremicaAnalyzerPanel
     extends MainPanel
 {
     private static final long serialVersionUID = 1L;
@@ -71,7 +71,7 @@ public class AnalyzerPanel
     private final DocumentContainer mDocumentContainer;
     private final VisualProject mVisualProject = new VisualProject();
 
-    public AnalyzerPanel(final DocumentContainer moduleContainer, final String name)
+    public SupremicaAnalyzerPanel(final DocumentContainer moduleContainer, final String name)
     {
         super(name);
 

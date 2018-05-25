@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -53,7 +53,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.DeleteCommand;
@@ -74,6 +73,8 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
+import org.supremica.gui.ide.ComponentEditorPanel;
+
 
 /**
  * The dialog window for guard/action blocks.
@@ -92,7 +93,7 @@ public class EdgeEditorDialog
   //#########################################################################
   //# Static Invocation
   public static void showDialog(final EdgeSubject edge,
-                                final EditorWindowInterface root)
+                                final ComponentEditorPanel root)
   {
     final ModuleWindowInterface rroot = root.getModuleWindowInterface();
     new EdgeEditorDialog(edge, rroot);
@@ -114,7 +115,7 @@ public class EdgeEditorDialog
     setMinimumSize(MIN_SIZE);
     mEdge = edge;
     mRoot = root;
-    mPanel = root.getActiveEditorWindowInterface().getGraphEditorPanel();
+    mPanel = root.getActiveComponentEditorPanel().getGraphEditorPanel();
 
     GridBagConstraints con = new GridBagConstraints();
 

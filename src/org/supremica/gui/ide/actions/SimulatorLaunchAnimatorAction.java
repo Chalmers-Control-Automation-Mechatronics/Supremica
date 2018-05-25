@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -86,7 +86,7 @@ public class SimulatorLaunchAnimatorAction
         final Logger logger = LogManager.getLogger();
         try
         {
-            final VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
+            final VisualProject currProject = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
 
             if (!currProject.hasAnimation())
             {

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -39,6 +39,7 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDVarSet;
+
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -52,6 +53,18 @@ import net.sourceforge.waters.xsd.base.EventKind;
  *
  * <P>The {@link #run()} method of this model checker does nothing,
  * and simply claims that every model is controllable.</P>
+ *
+ * <P>You are welcome to edit this file as much as you like,
+ * but please <STRONG>do not change</STRONG> the public interface.
+ * Do not change the signature of the constructor,
+ * or of the {@link #run()} or {@link #getCounterExample()} methods.
+ * You should expect a single constructor call, followed by several calls
+ * to {@link #run()} and {@link #getCounterExample()}, so your code needs
+ * to be reentrant.</P>
+ *
+ * <P><STRONG>WARNING:</STRONG> If you do not comply with these rules, the
+ * automatic tester may fail to run your program, resulting in 0 marks for
+ * your assignment.</P>
  *
  * @see ModelChecker
  *
@@ -99,22 +112,21 @@ public class BDDControllabilityChecker extends ModelChecker
     // Another (faster?) alternative is "cudd".
     mBDDFactory = BDDFactory.init("buddy", 10000, 5000);
     // You can try to increase performance by increasing the cache sizes,
-    // but please be aware of the memory limits. If you
-    // want to push the limits, please test your program inside
-    // 'ulimit -v 1048576 -m 1048576', and pass the -Xmx argument to
-    // the Java VM.
+    // but please be aware of the memory limits.
 
     // Uncomment the following try-catch block to disable disconcerting
-    // debug output.
+    // debug output. This also requires two imports:
+    // import java.lang.reflect.Method;
+    // import net.sourceforge.waters.model.base.WatersRuntimeException;
     /*
     try {
       final Class<?>[] parameterTypes =
         new Class<?>[] {Object.class, Object.class};
       final Method method =
         getClass().getMethod("silentBDDHandler", parameterTypes);
-      bddFactory.registerGCCallback(this, method);
-      bddFactory.registerReorderCallback(this, method);
-      bddFactory.registerResizeCallback(this, method);
+      mBDDFactory.registerGCCallback(this, method);
+      mBDDFactory.registerReorderCallback(this, method);
+      mBDDFactory.registerResizeCallback(this, method);
     } catch (final SecurityException exception) {
       throw new WatersRuntimeException(exception);
     } catch (final NoSuchMethodException exception) {

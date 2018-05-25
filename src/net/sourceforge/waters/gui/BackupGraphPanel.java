@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -39,7 +39,6 @@ import javax.swing.JDialog;
 
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
-import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
 import net.sourceforge.waters.gui.renderer.SubjectShapeProducer;
 import net.sourceforge.waters.gui.springembedder.EmbedderEvent;
@@ -160,14 +159,13 @@ public class BackupGraphPanel
 
   //#########################################################################
   //# Repaint Support
+  @Override
   public void close()
   {
-    final ProxyShapeProducer producer = getShapeProducer();
-    producer.close();
     final GraphSubject graph = getGraph();
     graph.removeModelObserver(mGraphModelObserver);
     getModule().removeModelObserver(mGraphModelObserver);
-    unregisterSupremicaPropertyChangeListeners();
+    super.close();
   }
 
   protected void graphChanged(final ModelChangeEvent event)

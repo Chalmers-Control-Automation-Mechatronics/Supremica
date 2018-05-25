@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -191,7 +191,7 @@ class EventHiderDialog
 
         try
         {
-            ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomata(newAutomata);
+            ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomata(newAutomata);
         }
         catch (final Exception ex)
         {
@@ -222,7 +222,7 @@ public class EventHider
         final Automata automata = ActionMan.getGui().getSelectedAutomata();
 
         // Throw up the dialog, let the user select the alphabet
-        new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
+        new EventHiderDialog(ide, automata, ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getUnselectedAutomata().getUnionAlphabet());
     }
 
     public void doAction(final Automata theAutomata, final Alphabet othersAlphabet)

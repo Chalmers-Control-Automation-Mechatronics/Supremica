@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -56,6 +56,7 @@ import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -127,23 +128,28 @@ public class AutomatonDesktopPane
   }
 
   public void addAutomaton(final String aut,
-      final ModuleContainer container, final Simulation sim, final int clicks)
+                           final ModuleContainer container,
+                           final Simulation sim,
+                           final int clicks)
   {
-    if (aut == null)
+    if (aut == null) {
       return;
-    if (!mOpenAutomata.containsKey(aut)) {
+    } else if (!mOpenAutomata.containsKey(aut)) {
       if (clicks == 2) {
-        final Map<Object,SourceInfo> infomap = container.getSourceInfoMap();
         final AutomatonProxy realAuto = sim.getAutomatonFromName(aut);
-        if (realAuto == null)
+        if (realAuto == null) {
           return;
-        final Proxy source = infomap.get(realAuto).getSourceObject();
+        }
+        final Map<Object,SourceInfo> infoMap = container.getSourceInfoMap();
+        final SourceInfo info = infoMap.get(realAuto);
+        final Proxy source = info.getSourceObject();
         if (source instanceof SimpleComponentSubject) {
           final SimpleComponentSubject comp = (SimpleComponentSubject) source;
           final GraphSubject graph = comp.getGraph();
+          final BindingContext bindings = info.getBindingContext();
           try {
             final AutomatonInternalFrame newFrame = new AutomatonInternalFrame
-              (realAuto, graph, this, container, sim);
+              (graph, realAuto, bindings, container, sim, this);
             final ArrayList<Rectangle> otherScreens = new ArrayList<Rectangle>();
             for (final AutomatonInternalFrame automaton : mOpenAutomata.values())
               otherScreens.add(automaton.getBounds());

@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -31,7 +31,6 @@
 //# exception.
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.renderer;
 
 import net.sourceforge.waters.gui.EditorColor;
@@ -46,12 +45,16 @@ import net.sourceforge.waters.gui.EditorColor;
  * @author Robi Malik
  */
 
-enum ColorGroup
+public enum ColorGroup
 {
   /**
-   * A regular graphical item such as a node or edge, but not a group node.
+   * A regular graphical item such an edge, but not a node.
    */
   GRAPH_ITEM,
+  /**
+   * A simple node.
+   */
+  SIMPLE_NODE,
   /**
    * A group node.
    */

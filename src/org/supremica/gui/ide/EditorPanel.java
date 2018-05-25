@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -53,7 +53,6 @@ import javax.swing.event.ChangeListener;
 
 import net.sourceforge.waters.gui.AliasesPanel;
 import net.sourceforge.waters.gui.ComponentsTree;
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.EventDeclListView;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -238,7 +237,7 @@ public class EditorPanel
   }
 
   @Override
-  public EditorWindowInterface showEditor(final SimpleComponentSubject comp)
+  public ComponentEditorPanel showEditor(final SimpleComponentSubject comp)
     throws GeometryAbsentException
   {
     final ComponentEditorPanel panel =
@@ -250,16 +249,16 @@ public class EditorPanel
   }
 
   @Override
-  public EditorWindowInterface getEditorWindowInterface
-  (final SimpleComponentSubject comp)
+  public ComponentEditorPanel getComponentEditorPanel
+    (final SimpleComponentSubject comp)
   {
     return mModuleContainer.getComponentEditorPanel(comp);
   }
 
   @Override
-  public ComponentEditorPanel getActiveEditorWindowInterface()
+  public ComponentEditorPanel getActiveComponentEditorPanel()
   {
-    if (getRightComponent() instanceof EditorWindowInterface) {
+    if (getRightComponent() instanceof ComponentEditorPanel) {
       return (ComponentEditorPanel) getRightComponent();
     } else {
       return null;

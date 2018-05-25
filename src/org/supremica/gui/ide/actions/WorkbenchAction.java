@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -86,8 +86,8 @@ public class WorkbenchAction
         final Logger logger = LogManager.getLogger();
         try
         {
-            final VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getVisualProject();
-            final Automata selection = ide.getIDE().getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+            final VisualProject visualProject = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getVisualProject();
+            final Automata selection = ide.getIDE().getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 
             if (selection.size() <= 0)
             {

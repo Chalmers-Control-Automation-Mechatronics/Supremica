@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -86,7 +86,8 @@ public class UpdateCommand
 
   /**
    * Creates a general update command.
-   * @param  modified         The list of items modified by the command.
+   * @param  modified         The list of items modified by the command,
+   *                          which will be selected after undo.
    * @param  added            The list of items added by the command.
    * @param  removed          The list of items removed by the command.
    * @param  panel            The panel owning the selection and controlling

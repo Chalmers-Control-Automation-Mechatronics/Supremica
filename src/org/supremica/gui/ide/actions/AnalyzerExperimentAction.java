@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -57,7 +57,7 @@ import org.supremica.automata.algorithms.SynchronizationOptions;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.gui.AutomataMinimizationWorker;
 import org.supremica.gui.AutomataSynchronizerWorker;
-import org.supremica.gui.ide.AnalyzerPanel;
+import org.supremica.gui.ide.SupremicaAnalyzerPanel;
 
 
 /**
@@ -81,7 +81,7 @@ class AutomataInterleaveWorker implements AutomataListener
 	private static final Logger logger = LogManager.getLogger(AutomataInterleaveWorker.class);
 
 	private final IDEActionInterface IDE;
-	private final AnalyzerPanel analyzerPanel;
+	private final SupremicaAnalyzerPanel analyzerPanel;
 	private final Alphabet changedAlphas;
 
 	private int currentMode;
@@ -91,7 +91,7 @@ class AutomataInterleaveWorker implements AutomataListener
 	public AutomataInterleaveWorker(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
-		this.analyzerPanel = this.IDE.getActiveDocumentContainer().getAnalyzerPanel();
+		this.analyzerPanel = this.IDE.getActiveDocumentContainer().getSupremicaAnalyzerPanel();
 		this.currentMode = SYNC_MODE;
 
 	    final Automata selectedAutomata = this.analyzerPanel.getSelectedAutomata();
@@ -261,7 +261,7 @@ public class AnalyzerExperimentAction
 	*/
 	void interleaveExperiment()	//-- MF
 	{
-        final Automata selectedAutomata = ide.getActiveDocumentContainer().getAnalyzerPanel().getSelectedAutomata();
+        final Automata selectedAutomata = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getSelectedAutomata();
 		if(!selectedAutomata.sanityCheck(ide.getIDE(), 2, true, false, false, false))
 		{
 			return;
@@ -340,7 +340,7 @@ public class AnalyzerExperimentAction
 	*/
 	void addAutomatonThreadedExperiment()	//-- MF
 	{
-		final Automata allAutomataBefore = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+		final Automata allAutomataBefore = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 		final int nbrAutomataBefore = allAutomataBefore.nbrOfAutomata();
 
 		final AnalyzerAddAutomatonJustForExperiment adder = new AnalyzerAddAutomatonJustForExperiment(ide);
@@ -362,7 +362,7 @@ public class AnalyzerExperimentAction
 		}
 
 		// Now we check if the automaton has really been added, there should be one more than before.
-		final Automata allAutomataAfter = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+		final Automata allAutomataAfter = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 		// The diff between nbrAutomataBefore and nbrAutomataAfter should be a single automaton, the one we look for
 		// final int num = allAutomataAfter.nbrOfAutomata() - allAutomataBefore.nbrOfAutomata();
 		final int num = allAutomataAfter.nbrOfAutomata() - nbrAutomataBefore;
@@ -387,19 +387,19 @@ public class AnalyzerExperimentAction
 	*/
 	void justAddAutomatonExperiment()	//-- MF
 	{
-		final Automata allAutomataBefore = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+		final Automata allAutomataBefore = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 		final int nbrAutomataBefore = allAutomataBefore.nbrOfAutomata();
 
 		/* Does it work if we just add the automaton here without starting that other thread? */
 			System.out.println("Adding automaton...");
 			final Automaton new_auto = new Automaton("Mxyzptlk");
-			final boolean done = ide.getActiveDocumentContainer().getAnalyzerPanel().addAutomaton(new_auto);
+			final boolean done = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().addAutomaton(new_auto);
 			System.out.println("Added automaton: " + done);
 		/* NO! It still doesn't work. done is true, but num below still becomes 0! WTF? */
 		/* But OK, so this means this is not a racing issue, but it simple does not work the way you expect it to */
 
 		// Now we check if the automaton has really been added, there should be one more than before.
-		final Automata allAutomataAfter = ide.getActiveDocumentContainer().getAnalyzerPanel().getAllAutomata();
+		final Automata allAutomataAfter = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel().getAllAutomata();
 		// The diff between nbrAutomataBefore and nbrAutomataAfter should be a single automaton, the one we look for
 		// final int num = allAutomataAfter.nbrOfAutomata() - allAutomataBefore.nbrOfAutomata();
 		final int num = allAutomataAfter.nbrOfAutomata() - nbrAutomataBefore;
@@ -453,12 +453,12 @@ class AnalyzerAddAutomatonJustForExperiment
 	private boolean abortRequested;
 	@SuppressWarnings("unused")
   private final IDEActionInterface IDE;
-	private final AnalyzerPanel analyzerPanel;
+	private final SupremicaAnalyzerPanel analyzerPanel;
 
 	public AnalyzerAddAutomatonJustForExperiment(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
-		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
+		this.analyzerPanel = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel();
 	}
 
 	@Override
@@ -510,12 +510,12 @@ class AnalyzerInterleaveWorker extends Thread implements Abortable
 {
 	private boolean abortRequested;
 	private final IDEActionInterface IDE;
-	private final AnalyzerPanel analyzerPanel;
+	private final SupremicaAnalyzerPanel analyzerPanel;
 
 	public AnalyzerInterleaveWorker(final IDEActionInterface ide)
 	{
 		this.IDE = ide;
-		this.analyzerPanel = ide.getActiveDocumentContainer().getAnalyzerPanel();
+		this.analyzerPanel = ide.getActiveDocumentContainer().getSupremicaAnalyzerPanel();
 	}
 
 	@Override

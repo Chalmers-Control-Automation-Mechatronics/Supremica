@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -33,24 +33,21 @@
 
 package net.sourceforge.waters.gui.renderer;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
+import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-
-import org.supremica.properties.Config;
 
 
 public class Renderer
@@ -77,28 +74,30 @@ public class Renderer
     // Blocked events
     final LabelBlockProxy blocked = mGraph.getBlockedEvents();
     if (blocked != null) {
-      addToQueue(blocked);
+      addToQueue(blocked, ColorGroup.GRAPH_ITEM);
       listToRender(blocked.getEventIdentifierList());
     }
 
     // Nodes
     for (final NodeProxy proxy : mGraph.getNodes()) {
-      addToQueue(proxy);
       if (proxy instanceof SimpleNodeProxy) {
+        addToQueue(proxy, ColorGroup.SIMPLE_NODE);
         final SimpleNodeProxy simple = (SimpleNodeProxy) proxy;
         addToQueue(simple.getLabelGeometry(), ColorGroup.NODE_LABEL);
+      } else if (proxy instanceof GroupNodeProxy) {
+        addToQueue(proxy, ColorGroup.GROUP_NODE);
       }
     }
 
     // Edges
     for (final EdgeProxy edge : mGraph.getEdges()) {
-      addToQueue(edge);
-      addToQueue(edge.getLabelBlock());
+      addToQueue(edge, ColorGroup.GRAPH_ITEM);
+      addToQueue(edge.getLabelBlock(), ColorGroup.GRAPH_ITEM);
 
       listToRender(edge.getLabelBlock().getEventIdentifierList());
 
       if (edge.getGuardActionBlock() != null) {
-        addToQueue(edge.getGuardActionBlock());
+        addToQueue(edge.getGuardActionBlock(), ColorGroup.GRAPH_ITEM);
         for (final BinaryExpressionProxy action :
              edge.getGuardActionBlock().getActions()) {
           addToQueue(action, ColorGroup.ACTION);
@@ -158,43 +157,28 @@ public class Renderer
   private void listToRender(final List<Proxy> list)
   {
     for (final Proxy proxy : list) {
-      addToQueue(proxy);
+      addToQueue(proxy, ColorGroup.GRAPH_ITEM);
       if (proxy instanceof ForeachProxy){
         final ForeachProxy foreach = (ForeachProxy) proxy;
         listToRender(foreach.getBody());
-        addToQueue(foreach.getRange());
+        addToQueue(foreach.getRange(), ColorGroup.GRAPH_ITEM);
         if(foreach.getGuard() != null) {
-          addToQueue(foreach.getGuard());
+          addToQueue(foreach.getGuard(), ColorGroup.GRAPH_ITEM);
         }
       }
     }
   }
 
-  protected void addToQueue(final Proxy proxy)
-  {
-    final RenderingContext context =
-      mProxyShapeProducer.getRenderingContext();
-    final RenderingInformation info = context.getRenderingInformation(proxy);
-    final ProxyShape shape = mProxyShapeProducer.getShape(proxy);
-    mQueue.offer(new ShapeToRender(shape, info));
-  }
-
   protected void addToQueue(final Proxy proxy, final ColorGroup group)
   {
-    final LayoutMode layout = Config.GUI_EDITOR_LAYOUT_MODE.get();
-    final Color color = layout.getColor(group);
-    if (color == null) {
-      return;
-    }
-    final Color shadow = EditorColor.shadow(color);
     final RenderingContext context =
       mProxyShapeProducer.getRenderingContext();
-    final RenderingInformation info = context.getRenderingInformation(proxy);
-    final RenderingInformation fixed = new RenderingInformation(
-        info.isSelected(), info.showHandles(), info.isUnderlined(),
-        info.isFocused(), color, shadow, info.getPriority());
-    final ProxyShape shape = mProxyShapeProducer.getShape(proxy);
-    mQueue.offer(new ShapeToRender(shape, fixed));
+    final RenderingInformation info =
+      context.getRenderingInformation(proxy, group);
+    if (info != null) {
+      final ProxyShape shape = mProxyShapeProducer.getShape(proxy);
+      mQueue.offer(new ShapeToRender(shape, info));
+    }
   }
 
 

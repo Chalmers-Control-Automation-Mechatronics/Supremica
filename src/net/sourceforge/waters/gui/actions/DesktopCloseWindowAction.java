@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -52,12 +52,8 @@ public class DesktopCloseWindowAction extends WatersDesktopAction
     final ComponentKind kind = mAutomaton.getKind();
     final String kindName = ModuleContext.getComponentKindToolTip(kind);
     final String compName = mAutomaton.getName();
-    String name = null;
-    if (compName.length() <= 32) {
-      name = kindName + " " + compName;
-    }
-    if (name.length() <= 32) {
-      putValue(Action.NAME, "Close " + name);
+    if (compName.length() + kindName.length() <= 32) {
+      putValue(Action.NAME, "Close " + kindName + " " + compName);
     } else {
       putValue(Action.NAME, "Close " + kindName);
     }

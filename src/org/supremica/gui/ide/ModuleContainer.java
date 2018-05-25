@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 1999-2017 Knut Akesson, Martin Fabian, Robi Malik
+//# Copyright (C) 1999-2018 Knut Akesson, Martin Fabian, Robi Malik
 //###########################################################################
 //# This file is part of Waters/Supremica IDE.
 //# Waters/Supremica IDE is free software: you can redistribute it and/or
@@ -40,19 +40,17 @@ import java.awt.Dimension;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sourceforge.waters.gui.EditorWindowInterface;
 import net.sourceforge.waters.gui.ModuleCompilationErrors;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.command.UndoableCommand;
@@ -67,7 +65,6 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.observer.UndoRedoEvent;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -114,14 +111,22 @@ public class ModuleContainer
     mTabPanel = new CompilingTabbedPane();
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
-    mAnalyzerPanel = new AnalyzerPanel(this, "Analyzer");
     mTabPanel.add(mEditorPanel);
     mSimulatorPropertyChangeListener =
       new SimulatorPropertyChangeListener();
     Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
-    (mSimulatorPropertyChangeListener);
+      (mSimulatorPropertyChangeListener);
     if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
       mTabPanel.add(mSimulatorPanel);
+    }
+    mWatersAnalyzerPropertyChangeListener =
+      new WatersAnalyzerPropertyChangeListener();
+    Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
+    (mWatersAnalyzerPropertyChangeListener);
+    if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+      mAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
+    } else {
+      mAnalyzerPanel = new SupremicaAnalyzerPanel(this, "Analyzer");
     }
     mTabPanel.add(mAnalyzerPanel);
     mEditorPanel.showComment();
@@ -133,6 +138,17 @@ public class ModuleContainer
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# org.supremica.gui.ide.DocumentContainer
+  @Override
+  public UndoInterface getActiveUndoInterface()
+  {
+    final MainPanel panel = getActivePanel();
+    if (panel != null && panel instanceof EditorPanel) {
+      return this;
+    } else {
+      return null;
+    }
+  }
+
   @Override
   public boolean hasUnsavedChanges()
   {
@@ -169,6 +185,8 @@ public class ModuleContainer
     mEditorPanel.close();
     Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
       (mSimulatorPropertyChangeListener);
+    Config.INCLUDE_WATERS_ANALYZER.removePropertyChangeListener
+      (mWatersAnalyzerPropertyChangeListener);
     mBackgroundCompiler.terminate();
   }
 
@@ -185,9 +203,13 @@ public class ModuleContainer
   }
 
   @Override
-  public AnalyzerPanel getAnalyzerPanel()
+  public SupremicaAnalyzerPanel getSupremicaAnalyzerPanel()
   {
-    return mAnalyzerPanel;
+    if (mAnalyzerPanel instanceof SupremicaAnalyzerPanel) {
+      return (SupremicaAnalyzerPanel) mAnalyzerPanel;
+    } else {
+      return null;
+    }
   }
 
   @Override
@@ -213,8 +235,8 @@ public class ModuleContainer
   {
     String title = super.getWindowTitle();
     if (getActivePanel() == mEditorPanel) {
-      final EditorWindowInterface editor =
-        mEditorPanel.getActiveEditorWindowInterface();
+      final ComponentEditorPanel editor =
+        mEditorPanel.getActiveComponentEditorPanel();
       if (editor != null) {
         final StringBuilder builder = new StringBuilder(title);
         builder.append(" - ");
@@ -360,42 +382,6 @@ public class ModuleContainer
     return mComponentToPanelMap.get(comp);
   }
 
-  public ComponentViewPanel getComponentViewPanel
-    (final SimpleComponentSubject comp)
-  {
-    ComponentViewPanel panel = mComponentToViewPanelMap.get(comp);
-    if (panel == null) {
-      final AnalyzerPanel analyzerPanel = getAnalyzerPanel();
-      final JComponent right = analyzerPanel.getRightComponent();
-      final Dimension oldsize = right.getSize();
-      try {
-        panel = new ComponentViewPanel(this, comp, oldsize);
-        mComponentToViewPanelMap.put(comp, panel);
-      } catch (final GeometryAbsentException exception) {
-        JOptionPane.showMessageDialog(getIDE(), exception.getMessage());
-      }
-    }
-    return panel;
-  }
-
-  public ComponentViewPanel getComponentViewPanel(final String name)
-  {
-    final List<Proxy> components = getModule().getComponentList();
-    for (final Proxy proxy : components) {
-      if (proxy instanceof NamedProxy) {
-        final NamedProxy namedProxy = (NamedProxy) proxy;
-        if (name.equals(namedProxy.getName())) {
-          if (proxy instanceof SimpleComponentSubject) {
-            return getComponentViewPanel(((SimpleComponentSubject)proxy));
-          } else {
-            return null;
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   public void switchToTraceMode(final TraceProxy trace)
   {
     mTabPanel.setSelectedComponent(mSimulatorPanel);
@@ -407,9 +393,9 @@ public class ModuleContainer
     return getIDE().getFrame();
   }
 
-  public EditorWindowInterface getActiveEditorWindowInterface()
+  public ComponentEditorPanel getActiveComponentEditorPanel()
   {
-    return getEditorPanel().getActiveEditorWindowInterface();
+    return getEditorPanel().getActiveComponentEditorPanel();
   }
 
 
@@ -570,6 +556,32 @@ public class ModuleContainer
 
 
   //#########################################################################
+  //# Inner Class WatersAnalyzerPropertyChangeListener
+  private class WatersAnalyzerPropertyChangeListener
+      implements SupremicaPropertyChangeListener
+  {
+    @Override
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      final int index = mTabPanel.indexOfComponent(mAnalyzerPanel);
+      final boolean selected = mTabPanel.getSelectedIndex() == index;
+      mTabPanel.removeTabAt(index);
+      if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+        mAnalyzerPanel =
+          new WatersAnalyzerPanel(ModuleContainer.this, "Analyzer");
+      } else {
+        mAnalyzerPanel =
+          new SupremicaAnalyzerPanel(ModuleContainer.this, "Analyzer");
+      }
+      mTabPanel.add(mAnalyzerPanel, index);
+      if (selected) {
+        mTabPanel.setSelectedIndex(index);
+      }
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class UpdateGraphPanelVisitor
   /**
    * This visitor is used to make sure an automaton is no longer visible in
@@ -583,7 +595,7 @@ public class ModuleContainer
     public void updateGraphPanel(final Proxy proxy)
     {
       try {
-        if (mEditorPanel.getActiveEditorWindowInterface() != null) {
+        if (mEditorPanel.getActiveComponentEditorPanel() != null) {
           proxy.acceptVisitor(this);
         }
       } catch (final VisitorException exception) {
@@ -618,7 +630,7 @@ public class ModuleContainer
       throws VisitorException
     {
       final ComponentEditorPanel panel =
-        mEditorPanel.getActiveEditorWindowInterface();
+        mEditorPanel.getActiveComponentEditorPanel();
       if (panel.getComponent() == simple) {
         mEditorPanel.showComment();
         return simple; //stop iterating children if in a foreach
@@ -668,8 +680,9 @@ public class ModuleContainer
     public void compilationSucceeded(final ProductDESProxy compiledDES)
     {
       try {
-        if (mSelected == mAnalyzerPanel) {
-          mAnalyzerPanel.updateAutomata(compiledDES);
+        if (mSelected instanceof SupremicaAnalyzerPanel) {
+          final SupremicaAnalyzerPanel panel = (SupremicaAnalyzerPanel) mSelected;
+          panel.updateAutomata(compiledDES);
         }
         final int index = indexOfComponent(mSelected);
         setSelectedIndexImpl(index);
@@ -692,7 +705,7 @@ public class ModuleContainer
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 7629950668427771146L;
   }
 
 
@@ -701,14 +714,11 @@ public class ModuleContainer
   private final JTabbedPane mTabPanel;
   private final EditorPanel mEditorPanel;
   private final SimulatorPanel mSimulatorPanel;
-  private final AnalyzerPanel mAnalyzerPanel;
+  private MainPanel mAnalyzerPanel;
 
   private final Map<SimpleComponentSubject,ComponentEditorPanel>
     mComponentToPanelMap =
     new HashMap<SimpleComponentSubject,ComponentEditorPanel>();
-  private final Map<SimpleComponentSubject,ComponentViewPanel>
-    mComponentToViewPanelMap =
-    new HashMap<SimpleComponentSubject,ComponentViewPanel>();
 
   private final ModuleContext mModuleContext;
   private final BackgroundCompiler mBackgroundCompiler;
@@ -716,8 +726,8 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
 
-  private final SupremicaPropertyChangeListener
-    mSimulatorPropertyChangeListener;
+  private final SupremicaPropertyChangeListener mSimulatorPropertyChangeListener;
+  private final SupremicaPropertyChangeListener mWatersAnalyzerPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;
   private int mUndoCheckPoint = 0;

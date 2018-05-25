@@ -1,6 +1,6 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
-//# Copyright (C) 2004-2017 Robi Malik
+//# Copyright (C) 2004-2018 Robi Malik
 //###########################################################################
 //# This file is part of Waters.
 //# Waters is free software: you can redistribute it and/or modify it under
@@ -104,6 +104,8 @@ public class ConflictMain
   public static void main(final String[] args)
   {
     try {
+      QuietLogConfigurationFactory.install();
+
       final ModuleProxyFactory moduleFactory =
         ModuleElementFactory.getInstance();
       final ProductDESProxyFactory desFactory =
