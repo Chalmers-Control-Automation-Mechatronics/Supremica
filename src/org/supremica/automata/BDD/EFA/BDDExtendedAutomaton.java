@@ -135,7 +135,7 @@ public class BDDExtendedAutomaton {
 
                 // Self loop events not in this alphabet
                 for (final EventDeclProxy event : inverseAlphabet) {
-                    addEdge(currLocation, currLocation, event);
+                    addEdge(null, currLocation, currLocation, event);
                 }
             }
 
@@ -224,19 +224,27 @@ public class BDDExtendedAutomaton {
             // Add all states that could be reach by only unobservable events including the destState
             for (final NodeProxy epsilonState : epsilonClosure(destLocation, true)) {
                 if (theEdge.getGuardActionBlock() != null) {
-                    addEdge(sourceLocation, epsilonState, theEvent, theEdge.getGuardActionBlock().getGuards(), theEdge.getGuardActionBlock().getActions());
+                    addEdge(theEdge, sourceLocation, epsilonState, theEvent, theEdge.getGuardActionBlock().getGuards(), theEdge.getGuardActionBlock().getActions());
                 } else {
-                    addEdge(sourceLocation, epsilonState, theEvent);
+                    addEdge(theEdge, sourceLocation, epsilonState, theEvent);
                 }
             }
         }
     }
 
-    void addEdge(final NodeProxy sourceLocation, final NodeProxy destLocation, final EventDeclProxy theEvent) {
-        addEdge(sourceLocation, destLocation, theEvent, null, null);
+    void addEdge(final EdgeProxy theEdge,
+                 final NodeProxy sourceLocation,
+                 final NodeProxy destLocation,
+                 final EventDeclProxy theEvent) {
+        addEdge(theEdge, sourceLocation, destLocation, theEvent, null, null);
     }
 
-    void addEdge(final NodeProxy sourceLocation, final NodeProxy destLocation, final EventDeclProxy theEvent, final List<SimpleExpressionProxy> guards, final List<BinaryExpressionProxy> actions) {
+    void addEdge(final EdgeProxy theEdge,
+                 final NodeProxy sourceLocation,
+                 final NodeProxy destLocation,
+                 final EventDeclProxy theEvent,
+                 final List<SimpleExpressionProxy> guards,
+                 final List<BinaryExpressionProxy> actions) {
 //        System.out.println("Edge belonging to "+theExAutomaton.getName()+": "+sourceLocation.getName()+"  "+theEvent.getName()+"  "+destLocation.getName());
         final int sourceLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, sourceLocation);
         final int destLocationIndex = bddExAutomata.getLocationIndex(theExAutomaton, destLocation);
@@ -258,12 +266,13 @@ public class BDDExtendedAutomaton {
 
             bddIndex2SourceStateName.put(bddIndex, sourceLocation.getName());
         }
-        manager.addEdge(edgeForwardBDD, edgeForwardWithoutDestBDD,
+        manager.addEdge(theEdge, edgeForwardBDD, edgeForwardWithoutDestBDD,
                 bddExAutomata.getForwardTransWhereVisUpdated(this),
                 bddExAutomata.getForwardTransAndNextValsForV(this),
                 sourceLocationIndex, sourceLocationDomain, destLocationIndex, destLocationDomain,
                 eventIndex, bddExAutomata.getEventDomain(),
                 guards, actions);
+        bddExAutomata.getEdge2ExAutomatonMap().put(theEdge, theExAutomaton);
     }
 
     private void addKeep(final NodeProxy location) {

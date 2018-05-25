@@ -249,7 +249,7 @@ public class EditorSynthesizerAction extends IDEAction
     // print guards or save them in a excel file.
     if (options.getSaveInFile() || options.getPrintGuard()) {
       final Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap =
-        bddSynthesizer.getBDDAutomata().edge2ExAutomatonMap;
+        bddSynthesizer.getBDDAutomata().getEdge2ExAutomatonMap();
       final Map<String,BDDExtendedGuardGenerator> event2GuardGen =
         bddSynthesizer.getEvent2GuardGen();
       final Map<String, List<Entry<EdgeProxy,ExtendedAutomaton>>>

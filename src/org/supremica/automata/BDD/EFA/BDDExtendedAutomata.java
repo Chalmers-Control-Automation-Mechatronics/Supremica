@@ -178,6 +178,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public boolean trackPeakBDD = false;
 
+    private Map<String, HashMap<EdgeProxy, BDD>> eventName2EdgeBDDMap;
+    private Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap;
+
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
@@ -242,6 +245,12 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     @SuppressWarnings("unchecked")
     private void initialize() {
+        eventName2EdgeBDDMap = new HashMap<String, HashMap<EdgeProxy, BDD>>();
+        for (final EventDeclProxy e: orgExAutomata.getUnionAlphabet()) {
+            final String n = e.getName();
+            eventName2EdgeBDDMap.put(n, new HashMap<EdgeProxy, BDD>());
+        }
+        edge2ExAutomatonMap = new HashMap<>();
         unionAlphabet = orgExAutomata.getUnionAlphabet();
         if (synType.equals(SynthesisAlgorithm.PARTITIONBDD)
                 || synType.equals(SynthesisAlgorithm.MINIMALITY_P)) {
@@ -1933,6 +1942,14 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
            }
        }
        return markedValuesBDD.equals(manager.getOneBDD());
+    }
+
+    public Map<String, HashMap<EdgeProxy, BDD>> getEventName2EdgeBDDMap() {
+      return eventName2EdgeBDDMap;
+    }
+
+    public Map<EdgeProxy, ExtendedAutomaton> getEdge2ExAutomatonMap() {
+      return edge2ExAutomatonMap;
     }
 }
 

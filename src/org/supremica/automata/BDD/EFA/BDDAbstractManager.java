@@ -15,6 +15,7 @@ import net.sf.javabdd.BDDVarSet;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -444,11 +445,19 @@ public abstract class BDDAbstractManager {
     }
 
     // Quite big method, however, encapsulation has been considered well :)
-    public void addEdge(final BDD forwardEdgesBDD, final BDD forwardEdgesWithoutDestBDD,
-            final BDD[] transWhereVisUpdated, final BDD[] transAndNextValsForV,
-            final int sourceLocationIndex, final BDDDomain sourceDomain, final int destLocationIndex, final BDDDomain destDomain,
-            final int eventIndex, final BDDDomain eventDomain,
-            final List<SimpleExpressionProxy> guards, final List<BinaryExpressionProxy> actions) {
+    public void addEdge(final EdgeProxy theEdge,
+                        final BDD forwardEdgesBDD,
+                        final BDD forwardEdgesWithoutDestBDD,
+                        final BDD[] transWhereVisUpdated,
+                        final BDD[] transAndNextValsForV,
+                        final int sourceLocationIndex,
+                        final BDDDomain sourceDomain,
+                        final int destLocationIndex,
+                        final BDDDomain destDomain,
+                        final int eventIndex,
+                        final BDDDomain eventDomain,
+                        final List<SimpleExpressionProxy> guards,
+                        final List<BinaryExpressionProxy> actions) {
         BDD sourceBDD = getOneBDD();
         BDD destBDD = getOneBDD();
 
@@ -474,6 +483,15 @@ public abstract class BDDAbstractManager {
 
         //Add guard to event and source and dest state
         sourceBDD = sourceBDD.and(guardBDD);
+
+        if (theEdge != null) {
+          final String eventName =
+            bddExAutomata.getIndexMap().getEventAt(eventIndex).getName();
+          final Map<EdgeProxy, BDD> eventEdge2BDDMap =
+            bddExAutomata.getEventName2EdgeBDDMap().get(eventName);
+          eventEdge2BDDMap.put(theEdge, guardBDD);
+        }
+
         forwardEdgesWithoutDestBDD.orWith(sourceEventBDD.and(guardBDD));
 
         final HashSet<String> updatedVars = new HashSet<String>();

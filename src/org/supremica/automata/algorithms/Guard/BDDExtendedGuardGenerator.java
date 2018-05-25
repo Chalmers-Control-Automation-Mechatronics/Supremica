@@ -1,12 +1,15 @@
 package org.supremica.automata.algorithms.Guard;
 
+import java.io.File;
 //###########################################################################
 //# Java standard imports
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 //###########################################################################
@@ -17,6 +20,11 @@ import net.sf.javabdd.BDDVarSet;
 //###########################################################################
 //# Waters imports
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 //###########################################################################
 //# Supremica imports
@@ -39,25 +47,41 @@ public final class BDDExtendedGuardGenerator {
 
   //#########################################################################
   //# Data Members
+  @SuppressWarnings("unused")
+  private static Logger logger =
+    LogManager.getLogger(BDDExtendedGuardGenerator.class);
+
   private final ExtendedAutomata theAutomata;
   private final BDDExtendedAutomata automataBDD;
   private final BDDExtendedManager manager;
   private final String eventName;
+  private final HashMap<EdgeProxy, String> edge2GuardMap;
   private final Set<ExtendedAutomaton> autGuardVars;
 
   // all kinds of states and transitions BDDs
   private BDD forwardMonolithicTransitionsBDD;
   private BDD mustAllowedStatesBDD;
   private BDD mustForbiddenStatesBDD;
-  private BDD dontCareStatesBDD;
+  private final HashMap<EdgeProxy, BDD> edge2BDDMap;
+  private final HashMap<EdgeProxy, BDD> edgesMustAllowedStates;
+  private final HashMap<EdgeProxy, BDD> edgesMustForbiddenStates;
+  private final HashMap<EdgeProxy, BDD> edgesCareStates;
+
+  // used for avoid computing same guards for edges
+  private final HashMap<BDD, HashSet<EdgeProxy>> edgesWithSameForbiddenStates;
+  private final HashMap<BDD, HashSet<EdgeProxy>> edgesWithSameAllowedStates;
+
+  private final HashMap<EdgeProxy, String> edge2BestStateSetMap;
+  private final HashMap<String, Integer> guard2NbrOfTerms;
+
+  private int nbrOfTerms;
+
   private final BDD sigmaBDD;
   private BDD statesEnablingSigmaBDD;     // Q^{\sigma}
   private final BDD safeStatesBDD;        // Q_{sup}
-  private BDD careStatesBDD;
   private BDD statesLeading2ForbiddenBDD;
   private BDD safeStatesEnablingSigmaBDD; // Q_{sup}^{\sigma}
 
-  private String guard = "";
   public static final String TRUE = "1";
   public static final String FALSE = "0";
 
@@ -67,29 +91,36 @@ public final class BDDExtendedGuardGenerator {
   private final String EQUAL;
   private final String NEQUAL;
 
-  // statistics and options
-  private int bddSize;
-  private int nbrOfTerms;
-  private int nbrOfCompHeurs = 0;
-  private int nbrOfIndpHeurs = 0;
   private boolean allowedForbidden = false;
   private boolean optimalMode = false;
   private boolean applyComplementHeuristics = false;
   private boolean applyIndependentHeuristics = false;
   private boolean generateIDD_PS = false;
-  private String bestStateSet = "";
-  private boolean isEventBlocked = false;
 
   //#########################################################################
   //# Constructor
   public BDDExtendedGuardGenerator(final BDDExtendedAutomata bddAutomata,
-                                   final String eventName, final BDD states,
+                                   final String eventName,
+                                   final HashMap<EdgeProxy, BDD> edgeToBDDMap,
+                                   final BDD states,
                                    final EditorSynthesizerOptions options)
   {
     theAutomata = bddAutomata.getExtendedAutomata();
     automataBDD = bddAutomata;
+    edge2BDDMap = edgeToBDDMap;
     manager = automataBDD.getManager();
     autGuardVars = new HashSet<ExtendedAutomaton>();
+
+    edgesMustAllowedStates = new HashMap<>();
+    edgesMustForbiddenStates = new HashMap<>();
+    edgesCareStates = new HashMap<>();
+
+    edgesWithSameAllowedStates = new HashMap<>();
+    edgesWithSameForbiddenStates = new HashMap<>();
+
+    edge2BestStateSetMap = new HashMap<>();
+    edge2GuardMap = new HashMap<>();
+    guard2NbrOfTerms = new HashMap<>();
 
     final CompilerOperatorTable ct = CompilerOperatorTable.getInstance();
     OR     = String.format(" %s ", ct.getOrOperator().getName());
@@ -98,17 +129,18 @@ public final class BDDExtendedGuardGenerator {
     NEQUAL = String.format(" %s ", ct.getNotEqualsOperator().getName());
 
     // options for saving IDD
-    automataBDD.setPathRoot(Config.FILE_SAVE_PATH.getAsString() + "/");
+    automataBDD.setPathRoot(Config.FILE_SAVE_PATH.getAsString() +
+                            File.separator);
     generateIDD_PS = options.getSaveIDDInFile();
 
     switch (options.getExpressionType()) {
-    case 0:
+    case FORBIDDEN:
       allowedForbidden = false;
       break;
-    case 1:
+    case ALLOWED:
       allowedForbidden = true;
       break;
-    case 2:
+    case ADAPTIVE:
       optimalMode = true;
       break;
     }
@@ -120,7 +152,7 @@ public final class BDDExtendedGuardGenerator {
     safeStatesBDD = states;
 
     final SynthesisAlgorithm synAlgo = bddAutomata.getSynthAlg();
-    if (synAlgo.equals(SynthesisAlgorithm.MONOLITHICBDD)) {
+    if (synAlgo == SynthesisAlgorithm.MONOLITHICBDD) {
 
       final BDDMonolithicEdges bddTransitions =
         (BDDMonolithicEdges) automataBDD.getBDDEdges();
@@ -139,56 +171,182 @@ public final class BDDExtendedGuardGenerator {
       computeStatesLeading2ForbiddenStates();
       computeMustAllowedSates();
       computeMustForbiddenSates();
+      computeEdgeMustAllowedStates();
+      computeEdgesMustForbiddenStates();
+      computeEdgesCareStates();
 
-    } else if (synAlgo.equals(SynthesisAlgorithm.PARTITIONBDD)) {
+    } else if (synAlgo == SynthesisAlgorithm.PARTITIONBDD) {
       disjunctivelyComputeMustAllowedStates();
       disjunctivelyComputeMustForbiddenStates();
     } else {
       assert false;  // never happens
     }
 
-    computeCareStates();
-
     applyComplementHeuristics = options.getCompHeuristic();
     applyIndependentHeuristics = options.getIndpHeuristic();
 
     if (optimalMode) {
-      allowedForbidden = true;
-
-      final String allowedGuard = generateGuard(mustAllowedStatesBDD);
-      final int minNbrOfTerms = nbrOfTerms;
-      final int nbrOfCompHeuris = this.nbrOfCompHeurs;
-      final int nbrOfIndpHeuris = this.nbrOfIndpHeurs;
-
-      allowedForbidden = false;
-      final String forbiddenGuard = generateGuard(mustForbiddenStatesBDD);
-      if (nbrOfTerms < minNbrOfTerms) {
-        guard = forbiddenGuard;
-        bestStateSet = "FORBIDDEN";
-      } else {
-        guard = allowedGuard;
-        nbrOfTerms = minNbrOfTerms;
-        this.nbrOfCompHeurs = nbrOfCompHeuris;
-        this.nbrOfIndpHeurs = nbrOfIndpHeuris;
-        bestStateSet = "ALLOWED";
+      for (final EdgeProxy edge: edge2BDDMap.keySet()) {
+        if (edge2GuardMap.containsKey(edge))
+          continue;
+        // first get must allowed guard for edge
+        allowedForbidden = true;
+        final BDD mustAllowedStates = edgesMustAllowedStates.get(edge);
+        final String allowedGuard = generateGuard(edge, mustAllowedStates);
+        final int minNbrOfTerms = nbrOfTerms;
+        // then get forbidden guards for edge
+        allowedForbidden = false;
+        final BDD mustForbiddenStates = edgesMustForbiddenStates.get(edge);
+        final String forbiddenGuard = generateGuard(edge, mustForbiddenStates);
+        // pick the guard having the smaller number of terms
+        if (nbrOfTerms <= minNbrOfTerms) {
+          edge2BestStateSetMap.put(edge, "FORBIDDEN");
+          edge2GuardMap.put(edge, forbiddenGuard);
+          guard2NbrOfTerms.put(forbiddenGuard, nbrOfTerms);
+          // assign guard to all edges with same forbidden states
+          for (final EdgeProxy otherEdge:
+            edgesWithSameForbiddenStates.get(mustForbiddenStates)) {
+            edge2BestStateSetMap.put(otherEdge, "FORBIDDEN");
+            edge2GuardMap.put(otherEdge, forbiddenGuard);
+          }
+        } else {
+          edge2BestStateSetMap.put(edge, "ALLOWED");
+          nbrOfTerms = minNbrOfTerms;
+          edge2GuardMap.put(edge, allowedGuard);
+          guard2NbrOfTerms.put(allowedGuard, nbrOfTerms);
+          // assign guard to all edges with same forbidden states
+          for (final EdgeProxy otherEdge:
+            edgesWithSameAllowedStates.get(mustAllowedStates)) {
+            edge2BestStateSetMap.put(otherEdge, "ALLOWED");
+            edge2GuardMap.put(otherEdge, allowedGuard);
+          }
+        }
       }
     } else {
       if (allowedForbidden) {
-        guard = generateGuard(mustAllowedStatesBDD);
-        bestStateSet = "ALLOWED";
+        for (final EdgeProxy edge: edge2BDDMap.keySet()) {
+          if (edge2GuardMap.containsKey(edge))
+            continue;
+          final BDD mustAllowedStates = edgesMustAllowedStates.get(edge);
+          final String allowedGuard = generateGuard(edge, mustAllowedStates);
+          edge2BestStateSetMap.put(edge, "ALLOWED");
+          edge2GuardMap.put(edge, allowedGuard);
+          guard2NbrOfTerms.put(allowedGuard, nbrOfTerms);
+         // assign guard to all edges with same allowed states
+          for (final EdgeProxy otherEdge:
+            edgesWithSameAllowedStates.get(mustAllowedStates)) {
+            edge2BestStateSetMap.put(otherEdge, "ALLOWED");
+            edge2GuardMap.put(otherEdge, allowedGuard);
+          }
+        }
       } else {
-        guard = generateGuard(mustForbiddenStatesBDD);
-        bestStateSet = "FORBIDDEN";
+        for (final EdgeProxy edge: edge2BDDMap.keySet()) {
+          final BDD mustForbiddenStates = edgesMustForbiddenStates.get(edge);
+          final String forbiddenGuard =
+            generateGuard(edge, mustForbiddenStates);
+          edge2BestStateSetMap.put(edge, "FORBIDDEN");
+          edge2GuardMap.put(edge, forbiddenGuard);
+          guard2NbrOfTerms.put(forbiddenGuard, nbrOfTerms);
+          // assign guard to all edges with same forbidden states
+          for (final EdgeProxy otherEdge:
+            edgesWithSameForbiddenStates.get(mustForbiddenStates)) {
+            edge2BestStateSetMap.put(otherEdge, "FORBIDDEN");
+            edge2GuardMap.put(otherEdge, forbiddenGuard);
+          }
+        }
       }
     }
-    // event is blocked in the synchronization process
-    if (mustAllowedStatesBDD.isZero() && mustForbiddenStatesBDD.isZero()) {
-      guard = FALSE;
-      isEventBlocked = true;
-    }
-    // generate IDD
+
+    // remove the unnecessary edge-guard entries
+    pruneEdge2GuardMap();
+
+    // generate IDD for debugging purposes
     if (generateIDD_PS) {
       generate_IDDs();
+    }
+  }
+
+  private void pruneEdge2GuardMap()
+  {
+    final Map<String, Set<EdgeProxy>> guard2EdgesMap =
+      new HashMap<>();
+    for (final Map.Entry<EdgeProxy, String> e: edge2GuardMap.entrySet()) {
+      if (guard2EdgesMap.containsKey(e.getValue())) {
+        guard2EdgesMap.get(e.getValue()).add(e.getKey());
+      }
+      else {
+        final Set<EdgeProxy> edges = new HashSet<>();
+        edges.add(e.getKey());
+        guard2EdgesMap.put(e.getValue(), edges);
+      }
+    }
+
+    // for debugging purposes, will be cleaned up after the testing.
+//    for (final Map.Entry<String, Set<EdgeProxy>> e:
+//         guard2EdgesMap.entrySet()) {
+//      final String guard = e.getKey();
+//      logger.info("The following edges have the same guard: " + guard);
+//      for (final EdgeProxy edge: e.getValue()) {
+//        logger.info("<" + edge.getSource().getName() + ", "
+//                    + edge.getTarget().getName() + ">");
+//      }
+//    }
+
+    for (final Map.Entry<String,Set<EdgeProxy>> e:
+          guard2EdgesMap.entrySet()) {
+      final String guard = e.getKey();
+      final ArrayList<EdgeProxy> edgeList = new ArrayList<>(e.getValue());
+      // sort based on the sizes of existing guards. If two has the same size,
+      // sort alphabetically.
+      Collections.sort(edgeList, new Comparator<EdgeProxy>() {
+        @Override
+        public int compare(final EdgeProxy e1, final EdgeProxy e2)
+        {
+          int e1GuardSize = 0;
+          if (e1.getGuardActionBlock() != null) {
+            if (e1.getGuardActionBlock().getGuards() != null &&
+                !e1.getGuardActionBlock().getGuards().isEmpty()) {
+              final SimpleExpressionProxy existingGuard =
+                e1.getGuardActionBlock().getGuards().get(0);
+              e1GuardSize = existingGuard.getPlainText().length();
+            }
+          }
+          int e2GuardSize = 0;
+          if (e2.getGuardActionBlock() != null) {
+            if (e2.getGuardActionBlock().getGuards() != null &&
+                !e2.getGuardActionBlock().getGuards().isEmpty()) {
+              final SimpleExpressionProxy existingGuard =
+                e2.getGuardActionBlock().getGuards().get(0);
+              e2GuardSize = existingGuard.getPlainText().length();
+            }
+          }
+          if (e1GuardSize == e2GuardSize) {
+            final String aut1 =
+              automataBDD.getEdge2ExAutomatonMap().get(e1).getName();
+            final String aut2 =
+              automataBDD.getEdge2ExAutomatonMap().get(e2).getName();
+            return aut1.compareTo(aut2);
+          }
+          else if (e1GuardSize < e2GuardSize) {
+            return -1;
+          }
+          else {
+            return 1;
+          }
+        }
+      });
+      final String autName =
+        automataBDD.getEdge2ExAutomatonMap().get(edgeList.get(0)).getName();
+      //Remove redundant edges from edge2GuardMap...
+      for (int i=1; i < edgeList.size(); i++) {
+        final EdgeProxy edge = edgeList.get(i);
+        final String otherAutName =
+          automataBDD.getEdge2ExAutomatonMap().get(edge).getName();
+        if (!autName.equals(otherAutName)) {
+          edge2GuardMap.remove(edge, guard);
+          edge2BestStateSetMap.remove(edge);
+        }
+      }
     }
   }
 
@@ -204,11 +362,11 @@ public final class BDDExtendedGuardGenerator {
     forbiddenAndReachableStatesBDD = forbiddenAndReachableStatesBDD
       .replace(automataBDD.getSourceToDestVariablePairing());
 
-    final BDD transitionsWithSigma = forwardMonolithicTransitionsBDD
+    final BDD transitionsWithoutSigma = forwardMonolithicTransitionsBDD
       .relprod(sigmaBDD, automataBDD.getEventVarSet());
 
     statesLeading2ForbiddenBDD =
-      (transitionsWithSigma.and(forbiddenAndReachableStatesBDD))
+      (transitionsWithoutSigma.and(forbiddenAndReachableStatesBDD))
         .exist(automataBDD.getDestStatesVarSet());
   }
 
@@ -219,6 +377,22 @@ public final class BDDExtendedGuardGenerator {
       safeStatesEnablingSigmaBDD.and(statesLeading2ForbiddenBDD.not());
   }
 
+  private void computeEdgeMustAllowedStates() {
+    for (final Map.Entry<EdgeProxy,BDD> entry: edge2BDDMap.entrySet()) {
+      final EdgeProxy edge = entry.getKey();
+      final BDD edgeBDD = entry.getValue();
+      final BDD allowedStates = mustAllowedStatesBDD.and(edgeBDD);
+      edgesMustAllowedStates.put(edge, allowedStates);
+      if (edgesWithSameAllowedStates.containsKey(allowedStates)) {
+        edgesWithSameAllowedStates.get(allowedStates).add(edge);
+      } else {
+        final HashSet<EdgeProxy> edgeSet = new HashSet<>();
+        edgeSet.add(edge);
+        edgesWithSameAllowedStates.put(allowedStates, edgeSet);
+      }
+    }
+  }
+
   //Q^sigma & C(Q^sigma_a) & Q_sup
   private void computeMustForbiddenSates()
   {
@@ -226,16 +400,29 @@ public final class BDDExtendedGuardGenerator {
       safeStatesEnablingSigmaBDD.and(mustAllowedStatesBDD.not());
   }
 
-  private void computeCareStates()
-  {
-    careStatesBDD = mustAllowedStatesBDD.or(mustForbiddenStatesBDD);
+  private void computeEdgesMustForbiddenStates() {
+    for (final Map.Entry<EdgeProxy,BDD> entry: edge2BDDMap.entrySet()) {
+      final EdgeProxy edge = entry.getKey();
+      final BDD edgeBDD = entry.getValue();
+      final BDD forbiddenStates = mustForbiddenStatesBDD.and(edgeBDD);
+      edgesMustForbiddenStates.put(edge, forbiddenStates);
+      if (edgesWithSameForbiddenStates.containsKey(forbiddenStates)) {
+        edgesWithSameForbiddenStates.get(forbiddenStates).add(edge);
+      } else {
+        final HashSet<EdgeProxy> edgeSet = new HashSet<>();
+        edgeSet.add(edge);
+        edgesWithSameForbiddenStates.put(forbiddenStates, edgeSet);
+      }
+    }
   }
 
-  //Q & C(mustForbiddenStatesBDD) & C(mustAllowedStatesBDD)
-  // OR C(careStatesBDD)
-  public void computeDontCareStates()
-  {
-    dontCareStatesBDD = careStatesBDD.not();
+  private void computeEdgesCareStates() {
+    for (final Map.Entry<EdgeProxy,BDD> entry: edge2BDDMap.entrySet()) {
+      final EdgeProxy e = entry.getKey();
+      final BDD careStates =
+        edgesMustAllowedStates.get(e).or(edgesMustForbiddenStates.get(e));
+      edgesCareStates.put(e, careStates);
+    }
   }
 
   private void disjunctivelyComputeMustAllowedStates()
@@ -333,12 +520,13 @@ public final class BDDExtendedGuardGenerator {
 
   //#########################################################################
   //# Guard
-  public String generateGuard(final BDD states)
+  public String generateGuard(final EdgeProxy edge, final BDD states)
   {
     nbrOfTerms = 0;
-    nbrOfCompHeurs = 0;
-    nbrOfIndpHeurs = 0;
     String localGuard = "";
+
+    final BDD careStatesBDD =
+      edgesMustAllowedStates.get(edge).or(edgesMustForbiddenStates.get(edge));
 
     if (states.equals(careStatesBDD)) {
       localGuard = allowedForbidden ? TRUE : FALSE;
@@ -448,7 +636,6 @@ public final class BDDExtendedGuardGenerator {
           }
 
         } else {
-          nbrOfIndpHeurs++;
           if (idd.getChildren().size() == 1) {
             // keep track of the independent term by keeping the number
             // of terms as a negative number
@@ -573,7 +760,6 @@ public final class BDDExtendedGuardGenerator {
       if ((allowedForbidden ? mustForbiddenStatesBDD : mustAllowedStatesBDD)
         .and(stateBDD).nodeCount() == 0) {
         indpStates.add(stateName);
-        //                    indpStates.add((symbol+autVarName.replaceAll(" ", "")+(allowedForbidden?EQUAL:NEQUAL)+stateName.replaceAll(" ", "")));
       }
     }
 
@@ -597,7 +783,6 @@ public final class BDDExtendedGuardGenerator {
     final boolean isComp = complementStates.size() < stateSet.size();
     StringIntPair e_n = null;
     if (isComp) {
-      nbrOfCompHeurs++;
       inputStateSet = new ArrayList<String>(complementStates);
     }
 
@@ -613,7 +798,6 @@ public final class BDDExtendedGuardGenerator {
 
   public String BDD2Expr(final BDD bdd)
   {
-    //        System.out.println(bdd.var()+": "+bdd.hashCode());
     if (bdd.isOne() || bdd.isZero()) {
       return "no expression";
     }
@@ -723,33 +907,38 @@ public final class BDDExtendedGuardGenerator {
 
   //#########################################################################
   //# IDD
+  /*
+   * Generate IDD files with the purpose of debugging.
+   * */
   private void generate_IDDs()
   {
     String fileName = "idd_" + eventName + "_enabled";
-    automataBDD.BDD2IDD2PS(statesEnablingSigmaBDD, statesEnablingSigmaBDD,
+    automataBDD.BDD2IDD2PS(statesEnablingSigmaBDD,
+                           statesEnablingSigmaBDD,
                            fileName);
     fileName = "iddSafeStates";
-    automataBDD.BDD2IDD2PS(safeStatesBDD, safeStatesBDD, fileName);
+    automataBDD.BDD2IDD2PS(safeStatesBDD, safeStatesBDD,
+                           fileName);
 
     fileName = "iddReachableStates";
     automataBDD.BDD2IDD2PS(automataBDD.getReachableStates(),
-                           automataBDD.getReachableStates(), fileName);
+                           automataBDD.getReachableStates(),
+                           fileName);
 
     fileName = "iddCoreachableStates";
     automataBDD.BDD2IDD2PS(automataBDD.getCoreachableStates(),
-                           automataBDD.getCoreachableStates(), fileName);
+                           automataBDD.getCoreachableStates(),
+                           fileName);
 
     fileName = "iddSafe_" + eventName + "_enabled";
-    automataBDD.BDD2IDD2PS(safeStatesEnablingSigmaBDD, safeStatesEnablingSigmaBDD, fileName);
+    automataBDD.BDD2IDD2PS(safeStatesEnablingSigmaBDD,
+                           safeStatesEnablingSigmaBDD,
+                           fileName);
 
     fileName = "idd_" + eventName + "_leadingToForbidden";
-    automataBDD.BDD2IDD2PS(statesLeading2ForbiddenBDD, statesLeading2ForbiddenBDD, fileName);
-
-    fileName = "idd_" + eventName + "_allowed";
-    automataBDD.BDD2IDD2PS(mustAllowedStatesBDD, mustAllowedStatesBDD, fileName);
-
-    fileName = "idd_" + eventName + "_forbidden";
-    automataBDD.BDD2IDD2PS(mustForbiddenStatesBDD, mustForbiddenStatesBDD, fileName);
+    automataBDD.BDD2IDD2PS(statesLeading2ForbiddenBDD,
+                           statesLeading2ForbiddenBDD,
+                           fileName);
   }
 
   //#########################################################################
@@ -768,61 +957,6 @@ public final class BDDExtendedGuardGenerator {
 
   //#########################################################################
   //# Simple Access
-  public boolean isEventBlocked()
-  {
-    return isEventBlocked;
-  }
-
-  public String getBestStateSet()
-  {
-    return bestStateSet;
-  }
-
-  public String getGuard()
-  {
-    return guard;
-  }
-
-  public int getBDDSize()
-  {
-    return bddSize;
-  }
-
-  public int getNbrOfTerms()
-  {
-    return nbrOfTerms;
-  }
-
-  public int getNbrOfCompHeuris()
-  {
-    return nbrOfCompHeurs;
-  }
-
-  public int getNbrOfIndpHeuris()
-  {
-    return nbrOfIndpHeurs;
-  }
-
-  public BDD getCareStates()
-  {
-    return careStatesBDD;
-  }
-
-  public BDD getMustAllowedStates()
-  {
-    return mustAllowedStatesBDD;
-  }
-
-  public BDD getMustForbiddenStates()
-  {
-    return mustForbiddenStatesBDD;
-  }
-
-  public BDD getDontCareStates()
-  {
-    return dontCareStatesBDD;
-  }
-
   public BDD getStatesEnablingSigma()
   {
     return statesEnablingSigmaBDD;
@@ -833,16 +967,23 @@ public final class BDDExtendedGuardGenerator {
     return statesLeading2ForbiddenBDD;
   }
 
-  public boolean guardIsTrue()
-  {
-    if (guard.equals(TRUE)) {
-      return true;
-    }
-    return false;
-  }
-
   public Set<ExtendedAutomaton> getAutGuardVars()
   {
     return autGuardVars;
+  }
+
+  public HashMap<EdgeProxy, String> getEdge2GuardMap()
+  {
+    return edge2GuardMap;
+  }
+
+  public HashMap<String, Integer> getGuard2NbrOfTerms()
+  {
+    return guard2NbrOfTerms;
+  }
+
+  public boolean isGuardTrue(final EdgeProxy edge)
+  {
+    return edge2GuardMap.get(edge).equals(TRUE);
   }
 }

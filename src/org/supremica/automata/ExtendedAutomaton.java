@@ -869,4 +869,8 @@ public class ExtendedAutomaton {
     public boolean isAllMarked(){
         return nodes.size() == acceptedLocations.size() || acceptedLocations.isEmpty();
     }
+
+    public GraphSubject getGraph() {
+      return this.graph;
+    }
 }
