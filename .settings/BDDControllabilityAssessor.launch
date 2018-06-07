@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/waters/src/net/sourceforge/waters/analysis/comp552/BDDControllabilityAssessor.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.comp552.BDDControllabilityAssessor"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="/home/robi/work/teaching/comp552-18a/assignment3/suite2.txt&#10;/home/robi/work/teaching/comp552-18a/assignment3/submissions/qsb1.run&#10;/home/robi/work/teaching/comp552-18a/assignment3/submissions/qsb1.progress&#10;10 &#10;4096m&#10;/home/robi/work/teaching/comp552-18a/assignment3/examples&#10;/home/robi/work/teaching/comp552-18a/assignment3/tests&#10;/home/robi/work/teaching/comp552-18a/assignment3/waters552"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx4096m&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#10;-ea"/>
+</launchConfiguration>
