@@ -225,9 +225,11 @@ abstract class AbstractAssessor
     mStream = null;
     if (!mTerminated) {
       final Thread timoutWatchdog = new TimeoutWatchdog(minutes);
-      final Thread memoryWatchdog = new MemoryWatchdog(maxBytes);
       timoutWatchdog.start();
-      memoryWatchdog.start();
+      if (maxBytes > 0) {
+        final Thread memoryWatchdog = new MemoryWatchdog(maxBytes);
+        memoryWatchdog.start();
+      }
     }
   }
 

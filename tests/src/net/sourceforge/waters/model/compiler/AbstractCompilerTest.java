@@ -568,6 +568,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_martijn1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "martijn1");
+    testCompile(module);
+  }
+
   public void testCompile_nodegroup_efa1()
     throws IOException, WatersException
   {

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.AbstractList;
@@ -93,8 +95,6 @@ import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -1186,16 +1186,12 @@ public class EFANormaliser extends AbortableCompiler
     //# Auxiliary Methods
     /**
      * Computes all combinations of the guards in different automata.
-     * <p>
      * This is the main recursive part of the algorithm.
-     *
-     * @param index The index of the component
-     *
-     * @param propagator
-     *
-     * @param second An array that contains the intermediate
-     *               {@link EFAUpdateInfo} which will later be
-     *               merged with the original ones.
+     * @param index      The index of the component
+     * @param propagator Constraint propagator used for symbolic computation.
+     * @param second     An array that contains the intermediate
+     *                   {@link EFAUpdateInfo} which will later be
+     *                   merged with the original ones.
      */
     private List<EFAIdentifier> combineUpdates(final int index,
                                                final ConstraintPropagator propagator,

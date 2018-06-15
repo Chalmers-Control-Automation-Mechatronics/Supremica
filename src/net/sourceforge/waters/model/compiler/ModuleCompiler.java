@@ -688,7 +688,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;
-  private boolean mIsNormalizationEnabled = false;
+  private boolean mIsNormalizationEnabled = true;
   private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMultiExceptionsEnabled = false;
