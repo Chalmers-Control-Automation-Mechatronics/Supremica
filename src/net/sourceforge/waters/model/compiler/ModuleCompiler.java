@@ -472,9 +472,7 @@ public class ModuleCompiler extends AbortableCompiler
    * with a transition in another EFSM that changes it.</P>
    *
    * <P>If disabled, an older semantics is used, where the set of variables
-   * changed by a transition is determined from EFSM containing it. The
-   * precise rules for this are further configured using the {@link
-   * #setUsingEventAlphabet(boolean) setUsingEventAlphabet()} method.</P>
+   * changed by a transition is determined from EFSM containing it.</P>
    *
    * <P>This option is disabled by default.</P>
    *

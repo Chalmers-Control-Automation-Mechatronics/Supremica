@@ -62,7 +62,7 @@ public class CompilationDialog extends JDialog
   //##########################################################################
   //# Constructors
   /**
-   * Creates a dialog.
+   * Creates a compilation dialog.
    * @param ide     The parent window.
    * @param action  The action to perform when the Abort/OK button is pressed.
    *                If <CODE>null</CODE>, the button closes the dialog.
@@ -74,7 +74,7 @@ public class CompilationDialog extends JDialog
     setLocationRelativeTo(ide);
     mInformationLabel = new JLabel();
     mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
-    HTMLPrinter.setLabelText(mInformationLabel, "Compiler ...", DEFAULT_WIDTH);
+    HTMLPrinter.setLabelText(mInformationLabel, "Compiling ...", DEFAULT_WIDTH);
     final Border outer = BorderFactory.createRaisedBevelBorder();
     final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     final Border border = BorderFactory.createCompoundBorder(outer, inner);

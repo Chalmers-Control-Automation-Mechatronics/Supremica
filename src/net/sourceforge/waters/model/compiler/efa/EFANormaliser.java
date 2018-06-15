@@ -67,10 +67,8 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
-import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
-import net.sourceforge.waters.model.expr.UnaryOperator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -1060,53 +1058,6 @@ public class EFANormaliser extends AbortableCompiler
     }
 
     /**
-     * If the flag {@link #mUsesEventAlphabet} is set, then
-     * this means that when a variable is not mentioned in an update,
-     * this particular variable can be changed.
-     *
-     * This method achieves this by explicitly adding extra terms in the
-     * form of (x'= x') to the updates.
-     */
-    private void createExplicitGuards()
-    {
-      if (!isBlocked()) {
-        // The overall set of all primed variables used by an EFAEventInfo.
-        final Set<EFAVariable> allPrimes = new THashSet<>();
-        // Ensure that the set of primed variables of every EFAUpdateInfo is
-        // properly initialised, then obtain the global set of primed variables.
-        for (final EFAUpdateInfo update : mList) {
-          update.setPrimeVariables();
-          allPrimes.addAll(update.getPrimeVariables());
-        }
-        // Add literals such as (x'=x') if the variable (x') is not mentioned
-        // in the update of the event.
-        for (final EFAIdentifier event : mEventList) {
-          for (final EFAVariable primeVar : allPrimes) {
-            if (!event.collectPrimeVariables().contains(primeVar)) {
-              // Prepare the operators.
-              final BinaryOperator equal = mOperatorTable.getEqualsOperator();
-              final UnaryOperator prime = mOperatorTable.getNextOperator();
-              // Construct the new term.
-              SimpleExpressionProxy term = primeVar.getVariableName();
-              term = mFactory.createUnaryExpressionProxy(prime, term);
-              term = mFactory.createBinaryExpressionProxy(equal, term, term);
-              // Add the new term to the conjunction.
-              final List<SimpleExpressionProxy> oldGuards =
-                event.getUpdate().getConstraints();
-              final List<SimpleExpressionProxy> newGuards = new ArrayList<>();
-              for (final SimpleExpressionProxy exp : oldGuards) {
-                newGuards.add(exp);
-              }
-              newGuards.add(term);
-              mEventUpdateMap.putByProxy(event.getIdentifier(),
-                                         new ConstraintList(newGuards));
-            }
-          }
-        }
-      }
-    }
-
-    /**
      * Generates elegant names for each {@link EFAIdentifier} of
      * {@link #mEventList}.
      */
@@ -1311,29 +1262,6 @@ public class EFANormaliser extends AbortableCompiler
       return mUpdateMap;
     }
 
-    private Set<EFAVariable> getPrimeVariables()
-    {
-      return mPrimeVariables;
-    }
-
-    /**
-     * Ensures that the field {@link #mPrimeVariables} is properly
-     * initiated.
-     * <p>
-     * The set would be null, if the method {@link #collectPrimeVariables()}
-     * is never called. In this case, it proceeds to collect the prime
-     * variables into the set.
-     * <p>
-     * If the method {@link #collectPrimeVariables()} has already been
-     * called before, then nothing needs to be done because the set is
-     * already initiated.
-     */
-    private void setPrimeVariables()
-    {
-      if (mPrimeVariables == null)
-        mPrimeVariables = collectPrimeVariables();
-    }
-
 
     //#######################################################################
     //# Auxiliary Methods
@@ -1369,21 +1297,6 @@ public class EFANormaliser extends AbortableCompiler
 
     //#######################################################################
     //# Pass 3
-    /**
-     * Collects all the prime variables used by an {@link EFAUpdateInfo}.
-     *
-     * @return A set of prime variables
-     */
-    private Set<EFAVariable> collectPrimeVariables()
-    {
-      final EFAVariableCollector collector =
-                       new EFAVariableCollector(mOperatorTable, mRootContext);
-      final Set<EFAVariable> primeVariables = new THashSet<>();
-      for (final ConstraintList constraint : mUpdates)
-        collector.collectPrimedVariables(constraint, primeVariables);
-      return primeVariables;
-    }
-
     /**
      * Merges two {@link EFAUpdateInfo}s. The algorithm is best described
      * with an example.
@@ -1625,11 +1538,6 @@ public class EFANormaliser extends AbortableCompiler
      * associated to any transition.
      */
     private final List<ConstraintList> mCaughtGuards = new ArrayList<>();
-
-    /**
-     * A set that contains the prime variables used by this EFAUpdateInfo.
-     */
-    private Set<EFAVariable> mPrimeVariables;
   }
 
 
@@ -1714,22 +1622,6 @@ public class EFANormaliser extends AbortableCompiler
     private void setIdentifier(final IdentifierProxy ident)
     {
       mIdentifier = ident;
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    /**
-     * Collects all prime variables used in the field {@link #mUpdate}.
-     *
-     * @return A set of prime variables
-     */
-    private Set<EFAVariable> collectPrimeVariables()
-    {
-      final EFAVariableCollector collector =
-        new EFAVariableCollector(mOperatorTable, mRootContext);
-      final Set<EFAVariable> primeVariables = new THashSet<>();
-      collector.collectPrimedVariables(mUpdate, primeVariables);
-      return primeVariables;
     }
 
     //#######################################################################
