@@ -78,7 +78,6 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
   {
     compiler.setNormalizationEnabled(true);
     compiler.setOptimizationEnabled(true);
-    compiler.setUsingEventAlphabet(false);
     compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
   }

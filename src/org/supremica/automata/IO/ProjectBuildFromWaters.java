@@ -187,12 +187,10 @@ public class ProjectBuildFromWaters
         final ProductDESProxyFactory factory =
             ProductDESElementFactory.getInstance();
 		final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
-		final boolean ealpha = Config.USE_EVENT_ALPHABET.isTrue();
 		final ModuleCompiler compiler =
 			new ModuleCompiler(mDocumentManager, factory, module);
 		compiler.setOptimizationEnabled(optimize);
 		compiler.setExpandingEFATransitions(expand);
-		compiler.setUsingEventAlphabet(ealpha);
         if (!mIncludesProperties) {
           final Collection<String> empty = Collections.emptyList();
           compiler.setEnabledPropositionNames(empty);

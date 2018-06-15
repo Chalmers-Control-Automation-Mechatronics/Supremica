@@ -190,12 +190,6 @@ public class EFANormaliser extends AbortableCompiler
         info.generateEventNames(mComparator);
       }
       mEventNameBuilder = null;
-      // Old semantics
-      if (mUsesEventAlphabet) {
-        for (final EFAEventInfo e : mEventMap.values()) {
-          e.createExplicitGuards();
-        }
-      }
       // End of Pass 3: Throw any accumulated exceptions
       if (mCompilationInfo.hasExceptions()) {
         throw mCompilationInfo.getExceptions();
@@ -232,16 +226,6 @@ public class EFANormaliser extends AbortableCompiler
   public void setCreatesGuardAutomaton(final boolean create)
   {
     mCreatesGuardAutomaton = create;
-  }
-
-  public boolean getUsesEventAlphabet()
-  {
-    return mUsesEventAlphabet;
-  }
-
-  public void setUsesEventAlphabet(final boolean use)
-  {
-    mUsesEventAlphabet = use;
   }
 
   public boolean getUsesEventNameBuilder()
@@ -1218,9 +1202,7 @@ public class EFANormaliser extends AbortableCompiler
         }
         return events;
       } else { // Base case of the recursion
-        if (!mUsesEventAlphabet) {
-          propagator.removeUnchangedVariables();
-        }
+        propagator.removeUnchangedVariables();
         final ConstraintList constraints = propagator.getAllConstraints();
         EFAIdentifier event = mConstraintMap.get(constraints);
         if (event == null) {
@@ -1820,10 +1802,8 @@ public class EFANormaliser extends AbortableCompiler
 
   //#########################################################################
   //# Data Members
-
   // Flags:
   private boolean mCreatesGuardAutomaton = false;
-  private boolean mUsesEventAlphabet = false; // Default: New semantics
   private boolean mUsesEventNameBuilder = false;
 
   // Utilities:

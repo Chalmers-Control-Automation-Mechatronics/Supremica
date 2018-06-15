@@ -325,7 +325,6 @@ public class ModuleCompiler extends AbortableCompiler
             new EFANormaliser(modfactory, mCompilationInfo, intermediate);
           mEFANormaliser.setUsesEventNameBuilder(true);
           mEFANormaliser.setCreatesGuardAutomaton(true);
-          mEFANormaliser.setUsesEventAlphabet(mIsUsingEventAlphabet);
           intermediate = mEFANormaliser.compile();
           mEFANormaliser = null;
         }
@@ -491,44 +490,6 @@ public class ModuleCompiler extends AbortableCompiler
   }
 
   /**
-   * Gets whether unchanged variables are determined per-event when using
-   * old EFSM semantics.
-   * @see #setUsingEventAlphabet(boolean)
-   */
-  public boolean isUsingEventAlphabet()
-  {
-    return mIsUsingEventAlphabet;
-  }
-
-  /**
-   * <P>Sets whether unchanged variables are determined per-event when using
-   * old EFSM semantics.</P>
-   *
-   * <P>With old EFSM semantics, the user has to specify explicitly that
-   * variables remains unchanged (by writing an update such as
-   * <CODE>x&nbsp;=&nbsp;x</CODE>) if they do not appear on a transition.
-   * This option controls which variables are affected by this.</P>
-   *
-   * <P>If enabled, the compiler collects for each event in a EFSM all the
-   * variables that appear as next-state variable on one of its updates. All
-   * these variables will be allowed to assume a new value when the EFSM
-   * performs a transition with the event.</P>
-   *
-   * <P>If disabled, the set of changed variables is determined on a per-EFSM
-   * basis. All variables that appear as next-state variable in an EFSM may
-   * change on every transition of that EFSM.</P>
-   *
-   * <P>This option is enabled by default.
-   * It has no effect when normalisation is enabled.</P>
-   *
-   * @see #setNormalizationEnabled(boolean)
-   */
-  public void setUsingEventAlphabet(final boolean using)
-  {
-    mIsUsingEventAlphabet = using;
-  }
-
-  /**
    * Returns whether the compiler generates source information.
    * @see #setSourceInfoEnabled(boolean)
    */
@@ -689,7 +650,6 @@ public class ModuleCompiler extends AbortableCompiler
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;
   private boolean mIsNormalizationEnabled = true;
-  private boolean mIsUsingEventAlphabet = true;
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
