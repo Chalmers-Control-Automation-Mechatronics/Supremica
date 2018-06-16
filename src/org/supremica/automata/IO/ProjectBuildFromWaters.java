@@ -177,26 +177,28 @@ public class ProjectBuildFromWaters
      * @throws EvalException to indicate that compilation of the module
      *                  has failed.
      */
-    public Project build(final ModuleProxy module)
-		throws EvalException
+    public Project build(final ModuleProxy module) throws EvalException
     {
-        if (module == null) {
-            throw new NullPointerException("argument must be non null");
-        }
-		final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
-        final ProductDESProxyFactory factory =
-            ProductDESElementFactory.getInstance();
-		final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
-		final ModuleCompiler compiler =
-			new ModuleCompiler(mDocumentManager, factory, module);
-		compiler.setOptimizationEnabled(optimize);
-		compiler.setExpandingEFATransitions(expand);
-        if (!mIncludesProperties) {
-          final Collection<String> empty = Collections.emptyList();
-          compiler.setEnabledPropositionNames(empty);
-        }
-		final ProductDESProxy des = compiler.compile();
-        return build(des);
+      if (module == null) {
+        throw new NullPointerException
+          ("NULL module passed to ProjectBuildFromWaters.build()!");
+      }
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
+      final boolean normalize = Config.NORMALIZING_COMPILER.isTrue();
+      final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
+      final ModuleCompiler compiler =
+        new ModuleCompiler(mDocumentManager, factory, module);
+      compiler.setOptimizationEnabled(optimize);
+      compiler.setNormalizationEnabled(normalize);
+      compiler.setExpandingEFATransitions(expand);
+      if (!mIncludesProperties) {
+        final Collection<String> empty = Collections.emptyList();
+        compiler.setEnabledPropertyNames(empty);
+      }
+      final ProductDESProxy des = compiler.compile();
+      return build(des);
     }
 
     /**
