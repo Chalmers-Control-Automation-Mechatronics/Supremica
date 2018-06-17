@@ -98,6 +98,11 @@ class AutomataTableModel extends AbstractTableModel implements Observer
 
   }
 
+  public void Close()
+  {
+    mModuleContainer.detach(this);
+  }
+
   //#########################################################################
   //# Interface javax.swing.table.TableModel
   @Override

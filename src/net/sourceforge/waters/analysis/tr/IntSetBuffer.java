@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -42,9 +45,6 @@ import java.util.List;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonTools;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -75,16 +75,42 @@ public class IntSetBuffer implements WatersIntHashingStrategy
 
   //#########################################################################
   //# Constructors
+  /**
+   * Creates a new integer set buffer.
+   * @param numValues  The number of different values possible within sets.
+   *                   Bit packing will be organised so that the set buffer
+   *                   contains sets of numbers in the range from 0 to
+   *                   <CODE>numValues</CODE>-1.
+   */
   public IntSetBuffer(final int numValues)
   {
     this(numValues, numValues);
   }
 
+  /**
+   * Creates a new integer set buffer.
+   * @param numValues   The number of different values possible within sets.
+   *                    Bit packing will be organised so that the set buffer
+   *                    contains sets of numbers in the range from 0 to
+   *                    <CODE>numValues</CODE>-1.
+   * @param initialSize The approximate initial size of the hash table.
+   */
   public IntSetBuffer(final int numValues, final int initialSize)
   {
     this(numValues, initialSize, 0);
   }
 
+  /**
+   * Creates a new integer set buffer.
+   * @param numValues  The number of different values possible within sets.
+   *                   Bit packing will be organised so that the set buffer
+   *                   contains sets of numbers in the range from 0 to
+   *                   <CODE>numValues</CODE>-1.
+   * @param initialSize The approximate initial size of the hash table.
+   * @param defaultHashSetValue The value returned when looking up a
+   *                    non-existent using the {@link #get(int[]) get()}
+   *                    method.
+   */
   public IntSetBuffer(final int numValues,
                       final int initialSize,
                       final int defaultHashSetValue)
@@ -270,7 +296,9 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    * Checks whether a set with the given contents exists in the buffer.
    * @param  data  An array containing the set contents to be looked up.
    * @return The set index of a set with the given contents, or -1 if the
-   *         buffer contains no such set.
+   *         buffer contains no such set. (The non-existent value can be
+   *         changed to something other than -1 using the constructor
+   *         {@link #IntSetBuffer(int, int, int)}).
    */
   public int get(final int[] data) {
 

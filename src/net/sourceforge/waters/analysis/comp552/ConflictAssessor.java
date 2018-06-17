@@ -44,6 +44,8 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
+import org.apache.logging.log4j.LogManager;
+
 import org.xml.sax.SAXException;
 
 
@@ -104,6 +106,8 @@ public class ConflictAssessor extends AbstractAssessor
   public static void main(final String[] args)
   {
     try {
+      QuietLogConfigurationFactory.install();
+      LogManager.getLogger(); // avoid trouble with security manager later
       final ConflictAssessor assessor = new ConflictAssessor();
       assessor.processCommandLine(args);
     } catch (final Throwable exception) {

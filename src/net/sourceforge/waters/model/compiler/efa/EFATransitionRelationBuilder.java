@@ -185,13 +185,11 @@ class EFATransitionRelationBuilder extends AbortableCompiler
           checkAbort();
           final EFAVariableTransitionRelationPart part =
             record.createTransitionRelationPart();
-          if (part != null) {
-            final EFAVariableTransitionRelationPart unique = getUnique(part);
-            final EFAVariable var = record.getUnprimed();
-            result.addPart(var, unique);
-            if (result.isEmpty()) {
-              break;
-            }
+          final EFAVariableTransitionRelationPart unique = getUnique(part);
+          final EFAVariable var = record.getUnprimed();
+          result.addPart(var, unique);
+          if (result.isEmpty()) {
+            break;
           }
         }
         for (final EFAVariable var : edecl.getVariables()) {
@@ -332,6 +330,9 @@ class EFATransitionRelationBuilder extends AbortableCompiler
   private EFAVariableTransitionRelationPart getUnique
     (final EFAVariableTransitionRelationPart part)
   {
+    if (part == null) {
+      return null;
+    }
     final EFAVariableTransitionRelationPart unique =
       mUniqueTransitionRelationParts.get(part);
     if (unique == null) {

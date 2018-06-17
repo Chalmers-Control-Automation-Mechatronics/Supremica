@@ -173,13 +173,14 @@ class EFAVariableTransitionRelation
    *                  contains a partial relation for this variable, the
    *                  behaviour is undefined.
    * @param part      The new partial transition relation to be associated
-   *                  to the variable.
+   *                  to the variable, or <CODE>null</CODE> to indicate an
+   *                  explicitly unchanged variable.
    */
   void addPart(final EFAVariable var,
                final EFAVariableTransitionRelationPart part)
   {
     if (!mIsEmpty) {
-      if (part.isEmpty()) {
+      if (part != null && part.isEmpty()) {
         mParts.clear();
         mIsEmpty = true;
       } else {
@@ -294,9 +295,17 @@ class EFAVariableTransitionRelation
       }
       final EFAVariableTransitionRelationPart part1 = mParts.get(var1);
       final EFAVariableTransitionRelationPart part2 = rel.mParts.get(var2);
-      result = part1.compareTo(part2);
-      if (result != 0) {
-        return result;
+      if (part1 == null) {
+        if (part2 != null) {
+          return -1;
+        }
+      } else if (part2 == null) {
+        return 1;
+      } else {
+        result = part1.compareTo(part2);
+        if (result != 0) {
+          return result;
+        }
       }
       var1 = iter1.hasNext() ? iter1.next() : null;
       var2 = iter2.hasNext() ? iter2.next() : null;
@@ -326,7 +335,7 @@ class EFAVariableTransitionRelation
           final EFAVariableTransitionRelationPart part2 = parts2.get(var);
           if (part2 != null) {
             final EFAVariableTransitionRelationPart part1 = entry.getValue();
-            if (part1.isDisjoint(part2)) {
+            if (part1 != null && part1.isDisjoint(part2)) {
               return true;
             }
           }
@@ -360,14 +369,16 @@ class EFAVariableTransitionRelation
                entry : parts1.entrySet()) {
           final EFAVariable var = entry.getKey();
           final EFAVariableTransitionRelationPart part1 = entry.getValue();
-          final EFAVariableTransitionRelationPart part2 = parts2.get(var);
-          final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
-          result = SubsumptionResult.combine(result, kind);
-          if (result == SubsumptionResult.Kind.INTERSECTS) {
-            return SubsumptionResult.Kind.INTERSECTS;
-          }
-          if (part2 != null) {
-            visited++;
+          if (part1 != null) {
+            final EFAVariableTransitionRelationPart part2 = parts2.get(var);
+            final SubsumptionResult.Kind kind = part1.subsumptionTest(part2);
+            result = SubsumptionResult.combine(result, kind);
+            if (result == SubsumptionResult.Kind.INTERSECTS) {
+              return SubsumptionResult.Kind.INTERSECTS;
+            }
+            if (part2 != null) {
+              visited++;
+            }
           }
         }
         if (visited < parts2.size()) {
@@ -376,15 +387,17 @@ class EFAVariableTransitionRelation
             final EFAVariable var = entry.getKey();
             if (parts1.get(var) == null) {
               final EFAVariableTransitionRelationPart part2 = entry.getValue();
-              final SubsumptionResult.Kind rkind = part2.subsumptionTest(null);
-              final SubsumptionResult.Kind kind =
-                SubsumptionResult.reverse(rkind);
-              result = SubsumptionResult.combine(result, kind);
-              if (result == SubsumptionResult.Kind.INTERSECTS) {
-                return SubsumptionResult.Kind.INTERSECTS;
-              }
-              if (++visited == parts2.size()) {
-                break;
+              if (part2 != null) {
+                final SubsumptionResult.Kind rkind = part2.subsumptionTest(null);
+                final SubsumptionResult.Kind kind =
+                  SubsumptionResult.reverse(rkind);
+                result = SubsumptionResult.combine(result, kind);
+                if (result == SubsumptionResult.Kind.INTERSECTS) {
+                  return SubsumptionResult.Kind.INTERSECTS;
+                }
+                if (++visited == parts2.size()) {
+                  break;
+                }
               }
             }
           }
@@ -459,7 +472,11 @@ class EFAVariableTransitionRelation
         final EFAVariableTransitionRelationPart part = mParts.get(var);
         printer.pprint(ident);
         printer.pprint(": ");
-        part.pprint(printer);
+        if (part == null) {
+          printer.pprint(" =");
+        } else {
+          part.pprint(printer);
+        }
       }
       printer.pprint("}");
     }

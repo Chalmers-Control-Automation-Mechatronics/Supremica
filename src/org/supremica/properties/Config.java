@@ -223,9 +223,6 @@ public final class Config
     public static final BooleanProperty NORMALIZING_COMPILER =
       new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
               "Use normalising EFSM compiler");
-    public static final BooleanProperty USE_EVENT_ALPHABET =
-      new BooleanProperty(PropertyType.GUI, "useEventAlphabet", true,
-			  "Use per-event alphabet when compiling EFSM");
     public static final BooleanProperty INCLUDE_RAS_SUPPORT =
       new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,
               "Include RAS support");

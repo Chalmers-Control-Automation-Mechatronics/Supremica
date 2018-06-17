@@ -1,12 +1,10 @@
 //# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 package org.supremica.automata.BDD.EFA;
 
-import java.util.Random;
-
-import net.sf.javabdd.BDD;
-
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.set.hash.TIntHashSet;
+
+import net.sf.javabdd.BDD;
 
 
 /**
@@ -81,13 +79,13 @@ public class BDDPartitionAlgoWorkerEve extends BDDPartitionAlgoWorker
         int cpCount = partitionCount;
         previousReachableStatesBDD = currentReachableStatesBDD.id();
         BDD tmpBDD = null;
-        final Random r = new Random();
         while (cpCount != 0) {
           tmpBDD = currentReachableStatesBDD.id();
           int comIndex = 0;
-          do {
-            comIndex = r.nextInt(cpActiveFlags.length);
-          } while (!cpActiveFlags[comIndex]);
+          while (!cpActiveFlags[comIndex] && comIndex < cpActiveFlags.length) {
+              comIndex++;
+          }
+          assert cpActiveFlags[comIndex];
           final BDD currentTansitionBDD =
             partitions.getCompIndexToCompBDDMap().get(comIndex);
           cpActiveFlags[comIndex] = false;
@@ -212,13 +210,13 @@ public class BDDPartitionAlgoWorkerEve extends BDDPartitionAlgoWorker
         previousTargetCoreachableStatesBDD =
           currentTargetCoreachableStatesBDD.id();
         BDD tmpBDD = null;
-        final Random r = new Random();
         while (cpCount != 0) {
           tmpBDD = currentTargetCoreachableStatesBDD.id();
           int comIndex = 0;
-          do {
-            comIndex = r.nextInt(cpActiveFlags.length);
-          } while (!cpActiveFlags[comIndex]);
+          while(!cpActiveFlags[comIndex] && comIndex < cpActiveFlags.length) {
+            comIndex++;
+          }
+          assert cpActiveFlags[comIndex];
           final BDD currentTansitionBDD =
             partitions.getCompIndexToCompBDDMap().get(comIndex);
           cpActiveFlags[comIndex] = false;

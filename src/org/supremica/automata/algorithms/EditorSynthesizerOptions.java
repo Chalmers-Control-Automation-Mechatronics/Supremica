@@ -57,417 +57,405 @@ import org.supremica.properties.Config;
 
 public final class EditorSynthesizerOptions
 {
-    private static Logger logger = LogManager.getLogger(SynthesizerOptions.class);
+  //#########################################################################
+  //# Data Members
+  private static Logger logger =
+    LogManager.getLogger(SynthesizerOptions.class);
 
-    private boolean dialogOK = false;
-    private SynthesisType synthesisType;
-    private SynthesisAlgorithm synthesisAlgorithm;
-    private boolean purge;
-    private boolean removeUnnecessarySupervisors;
-    private boolean maximallyPermissive;
-    private boolean maximallyPermissiveIncremental;
-    private boolean reduceSupervisors;
-    private boolean printGuard;
-    private boolean addGuards;
-    private boolean saveInFile;
-    private boolean saveIDDInFile;
-    private boolean compHeuristic;
-    private boolean indpHeuristic;
-    private boolean reachability;
-    private boolean peakBDD;
-    private boolean rememberDisabledUncontrollableEvents;
-    private boolean optimization;
-    private long globalClockDomain = 0;
+  private boolean dialogOK = false;
+  private SynthesisType synthesisType;
+  private SynthesisAlgorithm synthesisAlgorithm;
+  private boolean purge;
+  private boolean removeUnnecessarySupervisors;
+  private boolean maximallyPermissive;
+  private boolean maximallyPermissiveIncremental;
+  private boolean reduceSupervisors;
+  private boolean printGuard;
+  private boolean addGuards;
+  private boolean saveInFile;
+  private boolean saveIDDInFile;
+  private boolean compHeuristic;
+  private boolean indpHeuristic;
+  private boolean reachability;
+  private boolean peakBDD;
+  private boolean rememberDisabledUncontrollableEvents;
+  private boolean optimization;
+  private long globalClockDomain = 0;
 
-    public boolean oneEventAtATime = false;
-    public boolean addOnePlantAtATime = false;
+  public boolean oneEventAtATime = false;
+  public boolean addOnePlantAtATime = false;
 
+  //Guard options
+  private String event;
+  private ExpressionType expressionType;
 
-    //Guard options
-    private String event;
-    private int expressionType;    // 0: the guard expression will be generated from the forbidden states; 1: from allowed states; 2: Adaptive case
+  //Optimization options
+  private String optVariable;
+  private boolean typeOfVarOpt = true;
 
-    //Optimisation options
-    private String optVariable;
-    private boolean typeOfVarOpt = true;
+  //#########################################################################
+  //# Constructors
+  /**
+   * The current options, based on earlier user preferences.
+   */
+  public EditorSynthesizerOptions()
+  {
+    this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
+         Config.SYNTHESIS_ALGORITHM_TYPE.get(),
+         Config.SYNTHESIS_PURGE.get(),
+         Config.SYNTHESIS_OPTIMIZE.get(),
+         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
+         Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
+         Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
+         Config.SYNTHESIS_PRINT_GUARD.get(),
+         Config.SYNTHESIS_ADD_GUARDS.get(),
+         Config.SYNTHESIS_SAVE_IN_FILE.get(),
+         Config.SYNTHESIS_REACHABILITY.get(),
+         Config.SYNTHESIS_PEAKBDD.get(),
+         Config.SYNTHESIS_OPTIMIZATION.get());
+  }
 
+  /**
+   * This is not a good constructor so it is private, it is impossible to read
+   * in the code. Use the "getDefault..." method in this class instead or when
+   * they won't suit you, modify the necessary options one by one, starting
+   * from default! Much more readable and also more practical when adding new
+   * options.
+   */
+  private EditorSynthesizerOptions(final SynthesisType synthesisType,
+                                   final SynthesisAlgorithm synthesisAlgorithm,
+                                   final boolean purge,
+                                   final boolean removeUnnecessarySupervisors,
+                                   final boolean maximallyPermissive,
+                                   final boolean maximallyPermissiveIncremental,
+                                   final boolean reduceSupervisors,
+                                   final boolean computePrintGuard,
+                                   final boolean addGuards,
+                                   final boolean saveInFile,
+                                   final boolean reachability,
+                                   final boolean peakBDD,
+                                   final boolean optimization)
+  {
+    this.synthesisType = synthesisType;
+    this.synthesisAlgorithm = synthesisAlgorithm;
+    this.purge = purge;
+    this.removeUnnecessarySupervisors = removeUnnecessarySupervisors;
+    this.maximallyPermissive = maximallyPermissive;
+    this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
+    this.reduceSupervisors = reduceSupervisors;
+    this.printGuard = computePrintGuard;
+    this.addGuards = addGuards;
+    this.saveInFile = saveInFile;
+    this.reachability = reachability;
+    this.peakBDD = peakBDD;
+    this.optimization = optimization;
 
-    /**
-     * The current options, based on earlier user preferences.
-     */
-    public EditorSynthesizerOptions()
-    {
-        this(Config.SYNTHESIS_SYNTHESIS_TYPE.get(),
-            Config.SYNTHESIS_ALGORITHM_TYPE.get(),
-            Config.SYNTHESIS_PURGE.get(),
-            Config.SYNTHESIS_OPTIMIZE.get(),
-            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.get(),
-            Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.get(),
-            Config.SYNTHESIS_REDUCE_SUPERVISORS.get(),
-            Config.SYNTHESIS_PRINT_GUARD.get(),
-            Config.SYNTHESIS_ADD_GUARDS.get(),
-            Config.SYNTHESIS_SAVE_IN_FILE.get(),
-            Config.SYNTHESIS_REACHABILITY.get(),
-            Config.SYNTHESIS_PEAKBDD.get(),
-            Config.SYNTHESIS_OPTIMIZATION.get());
+    this.event = "";
+    this.expressionType = ExpressionType.ADAPTIVE;
+
+    this.optVariable = "";
+  }
+
+  /**
+   * Stores the current set of options in SupremicaProperties.
+   */
+  public void saveOptions()
+  {
+    Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
+    Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
+    Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
+    Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL
+      .set(maximallyPermissiveIncremental);
+    Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
+    Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
+    Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
+    Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
+    Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
+    Config.SYNTHESIS_INDEPENDENT_HEURISTIC.set(indpHeuristic);
+  }
+
+  /**
+   * Returns the default options for synthesis.
+   */
+  // In which case is this method used? The defaults are specified
+  // in Config.
+  public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
+  {
+    return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
+                                        SynthesisAlgorithm.MONOLITHIC_WATERS,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        true,
+                                        false,
+                                        false,
+                                        true,
+                                        true,
+                                        false);
+  }
+
+  //#########################################################################
+  //# Sanity check
+  public boolean isValid()
+  {
+    final String errorMessage = validOptions();
+    if (errorMessage != null) {
+      logger.error(errorMessage);
+      return false;
     }
 
-    /**
-     * This is not a good constructor so it is private, it is impossible to read in the code.
-     * Use the "getDefault..."-methods in this class instead or when they won't suit you,
-     * modify the necessary options one by one, starting from default! Much more readable and
-     * also more practical when adding new options.
-     */
-    private EditorSynthesizerOptions(final SynthesisType synthesisType,
-                                     final SynthesisAlgorithm synthesisAlgorithm,
-                                     final boolean purge,
-                                     final boolean removeUnnecessarySupervisors,
-                                     final boolean maximallyPermissive,
-                                     final boolean maximallyPermissiveIncremental,
-                                     final boolean reduceSupervisors,
-                                     final boolean computePrintGuard,
-                                     final boolean addGuards,
-                                     final boolean saveInFile,
-                                     final boolean reachability,
-                                     final boolean peakBDD,
-                                     final boolean optimization)
-    {
-        this.synthesisType = synthesisType;
-        this.synthesisAlgorithm = synthesisAlgorithm;
-        this.purge = purge;
-        this.removeUnnecessarySupervisors = removeUnnecessarySupervisors;
-        this.maximallyPermissive = maximallyPermissive;
-        this.maximallyPermissiveIncremental = maximallyPermissiveIncremental;
-        this.reduceSupervisors = reduceSupervisors;
-        this.printGuard = computePrintGuard;
-        this.addGuards = addGuards;
-        this.saveInFile = saveInFile;
-        this.reachability = reachability;
-        this.peakBDD = peakBDD;
-        this.optimization = optimization;
+    return true;
+  }
 
-        this.event = "";
-        this.expressionType = 2;
-
-        this.optVariable = "";
+  public String validOptions()
+  {
+    if (synthesisType == null) {
+      return "Unknown synthesis type.";
     }
+    return null;
+  }
 
-    public boolean isValid()
-    {
-        final String errorMessage = validOptions();
-        if (errorMessage != null)
-        {
-            logger.error(errorMessage);
-            return false;
-        }
+  //#########################################################################
+  //# Getters and setters
+  public void setDialogOK(final boolean bool)
+  {
+    dialogOK = bool;
+  }
 
-        return true;
-    }
+  public boolean getDialogOK()
+  {
+    return dialogOK;
+  }
 
-    public String validOptions()
-    {
-        if (synthesisType == null)
-        {
-            return "Unknown synthesis type.";
-        }
+  public void setSynthesisType(final SynthesisType type)
+  {
+    synthesisType = type;
+  }
 
-        //At present, it is only possible to synthesize with BDDs.
-/*
-        if (synthesisAlgorithm == SynthesisAlgorithm.BDD)
-        {
-            if ((synthesisType != SynthesisType.NONBLOCKINGCONTROLLABLE) &&
-                (synthesisType != SynthesisType.CONTROLLABLE) &&
-                (synthesisType != SynthesisType.NONBLOCKING))
-            {
-                return("BDD algorithms currently only support supNB+C synthesis.");
-            }
-        }
+  public SynthesisType getSynthesisType()
+  {
+    return synthesisType;
+  }
 
-        if (synthesisAlgorithm == SynthesisAlgorithm.MONOLITHICBDD)
-        {
-            if (synthesisType != SynthesisType.NONBLOCKING)
-            {
-                return("BDD2 algorithms currently only support supNB synthesis.");
-            }
-        }
- */
-        return null;
-    }
+  public void setSynthesisAlgorithm(final SynthesisAlgorithm algorithm)
+  {
+    synthesisAlgorithm = algorithm;
+  }
 
-    public void setDialogOK(final boolean bool)
-    {
-        dialogOK = bool;
-    }
+  public SynthesisAlgorithm getSynthesisAlgorithm()
+  {
+    return synthesisAlgorithm;
+  }
 
-    public boolean getDialogOK()
-    {
-        return dialogOK;
-    }
+  public void setPurge(final boolean bool)
+  {
+    purge = bool;
+  }
 
-    public void setSynthesisType(final SynthesisType type)
-    {
-        synthesisType = type;
-    }
+  public boolean doPurge()
+  {
+    return purge;
+  }
 
-    public SynthesisType getSynthesisType()
-    {
-        return synthesisType;
-    }
+  public void setRememberDisabledUncontrollableEvents(final boolean remember)
+  {
+    rememberDisabledUncontrollableEvents = remember;
+  }
 
-    public void setSynthesisAlgorithm(final SynthesisAlgorithm algorithm)
-    {
-        synthesisAlgorithm = algorithm;
-    }
+  public boolean doRememberDisabledUncontrollableEvents()
+  {
+    return rememberDisabledUncontrollableEvents;
+  }
 
-    public SynthesisAlgorithm getSynthesisAlgorithm()
-    {
-        return synthesisAlgorithm;
-    }
+  public void setRemoveUnecessarySupervisors(final boolean bool)
+  {
+    removeUnnecessarySupervisors = bool;
+  }
 
-    public void setPurge(final boolean bool)
-    {
-        purge = bool;
-    }
+  public boolean getRemoveUnecessarySupervisors()
+  {
+    return removeUnnecessarySupervisors;
+  }
 
-    public boolean doPurge()
-    {
-        return purge;
-    }
+  public void setMaximallyPermissive(final boolean bool)
+  {
+    maximallyPermissive = bool;
+  }
 
-    public void setRememberDisabledUncontrollableEvents(final boolean remember)
-    {
-        rememberDisabledUncontrollableEvents = remember;
-    }
+  public boolean getMaximallyPermissive()
+  {
+    return maximallyPermissive;
+  }
 
-    public boolean doRememberDisabledUncontrollableEvents()
-    {
-        return rememberDisabledUncontrollableEvents;
-    }
+  public void setMaximallyPermissiveIncremental(final boolean bool)
+  {
+    maximallyPermissiveIncremental = bool;
+  }
 
-    public void setRemoveUnecessarySupervisors(final boolean bool)
-    {
-        removeUnnecessarySupervisors = bool;
-    }
+  public boolean getMaximallyPermissiveIncremental()
+  {
+    return maximallyPermissiveIncremental;
+  }
 
-    public boolean getRemoveUnecessarySupervisors()
-    {
-        return removeUnnecessarySupervisors;
-    }
+  public void setReduceSupervisors(final boolean bool)
+  {
+    reduceSupervisors = bool;
+  }
 
-    public void setMaximallyPermissive(final boolean bool)
-    {
-        maximallyPermissive = bool;
-    }
+  public boolean getReduceSupervisors()
+  {
+    return reduceSupervisors;
+  }
 
-    public boolean getMaximallyPermissive()
-    {
-        return maximallyPermissive;
-    }
+  public boolean getPrintGuard()
+  {
+    return printGuard;
+  }
 
-    public void setMaximallyPermissiveIncremental(final boolean bool)
-    {
-        maximallyPermissiveIncremental = bool;
-    }
+  public void setPrintGuard(final boolean bool)
+  {
+    printGuard = bool;
+  }
 
-    public boolean getMaximallyPermissiveIncremental()
-    {
-        return maximallyPermissiveIncremental;
-    }
+  public boolean getAddGuards()
+  {
+    return addGuards;
+  }
 
-    public void setReduceSupervisors(final boolean bool)
-    {
-        reduceSupervisors = bool;
-    }
+  public void setAddGuards(final boolean bool)
+  {
+    addGuards = bool;
+  }
 
-    public boolean getReduceSupervisors()
-    {
-        return reduceSupervisors;
-    }
+  public boolean getSaveInFile()
+  {
+    return saveInFile;
+  }
 
-    public boolean getPrintGuard()
-    {
-        return printGuard;
-    }
+  public void setSaveInFile(final boolean bool)
+  {
+    saveInFile = bool;
+  }
 
-    public void setPrintGuard(final boolean bool)
-    {
-        printGuard = bool;
-    }
+  public void setSaveIDDInFile(final boolean bool)
+  {
+    saveIDDInFile = bool;
+  }
 
-    public boolean getAddGuards()
-    {
-        return addGuards;
-    }
+  public boolean getSaveIDDInFile()
+  {
+    return saveIDDInFile;
+  }
 
-    public void setAddGuards(final boolean bool)
-    {
-        addGuards = bool;
-    }
+  public void setCompHeuristic(final boolean bool)
+  {
+    compHeuristic = bool;
+  }
 
-    public boolean getSaveInFile()
-    {
-        return saveInFile;
-    }
+  public boolean getCompHeuristic()
+  {
+    return compHeuristic;
+  }
 
+  public void setIndpHeuristic(final boolean bool)
+  {
+    indpHeuristic = bool;
+  }
 
-    public void setSaveInFile(final boolean bool)
-    {
-        saveInFile = bool;
-    }
+  public boolean getIndpHeuristic()
+  {
+    return indpHeuristic;
+  }
 
-    public void setSaveIDDInFile(final boolean bool)
-    {
-        saveIDDInFile = bool;
-    }
+  public boolean getReachability()
+  {
+    return reachability;
+  }
 
-    public boolean getSaveIDDInFile()
-    {
-        return saveIDDInFile;
-    }
+  public void setReachability(final boolean bool)
+  {
+    reachability = bool;
+  }
 
-    public void setCompHeuristic(final boolean bool)
-    {
-        compHeuristic = bool;
-    }
+  public boolean getPeakBDD()
+  {
+    return peakBDD;
+  }
 
-    public boolean getCompHeuristic()
-    {
-        return compHeuristic;
-    }
+  public void setPeakBDD(final boolean bool)
+  {
+    peakBDD = bool;
+  }
 
-    public void setIndpHeuristic(final boolean bool)
-    {
-        indpHeuristic = bool;
-    }
+  public boolean getOptimization()
+  {
+    return optimization;
+  }
 
-    public boolean getIndpHeuristic()
-    {
-        return indpHeuristic;
-    }
+  public void setOptimization(final boolean bool)
+  {
+    optimization = bool;
+  }
 
-    public boolean getReachability()
-    {
-        return reachability;
-    }
+  public void setGlobalClockDomain(final long domain)
+  {
+    globalClockDomain = domain;
+  }
 
+  public long getGlobalClockDomain()
+  {
+    return globalClockDomain;
+  }
 
-    public void setReachability(final boolean bool)
-    {
-        reachability = bool;
-    }
+  //Guard options
 
-    public boolean getPeakBDD()
-    {
-      return peakBDD;
-    }
+  public ExpressionType getExpressionType()
+  {
+    return expressionType;
+  }
 
-    public void setPeakBDD(final boolean bool)
-    {
-      peakBDD = bool;
-    }
+  public void setExpressionType(final ExpressionType exType)
+  {
+    expressionType = exType;
+  }
 
-    public boolean getOptimization()
-    {
-        return optimization;
-    }
+  public String getEvent()
+  {
+    return event;
+  }
 
-    public void setOptimization(final boolean bool)
-    {
-        optimization = bool;
-    }
+  public void setEvent(final String set)
+  {
+    event = set;
+  }
 
-    public void setGlobalClockDomain(final long domain)
-    {
-        globalClockDomain = domain;
-    }
+  public String getOptVaribale()
+  {
+    return optVariable;
+  }
 
-    public long getGlobalClockDomain()
-    {
-        return globalClockDomain;
-    }
+  public void setOptVariable(final String var)
+  {
+    optVariable = var;
+  }
 
-    /**
-     * Stores the current set of options in SupremicaProperties.
-     */
-    public void saveOptions()
-    {
-        Config.SYNTHESIS_SYNTHESIS_TYPE.setValue(synthesisType);
-        Config.SYNTHESIS_ALGORITHM_TYPE.setValue(synthesisAlgorithm);
-//        Config.SYNTHESIS_PURGE.set(purge);
-//        Config.SYNTHESIS_OPTIMIZE.set(removeUnnecessarySupervisors);
-        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE.set(maximallyPermissive);
-        Config.SYNTHESIS_MAXIMALLY_PERMISSIVE_INCREMENTAL.set(maximallyPermissiveIncremental);
-//        Config.SYNTHESIS_REDUCE_SUPERVISORS.set(reduceSupervisors);
-        Config.SYNTHESIS_PRINT_GUARD.set(printGuard);
-        Config.SYNTHESIS_ADD_GUARDS.set(addGuards);
-        Config.SYNTHESIS_SAVE_IN_FILE.set(saveInFile);
-        Config.SYNTHESIS_SAVE_IDD_IN_FILE.set(saveIDDInFile);
-        Config.SYNTHESIS_COMPLEMENT_HEURISTIC.set(compHeuristic);
-        Config.SYNTHESIS_INDEPENDENT_HEURISTIC.set(indpHeuristic);
+  public boolean getTypeOfVarOpt()
+  {
+    return typeOfVarOpt;
+  }
 
-    }
+  public void setTypeOfVarOpt(final boolean minMax)
+  {
+    typeOfVarOpt = minMax;
+  }
 
-    /**
-     * Returns the default options for synthesis.
-     */
-    public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
-    {
-        return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
-                                            SynthesisAlgorithm.MONOLITHIC_WATERS,
-                                            true,
-                                            true,
-                                            true,
-                                            true,
-                                            true,
-                                            true,
-                                            false,
-                                            false,
-                                            true,
-                                            true,
-                                            false);
-    }
-
-    //Guard options
-
-	public int getExpressionType()
-    {
-        return expressionType;
-    }
-
-    public void setExpressionType(final int set)
-	{
-		expressionType = set;
-	}
-
-    public String getEvent()
-    {
-        return event;
-    }
-
-    public void setEvent(final String set)
-    {
-	event = set;
-    }
-
-    public String getOptVaribale()
-    {
-        return optVariable;
-    }
-
-    public void setOptVariable(final String var)
-    {
-        optVariable=  var;
-    }
-
-    public boolean getTypeOfVarOpt()
-    {
-        return typeOfVarOpt;
-    }
-
-    public void setTypeOfVarOpt(final boolean minMax)
-    {
-        typeOfVarOpt = minMax;
-    }
-
-
+  //#########################################################################
+  //# Enum
+  public enum ExpressionType {
+    FORBIDDEN,
+    ALLOWED,
+    ADAPTIVE
+  }
 }

@@ -1053,7 +1053,7 @@ public class GraphEditorPanel
     final Rectangle bounds = area2D.getBounds();
     if (!bounds.isEmpty()) {
       final int grid = ConfigBridge.getGridSize();
-      final double gz = grid * mZoomFactor;
+      final double gz = grid * mAdjustedZoomFactor;
       final int x0 = (int) (gz *
         Math.floorDiv(bounds.x - LOWER_MARGIN, grid));
       final int x1 = (int) Math.ceil(gz *

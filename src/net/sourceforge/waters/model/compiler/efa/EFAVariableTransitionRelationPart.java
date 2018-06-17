@@ -322,7 +322,7 @@ class EFAVariableTransitionRelationPart
 
 
   //#########################################################################
-  //# Auxliary Methods
+  //# Auxiliary Methods
   void pprint(final ProxyPrinter printer)
     throws IOException
   {
