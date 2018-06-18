@@ -46,9 +46,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -56,12 +58,10 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 /**
  * @author Jordan Schroder
- */
-/**
- * @author Pwnbot
  */
 public class CliqueBasedSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
@@ -124,20 +124,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    final boolean[][] incompatibilityRelation = getIncompatibilityRelation(stateOutputs);
-
-    //for each state, a list of states it is compatible with
-    mStateNeighbourLists = new TIntHashSet[mNumStates];
-    for (int x = 0; x < mNumStates; x++) {
-      final TIntHashSet neighbours = new TIntHashSet();
-      for (int y = 0; y < mNumStates; y++) {
-        if (!incompatibilityRelation[x][y] && x != y)
-        {
-          neighbours.add(y);
-        }
-      }
-      mStateNeighbourLists[x] = neighbours;
-    }
+    mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
+    mCoversCache = new HashMap<>();
   }
 
 
@@ -163,96 +151,99 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     else {
       //we managed to reduce the supervisor
-
-      final Compatible[] reducedSupervisor = new Compatible[mReducedSupervisor.size()];
-      mReducedSupervisor.toArray(reducedSupervisor);
-      final int supervisorSize = reducedSupervisor.length;
-
-      //we have the set of compatibles, now we need to construct a new automaton based off them
-      //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
-      int startStateIndexOffset = 0;
-      for (; startStateIndexOffset < supervisorSize; startStateIndexOffset++) {
-        final Compatible currentCompatible = reducedSupervisor[startStateIndexOffset];
-        if (currentCompatible.containsAll(mInitialCompatible)) { break; }
-      }
-
-      //we must now go through each compatible (which is to become a state in the reduced automaton) and determine its successors
-      //in doing so, we build up a transition relation. We will use the index of the compatible in mReducedSupervisor to denote its index in the transition buffer
-      //however we want the initial state to have index 0 so we will offset all values by that amount
-      final PreTransitionBuffer transitionBuffer = new PreTransitionBuffer(mNumProperEvents);
-      boolean hasExplicitDumpState = false;
-      final TIntSet enabledEvents = new TIntHashSet();
-
-      for (int state = 0; state < supervisorSize; state++) {
-        final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
-        final Compatible compatible = reducedSupervisor[compatibleIndex];
-
-        //get the union of all events among the compatible's states (from the original automaton definition)
-        enabledEvents.clear();
-        getEnabledEventsOf(compatible, enabledEvents);
-        for (final TIntIterator eventIterator = enabledEvents.iterator(); eventIterator.hasNext();) {
-          final int event = eventIterator.next();
-          final Compatible successorCompatible = new Compatible();
-
-          //for each state in original compatible, retrieve the successor state which forms part of a successor compatible
-          for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
-            final int targetState = getSuccessorState(stateIterator.next(), event);
-            //if the target exists
-            if (targetState != -1) {
-              successorCompatible.add(targetState);
-            }
-          }
-
-          //map this successorCompatible to its index in our list of compatibles
-          int successorState = 0;
-
-          //map the dump state to a special state index
-          if (successorCompatible.size() == 1 && successorCompatible.contains(mDumpStateIndex)) {
-            successorState = supervisorSize;
-            hasExplicitDumpState = true;
-          }
-          else {
-            for (; successorState < supervisorSize; successorState++) {
-              final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
-              if (reducedSupervisor[successorCompatibleIndex].containsAll(successorCompatible)) {
-                break;
-              }
-            }
-          }
-
-          transitionBuffer.addTransition(state, event, successorState);
-        }
-      }
-      final ListBufferTransitionRelation relation = getTransitionRelation();
-      final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
-
-      //explicitly identify the dump state
-      relation.reset(supervisorSize + 1, supervisorSize, transitionBuffer.size(), getPreferredInputConfiguration());
-      //set the dump state as reachable only if there is actually a transition to it from our cliques
-      relation.setReachable(supervisorSize, hasExplicitDumpState);
-
-      relation.setInitial(0, true);
-
-      transitionBuffer.addOutgoingTransitions(relation);
-      relation.removeRedundantPropositions();
-      relation.removeEvent(EventEncoding.TAU);
-      relation.removeProperSelfLoopEvents();
-
-      for (int state = 0; state < supervisorSize; state++) {
-        final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
-        final Compatible compatible = reducedSupervisor[compatibleIndex];
-        long newStateMarkings = relation.createMarkings();
-
-        for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
-          final int compatibleState = stateIterator.next();
-          final long oldStateMarkings = oldStateBuffer.getAllMarkings(compatibleState);
-          newStateMarkings = relation.mergeMarkings(newStateMarkings, oldStateMarkings);
-        }
-        relation.setAllMarkings(state, newStateMarkings);
-      }
-
-      return true;
+       return buildReducedSupervisor();
     }
+  }
+
+  private boolean buildReducedSupervisor() throws OverflowException {
+    final Compatible[] reducedSupervisor = new Compatible[mReducedSupervisor.size()];
+    mReducedSupervisor.toArray(reducedSupervisor);
+    final int supervisorSize = reducedSupervisor.length;
+
+    //we have the set of compatibles, now we need to construct a new automaton based off them
+    //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
+    int startStateIndexOffset = 0;
+    for (; startStateIndexOffset < supervisorSize; startStateIndexOffset++) {
+      final Compatible currentCompatible = reducedSupervisor[startStateIndexOffset];
+      if (currentCompatible.containsAll(mInitialCompatible)) { break; }
+    }
+
+    //we must now go through each compatible (which is to become a state in the reduced automaton) and determine its successors
+    //in doing so, we build up a transition relation. We will use the index of the compatible in mReducedSupervisor to denote its index in the transition buffer
+    //however we want the initial state to have index 0 so we will offset all values by that amount
+    final PreTransitionBuffer transitionBuffer = new PreTransitionBuffer(mNumProperEvents);
+    boolean hasExplicitDumpState = false;
+    final TIntSet enabledEvents = new TIntHashSet();
+
+    for (int state = 0; state < supervisorSize; state++) {
+      final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
+      final Compatible compatible = reducedSupervisor[compatibleIndex];
+
+      //get the union of all events among the compatible's states (from the original automaton definition)
+      enabledEvents.clear();
+      getEnabledEventsOf(compatible, enabledEvents);
+      for (final TIntIterator eventIterator = enabledEvents.iterator(); eventIterator.hasNext();) {
+        final int event = eventIterator.next();
+        final Compatible successorCompatible = new Compatible();
+
+        //for each state in original compatible, retrieve the successor state which forms part of a successor compatible
+        for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
+          final int targetState = getSuccessorState(stateIterator.next(), event);
+          //if the target exists
+          if (targetState != -1) {
+            successorCompatible.add(targetState);
+          }
+        }
+
+        //map this successorCompatible to its index in our list of compatibles
+        int successorState = 0;
+
+        //map the dump state to a special state index
+        if (successorCompatible.size() == 1 && successorCompatible.contains(mDumpStateIndex)) {
+          successorState = supervisorSize;
+          hasExplicitDumpState = true;
+        }
+        else {
+          for (; successorState < supervisorSize; successorState++) {
+            final int successorCompatibleIndex = (successorState + startStateIndexOffset) % supervisorSize;
+            if (reducedSupervisor[successorCompatibleIndex].containsAll(successorCompatible)) {
+              break;
+            }
+          }
+        }
+
+        transitionBuffer.addTransition(state, event, successorState);
+      }
+    }
+    final ListBufferTransitionRelation relation = getTransitionRelation();
+    final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
+
+    //explicitly identify the dump state
+    relation.reset(supervisorSize + 1, supervisorSize, transitionBuffer.size(), getPreferredInputConfiguration());
+    //set the dump state as reachable only if there is actually a transition to it from our cliques
+    relation.setReachable(supervisorSize, hasExplicitDumpState);
+
+    relation.setInitial(0, true);
+
+    transitionBuffer.addOutgoingTransitions(relation);
+    relation.removeRedundantPropositions();
+    relation.removeEvent(EventEncoding.TAU);
+    relation.removeProperSelfLoopEvents();
+
+    for (int state = 0; state < supervisorSize; state++) {
+      final int compatibleIndex = (state + startStateIndexOffset) % supervisorSize;
+      final Compatible compatible = reducedSupervisor[compatibleIndex];
+      long newStateMarkings = relation.createMarkings();
+
+      for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
+        final int compatibleState = stateIterator.next();
+        final long oldStateMarkings = oldStateBuffer.getAllMarkings(compatibleState);
+        newStateMarkings = relation.mergeMarkings(newStateMarkings, oldStateMarkings);
+      }
+      relation.setAllMarkings(state, newStateMarkings);
+    }
+
+    return true;
   }
 
   private void reduce(final ParetoCompatibleSet currentSolution, final ParetoCompatibleSet compatibleDependencies) {
@@ -304,7 +295,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return BronKerbosch(clique, possibleInclusions, alreadyChecked, new ArrayList<Compatible>());
   }
 
-  private Collection<Compatible> BronKerbosch(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked, final Collection<Compatible> cliques) {
+  private Collection<Compatible> BronKerbosch(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked, final List<Compatible> cliques) {
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleInclusions.isEmpty() && alreadyChecked.isEmpty()) {
       //add this maximal clique
@@ -313,58 +304,57 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     for (final TIntIterator inclusionIterator = possibleInclusions.iterator(); inclusionIterator.hasNext();) {
-      final int stateToInclude = inclusionIterator.next();
-      final TIntCollection newNeighbours = mStateNeighbourLists[stateToInclude];
+      final int vertex = inclusionIterator.next();
 
       //create a copy with the new vertex
       final Compatible newClique = new Compatible(clique);
-      newClique.add(stateToInclude);
+      newClique.add(vertex);
 
       //create a copy with a restricted set of neighbours
-      final TIntCollection newPossibleInclusions = new TIntHashSet();
-      for (final TIntIterator possibleInclusionIterator = possibleInclusions.iterator(); possibleInclusionIterator.hasNext();) {
-        final int possibleInclusion = possibleInclusionIterator.next();
-        if (newNeighbours.contains(possibleInclusion)) {
-          newPossibleInclusions.add(possibleInclusion);
+      final TIntCollection newPossibleInclusions = new TIntArrayList();
+      for (final TIntIterator stateIterator = possibleInclusions.iterator(); stateIterator.hasNext();) {
+        final int state = stateIterator.next();
+        if (isNeighbour(vertex, state)) {
+          newPossibleInclusions.add(state);
         }
       }
 
-      final TIntCollection newAlreadyChecked = new TIntHashSet();
-      for (final TIntIterator alreadyCheckedIterator = alreadyChecked.iterator(); alreadyCheckedIterator.hasNext();) {
-        final int checkedState = alreadyCheckedIterator.next();
-        if (newNeighbours.contains(checkedState)) {
-          newAlreadyChecked.add(checkedState);
-        }
-      }
+      final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked);
 
       //find any maximal cliques based on newCliques and add them to the object referenced by cliques
       BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked, cliques);
 
       inclusionIterator.remove();
-      alreadyChecked.add(stateToInclude);
+      alreadyChecked.add(vertex);
     }
 
     return cliques;
   }
 
   private Collection<Compatible> getCoversOf(final Compatible compatible) {
+    if (mCoversCache.containsKey(compatible)) {
+      return mCoversCache.get(compatible);
+    }
 
-    final TIntCollection possibleInclusions = new TIntHashSet();
+    final TIntCollection possibleInclusions = new TIntArrayList();
 
     if (compatible.size() > 0) {
+
       //find neighbours of the first state in the compatible - we know possibleInclusions must contain a subset of these in the end since we are taking intersections
-      for (final TIntIterator neighbourIterator = mStateNeighbourLists[compatible.iterator().next()].iterator(); neighbourIterator.hasNext();) {
+      final TIntCollection neighbours = getNeighboursOf(compatible.iterator().next());
+      for (final TIntIterator neighbourIterator = neighbours.iterator(); neighbourIterator.hasNext();) {
         final int neighbour = neighbourIterator.next();
-        final TIntCollection neighboursOfNeighbour = mStateNeighbourLists[neighbour];
 
         //skip the first compatible because we have dealt with it above
         final TIntIterator stateIterator = compatible.iterator();
         stateIterator.next();
 
-        //everything else in the compatible should be neighbours with neighbour, so should appear in neighboursOfNeighbour
         boolean allNeighbours = true;
         while (stateIterator.hasNext() && allNeighbours) {
-          allNeighbours = neighboursOfNeighbour.contains(stateIterator.next());
+          final int state = stateIterator.next();
+          if (!isNeighbour(neighbour, state)) {
+            allNeighbours = false;
+          }
         }
         if (allNeighbours) {
           possibleInclusions.add(neighbour);
@@ -372,7 +362,24 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    return BronKerbosch(compatible, possibleInclusions, new TIntHashSet());
+    final Collection<Compatible> covers = BronKerbosch(compatible, possibleInclusions, new TIntArrayList());
+    mCoversCache.put(compatible, covers);
+    return covers;
+  }
+
+  private boolean isNeighbour(final int state1, final int state2) {
+    return !mIncompatibilityRelation[state1][state2] && state1 != state2;
+  }
+
+  private TIntCollection getNeighboursOf(final int state) {
+    final TIntList neighbours = new TIntArrayList();
+    for (int s = 0; s < mNumStates; s++) {
+      //if the two states are compatible and not the same state, add to neighbours
+      if (isNeighbour(state, s)) {
+        neighbours.add(s);
+      }
+    }
+    return neighbours;
   }
 
   private void getSuccessorCompatiblesOf(final Compatible compatible, final Collection<Compatible> successorsToFill) {
@@ -396,13 +403,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getEnabledEventsOf(final Compatible compatible, final TIntCollection enabledEventsToFill) {
+  private void getEnabledEventsOf(final Compatible compatible, final TIntCollection eventSetToFill) {
     //get the union of enabled events across states in the compatible
     final TIntList successorEvents = new TIntArrayList();
     for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
       successorEvents.clear();
       getSuccessorEvents(compatibleIterator.next(), successorEvents);
-      enabledEventsToFill.addAll(successorEvents);
+      eventSetToFill.addAll(successorEvents);
     }
   }
 
@@ -585,6 +592,18 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
+  private class BronKerboschState {
+    public final Compatible clique;
+    public final TIntCollection possibleInclusions;
+    public final TIntCollection alreadyChecked;
+
+    public BronKerboschState(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked) {
+      this.clique = clique;
+      this.possibleInclusions = possibleInclusions;
+      this.alreadyChecked = alreadyChecked;
+    }
+  }
+
   private enum StateOutput {
     ENABLE,
     DISABLE,
@@ -595,8 +614,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //# Data Members
   private int mNumProperEvents;
   private int mDumpStateIndex;
-  private Compatible mInitialCompatible;
   private int mNumStates;
-  private TIntCollection[] mStateNeighbourLists;
+  private boolean[][] mIncompatibilityRelation;
+  private Compatible mInitialCompatible;
+  private HashMap<BronKerboschState, Collection<Compatible>> mBronKerboschCache;
+  private HashMap<Compatible,Collection<Compatible>> mCoversCache;
   private ParetoCompatibleSet mReducedSupervisor;
 }
