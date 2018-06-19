@@ -592,18 +592,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private class BronKerboschState {
-    public final Compatible clique;
-    public final TIntCollection possibleInclusions;
-    public final TIntCollection alreadyChecked;
-
-    public BronKerboschState(final Compatible clique, final TIntCollection possibleInclusions, final TIntCollection alreadyChecked) {
-      this.clique = clique;
-      this.possibleInclusions = possibleInclusions;
-      this.alreadyChecked = alreadyChecked;
-    }
-  }
-
   private enum StateOutput {
     ENABLE,
     DISABLE,
@@ -617,7 +605,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private int mNumStates;
   private boolean[][] mIncompatibilityRelation;
   private Compatible mInitialCompatible;
-  private HashMap<BronKerboschState, Collection<Compatible>> mBronKerboschCache;
   private HashMap<Compatible,Collection<Compatible>> mCoversCache;
   private ParetoCompatibleSet mReducedSupervisor;
 }
