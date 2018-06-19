@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.diagnosis;
 
 import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntLongHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.hash.THashSet;
@@ -49,6 +50,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -111,7 +113,9 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final TRSynchronousProductResult spResult = spBuilder.getAnalysisResult();
       final TRAutomatonProxy sp = spResult.getComputedAutomaton();
       final EventEncoding spEvents = sp.getEventEncoding();
-      rel = sp.getTransitionRelation();
+      final ListBufferTransitionRelation rel = sp.getTransitionRelation();
+      iterA = rel.createSuccessorsReadOnlyIterator();
+      iterB = rel.createSuccessorsReadOnlyIterator();
       final int numEvents = spEvents.getNumberOfProperEvents();
       eventObservability = new boolean[numEvents];
       final THashSet<String> faultClasses = new THashSet<String>();
@@ -140,22 +144,57 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       if(!faultClasses.isEmpty()) {
         final TObjectHashIterator<String> faultClassIter = faultClasses.iterator();
         final int initialState = rel.getFirstInitialState();
-        final long verifierInitState = ((long)initialState<<32)|initialState;
+        final long verifierInitState = (((long)initialState)<<32)|initialState;
         while(faultClassIter.hasNext()) {
           faultClass = faultClassIter.next();
-          Qindex = 0;
-          Q.clear();
-          Q.put(verifierInitState,Qindex);
-          Qindex++;
-          stack.clear();
+          compStack.clear();
+          contStack.clear();
           lowlink.clear();
-          lowlink.add(0);
-          if(!explore(verifierInitState)) {
-            return setFailedResult(null); // not diagnosable
+          dfs.clear();
+          mode.clear();
+          stateIndexMap.clear();
+          indexStateMap.clear();
+          stateCount = 0;
+          stateIndexMap.put(verifierInitState,stateCount);
+          indexStateMap.put(stateCount, verifierInitState);
+          stateCount++;
+          mode.add(1);
+          dfs.add(0);
+          lowlink.add(2);
+          contStack.add(0);
+          contStack.add(0);
+          contStack.add(0);
+          contStack.add(0);
+          contStackTop = 2;
+
+          while(contStackTop!=0) {
+            final int i = contStack.get(contStackTop);
+            final int p = contStack.get(contStackTop+1);
+            if(mode.get(i) == 1) {
+              mode.set(i, 2);
+              expand(i);
+            }else if(mode.get(i) == 2) {
+              contStackTop-=2;
+              while(contStack.get(contStackTop)==-1) {
+                contStackTop-=2;
+              }
+              if(!close(i,p)) {
+                return setFailedResult(null);
+              }
+            }else if(mode.get(i)== 3) {
+              contStackTop-=2;
+              while(contStack.get(contStackTop)==-1) {
+                contStackTop-=2;
+              }
+            }
           }
         }
       }
 
+    } catch (final OverflowException overflow) {
+      throw setExceptionResult(overflow);
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
@@ -164,16 +203,14 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
 
 
-
-
-  private boolean explore(final long current) {
-    final TransitionIterator iterA = rel.createSuccessorsReadOnlyIterator();
-    final TransitionIterator iterB = rel.createSuccessorsReadOnlyIterator();
-    final int index = Q.get(current);
-    lowlink.set(index, index);
-    stack.add(index);
-    final int a = (int)(current>>>32);
-    final int b = (int)current;
+  private void expand(final int index) throws OverflowException
+  {
+    final long state = indexStateMap.get(index);
+    final int a = (int)(state>>>32);
+    final int b = (int)state;
+    dfs.set(index, compStack.size());
+    lowlink.set(index, compStack.size());
+    compStack.add(index);
     if(a>=0||b>=0) {
       iterA.resetState(a&MsbMask);
       int e;
@@ -185,24 +222,26 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         //if unobservable
         if(!eventObservability[e]) {
           if(faultClass.equals(faultClassMap.get(e))) {
-            newA = targetA|Msb1; newB = b;
+            newA = targetA|Msb1;
+            newB = b;
           }else {
-            newA = targetA|(a&Msb1); newB = b;
+            newA = targetA|(a&Msb1);
+            newB = b;
           }
-          if(!newState(newA,newB,index))
-            return false;
+          newState(newA,newB,index);
         //if observable
         }else {
           iterB.reset((b&MsbMask),e);
           while(iterB.advance()) {
             targetB = iterB.getCurrentTargetState();
             if(faultClass.equals(faultClassMap.get(e))) {
-              newA = targetA|Msb1; newB = targetB|Msb1;
+              newA = targetA|Msb1;
+              newB = targetB|Msb1;
             }else {
-              newA = targetA|(a&Msb1); newB = targetB|(b&Msb1);
+              newA = targetA|(a&Msb1);
+              newB = targetB|(b&Msb1);
             }
-            if(!newState(newA,newB,index))
-              return false;
+            newState(newA,newB,index);
           }
         }
 
@@ -214,21 +253,82 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         //if unobservable
         if(!eventObservability[e]) {
           if(faultClass.equals(faultClassMap.get(e))) {
-            newA = a; newB = targetB|Msb1;
+            newA = a;
+            newB = targetB|Msb1;
           }else {
-            newA = a; newB = targetB|(b&Msb1);
+            newA = a;
+            newB = targetB|(b&Msb1);
           }
-          if(!newState(newA,newB,index))
-            return false;
+          newState(newA,newB,index);
         }
       }
     }
-    //check for SCC
-    if(lowlink.get(index)==index) {
-      int j = stack.removeAt(stack.size()-1);
+  }
+
+
+
+  private void newState(final int a, final int b, final int parentIndex)
+    throws OverflowException
+  {
+
+    long next;
+    if(a > b) {
+      next = (((long)a)<<32) | (b&0xffffffffL);
+    }else {
+      next = (((long)a)<<32) | (b&0xffffffffL);
+    }
+    int index = stateIndexMap.get(next);
+    if(!stateIndexMap.containsKey(next)) {
+      stateIndexMap.put(next, stateCount);
+      indexStateMap.put(stateCount, next);
+      index = stateCount;
+      stateCount++;
+      if(stateCount >= getNodeLimit()) {
+        throw new OverflowException(getNodeLimit());
+      }
+      contStackTop+=2;
+      if(contStackTop==contStack.size()) {
+        contStack.add(index);
+        contStack.add(parentIndex);
+      }else {
+        contStack.set(contStackTop, index);
+        contStack.set(contStackTop+1,parentIndex);
+      }
+
+      lowlink.add(contStackTop);
+      dfs.add(0);
+      mode.add(1);
+
+    }else if(mode.get(index) == 1){
+      contStack.set(lowlink.get(index), -1);
+      contStackTop+=2;
+      if(contStackTop==contStack.size()) {
+        contStack.add(index);
+        contStack.add(parentIndex);
+      }else {
+        contStack.set(contStackTop, index);
+        contStack.set(contStackTop+1,parentIndex);
+      }
+      lowlink.set(index, contStackTop);
+    }else if(mode.get(index) == 2) {
+      lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex), lowlink.get(index)));
+    }
+  }
+
+
+
+  private boolean close(final int index, final int parentIndex) {
+    final long state = indexStateMap.get(index);
+    final int a = (int)(state>>>32);
+    final int b = (int)state;
+
+    if(lowlink.get(index)==dfs.get(index)) {
+      int j = compStack.removeAt(compStack.size()-1);
+      mode.set(j, 3);
       if(j!=index) {
         do {
-          j = stack.removeAt(stack.size()-1);
+          j = compStack.removeAt(compStack.size()-1);
+          mode.set(j, 3);
         }while(j!=index);
         if((a&Msb1)==(b&Msb1)) {
           return true;
@@ -267,38 +367,8 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           }
         }
       }
-    }
-    return true;
-  }
-
-
-
-  private boolean newState(final int a, final int b, final int parentIndex) {
-    int index;
-    long next;
-    if(a > b) {
-      next = (((long)a)<<32) | (b&0xffffffffL);
     }else {
-      next = (((long)a)<<32) | (b&0xffffffffL);
-    }
-    if(!Q.containsKey(next)) {
-      Q.put(next, Qindex);
-      index = Qindex;
-      Qindex++;
-      if(Qindex > getNodeLimit()) {
-        //throw overflow exception;
-      }
-
-      lowlink.add(0);
-      if(!explore(next)) {
-        return false;
-      }
-      lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex),lowlink.get(index)));
-    }else {
-      index = Q.get(next);
-      if(stack.contains(index)) {
-        lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex),index));
-      }
+      lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex), lowlink.get(index)));
     }
     return true;
   }
@@ -308,12 +378,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //# Instance Variables
   private boolean[] eventObservability;
   private final TIntObjectHashMap<String> faultClassMap = new TIntObjectHashMap<String>();
-  private final TLongIntHashMap Q = new TLongIntHashMap();
-  private final TIntArrayList stack = new TIntArrayList();
+  private final TLongIntHashMap stateIndexMap = new TLongIntHashMap();
+  private final TIntLongHashMap indexStateMap = new TIntLongHashMap();
+  private final TIntArrayList compStack = new TIntArrayList();
+  private final TIntArrayList contStack = new TIntArrayList();
   private final TIntArrayList lowlink = new TIntArrayList();
-  private int Qindex = 0;
+  private final TIntArrayList dfs = new TIntArrayList();
+  private final TIntArrayList mode = new TIntArrayList();
+  private int contStackTop;
+  private int stateCount = 0;
   private String faultClass;
-  ListBufferTransitionRelation rel;
+  private TransitionIterator iterA;
+  private TransitionIterator iterB;
 
 
   //#########################################################################
