@@ -101,7 +101,36 @@ public class MonolithicDiagnosabilityVerifierTest
       getCompiledDES("tests", "diagnosability", "Diag_1.wmod");
     runModelVerifier(des, true);
   }
-
+  public void testDiag2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "Diag_2.wmod");
+    runModelVerifier(des, true);
+  }
+  public void testDiag3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "Diag_3.wmod");
+    runModelVerifier(des, true);
+  }
+  public void testDiag4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "Diag_4.wmod");
+    runModelVerifier(des, true);
+  }
+  public void testDiag5() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "Diag_5.wmod");
+    runModelVerifier(des, true);
+  }
+  public void testDiag6() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "Diag_6.wmod");
+    runModelVerifier(des, true);
+  }
 
   //#########################################################################
   //# Test Cases --- not diagnosable
@@ -111,6 +140,70 @@ public class MonolithicDiagnosabilityVerifierTest
       getCompiledDES("tests", "diagnosability", "notDiag_1.wmod");
     runModelVerifier(des, false);
   }
+  public void testNotDiag2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_2.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_3.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_4.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag5() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_5.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag6() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_6.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag7() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_7.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag8() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_8.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag9() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_9.wmod");
+    runModelVerifier(des, false);
+  }
+
+  public void testNotDiag10() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_10.wmod");
+    runModelVerifier(des, false);
+  }
+
+
 
 
   //#########################################################################
