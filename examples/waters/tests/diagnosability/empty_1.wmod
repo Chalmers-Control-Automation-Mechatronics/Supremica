@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="empty_1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Observable="false" Name="f">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAULT" Value="1"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+</Module>
