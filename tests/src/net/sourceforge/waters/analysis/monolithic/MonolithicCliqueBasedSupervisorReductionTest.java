@@ -133,11 +133,6 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   }
 
   @Override
-  public void testIPCcswitch() throws Exception
-  {
-  }
-
-  @Override
   public void testIPClswitch() throws Exception
   {
   }
