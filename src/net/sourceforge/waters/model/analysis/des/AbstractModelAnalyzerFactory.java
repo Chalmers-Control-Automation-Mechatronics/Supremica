@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -62,8 +64,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -148,6 +148,14 @@ public abstract class AbstractModelAnalyzerFactory
     throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("deadlock check");
+  }
+
+  @Override
+  public DiagnosabilityChecker createDiagnosabilityChecker
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    throw createUnsupportedOperationException("diagnosability check");
   }
 
   @Override

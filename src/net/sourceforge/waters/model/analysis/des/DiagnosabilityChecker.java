@@ -31,42 +31,37 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 
-import org.supremica.gui.ide.IDE;
+/**
+ * <P>A model verifier that checks whether a system of composed automata
+ * is <I>diagnosable</I>.</P>
+ *
+ * <P>A diagnosability checker searches the input model for unobservable
+ * events marked with the FAULT attribute. Events with this attribute are
+ * considered as faults, and the attribute value defines the fault class.
+ * Different fault events with the same attribute value belong to the same
+ * fault class.</P>
+ *
+ * <P>A model is diagnosable with respect to a fault class, if for each trace
+ * that includes an event with this fault class, it is guaranteed that the
+ * fault is detected eventually. That is, there exists a maximum number of
+ * steps, such that all continuations of this length with equal projection
+ * to observable events include a fault of the same class.</P>
+ *
+ * <P><I>Reference:</I> M. Sampath, R. Sengupta, S. Lafortune,
+ * K. Sinnamohideen, D. Teneketzis. Diagnosability of discrete-event systems.
+ * IEEE Transactions on Automatic Control, <STRONG>40</STRONG>(9),
+ * 1555&ndash;1575, 1995.</P>
+ *
+ * @see DiagnosabilityAttributeFactory
+ *
+ * @author Robi Malik
+ */
 
-public class AnalyzeControllabilityAction extends WatersAnalyzeAction
+public interface DiagnosabilityChecker extends ModelVerifier
 {
-  protected AnalyzeControllabilityAction(final IDE ide)
-  {
-    super(ide);
-  }
 
-  protected String getCheckName()
-  {
-    return "Controllability";
-  }
-
-  protected String getFailureDescription()
-  {
-    return "is not controllable";
-  }
-
-  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {
-    return factory.createControllabilityChecker(desFactory);
-  }
-
-  protected String getSuccessDescription()
-  {
-    return "is controllable";
-  }
-
-  private static final long serialVersionUID = -1008097797553564719L;
 }

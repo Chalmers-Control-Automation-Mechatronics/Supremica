@@ -34,7 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -42,59 +42,57 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke an HISC-CP controllability check.
- * This invokes just a standard controllability check.
- * The only difference to {@link AnalyzeControllabilityCheckAction} is that
- * the module is compiled differently for HISC, with only the interfaces
- * of instantiated modules included.
+ * The action to invoke a diagnosability check through the editor's
+ * Verify menu.
+ *
+ * @see DiagnosabilityChecker
  *
  * @author Robi Malik
  */
 
-public class AnalyzeHISCCPControllabilityAction
-  extends WatersAnalyzeHISCAction
+public class AnalyzeDiagnosabilityCheckAction extends WatersAnalyzeAction
 {
 
   //#########################################################################
-  //# Constructor
-  protected AnalyzeHISCCPControllabilityAction(final IDE ide)
+  //# Constructors
+  protected AnalyzeDiagnosabilityCheckAction(final IDE ide)
   {
     super(ide);
   }
 
 
   //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
   protected String getCheckName()
   {
-    return "HISC-CP Controllability";
+    return "Diagnosability";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "is not locally controllable";
+    return "is not diagnosable";
   }
 
   @Override
-  protected ModelVerifier getModelVerifier
+  protected DiagnosabilityChecker getModelVerifier
     (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+     final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    return factory.createControllabilityChecker(desFactory);
+    return factory.createDiagnosabilityChecker(desFactory);
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "is locally controllable";
+    return "is diagnosable";
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -6505471793647504953L;
 
 }

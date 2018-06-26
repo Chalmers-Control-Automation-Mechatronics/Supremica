@@ -206,7 +206,7 @@ public final class Config
                           0, "Y position at which IDE opens", false, 0);
     public static BooleanProperty GUI_IDE_MAXIMIZED =
       new BooleanProperty(PropertyType.GUI, "ideFrameMaximized", false,
-                          "Whether or not the IDE opens as a maximized window ",
+                          "Whether or not the IDE opens as a maximised window",
                           false);
 
     public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
@@ -221,7 +221,7 @@ public final class Config
 			  "Remove redundant events, transitions, and components " +
               "when compiling");
     public static final BooleanProperty NORMALIZING_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
+      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", true,
               "Use normalising EFSM compiler");
     public static final BooleanProperty INCLUDE_RAS_SUPPORT =
       new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,
@@ -276,6 +276,9 @@ public final class Config
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeSeamlessSynthesis",
                           true, "Include Seamless Synthesis");
+    public static final BooleanProperty GUI_ANALYZER_INCLUDE_DIAGNOSABILIY =
+      new BooleanProperty(PropertyType.GUI_ANALYZER, "includeDiagnosability", false,
+                          "Include diagnosability check");
     public static final BooleanProperty GUI_ANALYZER_INCLUDE_HISC =
       new BooleanProperty(PropertyType.GUI_ANALYZER, "includeHISC", false,
                           "Include HISC property checks");

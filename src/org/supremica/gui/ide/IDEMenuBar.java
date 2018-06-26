@@ -51,8 +51,9 @@ import javax.swing.JMenuItem;
 
 import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeControllabilityAction;
+import net.sourceforge.waters.gui.actions.AnalyzeControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzeDiagnosabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
 import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
@@ -385,7 +386,7 @@ public class IDEMenuBar extends JMenuBar
         mVerifyMenu = new JMenu("Verify");
         mVerifyMenu.setMnemonic(KeyEvent.VK_R);
         final Action controllability =
-            actions.getAction(AnalyzeControllabilityAction.class);
+            actions.getAction(AnalyzeControllabilityCheckAction.class);
         mVerifyMenu.add(controllability);
         final Action conflict =
           actions.getAction(AnalyzeConflictCheckAction.class);
@@ -399,6 +400,11 @@ public class IDEMenuBar extends JMenuBar
         final Action languageInclusion =
             actions.getAction(AnalyzeLanguageInclusionAction.class);
         mVerifyMenu.add(languageInclusion);
+        if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
+          final Action diagnosability =
+            actions.getAction(AnalyzeDiagnosabilityCheckAction.class);
+          mVerifyMenu.add(diagnosability);
+        }
         if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
           mVerifyMenu.addSeparator();
           final Action sic5 =

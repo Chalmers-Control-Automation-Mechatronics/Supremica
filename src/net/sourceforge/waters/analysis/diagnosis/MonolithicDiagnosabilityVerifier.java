@@ -49,9 +49,11 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -60,11 +62,18 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Nicholas McGrath
  */
-public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
+public class MonolithicDiagnosabilityVerifier
+  extends AbstractModelVerifier
+  implements DiagnosabilityChecker
 {
 
   //#########################################################################
   //# Constructors
+  public MonolithicDiagnosabilityVerifier(final ProductDESProxyFactory factory)
+  {
+    this(factory, IdenticalKindTranslator.getInstance());
+  }
+
   public MonolithicDiagnosabilityVerifier(final ProductDESProxyFactory factory,
                                           final KindTranslator translator)
   {
@@ -119,7 +128,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final int numEvents = spEvents.getNumberOfProperEvents();
       eventObservability = new boolean[numEvents];
       final THashSet<String> faultClasses = new THashSet<String>();
-      final String key = "FAULT";
       String value;
       Map<String,String> attrib;
       EventProxy event;
@@ -127,7 +135,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         event = spEvents.getProperEvent(i);
         if(event!=null) {
           attrib = event.getAttributes();
-          value = attrib.get(key);
+          value = attrib.get(DiagnosabilityAttributeFactory.FAULT_KEY);
           if(value!=null) {
             faultClassMap.put(i,value);
             if(!faultClasses.contains(value)) {
