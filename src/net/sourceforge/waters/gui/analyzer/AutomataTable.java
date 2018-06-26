@@ -98,6 +98,8 @@ class AutomataTable extends JTable implements SelectionOwner
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
 
+//    this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "none");
+
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
     final int columnGap = IconAndFontLoader.getTableColumnGap();
@@ -279,7 +281,6 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
-
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.observer.subject
   @Override
@@ -312,7 +313,6 @@ class AutomataTable extends JTable implements SelectionOwner
       }
     }
   }
-
 
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
@@ -416,7 +416,7 @@ class AutomataTable extends JTable implements SelectionOwner
       @Override
       public int compare(final AutomatonProxy lhs, final AutomatonProxy rhs)
       {
-        // -1 - less than, 1 - greater than, 0 - equal, all inversed for ascending
+        // -1 - less than, 1 - greater than, 0 - equal, all inverted for ascending
         return rhs.getName().compareTo(lhs.getName());
       }
     });
@@ -434,6 +434,7 @@ class AutomataTable extends JTable implements SelectionOwner
         end = position;
       }
     }
+    addRowSelectionInterval(start, end);
   }
 
   @Override
