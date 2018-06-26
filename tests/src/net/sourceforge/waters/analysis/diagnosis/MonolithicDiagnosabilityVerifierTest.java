@@ -132,6 +132,15 @@ public class MonolithicDiagnosabilityVerifierTest
     runModelVerifier(des, true);
   }
 
+
+  public void testSmallFactory2d() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "small_factory_2d.wmod");
+    runModelVerifier(des, true);
+  }
+
+
   //#########################################################################
   //# Test Cases --- not diagnosable
   public void testNotDiag1() throws Exception
@@ -204,6 +213,12 @@ public class MonolithicDiagnosabilityVerifierTest
   }
 
 
+  public void testSmallFactory2nd() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "small_factory_2nd.wmod");
+    runModelVerifier(des, false);
+  }
 
 
   //#########################################################################
