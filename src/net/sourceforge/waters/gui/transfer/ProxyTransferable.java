@@ -42,9 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
@@ -94,13 +92,13 @@ public class ProxyTransferable implements Transferable
 
   //#########################################################################
   //# Interface java.awt.datatransfer.Transferable
+  @Override
   public Object getTransferData(final DataFlavor flavor)
     throws IOException, UnsupportedFlavorException
   {
     if (flavor instanceof WatersDataFlavor) {
       final WatersDataFlavor wflavor = (WatersDataFlavor) flavor;
-      final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-      return wflavor.createImportData(mData, factory);
+      return wflavor.createImportData(mData);
     } else if (DataFlavor.stringFlavor.equals(flavor)) {
       final StringWriter writer = new StringWriter();
       for (final Proxy proxy : mData) {
@@ -113,11 +111,13 @@ public class ProxyTransferable implements Transferable
     }
   }
 
+  @Override
   public DataFlavor[] getTransferDataFlavors()
   {
     return mFlavors;
   }
 
+  @Override
   public boolean isDataFlavorSupported(final DataFlavor flavor)
   {
     final DataFlavor[] flavors = getTransferDataFlavors();

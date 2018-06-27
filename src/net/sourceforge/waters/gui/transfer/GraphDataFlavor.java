@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,8 +55,7 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
-
-import gnu.trove.set.hash.THashSet;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
@@ -87,11 +88,11 @@ public class GraphDataFlavor extends ModuleDataFlavor
   }
 
   @Override
-  List<Proxy> createImportData(final Collection<? extends Proxy> data,
-                               final ModuleProxyFactory factory)
+  List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
-    final ModuleProxyFactory rootFactory = ModuleElementFactory.getInstance();
+    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final ModuleProxyCloner cloner = factory.getCloner();
+    final ModuleProxyFactory rootFactory = ModuleElementFactory.getInstance();
     final int size = data.size();
     final List<Proxy> result = new ArrayList<Proxy>(size);
     for (final Proxy proxy : data) {

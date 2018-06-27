@@ -391,19 +391,17 @@ class AutomataTable extends JTable implements SelectionOwner
   public void replaceSelection(final List<? extends Proxy> items)
   {
     clearSelection();
-    this.addToSelection(items);
-
+    addToSelection(items);
   }
 
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
-    /*
-     * final AutomataTableModel model = getModel(); for (final Proxy p :
-     * items) { if (p instanceof AutomatonProxy) { final AutomatonProxy aut =
-     * (AutomatonProxy) p; final int position = model.getIndex(aut);
-     * addRowSelectionInterval(position, position); } }
-     */
+    // TODO This assumes that the automata are sorted alphabetically in
+    // the table, which may be false after implementing sorting through the
+    // table headers. For a more general solution, change autList to a list
+    // of indices (can use TIntArrayList).
+
     final AutomataTableModel model = getModel();
     final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
     for (final Proxy p : items) {
@@ -440,6 +438,9 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
+    // TODO This should be done by deselecting groups in a similar way
+    // as above.
+
     final AutomataTableModel model = getModel();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
@@ -486,7 +487,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
+    // TODO This loop returns true or false depending on whether the first
+    // automaton in the list can be deleted. It should return true if any one
+    // item can be deleted, false if none can be deleted.
+
     final AutomataTableModel model = getModel();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
@@ -503,6 +507,9 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
+    // TODO There is no need to check for the empty case. Always make a list.
+    // TODO The size of the list is known, so pass it to the constructor
+    // to avoid resizing: infoList = new ArrayList<>(items.size());
     if (items.size() > 0) {
       final List<InsertInfo> infoList = new ArrayList<InsertInfo>();
       for (final Proxy p : items)
@@ -522,8 +529,7 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void deleteItems(final List<InsertInfo> deletes)
   {
-    // TODO Auto-generated method stub
-
+    // TODO Please implement this method to enable deletion.
   }
 
   @Override

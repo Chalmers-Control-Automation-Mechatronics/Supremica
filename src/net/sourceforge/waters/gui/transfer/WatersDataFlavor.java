@@ -53,7 +53,6 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -104,7 +103,7 @@ import gnu.trove.set.hash.THashSet;
  * <P>When data is retrieved from a transferable by the {@link
  * Transferable#getTransferData(DataFlavor) getTransferData()} method, the
  * transferable calls the {@link
- * #createImportData(Collection,ModuleProxyFactory) createImportData()} method
+ * #createImportData(Collection) createImportData()} method
  * of the requested data flavour, which copies the data back for use by the
  * GUI.</P>
  *
@@ -320,15 +319,12 @@ public abstract class WatersDataFlavor extends DataFlavor
    * and convert it to a form that can be used by an application.
    * @param  data     Collection of objects stored in a
    *                  {@link ProxyTransferable}.
-   * @param  factory  Factory used to create any {@link Proxy} objects
-   *                  in the output.
    * @return List of data to be inserted in an application.
    *         The returned data should be created using the given factory,
    *         and not share any references with the transfer data.
    * @see WatersDataFlavor
    */
-  abstract List<Proxy> createImportData(Collection<? extends Proxy> data,
-                                        ModuleProxyFactory factory);
+  abstract List<Proxy> createImportData(Collection<? extends Proxy> data);
 
 
   //#########################################################################

@@ -53,6 +53,7 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
@@ -89,9 +90,9 @@ class IdentifierDataFlavor extends ModuleDataFlavor
   }
 
   @Override
-  List<Proxy> createImportData(final Collection<? extends Proxy> data,
-                               final ModuleProxyFactory factory)
+  List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
+    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     return mConversionVisitor.convert(data, factory);
   }
 
