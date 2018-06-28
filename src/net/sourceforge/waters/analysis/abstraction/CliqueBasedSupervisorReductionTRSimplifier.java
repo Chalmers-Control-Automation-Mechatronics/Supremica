@@ -99,7 +99,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mNumProperEvents = rel.getNumberOfProperEvents();
     final StateOutput[] stateOutputs = new StateOutput[mNumStates];
 
-    mInitialCompatible = new TIntArrayList();
+    final TIntArrayList initialCompatible = new TIntArrayList();
     mReducedSupervisor = new ParetoCompatibleSet();
     mCompatibleCache = new IntSetBuffer(mNumStates);
     //mCoversCache = new TIntObjectHashMap<>();
@@ -111,7 +111,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       mReducedSupervisor.add(mCompatibleCache.add(oneStateCompatible));
 
       if (rel.isInitial(s)) {
-        mInitialCompatible.add(s);
+        initialCompatible.add(s);
       }
 
       final int successorState = getSuccessorState(s, supervisedEvent);
@@ -124,6 +124,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
+    mInitialCompatibleId = mCompatibleCache.add(initialCompatible);
     mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
   }
 
@@ -131,17 +132,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    if (mInitialCompatible.size() == 0) {
-      return false;
-    }
-
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
-    final TIntCollection initialCompatibleIds = getCoversOf(mInitialCompatible);
-    for (final TIntIterator compatibleIdIterator = initialCompatibleIds.iterator(); compatibleIdIterator.hasNext();) {
-      final ParetoCompatibleSet dependencies = new ParetoCompatibleSet();
-      dependencies.add(compatibleIdIterator.next());
-      reduce(new ParetoCompatibleSet(), dependencies);
-    }
+    final ParetoCompatibleSet dependencies = new ParetoCompatibleSet();
+    dependencies.add(mInitialCompatibleId);
+    reduce(new ParetoCompatibleSet(), dependencies);
 
     //account for the dump state which is included in the initial automaton but not in our compatibles
     if (mReducedSupervisor.size() + 1 >= mNumStates) {
@@ -156,10 +150,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private void reduce(final ParetoCompatibleSet currentSolution, final ParetoCompatibleSet compatibleDependencies) {
 
+    System.out.println(currentSolution);
+
     //we can assume our solution is not worst than the current best if we get here
     if (compatibleDependencies.isEmpty()) {
     //if we got here we know our solution is better than the current best
       mReducedSupervisor = currentSolution;
+
+      System.out.println("Size of new best solution: " + mReducedSupervisor.size());
       return;
     }
 
@@ -233,12 +231,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       getCompatibleFromCache(compatibleIdIterator.next(), reducedSupervisor[i]);
     }
 
+    final TIntArrayList initialCompatible = new TIntArrayList();
+    getCompatibleFromCache(mInitialCompatibleId, initialCompatible);
+
     //we have the set of compatibles, now we need to construct a new automaton based off them
     //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
     int startStateIndexOffset = 0;
     for (; startStateIndexOffset < reducedSupervisor.length; startStateIndexOffset++) {
       final TIntSet currentCompatible = reducedSupervisor[startStateIndexOffset];
-      if (currentCompatible.containsAll(mInitialCompatible)) { break; }
+      if (currentCompatible.containsAll(initialCompatible)) { break; }
     }
 
     //we must now go through each compatible (which is to become a state in the reduced automaton) and determine its successors
@@ -330,36 +331,42 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
       maximalCliquesToFill.add(clique);
+      return;
     }
 
     //go through each state we haven't tried adding yet
-    for (final TIntIterator inclusionIterator = possibleAdditions.iterator(); inclusionIterator.hasNext();) {
-      final int candidateState = inclusionIterator.next();
+    for (final TIntIterator additionIterator = possibleAdditions.iterator(); additionIterator.hasNext();) {
+      final int candidate = additionIterator.next();
 
       //create a copy with the new vertex
       final TIntArrayList newClique = new TIntArrayList(clique);
-      newClique.add(candidateState);
+      newClique.add(candidate);
 
       //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
-      final TIntCollection newPossibleInclusions = new TIntArrayList();
-      for (final TIntIterator inclusionsIterator = possibleAdditions.iterator(); inclusionsIterator.hasNext();) {
-        final int oldInclusion = inclusionsIterator.next();
-        if (isNeighbour(candidateState, oldInclusion)) {
-          newPossibleInclusions.add(oldInclusion);
+      final TIntCollection newPossibleAdditions = new TIntArrayList(possibleAdditions.size());
+      for (final TIntIterator oldAdditionsIterator = possibleAdditions.iterator(); oldAdditionsIterator.hasNext();) {
+        final int oldPossibleAddition = oldAdditionsIterator.next();
+        if (isNeighbour(candidate, oldPossibleAddition)) {
+          newPossibleAdditions.add(oldPossibleAddition);
         }
       }
 
-      //copy the list of states that have been already checked
-      final TIntCollection newAlreadyChecked = new TIntArrayList(alreadyChecked);
+      final TIntCollection newAlreadyChecked = new TIntArrayList(alreadyChecked.size());
+      for (final TIntIterator oldAlreadyCheckedIterator = alreadyChecked.iterator(); oldAlreadyCheckedIterator.hasNext();) {
+        final int oldAlreadyChecked  = oldAlreadyCheckedIterator.next();
+        if (isNeighbour(candidate, oldAlreadyChecked)) {
+          newAlreadyChecked.add(oldAlreadyChecked);
+        }
+      }
 
       //find any maximal cliques based on newCliques and add them to the object referenced by cliques
-      BronKerbosch(newClique, newPossibleInclusions, newAlreadyChecked, maximalCliquesToFill);
+      BronKerbosch(newClique, newPossibleAdditions, newAlreadyChecked, maximalCliquesToFill);
 
       //remove the current candidate state from further consideration
-      inclusionIterator.remove();
+      additionIterator.remove();
 
       //add to the list of states we have already checked
-      alreadyChecked.add(candidateState);
+      alreadyChecked.add(candidate);
     }
   }
 
@@ -699,7 +706,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private int mDumpStateIndex;
   private int mNumStates;
   private boolean[][] mIncompatibilityRelation;
-  private TIntArrayList mInitialCompatible;
+  private int mInitialCompatibleId;
   private IntSetBuffer mCompatibleCache;
   //private TIntObjectHashMap<TIntCollection> mCoversCache;
   private ParetoCompatibleSet mReducedSupervisor;

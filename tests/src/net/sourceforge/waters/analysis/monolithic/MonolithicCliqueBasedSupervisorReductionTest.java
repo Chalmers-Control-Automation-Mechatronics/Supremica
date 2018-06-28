@@ -82,6 +82,11 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   }
 
   @Override
+  public void testCatMouseUnsup1() throws Exception
+  {
+  }
+
+  @Override
   public void testCatMouseUnsup2() throws Exception
   {
   }
