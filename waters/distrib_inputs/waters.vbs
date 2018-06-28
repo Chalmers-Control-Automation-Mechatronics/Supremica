@@ -1,7 +1,10 @@
+strComputer = "."
 
 set FSO = WScript.CreateObject("Scripting.FileSystemObject")
 set SHO = WScript.CreateObject("WScript.Shell")
 set ENV = SHO.Environment("Process")
+set REG = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" &_ 
+                    strComputer & "\root\default:StdRegProv")
 
 Home = ENV("HOMEDRIVE") & ENV("HOMEPATH")
 
@@ -16,13 +19,13 @@ IF NOT FSO.FileExists(PropPath) THEN
 END IF
 
 q = """"
-JavaCmd = FindJava("1.8")
-IF JavaCmd = "" THEN
-  WScript.echo("Could not locate Java 1.8." & VBNewLine & "Please make sure it is installed correctly.")
+javaCmd = FindJava()
+IF javaCmd = "" THEN
+  WScript.echo("Could not locate Java 8, 9, or 10." & VBNewLine & "Please make sure it is installed correctly.")
   Wscript.Quit(1)
 END IF
 Jar = ScriptDir & "\Supremica.jar"
-WatersCmd = q & JavaCmd & q & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
+WatersCmd = javaCmd & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
 limit = WScript.Arguments.Count - 1
 FOR i = 0 to limit
   arg = WScript.Arguments.Item(i)
@@ -31,65 +34,123 @@ NEXT
 SHO.Run WatersCmd, 0, False
 
 
-FUNCTION FindJava(version)
-  Part1 = "HKEY_LOCAL_MACHINE\SOFTWARE"
-  Part2 = "\JavaSoft"
-  Part3 = "\" & version & "\JavaHome"
-  RegistryKey = Part1 & Part2 & "\Java Runtime Environment" & Part3
-  JavaCmd = FindJavaInRegistry(RegistryKey)
-  IF JavaCmd <> "" THEN
-    FindJava = JavaCmd
-    EXIT FUNCTION
+FUNCTION FindJava()
+  options = Array("", "\Wow6432Node")
+  FOR EACH opt IN options
+    javaCmd = FindJava8(opt)
+    IF javaCmd <> "" THEN
+      FindJava = javaCmd
+      EXIT FUNCTION
+    END IF
+    javaCmd = FindJava10(opt)
+    IF javaCmd <> "" THEN
+      FindJava = javaCmd
+      EXIT FUNCTION
+    END IF
+  NEXT
+  javaHome = ENV("JAVA_HOME")
+  IF javaHome <> "" THEN
+    javaCmd = CheckJavaCommand(javaHome & "\bin\java")
+    IF javaCmd <> "" THEN
+      FindJava = javaCmd
+      EXIT FUNCTION
+    END IF
   END IF
-  RegistryKey = Part1 & Part2 & "\Java Development Kit" & Part3
-  JavaCmd = FindJavaInRegistry(RegistryKey)
-  IF JavaCmd <> "" THEN
-    FindJava = JavaCmd
-    EXIT FUNCTION
-  END IF
-  RegistryKey = Part1 & "\Wow6432Node\" & Part2 & "\Java Runtime Environment" & Part3
-  JavaCmd = FindJavaInRegistry(RegistryKey)
-  IF JavaCmd <> "" THEN
-    FindJava = JavaCmd
-    EXIT FUNCTION
-  END IF
-  RegistryKey = Part1 & "\Wow6432Node\" & Part2 & "\Java Development Kit" & Part3
-  JavaCmd = FindJavaInRegistry(RegistryKey)
-  IF JavaCmd <> "" THEN
-    FindJava = JavaCmd
-    EXIT FUNCTION
-  END IF
-  IF GetJavaVersion("java") = version THEN
-    FindJava = "java"
-    EXIT FUNCTION
-  END IF
-  JavaHome = ENV("JAVA_HOME")
-  JavaTest = JavaHome & "\bin\java"
-  IF GetJavaVersion(JavaTest) = version THEN
-    FindJava = JavaTest
-  ELSE
-    FindJava = ""
-  END IF
+  FindJava = CheckJavaCommand("java")
 END FUNCTION
 
-FUNCTION FindJavaInRegistry(RegistryKey)
-  On Error Resume Next
-  JavaHome = SHO.RegRead(RegistryKey)
-  IF err.Number = 0 THEN
-    FindJavaInRegistry = JavaHome & "\bin\java"
-  ELSE
+FUNCTION FindJava8(wow6432)
+  prefix = "HKEY_LOCAL_MACHINE\SOFTWARE" & wow6432 & "\JavaSoft"
+  JavaCmd = FindJavaInRegistryGroup(prefix & "\Java Runtime Environment")
+  IF JavaCmd <> "" THEN
+    FindJava8 = JavaCmd
+    EXIT FUNCTION
+  END IF
+  FindJava8 = FindJavaInRegistryGroup(prefix & "\Java Development Kit")
+END FUNCTION
+
+FUNCTION FindJava10(wow6432)
+  prefix = "HKEY_LOCAL_MACHINE\SOFTWARE" & wow6432 & "\JavaSoft"
+  options = Array("\JRE", "\JDK")
+  FOR EACH opt IN options
+    JavaCmd = FindJavaInRegistryGroup(prefix & opt)
+    IF JavaCmd <> "" THEN
+      FindJava10 = JavaCmd
+      EXIT FUNCTION
+    END IF
+  NEXT
+  const HKEY_LOCAL_MACHINE = &H80000002
+  FOR EACH opt IN options
+    REG.EnumKey HKEY_LOCAL_MACHINE, prefix & opt, subKeys
+    IF NOT IsNull(subKeys) THEN
+      FOR EACH version IN subKeys
+        IF InStr(version, "9.") = 1 OR InStr(version, "10.") = 1 THEN
+          key = group & "\" & version & "\JavaHome"
+          ON ERROR RESUME NEXT
+          javaHome = SHO.RegRead(key)
+          IF err.Number = 0 THEN
+            ON ERROR GOTO 0
+            q = """"
+            FindJava10 = q & javaHome & "\bin\java" & q & " --add-modules java.xml.bind"
+            EXIT FUNCTION
+          ELSE
+            err.Clear
+            ON ERROR GOTO 0
+          END IF
+        END IF
+      NEXT
+    END IF
+  NEXT
+  FindJava10 = ""
+END FUNCTION
+
+FUNCTION FindJavaInRegistryGroup(group)
+  key = group & "\CurrentVersion"
+  ON ERROR RESUME NEXT
+  version = SHO.RegRead(key)
+  IF err.Number <> 0 THEN
     err.Clear
-    FindJavaInRegistry = ""
+    ON ERROR GOTO 0
+    FindJavaInRegistryGroup = ""
+    EXIT FUNCTION
   END IF
+  ON ERROR GOTO 0
+  IF version = "1.8" OR InStr(version, "1.8.") = 1 THEN
+    v = 8
+  ELSEIF InStr(version, "9.") = 1 THEN
+    v = 9
+  ELSEIF InStr(version, "10.") = 1 THEN
+    v = 10
+  ELSE
+    FindJavaInRegistryGroup = ""
+    EXIT FUNCTION
+  END IF
+  key = group & "\" & version & "\JavaHome"
+  ON ERROR RESUME NEXT
+  javaHome = SHO.RegRead(key)
+  IF err.Number <> 0 THEN
+    err.Clear
+    ON ERROR GOTO 0
+    FindJavaInRegistryGroup = ""
+    EXIT FUNCTION
+  END IF
+  ON ERROR GOTO 0
+  q = """"
+  javaCmd = q & javaHome & "\bin\java" & q
+  IF v > 8 THEN
+    javaCmd = javaCmd & " --add-modules java.xml.bind"
+  END IF
+  FindJavaInRegistryGroup = javaCmd
 END FUNCTION
 
-FUNCTION GetJavaVersion(cmd)
+FUNCTION CheckJavaCommand(cmd)
   On Error Resume Next  
-  set Exec = SHO.Exec(cmd & " -version")
+  javaCmd = q & cmd & q
+  set Exec = SHO.Exec(javaCmd & " -version")
   IF err.Number <> 0 THEN
     err.Clear
     On Error Goto 0
-    GetJavaVersion = "???"
+    CheckJavaCommand = ""
     EXIT FUNCTION
   END IF
   On Error Goto 0
@@ -97,14 +158,21 @@ FUNCTION GetJavaVersion(cmd)
   line = StdErr.ReadLine
   set re = new RegExp
   with re
-    .Pattern = "java version ""([0-9]+\.[0-9]+)[0-9\._]*"""
+    .Pattern = "java version ""([0-9\._]+)"""
     .IgnoreCase = False
     .Global = False
   end with
   set match = re.Execute(line)
-  IF match.Count = 1 THEN
-    GetJavaVersion = match.Item(0).Submatches(0)
+  IF match.Count <> 1 THEN
+    CheckJavaCommand = ""
+    EXIT FUNCTION
+  END IF
+  version = match.Item(0).Submatches(0)
+  IF version = "1.8" OR InStr(version, "1.8.") = 1 THEN
+    CheckJavaCommand = javaCmd
+  ELSEIF InStr(version, "9.") = 1 OR InStr(version, "10.") = 1 THEN
+    CheckJavaCommand = javaCmd & " --add-modules java.xml.bind"
   ELSE
-    GetJavaVersion = "???"
+    CheckJavaCommand = ""
   END IF
 END FUNCTION

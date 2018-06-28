@@ -1,7 +1,7 @@
 Welcome to Waters/Supremica IDE
 
-To run the software, you need to have a Java 1.8 runtime environment
-or higher.  Please make sure the java executable is in your search
+To run the software, you need to have a Java 8, 9, or 10 runtime
+environment. Please make sure the java executable is in your search
 path, or the JAVA_HOME environment variable points to your Java
 installation, or edit the script waters so it can find a working java
 executable.

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
@@ -58,8 +60,6 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SubjectTools;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -320,8 +320,8 @@ public abstract class WatersDataFlavor extends DataFlavor
    * @param  data     Collection of objects stored in a
    *                  {@link ProxyTransferable}.
    * @return List of data to be inserted in an application.
-   *         The returned data should be created using the given factory,
-   *         and not share any references with the transfer data.
+   *         The returned data should not share any references with the
+   *         transfer data.
    * @see WatersDataFlavor
    */
   abstract List<Proxy> createImportData(Collection<? extends Proxy> data);
