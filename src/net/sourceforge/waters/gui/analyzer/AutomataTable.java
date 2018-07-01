@@ -45,7 +45,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -98,7 +97,7 @@ class AutomataTable extends JTable implements SelectionOwner
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
 
-//    this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "none");
+    //    this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "none");
 
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
@@ -403,26 +402,19 @@ class AutomataTable extends JTable implements SelectionOwner
     // of indices (can use TIntArrayList).
 
     final AutomataTableModel model = getModel();
-    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
+    final List<Integer> autList = new ArrayList<Integer>();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
-        autList.add((AutomatonProxy) p);
+        autList.add(model.getIndex((AutomatonProxy) p));
       }
     }
 
-    Collections.sort(autList, new Comparator<AutomatonProxy>() {
-      @Override
-      public int compare(final AutomatonProxy lhs, final AutomatonProxy rhs)
-      {
-        // -1 - less than, 1 - greater than, 0 - equal, all inverted for ascending
-        return rhs.getName().compareTo(lhs.getName());
-      }
-    });
+    Collections.sort(autList);
 
     int start = -1;
     int end = -1;
-    for (final AutomatonProxy a : autList) {
-      final int position = model.getIndex(a);
+    for (final int i : autList) {
+      final int position = i;
       if (start == -1) {
         start = end = position;
       } else if (position > (end + 1)) {
@@ -438,17 +430,30 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
-    // TODO This should be done by deselecting groups in a similar way
-    // as above.
-
     final AutomataTableModel model = getModel();
+    final List<Integer> autList = new ArrayList<Integer>();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        final int position = model.getIndex(aut);
-        removeRowSelectionInterval(position, position);
+        autList.add(model.getIndex((AutomatonProxy) p));
       }
     }
+
+    Collections.sort(autList);
+
+    int start = -1;
+    int end = -1;
+    for (final int i : autList) {
+      final int position = i;
+      if (start == -1) {
+        start = end = position;
+      } else if (position > (end + 1)) {
+        removeRowSelectionInterval(start, end);
+        start = end = position;
+      } else {
+        end = position;
+      }
+    }
+    removeRowSelectionInterval(start, end);
   }
 
   @Override
@@ -487,18 +492,12 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
-    // TODO This loop returns true or false depending on whether the first
-    // automaton in the list can be deleted. It should return true if any one
-    // item can be deleted, false if none can be deleted.
-
     final AutomataTableModel model = getModel();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
         if ((model.getIndex(aut) != -1))
           return true;
-        else
-          return false;
       }
     }
     return false;
@@ -507,16 +506,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    // TODO There is no need to check for the empty case. Always make a list.
-    // TODO The size of the list is known, so pass it to the constructor
-    // to avoid resizing: infoList = new ArrayList<>(items.size());
-    if (items.size() > 0) {
-      final List<InsertInfo> infoList = new ArrayList<InsertInfo>();
-      for (final Proxy p : items)
-        infoList.add(new InsertInfo(p));
-      return infoList;
-    } else
-      return null;
+    final List<InsertInfo> infoList = new ArrayList<InsertInfo>(items.size());
+    for (final Proxy p : items)
+      infoList.add(new InsertInfo(p));
+    return infoList;
   }
 
   @Override
@@ -530,6 +523,16 @@ class AutomataTable extends JTable implements SelectionOwner
   public void deleteItems(final List<InsertInfo> deletes)
   {
     // TODO Please implement this method to enable deletion.
+    final List<Integer> deleteIndexList = new ArrayList<Integer>();
+    final AutomataTableModel model = getModel();
+    for (final InsertInfo info : deletes) {
+      final Proxy proxy = info.getProxy();
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        deleteIndexList.add(model.getIndex(aut));
+      }
+    }
+    model.deleteRows(deleteIndexList);
   }
 
   @Override

@@ -53,12 +53,14 @@ import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
@@ -108,6 +110,13 @@ class ComponentDataFlavor extends ModuleDataFlavor
     }
   }
 
+  @Override
+  List<Proxy> createImportData(final Collection<? extends Proxy> data)
+  {
+    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+    final ProxyCloner cloner = factory.getCloner();
+    return cloner.getClonedList(data);
+  }
 
   //#########################################################################
   //# Inner Class EventCollector
