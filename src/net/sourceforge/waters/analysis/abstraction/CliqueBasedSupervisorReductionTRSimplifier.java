@@ -39,6 +39,7 @@ import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
@@ -100,9 +101,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final StateOutput[] stateOutputs = new StateOutput[mNumStates];
 
     final TIntArrayList initialCompatible = new TIntArrayList();
-    mReducedSupervisor = new ParetoCompatibleSet();
+    mReducedSupervisor = new CompatibleSet(mNumStates);
     mCompatibleCache = new IntSetBuffer(mNumStates);
-    //mCoversCache = new TIntObjectHashMap<>();
+    mCoversCache = new TIntObjectHashMap<>();
 
     for (int s = 0; s < mNumStates; s++) {
       //set the reduced supervisor to the current set of states
@@ -133,9 +134,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   protected boolean runSimplifier() throws AnalysisException
   {
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
-    final ParetoCompatibleSet dependencies = new ParetoCompatibleSet();
+    final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
     dependencies.add(mInitialCompatibleId);
-    reduce(new ParetoCompatibleSet(), dependencies);
+    reduce(new CompatibleSet(), dependencies, 0);
+    System.out.println("\nR: " + mReducedSupervisor.size() + " S: " + mNumStates);
 
     //account for the dump state which is included in the initial automaton but not in our compatibles
     if (mReducedSupervisor.size() + 1 >= mNumStates) {
@@ -148,35 +150,40 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void reduce(final ParetoCompatibleSet currentSolution, final ParetoCompatibleSet compatibleDependencies) {
+  private void reduce(final CompatibleSet currentSolution, final CompatibleDependenciesSet compatibleDependencies, final int level) {
 
-    System.out.println(currentSolution);
+    System.out.print("\nC: " + currentSolution + " D: " + compatibleDependencies + " L: " + level);
 
-    //we can assume our solution is not worst than the current best if we get here
-    if (compatibleDependencies.isEmpty()) {
+    //if solution is complete and more reduced, save it
+    if (currentSolution.size() < mReducedSupervisor.size() && compatibleDependencies.isEmpty()) {
     //if we got here we know our solution is better than the current best
       mReducedSupervisor = currentSolution;
 
-      System.out.println("Size of new best solution: " + mReducedSupervisor.size());
+      System.out.print(" -- New Best");
+      return;
+    }
+
+    //our solution is too big (either because it is complete but too many states, or because it is has more dependencies), stop
+    if (currentSolution.size() + 1 >= mReducedSupervisor.size()) {
+      System.out.print(" -- Too big (" + mReducedSupervisor.size() +")");
       return;
     }
 
     //our container for the actual compatible being processed at any given time
     final TIntArrayList compatible = new TIntArrayList();
 
-
     //get the id of next compatible we need to add
     final int nextCompatibleId = compatibleDependencies.pop();
 
     //get all ids of compatibles covering this compatible
-    /*TIntCollection coverIds = mCoversCache.get(nextCompatibleId);
+    TIntCollection coverIds = mCoversCache.get(nextCompatibleId);
     if (coverIds == null) {
       getCompatibleFromCache(nextCompatibleId, compatible);
       coverIds = getCoversOf(compatible);
       mCoversCache.put(nextCompatibleId, coverIds);
-    }*/
-    getCompatibleFromCache(nextCompatibleId, compatible);
-    final TIntCollection coverIds = getCoversOf(compatible);
+    }
+    /*getCompatibleFromCache(nextCompatibleId, compatible);
+    final TIntCollection coverIds = getCoversOf(compatible);*/
 
     //container for successor compatible ids
     final TIntCollection dependentIds = new TIntArrayList();
@@ -196,12 +203,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       getSuccessorCompatiblesOf(compatible, dependentIds);
 
       //copy the current solution and add the cover
-      final ParetoCompatibleSet newSolution = new ParetoCompatibleSet(currentSolution);
+      final CompatibleSet newSolution = new CompatibleSet(currentSolution);
       newSolution.add(coverId);
 
       //copy the things we know we need to add, but remove anything covered by the compatible we just added to our solution
-      final ParetoCompatibleSet newCompatibleDependencies = new ParetoCompatibleSet(compatibleDependencies);
-      newCompatibleDependencies.removeAllDominatedBy(coverId);
+      final CompatibleDependenciesSet newCompatibleDependencies = new CompatibleDependenciesSet(compatibleDependencies);
+      newCompatibleDependencies.removeAllCoveredBy(coverId);
 
       //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
       for (final TIntIterator dependentsIterator = dependentIds.iterator(); dependentsIterator.hasNext();) {
@@ -209,16 +216,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         final int dependentId = dependentsIterator.next();
 
         //if this compatible isn't a subset of anything in our current (and partial solution)
-        if (newSolution.undominatedByAll(dependentId)) {
+        if (newSolution.isUncoveredByAll(dependentId)) {
           //try adding it to the list of compatibles we know we still need to cover
           //it may not actually be added if it is already covered by an existing member
           newCompatibleDependencies.add(dependentId);
         }
       }
-
-      if (newSolution.size() + newCompatibleDependencies.size() < mReducedSupervisor.size()) {
-        reduce(newSolution, newCompatibleDependencies);
-      }
+      reduce(newSolution, newCompatibleDependencies, level + 1);
     }
   }
 
@@ -226,7 +230,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //translate set of compatible ids which comprise the reduced supervisor into the compatibles themselves
     final TIntSet[] reducedSupervisor = new TIntHashSet[mReducedSupervisor.size()];
     int i = 0;
-    for (final Iterator<Integer> compatibleIdIterator = mReducedSupervisor.iterator(); compatibleIdIterator.hasNext(); i++) {
+    for (final TIntIterator compatibleIdIterator = mReducedSupervisor.iterator(); compatibleIdIterator.hasNext(); i++) {
       reducedSupervisor[i] = new TIntHashSet();
       getCompatibleFromCache(compatibleIdIterator.next(), reducedSupervisor[i]);
     }
@@ -371,8 +375,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private TIntCollection getCoversOf(final TIntArrayList compatible) {
-
-
     final TIntCollection possibleAdditions = new TIntArrayList();
     if (compatible.size() > 0) {
 
@@ -564,6 +566,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   /**
+   * Determines whether a compatible (referenced by its index in mCompatibleCache)
+   * is a superset of another compatible
+   * @param xId The compatible we want the cover status of
+   * @param yId The compatible we check is being covered (or not)
+   * @return true if the first compatible is a superset of the second, otherwise false.
+   */
+  private boolean isCover(final int xId, final int yId) {
+    return mCompatibleCache.containsAll(xId, yId);
+  }
+
+  /**
    * Contains a set of ints that each represent a Compatible (a set of states).
    * Each value is an index into the IntBufferSet, mCompatibleCache and can
    * used to retrieve the corresponding compatible.
@@ -575,15 +588,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
    * systematically.
    * @author Jordan Schroder
    */
-  private class ParetoCompatibleSet extends LinkedHashSet<Integer> {
+  private class CompatibleDependenciesSet extends LinkedHashSet<Integer> {
 
     private static final long serialVersionUID = -4434294284951063515L;
 
-    public ParetoCompatibleSet() {
+    public CompatibleDependenciesSet() {
       super();
     }
 
-    public ParetoCompatibleSet(final HashSet<Integer> compatibleIdSet) {
+    public CompatibleDependenciesSet(final HashSet<Integer> compatibleIdSet) {
       super(compatibleIdSet);
     }
 
@@ -603,13 +616,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     /**
      * Checks whether the compatible associated with the specified id
-     * is a subset ('dominated') of any compatibles referenced by existing ids in the set.
+     * is a subset ('covered') of any compatibles referenced by existing ids in the set.
      * If and only if this condition is met, the id is added to the set.
-     * Then, any compatibles referenced by the set that dominated by the newly
+     * Then, any compatibles referenced by the set that covered by the newly
      * added member are then removed.
      *
      * @param applicantId the unique id corresponding to a compatible stored in an IntSetBuffer
-     * @return true if and only if the compatible referenced by applicantId is not dominated by existing members
+     * @return true if and only if the compatible referenced by applicantId is not covered by existing members
      */
     @Override
     public boolean add(final Integer applicantId) {
@@ -618,24 +631,23 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       //check if the applicant is a strict subset of any existing members
-      if (!undominatedByAll(applicantId)) { return false; }
+      if (!isUncoveredByAll(applicantId)) { return false; }
 
-      //not dominated by any existing members, we want to add it.
-      //now kick out any members the applicant dominates
-      removeAllDominatedBy(applicantId);
-
+      //not covered by any existing members, we want to add it.
+      //now kick out any members the applicant covers
+      removeAllCoveredBy(applicantId);
       return super.add(applicantId);
     }
 
     /**
-     * Checks whether the compatible referenced by xId is a subset of (dominated by) any compatibles already
+     * Checks whether the compatible referenced by xId is a subset of (covered by) any compatibles already
      * referenced by ids in the set.
      * @param xId The id of a compatible
-     * @return true if and only if the compatible is not dominated by any existing compatibles.
+     * @return true if and only if the compatible is not covered by any existing compatibles.
      */
-    public boolean undominatedByAll(final int xId) {
+    public boolean isUncoveredByAll(final int xId) {
       for (final Iterator<Integer> compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
-        if (dominates(compatibleIdsIterator.next(), xId)) { return false; }
+        if (isCover(compatibleIdsIterator.next(), xId)) { return false; }
       }
       return true;
     }
@@ -644,14 +656,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      * Removes any compatibles in this set that are subsets of the compatible referenced by xId.
      * @param xId The id of a compatible
      */
-    public void removeAllDominatedBy(final int xId) {
+    public void removeAllCoveredBy(final int xId) {
       for (final Iterator<Integer> compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
-        if (dominates(xId, compatibleIdsIterator.next())) { compatibleIdsIterator.remove(); }
+        if (isCover(xId, compatibleIdsIterator.next())) { compatibleIdsIterator.remove(); }
       }
-    }
-
-    private boolean dominates(final int xId, final int yId) {
-      return mCompatibleCache.containsAll(xId, yId);
     }
 
 
@@ -660,12 +668,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       final Integer[] compatibleIdBuffer = new Integer[size()];
       this.toArray(compatibleIdBuffer);
-      final TIntArrayList[] compatibleBuffer = new TIntArrayList[size()];
+      /*final TIntArrayList[] compatibleBuffer = new TIntArrayList[size()];
       for (int i = 0; i < compatibleIdBuffer.length; i++) {
         compatibleBuffer[i] = new TIntArrayList();
         getCompatibleFromCache(compatibleIdBuffer[i], compatibleBuffer[i]);
-      }
-      return Arrays.toString(compatibleBuffer);
+      }*/
+      return Arrays.toString(compatibleIdBuffer);
     }
 
     @Override
@@ -681,16 +689,37 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     @Override
     public boolean equals(final Object o)
     {
-      if (!(o instanceof ParetoCompatibleSet)) {
+      if (!(o instanceof CompatibleDependenciesSet)) {
         return false;
       }
 
-      final ParetoCompatibleSet otherSet = (ParetoCompatibleSet)o;
+      final CompatibleDependenciesSet otherSet = (CompatibleDependenciesSet)o;
       if (size() != otherSet.size()) {
         return false;
       }
 
       return containsAll(otherSet);
+    }
+  }
+
+  private class CompatibleSet extends TIntHashSet {
+    public CompatibleSet() {
+      super();
+    }
+
+    public CompatibleSet(final int initialCapacity) {
+      super(initialCapacity);
+    }
+
+    public CompatibleSet(final TIntCollection existingCollection) {
+      super(existingCollection);
+    }
+
+    public boolean isUncoveredByAll(final int xId) {
+      for (final TIntIterator compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
+        if (isCover(compatibleIdsIterator.next(), xId)) { return false; }
+      }
+      return true;
     }
   }
 
@@ -708,6 +737,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private boolean[][] mIncompatibilityRelation;
   private int mInitialCompatibleId;
   private IntSetBuffer mCompatibleCache;
-  //private TIntObjectHashMap<TIntCollection> mCoversCache;
-  private ParetoCompatibleSet mReducedSupervisor;
+  private TIntObjectHashMap<TIntCollection> mCoversCache;
+  private CompatibleSet mReducedSupervisor;
 }
