@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
@@ -96,6 +97,31 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     }
     return -1;
 
+  }
+
+  public void deleteRows(final List<Integer> deleteList)
+  {
+    final Comparator<Integer> c = Collections.reverseOrder();
+    Collections.sort(deleteList, c);
+
+    int start = -1;
+    int end = -1;
+    for (final int i : deleteList) {
+      final int position = i;
+      if (start == -1) {
+        start = end = position;
+      } else if (position > (end + 1)) {
+        for(int q = start; q >= end; q--)
+          mAutomataList.remove(q);
+        fireTableRowsDeleted(end, start);
+        start = end = position;
+      } else {
+        end = position;
+      }
+    }
+    for(int q = start; q >= end; q--)
+      mAutomataList.remove(q);
+    fireTableRowsDeleted(end ,start);
   }
 
   public void Close()
