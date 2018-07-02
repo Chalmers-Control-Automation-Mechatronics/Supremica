@@ -39,7 +39,6 @@ import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
@@ -103,7 +102,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final TIntArrayList initialCompatible = new TIntArrayList();
     mReducedSupervisor = new CompatibleSet(mNumStates);
     mCompatibleCache = new IntSetBuffer(mNumStates);
-    mCoversCache = new TIntObjectHashMap<>();
+    //mCoversCache = new TIntObjectHashMap<>();
 
     for (int s = 0; s < mNumStates; s++) {
       //set the reduced supervisor to the current set of states
@@ -176,14 +175,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final int nextCompatibleId = compatibleDependencies.pop();
 
     //get all ids of compatibles covering this compatible
-    TIntCollection coverIds = mCoversCache.get(nextCompatibleId);
+    /*TIntCollection coverIds = mCoversCache.get(nextCompatibleId);
     if (coverIds == null) {
       getCompatibleFromCache(nextCompatibleId, compatible);
       coverIds = getCoversOf(compatible);
       mCoversCache.put(nextCompatibleId, coverIds);
-    }
-    /*getCompatibleFromCache(nextCompatibleId, compatible);
-    final TIntCollection coverIds = getCoversOf(compatible);*/
+    }*/
+    getCompatibleFromCache(nextCompatibleId, compatible);
+    final TIntCollection coverIds = getCoversOf(compatible);
 
     //container for successor compatible ids
     final TIntCollection dependentIds = new TIntArrayList();
@@ -721,6 +720,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
       return true;
     }
+
+    @Override
+    public String toString()
+    {
+      final int[] set = toArray();
+      Arrays.sort(set);
+      return Arrays.toString(set);
+    }
   }
 
   private enum StateOutput {
@@ -737,6 +744,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private boolean[][] mIncompatibilityRelation;
   private int mInitialCompatibleId;
   private IntSetBuffer mCompatibleCache;
-  private TIntObjectHashMap<TIntCollection> mCoversCache;
+  //private TIntObjectHashMap<TIntCollection> mCoversCache;
   private CompatibleSet mReducedSupervisor;
 }
