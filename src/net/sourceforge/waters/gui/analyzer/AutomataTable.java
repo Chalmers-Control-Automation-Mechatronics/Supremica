@@ -72,6 +72,8 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -486,7 +488,25 @@ class AutomataTable extends JTable implements SelectionOwner
     throws IOException, UnsupportedFlavorException
   {
     // TODO Auto-generated method stub
-    return null;
+    final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      @SuppressWarnings("unchecked")
+      final List<Proxy> data =
+        (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
+      for (final Proxy proxy : data) {
+        if (!containsEqualIdentifier(proxy)) {
+          final Proxy cloned = cloner.getClone(proxy);
+          final InsertInfo insert = new InsertInfo(cloned);
+          inserts.add(insert);
+        }
+      }
+    } else {
+      throw new UnsupportedFlavorException(null);
+    }
+    return inserts;
   }
 
   @Override

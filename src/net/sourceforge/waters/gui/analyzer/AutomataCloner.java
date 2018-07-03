@@ -1,0 +1,145 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# Copyright (C) 2004-2018 Robi Malik
+//###########################################################################
+//# This file is part of Waters.
+//# Waters is free software: you can redistribute it and/or modify it under
+//# the terms of the GNU General Public License as published by the Free
+//# Software Foundation, either version 2 of the License, or (at your option)
+//# any later version.
+//# Waters is distributed in the hope that it will be useful, but WITHOUT ANY
+//# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+//# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+//# details.
+//# You should have received a copy of the GNU General Public License along
+//# with Waters. If not, see <http://www.gnu.org/licenses/>.
+//#
+//# Linking Waters statically or dynamically with other modules is making a
+//# combined work based on Waters. Thus, the terms and conditions of the GNU
+//# General Public License cover the whole combination.
+//# In addition, as a special exception, the copyright holders of Waters give
+//# you permission to combine Waters with code included in the standard
+//# release of Supremica under the Supremica Software License Agreement (or
+//# modified versions of such code, with unchanged license). You may copy and
+//# distribute such a system following the terms of the GNU GPL for Waters and
+//# the licenses of the other code concerned.
+//# Note that people who make modified versions of Waters are not obligated to
+//# grant this special exception for their modified versions; it is their
+//# choice whether to do so. The GNU General Public License gives permission
+//# to release a modified version without this exception; this exception also
+//# makes it possible to release a modified version which carries forward this
+//# exception.
+//###########################################################################
+
+package net.sourceforge.waters.gui.analyzer;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TransitionProxy;
+
+
+/**
+ * @author George Hewlett
+ */
+
+public class AutomataCloner
+{
+
+  //#########################################################################
+  //# Constructor
+  public AutomataCloner(final ProductDESProxyFactory factory,
+                        final Map<String,EventProxy> EventMap)
+  {
+    mFactory = factory;
+    mEventMap = EventMap;
+  }
+
+  public AutomataCloner(final ProductDESProxyFactory factory)
+  {
+    mFactory = factory;
+    mEventMap = null;
+  }
+
+  public AutomatonProxy clone(final AutomatonProxy aut)
+  {
+    final AutomatonProxy clonedAut;
+    final Set<EventProxy> copiedEvents = new HashSet<EventProxy>();
+    final Set<StateProxy> copiedStates = new HashSet<StateProxy>();
+    final Collection<TransitionProxy> copiedTranisitions =
+      new ArrayList<TransitionProxy>();
+
+
+    final Set<EventProxy> eventList = aut.getEvents();
+    final Set<StateProxy> stateList = aut.getStates();
+    final Collection<TransitionProxy> transitionList = aut.getTransitions();
+
+    if (mEventMap == null) {
+      mEventMap = new HashMap<String,EventProxy>();
+      for (final EventProxy ep : eventList) {
+        copiedEvents.add(ep);
+      }
+      for (final StateProxy sp : stateList) {
+        copiedStates.add(sp);
+      }
+      for (final TransitionProxy tp : transitionList) {
+        if (copiedStates.contains(tp.getSource())
+            && copiedStates.contains(tp.getTarget())
+            && copiedEvents.contains(tp.getEvent())) {
+          copiedTranisitions.add(tp);
+        }
+      }
+
+      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                                copiedEvents, copiedStates,
+                                                copiedTranisitions);
+
+    } else {
+      for (final EventProxy ep : eventList) {
+        if(!mEventMap.containsValue(ep)){
+          mEventMap.put(ep.getName(), ep);
+        }
+        copiedEvents.add(ep);
+      }
+      for (final StateProxy sp : stateList) {
+        copiedStates.add(sp);
+      }
+      for (final TransitionProxy tp : transitionList) {
+        if (copiedStates.contains(tp.getSource())
+            && copiedStates.contains(tp.getTarget())
+            && copiedEvents.contains(tp.getEvent())) {
+          mStateMap.put(tp.getSource(), tp.getTarget());
+          copiedTranisitions.add(tp);
+        }
+      }
+
+      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                                copiedEvents, copiedStates,
+                                                copiedTranisitions);
+    }
+    return clonedAut;
+  }
+
+  public List<AutomatonProxy> getClonedList(final List<AutomatonProxy> autList)
+  {
+    final List<AutomatonProxy> outputList = new ArrayList<AutomatonProxy>();
+    for(final AutomatonProxy aut : autList) {
+      outputList.add(clone(aut));
+    }
+    return outputList;
+  }
+
+  private final ProductDESProxyFactory mFactory;
+  private Map<String,EventProxy> mEventMap;
+  private Map<StateProxy,StateProxy> mStateMap;
+
+}
