@@ -391,6 +391,7 @@ public class MonolithicDiagnosabilityVerifier
 
   //#########################################################################
   //# Inner Class ControllStack
+  @SuppressWarnings("unused")
   private class ControllStack{
 
     private final TIntArrayList stack;
