@@ -67,6 +67,7 @@ public class AutomatonDataFlavor extends WatersDataFlavor
   List<Proxy> createExportData(final Collection<? extends Proxy> data,
                                final ModuleContext context)
   {
+    // TODO Use ProductDESElementFactory.getInstance()
     //final ProductDESProxyFactory factory = factory;
     //final AutomataCloner cloner = new AutomataCloner();
     //return cloner.getClonedList(data);
@@ -77,6 +78,7 @@ public class AutomatonDataFlavor extends WatersDataFlavor
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
+    // TODO ditto
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final ProxyCloner cloner = factory.getCloner();
     return cloner.getClonedList(data);

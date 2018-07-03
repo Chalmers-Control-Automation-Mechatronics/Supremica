@@ -61,11 +61,12 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     mModuleContainer.attach(this);
     mCompiledDES = ModContainer.getCompiledDES();
     updateCompiledDES();
-    if (mCompiledDES != null)
+    // TODO Also initialise an event map
+    if (mCompiledDES != null) {
       mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
-    else
+    } else {
       mAutomataList = new ArrayList<>();
-    //desktop.attach(this);
+    }
   }
 
   //#########################################################################

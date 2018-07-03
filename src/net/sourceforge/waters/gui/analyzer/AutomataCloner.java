@@ -56,7 +56,7 @@ public class AutomataCloner
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public AutomataCloner(final ProductDESProxyFactory factory,
                         final Map<String,EventProxy> EventMap)
   {
@@ -66,23 +66,32 @@ public class AutomataCloner
 
   public AutomataCloner(final ProductDESProxyFactory factory)
   {
+    // TODO Instead use: use this(factory, new HashMap<String,EventProxy>();
     mFactory = factory;
     mEventMap = null;
   }
 
+
+  //#########################################################################
+  //# Invocation
   public AutomatonProxy clone(final AutomatonProxy aut)
   {
     final AutomatonProxy clonedAut;
+    // TODO Can use: Collection<EventProxy> copiedEvents = new ArrayList<>();
+    // TODO Can also specify size: new ArrayList<>(eventList.size());
     final Set<EventProxy> copiedEvents = new HashSet<EventProxy>();
+    // TODO ditto
     final Set<StateProxy> copiedStates = new HashSet<StateProxy>();
+    // TODO Specify size
     final Collection<TransitionProxy> copiedTranisitions =
       new ArrayList<TransitionProxy>();
 
-
+    // TODO Do these first so we can query size as above
     final Set<EventProxy> eventList = aut.getEvents();
     final Set<StateProxy> stateList = aut.getStates();
     final Collection<TransitionProxy> transitionList = aut.getTransitions();
 
+    // TODO Create and use new states and events correctly ...
     if (mEventMap == null) {
       mEventMap = new HashMap<String,EventProxy>();
       for (final EventProxy ep : eventList) {
@@ -138,6 +147,9 @@ public class AutomataCloner
     return outputList;
   }
 
+
+  //#########################################################################
+  //# Data Members
   private final ProductDESProxyFactory mFactory;
   private Map<String,EventProxy> mEventMap;
   private Map<StateProxy,StateProxy> mStateMap;
