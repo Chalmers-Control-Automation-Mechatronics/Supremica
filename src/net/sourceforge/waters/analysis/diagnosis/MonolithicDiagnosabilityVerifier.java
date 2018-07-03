@@ -117,7 +117,7 @@ public class MonolithicDiagnosabilityVerifier
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
       final int numEvents = spEvents.getNumberOfProperEvents();
-      eventObservability = new boolean[numEvents];
+      eventObservable = new boolean[numEvents];
       eventFaultClass = new String[numEvents];
       final THashSet<String> faultClasses = new THashSet<String>();
       String faultLabel;
@@ -133,9 +133,9 @@ public class MonolithicDiagnosabilityVerifier
           }
           eventFaultClass[i] = faultLabel;
           if(event.isObservable()) {
-            eventObservability[i] = true;
+            eventObservable[i] = true;
           }else {
-            eventObservability[i] = false;
+            eventObservable[i] = false;
           }
         }
       }
@@ -154,34 +154,22 @@ public class MonolithicDiagnosabilityVerifier
           stateIndexMap.put(verifierInitState,stateCount);
           indexStateMap.add(verifierInitState);
           stateCount++;
-          link.add(2);
-          contStack.add(0);
-          contStack.add(0);
-          contStack.add(0);
-          contStack.add(0);
-          contStackTop = 2;
+          contStack.push(0,0);
 
-          while(contStackTop!=0) {
-            final int i = contStack.get(contStackTop);
-            final int p = contStack.get(contStackTop+1);
-
-            if((i&Msb1)==0) {
+          while(!contStack.isEmpty()) {
+            final int i = contStack.getTopIndex();
+            final int p = contStack.getTopParent();
+            if(!contStack.isTopExpanded()) {
               expand(i);
             }else{
-              contStackTop-=2;
-              while(contStack.get(contStackTop)==-1) {
-                contStackTop-=2;
-              }
-              if((i&MsbMask)<compStack.size()) {
-                if(!close((i&MsbMask),p)) {
-                  return setFailedResult(null);
-                }
+              contStack.pop();
+              if(!close(i,p)) {
+                return setFailedResult(null);
               }
             }
           }
         }
       }
-
     } catch (final OverflowException overflow) {
       throw setExceptionResult(overflow);
     } catch (final AnalysisException exception) {
@@ -189,7 +177,7 @@ public class MonolithicDiagnosabilityVerifier
     } finally {
       tearDown();
     }
-    return setSatisfiedResult();  // diagnosable
+    return setSatisfiedResult();
   }
 
 
@@ -199,7 +187,7 @@ public class MonolithicDiagnosabilityVerifier
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
-    contStack.set(link.get(index), compStack.size()|Msb1);
+    contStack.setTopIndex(compStack.size()|Msb1);
     link.set(index, (compStack.size()|Msb1));
     compStack.add(index);
     if(a>=0||b>=0) {
@@ -210,8 +198,7 @@ public class MonolithicDiagnosabilityVerifier
       while(iterA.advance()) {
         event = iterA.getCurrentEvent();
         targetA = iterA.getCurrentTargetState();
-        //if unobservable
-        if(!eventObservability[event]) {
+        if(!eventObservable[event]) {
           if(faultClass.equals(eventFaultClass[event])) {
             newA = targetA|Msb1;
             newB = b;
@@ -220,7 +207,6 @@ public class MonolithicDiagnosabilityVerifier
             newB = b;
           }
           newState(newA,newB,index);
-        //if observable
         }else {
           iterB.reset((b&MsbMask),event);
           while(iterB.advance()) {
@@ -235,14 +221,12 @@ public class MonolithicDiagnosabilityVerifier
             newState(newA,newB,index);
           }
         }
-
       }
       iterA.resetState(b&MsbMask);
       while(iterA.advance()) {
         event = iterA.getCurrentEvent();
         targetB = iterA.getCurrentTargetState();
-        //if unobservable
-        if(!eventObservability[event]) {
+        if(!eventObservable[event]) {
           if(faultClass.equals(eventFaultClass[event])) {
             newA = a;
             newB = targetB|Msb1;
@@ -256,16 +240,14 @@ public class MonolithicDiagnosabilityVerifier
     }
   }
 
-
-
   private void newState(final int a, final int b, final int parentIndex)
     throws OverflowException
   {
     long next;
     if(a > b) {
-      next = (((long)a)<<32) | (b&0xffffffffL);
+      next = (((long)a)<<32)|(b&0xffffffffL);
     }else {
-      next = (((long)a)<<32) | (b&0xffffffffL);
+      next = (((long)a)<<32)|(b&0xffffffffL);
     }
     int index = stateIndexMap.get(next);
     if(!stateIndexMap.containsKey(next)) {
@@ -276,34 +258,15 @@ public class MonolithicDiagnosabilityVerifier
       if(stateCount >= getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
       }
-      contStackTop+=2;
-      if(contStackTop==contStack.size()) {//if stack has not shrunk
-        contStack.add(index);
-        contStack.add(parentIndex);
-      }else {
-        contStack.set(contStackTop, index);
-        contStack.set(contStackTop+1,parentIndex);
-      }
-      link.add(contStackTop);
+      contStack.push(index, parentIndex);
     }else if((link.get(index)&Msb1)==0){
-      contStack.set(link.get(index), -1);
-      contStackTop+=2;
-      if(contStackTop==contStack.size()) {
-        contStack.add(index);
-        contStack.add(parentIndex);
-      }else {
-        contStack.set(contStackTop, index);
-        contStack.set(contStackTop+1,parentIndex);
-      }
-      link.set(index, contStackTop);
+      contStack.moveToTop(link.get(index));
     }else if(link.get(index)!=-1) {
       int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
       newParentLink |= (link.get(parentIndex)&Msb1);
       link.set(parentIndex, newParentLink);
     }
   }
-
-
 
   private boolean close(final int dfsIndex, final int parentIndex) {
     final int index = compStack.get(dfsIndex);
@@ -328,15 +291,15 @@ public class MonolithicDiagnosabilityVerifier
         if((a&Msb1)==(b&Msb1)) {
           return true;
         }else {
-          int e;
+          int event;
           iterA.resetState(a&MsbMask);
           while(iterA.advance()) {
             if(iterA.getCurrentTargetState()==(a&MsbMask)) {
-              e = iterA.getCurrentEvent();
-              if(!eventObservability[e]) {
+              event = iterA.getCurrentEvent();
+              if(!eventObservable[event]) {
                 return false;
               }else {
-                iterB.reset((b&MsbMask),e);
+                iterB.reset((b&MsbMask),event);
                 while(iterB.advance()) {
                   if(iterB.getCurrentTargetState()==(b&MsbMask)) {
                     return false;
@@ -348,8 +311,8 @@ public class MonolithicDiagnosabilityVerifier
           iterB.resetState(b&MsbMask);
           while(iterB.advance()) {
             if(iterB.getCurrentTargetState()==(b&MsbMask)) {
-              e = iterB.getCurrentEvent();
-              if(!eventObservability[e]) {
+              event = iterB.getCurrentEvent();
+              if(!eventObservable[event]) {
                 return false;
               }
             }
@@ -367,14 +330,13 @@ public class MonolithicDiagnosabilityVerifier
 
   //#########################################################################
   //# Instance Variables
-  private boolean[] eventObservability;
+  private boolean[] eventObservable;
   private String[] eventFaultClass;
   private final TLongIntHashMap stateIndexMap = new TLongIntHashMap();
   private final TLongArrayList indexStateMap = new TLongArrayList();
+  private final ControllStack contStack = new ControllStack();
   private final TIntArrayList compStack = new TIntArrayList();
-  private final TIntArrayList contStack = new TIntArrayList();
   private final TIntArrayList link = new TIntArrayList();
-  private int contStackTop;
   private int stateCount = 0;
   private String faultClass;
   private TransitionIterator iterA;
@@ -399,96 +361,72 @@ public class MonolithicDiagnosabilityVerifier
     private int top;
 
     public ControllStack(){
-      final int top = 0;
+      top = -1;
       stack = new TIntArrayList();
       freeNodes = new TIntArrayList();
-      stack.add(0);
-      stack.add(0);
-      stack.add(-1);
-
     }
 
-    public void push(final int entry1, final int entry2) {
+    public void push(final int index, final int parent) {
       if(freeNodes.isEmpty()) {
         final int newTop = stack.size();
-        stack.add(entry1);
-        stack.add(entry2);
+        stack.add(index);
+        stack.add(parent);
         stack.add(top);
         top = newTop;
       }else {
         final int newTop = freeNodes.get(freeNodes.size()-1);
         freeNodes.removeAt(freeNodes.size()-1);
-        stack.set(newTop, entry1);
-        stack.set(newTop+1, entry2);
+        stack.set(newTop, index);
+        stack.set(newTop+1, parent);
         stack.set(newTop+2, top);
         top = newTop;
       }
-
+      if(freeNodes.isEmpty()) {
+        link.add(stack.size());
+      }else {
+        link.add(freeNodes.get(freeNodes.size()-1));
+      }
     }
 
     public void pop() {
       final int oldTop = top;
+      freeNodes.add(oldTop);
       top = stack.get(oldTop+2);
-      if((oldTop+3) == stack.size()) {
-        stack.remove(oldTop, 3);
-      }else {
-        freeNodes.add(oldTop);
-      }
-      int endIndex = stack.size()-3;
-      while(freeNodes.contains(endIndex)) {
-        stack.remove(endIndex, 3);
-        freeNodes.remove(endIndex);
-        endIndex = stack.size()-3;
-      }
+      stack.set(oldTop+2, -1);
     }
 
     public void moveToTop(final int nextIndex) {
-      final int index = stack.get(nextIndex+2);
-      final int prevIndex = stack.get(index+2);
-      stack.set(nextIndex+2, prevIndex);
-      stack.set(index+2, top);
-      top = index;
+      if(nextIndex!=stack.size()) {
+        final int index = stack.get(nextIndex+2);
+        if(index!=-1) {
+          final int prevIndex = stack.get(index+2);
+          stack.set(nextIndex+2, prevIndex);
+          stack.set(index+2, top);
+          top = index;
+          if(freeNodes.isEmpty()) {
+            link.set(index, stack.size());
+          }else {
+            link.set(index, freeNodes.get(freeNodes.size()-1));
+          }
+        }
+      }
     }
 
-    public int getNextTopIndex() {
-      if(freeNodes.isEmpty())
-        return stack.size();
-      else
-        return freeNodes.get(freeNodes.size()-1);
+    public void clear() {
+      stack.clear();
+      freeNodes.clear();
+      top = -1;
     }
 
-    public int getTopIndex() { return top; }
+    public int getTopIndex() { return (stack.get(top)&MsbMask); }
 
-    public int getTopEntry1() { return (stack.get(top)&MsbMask); }
+    public int getTopParent() { return stack.get(top+1); }
 
-    public int getTopEntry2() { return stack.get(top+1); }
+    public void setTopIndex(final int entry1) { stack.set(top, entry1); }
 
-    public void setTopEntry1(final int entry1) { stack.set(top, entry1); }
+    public boolean isEmpty() { return (top==-1)?true:false; }
 
-    public void setTopEntry2(final int entry2) { stack.set(top+1, entry2); }
-
-    public boolean isEmpty() {
-      if(top==0)
-        return true;
-      else
-        return false;
-    }
-
-    public boolean isTopExpanded() {
-      final int entry1 = stack.get(top);
-      if((entry1&Msb1)!=0)
-        return true;
-      else
-        return false;
-    }
-
+    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0)?true:false;}
 
   }
-
-
-
-
-
-
-
 }
