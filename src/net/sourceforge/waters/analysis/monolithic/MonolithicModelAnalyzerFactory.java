@@ -33,7 +33,10 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -96,6 +99,14 @@ public class MonolithicModelAnalyzerFactory
     (final ProductDESProxyFactory factory)
   {
     return new TRDeadlockChecker();
+  }
+
+  @Override
+  public DiagnosabilityChecker createDiagnosabilityChecker
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    return new MonolithicDiagnosabilityVerifier(factory);
   }
 
   @Override

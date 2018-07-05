@@ -77,6 +77,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
+import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
@@ -539,7 +540,12 @@ public class AttributesPanel extends JPanel
   static {
     //=======================================================================
     // Register Attribute Factories
+    //=======================================================================
+    // TODO Make responsive to configuration changes ...
     ATTRIBUTE_FACTORIES.add(DefaultAttributeFactory.getInstance());
+    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
+      ATTRIBUTE_FACTORIES.add(DiagnosabilityAttributeFactory.getInstance());
+    }
     if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
       ATTRIBUTE_FACTORIES.add(HISCAttributeFactory.getInstance());
     }

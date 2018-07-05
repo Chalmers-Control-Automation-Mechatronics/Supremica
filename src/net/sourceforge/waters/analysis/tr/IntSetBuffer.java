@@ -293,6 +293,48 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   }
 
   /**
+   * Determines whether a set in the buffer is a superset of another.
+   * @param  set1   The unique set index identifying the first set to be
+   *                compared in this integer set buffer.
+   * @param  set2   The unique set index identifying the second set to be
+   *                compared in this integer set buffer.
+   * @return <CODE>true</CODE> if the given <CODE>set1</CODE> is a superset
+   *         of the given <CODE>set2</CODE>, i.e., if all elements of
+   *         <CODE>set2</CODE> are contained in <CODE>set1</CODE>;
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean containsAll(final int set1, final int set2)
+  {
+    final int size1 = size(set1);
+    final int size2 = size(set2);
+    if (size1 < size2) {
+      return false;
+    } else if (size1 == size2) {
+      return equals(set1, set2);
+    } else if (size2 == 0) {
+      return true;
+    } else {
+      final IntSetIterator iter1 = iterator(set1);
+      final IntSetIterator iter2 = iterator(set2);
+      while (iter2.advance()) {
+        final int elem2 = iter2.getCurrentData();
+        do {
+          if (!iter1.advance()) {
+            return false;
+          }
+          final int elem1 = iter1.getCurrentData();
+          if (elem1 > elem2) {
+            return false;
+          } else if (elem1 == elem2) {
+            break;
+          }
+        } while (true);
+      }
+      return true;
+    }
+  }
+
+  /**
    * Checks whether a set with the given contents exists in the buffer.
    * @param  data  An array containing the set contents to be looked up.
    * @return The set index of a set with the given contents, or -1 if the
@@ -487,6 +529,9 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   @Override
   public boolean equals(final int set1, final int set2)
   {
+    if (set1 == set2) {
+      return true;
+    }
     int blockno1 = set1 >>> BLOCK_SHIFT;
     int[] block1 = mBlocks.get(blockno1);
     int offset1 = set1 & BLOCK_MASK;

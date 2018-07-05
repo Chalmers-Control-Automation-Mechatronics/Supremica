@@ -31,70 +31,37 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-import org.supremica.gui.ide.IDE;
-
+import net.sourceforge.waters.analysis.diagnosis.DiagnosabilityAttributeFactory;
 
 /**
- * The action to invoke an HISC-CP controllability check.
- * This invokes just a standard controllability check.
- * The only difference to {@link AnalyzeControllabilityCheckAction} is that
- * the module is compiled differently for HISC, with only the interfaces
- * of instantiated modules included.
+ * <P>A model verifier that checks whether a system of composed automata
+ * is <I>diagnosable</I>.</P>
+ *
+ * <P>A diagnosability checker searches the input model for unobservable
+ * events marked with the FAULT attribute. Events with this attribute are
+ * considered as faults, and the attribute value defines the fault class.
+ * Different fault events with the same attribute value belong to the same
+ * fault class.</P>
+ *
+ * <P>A model is diagnosable with respect to a fault class, if for each trace
+ * that includes an event with this fault class, it is guaranteed that the
+ * fault is detected eventually. That is, there exists a maximum number of
+ * steps, such that all continuations of this length with equal projection
+ * to observable events include a fault of the same class.</P>
+ *
+ * <P><I>Reference:</I> M. Sampath, R. Sengupta, S. Lafortune,
+ * K. Sinnamohideen, D. Teneketzis. Diagnosability of discrete-event systems.
+ * IEEE Transactions on Automatic Control, <STRONG>40</STRONG>(9),
+ * 1555&ndash;1575, 1995.</P>
+ *
+ * @see DiagnosabilityAttributeFactory
  *
  * @author Robi Malik
  */
 
-public class AnalyzeHISCCPControllabilityAction
-  extends WatersAnalyzeHISCAction
+public interface DiagnosabilityChecker extends ModelVerifier
 {
-
-  //#########################################################################
-  //# Constructor
-  protected AnalyzeHISCCPControllabilityAction(final IDE ide)
-  {
-    super(ide);
-  }
-
-
-  //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
-  protected String getCheckName()
-  {
-    return "HISC-CP Controllability";
-  }
-
-  @Override
-  protected String getFailureDescription()
-  {
-    return "is not locally controllable";
-  }
-
-  @Override
-  protected ModelVerifier getModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {
-    return factory.createControllabilityChecker(desFactory);
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "is locally controllable";
-  }
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
 
 }

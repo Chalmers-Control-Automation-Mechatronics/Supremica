@@ -58,20 +58,20 @@ import org.xml.sax.SAXException;
 
 
 /**
- * <P>The assessor for  explicit controllability checker programming
+ * <P>The assessor for BDD-based controllability checker programming
  * assignments. The assessor reads a test suite description,
- * passes all tests contained to a {@link ControllabilityChecker},
+ * passes all tests contained to a {@link BDDControllabilityChecker},
  * and prints a result with recommended grades.</P>
  *
  * @author Robi Malik
  */
 
-public class ControllabilityAssessor extends AbstractAssessor
+public class BDDControllabilityAssessor extends AbstractAssessor
 {
 
   //#########################################################################
   //# Constructor
-  private ControllabilityAssessor()
+  private BDDControllabilityAssessor()
     throws JAXBException, SAXException, IOException
   {
   }
@@ -79,10 +79,10 @@ public class ControllabilityAssessor extends AbstractAssessor
   //#########################################################################
   //# Hooks
   @Override
-  ControllabilityChecker createChecker(final ProductDESProxy des)
+  BDDControllabilityChecker createChecker(final ProductDESProxy des)
   {
     final ProductDESProxyFactory factory = getFactory();
-    return new ControllabilityChecker(des, factory);
+    return new BDDControllabilityChecker(des, factory);
   }
 
   @Override
@@ -185,7 +185,7 @@ public class ControllabilityAssessor extends AbstractAssessor
     try {
       QuietLogConfigurationFactory.install();
       LogManager.getLogger(); // avoid trouble with security manager later
-      final ControllabilityAssessor assessor = new ControllabilityAssessor();
+      final BDDControllabilityAssessor assessor = new BDDControllabilityAssessor();
       assessor.processCommandLine(args);
     } catch (final Throwable exception) {
       System.err.println("FATAL ERROR !!!");

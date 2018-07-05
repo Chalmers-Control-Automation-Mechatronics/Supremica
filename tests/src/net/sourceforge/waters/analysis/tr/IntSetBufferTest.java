@@ -33,14 +33,17 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import java.util.Random;
-
-import net.sourceforge.waters.junit.AbstractWatersTest;
-
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.set.hash.TIntHashSet;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
+import net.sourceforge.waters.junit.AbstractWatersTest;
 
 
 /**
@@ -249,6 +252,34 @@ public class IntSetBufferTest extends AbstractWatersTest
       for (int i = 0; i <= size; i++) {
         assertEquals("Unexpected result from containment test!",
                      i % 2 != 0, buffer.contains(set, i));
+      }
+    }
+  }
+
+  public void testContainsAll()
+  {
+    final int SIZE = 6;
+    final int COUNT = 1 << SIZE;
+    final List<TIntHashSet> sets = new ArrayList<>(COUNT);
+    for (int i = 0; i < COUNT; i++) {
+      final TIntHashSet set = new TIntHashSet();
+      for (int bit = 0; bit < SIZE; bit++) {
+        if ((i & (1 << bit)) != 0) {
+          set.add(bit);
+        }
+      }
+      sets.add(set);
+    }
+    final IntSetBuffer buffer = new IntSetBuffer(SIZE);
+    for (int i = 0; i < COUNT; i++) {
+      final TIntHashSet contents1 = sets.get(i);
+      final int set1 = buffer.add(contents1);
+      for (int j = 0; j < COUNT; j++) {
+        final TIntHashSet contents2 = sets.get(j);
+        final int set2 = buffer.add(contents2);
+        assertEquals("Unexpected result from superset test!",
+                     contents1.containsAll(contents2),
+                     buffer.containsAll(set1, set2));
       }
     }
   }

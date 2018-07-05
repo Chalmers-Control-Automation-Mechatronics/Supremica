@@ -325,7 +325,6 @@ public class ModuleCompiler extends AbortableCompiler
             new EFANormaliser(modfactory, mCompilationInfo, intermediate);
           mEFANormaliser.setUsesEventNameBuilder(true);
           mEFANormaliser.setCreatesGuardAutomaton(true);
-          mEFANormaliser.setUsesEventAlphabet(mIsUsingEventAlphabet);
           intermediate = mEFANormaliser.compile();
           mEFANormaliser = null;
         }
@@ -473,9 +472,7 @@ public class ModuleCompiler extends AbortableCompiler
    * with a transition in another EFSM that changes it.</P>
    *
    * <P>If disabled, an older semantics is used, where the set of variables
-   * changed by a transition is determined from EFSM containing it. The
-   * precise rules for this are further configured using the {@link
-   * #setUsingEventAlphabet(boolean) setUsingEventAlphabet()} method.</P>
+   * changed by a transition is determined from EFSM containing it.</P>
    *
    * <P>This option is disabled by default.</P>
    *
@@ -488,44 +485,6 @@ public class ModuleCompiler extends AbortableCompiler
   public void setNormalizationEnabled(final boolean enable)
   {
     mIsNormalizationEnabled = enable;
-  }
-
-  /**
-   * Gets whether unchanged variables are determined per-event when using
-   * old EFSM semantics.
-   * @see #setUsingEventAlphabet(boolean)
-   */
-  public boolean isUsingEventAlphabet()
-  {
-    return mIsUsingEventAlphabet;
-  }
-
-  /**
-   * <P>Sets whether unchanged variables are determined per-event when using
-   * old EFSM semantics.</P>
-   *
-   * <P>With old EFSM semantics, the user has to specify explicitly that
-   * variables remains unchanged (by writing an update such as
-   * <CODE>x&nbsp;=&nbsp;x</CODE>) if they do not appear on a transition.
-   * This option controls which variables are affected by this.</P>
-   *
-   * <P>If enabled, the compiler collects for each event in a EFSM all the
-   * variables that appear as next-state variable on one of its updates. All
-   * these variables will be allowed to assume a new value when the EFSM
-   * performs a transition with the event.</P>
-   *
-   * <P>If disabled, the set of changed variables is determined on a per-EFSM
-   * basis. All variables that appear as next-state variable in an EFSM may
-   * change on every transition of that EFSM.</P>
-   *
-   * <P>This option is enabled by default.
-   * It has no effect when normalisation is enabled.</P>
-   *
-   * @see #setNormalizationEnabled(boolean)
-   */
-  public void setUsingEventAlphabet(final boolean using)
-  {
-    mIsUsingEventAlphabet = using;
   }
 
   /**
@@ -688,8 +647,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;
-  private boolean mIsNormalizationEnabled = false;
-  private boolean mIsUsingEventAlphabet = true;
+  private boolean mIsNormalizationEnabled = true;
   private boolean mIsSourceInfoEnabled = false;
   private boolean mIsMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;

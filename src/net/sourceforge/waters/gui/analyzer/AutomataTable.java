@@ -45,7 +45,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,6 +72,8 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -97,6 +98,8 @@ class AutomataTable extends JTable implements SelectionOwner
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
+
+    //    this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "none");
 
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
@@ -181,6 +184,7 @@ class AutomataTable extends JTable implements SelectionOwner
 
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
+    // TODO Remove this method (for now)
     /*
      * final AutomataTableModel model = getModel(); if (proxy instanceof
      * IdentifierSubject) { final IdentifierSubject ident =
@@ -191,92 +195,6 @@ class AutomataTable extends JTable implements SelectionOwner
      * return model.containsEqualIdentifier(ident); } else { return false; }
      */
     return false;
-  }
-
-
-  //#########################################################################
-  //# Inner Class TextCellRenderer
-  /**
-   * A text renderer for the simulator's automata table. This renderer
-   * displays text without the focus rectangle, and changes the font to bold
-   * if the automaton is open on the simulator's desktop.
-   */
-  private class TextCellRenderer extends DefaultTableCellRenderer
-  {
-    //#######################################################################
-    //# Interface javax.swing.table.TableCellRenderer
-    @Override
-    public Component getTableCellRendererComponent(final JTable table,
-                                                   final Object value,
-                                                   final boolean selected,
-                                                   final boolean focused,
-                                                   final int row,
-                                                   final int column)
-    {
-      final Component cell =
-        super.getTableCellRendererComponent(table, value, selected, false,
-                                            row, column);
-      return cell;
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 2739259938102695664L;
-  }
-
-
-  //#########################################################################
-  //# Inner Class IconCellRenderer
-  private class IconCellRenderer extends DefaultTableCellRenderer
-  {
-    //#######################################################################
-    //# Interface javax.swing.table.TableCellRenderer
-    @Override
-    public Component getTableCellRendererComponent(final JTable table,
-                                                   final Object value,
-                                                   final boolean selected,
-                                                   final boolean focused,
-                                                   final int row,
-                                                   final int column)
-    {
-      final JLabel cell =
-        (JLabel) super.getTableCellRendererComponent(table, value, selected,
-                                                     false, row, column);
-      final ComponentKind kind = (ComponentKind) value;
-      final Icon icon = ModuleContext.getComponentKindIcon(kind);
-      cell.setIcon(icon);
-      cell.setText(null);
-      return cell;
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 7455415810847160716L;
-  }
-
-
-  //#########################################################################
-  //# Inner Class TableHeaderMouseListener
-  private class TableMouseListener extends MouseAdapter
-  {
-    //#######################################################################
-    //# Interface java.awt.event.MouseListener
-    @Override
-    public void mouseClicked(final MouseEvent event)
-    {
-      if (event.getButton() == MouseEvent.BUTTON1
-          && event.getClickCount() == 2) {
-        final AutomatonProxy aut = getAutomaton(event);
-        if (aut != null) {
-          if (getSelectedRowCount() > 1) {
-            final AutomataTableModel model = getModel();
-            model.getAutomaton(getSelectedRows()[0]);
-          } else {
-            mParent.displaySelectedAutomata(aut);
-          }
-        }
-      }
-    }
   }
 
 
@@ -391,40 +309,26 @@ class AutomataTable extends JTable implements SelectionOwner
   public void replaceSelection(final List<? extends Proxy> items)
   {
     clearSelection();
-    this.addToSelection(items);
-
+    addToSelection(items);
   }
 
   @Override
   public void addToSelection(final List<? extends Proxy> items)
   {
-    /*
-     * final AutomataTableModel model = getModel(); for (final Proxy p :
-     * items) { if (p instanceof AutomatonProxy) { final AutomatonProxy aut =
-     * (AutomatonProxy) p; final int position = model.getIndex(aut);
-     * addRowSelectionInterval(position, position); } }
-     */
     final AutomataTableModel model = getModel();
-    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
+    final List<Integer> autList = new ArrayList<Integer>();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
-        autList.add((AutomatonProxy) p);
+        autList.add(model.getIndex((AutomatonProxy) p));
       }
     }
 
-    Collections.sort(autList, new Comparator<AutomatonProxy>() {
-      @Override
-      public int compare(final AutomatonProxy lhs, final AutomatonProxy rhs)
-      {
-        // -1 - less than, 1 - greater than, 0 - equal, all inversed for ascending
-        return rhs.getName().compareTo(lhs.getName());
-      }
-    });
+    Collections.sort(autList);
 
     int start = -1;
     int end = -1;
-    for (final AutomatonProxy a : autList) {
-      final int position = model.getIndex(a);
+    for (final int i : autList) {
+      final int position = i;
       if (start == -1) {
         start = end = position;
       } else if (position > (end + 1)) {
@@ -434,25 +338,42 @@ class AutomataTable extends JTable implements SelectionOwner
         end = position;
       }
     }
+    addRowSelectionInterval(start, end);
   }
 
   @Override
   public void removeFromSelection(final List<? extends Proxy> items)
   {
     final AutomataTableModel model = getModel();
+    final List<Integer> autList = new ArrayList<Integer>();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        final int position = model.getIndex(aut);
-        removeRowSelectionInterval(position, position);
+        autList.add(model.getIndex((AutomatonProxy) p));
       }
     }
+
+    Collections.sort(autList);
+
+    int start = -1;
+    int end = -1;
+    for (final int i : autList) {
+      final int position = i;
+      if (start == -1) {
+        start = end = position;
+      } else if (position > (end + 1)) {
+        removeRowSelectionInterval(start, end);
+        start = end = position;
+      } else {
+        end = position;
+      }
+    }
+    removeRowSelectionInterval(start, end);
   }
 
   @Override
   public boolean canPaste(final Transferable transferable)
   {
-    // TODO Auto-generated method stub
+    // TODO Can paste if automaton flavour supported
     try {
       if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
         @SuppressWarnings("unchecked")
@@ -478,22 +399,40 @@ class AutomataTable extends JTable implements SelectionOwner
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
-    // TODO Auto-generated method stub
-    return null;
+    // TODO Must also implement AutomatonDataFlavor and DataFlavorVisitor ...
+    final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
+      // TODO Use event map from table model
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      @SuppressWarnings("unchecked")
+      // TODO Use the correct flavour
+      final List<Proxy> data =
+        (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
+      for (final Proxy proxy : data) {
+        // TODO Always insert, do not check identifier
+        if (!containsEqualIdentifier(proxy)) {
+          final Proxy cloned = cloner.getClone(proxy);
+          final InsertInfo insert = new InsertInfo(cloned);
+          inserts.add(insert);
+        }
+      }
+    } else {
+      throw new UnsupportedFlavorException(null);
+    }
+    return inserts;
   }
 
   @Override
   public boolean canDelete(final List<? extends Proxy> items)
   {
-    // TODO Auto-generated method stub
     final AutomataTableModel model = getModel();
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
         if ((model.getIndex(aut) != -1))
           return true;
-        else
-          return false;
       }
     }
     return false;
@@ -502,27 +441,31 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    if (items.size() > 0) {
-      final List<InsertInfo> infoList = new ArrayList<InsertInfo>();
-      for (final Proxy p : items)
-        infoList.add(new InsertInfo(p));
-      return infoList;
-    } else
-      return null;
+    final List<InsertInfo> infoList = new ArrayList<InsertInfo>(items.size());
+    for (final Proxy p : items)
+      infoList.add(new InsertInfo(p));
+    return infoList;
   }
 
   @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void deleteItems(final List<InsertInfo> deletes)
   {
-    // TODO Auto-generated method stub
-
+    final List<Integer> deleteIndexList = new ArrayList<Integer>();
+    final AutomataTableModel model = getModel();
+    for (final InsertInfo info : deletes) {
+      final Proxy proxy = info.getProxy();
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        deleteIndexList.add(model.getIndex(aut));
+      }
+    }
+    model.deleteRows(deleteIndexList);
   }
 
   @Override
@@ -552,11 +495,99 @@ class AutomataTable extends JTable implements SelectionOwner
     model.Close();
   }
 
+
+  //#########################################################################
+  //# Inner Class TextCellRenderer
+  /**
+   * A text renderer for the simulator's automata table. This renderer
+   * displays text without the focus rectangle, and changes the font to bold
+   * if the automaton is open on the simulator's desktop.
+   */
+  private class TextCellRenderer extends DefaultTableCellRenderer
+  {
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    @Override
+    public Component getTableCellRendererComponent(final JTable table,
+                                                   final Object value,
+                                                   final boolean selected,
+                                                   final boolean focused,
+                                                   final int row,
+                                                   final int column)
+    {
+      final Component cell =
+        super.getTableCellRendererComponent(table, value, selected, false,
+                                            row, column);
+      return cell;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 2739259938102695664L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class IconCellRenderer
+  private class IconCellRenderer extends DefaultTableCellRenderer
+  {
+    //#######################################################################
+    //# Interface javax.swing.table.TableCellRenderer
+    @Override
+    public Component getTableCellRendererComponent(final JTable table,
+                                                   final Object value,
+                                                   final boolean selected,
+                                                   final boolean focused,
+                                                   final int row,
+                                                   final int column)
+    {
+      final JLabel cell =
+        (JLabel) super.getTableCellRendererComponent(table, value, selected,
+                                                     false, row, column);
+      final ComponentKind kind = (ComponentKind) value;
+      final Icon icon = ModuleContext.getComponentKindIcon(kind);
+      cell.setIcon(icon);
+      cell.setText(null);
+      return cell;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 7455415810847160716L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class TableHeaderMouseListener
+  private class TableMouseListener extends MouseAdapter
+  {
+    //#######################################################################
+    //# Interface java.awt.event.MouseListener
+    @Override
+    public void mouseClicked(final MouseEvent event)
+    {
+      if (event.getButton() == MouseEvent.BUTTON1
+          && event.getClickCount() == 2) {
+        final AutomatonProxy aut = getAutomaton(event);
+        if (aut != null) {
+          if (getSelectedRowCount() > 1) {
+            final AutomataTableModel model = getModel();
+            model.getAutomaton(getSelectedRows()[0]);
+          } else {
+            mParent.displaySelectedAutomata(aut);
+          }
+        }
+      }
+    }
+  }
+
+
   //#########################################################################
   //# Data Members
   final WatersAnalyzerPanel mParent;
   private List<Observer> mObservers;
   final ModuleContainer mModuleContainer;
+
 
   //#########################################################################
   //# Class Constants

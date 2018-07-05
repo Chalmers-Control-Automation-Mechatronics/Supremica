@@ -90,8 +90,6 @@ public class BackgroundCompiler
       (mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
-    Config.USE_EVENT_ALPHABET.addPropertyChangeListener
-      (mCompilerPropertyChangeListener);
 
     mRemoveObserverAction = new ActionListener() {
       @Override
@@ -151,7 +149,6 @@ public class BackgroundCompiler
       mRunning = true;
       mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
       mCompiler.setNormalizationEnabled(Config.NORMALIZING_COMPILER.isTrue());
-      mCompiler.setUsingEventAlphabet(Config.USE_EVENT_ALPHABET.isTrue());
       mCompiler.setInputModule(mModuleContainer.getModule(), true);
       mWorker.compile();
     } else if (mModuleChanged && mRunning) {
@@ -173,8 +170,6 @@ public class BackgroundCompiler
     Config.OPTIMIZING_COMPILER.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER.removePropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.USE_EVENT_ALPHABET.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
     mTimer.stop();
     mWorker.terminate();

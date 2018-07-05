@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.transfer;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
@@ -44,6 +46,7 @@ import java.util.Set;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -53,14 +56,11 @@ import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.SubjectTools;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -104,7 +104,7 @@ import gnu.trove.set.hash.THashSet;
  * <P>When data is retrieved from a transferable by the {@link
  * Transferable#getTransferData(DataFlavor) getTransferData()} method, the
  * transferable calls the {@link
- * #createImportData(Collection,ModuleProxyFactory) createImportData()} method
+ * #createImportData(Collection) createImportData()} method
  * of the requested data flavour, which copies the data back for use by the
  * GUI.</P>
  *
@@ -320,15 +320,12 @@ public abstract class WatersDataFlavor extends DataFlavor
    * and convert it to a form that can be used by an application.
    * @param  data     Collection of objects stored in a
    *                  {@link ProxyTransferable}.
-   * @param  factory  Factory used to create any {@link Proxy} objects
-   *                  in the output.
    * @return List of data to be inserted in an application.
-   *         The returned data should be created using the given factory,
-   *         and not share any references with the transfer data.
+   *         The returned data should not share any references with the
+   *         transfer data.
    * @see WatersDataFlavor
    */
-  abstract List<Proxy> createImportData(Collection<? extends Proxy> data,
-                                        ModuleProxyFactory factory);
+  abstract List<Proxy> createImportData(Collection<? extends Proxy> data);
 
 
   //#########################################################################
@@ -345,6 +342,17 @@ public abstract class WatersDataFlavor extends DataFlavor
    * @see ComponentDataFlavor
    */
   public static final WatersDataFlavor COMPONENT = new ComponentDataFlavor();
+
+  /**
+   * The data flavour for a list of automaton proxy. It is implemented as a
+   * {@link ProxyTransferable} and contains a list of objects of type
+   * {@link AutomatonProxy} and possibly
+   * {@link SimpleComponentProxy}. The event declarations are added to facilitate
+   * copying and pasting of automata between modules together with their
+   * events.
+   * @see AutomatonDataFlavor
+   */
+  public static final WatersDataFlavor AUTOMATON = new AutomatonDataFlavor();
 
   /**
    * The data flavour for a list of constant aliases, as contained in the

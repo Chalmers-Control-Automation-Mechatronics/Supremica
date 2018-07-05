@@ -31,81 +31,68 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler;
+package net.sourceforge.waters.gui.actions;
 
-import java.io.IOException;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import net.sourceforge.waters.model.base.WatersException;
-import net.sourceforge.waters.model.compiler.efa.EFSMControllabilityException;
-import net.sourceforge.waters.model.module.ModuleProxy;
+import org.supremica.gui.ide.IDE;
 
 
-public class NormalisingPerEventCompilerTest extends AbstractCompilerTest
+/**
+ * The action to invoke a diagnosability check through the editor's
+ * Verify menu.
+ *
+ * @see DiagnosabilityChecker
+ *
+ * @author Robi Malik
+ */
+
+public class AnalyzeDiagnosabilityCheckAction extends WatersAnalyzeAction
 {
-  //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
-  {
-    return new TestSuite(NormalisingPerEventCompilerTest.class);
-  }
 
-  public static void main(final String[] args)
+  //#########################################################################
+  //# Constructors
+  protected AnalyzeDiagnosabilityCheckAction(final IDE ide)
   {
-    junit.textui.TestRunner.run(suite());
+    super(ide);
   }
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
-  void configure(final ModuleCompiler compiler)
+  protected String getCheckName()
   {
-    compiler.setMultiExceptionsEnabled(true);
-    compiler.setNormalizationEnabled(true);
-    compiler.setOptimizationEnabled(false);
-    compiler.setSourceInfoEnabled(true);
-    compiler.setUsingEventAlphabet(true);
+    return "Diagnosability";
   }
 
   @Override
-  public void testCompile_EFATransferLine()
-    throws IOException, WatersException
+  protected String getFailureDescription()
   {
-    final ModuleProxy module = loadModule("efa", "transferline_efa");
-    final String[] culprit1 = {"'bufferA[1].c'", "'acceptT[0]'"};
-    final String[] culprit2 = {"'bufferA[1].c'", "'rejectT[1]'"};
-    final String[] culprit3 = {"'bufferB[1].c'", "'finishM[1]'"};
-    compileError(module, null, EFSMControllabilityException.class,
-                 culprit1, culprit2, culprit3);
+    return "is not diagnosable";
   }
 
   @Override
-  String[] getTestSuffices()
+  protected DiagnosabilityChecker getModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    final String[] array = {"-norm", "-pea"};
-    return array;
+    return factory.createDiagnosabilityChecker(desFactory);
+  }
+
+  @Override
+  protected String getSuccessDescription()
+  {
+    return "is diagnosable";
   }
 
 
   //#########################################################################
-  //# Specific Test Cases
-  public void testCompile_normalise1()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "normalise1");
-    testCompile(module);
-  }
-
-  public void testCompile_normalise2() throws IOException, WatersException
-  {
-    final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "normalise2");
-    testCompile(module);
-  }
+  //# Class Constants
+  private static final long serialVersionUID = -6505471793647504953L;
 
 }

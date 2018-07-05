@@ -198,16 +198,17 @@
     </jar>
     <jar jarfile="${waters552.jar}" update="true">
       <fileset dir="${waters.classes}">
+        <!-- Beware of inner classes !!! -->
         <include
-           name="net/sourceforge/waters/analysis/comp552/ModelChecker.class"/>
+           name="net/sourceforge/waters/analysis/comp552/ModelChecker*.class"/>
         <include
-           name="net/sourceforge/waters/analysis/comp552/AbstractCounterExampleChecker.class"/>
+           name="net/sourceforge/waters/analysis/comp552/AbstractCounterExampleChecker*.class"/>
         <include
-           name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker.class"/>
+           name="net/sourceforge/waters/analysis/comp552/ConflictCounterExampleChecker*.class"/>
         <include
-           name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker.class"/>
+           name="net/sourceforge/waters/analysis/comp552/ControllabilityCounterExampleChecker*.class"/>
         <include
-           name="net/sourceforge/waters/analysis/comp552/QuietLogConfigurationFactory.class"/>
+           name="net/sourceforge/waters/analysis/comp552/QuietLogConfigurationFactory*.class"/>
       </fileset>
     </jar>
   </target>

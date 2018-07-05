@@ -59,9 +59,10 @@ public abstract class WatersActionManager implements Observer
     mActionMap = new HashMap<Class<? extends IDEAction>,IDEAction>(SIZE);
     mKeyboardActionMap = new HashMap<Class<? extends IDEAction>,Action>(SIZE);
     addAction(new AnalyzeConflictCheckAction(ide));
-    addAction(new AnalyzeControllabilityAction(ide));
+    addAction(new AnalyzeControllabilityCheckAction(ide));
     addAction(new AnalyzeControlLoopAction(ide));
     addAction(new AnalyzeDeadlockCheckAction(ide));
+    addAction(new AnalyzeDiagnosabilityCheckAction(ide));
     addAction(new AnalyzeHISCCPControllabilityAction(ide));
     try {
       addAction(new AnalyzeHISCCPInterfaceConsistencyAction(ide));

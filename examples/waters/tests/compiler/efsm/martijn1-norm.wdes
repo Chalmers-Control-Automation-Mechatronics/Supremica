@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="martijn1" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<Comment>A test for EFSM compilation.
+The event e has two updates, x'=x' to leave x unchanged explicitly, and true.
+Under normalising semantics, x is unchanged in both cases.
+Under old compiler semantics, x can change arbitrarily on the true update.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="PROPOSITION" Name=":accepting"/>
+<ns2:Event Kind="CONTROLLABLE" Name="e"/>
+<ns2:Event Kind="CONTROLLABLE" Name="u"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="A">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+<ns2:EventRef Name="e"/>
+<ns2:EventRef Name="u"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0">
+<ns2:EventRefList>
+<ns2:EventRef Name=":accepting"/>
+</ns2:EventRefList>
+</ns2:State>
+<ns2:State Name="S1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="S0" Event="e" Target="S1"/>
+<ns2:Transition Source="S1" Event="e" Target="S0"/>
+<ns2:Transition Source="S1" Event="u" Target="S1"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="x">
+<ns2:EventRefList>
+<ns2:EventRef Name="u"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="0"/>
+<ns2:State Name="1"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="0" Event="u" Target="0"/>
+<ns2:Transition Source="0" Event="u" Target="1"/>
+<ns2:Transition Source="1" Event="u" Target="0"/>
+<ns2:Transition Source="1" Event="u" Target="1"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

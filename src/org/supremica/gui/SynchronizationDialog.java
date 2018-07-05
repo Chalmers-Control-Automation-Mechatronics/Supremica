@@ -35,10 +35,26 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import org.supremica.automata.algorithms.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+
+import org.supremica.automata.algorithms.SynchronizationOptions;
+import org.supremica.automata.algorithms.SynchronizationType;
 import org.supremica.properties.Config;
 
 abstract class SynchronizationPanel
@@ -119,12 +135,12 @@ class SynchronizationDialogAdvancedPanel
 
 		this.synchronizationTypeBox = new JComboBox<SynchronizationType>(SynchronizationType.values());
 		this.synchronizationTypeBox.setToolTipText("Choose the type of composition");
-		
+
 		this.expandForbiddenStatesBox = new JCheckBox(Config.SYNC_EXPAND_FORBIDDEN_STATES.getComment());
 		this.expandForbiddenStatesBox.setToolTipText("If checked, transitions from forbidden states are " +
 												"examined, otherwise, forbidden states are considered terminal");
 		this.expandForbiddenStatesBox.addActionListener(this);
-		
+
 		this.rememberDisabledEventsBox = new JCheckBox("Include disabled transitions");
 		this.rememberDisabledEventsBox.setToolTipText("Adds transitions to a new 'dump'-state for all transitions in a plant that are disabled by a specification");
 
@@ -136,7 +152,7 @@ class SynchronizationDialogAdvancedPanel
 		this.unobsEventsSyncBox = new JCheckBox(Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
 		this.unobsEventsSyncBox.setToolTipText("If checked: " + Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
 		this.unobsEventsSyncBox.setSelected(Config.SYNC_UNOBS_EVENTS_SYNC.isTrue());
-		
+
 		final JPanel choicePanel = new JPanel();
 		choicePanel.setLayout(new FlowLayout());
 		choicePanel.add(synchronizationTypeBox);
@@ -178,7 +194,7 @@ class SynchronizationDialogAdvancedPanel
 		expandForbiddenStatesBox.setSelected(synchronizationOptions.expandForbiddenStates());
 		rememberDisabledEventsBox.setSelected(synchronizationOptions.rememberDisabledEvents());
 		this.unobsEventsSyncBox.setSelected(synchronizationOptions.getUnobsEventsSynch());
-		
+
 		if (!expandForbiddenStatesBox.isSelected())
 		{
 			rememberDisabledEventsBox.setEnabled(false);
@@ -226,16 +242,16 @@ public final class SynchronizationDialog
 	private final Frame parentFrame;
 
 	/**
-	 * Creates modal dialog box for input of synthesizer options.
+	 * Creates modal dialog box for input of synchronous product options.
 	 */
-	public SynchronizationDialog(final Frame parentFrame, final SynchronizationOptions synchronizationOptions)
+	public SynchronizationDialog(final Frame parentFrame,
+	                             final SynchronizationOptions synchronizationOptions)
 	{
 		dialog = new JDialog(parentFrame, true);    // modal
 		this.parentFrame = parentFrame;
 		this.synchronizationOptions = synchronizationOptions;
 
 		dialog.setTitle("Synchronization options");
-		dialog.setSize(new Dimension(400, 300));
 
 		final Container contentPane = dialog.getContentPane();
 
@@ -256,13 +272,10 @@ public final class SynchronizationDialog
 		contentPane.add("Center", tabbedPane);
 		contentPane.add("South", buttonPanel);
 		Utility.setDefaultButton(dialog, okButton);
+        update();
 
-		// ** MF ** Fix to get the frigging thing centered
-		final Dimension dim = dialog.getMinimumSize();
-
-		dialog.setLocation(Utility.getPosForCenter(dim));
-		dialog.setResizable(false);
-		update();
+		dialog.setLocationRelativeTo(parentFrame);
+		dialog.pack();
 	}
 
 	/**
@@ -318,12 +331,12 @@ public final class SynchronizationDialog
 			dialog.dispose();
 		}
 	}
-	
+
 	//----------- Just for testing
 	public static void main(final String[] args)
 	{
-		SynchronizationOptions options = new SynchronizationOptions();
-		SynchronizationDialog dialog = new SynchronizationDialog(null, options);
+		final SynchronizationOptions options = new SynchronizationOptions();
+		final SynchronizationDialog dialog = new SynchronizationDialog(null, options);
 		dialog.show();
 		System.out.println("getUnobsEventsSynch : " + options.getUnobsEventsSynch());
 	}

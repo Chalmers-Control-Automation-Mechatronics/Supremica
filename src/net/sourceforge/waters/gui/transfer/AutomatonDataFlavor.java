@@ -31,42 +31,57 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.gui.transfer;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import java.util.Collection;
+import java.util.List;
 
-import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyCloner;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-public class AnalyzeControllabilityAction extends WatersAnalyzeAction
+
+/**
+ * A general data flavour for items that are a Automaton.
+ *
+ * @author George Hewlett
+ */
+
+public class AutomatonDataFlavor extends WatersDataFlavor
 {
-  protected AnalyzeControllabilityAction(final IDE ide)
+
+  //#########################################################################
+  //# Constructor
+  AutomatonDataFlavor()
   {
-    super(ide);
+    super(AutomatonProxy.class);
   }
 
-  protected String getCheckName()
+  //#########################################################################
+  //# Importing and Exporting Data
+  @Override
+  List<Proxy> createExportData(final Collection<? extends Proxy> data,
+                               final ModuleContext context)
   {
-    return "Controllability";
+    // TODO Use ProductDESElementFactory.getInstance()
+    //final ProductDESProxyFactory factory = factory;
+    //final AutomataCloner cloner = new AutomataCloner();
+    //return cloner.getClonedList(data);
+    final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
+    return cloner.getClonedList(data);
   }
 
-  protected String getFailureDescription()
+  @Override
+  List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
-    return "is not controllable";
+    // TODO ditto
+    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+    final ProxyCloner cloner = factory.getCloner();
+    return cloner.getClonedList(data);
   }
 
-  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {
-    return factory.createControllabilityChecker(desFactory);
-  }
-
-  protected String getSuccessDescription()
-  {
-    return "is controllable";
-  }
-
-  private static final long serialVersionUID = -1008097797553564719L;
 }

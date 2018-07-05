@@ -81,6 +81,13 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
   /**
+   * Creates a diagnosability checker.
+   */
+  public DiagnosabilityChecker createDiagnosabilityChecker
+    (ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException;
+
+  /**
    * Creates a language inclusion checker.
    */
   public LanguageInclusionChecker createLanguageInclusionChecker

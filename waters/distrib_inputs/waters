@@ -8,7 +8,11 @@ which java > /dev/null 2>&1
 if [ "$?" -eq "0" ]; then
     JAVAVERSION=`java -version 2>&1`
     case "$JAVAVERSION" in
-        java\ version\ \"1.8*) JAVACMD=java
+        java\ version\ \"1.8.*) JAVACMD=java
+        ;;
+        java\ version\ \"9.*) JAVACMD=java --add-modules java.xml.bind 
+        ;;
+        java\ version\ \"10.*) JAVACMD=java --add-modules java.xml.bind 
         ;;
     esac
 fi
@@ -16,8 +20,12 @@ fi
 if [ "$JAVACMD" = "" -a -x $JAVA_HOME/bin/java ]; then
     JAVAVERSION=`$JAVA_HOME/bin/java -version 2>&1`
     case "$JAVAVERSION" in
-	java\ version\ \"1.8*) JAVACMD=$JAVA_HOME/bin/java
+	java\ version\ \"1.8.*) JAVACMD=$JAVA_HOME/bin/java
 	;;
+        java\ version\ \"9.*) JAVACMD=$JAVA_HOME/bin/java --add-modules java.xml.bind 
+        ;;
+        java\ version\ \"10.*) JAVACMD=$JAVA_HOME/bin/java --add-modules java.xml.bind 
+        ;;
     esac
 fi
 
@@ -25,7 +33,7 @@ if [ "$JAVACMD" = "" ]; then
     export JAVA_HOME=/usr/lib/jvm/java-8-oracle
     JAVACMD=$JAVA_HOME/bin/java
     if [ ! -x $JAVACMD ]; then
-        echo "Cannot find a working installation of Java 1.8."
+        echo "Cannot find a working installation of Java 8, 9, or 10."
         echo "Please make sure it is installed and JAVA_HOME points to it."
         exit 1
     fi
