@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.list.TIntList;
+import gnu.trove.set.TIntSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -186,7 +186,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    *         this buffer. This may be a newly created or an already existent
    *         set.
    */
-  public int add(final TIntArrayList data)
+  public int add(final TIntList data)
   {
     final int count = data.size();
     final int words = getNumberOfWords(count);
@@ -232,7 +232,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    *         this buffer. This may be a newly created or an already existent
    *         set.
    */
-  public int add(final TIntHashSet data)
+  public int add(final TIntSet data)
   {
     final int[] array = data.toArray();
     Arrays.sort(array);
@@ -245,7 +245,7 @@ public class IntSetBuffer implements WatersIntHashingStrategy
    *                 in this integer set buffer.
    * @param  output  Hash set to which data is to be added.
    */
-  public void collect(final int set, final TIntHashSet output)
+  public void collect(final int set, final TIntSet output)
   {
     int blockno = set >>> BLOCK_SHIFT;
     int[] block = mBlocks.get(blockno);

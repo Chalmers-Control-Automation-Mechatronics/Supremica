@@ -45,10 +45,10 @@ import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -99,14 +99,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mNumProperEvents = rel.getNumberOfProperEvents();
     final StateOutput[] stateOutputs = new StateOutput[mNumStates];
 
-    final TIntArrayList initialCompatible = new TIntArrayList();
+    final TIntList initialCompatible = new TIntArrayList();
     mReducedSupervisor = new CompatibleSet(mNumStates);
     mCompatibleCache = new IntSetBuffer(mNumStates);
     //mCoversCache = new TIntObjectHashMap<>();
 
     for (int s = 0; s < mNumStates; s++) {
       //set the reduced supervisor to the current set of states
-      final TIntArrayList oneStateCompatible = new TIntArrayList();
+      final TIntList oneStateCompatible = new TIntArrayList();
       oneStateCompatible.add(s);
       mReducedSupervisor.add(mCompatibleCache.add(oneStateCompatible));
 
@@ -135,7 +135,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
     dependencies.add(mInitialCompatibleId);
-    reduce(new CompatibleSet(), dependencies, 0);
+    reduce(new CompatibleSet(), dependencies);
     System.out.println("\nR: " + mReducedSupervisor.size() + " S: " + mNumStates);
 
     //account for the dump state which is included in the initial automaton but not in our compatibles
@@ -149,9 +149,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void reduce(final CompatibleSet currentSolution, final CompatibleDependenciesSet compatibleDependencies, final int level) {
+  private void reduce(final CompatibleSet currentSolution, final CompatibleDependenciesSet compatibleDependencies) {
 
-    System.out.print("\nC: " + currentSolution + " D: " + compatibleDependencies + " L: " + level);
+    System.out.print("\nC: " + currentSolution + " D: " + compatibleDependencies + " L: " + currentSolution.size());
 
     //if solution is complete and more reduced, save it
     if (currentSolution.size() < mReducedSupervisor.size() && compatibleDependencies.isEmpty()) {
@@ -169,7 +169,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     //our container for the actual compatible being processed at any given time
-    final TIntArrayList compatible = new TIntArrayList();
+    final TIntList compatible = new TIntArrayList();
 
     //get the id of next compatible we need to add
     final int nextCompatibleId = compatibleDependencies.pop();
@@ -182,10 +182,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       mCoversCache.put(nextCompatibleId, coverIds);
     }*/
     getCompatibleFromCache(nextCompatibleId, compatible);
-    final TIntCollection coverIds = getCoversOf(compatible);
+    final TIntList coverIds = getCoversOf(compatible);
 
     //container for successor compatible ids
-    final TIntCollection dependentIds = new TIntArrayList();
+    final TIntList dependentIds = new TIntArrayList();
 
     for (final TIntIterator coversIterator = coverIds.iterator(); coversIterator.hasNext();) {
       //get the id of a cover
@@ -221,27 +221,27 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           newCompatibleDependencies.add(dependentId);
         }
       }
-      reduce(newSolution, newCompatibleDependencies, level + 1);
+      reduce(newSolution, newCompatibleDependencies);
     }
   }
 
   private boolean buildReducedSupervisor() throws OverflowException {
     //translate set of compatible ids which comprise the reduced supervisor into the compatibles themselves
-    final TIntSet[] reducedSupervisor = new TIntHashSet[mReducedSupervisor.size()];
+    final TIntList[] reducedSupervisor = new TIntArrayList[mReducedSupervisor.size()];
     int i = 0;
     for (final TIntIterator compatibleIdIterator = mReducedSupervisor.iterator(); compatibleIdIterator.hasNext(); i++) {
-      reducedSupervisor[i] = new TIntHashSet();
+      reducedSupervisor[i] = new TIntArrayList();
       getCompatibleFromCache(compatibleIdIterator.next(), reducedSupervisor[i]);
     }
 
-    final TIntArrayList initialCompatible = new TIntArrayList();
+    final TIntList initialCompatible = new TIntArrayList();
     getCompatibleFromCache(mInitialCompatibleId, initialCompatible);
 
     //we have the set of compatibles, now we need to construct a new automaton based off them
     //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
     int startStateIndexOffset = 0;
     for (; startStateIndexOffset < reducedSupervisor.length; startStateIndexOffset++) {
-      final TIntSet currentCompatible = reducedSupervisor[startStateIndexOffset];
+      final TIntList currentCompatible = reducedSupervisor[startStateIndexOffset];
       if (currentCompatible.containsAll(initialCompatible)) { break; }
     }
 
@@ -254,7 +254,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     for (int state = 0; state < reducedSupervisor.length; state++) {
       final int compatibleIndex = (state + startStateIndexOffset) % reducedSupervisor.length;
-      final TIntSet compatible = reducedSupervisor[compatibleIndex];
+      final TIntList compatible = reducedSupervisor[compatibleIndex];
 
       //get the union of all events among the compatible's states (from the original automaton definition)
       enabledEvents.clear();
@@ -309,7 +309,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     for (int state = 0; state < reducedSupervisor.length; state++) {
       final int compatibleIndex = (state + startStateIndexOffset) % reducedSupervisor.length;
-      final TIntSet compatible = reducedSupervisor[compatibleIndex];
+      final TIntList compatible = reducedSupervisor[compatibleIndex];
       long newStateMarkings = relation.createMarkings();
 
       for (final TIntIterator stateIterator = compatible.iterator(); stateIterator.hasNext();) {
@@ -323,13 +323,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
 
-  private Collection<TIntArrayList> BronKerbosch(final TIntArrayList clique, final TIntCollection possibleAdditions, final TIntCollection alreadyChecked) {
-    final Collection<TIntArrayList> maximalCliques = new ArrayList<TIntArrayList>();
+  private List<TIntList> BronKerbosch(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked) {
+    final List<TIntList> maximalCliques = new ArrayList<TIntList>();
     BronKerbosch(clique, possibleAdditions, alreadyChecked, maximalCliques);
     return maximalCliques;
   }
 
-  private void BronKerbosch(final TIntArrayList clique, final TIntCollection possibleAdditions, final TIntCollection alreadyChecked, final Collection<TIntArrayList> maximalCliquesToFill) {
+  private void BronKerbosch(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final List<TIntList> maximalCliquesToFill) {
 
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
@@ -346,7 +346,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       newClique.add(candidate);
 
       //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
-      final TIntCollection newPossibleAdditions = new TIntArrayList(possibleAdditions.size());
+      final TIntList newPossibleAdditions = new TIntArrayList(possibleAdditions.size());
       for (final TIntIterator oldAdditionsIterator = possibleAdditions.iterator(); oldAdditionsIterator.hasNext();) {
         final int oldPossibleAddition = oldAdditionsIterator.next();
         if (isNeighbour(candidate, oldPossibleAddition)) {
@@ -354,7 +354,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       }
 
-      final TIntCollection newAlreadyChecked = new TIntArrayList(alreadyChecked.size());
+      final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked.size());
       for (final TIntIterator oldAlreadyCheckedIterator = alreadyChecked.iterator(); oldAlreadyCheckedIterator.hasNext();) {
         final int oldAlreadyChecked  = oldAlreadyCheckedIterator.next();
         if (isNeighbour(candidate, oldAlreadyChecked)) {
@@ -373,13 +373,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private TIntCollection getCoversOf(final TIntArrayList compatible) {
-    final TIntCollection possibleAdditions = new TIntArrayList();
+  private TIntList getCoversOf(final TIntList compatible) {
+    final TIntList possibleAdditions = new TIntArrayList();
     if (compatible.size() > 0) {
 
       //we need to figure out the initial valid set of states that could be included to our compatible
       //at most, our possible additions will be the set of neighbours to the first state in the compatible
-      final TIntCollection neighbours = new TIntArrayList();
+      final TIntList neighbours = new TIntArrayList();
       getNeighboursOf(compatible.get(0), neighbours);
 
       //then we go through each of these neighbours and cull ones that aren't mutually neighbours with the rest
@@ -400,14 +400,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     //actually get the cover compatibles
-    final Collection<TIntArrayList> covers = BronKerbosch(compatible, possibleAdditions, new TIntArrayList());
+    final List<TIntList> covers = BronKerbosch(compatible, possibleAdditions, new TIntArrayList());
 
     //init the list of ints that represent ids in the compatible cache to the actual compatible covers.
-    final TIntCollection compatibleIds = new TIntArrayList(covers.size());
+    final TIntList compatibleIds = new TIntArrayList(covers.size());
 
     //we then need to record each compatible cover we have seen in our cache for future retrieval.
     //to add them to the cache we need to sort the states in each compatible.
-    for (final TIntArrayList compatibleCover : covers) {
+    for (final TIntList compatibleCover : covers) {
       compatibleCover.sort();
       compatibleIds.add(mCompatibleCache.add(compatibleCover));
     }
@@ -422,7 +422,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return !mIncompatibilityRelation[state1][state2] && state1 != state2;
   }
 
-  private void getNeighboursOf(final int state, final TIntCollection neighboursToFill) {
+  private void getNeighboursOf(final int state, final TIntList neighboursToFill) {
     for (int s = 0; s < mNumStates; s++) {
       //if the two states are compatible and not the same state, add to neighbours
       if (isNeighbour(state, s)) {
@@ -431,7 +431,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getSuccessorCompatiblesOf(final TIntArrayList compatible, final TIntCollection successorsToFill) {
+  private void getSuccessorCompatiblesOf(final TIntList compatible, final TIntList successorsToFill) {
     final TIntSet enabledEvents = new TIntHashSet();
     getEnabledEventsOf(compatible, enabledEvents);
 
@@ -459,7 +459,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getEnabledEventsOf(final TIntCollection compatible, final TIntCollection eventSetToFill) {
+  private void getEnabledEventsOf(final TIntList compatible, final TIntSet eventSetToFill) {
     //get the union of enabled events across states in the compatible
     final TIntList successorEvents = new TIntArrayList();
     for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
@@ -667,11 +667,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       final Integer[] compatibleIdBuffer = new Integer[size()];
       this.toArray(compatibleIdBuffer);
-      /*final TIntArrayList[] compatibleBuffer = new TIntArrayList[size()];
-      for (int i = 0; i < compatibleIdBuffer.length; i++) {
-        compatibleBuffer[i] = new TIntArrayList();
-        getCompatibleFromCache(compatibleIdBuffer[i], compatibleBuffer[i]);
-      }*/
       return Arrays.toString(compatibleIdBuffer);
     }
 
