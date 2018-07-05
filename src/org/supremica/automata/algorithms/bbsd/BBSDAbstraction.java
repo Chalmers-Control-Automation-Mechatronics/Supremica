@@ -14,6 +14,8 @@ import org.supremica.automata.State;
 
 public class BBSDAbstraction
 {
+    static final String CYCLE_EVENT = "CYCLE";
+
     // Create a dummy state that is used for local loops
     final State dummy = new State("SelfLoopDummyState");
 
@@ -25,7 +27,10 @@ public class BBSDAbstraction
         return calculateAbstraction(aut, local_events, (Hashtable<State,Integer>)state_labels);
     }
 
-    public Automaton calculateAbstraction(final Automaton aut, final HashSet<LabeledEvent> local_events, final Hashtable<State,Integer> state_labels) {
+    public Automaton calculateAbstraction(final Automaton aut,
+                                          final HashSet<LabeledEvent> local_events,
+                                          final Hashtable<State,Integer> state_labels) {
+        final boolean cycleDetected = detectCycles(aut);
 
         //timer.start();
         //logger.info(" - - -");
@@ -227,9 +232,111 @@ public class BBSDAbstraction
         //logger.info(" - - -");
         //timer.stop();
 
+        // post-process result automaton by renaming 'CYCLE' transition with tau
+        final HashSet<Arc> cycleTransToBeRemoved = new HashSet<>();
+        if (cycleDetected) {
+          for (final Arc arc: aut.iterableArcs()) {
+            if (arc.isSelfLoop() && arc.getEvent().getName().equals(CYCLE_EVENT))
+              cycleTransToBeRemoved.add(arc);
+          }
+          for (final Arc arc: cycleTransToBeRemoved) {
+            aut.removeArc(arc);
+            final State s = arc.getSource();
+            aut.addArc(new Arc(s, s, aut.getAlphabet().getEvent("tau_" + aut.getName())));
+          }
+        }
         return result;
     }
 
+    /*
+     * The private method detects cycles composed only by tau transitions and
+     * adds a self-loop labeled the "CYCLE" event to one state of a cycle;
+     * if such a state already has a self-loop labeled by tau, the method replaces
+     * the tau event with "CYCLE" instead.
+     * */
+    private boolean detectCycles(final Automaton aut) {
+      boolean cycleDetected = false;
+      // collect all transitions that are not labeled by tau event and remove them
+      // the temporarily removed transitions will be added after cycle is detected.
+      final Set<Arc> nonTauTransitions = new HashSet<>();
+      for (final Arc arc : aut.iterableArcs())
+      {
+        final LabeledEvent event = aut.getAlphabet().getEvent(arc.getEvent().getLabel());
+        if (event.getName().startsWith("tau"))
+          continue;
+        nonTauTransitions.add(arc);
+      }
+      for (final Arc arc: nonTauTransitions)
+        aut.removeArc(arc);
+      // Find all cycles for each state. The minimal cycle is used for adding 'CYCLE'
+      // event; the states in the rest of the cycles are stored and there is no need
+      // to detect cycles for them.
+      final HashSet<State> withinCycles = new HashSet<>();
+      for (final State s : aut.iterableStates())
+      {
+        if (withinCycles.contains(s))
+          continue;
+        // run DFS from to find cycles from state s
+        final HashSet<State> visited = new HashSet<>();
+        findCyclesFromStates(s, s, aut, visited);
+        final boolean stateHasCycles = visited.contains(s);
+        if (stateHasCycles) {
+          cycleDetected = true;
+          withinCycles.addAll(visited);
+        }
+        // add self-loop labeled by 'CYCLE' or replace self-loop tau
+        if (stateHasCycles) {
+          Arc statesSelfLoop = null;
+          for (final Arc arc: s.getOutgoingArcs()) {
+            if (arc.getTarget().equals(s)) {
+              statesSelfLoop = arc;
+              break;
+            }
+          }
+          // add 'CYCLE' in the alphabet
+          LabeledEvent cycleEvent = null;
+          if (aut.getAlphabet().contains(CYCLE_EVENT)) {
+            cycleEvent = aut.getAlphabet().getEvent(CYCLE_EVENT);
+          } else {
+            cycleEvent = new LabeledEvent(CYCLE_EVENT);
+            aut.getAlphabet().addEvent(cycleEvent);
+          }
+          if (statesSelfLoop != null) {
+            assert statesSelfLoop.getEvent().getName().startsWith("tau");
+            aut.removeArc(statesSelfLoop);
+          }
+          aut.addArc(new Arc(s, s, cycleEvent));
+        }
+      }
+
+      // bring the transitions labeled by non-tau events back
+      for (final Arc arc: nonTauTransitions) {
+        aut.addArc(arc);
+      }
+      return cycleDetected;
+    }
+
+    /*
+     * The private method runs DFS from state, which initially is the start state,
+     * to find all its cycles.
+     *
+     * Note that if there is no cycle from start, state is not in visited.
+     * */
+    private void findCyclesFromStates(final State start,
+                                         final State state,
+                                         final Automaton aut,
+                                         final HashSet<State> visited) {
+      if (visited.contains(state)) {
+        if (state.equals(start))
+          return;
+      }
+      visited.add(state);
+      for (final Arc arc: state.getOutgoingArcs()) {
+        final State next = arc.getTarget();
+        findCyclesFromStates(start, next, aut, visited);
+      }
+      visited.remove(state);
+    }
 
     /*
      * CONTAINER CLASS FOR TRANSITIONS BETWEEN BLOCKS
