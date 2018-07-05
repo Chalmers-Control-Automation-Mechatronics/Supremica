@@ -730,12 +730,20 @@ public class BDDPartitionSetEve extends BDDPartitionSet
             qualifiedForMarkedComponent = true;
           }
 
+          final HashSet<String> updatedVars = new HashSet<>();
+
           /* Construct the BDD for the edge but exclude the actions. */
           final BDD transitionWithoutActionsOnCurrEdge =
-            getEdgeBDDWithoutActions(anAutomaton, anEdge);
+            getEdgeBDDWithoutActions(anAutomaton, anEdge, updatedVars);
 
           /* Keep track of the updated variable index */
           final TIntHashSet updatedVariableIndexSet = new TIntHashSet();
+
+          for (final String eventName: updatedVars) {
+            final int index = theIndexMap.getVariableIndexByName(eventName);
+            updatedVariableIndexSet.add(index);
+            eventIndex2UpdatedVariables.get(eventIndex).add(eventName);
+          }
 
           List<BinaryExpressionProxy> actions = null;
           final BDD actionsBDD = manager.getOneBDD();
@@ -761,8 +769,9 @@ public class BDDPartitionSetEve extends BDDPartitionSet
 
           /*
            * Now we have, for each edge (1) forward BDD transition without
-           * actions (2) actionsBDD (3) the updated variable set Next, we
-           * merge them together (1) based on the indices of updated
+           * actions (2) actionsBDD (3) the updated variable set.
+           *
+           * Next, we merge them together (1) based on the indices of updated
            * variables, OR with them on the BDD array and return this BDD
            * array (2) Or with transitionBDDWithoutActions with
            * transitionWithoutActionsOnCurrEdge
@@ -784,7 +793,8 @@ public class BDDPartitionSetEve extends BDDPartitionSet
       }
 
       private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton,
-                                           final EdgeProxy anEdge)
+                                           final EdgeProxy anEdge,
+                                           final HashSet<String> updatedVars)
       {
 
         final BDDDomain sourceLocationDomain =
@@ -813,7 +823,7 @@ public class BDDPartitionSetEve extends BDDPartitionSet
         if (guards != null && guards.size() > 0) {
           eventIndex2GuardVariables.get(eventIndex)
             .addAll(extractVariablesFromTheEdge(guards.get(0)));
-          guardBDD = manager.guard2BDD(guards.get(0));
+          guardBDD = manager.guard2BDD(guards.get(0), updatedVars);
         }
 
         /*
