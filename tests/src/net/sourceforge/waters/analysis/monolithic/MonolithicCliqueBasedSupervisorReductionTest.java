@@ -92,12 +92,6 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   }
 
   @Override
-  public void testTrafficlights() throws Exception
-  {
-
-  }
-
-  @Override
   public void testTransferLine2() throws Exception
   {
   }
@@ -108,17 +102,7 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   }
 
   @Override
-  public void test2LinkAltBatch() throws Exception
-  {
-  }
-
-  @Override
   public void testDosingUnit() throws Exception
-  {
-  }
-
-  @Override
-  public void testCell() throws Exception
   {
   }
 
