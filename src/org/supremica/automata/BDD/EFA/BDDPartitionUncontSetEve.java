@@ -335,11 +335,18 @@ public class BDDPartitionUncontSetEve
 
           final EdgeProxy anEdge = edgeIterator.next();
 
+          final HashSet<String> updatedVars = new HashSet<>();
+
           /* Construct the BDD for the edge but exclude the actions. */
           final BDD transitionWithoutActionsOnCurrEdge =
-            getEdgeBDDWithoutActions(automaton, anEdge);
+            getEdgeBDDWithoutActions(automaton, anEdge, updatedVars);
 
           final TIntHashSet updatedVariableIndexSet = new TIntHashSet();
+          for (final String eventName: updatedVars) {
+            final int index = bddExAutomata.theIndexMap
+              .getVariableIndexByName(eventName);
+            updatedVariableIndexSet.add(index);
+          }
 
           List<BinaryExpressionProxy> actions = null;
           final BDD actionsBDD = manager.getOneBDD();
@@ -385,7 +392,8 @@ public class BDDPartitionUncontSetEve
       }
 
       private BDD getEdgeBDDWithoutActions(final ExtendedAutomaton anAutomaton,
-                                           final EdgeProxy anEdge)
+                                           final EdgeProxy anEdge,
+                                           final HashSet<String> updatedVars)
       {
 
         final BDDDomain sourceLocationDomain =
@@ -412,7 +420,7 @@ public class BDDPartitionUncontSetEve
           guards = anEdge.getGuardActionBlock().getGuards();
         }
         if (guards != null && guards.size() > 0) {
-          guardBDD = manager.guard2BDD(guards.get(0));
+          guardBDD = manager.guard2BDD(guards.get(0), updatedVars);
         }
 
         sourceBDD.andWith(destBDD);

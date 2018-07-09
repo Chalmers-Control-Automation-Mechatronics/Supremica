@@ -177,8 +177,13 @@ public abstract class BDDAbstractManager {
     }
 
     public BDD guard2BDD(final SimpleExpressionProxy expr) {
-        final ResultOverflows guardBDD = expr2BDDBitVec(expr, true);
-        return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
+      return guard2BDD(expr, null);
+    }
+
+    public BDD guard2BDD(final SimpleExpressionProxy expr,
+                         final HashSet<String> updatedVars) {
+      final ResultOverflows guardBDD = expr2BDDBitVec(expr, true, updatedVars);
+      return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
     }
 
     public BDD action2BDD(final BinaryExpressionProxy expr)
@@ -230,39 +235,57 @@ public abstract class BDDAbstractManager {
 		}
     }
 
-    ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr, final boolean guardAction) {
+    ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr,
+                                   final boolean guardAction) {
+        return expr2BDDBitVec(expr, guardAction, null);
+    }
+
+    // This method should be implemented using Visitor Pattern.
+    ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr,
+                                   final boolean guardAction,
+                                   final HashSet<String> updatedVariables) {
         if (expr instanceof UnaryExpressionProxy) {
             final UnaryExpressionProxy unExpr = (UnaryExpressionProxy) expr;
             if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNotOperator())) {
-                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true);
+                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true, updatedVariables);
                 final SupremicaBDDBitVector tmp = ro.getResult().copy();
                 tmp.setBit(0, tmp.getBit(0).not());
                 return new ResultOverflows(tmp, ro.getOverflows());
-            } else if (((UnaryExpressionProxy) expr).getOperator().equals(CompilerOperatorTable.getInstance().getUnaryMinusOperator())) {
-                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true);
+            } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getUnaryMinusOperator())) {
+                final ResultOverflows ro = expr2BDDBitVec(unExpr.getSubTerm(), true, updatedVariables);
                 return new ResultOverflows(((TCSupremicaBDDBitVector) ro.getResult()).toTwosComplement(), ro.getOverflows());
-            } else {
+            } else if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNextOperator())) {
+                final String primedVarName = unExpr.getSubTerm().toString();
+                if (updatedVariables != null) {
+                  updatedVariables.add(primedVarName);
+                }
+                final Map<String, Integer> varToIndexMap = bddExAutomata.theIndexMap.variableStringToIndexMap;
+                final Integer index = varToIndexMap.get(primedVarName);
+                final SupremicaBDDBitVector leftSide = bddExAutomata.getBDDBitVecTarget(index);
+                return new ResultOverflows(leftSide, getZeroBDD());
+            }
+            else {
                 throw new IllegalArgumentException("Type of operator not known!");
             }
         } else if (expr instanceof BinaryExpressionProxy) {
             final BinaryExpressionProxy bexpr = (BinaryExpressionProxy) expr;
             if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getAndOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), true);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), true);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), true, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), true, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 final SupremicaBDDBitVector rightGuard = roRight.getResult();
                 tmp.setBit(0, tmp.getBit(0).and(rightGuard.getBit(0)));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getOrOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), true);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), true);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), true, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), true, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 final SupremicaBDDBitVector rightGuard = roRight.getResult();
                 tmp.setBit(0, tmp.getBit(0).or(rightGuard.getBit(0)));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getModuloOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector v2 = roRight.getResult();
                 if (v2.isConst()) {
                     return new ResultOverflows(roLeft.getResult().divmod(v2.val(), false), roLeft.getOverflows().or(roRight.getOverflows()));
@@ -270,13 +293,13 @@ public abstract class BDDAbstractManager {
                     throw new IllegalArgumentException("Divisor is not constant");
                 }
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getMinusOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final ResultOverflows ro = roLeft.getResult().subConsideringOverflows(roRight.getResult());
                 return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getPlusOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final ResultOverflows ro = roLeft.getResult().addConsideringOverflows(roRight.getResult());
                 return new ResultOverflows(ro.getResult(), ro.getOverflows().or(roLeft.getOverflows().or(roRight.getOverflows())));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getEqualsOperator())) {
@@ -291,11 +314,12 @@ public abstract class BDDAbstractManager {
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName));
                     tmp.setBit(0, locBDD);
-                } else {
+                }
+                else {
                     final SimpleExpressionProxy left = bexpr.getLeft();
                     final SimpleExpressionProxy right = bexpr.getRight();
                     final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
-                    final ResultOverflows roLeft = expr2BDDBitVec(left, false);
+                    final ResultOverflows roLeft = expr2BDDBitVec(left, false, updatedVariables);
                     ResultOverflows roRight = null;
                     if (nonIntegerVarNameSet.contains(left.toString()) &&
                         !nonIntegerVarNameSet.contains(right.toString())) {
@@ -303,9 +327,9 @@ public abstract class BDDAbstractManager {
                         bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
                       final IntConstantProxy mappedIntProxy =
                         new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
-                      roRight = expr2BDDBitVec(mappedIntProxy, false);
+                      roRight = expr2BDDBitVec(mappedIntProxy, false, updatedVariables);
                     } else {
-                      roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                      roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                     }
                     tmp = roLeft.getResult().copy();
                     tmp.setBit(0, tmp.equ(roRight.getResult()));
@@ -329,7 +353,7 @@ public abstract class BDDAbstractManager {
                     final SimpleExpressionProxy left = bexpr.getLeft();
                     final SimpleExpressionProxy right = bexpr.getRight();
                     final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
-                    final ResultOverflows roLeft = expr2BDDBitVec(left, false);
+                    final ResultOverflows roLeft = expr2BDDBitVec(left, false, updatedVariables);
                     ResultOverflows roRight = null;
                     if (nonIntegerVarNameSet.contains(left.toString()) &&
                         !nonIntegerVarNameSet.contains(right.toString())) {
@@ -337,9 +361,9 @@ public abstract class BDDAbstractManager {
                         bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
                       final IntConstantProxy mappedIntProxy =
                         new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
-                      roRight = expr2BDDBitVec(mappedIntProxy, false);
+                      roRight = expr2BDDBitVec(mappedIntProxy, false, updatedVariables);
                     } else {
-                      roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                      roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                     }
                     tmp = roLeft.getResult().copy();
                     tmp.setBit(0, tmp.neq(roRight.getResult()));
@@ -348,40 +372,40 @@ public abstract class BDDAbstractManager {
                 }
                 return new ResultOverflows(tmp, leftOverflows.or(rightOverflows));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getGreaterThanOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 tmp.setBit(0, tmp.gth(roRight.getResult()));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getGreaterEqualsOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 tmp.setBit(0, tmp.gte(roRight.getResult()));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getLessThanOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 tmp.setBit(0, tmp.lth(roRight.getResult()));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getLessEqualsOperator())) {
-                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false);
-                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false);
+                final ResultOverflows roLeft = expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables);
+                final ResultOverflows roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
                 final SupremicaBDDBitVector tmp = roLeft.getResult().copy();
                 tmp.setBit(0, tmp.lte(roRight.getResult()));
                 return new ResultOverflows(tmp, roLeft.getOverflows().or(roRight.getOverflows()));
             } else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getDivideOperator())) {
-                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false).getResult().copy();
+                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables).getResult().copy();
                 if (v2.isConst()) {
-                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false).getResult().divmod(v2.val(), true), getZeroBDD());
+                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult().divmod(v2.val(), true), getZeroBDD());
                 } else {
                     throw new IllegalArgumentException("Divisor is not constant!");
                 }
             }else if (bexpr.getOperator().equals(CompilerOperatorTable.getInstance().getTimesOperator())) {
-                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false).getResult().copy();
+                final SupremicaBDDBitVector v2 = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables).getResult().copy();
                 if (v2.isConst()) {
-                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false).getResult().mulfixed(v2.val()), getZeroBDD());
+                    return new ResultOverflows(expr2BDDBitVec(bexpr.getLeft(), false, updatedVariables).getResult().mulfixed(v2.val()), getZeroBDD());
                 } else {
                     throw new IllegalArgumentException("Factor is not constant!");
                 }
@@ -475,10 +499,14 @@ public abstract class BDDAbstractManager {
 
         sourceBDD = sourceBDD.and(destBDD);
 
+        // keep track of variables that are updated either by actions or
+        // the next operator appearing in guards
+        final HashSet<String> updatedVars = new HashSet<String>();
+
         BDD guardBDD = factory.one();
         if (guards != null && guards.size() > 0) {
             //Only the first guard should be considered. If there are more, it will just affect the GUI.
-            guardBDD = guard2BDD(guards.get(0));
+            guardBDD = guard2BDD(guards.get(0), updatedVars);
         }
 
         //Add guard to event and source and dest state
@@ -496,8 +524,6 @@ public abstract class BDDAbstractManager {
         }
 
         forwardEdgesWithoutDestBDD.orWith(sourceEventBDD.and(guardBDD));
-
-        final HashSet<String> updatedVars = new HashSet<String>();
 
         BDD actionBDD = factory.one();
         if (actions != null) {

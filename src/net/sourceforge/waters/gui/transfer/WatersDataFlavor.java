@@ -46,6 +46,7 @@ import java.util.Set;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
@@ -341,6 +342,17 @@ public abstract class WatersDataFlavor extends DataFlavor
    * @see ComponentDataFlavor
    */
   public static final WatersDataFlavor COMPONENT = new ComponentDataFlavor();
+
+  /**
+   * The data flavour for a list of automaton proxy. It is implemented as a
+   * {@link ProxyTransferable} and contains a list of objects of type
+   * {@link AutomatonProxy} and possibly
+   * {@link SimpleComponentProxy}. The event declarations are added to facilitate
+   * copying and pasting of automata between modules together with their
+   * events.
+   * @see AutomatonDataFlavor
+   */
+  public static final WatersDataFlavor AUTOMATON = new AutomatonDataFlavor();
 
   /**
    * The data flavour for a list of constant aliases, as contained in the

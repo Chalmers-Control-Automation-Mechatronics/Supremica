@@ -35,8 +35,7 @@ package net.sourceforge.waters.analysis.diagnosis;
 
 import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntLongHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -60,6 +59,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
+
+  //#################################################
  * @author Nicholas McGrath
  */
 public class MonolithicDiagnosabilityVerifier
@@ -87,7 +88,6 @@ public class MonolithicDiagnosabilityVerifier
     super(model, factory, translator);
   }
 
-
   //#########################################################################
   //# Configuration
   @Override
@@ -101,14 +101,6 @@ public class MonolithicDiagnosabilityVerifier
     return false;
   }
 
-  @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    super.setUp();
-  }
-
-
   //#########################################################################
   //# Invocation
   @Override
@@ -116,7 +108,6 @@ public class MonolithicDiagnosabilityVerifier
   {
     try {
       setUp();
-
       final TRSynchronousProductBuilder spBuilder = new TRSynchronousProductBuilder(getModel());
       spBuilder.run();
       final TRSynchronousProductResult spResult = spBuilder.getAnalysisResult();
@@ -126,26 +117,25 @@ public class MonolithicDiagnosabilityVerifier
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
       final int numEvents = spEvents.getNumberOfProperEvents();
-      eventObservability = new boolean[numEvents];
+      eventObservable = new boolean[numEvents];
+      eventFaultClass = new String[numEvents];
       final THashSet<String> faultClasses = new THashSet<String>();
-      String value;
+      String faultLabel;
       Map<String,String> attrib;
       EventProxy event;
       for(int i= EventEncoding.NONTAU; i<numEvents; i++){
         event = spEvents.getProperEvent(i);
         if(event!=null) {
           attrib = event.getAttributes();
-          value = attrib.get(DiagnosabilityAttributeFactory.FAULT_KEY);
-          if(value!=null) {
-            faultClassMap.put(i,value);
-            if(!faultClasses.contains(value)) {
-              faultClasses.add(value);
-            }
+          faultLabel = attrib.get(DiagnosabilityAttributeFactory.FAULT_KEY);
+          if(faultLabel!=null) {
+            faultClasses.add(faultLabel);
           }
+          eventFaultClass[i] = faultLabel;
           if(event.isObservable()) {
-            eventObservability[i] = true;
+            eventObservable[i] = true;
           }else {
-            eventObservability[i] = false;
+            eventObservable[i] = false;
           }
         }
       }
@@ -157,48 +147,29 @@ public class MonolithicDiagnosabilityVerifier
           faultClass = faultClassIter.next();
           compStack.clear();
           contStack.clear();
-          lowlink.clear();
-          dfs.clear();
-          mode.clear();
+          link.clear();
           stateIndexMap.clear();
           indexStateMap.clear();
           stateCount = 0;
           stateIndexMap.put(verifierInitState,stateCount);
-          indexStateMap.put(stateCount, verifierInitState);
+          indexStateMap.add(verifierInitState);
           stateCount++;
-          mode.add(1);
-          dfs.add(0);
-          lowlink.add(2);
-          contStack.add(0);
-          contStack.add(0);
-          contStack.add(0);
-          contStack.add(0);
-          contStackTop = 2;
+          contStack.push(0,0);
 
-          while(contStackTop!=0) {
-            final int i = contStack.get(contStackTop);
-            final int p = contStack.get(contStackTop+1);
-            if(mode.get(i) == 1) {
-              mode.set(i, 2);
+          while(!contStack.isEmpty()) {
+            final int i = contStack.getTopIndex();
+            final int p = contStack.getTopParent();
+            if(!contStack.isTopExpanded()) {
               expand(i);
-            }else if(mode.get(i) == 2) {
-              contStackTop-=2;
-              while(contStack.get(contStackTop)==-1) {
-                contStackTop-=2;
-              }
+            }else{
+              contStack.pop();
               if(!close(i,p)) {
                 return setFailedResult(null);
-              }
-            }else if(mode.get(i)== 3) {
-              contStackTop-=2;
-              while(contStack.get(contStackTop)==-1) {
-                contStackTop-=2;
               }
             }
           }
         }
       }
-
     } catch (final OverflowException overflow) {
       throw setExceptionResult(overflow);
     } catch (final AnalysisException exception) {
@@ -206,7 +177,7 @@ public class MonolithicDiagnosabilityVerifier
     } finally {
       tearDown();
     }
-    return setSatisfiedResult();  // diagnosable
+    return setSatisfiedResult();
   }
 
 
@@ -216,20 +187,19 @@ public class MonolithicDiagnosabilityVerifier
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
-    dfs.set(index, compStack.size());
-    lowlink.set(index, compStack.size());
+    contStack.setTopIndex(compStack.size()|Msb1);
+    link.set(index, (compStack.size()|Msb1));
     compStack.add(index);
     if(a>=0||b>=0) {
       iterA.resetState(a&MsbMask);
-      int e;
+      int event;
       int targetA, targetB;
       int newA, newB;
       while(iterA.advance()) {
-        e = iterA.getCurrentEvent();
+        event = iterA.getCurrentEvent();
         targetA = iterA.getCurrentTargetState();
-        //if unobservable
-        if(!eventObservability[e]) {
-          if(faultClass.equals(faultClassMap.get(e))) {
+        if(!eventObservable[event]) {
+          if(faultClass.equals(eventFaultClass[event])) {
             newA = targetA|Msb1;
             newB = b;
           }else {
@@ -237,12 +207,11 @@ public class MonolithicDiagnosabilityVerifier
             newB = b;
           }
           newState(newA,newB,index);
-        //if observable
         }else {
-          iterB.reset((b&MsbMask),e);
+          iterB.reset((b&MsbMask),event);
           while(iterB.advance()) {
             targetB = iterB.getCurrentTargetState();
-            if(faultClass.equals(faultClassMap.get(e))) {
+            if(faultClass.equals(eventFaultClass[event])) {
               newA = targetA|Msb1;
               newB = targetB|Msb1;
             }else {
@@ -252,15 +221,13 @@ public class MonolithicDiagnosabilityVerifier
             newState(newA,newB,index);
           }
         }
-
       }
       iterA.resetState(b&MsbMask);
       while(iterA.advance()) {
-        e = iterA.getCurrentEvent();
+        event = iterA.getCurrentEvent();
         targetB = iterA.getCurrentTargetState();
-        //if unobservable
-        if(!eventObservability[e]) {
-          if(faultClass.equals(faultClassMap.get(e))) {
+        if(!eventObservable[event]) {
+          if(faultClass.equals(eventFaultClass[event])) {
             newA = a;
             newB = targetB|Msb1;
           }else {
@@ -273,70 +240,47 @@ public class MonolithicDiagnosabilityVerifier
     }
   }
 
-
-
   private void newState(final int a, final int b, final int parentIndex)
     throws OverflowException
   {
-
     long next;
     if(a > b) {
-      next = (((long)a)<<32) | (b&0xffffffffL);
+      next = (((long)a)<<32)|(b&0xffffffffL);
     }else {
-      next = (((long)a)<<32) | (b&0xffffffffL);
+      next = (((long)a)<<32)|(b&0xffffffffL);
     }
     int index = stateIndexMap.get(next);
     if(!stateIndexMap.containsKey(next)) {
       stateIndexMap.put(next, stateCount);
-      indexStateMap.put(stateCount, next);
+      indexStateMap.add(next);
       index = stateCount;
       stateCount++;
       if(stateCount >= getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
       }
-      contStackTop+=2;
-      if(contStackTop==contStack.size()) {
-        contStack.add(index);
-        contStack.add(parentIndex);
-      }else {
-        contStack.set(contStackTop, index);
-        contStack.set(contStackTop+1,parentIndex);
-      }
-
-      lowlink.add(contStackTop);
-      dfs.add(0);
-      mode.add(1);
-
-    }else if(mode.get(index) == 1){
-      contStack.set(lowlink.get(index), -1);
-      contStackTop+=2;
-      if(contStackTop==contStack.size()) {
-        contStack.add(index);
-        contStack.add(parentIndex);
-      }else {
-        contStack.set(contStackTop, index);
-        contStack.set(contStackTop+1,parentIndex);
-      }
-      lowlink.set(index, contStackTop);
-    }else if(mode.get(index) == 2) {
-      lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex), lowlink.get(index)));
+      contStack.push(index, parentIndex);
+    }else if((link.get(index)&Msb1)==0){
+      contStack.moveToTop(link.get(index));
+    }else if(link.get(index)!=-1) {
+      int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
+      newParentLink |= (link.get(parentIndex)&Msb1);
+      link.set(parentIndex, newParentLink);
     }
   }
 
-
-
-  private boolean close(final int index, final int parentIndex) {
+  private boolean close(final int dfsIndex, final int parentIndex) {
+    final int index = compStack.get(dfsIndex);
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
 
-    if(lowlink.get(index)==dfs.get(index)) {
+    if((link.get(index)&MsbMask)==dfsIndex) {
       int j = compStack.removeAt(compStack.size()-1);
-      mode.set(j, 3);
+      link.set(j, -1);
       if(j!=index) {
         do {
           j = compStack.removeAt(compStack.size()-1);
-          mode.set(j, 3);
+          link.set(j, -1);
         }while(j!=index);
         if((a&Msb1)==(b&Msb1)) {
           return true;
@@ -347,15 +291,15 @@ public class MonolithicDiagnosabilityVerifier
         if((a&Msb1)==(b&Msb1)) {
           return true;
         }else {
-          int e;
+          int event;
           iterA.resetState(a&MsbMask);
           while(iterA.advance()) {
             if(iterA.getCurrentTargetState()==(a&MsbMask)) {
-              e = iterA.getCurrentEvent();
-              if(!eventObservability[e]) {
+              event = iterA.getCurrentEvent();
+              if(!eventObservable[event]) {
                 return false;
               }else {
-                iterB.reset((b&MsbMask),e);
+                iterB.reset((b&MsbMask),event);
                 while(iterB.advance()) {
                   if(iterB.getCurrentTargetState()==(b&MsbMask)) {
                     return false;
@@ -367,8 +311,8 @@ public class MonolithicDiagnosabilityVerifier
           iterB.resetState(b&MsbMask);
           while(iterB.advance()) {
             if(iterB.getCurrentTargetState()==(b&MsbMask)) {
-              e = iterB.getCurrentEvent();
-              if(!eventObservability[e]) {
+              event = iterB.getCurrentEvent();
+              if(!eventObservable[event]) {
                 return false;
               }
             }
@@ -376,7 +320,9 @@ public class MonolithicDiagnosabilityVerifier
         }
       }
     }else {
-      lowlink.set(parentIndex, Math.min(lowlink.get(parentIndex), lowlink.get(index)));
+      int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
+      newParentLink |= (link.get(parentIndex)&Msb1);
+      link.set(parentIndex, newParentLink);
     }
     return true;
   }
@@ -384,16 +330,13 @@ public class MonolithicDiagnosabilityVerifier
 
   //#########################################################################
   //# Instance Variables
-  private boolean[] eventObservability;
-  private final TIntObjectHashMap<String> faultClassMap = new TIntObjectHashMap<String>();
+  private boolean[] eventObservable;
+  private String[] eventFaultClass;
   private final TLongIntHashMap stateIndexMap = new TLongIntHashMap();
-  private final TIntLongHashMap indexStateMap = new TIntLongHashMap();
+  private final TLongArrayList indexStateMap = new TLongArrayList();
+  private final ControllStack contStack = new ControllStack();
   private final TIntArrayList compStack = new TIntArrayList();
-  private final TIntArrayList contStack = new TIntArrayList();
-  private final TIntArrayList lowlink = new TIntArrayList();
-  private final TIntArrayList dfs = new TIntArrayList();
-  private final TIntArrayList mode = new TIntArrayList();
-  private int contStackTop;
+  private final TIntArrayList link = new TIntArrayList();
   private int stateCount = 0;
   private String faultClass;
   private TransitionIterator iterA;
@@ -404,32 +347,86 @@ public class MonolithicDiagnosabilityVerifier
   //# Constants
   final int Msb1 = -2147483648;
   final int MsbMask = 2147483647;
+  final int OPEN = 1;
+  final int EXPANDED = 2;
+  final int CLOSED = 3;
 
+  //#########################################################################
+  //# Inner Class ControllStack
+  @SuppressWarnings("unused")
+  private class ControllStack{
+
+    private final TIntArrayList stack;
+    private final TIntArrayList freeNodes;
+    private int top;
+
+    public ControllStack(){
+      top = -1;
+      stack = new TIntArrayList();
+      freeNodes = new TIntArrayList();
+    }
+
+    public void push(final int index, final int parent) {
+      if(freeNodes.isEmpty()) {
+        final int newTop = stack.size();
+        stack.add(index);
+        stack.add(parent);
+        stack.add(top);
+        top = newTop;
+      }else {
+        final int newTop = freeNodes.get(freeNodes.size()-1);
+        freeNodes.removeAt(freeNodes.size()-1);
+        stack.set(newTop, index);
+        stack.set(newTop+1, parent);
+        stack.set(newTop+2, top);
+        top = newTop;
+      }
+      if(freeNodes.isEmpty()) {
+        link.add(stack.size());
+      }else {
+        link.add(freeNodes.get(freeNodes.size()-1));
+      }
+    }
+
+    public void pop() {
+      final int oldTop = top;
+      freeNodes.add(oldTop);
+      top = stack.get(oldTop+2);
+      stack.set(oldTop+2, -1);
+    }
+
+    public void moveToTop(final int nextIndex) {
+      if(nextIndex!=stack.size()) {
+        final int index = stack.get(nextIndex+2);
+        if(index!=-1) {
+          final int prevIndex = stack.get(index+2);
+          stack.set(nextIndex+2, prevIndex);
+          stack.set(index+2, top);
+          top = index;
+          if(freeNodes.isEmpty()) {
+            link.set(index, stack.size());
+          }else {
+            link.set(index, freeNodes.get(freeNodes.size()-1));
+          }
+        }
+      }
+    }
+
+    public void clear() {
+      stack.clear();
+      freeNodes.clear();
+      top = -1;
+    }
+
+    public int getTopIndex() { return (stack.get(top)&MsbMask); }
+
+    public int getTopParent() { return stack.get(top+1); }
+
+    public void setTopIndex(final int entry1) { stack.set(top, entry1); }
+
+    public boolean isEmpty() { return (top==-1)?true:false; }
+
+    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0)?true:false;}
+
+  }
 }
-
-//code to print out verifier transitions
-
-//boolean caf = false;
-//boolean cbf = false;
-//boolean naf = false;
-//boolean nbf = false;
-//int na = (int)(next>>>32);
-//int nb = (int)next;
-//if((a&Msb1) == Msb1) {
-//  caf = true;
-//}
-//if((b&Msb1) == Msb1) {
-//  cbf = true;
-//}
-//if((na&Msb1) == Msb1) {
-//  naf = true;
-//}
-//if((nb&Msb1) == Msb1) {
-//  nbf = true;
-//}
-//final int ca = a&MsbMask;
-//final int cb = b&MsbMask;
-//na &=MsbMask;
-//nb &=MsbMask;
-//
-//System.out.println("("+ca+" "+caf+", "+cb+" "+cbf+") to ("+na+" "+naf+", "+nb+" "+nbf+")");

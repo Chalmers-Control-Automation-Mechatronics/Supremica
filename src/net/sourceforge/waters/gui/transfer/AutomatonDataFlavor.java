@@ -39,6 +39,7 @@ import java.util.List;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -55,11 +56,10 @@ public class AutomatonDataFlavor extends WatersDataFlavor
 
   //#########################################################################
   //# Constructor
-  AutomatonDataFlavor(final Class<? extends Proxy> clazz)
+  AutomatonDataFlavor()
   {
-    super(clazz);
+    super(AutomatonProxy.class);
   }
-
 
   //#########################################################################
   //# Importing and Exporting Data
@@ -67,6 +67,10 @@ public class AutomatonDataFlavor extends WatersDataFlavor
   List<Proxy> createExportData(final Collection<? extends Proxy> data,
                                final ModuleContext context)
   {
+    // TODO Use ProductDESElementFactory.getInstance()
+    //final ProductDESProxyFactory factory = factory;
+    //final AutomataCloner cloner = new AutomataCloner();
+    //return cloner.getClonedList(data);
     final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
     return cloner.getClonedList(data);
   }
@@ -74,6 +78,7 @@ public class AutomatonDataFlavor extends WatersDataFlavor
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
+    // TODO ditto
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final ProxyCloner cloner = factory.getCloner();
     return cloner.getClonedList(data);

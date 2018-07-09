@@ -72,6 +72,8 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -182,6 +184,7 @@ class AutomataTable extends JTable implements SelectionOwner
 
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
+    // TODO Remove this method (for now)
     /*
      * final AutomataTableModel model = getModel(); if (proxy instanceof
      * IdentifierSubject) { final IdentifierSubject ident =
@@ -192,6 +195,304 @@ class AutomataTable extends JTable implements SelectionOwner
      * return model.containsEqualIdentifier(ident); } else { return false; }
      */
     return false;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourcefore.waters.gui.observer.subject
+  @Override
+  public void attach(final Observer observer)
+  {
+    if (mObservers == null) {
+      mObservers = new LinkedList<Observer>();
+    }
+    mObservers.add(observer);
+  }
+
+  @Override
+  public void detach(final Observer observer)
+  {
+    if (mObservers != null) {
+      mObservers.remove(observer);
+      if (mObservers.isEmpty()) {
+        mObservers = null;
+      }
+    }
+  }
+
+  @Override
+  public void fireEditorChangedEvent(final EditorChangedEvent event)
+  {
+    if (mObservers != null) {
+      final List<Observer> copy = new ArrayList<Observer>(mObservers);
+      for (final Observer observer : copy) {
+        observer.update(event);
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
+  @Override
+  public UndoInterface getUndoInterface(final Action action)
+  {
+    // NOT using editor's undo queue. May include separate queue for
+    // analyser later, or simply do not support undo in analyser.
+    return null;
+  }
+
+  @Override
+  public boolean hasNonEmptySelection()
+  {
+    return getSelectedRow() >= 0;
+  }
+
+  @Override
+  public boolean canSelectMore()
+  {
+    return getSelectedRowCount() < getRowCount();
+  }
+
+  @Override
+  public boolean isSelected(final Proxy proxy)
+  {
+    if (proxy instanceof AutomatonProxy) {
+      final AutomatonProxy aut = (AutomatonProxy) proxy;
+      final AutomataTableModel model = getModel();
+      return this.isRowSelected(model.getIndex(aut));
+    }
+    return false;
+  }
+
+  @Override
+  public List<AutomatonProxy> getCurrentSelection()
+  {
+    final AutomataTableModel model = getModel();
+    final List<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
+    for (final int i : this.getSelectedRows()) {
+      output.add(model.getAutomaton(i));
+    }
+    return output;
+  }
+
+  @Override
+  public List<AutomatonProxy> getAllSelectableItems()
+  {
+    final AutomataTableModel model = getModel();
+    return model.getAutomatonList();
+  }
+
+  @Override
+  public AutomatonProxy getSelectionAnchor()
+  {
+    final AutomataTableModel model = getModel();
+    if (this.getSelectedRow() != -1)
+      return model.getAutomaton(this.getSelectedRow());
+    else
+      return null;
+  }
+
+  @Override
+  public Proxy getSelectableAncestor(final Proxy item)
+  {
+    return item;
+  }
+
+  @Override
+  public void clearSelection(final boolean propagate)
+  {
+    clearSelection();
+  }
+
+  @Override
+  public void replaceSelection(final List<? extends Proxy> items)
+  {
+    clearSelection();
+    addToSelection(items);
+  }
+
+  @Override
+  public void addToSelection(final List<? extends Proxy> items)
+  {
+    final AutomataTableModel model = getModel();
+    final List<Integer> autList = new ArrayList<Integer>();
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        autList.add(model.getIndex((AutomatonProxy) p));
+      }
+    }
+
+    Collections.sort(autList);
+
+    int start = -1;
+    int end = -1;
+    for (final int i : autList) {
+      final int position = i;
+      if (start == -1) {
+        start = end = position;
+      } else if (position > (end + 1)) {
+        addRowSelectionInterval(start, end);
+        start = end = position;
+      } else {
+        end = position;
+      }
+    }
+    addRowSelectionInterval(start, end);
+  }
+
+  @Override
+  public void removeFromSelection(final List<? extends Proxy> items)
+  {
+    final AutomataTableModel model = getModel();
+    final List<Integer> autList = new ArrayList<Integer>();
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        autList.add(model.getIndex((AutomatonProxy) p));
+      }
+    }
+
+    Collections.sort(autList);
+
+    int start = -1;
+    int end = -1;
+    for (final int i : autList) {
+      final int position = i;
+      if (start == -1) {
+        start = end = position;
+      } else if (position > (end + 1)) {
+        removeRowSelectionInterval(start, end);
+        start = end = position;
+      } else {
+        end = position;
+      }
+    }
+    removeRowSelectionInterval(start, end);
+  }
+
+  @Override
+  public boolean canPaste(final Transferable transferable)
+  {
+    // TODO Can paste if automaton flavour supported
+    try {
+      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+        @SuppressWarnings("unchecked")
+        final List<Proxy> data = (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
+        for (final Proxy proxy : data) {
+          if (!containsEqualIdentifier(proxy)) {
+            return true;
+          }
+        }
+        return false;
+      } else {
+        return false;
+      }
+    } catch (final IOException exception) {
+      throw new WatersRuntimeException(exception);
+    } catch (final UnsupportedFlavorException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  @Override
+  public List<InsertInfo> getInsertInfo(final Transferable transferable)
+    throws IOException, UnsupportedFlavorException
+  {
+    // TODO Must also implement AutomatonDataFlavor and DataFlavorVisitor ...
+    final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
+      // TODO Use event map from table model
+      final ModuleProxyCloner cloner =
+        ModuleSubjectFactory.getCloningInstance();
+      @SuppressWarnings("unchecked")
+      // TODO Use the correct flavour
+      final List<Proxy> data =
+        (List<Proxy>) transferable
+          .getTransferData(WatersDataFlavor.IDENTIFIER);
+      for (final Proxy proxy : data) {
+        // TODO Always insert, do not check identifier
+        if (!containsEqualIdentifier(proxy)) {
+          final Proxy cloned = cloner.getClone(proxy);
+          final InsertInfo insert = new InsertInfo(cloned);
+          inserts.add(insert);
+        }
+      }
+    } else {
+      throw new UnsupportedFlavorException(null);
+    }
+    return inserts;
+  }
+
+  @Override
+  public boolean canDelete(final List<? extends Proxy> items)
+  {
+    final AutomataTableModel model = getModel();
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        if ((model.getIndex(aut) != -1))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
+  {
+    final List<InsertInfo> infoList = new ArrayList<InsertInfo>(items.size());
+    for (final Proxy p : items)
+      infoList.add(new InsertInfo(p));
+    return infoList;
+  }
+
+  @Override
+  public void insertItems(final List<InsertInfo> inserts)
+  {
+    // TODO Auto-generated method stub
+  }
+
+  @Override
+  public void deleteItems(final List<InsertInfo> deletes)
+  {
+    final List<Integer> deleteIndexList = new ArrayList<Integer>();
+    final AutomataTableModel model = getModel();
+    for (final InsertInfo info : deletes) {
+      final Proxy proxy = info.getProxy();
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        deleteIndexList.add(model.getIndex(aut));
+      }
+    }
+    model.deleteRows(deleteIndexList);
+  }
+
+  @Override
+  public void scrollToVisible(final List<? extends Proxy> items)
+  {
+    for (final Proxy p : items) {
+      if (p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
+        final AutomataTableModel model = getModel();
+        this.scrollRectToVisible(this.getCellRect(model.getIndex(aut), 0,
+                                                  true));
+        break;
+      }
+    }
+  }
+
+  @Override
+  public void activate()
+  {
+    requestFocusInWindow();
+  }
+
+  @Override
+  public void close()
+  {
+    final AutomataTableModel model = getModel();
+    model.Close();
   }
 
 
@@ -280,293 +581,13 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
-  //#########################################################################
-  //# Interface net.sourcefore.waters.gui.observer.subject
-  @Override
-  public void attach(final Observer observer)
-  {
-    if (mObservers == null) {
-      mObservers = new LinkedList<Observer>();
-    }
-    mObservers.add(observer);
-  }
-
-  @Override
-  public void detach(final Observer observer)
-  {
-    if (mObservers != null) {
-      mObservers.remove(observer);
-      if (mObservers.isEmpty()) {
-        mObservers = null;
-      }
-    }
-  }
-
-  @Override
-  public void fireEditorChangedEvent(final EditorChangedEvent event)
-  {
-    if (mObservers != null) {
-      final List<Observer> copy = new ArrayList<Observer>(mObservers);
-      for (final Observer observer : copy) {
-        observer.update(event);
-      }
-    }
-  }
-
-  //#########################################################################
-  //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
-  @Override
-  public UndoInterface getUndoInterface(final Action action)
-  {
-    // NOT using editor's undo queue. May include separate queue for
-    // analyser later, or simply do not support undo in analyser.
-    return null;
-  }
-
-  @Override
-  public boolean hasNonEmptySelection()
-  {
-    return getSelectedRow() >= 0;
-  }
-
-  @Override
-  public boolean canSelectMore()
-  {
-    return getSelectedRowCount() < getRowCount();
-  }
-
-  @Override
-  public boolean isSelected(final Proxy proxy)
-  {
-    if (proxy instanceof AutomatonProxy) {
-      final AutomatonProxy aut = (AutomatonProxy) proxy;
-      final AutomataTableModel model = getModel();
-      return this.isRowSelected(model.getIndex(aut));
-    }
-    return false;
-  }
-
-  @Override
-  public List<AutomatonProxy> getCurrentSelection()
-  {
-    final AutomataTableModel model = getModel();
-    final List<AutomatonProxy> output = new ArrayList<AutomatonProxy>();
-    for (final int i : this.getSelectedRows()) {
-      output.add(model.getAutomaton(i));
-    }
-    return output;
-  }
-
-  @Override
-  public List<AutomatonProxy> getAllSelectableItems()
-  {
-    final AutomataTableModel model = getModel();
-    return model.getAutomatonList();
-  }
-
-  @Override
-  public AutomatonProxy getSelectionAnchor()
-  {
-    final AutomataTableModel model = getModel();
-    if (this.getSelectedRow() != -1)
-      return model.getAutomaton(this.getSelectedRow());
-    else
-      return null;
-  }
-
-  @Override
-  public Proxy getSelectableAncestor(final Proxy item)
-  {
-    return item;
-  }
-
-  @Override
-  public void clearSelection(final boolean propagate)
-  {
-    clearSelection();
-  }
-
-  @Override
-  public void replaceSelection(final List<? extends Proxy> items)
-  {
-    clearSelection();
-    addToSelection(items);
-  }
-
-  @Override
-  public void addToSelection(final List<? extends Proxy> items)
-  {
-    // TODO This assumes that the automata are sorted alphabetically in
-    // the table, which may be false after implementing sorting through the
-    // table headers. For a more general solution, change autList to a list
-    // of indices (can use TIntArrayList).
-
-    final AutomataTableModel model = getModel();
-    final List<Integer> autList = new ArrayList<Integer>();
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        autList.add(model.getIndex((AutomatonProxy) p));
-      }
-    }
-
-    Collections.sort(autList);
-
-    int start = -1;
-    int end = -1;
-    for (final int i : autList) {
-      final int position = i;
-      if (start == -1) {
-        start = end = position;
-      } else if (position > (end + 1)) {
-        addRowSelectionInterval(start, end);
-        start = end = position;
-      } else {
-        end = position;
-      }
-    }
-    addRowSelectionInterval(start, end);
-  }
-
-  @Override
-  public void removeFromSelection(final List<? extends Proxy> items)
-  {
-    final AutomataTableModel model = getModel();
-    final List<Integer> autList = new ArrayList<Integer>();
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        autList.add(model.getIndex((AutomatonProxy) p));
-      }
-    }
-
-    Collections.sort(autList);
-
-    int start = -1;
-    int end = -1;
-    for (final int i : autList) {
-      final int position = i;
-      if (start == -1) {
-        start = end = position;
-      } else if (position > (end + 1)) {
-        removeRowSelectionInterval(start, end);
-        start = end = position;
-      } else {
-        end = position;
-      }
-    }
-    removeRowSelectionInterval(start, end);
-  }
-
-  @Override
-  public boolean canPaste(final Transferable transferable)
-  {
-    // TODO Auto-generated method stub
-    try {
-      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
-        @SuppressWarnings("unchecked")
-        final List<Proxy> data = (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.IDENTIFIER);
-        for (final Proxy proxy : data) {
-          if (!containsEqualIdentifier(proxy)) {
-            return true;
-          }
-        }
-        return false;
-      } else {
-        return false;
-      }
-    } catch (final IOException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final UnsupportedFlavorException exception) {
-      throw new WatersRuntimeException(exception);
-    }
-  }
-
-  @Override
-  public List<InsertInfo> getInsertInfo(final Transferable transferable)
-    throws IOException, UnsupportedFlavorException
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean canDelete(final List<? extends Proxy> items)
-  {
-    final AutomataTableModel model = getModel();
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        if ((model.getIndex(aut) != -1))
-          return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
-  {
-    final List<InsertInfo> infoList = new ArrayList<InsertInfo>(items.size());
-    for (final Proxy p : items)
-      infoList.add(new InsertInfo(p));
-    return infoList;
-  }
-
-  @Override
-  public void insertItems(final List<InsertInfo> inserts)
-  {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public void deleteItems(final List<InsertInfo> deletes)
-  {
-    // TODO Please implement this method to enable deletion.
-    final List<Integer> deleteIndexList = new ArrayList<Integer>();
-    final AutomataTableModel model = getModel();
-    for (final InsertInfo info : deletes) {
-      final Proxy proxy = info.getProxy();
-      if (proxy instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) proxy;
-        deleteIndexList.add(model.getIndex(aut));
-      }
-    }
-    model.deleteRows(deleteIndexList);
-  }
-
-  @Override
-  public void scrollToVisible(final List<? extends Proxy> items)
-  {
-    for (final Proxy p : items) {
-      if (p instanceof AutomatonProxy) {
-        final AutomatonProxy aut = (AutomatonProxy) p;
-        final AutomataTableModel model = getModel();
-        this.scrollRectToVisible(this.getCellRect(model.getIndex(aut), 0,
-                                                  true));
-        break;
-      }
-    }
-  }
-
-  @Override
-  public void activate()
-  {
-    requestFocusInWindow();
-  }
-
-  @Override
-  public void close()
-  {
-    final AutomataTableModel model = getModel();
-    model.Close();
-  }
 
   //#########################################################################
   //# Data Members
   final WatersAnalyzerPanel mParent;
   private List<Observer> mObservers;
   final ModuleContainer mModuleContainer;
+
 
   //#########################################################################
   //# Class Constants
