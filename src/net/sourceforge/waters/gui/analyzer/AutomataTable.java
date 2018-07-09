@@ -62,6 +62,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -78,6 +79,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -133,6 +135,10 @@ class AutomataTable extends JTable implements SelectionOwner
     final ListSelectionModel listModel = getSelectionModel();
     listModel
       .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+    final IDE ide = mModuleContainer.getIDE();
+    final WatersPopupActionManager manager = ide.getPopupActionManager();
+    manager.installCutCopyPasteActions(this);
 
     this.addMouseListener(new TableMouseListener());
 
@@ -376,6 +382,7 @@ class AutomataTable extends JTable implements SelectionOwner
   {
     try {
       if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
+        // TODO Just return true
         @SuppressWarnings("unchecked")
         final List<Proxy> data = (List<Proxy>) transferable
           .getTransferData(WatersDataFlavor.AUTOMATON);

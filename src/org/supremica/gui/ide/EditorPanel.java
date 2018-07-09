@@ -136,13 +136,13 @@ public class EditorPanel
   //#########################################################################
   //# Focus Switching
   @Override
-  void activate()
+  protected void activate()
   {
     FocusTracker.requestFocusFor(mLastFocusOwner);
   }
 
   @Override
-  void deactivate()
+  protected void deactivate()
   {
     final IDE ide = mModuleContainer.getIDE();
     final FocusTracker tracker = ide.getFocusTracker();

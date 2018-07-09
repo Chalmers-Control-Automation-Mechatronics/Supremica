@@ -85,7 +85,7 @@ public class AutomataCloner
     final Collection<TransitionProxy> copiedTranisitions =
       new ArrayList<TransitionProxy>(transitionList.size());
 
-
+    // TODO No need to distinguish if event map initialised in constructor
     if (mEventMap == null) {
       mEventMap = new HashMap<String,EventProxy>();
       for (final EventProxy ep : eventList) {
@@ -100,12 +100,14 @@ public class AutomataCloner
         final EventProxy copiedEP =
           mFactory.createEventProxy(ep.getName(), ep.getKind(),
                                     ep.isObservable(), ep.getAttributes());
+        // TODO Look up by name
         if (!mEventMap.containsValue(ep)) {
           mEventMap.put(copiedEP.getName(), copiedEP);
         }
         copiedEvents.add(copiedEP);
       }
     }
+    // TODO Create and use state map
     for (final StateProxy sp : stateList) {
       final StateProxy copiedSP = mFactory
         .createStateProxy(sp.getName(), sp.isInitial(), sp.getPropositions());
@@ -172,6 +174,7 @@ public class AutomataCloner
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private Map<String,EventProxy> mEventMap;
+  // TODO State map should be local variable---must be reset for each automaton
   private Map<StateProxy,StateProxy> mStateMap;
 
 }

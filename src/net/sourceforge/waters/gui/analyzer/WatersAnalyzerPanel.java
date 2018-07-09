@@ -41,6 +41,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
@@ -106,12 +107,22 @@ public class WatersAnalyzerPanel extends MainPanel
 
 
   //#########################################################################
+  //# Focus Switching
+  @Override
+  protected void activate()
+  {
+    FocusTracker.requestFocusFor(mAutomataTable);
+  }
+
+
+  //#########################################################################
   //# Callbacks
   void displaySelectedAutomata(final AutomatonProxy aut)
   {
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
+    // TODO Not all automata have source info ...
     final Proxy source = info.getSourceObject();
     if (source instanceof SimpleComponentSubject) {
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;

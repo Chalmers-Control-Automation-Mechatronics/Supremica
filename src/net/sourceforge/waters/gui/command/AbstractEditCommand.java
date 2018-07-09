@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.command;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -47,8 +49,6 @@ import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.SubjectTools;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -149,7 +149,7 @@ public abstract class AbstractEditCommand
     mUpdatesSelection = updatesSelection;
   }
 
-  public List<ProxySubject> getSelectionAfterInsert()
+  public List<Proxy> getSelectionAfterInsert()
   {
     return Collections.emptyList();
   }
@@ -172,18 +172,20 @@ public abstract class AbstractEditCommand
 
   //#########################################################################
   //# Auxiliary Methods
-  List<ProxySubject> getSelectionAfterInsert(final List<InsertInfo> inserts)
+  List<Proxy> getSelectionAfterInsert(final List<InsertInfo> inserts)
   {
     final int size = inserts.size();
     final Set<Proxy> set = new THashSet<>(size);
-    final List<ProxySubject> result = new ArrayList<>(size);
+    final List<Proxy> result = new ArrayList<>(size);
     boolean newLabelBlock = true;
     LabelBlockSubject block = null;
     for (final InsertInfo insert : inserts) {
       final Proxy proxy = insert.getProxy();
-      final Subject subject = (Subject) proxy;
       //only bother if it is still possible that its a new labelblock
-      if (newLabelBlock) {
+      if (!(proxy instanceof Subject)) {
+        newLabelBlock = false;
+      } else if (newLabelBlock) {
+        final Subject subject = (Subject) proxy;
         if (block == null) {
           block = SubjectTools.getAncestor(subject, LabelBlockSubject.class);
         } else if (SubjectTools.isAncestor(block, subject)) {
@@ -195,8 +197,7 @@ public abstract class AbstractEditCommand
       }
       final Proxy ancestor = mPanel.getSelectableAncestor(proxy);
       if (ancestor != null && set.add(ancestor)) {
-        final ProxySubject ancestorSubject = (ProxySubject) ancestor;
-        result.add(ancestorSubject);
+        result.add(ancestor);
       }
     }
     if (newLabelBlock) {

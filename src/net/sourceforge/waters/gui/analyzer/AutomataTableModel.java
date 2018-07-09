@@ -93,6 +93,8 @@ class AutomataTableModel extends AbstractTableModel implements Observer
 
   int getIndex(final AutomatonProxy aut)
   {
+    return mAutomataList.indexOf(aut);
+    /*
     for (int looper = 0; looper < this.getRowCount(); looper++) {
       if ((mAutomataList.get(looper).getName())
         .compareTo(aut.getName()) == 0) {
@@ -100,7 +102,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
       }
     }
     return -1;
-
+    */
   }
 
   Map<String,EventProxy> getEventMap()

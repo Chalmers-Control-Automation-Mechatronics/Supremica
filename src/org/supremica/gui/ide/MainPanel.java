@@ -138,7 +138,7 @@ public abstract class MainPanel extends JPanel
    * has been selected. It typically requests the focus for one of its
    * controls.
    */
-  void activate()
+  protected void activate()
   {
   }
 
@@ -146,7 +146,7 @@ public abstract class MainPanel extends JPanel
    * Deactivates this panel. This method is called before the container
    * becomes inactive due to selection of another one.
    */
-  void deactivate()
+  protected void deactivate()
   {
   }
 
