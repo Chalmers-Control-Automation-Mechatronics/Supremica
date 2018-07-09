@@ -348,7 +348,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       if (isNeighbour(pivot, addition)) { continue; }
 
       //create a copy with the new vertex
-      final TIntArrayList newClique = new TIntArrayList(clique);
+      final TIntList newClique = new TIntArrayList(clique);
       newClique.add(addition);
 
       //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
