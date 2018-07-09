@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.diagnosis;
 import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.list.linked.TIntLinkedList;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.hash.THashSet;
 
@@ -187,9 +188,11 @@ public class MonolithicDiagnosabilityVerifier
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
-    contStack.setTopIndex(compStack.size()|Msb1);
-    link.set(index, (compStack.size()|Msb1));
-    compStack.add(index);
+    if(!counterExample) {
+      contStack.setTopIndex(compStack.size()|Msb1);
+      link.set(index, (compStack.size()|Msb1));
+      compStack.add(index);
+    }
     if(a>=0||b>=0) {
       iterA.resetState(a&MsbMask);
       int event;
@@ -250,41 +253,57 @@ public class MonolithicDiagnosabilityVerifier
       next = (((long)a)<<32)|(b&0xffffffffL);
     }
     int index = stateIndexMap.get(next);
-    if(!stateIndexMap.containsKey(next)) {
-      stateIndexMap.put(next, stateCount);
-      indexStateMap.add(next);
-      index = stateCount;
-      stateCount++;
-      if(stateCount >= getNodeLimit()) {
-        throw new OverflowException(getNodeLimit());
+    if(!counterExample){
+      if(!stateIndexMap.containsKey(next)) {
+        stateIndexMap.put(next, stateCount);
+        indexStateMap.add(next);
+        index = stateCount;
+        stateCount++;
+        if(stateCount >= getNodeLimit()) {
+          throw new OverflowException(getNodeLimit());
+        }
+        contStack.push(index, parentIndex);
+      }else if((link.get(index)&Msb1)==0){
+        contStack.moveToTop(link.get(index));
+      }else if(link.get(index)!=-1) {
+        int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
+        newParentLink |= (link.get(parentIndex)&Msb1);
+        link.set(parentIndex, newParentLink);
       }
-      contStack.push(index, parentIndex);
-    }else if((link.get(index)&Msb1)==0){
-      contStack.moveToTop(link.get(index));
-    }else if(link.get(index)!=-1) {
-      int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
-      newParentLink |= (link.get(parentIndex)&Msb1);
-      link.set(parentIndex, newParentLink);
+    }else {
+      if(stateIndexMap.containsKey(next)) {
+        if(link.get(index)==-1) {
+          bfsQueue.add(index);
+          link.set(index, bfsIndex);
+          bfsIndex++;
+        }
+      }
     }
   }
 
-  private boolean close(final int dfsIndex, final int parentIndex) {
+  private boolean close(final int dfsIndex, final int parentIndex)
+    throws OverflowException
+  {
     final int index = compStack.get(dfsIndex);
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
 
     if((link.get(index)&MsbMask)==dfsIndex) {
+      scc.clear();
       int j = compStack.removeAt(compStack.size()-1);
+      scc.add(j);
       link.set(j, -1);
       if(j!=index) {
         do {
           j = compStack.removeAt(compStack.size()-1);
+          scc.add(j);
           link.set(j, -1);
         }while(j!=index);
         if((a&Msb1)==(b&Msb1)) {
           return true;
         }else {
+          computeCounterExample();
           return false;
         }
       }else {
@@ -297,11 +316,13 @@ public class MonolithicDiagnosabilityVerifier
             if(iterA.getCurrentTargetState()==(a&MsbMask)) {
               event = iterA.getCurrentEvent();
               if(!eventObservable[event]) {
+                computeCounterExample();
                 return false;
               }else {
                 iterB.reset((b&MsbMask),event);
                 while(iterB.advance()) {
                   if(iterB.getCurrentTargetState()==(b&MsbMask)) {
+                    computeCounterExample();
                     return false;
                   }
                 }
@@ -313,6 +334,7 @@ public class MonolithicDiagnosabilityVerifier
             if(iterB.getCurrentTargetState()==(b&MsbMask)) {
               event = iterB.getCurrentEvent();
               if(!eventObservable[event]) {
+                computeCounterExample();
                 return false;
               }
             }
@@ -327,18 +349,44 @@ public class MonolithicDiagnosabilityVerifier
     return true;
   }
 
+  private void computeCounterExample()
+    throws OverflowException
+  {
+    contStack.clear();
+    compStack.clear();
+    System.gc();
+    for(int i = 0; i < link.size(); i++) {
+      link.set(i, -1);
+    }
+    counterExample = true;
+    final int sccRoot = scc.get(scc.size()-1);
+    bfsQueue.add(0);
+    link.set(0, bfsIndex);
+    bfsIndex++;
+    while(!bfsQueue.isEmpty()) {
+      final int current = bfsQueue.removeAt(0);
+      if(current==sccRoot)
+        break;
+      expand(current);
+    }
+
+  }
 
   //#########################################################################
   //# Instance Variables
   private boolean[] eventObservable;
   private String[] eventFaultClass;
+  private int stateCount = 0;
+  private int bfsIndex = 0;
+  private String faultClass;
+  private boolean counterExample = false;
   private final TLongIntHashMap stateIndexMap = new TLongIntHashMap();
   private final TLongArrayList indexStateMap = new TLongArrayList();
   private final ControllStack contStack = new ControllStack();
   private final TIntArrayList compStack = new TIntArrayList();
   private final TIntArrayList link = new TIntArrayList();
-  private int stateCount = 0;
-  private String faultClass;
+  private final TIntArrayList scc = new TIntArrayList();
+  private final TIntLinkedList bfsQueue = new TIntLinkedList();
   private TransitionIterator iterA;
   private TransitionIterator iterB;
 
@@ -347,9 +395,6 @@ public class MonolithicDiagnosabilityVerifier
   //# Constants
   final int Msb1 = -2147483648;
   final int MsbMask = 2147483647;
-  final int OPEN = 1;
-  final int EXPANDED = 2;
-  final int CLOSED = 3;
 
   //#########################################################################
   //# Inner Class ControllStack
