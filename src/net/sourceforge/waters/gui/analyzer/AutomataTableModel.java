@@ -36,13 +36,17 @@ package net.sourceforge.waters.gui.analyzer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.swing.table.AbstractTableModel;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -61,7 +65,6 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     mModuleContainer.attach(this);
     mCompiledDES = ModContainer.getCompiledDES();
     updateCompiledDES();
-    // TODO Also initialise an event map
     if (mCompiledDES != null) {
       mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
     } else {
@@ -100,6 +103,19 @@ class AutomataTableModel extends AbstractTableModel implements Observer
 
   }
 
+  Map<String,EventProxy> getEventMap()
+  {
+    mEventMap = new HashMap<String,EventProxy>();
+    for (final AutomatonProxy aut : mAutomataList) {
+      final Set<EventProxy> eventList = aut.getEvents();
+      for (final EventProxy ep : eventList) {
+        if (!mEventMap.containsKey(ep.getName()))
+          mEventMap.put(ep.getName(), ep);
+      }
+    }
+    return mEventMap;
+  }
+
   public void deleteRows(final List<Integer> deleteList)
   {
     final Comparator<Integer> c = Collections.reverseOrder();
@@ -112,7 +128,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
       if (start == -1) {
         start = end = position;
       } else if (position > (end + 1)) {
-        for(int q = start; q >= end; q--)
+        for (int q = start; q >= end; q--)
           mAutomataList.remove(q);
         fireTableRowsDeleted(end, start);
         start = end = position;
@@ -120,9 +136,18 @@ class AutomataTableModel extends AbstractTableModel implements Observer
         end = position;
       }
     }
-    for(int q = start; q >= end; q--)
+    for (int q = start; q >= end; q--)
       mAutomataList.remove(q);
-    fireTableRowsDeleted(end ,start);
+    fireTableRowsDeleted(end, start);
+  }
+
+  public void insertRows(final List<AutomatonProxy> insertList)
+  {
+    final int count = mAutomataList.size()+1;
+    for (final AutomatonProxy aut : insertList) {
+      mAutomataList.add(aut);
+    }
+    fireTableRowsInserted(count, count+insertList.size());
   }
 
   public void Close()
@@ -229,6 +254,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
   private ProductDESProxy mCompiledDES;
   private List<AutomatonProxy> mAutomataList;
   private final ModuleContainer mModuleContainer;
+  private Map<String,EventProxy> mEventMap;
 
   //#########################################################################
   //# Class Constants

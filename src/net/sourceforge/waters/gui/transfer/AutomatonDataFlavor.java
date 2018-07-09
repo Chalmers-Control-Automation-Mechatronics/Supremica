@@ -37,12 +37,11 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.analyzer.AutomataCloner;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -67,20 +66,18 @@ public class AutomatonDataFlavor extends WatersDataFlavor
   List<Proxy> createExportData(final Collection<? extends Proxy> data,
                                final ModuleContext context)
   {
-    // TODO Use ProductDESElementFactory.getInstance()
-    //final ProductDESProxyFactory factory = factory;
-    //final AutomataCloner cloner = new AutomataCloner();
-    //return cloner.getClonedList(data);
-    final ProxyCloner cloner = ModuleElementFactory.getCloningInstance();
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final AutomataCloner cloner = new AutomataCloner(factory);
     return cloner.getClonedList(data);
   }
 
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
-    // TODO ditto
-    final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-    final ProxyCloner cloner = factory.getCloner();
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
+    final AutomataCloner cloner = new AutomataCloner(factory);
     return cloner.getClonedList(data);
   }
 

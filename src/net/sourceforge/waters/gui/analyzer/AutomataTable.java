@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -72,8 +73,9 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -182,6 +184,7 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
+  @SuppressWarnings("unused")
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
     // TODO Remove this method (for now)
@@ -196,7 +199,6 @@ class AutomataTable extends JTable implements SelectionOwner
      */
     return false;
   }
-
 
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.observer.subject
@@ -230,7 +232,6 @@ class AutomataTable extends JTable implements SelectionOwner
       }
     }
   }
-
 
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
@@ -373,16 +374,14 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean canPaste(final Transferable transferable)
   {
-    // TODO Can paste if automaton flavour supported
     try {
-      if (transferable.isDataFlavorSupported(WatersDataFlavor.IDENTIFIER)) {
+      if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
         @SuppressWarnings("unchecked")
         final List<Proxy> data = (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.IDENTIFIER);
-        for (final Proxy proxy : data) {
-          if (!containsEqualIdentifier(proxy)) {
-            return true;
-          }
+          .getTransferData(WatersDataFlavor.AUTOMATON);
+        for (@SuppressWarnings("unused")
+        final Proxy proxy : data) {
+          return true;
         }
         return false;
       } else {
@@ -399,24 +398,20 @@ class AutomataTable extends JTable implements SelectionOwner
   public List<InsertInfo> getInsertInfo(final Transferable transferable)
     throws IOException, UnsupportedFlavorException
   {
-    // TODO Must also implement AutomatonDataFlavor and DataFlavorVisitor ...
     final List<InsertInfo> inserts = new LinkedList<InsertInfo>();
     if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
-      // TODO Use event map from table model
-      final ModuleProxyCloner cloner =
-        ModuleSubjectFactory.getCloningInstance();
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final AutomataTableModel tableModel = getModel();
+      final Map<String,EventProxy> eMap = tableModel.getEventMap();
+      final AutomataCloner cloner = new AutomataCloner(factory, eMap);
       @SuppressWarnings("unchecked")
-      // TODO Use the correct flavour
-      final List<Proxy> data =
-        (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.IDENTIFIER);
+      final List<Proxy> data = (List<Proxy>) transferable
+        .getTransferData(WatersDataFlavor.AUTOMATON);
       for (final Proxy proxy : data) {
-        // TODO Always insert, do not check identifier
-        if (!containsEqualIdentifier(proxy)) {
-          final Proxy cloned = cloner.getClone(proxy);
-          final InsertInfo insert = new InsertInfo(cloned);
-          inserts.add(insert);
-        }
+        final AutomatonProxy cloned = cloner.clone((AutomatonProxy) proxy);
+        final InsertInfo insert = new InsertInfo(cloned);
+        inserts.add(insert);
       }
     } else {
       throw new UnsupportedFlavorException(null);
@@ -450,7 +445,16 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
-    // TODO Auto-generated method stub
+    final List<AutomatonProxy> insertAutomatonList = new ArrayList<AutomatonProxy>();
+    final AutomataTableModel model = getModel();
+    for(final InsertInfo info : inserts) {
+      final Proxy proxy = info.getProxy();
+      if (proxy instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        insertAutomatonList.add(aut);
+      }
+    }
+    model.insertRows(insertAutomatonList);
   }
 
   @Override
@@ -581,13 +585,11 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
-
   //#########################################################################
   //# Data Members
   final WatersAnalyzerPanel mParent;
   private List<Observer> mObservers;
   final ModuleContainer mModuleContainer;
-
 
   //#########################################################################
   //# Class Constants

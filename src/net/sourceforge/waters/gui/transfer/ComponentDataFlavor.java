@@ -40,9 +40,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.analyzer.AutomataCloner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -59,14 +62,15 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
 
 /**
- * A data flavour representing a collection of simple components ({@link
- * SimpleComponentProxy}) or other elements of a module's component list.
- * It differs from the {@link ModuleDataFlavor} in that it collects and
+ * A data flavour representing a collection of simple components
+ * ({@link SimpleComponentProxy}) or other elements of a module's component
+ * list. It differs from the {@link ModuleDataFlavor} in that it collects and
  * adds all events found in the copied data to the transferable so that they
  * can be copied from one module to another when copying and pasting automata.
  *
@@ -82,7 +86,6 @@ class ComponentDataFlavor extends ModuleDataFlavor
   {
     super(ComponentProxy.class);
   }
-
 
   //#########################################################################
   //# Importing and Exporting Data
@@ -113,10 +116,21 @@ class ComponentDataFlavor extends ModuleDataFlavor
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
+    final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
+    final ProductDESProxyFactory autFactory =
+      ProductDESElementFactory.getInstance();
+    final AutomataCloner autCloner = new AutomataCloner(autFactory);
     final ProxyCloner cloner = factory.getCloner();
-    return cloner.getClonedList(data);
+    for (final Proxy p : data) {
+      if (p instanceof AutomatonProxy)
+        proxyList.add((Proxy)autCloner.clone((AutomatonProxy) p));
+      else
+        proxyList.add(cloner.getClone(p));
+    }
+    return proxyList;
   }
+
 
   //#########################################################################
   //# Inner Class EventCollector
@@ -145,8 +159,7 @@ class ComponentDataFlavor extends ModuleDataFlavor
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public Object visitEdgeProxy(final EdgeProxy edge)
-      throws VisitorException
+    public Object visitEdgeProxy(final EdgeProxy edge) throws VisitorException
     {
       final LabelBlockProxy labelBlock = edge.getLabelBlock();
       return visitLabelBlockProxy(labelBlock);

@@ -42,6 +42,7 @@ import java.util.List;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
@@ -181,6 +182,12 @@ class DataFlavorVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+  @Override
+  public List<WatersDataFlavor> visitAutomatonProxy(final AutomatonProxy aut)
+  {
+    return LIST_AUTOMATON;
+  }
+
   @Override
   public List<WatersDataFlavor> visitComponentProxy(final ComponentProxy comp)
   {
@@ -345,6 +352,8 @@ class DataFlavorVisitor
 
   //#########################################################################
   //# Class Constants
+  private static final List<WatersDataFlavor> LIST_AUTOMATON =
+    Collections.singletonList(WatersDataFlavor.AUTOMATON);
   private static final List<WatersDataFlavor> LIST_COMPONENT =
     Collections.singletonList(WatersDataFlavor.COMPONENT);
   private static final List<WatersDataFlavor> LIST_CONSTANT_ALIAS =

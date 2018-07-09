@@ -36,11 +36,11 @@ package net.sourceforge.waters.gui.analyzer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -71,82 +71,102 @@ public class AutomataCloner
     mEventMap = null;
   }
 
-
   //#########################################################################
   //# Invocation
   public AutomatonProxy clone(final AutomatonProxy aut)
   {
     final AutomatonProxy clonedAut;
-    // TODO Can use: Collection<EventProxy> copiedEvents = new ArrayList<>();
-    // TODO Can also specify size: new ArrayList<>(eventList.size());
-    final Set<EventProxy> copiedEvents = new HashSet<EventProxy>();
-    // TODO ditto
-    final Set<StateProxy> copiedStates = new HashSet<StateProxy>();
-    // TODO Specify size
-    final Collection<TransitionProxy> copiedTranisitions =
-      new ArrayList<TransitionProxy>();
-
-    // TODO Do these first so we can query size as above
     final Set<EventProxy> eventList = aut.getEvents();
     final Set<StateProxy> stateList = aut.getStates();
     final Collection<TransitionProxy> transitionList = aut.getTransitions();
 
-    // TODO Create and use new states and events correctly ...
+    final Collection<EventProxy> copiedEvents = new ArrayList<EventProxy>(eventList.size());
+    final Collection<StateProxy> copiedStates = new ArrayList<StateProxy>(stateList.size());
+    final Collection<TransitionProxy> copiedTranisitions =
+      new ArrayList<TransitionProxy>(transitionList.size());
+
+
     if (mEventMap == null) {
       mEventMap = new HashMap<String,EventProxy>();
       for (final EventProxy ep : eventList) {
-        copiedEvents.add(ep);
+        final EventProxy copiedEP =
+          mFactory.createEventProxy(ep.getName(), ep.getKind(),
+                                    ep.isObservable(), ep.getAttributes());
+        mEventMap.put(copiedEP.getName(), copiedEP);
+        copiedEvents.add(copiedEP);
       }
-      for (final StateProxy sp : stateList) {
-        copiedStates.add(sp);
-      }
-      for (final TransitionProxy tp : transitionList) {
-        if (copiedStates.contains(tp.getSource())
-            && copiedStates.contains(tp.getTarget())
-            && copiedEvents.contains(tp.getEvent())) {
-          copiedTranisitions.add(tp);
-        }
-      }
-
-      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
-                                                copiedEvents, copiedStates,
-                                                copiedTranisitions);
-
     } else {
       for (final EventProxy ep : eventList) {
-        if(!mEventMap.containsValue(ep)){
-          mEventMap.put(ep.getName(), ep);
+        final EventProxy copiedEP =
+          mFactory.createEventProxy(ep.getName(), ep.getKind(),
+                                    ep.isObservable(), ep.getAttributes());
+        if (!mEventMap.containsValue(ep)) {
+          mEventMap.put(copiedEP.getName(), copiedEP);
         }
-        copiedEvents.add(ep);
+        copiedEvents.add(copiedEP);
       }
-      for (final StateProxy sp : stateList) {
-        copiedStates.add(sp);
-      }
-      for (final TransitionProxy tp : transitionList) {
-        if (copiedStates.contains(tp.getSource())
-            && copiedStates.contains(tp.getTarget())
-            && copiedEvents.contains(tp.getEvent())) {
-          mStateMap.put(tp.getSource(), tp.getTarget());
-          copiedTranisitions.add(tp);
-        }
-      }
-
-      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
-                                                copiedEvents, copiedStates,
-                                                copiedTranisitions);
     }
+    for (final StateProxy sp : stateList) {
+      final StateProxy copiedSP = mFactory
+        .createStateProxy(sp.getName(), sp.isInitial(), sp.getPropositions());
+      copiedStates.add(copiedSP);
+    }
+    for (final TransitionProxy tp : transitionList) {
+//      if (copiedStates.contains(tp.getSource())
+//          && copiedStates.contains(tp.getTarget())
+//          && copiedEvents.contains(tp.getEvent())) {
+
+        final StateProxy source = tp.getSource();
+        final StateProxy target = tp.getTarget();
+        final EventProxy event = tp.getEvent();
+        final StateProxy newSource =
+          mFactory.createStateProxy(source.getName(), source.isInitial(),
+                                    source.getPropositions());
+        final StateProxy newTarget =
+          mFactory.createStateProxy(target.getName(), target.isInitial(),
+                                    target.getPropositions());
+        final EventProxy newEvent = mEventMap.get(event.getName());
+
+        if(mStateMap == null)
+          mStateMap = new HashMap<StateProxy,StateProxy>();
+        mStateMap.put(newSource, newTarget);
+        final TransitionProxy copiedTP =
+          mFactory.createTransitionProxy(newSource, newEvent, newTarget);
+        copiedTranisitions.add(copiedTP);
+//      }
+    }
+
+    clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                              copiedEvents, copiedStates,
+                                              copiedTranisitions);
+
+    //      for (final StateProxy sp : stateList) {
+    //        copiedStates.add(sp);
+    //      }
+    //      for (final TransitionProxy tp : transitionList) {
+    //        if (copiedStates.contains(tp.getSource())
+    //            && copiedStates.contains(tp.getTarget())
+    //            && copiedEvents.contains(tp.getEvent())) {
+    //          mStateMap.put(tp.getSource(), tp.getTarget());
+    //          copiedTranisitions.add(tp);
+    //        }
+    //      }
+    //
+    //      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+    //                                                copiedEvents, copiedStates,
+    //                                                copiedTranisitions);
+
     return clonedAut;
   }
 
-  public List<AutomatonProxy> getClonedList(final List<AutomatonProxy> autList)
+  public List<Proxy> getClonedList(final Collection<? extends Proxy> autList)
   {
-    final List<AutomatonProxy> outputList = new ArrayList<AutomatonProxy>();
-    for(final AutomatonProxy aut : autList) {
-      outputList.add(clone(aut));
+    final List<Proxy> outputList = new ArrayList<Proxy>();
+    for (final Proxy aut : autList) {
+      outputList.add(clone((AutomatonProxy)aut));
     }
     return outputList;
   }
-
 
   //#########################################################################
   //# Data Members
