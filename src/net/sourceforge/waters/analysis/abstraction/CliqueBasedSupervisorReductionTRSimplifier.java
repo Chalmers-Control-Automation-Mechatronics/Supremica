@@ -44,9 +44,10 @@ import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
@@ -135,10 +136,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   protected boolean runSimplifier() throws AnalysisException
   {
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
+    final PriorityQueue<CompatibleSet> searchSpace = new PriorityQueue<>();
     final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
     dependencies.add(mInitialCompatibleId);
-    reduce(new CompatibleSet(), dependencies);
-    System.out.println("\nR: " + mReducedSupervisor.size() + " S: " + mNumStates);
+    searchSpace.add(new CompatibleSet(new TIntHashSet(), dependencies));
+    reduce(searchSpace);
+    System.out.print("\n#Reduced: " + mReducedSupervisor.size() + " #Initial: " + mNumStates);
 
     //account for the dump state which is included in the initial automaton but not in our compatibles
     if (mReducedSupervisor.size() + 1 >= mNumStates) {
@@ -151,78 +154,84 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void reduce(final CompatibleSet currentSolution, final CompatibleDependenciesSet compatibleDependencies) {
+  private void reduce(final PriorityQueue<CompatibleSet> searchSpace) {
+    while (true) {
+      //get the most promising partial solution
+      final CompatibleSet currentSolution = searchSpace.poll();
 
-    System.out.print("\nC: " + currentSolution + " D: " + compatibleDependencies + " L: " + currentSolution.size());
-
-    //if solution is complete and more reduced, save it
-    if (currentSolution.size() < mReducedSupervisor.size() && compatibleDependencies.isEmpty()) {
-    //if we got here we know our solution is better than the current best
-      mReducedSupervisor = currentSolution;
-      System.out.print(" -- New Best");
-      return;
-    }
-
-    //our solution is too big (either because it is complete but too many states, or because it is has more dependencies), stop
-    if (currentSolution.size() + 1 >= mReducedSupervisor.size()) {
-      System.out.print(" -- Too big (" + mReducedSupervisor.size() +")");
-      return;
-    }
-
-    //our container for the actual compatible being processed at any given time
-    mCompatibleBuffer.clear();
-
-    //get the id of next compatible we need to add
-    final int nextCompatibleId = compatibleDependencies.pop();
-
-    //get all ids of compatibles covering this compatible
-    /*TIntCollection coverIds = mCoversCache.get(nextCompatibleId);
-    if (coverIds == null) {
-      getCompatibleFromCache(nextCompatibleId, compatible);
-      coverIds = getCoversOf(compatible);
-      mCoversCache.put(nextCompatibleId, coverIds);
-    }*/
-    getCompatibleFromCache(nextCompatibleId, mCompatibleBuffer);
-    final TIntList coverIds = getCoversOf(mCompatibleBuffer);
-    final int coverIdsSize = coverIds.size();
-
-    for (int c = 0; c < coverIdsSize; c++) {
-      //get the id of a cover
-      final int coverId = coverIds.get(c);
-
-      //clear containersy
-      mDependencyIdBuffer.clear();
-      mCompatibleBuffer.clear();
-      mEnabledEventsBuffer.clear();
-
-      //get the actual compatible for the cover id
-      getCompatibleFromCache(coverId, mCompatibleBuffer);
-
-      //get the compatible ids of its successors
-      getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer, mDependencyIdBuffer);
-      final int dependentIdsSize = mDependencyIdBuffer.size();
-
-      //copy the current solution and add the cover
-      final CompatibleSet newSolution = new CompatibleSet(currentSolution);
-      newSolution.add(coverId);
-
-      //copy the things we know we need to add, but remove anything covered by the compatible we just added to our solution
-      final CompatibleDependenciesSet newCompatibleDependencies = new CompatibleDependenciesSet(compatibleDependencies);
-      newCompatibleDependencies.removeAllCoveredBy(coverId);
-
-      //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
-      for (int d = 0; d < dependentIdsSize; d++) {
-        //a successor compatible id
-        final int dependentId = mDependencyIdBuffer.get(d);
-
-        //if this compatible isn't a subset of anything in our current (and partial solution)
-        if (newSolution.isUncoveredByAll(dependentId)) {
-          //try adding it to the list of compatibles we know we still need to cover
-          //it may not actually be added if it is already covered by an existing member
-          newCompatibleDependencies.add(dependentId);
-        }
+      //if we are empty, done
+      if (currentSolution == null) {
+        System.out.print("\nExhausted search space");
+        break;
       }
-      reduce(newSolution, newCompatibleDependencies);
+
+      final CompatibleDependenciesSet currentDependencies = currentSolution.getDependencies();
+      System.out.print("\nC: " + currentSolution.toString() + " D: " + currentDependencies + " L: " + currentSolution.size());
+
+      //if we are too big skip (we could stop the search if our ordering of the queue were just based on solution size)
+      if (currentSolution.size() + 1 >= mReducedSupervisor.size()) {
+        System.out.print("-- Too big.");
+        continue;
+      }
+
+      //if solution is complete and more reduced, save it
+      if (currentSolution.size() < mReducedSupervisor.size() && currentDependencies.isEmpty()) {
+      //if we got here we know our solution is better than the current best
+        mReducedSupervisor = currentSolution;
+        System.out.print("-- New Best");
+        continue;
+      }
+
+      //our container for the actual compatible being processed at any given time
+      mCompatibleBuffer.clear();
+
+      //get the id of next compatible we need to add
+      final int nextCompatibleId = currentDependencies.pop();
+
+      //get all ids of compatibles covering this compatible
+      getCompatibleFromCache(nextCompatibleId, mCompatibleBuffer);
+      final TIntList coverIds = getCoversOf(mCompatibleBuffer);
+      final int coverIdsSize = coverIds.size();
+
+      for (int c = 0; c < coverIdsSize; c++) {
+        //get the id of a cover
+        final int coverId = coverIds.get(c);
+
+        mCompatibleBuffer.clear();
+        mDependencyIdBuffer.clear();
+        mEnabledEventsBuffer.clear();
+
+        //get the actual compatible for the cover id
+        getCompatibleFromCache(coverId, mCompatibleBuffer);
+
+        //get the compatible ids of its successors
+        getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer, mDependencyIdBuffer);
+        final int dependentIdsSize = mDependencyIdBuffer.size();
+
+        //copy the current solution and dependencies.
+        final CompatibleSet newSolution = new CompatibleSet(currentSolution, currentDependencies);
+        final CompatibleDependenciesSet newDependencies = newSolution.getDependencies();
+
+        //we now need to add the cover and update dependencies to include the cover's successors
+        newSolution.add(coverId);
+        //now that we have added the associate compatible to the partial solution, anything covered by it in the dependencies is no longer needed
+        newDependencies.removeAllCoveredBy(coverId);
+
+        //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
+        for (int d = 0; d < dependentIdsSize; d++) {
+          //a successor compatible id
+          final int dependentId = mDependencyIdBuffer.get(d);
+
+          //if this compatible isn't a subset of anything in our current (and partial solution)
+          if (newSolution.isUncoveredByAll(dependentId)) {
+            //try adding it to the list of compatibles we know we still need to cover
+            //it may not actually be added if it is already covered by an existing member
+            newDependencies.add(dependentId);
+          }
+        }
+
+        searchSpace.add(newSolution);
+      }
     }
   }
 
@@ -600,7 +609,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       super();
     }
 
-    public CompatibleDependenciesSet(final HashSet<Integer> compatibleIdSet) {
+    public CompatibleDependenciesSet(final Collection<Integer> compatibleIdSet) {
       super(compatibleIdSet);
     }
 
@@ -701,17 +710,30 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private class CompatibleSet extends TIntHashSet {
+  private class CompatibleSet extends TIntHashSet implements Comparable<CompatibleSet> {
+    private final CompatibleDependenciesSet dependenciesSet;
+
     public CompatibleSet() {
       super();
+      dependenciesSet = new CompatibleDependenciesSet();
     }
 
-    public CompatibleSet(final int initialCapacity) {
-      super(initialCapacity);
+    public CompatibleSet(final int capacity) {
+      super(capacity);
+      dependenciesSet = new CompatibleDependenciesSet();
     }
 
-    public CompatibleSet(final TIntCollection existingCollection) {
-      super(existingCollection);
+    private CompatibleSet(final TIntCollection existingCompatibles, final Collection<Integer> existingDependencies) {
+      super(existingCompatibles);
+      dependenciesSet = new CompatibleDependenciesSet(existingDependencies);
+    }
+
+    public CompatibleSet(final CompatibleSet compatibleSet) {
+      this(compatibleSet, compatibleSet.dependenciesSet);
+    }
+
+    public CompatibleDependenciesSet getDependencies() {
+      return dependenciesSet;
     }
 
     public boolean isUncoveredByAll(final int xId) {
@@ -727,6 +749,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final int[] set = toArray();
       Arrays.sort(set);
       return Arrays.toString(set);
+    }
+
+    @Override
+    public int compareTo(final CompatibleSet anotherSet)
+    {
+      final Integer ourSize = size() + dependenciesSet.size();
+      final Integer theirSize = anotherSet.size() + anotherSet.getDependencies().size();
+      return ourSize.compareTo(theirSize);
     }
   }
 

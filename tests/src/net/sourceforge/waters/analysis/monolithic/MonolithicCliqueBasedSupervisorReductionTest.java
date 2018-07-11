@@ -81,73 +81,99 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     junit.textui.TestRunner.run(suite());
   }
 
+  //92 states, 56 events, 336 transitions
   @Override
   public void testCatMouseUnsup1() throws Exception
   {
   }
 
+  //698 states, 72 events, 4272 transitions
   @Override
   public void testCatMouseUnsup2() throws Exception
   {
   }
 
+  //410 states, 12 events, 1494 transitions
   @Override
   public void testTransferLine2() throws Exception
   {
   }
 
+  //5992 states, 17 events, 29749 transitions
   @Override
   public void testTransferLine3() throws Exception
   {
   }
 
+  //32 states, 13 events, 74 transitions
   @Override
   public void testDosingUnit() throws Exception
   {
   }
 
+  //672 states, 15 events, 2248 transitions
   @Override
   public void testCellSwitch() throws Exception
   {
   }
 
+  //830 states, 16 events, 8432 transitions
   @Override
   public void testIPC() throws Exception
   {
   }
 
+  //18432 states, 18 events, 83316 transitions
+  @Override
+  public void testIPCcswitch() throws Exception
+  {
+  }
+
+  //4374 states, 20 events, 14293 transitions
   @Override
   public void testIPClswitch() throws Exception
   {
   }
 
+  //852 states, 18 events, 2826 transitions
   @Override
   public void testIPCuswicth() throws Exception
   {
   }
 
+  //2394 states, 35 events, 4381 transitions
   @Override
   public void testTictactoe() throws Exception
   {
   }
 
+  //419 states, 22 events, 972 transitions
   @Override
   public void testCT3() throws Exception
   {
   }
 
+  //4675 states, 36 events, 20752 transitions (can be reduced to 2 states?)
   @Override
   public void testRobotAssemblyCell() throws Exception
   {
   }
 
+  //6288 states, 26 events, 35308 transitions
   @Override
   public void test2LinkAlt() throws Exception
   {
   }
 
+  //33712 states, 26 events, 186444 transitions
   @Override
-  public void testManufacturingSystem() throws Exception
+  public void test2LinkAltBatch() throws Exception
+  {
+  }
+
+  //12960 states, 17 events, 49968 transitions
+  @Override
+  public void testIMS() throws Exception
   {
   }
 }
