@@ -48,10 +48,14 @@ import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
@@ -77,7 +81,8 @@ public class WatersAnalyzerPanel extends MainPanel
     mModuleContainer = moduleContainer;
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
     final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
@@ -86,7 +91,6 @@ public class WatersAnalyzerPanel extends MainPanel
     setLeftComponent(scroll);
     setRightComponent(scrollDisplay);
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -105,7 +109,6 @@ public class WatersAnalyzerPanel extends MainPanel
     return mSimpleExpressionCompiler;
   }
 
-
   //#########################################################################
   //# Focus Switching
   @Override
@@ -114,7 +117,6 @@ public class WatersAnalyzerPanel extends MainPanel
     FocusTracker.requestFocusFor(mAutomataTable);
   }
 
-
   //#########################################################################
   //# Callbacks
   void displaySelectedAutomata(final AutomatonProxy aut)
@@ -122,7 +124,6 @@ public class WatersAnalyzerPanel extends MainPanel
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
-    // TODO Not all automata have source info ...
     final Proxy source = info.getSourceObject();
     if (source instanceof SimpleComponentSubject) {
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
@@ -139,9 +140,36 @@ public class WatersAnalyzerPanel extends MainPanel
         final String msg = exception.getMessage(comp);
         logger.error(msg);
       }
+    } else if (source instanceof AutomatonProxy) {
+      final AutomatonProxy ap = (AutomatonProxy) source;
+      SimpleComponentSubject comp = null;
+      if (mDisplayMap.containsKey(ap)) {
+        comp = (SimpleComponentSubject) mDisplayMap.get(ap);
+      } else {
+        try {
+          final ModuleProxyFactory factory =
+            ModuleSubjectFactory.getInstance();
+          final ProductDESImporter importer = new ProductDESImporter(factory);
+          comp = (SimpleComponentSubject) importer.importComponent(ap);
+          mDisplayMap.put(ap, comp);
+        } catch (final ParseException exception) {
+        }
+      }
+      final GraphSubject graph = comp.getGraph();
+      final BindingContext bindings = info.getBindingContext();
+      try {
+        mAutomataDisplayPane =
+          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                                   mSimpleExpressionCompiler, aut);
+        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+        setRightComponent(scroll);
+      } catch (final GeometryAbsentException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage(comp);
+        logger.error(msg);
+      }
     }
   }
-
 
   //#########################################################################
   //# Data Members
@@ -151,7 +179,7 @@ public class WatersAnalyzerPanel extends MainPanel
   private final JPanel mAutomataPanel = new JPanel();
   private final JTable mAutomataTable;
   private AutomatonDisplayPane mAutomataDisplayPane;
-
+  private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
 
   //#########################################################################
   //# Class Constants

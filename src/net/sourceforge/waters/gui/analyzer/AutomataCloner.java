@@ -66,9 +66,7 @@ public class AutomataCloner
 
   public AutomataCloner(final ProductDESProxyFactory factory)
   {
-    // TODO Instead use: use this(factory, new HashMap<String,EventProxy>();
-    mFactory = factory;
-    mEventMap = null;
+    this(factory, new HashMap<String,EventProxy>());
   }
 
   //#########################################################################
@@ -80,83 +78,48 @@ public class AutomataCloner
     final Set<StateProxy> stateList = aut.getStates();
     final Collection<TransitionProxy> transitionList = aut.getTransitions();
 
-    final Collection<EventProxy> copiedEvents = new ArrayList<EventProxy>(eventList.size());
-    final Collection<StateProxy> copiedStates = new ArrayList<StateProxy>(stateList.size());
+    final Collection<EventProxy> copiedEvents =
+      new ArrayList<EventProxy>(eventList.size());
+    final Collection<StateProxy> copiedStates =
+      new ArrayList<StateProxy>(stateList.size());
     final Collection<TransitionProxy> copiedTranisitions =
       new ArrayList<TransitionProxy>(transitionList.size());
 
-    // TODO No need to distinguish if event map initialised in constructor
-    if (mEventMap == null) {
-      mEventMap = new HashMap<String,EventProxy>();
-      for (final EventProxy ep : eventList) {
-        final EventProxy copiedEP =
+    for (final EventProxy ep : eventList) {
+      final String name = ep.getName();
+      EventProxy newEvent = mEventMap.get(name);
+      if (newEvent == null) {
+        newEvent =
           mFactory.createEventProxy(ep.getName(), ep.getKind(),
                                     ep.isObservable(), ep.getAttributes());
-        mEventMap.put(copiedEP.getName(), copiedEP);
-        copiedEvents.add(copiedEP);
+        mEventMap.put(name, newEvent);
       }
-    } else {
-      for (final EventProxy ep : eventList) {
-        final EventProxy copiedEP =
-          mFactory.createEventProxy(ep.getName(), ep.getKind(),
-                                    ep.isObservable(), ep.getAttributes());
-        // TODO Look up by name
-        if (!mEventMap.containsValue(ep)) {
-          mEventMap.put(copiedEP.getName(), copiedEP);
-        }
-        copiedEvents.add(copiedEP);
-      }
+      copiedEvents.add(newEvent);
     }
-    // TODO Create and use state map
     for (final StateProxy sp : stateList) {
       final StateProxy copiedSP = mFactory
         .createStateProxy(sp.getName(), sp.isInitial(), sp.getPropositions());
       copiedStates.add(copiedSP);
+      if (mStateMap == null)
+        mStateMap = new HashMap<StateProxy,StateProxy>();
+      mStateMap.put(sp, copiedSP);
     }
     for (final TransitionProxy tp : transitionList) {
-//      if (copiedStates.contains(tp.getSource())
-//          && copiedStates.contains(tp.getTarget())
-//          && copiedEvents.contains(tp.getEvent())) {
+      final StateProxy source = tp.getSource();
+      final StateProxy target = tp.getTarget();
+      final EventProxy event = tp.getEvent();
+      final StateProxy newSource = mStateMap.get(source);
+      final StateProxy newTarget = mStateMap.get(target);
+      final EventProxy newEvent = mEventMap.get(event.getName());
 
-        final StateProxy source = tp.getSource();
-        final StateProxy target = tp.getTarget();
-        final EventProxy event = tp.getEvent();
-        final StateProxy newSource =
-          mFactory.createStateProxy(source.getName(), source.isInitial(),
-                                    source.getPropositions());
-        final StateProxy newTarget =
-          mFactory.createStateProxy(target.getName(), target.isInitial(),
-                                    target.getPropositions());
-        final EventProxy newEvent = mEventMap.get(event.getName());
-
-        if(mStateMap == null)
-          mStateMap = new HashMap<StateProxy,StateProxy>();
-        mStateMap.put(newSource, newTarget);
-        final TransitionProxy copiedTP =
-          mFactory.createTransitionProxy(newSource, newEvent, newTarget);
-        copiedTranisitions.add(copiedTP);
-//      }
+      final TransitionProxy copiedTP =
+        mFactory.createTransitionProxy(newSource, newEvent, newTarget);
+      copiedTranisitions.add(copiedTP);
     }
 
     clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
                                               copiedEvents, copiedStates,
                                               copiedTranisitions);
-
-    //      for (final StateProxy sp : stateList) {
-    //        copiedStates.add(sp);
-    //      }
-    //      for (final TransitionProxy tp : transitionList) {
-    //        if (copiedStates.contains(tp.getSource())
-    //            && copiedStates.contains(tp.getTarget())
-    //            && copiedEvents.contains(tp.getEvent())) {
-    //          mStateMap.put(tp.getSource(), tp.getTarget());
-    //          copiedTranisitions.add(tp);
-    //        }
-    //      }
-    //
-    //      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
-    //                                                copiedEvents, copiedStates,
-    //                                                copiedTranisitions);
 
     return clonedAut;
   }
@@ -165,7 +128,7 @@ public class AutomataCloner
   {
     final List<Proxy> outputList = new ArrayList<Proxy>();
     for (final Proxy aut : autList) {
-      outputList.add(clone((AutomatonProxy)aut));
+      outputList.add(clone((AutomatonProxy) aut));
     }
     return outputList;
   }
@@ -173,7 +136,7 @@ public class AutomataCloner
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private Map<String,EventProxy> mEventMap;
+  private final Map<String,EventProxy> mEventMap;
   // TODO State map should be local variable---must be reset for each automaton
   private Map<StateProxy,StateProxy> mStateMap;
 

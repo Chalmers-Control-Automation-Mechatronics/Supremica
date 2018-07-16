@@ -353,7 +353,8 @@ class DataFlavorVisitor
   //#########################################################################
   //# Class Constants
   private static final List<WatersDataFlavor> LIST_AUTOMATON =
-    Collections.singletonList(WatersDataFlavor.AUTOMATON);
+    Arrays.asList(new WatersDataFlavor[]{WatersDataFlavor.AUTOMATON,
+                                         WatersDataFlavor.COMPONENT});
   private static final List<WatersDataFlavor> LIST_COMPONENT =
     Collections.singletonList(WatersDataFlavor.COMPONENT);
   private static final List<WatersDataFlavor> LIST_CONSTANT_ALIAS =

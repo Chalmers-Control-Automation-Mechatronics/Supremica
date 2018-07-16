@@ -40,12 +40,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.analyzer.AutomataCloner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -62,9 +62,11 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -118,13 +120,17 @@ class ComponentDataFlavor extends ModuleDataFlavor
   {
     final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-    final ProductDESProxyFactory autFactory =
-      ProductDESElementFactory.getInstance();
-    final AutomataCloner autCloner = new AutomataCloner(autFactory);
+    final ProductDESImporter importer = new ProductDESImporter(factory);
     final ProxyCloner cloner = factory.getCloner();
     for (final Proxy p : data) {
       if (p instanceof AutomatonProxy)
-        proxyList.add((Proxy)autCloner.clone((AutomatonProxy) p));
+        try {
+          proxyList.add(importer.importComponent((AutomatonProxy)p));
+        } catch (final ParseException exception) {
+          final Logger logger = LogManager.getLogger();
+          final String msg = exception.getMessage();
+          logger.error(msg);
+        }
       else
         proxyList.add(cloner.getClone(p));
     }
