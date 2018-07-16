@@ -36,10 +36,13 @@ package net.sourceforge.waters.analysis.diagnosis;
 import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.list.linked.TIntLinkedList;
 import gnu.trove.map.hash.TLongIntHashMap;
 import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
 
+import java.util.ArrayDeque;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
@@ -55,6 +58,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -114,7 +118,7 @@ public class MonolithicDiagnosabilityVerifier
       final TRSynchronousProductResult spResult = spBuilder.getAnalysisResult();
       final TRAutomatonProxy sp = spResult.getComputedAutomaton();
       final EventEncoding spEvents = sp.getEventEncoding();
-      final ListBufferTransitionRelation rel = sp.getTransitionRelation();
+      rel = sp.getTransitionRelation();
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
       final int numEvents = spEvents.getNumberOfProperEvents();
@@ -156,15 +160,17 @@ public class MonolithicDiagnosabilityVerifier
           indexStateMap.add(verifierInitState);
           stateCount++;
           contStack.push(0,0);
-
           while(!contStack.isEmpty()) {
             final int i = contStack.getTopIndex();
             final int p = contStack.getTopParent();
             if(!contStack.isTopExpanded()) {
-              expand(i);
+              contStack.setTopIndex(compStack.size()|Msb1);
+              link.set(i, (compStack.size()|Msb1));
+              compStack.add(i);
             }else{
               contStack.pop();
               if(!close(i,p)) {
+                final LoopTraceProxy counterExample = computeCounterExample();
                 return setFailedResult(null);
               }
             }
@@ -181,18 +187,11 @@ public class MonolithicDiagnosabilityVerifier
     return setSatisfiedResult();
   }
 
-
-
-  private void expand(final int index) throws OverflowException
+  private void expand(final int index, final int mode) throws OverflowException
   {
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
-    if(!counterExample) {
-      contStack.setTopIndex(compStack.size()|Msb1);
-      link.set(index, (compStack.size()|Msb1));
-      compStack.add(index);
-    }
     if(a>=0||b>=0) {
       iterA.resetState(a&MsbMask);
       int event;
@@ -209,7 +208,7 @@ public class MonolithicDiagnosabilityVerifier
             newA = targetA|(a&Msb1);
             newB = b;
           }
-          newState(newA,newB,index);
+          newState(newA,newB,index,mode);
         }else {
           iterB.reset((b&MsbMask),event);
           while(iterB.advance()) {
@@ -221,7 +220,7 @@ public class MonolithicDiagnosabilityVerifier
               newA = targetA|(a&Msb1);
               newB = targetB|(b&Msb1);
             }
-            newState(newA,newB,index);
+            newState(newA,newB,index,mode);
           }
         }
       }
@@ -237,13 +236,13 @@ public class MonolithicDiagnosabilityVerifier
             newA = a;
             newB = targetB|(b&Msb1);
           }
-          newState(newA,newB,index);
+          newState(newA,newB,index,mode);
         }
       }
     }
   }
 
-  private void newState(final int a, final int b, final int parentIndex)
+  private void newState(final int a, final int b, final int parentIndex, final int mode)
     throws OverflowException
   {
     long next;
@@ -253,7 +252,7 @@ public class MonolithicDiagnosabilityVerifier
       next = (((long)a)<<32)|(b&0xffffffffL);
     }
     int index = stateIndexMap.get(next);
-    if(!counterExample){
+    if(mode == VERIFIER){
       if(!stateIndexMap.containsKey(next)) {
         stateIndexMap.put(next, stateCount);
         indexStateMap.add(next);
@@ -270,8 +269,16 @@ public class MonolithicDiagnosabilityVerifier
         newParentLink |= (link.get(parentIndex)&Msb1);
         link.set(parentIndex, newParentLink);
       }
-    }else {
+    }else if(mode == TRACE){
       if(stateIndexMap.containsKey(next)) {
+        if(link.get(index)==-1) {
+          bfsQueue.add(index);
+          link.set(index, bfsIndex);
+          bfsIndex++;
+        }
+      }
+    }else if(mode == COMPONENT) {
+      if(scc.contains(index)) {
         if(link.get(index)==-1) {
           bfsQueue.add(index);
           link.set(index, bfsIndex);
@@ -303,7 +310,6 @@ public class MonolithicDiagnosabilityVerifier
         if((a&Msb1)==(b&Msb1)) {
           return true;
         }else {
-          computeCounterExample();
           return false;
         }
       }else {
@@ -316,13 +322,11 @@ public class MonolithicDiagnosabilityVerifier
             if(iterA.getCurrentTargetState()==(a&MsbMask)) {
               event = iterA.getCurrentEvent();
               if(!eventObservable[event]) {
-                computeCounterExample();
                 return false;
               }else {
                 iterB.reset((b&MsbMask),event);
                 while(iterB.advance()) {
                   if(iterB.getCurrentTargetState()==(b&MsbMask)) {
-                    computeCounterExample();
                     return false;
                   }
                 }
@@ -334,7 +338,6 @@ public class MonolithicDiagnosabilityVerifier
             if(iterB.getCurrentTargetState()==(b&MsbMask)) {
               event = iterB.getCurrentEvent();
               if(!eventObservable[event]) {
-                computeCounterExample();
                 return false;
               }
             }
@@ -349,7 +352,7 @@ public class MonolithicDiagnosabilityVerifier
     return true;
   }
 
-  private void computeCounterExample()
+  private LoopTraceProxy computeCounterExample()
     throws OverflowException
   {
     contStack.clear();
@@ -358,18 +361,37 @@ public class MonolithicDiagnosabilityVerifier
     for(int i = 0; i < link.size(); i++) {
       link.set(i, -1);
     }
-    counterExample = true;
-    final int sccRoot = scc.get(scc.size()-1);
+    bfsQueue.clear();
     bfsQueue.add(0);
     link.set(0, bfsIndex);
     bfsIndex++;
+    int sccRoot = 0;
     while(!bfsQueue.isEmpty()) {
-      final int current = bfsQueue.removeAt(0);
-      if(current==sccRoot)
+      final int current = bfsQueue.remove();
+      if(scc.contains(current)) {
+        sccRoot = current;
         break;
-      expand(current);
+      }
+      expand(current,TRACE);
     }
+    bfsQueue.clear();
+    bfsQueue.add(sccRoot);
+    while(!bfsQueue.isEmpty()) {
+      final int current = bfsQueue.remove();
+      if(current == sccRoot) {
+        break;
+      }
+      expand(current,COMPONENT);
+    }
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
+    iterA = rel.createPredecessorsReadOnlyIterator();
+    iterB = rel.createPredecessorsReadOnlyIterator();
 
+    final List<EventProxy> traceA = new LinkedList<EventProxy>();
+    final List<EventProxy> traceB = new LinkedList<EventProxy>();
+
+    final LoopTraceProxy counterExample = getFactory().createLoopTraceProxy(name, getModel(), trace , loopIndex);
+    return counterExample;
   }
 
   //#########################################################################
@@ -379,14 +401,14 @@ public class MonolithicDiagnosabilityVerifier
   private int stateCount = 0;
   private int bfsIndex = 0;
   private String faultClass;
-  private boolean counterExample = false;
   private final TLongIntHashMap stateIndexMap = new TLongIntHashMap();
   private final TLongArrayList indexStateMap = new TLongArrayList();
   private final ControllStack contStack = new ControllStack();
   private final TIntArrayList compStack = new TIntArrayList();
   private final TIntArrayList link = new TIntArrayList();
-  private final TIntArrayList scc = new TIntArrayList();
-  private final TIntLinkedList bfsQueue = new TIntLinkedList();
+  private final TIntHashSet scc = new TIntHashSet();
+  private final ArrayDeque<Integer> bfsQueue = new ArrayDeque<Integer>();
+  private ListBufferTransitionRelation rel;
   private TransitionIterator iterA;
   private TransitionIterator iterB;
 
@@ -395,6 +417,9 @@ public class MonolithicDiagnosabilityVerifier
   //# Constants
   final int Msb1 = -2147483648;
   final int MsbMask = 2147483647;
+  final int VERIFIER = 0;
+  final int TRACE = 1;
+  final int COMPONENT = 2;
 
   //#########################################################################
   //# Inner Class ControllStack
@@ -471,7 +496,7 @@ public class MonolithicDiagnosabilityVerifier
 
     public boolean isEmpty() { return (top==-1)?true:false; }
 
-    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0)?true:false;}
+    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0)?true:false; }
 
   }
 }
