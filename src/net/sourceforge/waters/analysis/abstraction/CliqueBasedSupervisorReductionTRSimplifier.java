@@ -39,6 +39,8 @@ import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
@@ -129,6 +131,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     mInitialCompatibleId = mCompatibleCache.add(initialCompatible);
     mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
+
+    mStateToNeighbourCountMap = new TIntIntHashMap(mNumStates);
+    for (int s = 0; s < mNumStates; s++) {
+      int numNeighbours = 0;
+      for (int i = 0; i < mNumStates; i++) {
+        if (!mIncompatibilityRelation[s][i]) {
+          numNeighbours++;
+        }
+      }
+      mStateToNeighbourCountMap.put(s, numNeighbours);
+    }
   }
 
 
@@ -345,12 +358,33 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     final int initialPossibleAdditionsSize = possibleAdditions.size();
 
+    int pivot = 0;
+    int mostNeighbours = 0;
+
+    for (int i = 0; i < initialPossibleAdditionsSize; i++) {
+      final int state = possibleAdditions.get(i);
+      final int numNeighbours = mStateToNeighbourCountMap.get(state);
+      if (numNeighbours > mostNeighbours) {
+        mostNeighbours = numNeighbours;
+        pivot = state;
+      }
+    }
+
+    for (int i = 0; i < alreadyChecked.size(); i++) {
+      final int state = alreadyChecked.get(i);
+      final int numNeighbours = mStateToNeighbourCountMap.get(state);
+      if (numNeighbours > mostNeighbours) {
+        mostNeighbours = numNeighbours;
+        pivot = state;
+      }
+    }
+
     //introduce for more pruning
-    final int pivotIndex = sRandom.nextInt(initialPossibleAdditionsSize + alreadyChecked.size());
-    final int pivot = pivotIndex < initialPossibleAdditionsSize ? possibleAdditions.get(pivotIndex) : alreadyChecked.get(pivotIndex - initialPossibleAdditionsSize);
+    /*final int pivotIndex = sRandom.nextInt(initialPossibleAdditionsSize + alreadyChecked.size());
+    final int pivot = pivotIndex < initialPossibleAdditionsSize ? possibleAdditions.get(pivotIndex) : alreadyChecked.get(pivotIndex - initialPossibleAdditionsSize);*/
 
     //go through each state we haven't tried adding yet
-    for (int a = possibleAdditions.size() - 1; a >= 0; a--) {
+    for (int a = initialPossibleAdditionsSize - 1; a >= 0; a--) {
       final int addition = possibleAdditions.get(a);
 
       //any search path trying to add a neighbour of the pivot will already be explored when the pivot is chosen as the addition, so skip
@@ -754,9 +788,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     @Override
     public int compareTo(final CompatibleSet anotherSet)
     {
-      final Integer ourSize = size() + dependenciesSet.size();
-      final Integer theirSize = anotherSet.size() + anotherSet.getDependencies().size();
-      return ourSize.compareTo(theirSize);
+      return Integer.compare(size() + dependenciesSet.size(), anotherSet.size() + anotherSet.getDependencies().size());
     }
   }
 
@@ -776,6 +808,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private TIntList mCompatibleBuffer;
   private TIntList mDependencyIdBuffer;
   private TIntSet mEnabledEventsBuffer;
+  private TIntIntMap mStateToNeighbourCountMap;
 
   //private TIntObjectHashMap<TIntCollection> mCoversCache;
   private CompatibleSet mReducedSupervisor;

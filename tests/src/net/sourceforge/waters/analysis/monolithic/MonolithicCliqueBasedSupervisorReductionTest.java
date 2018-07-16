@@ -105,12 +105,6 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   {
   }
 
-  //32 states, 13 events, 74 transitions
-  @Override
-  public void testDosingUnit() throws Exception
-  {
-  }
-
   //672 states, 15 events, 2248 transitions
   @Override
   public void testCellSwitch() throws Exception
