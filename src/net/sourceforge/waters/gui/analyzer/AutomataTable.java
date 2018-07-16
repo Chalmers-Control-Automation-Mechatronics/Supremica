@@ -62,6 +62,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -71,13 +72,13 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -133,6 +134,10 @@ class AutomataTable extends JTable implements SelectionOwner
     final ListSelectionModel listModel = getSelectionModel();
     listModel
       .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
+    final IDE ide = mModuleContainer.getIDE();
+    final WatersPopupActionManager manager = ide.getPopupActionManager();
+    manager.installCutCopyPasteActions(this);
 
     this.addMouseListener(new TableMouseListener());
 
@@ -374,24 +379,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean canPaste(final Transferable transferable)
   {
-    try {
-      if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
-        @SuppressWarnings("unchecked")
-        final List<Proxy> data = (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.AUTOMATON);
-        for (@SuppressWarnings("unused")
-        final Proxy proxy : data) {
-          return true;
-        }
-        return false;
-      } else {
-        return false;
-      }
-    } catch (final IOException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final UnsupportedFlavorException exception) {
-      throw new WatersRuntimeException(exception);
-    }
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON))
+      return true;
+    else
+      return false;
   }
 
   @Override
@@ -445,9 +436,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
-    final List<AutomatonProxy> insertAutomatonList = new ArrayList<AutomatonProxy>();
+    final List<AutomatonProxy> insertAutomatonList =
+      new ArrayList<AutomatonProxy>();
     final AutomataTableModel model = getModel();
-    for(final InsertInfo info : inserts) {
+    for (final InsertInfo info : inserts) {
       final Proxy proxy = info.getProxy();
       if (proxy instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) proxy;

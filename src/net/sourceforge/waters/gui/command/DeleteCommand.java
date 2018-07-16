@@ -40,7 +40,6 @@ import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.subject.base.ProxySubject;
 
 
 /**
@@ -137,6 +136,7 @@ public class DeleteCommand
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.command.Command
+  @Override
   public void execute()
   {
     final List<Proxy> selection;
@@ -160,12 +160,13 @@ public class DeleteCommand
     }
   }
 
+  @Override
   public void undo()
   {
     final SelectionOwner panel = getPanel();
     panel.insertItems(mDeletes);
     if (getUpdatesSelection()) {
-      final List<ProxySubject> selection = getSelectionAfterInsert(mDeletes);
+      final List<Proxy> selection = getSelectionAfterInsert(mDeletes);
       panel.replaceSelection(selection);
       panel.scrollToVisible(selection);
       panel.activate();

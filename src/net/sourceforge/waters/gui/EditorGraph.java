@@ -315,7 +315,7 @@ class EditorGraph
     if (count == 0) {
       return null;
     }
-    final List<ProxySubject> added = new LinkedList<ProxySubject>();
+    final List<Proxy> added = new LinkedList<>();
     final List<AbstractEditCommand> commands =
       new ArrayList<AbstractEditCommand>(count);
     for (int pass = minpass; pass <= maxpass; pass++) {
@@ -324,7 +324,7 @@ class EditorGraph
         if (cmd != null) {
           cmd.setUpdatesSelection(false);
           commands.add(cmd);
-          final List<ProxySubject> created = cmd.getSelectionAfterInsert();
+          final List<Proxy> created = cmd.getSelectionAfterInsert();
           added.addAll(created);
         }
       }

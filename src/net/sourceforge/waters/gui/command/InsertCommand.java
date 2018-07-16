@@ -165,7 +165,7 @@ public class InsertCommand
     panel.insertItems(mInserts);
     if (getUpdatesSelection()) {
       final boolean shown = showAutomaton();
-      final List<ProxySubject> selection = getSelectionAfterInsert(mInserts);
+      final List<Proxy> selection = getSelectionAfterInsert(mInserts);
       panel.replaceSelection(selection);
       panel.scrollToVisible(selection);
       if (!shown) {
@@ -197,7 +197,7 @@ public class InsertCommand
   //#########################################################################
   //# Simple Access
   @Override
-  public List<ProxySubject> getSelectionAfterInsert()
+  public List<Proxy> getSelectionAfterInsert()
   {
     return getSelectionAfterInsert(mInserts);
   }
