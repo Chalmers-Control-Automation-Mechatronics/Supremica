@@ -192,7 +192,7 @@ class AutomataTable extends JTable implements SelectionOwner
   @SuppressWarnings("unused")
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
-    // TODO Remove this method (for now)
+    // TODO Change to containsName(String) and reprogram
     /*
      * final AutomataTableModel model = getModel(); if (proxy instanceof
      * IdentifierSubject) { final IdentifierSubject ident =
@@ -570,7 +570,7 @@ class AutomataTable extends JTable implements SelectionOwner
             final AutomataTableModel model = getModel();
             model.getAutomaton(getSelectedRows()[0]);
           } else {
-            mParent.displaySelectedAutomata(aut);
+            mParent.displaySelectedAutomaton(aut);
           }
         }
       }

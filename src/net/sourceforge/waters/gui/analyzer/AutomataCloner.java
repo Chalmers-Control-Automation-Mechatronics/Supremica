@@ -97,6 +97,7 @@ public class AutomataCloner
       copiedEvents.add(newEvent);
     }
     for (final StateProxy sp : stateList) {
+      // TODO Replace propositions using event map
       final StateProxy copiedSP = mFactory
         .createStateProxy(sp.getName(), sp.isInitial(), sp.getPropositions());
       copiedStates.add(copiedSP);
