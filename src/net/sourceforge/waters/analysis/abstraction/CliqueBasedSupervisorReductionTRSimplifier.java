@@ -747,6 +747,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private class CompatibleSet extends TIntHashSet implements Comparable<CompatibleSet> {
     private final CompatibleDependenciesSet dependenciesSet;
 
+    @SuppressWarnings("unused")
     public CompatibleSet() {
       super();
       dependenciesSet = new CompatibleDependenciesSet();
@@ -762,6 +763,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       dependenciesSet = new CompatibleDependenciesSet(existingDependencies);
     }
 
+    @SuppressWarnings("unused")
     public CompatibleSet(final CompatibleSet compatibleSet) {
       this(compatibleSet, compatibleSet.dependenciesSet);
     }
@@ -813,5 +815,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //private TIntObjectHashMap<TIntCollection> mCoversCache;
   private CompatibleSet mReducedSupervisor;
 
+  @SuppressWarnings("unused")
   private static Random sRandom = new Random(1);
 }

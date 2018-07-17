@@ -41,8 +41,6 @@ import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
@@ -170,6 +168,7 @@ public class MonolithicDiagnosabilityVerifier
             }else{
               contStack.pop();
               if(!close(i,p)) {
+                @SuppressWarnings("unused")
                 final LoopTraceProxy counterExample = computeCounterExample();
                 return setFailedResult(null);
               }
@@ -387,10 +386,11 @@ public class MonolithicDiagnosabilityVerifier
     iterA = rel.createPredecessorsReadOnlyIterator();
     iterB = rel.createPredecessorsReadOnlyIterator();
 
-    final List<EventProxy> traceA = new LinkedList<EventProxy>();
-    final List<EventProxy> traceB = new LinkedList<EventProxy>();
+    // final List<EventProxy> traceA = new LinkedList<EventProxy>();
+    // final List<EventProxy> traceB = new LinkedList<EventProxy>();
 
-    final LoopTraceProxy counterExample = getFactory().createLoopTraceProxy(name, getModel(), trace , loopIndex);
+    final LoopTraceProxy counterExample = null;
+    // getFactory().createLoopTraceProxy(name, getModel(), trace , loopIndex);
     return counterExample;
   }
 
