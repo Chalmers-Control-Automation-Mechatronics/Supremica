@@ -148,9 +148,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
+    for (int s = 0; s < mNumStates; s++) {
+
+    }
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<CompatibleSet> searchSpace = new PriorityQueue<>();
     final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
+
     dependencies.add(mInitialCompatibleId);
     searchSpace.add(new CompatibleSet(new TIntHashSet(), dependencies));
     reduce(searchSpace);
@@ -249,6 +253,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private boolean buildReducedSupervisor() throws OverflowException {
+
     final ListBufferTransitionRelation relation = getTransitionRelation();
     final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
 
@@ -347,7 +352,80 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
 
-  private void BronKerbosch(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final TIntList maximalCliquesIdsToFill) {
+  private void bronKerboschWithDegeneracyOrdering(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final TIntList maximalCliquesIdsToFill) {
+    //if we have exhausted all possibilities, this must be the largest clique we have seen
+    if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
+      clique.sort();
+      maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
+      return;
+    }
+
+    final int initialPossibleAdditionsSize = possibleAdditions.size();
+    final TIntSet alreadyAddedIndexes = new TIntHashSet(possibleAdditions.size());
+    final TIntList possibleAdditionsDegeneracyOrdered = new TIntArrayList(possibleAdditions.size());
+
+    //find the state with the minimum number of neighbours from possibleAdditions we haven't already removed
+    for (int i = 0; i < initialPossibleAdditionsSize; i++) {
+      int leastNeighboursIndex = -1;
+      int leastNumNeighbours = Integer.MAX_VALUE;
+      for (int stateIndex = 0; stateIndex < initialPossibleAdditionsSize; stateIndex++) {
+        if (alreadyAddedIndexes.contains(stateIndex)) { continue; }
+
+        final int currentState = possibleAdditions.get(stateIndex);
+        int numNeighbours = 0;
+
+        for (int potentialNeighbourStateIndex = 0; potentialNeighbourStateIndex < initialPossibleAdditionsSize; potentialNeighbourStateIndex++) {
+          if (alreadyAddedIndexes.contains(potentialNeighbourStateIndex)) { continue; }
+          final int potentialNeighbourState = possibleAdditions.get(potentialNeighbourStateIndex);
+          if (isNeighbour(currentState, potentialNeighbourState)) { numNeighbours++; }
+        }
+        if (numNeighbours < leastNumNeighbours) {
+          leastNeighboursIndex = stateIndex;
+          leastNumNeighbours = numNeighbours;
+        }
+      }
+      alreadyAddedIndexes.add(leastNeighboursIndex);
+      possibleAdditionsDegeneracyOrdered.add(possibleAdditions.get(leastNeighboursIndex));
+    }
+
+    alreadyAddedIndexes.clear();
+
+    for (int a = initialPossibleAdditionsSize - 1; a >= 0; a--) {
+      final int addition = possibleAdditionsDegeneracyOrdered.get(a);
+
+      //create a copy with the new vertex
+      final TIntList newClique = new TIntArrayList(clique);
+      newClique.add(addition);
+
+      //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
+      final TIntList newPossibleAdditions = new TIntArrayList(possibleAdditionsDegeneracyOrdered.size());
+      for (int i = 0; i < possibleAdditionsDegeneracyOrdered.size(); i++) {
+        final int oldPossibleAddition = possibleAdditionsDegeneracyOrdered.get(i);
+        if (isNeighbour(addition, oldPossibleAddition)) {
+          newPossibleAdditions.add(oldPossibleAddition);
+        }
+      }
+
+      final TIntList newAlreadyChecked = new TIntArrayList(alreadyChecked.size());
+      for (int i = 0; i < alreadyChecked.size(); i++) {
+        final int oldAlreadyChecked  = alreadyChecked.get(i);
+        if (isNeighbour(addition, oldAlreadyChecked)) {
+          newAlreadyChecked.add(oldAlreadyChecked);
+        }
+      }
+
+      //find any maximal cliques based on newCliques and add them to the object referenced by cliques
+      bronKerboschWithPivot(newClique, newPossibleAdditions, newAlreadyChecked, maximalCliquesIdsToFill);
+
+      //remove the current candidate state from further consideration
+      possibleAdditionsDegeneracyOrdered.removeAt(a);
+
+      //add to the list of states we have already checked
+      alreadyChecked.add(addition);
+    }
+  }
+
+  private void bronKerboschWithPivot(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final TIntList maximalCliquesIdsToFill) {
 
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
@@ -412,7 +490,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       //find any maximal cliques based on newCliques and add them to the object referenced by cliques
-      BronKerbosch(newClique, newPossibleAdditions, newAlreadyChecked, maximalCliquesIdsToFill);
+      bronKerboschWithPivot(newClique, newPossibleAdditions, newAlreadyChecked, maximalCliquesIdsToFill);
 
       //remove the current candidate state from further consideration
       possibleAdditions.removeAt(a);
@@ -422,20 +500,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private TIntList getCoversOf(final TIntList compatible) {
-    final TIntList possibleAdditions = new TIntArrayList();
+  private void getNeighboursOf(final TIntList compatible, final TIntList neighboursToFill) {
     if (compatible.size() > 0) {
-
       //we need to figure out the initial valid set of states that could be included to our compatible
       //at most, our possible additions will be the set of neighbours to the first state in the compatible
-      final TIntList neighbours = new TIntArrayList();
-      getNeighboursOf(compatible.get(0), neighbours);
-      final int neighboursSize = neighbours.size();
+      getNeighboursOf(compatible.get(0), neighboursToFill);
+      final int neighboursSize = neighboursToFill.size();
 
       //then we go through each of these neighbours and cull ones that aren't mutually neighbours with the rest
       //of the states in our compatible
-      for (int n = 0; n < neighboursSize; n++) {
-        final int neighbour = neighbours.get(n);
+      for (int n = neighboursSize - 1; n >= 0; n--) {
+        final int neighbour = neighboursToFill.get(n);
 
         boolean allNeighbours = true;
         for (int s = 1; s < compatible.size() && allNeighbours; s++) {
@@ -443,15 +518,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             allNeighbours = false;
           }
         }
-        if (allNeighbours) {
-          possibleAdditions.add(neighbour);
+        if (!allNeighbours) {
+          neighboursToFill.removeAt(n);
         }
       }
     }
+  }
+
+  private TIntList getCoversOf(final TIntList compatible) {
+    final TIntList possibleAdditions = new TIntArrayList();
+    getNeighboursOf(compatible, possibleAdditions);
 
     //actually get the cover compatibles
     final TIntList maximalCompatibleIds = new TIntArrayList();
-    BronKerbosch(compatible, possibleAdditions, new TIntArrayList(), maximalCompatibleIds);
+    bronKerboschWithPivot(compatible, possibleAdditions, new TIntArrayList(), maximalCompatibleIds);
 
     return maximalCompatibleIds;
   }
