@@ -35,7 +35,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 
 import gnu.trove.TIntCollection;
-import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -46,9 +45,8 @@ import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -152,7 +150,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     }
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
-    final PriorityQueue<CompatibleSet> searchSpace = new PriorityQueue<>();
+    final PriorityQueue<CompatibleSet> searchSpace = new PriorityQueue<>(new Comparator<CompatibleSet>() {
+      @Override
+      public int compare(final CompatibleSet o1, final CompatibleSet o2)
+      {
+        return Integer.compare(o1.size() + o1.getDependencies().size(), o2.size() + o2.getDependencies().size());
+      }
+    });
+
     final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
 
     dependencies.add(mInitialCompatibleId);
@@ -192,7 +197,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       //if solution is complete and more reduced, save it
-      if (currentSolution.size() < mReducedSupervisor.size() && currentDependencies.isEmpty()) {
+      if (currentSolution.size() < mReducedSupervisor.size() && currentDependencies.size() == 0) {
       //if we got here we know our solution is better than the current best
         mReducedSupervisor = currentSolution;
         System.out.print("-- New Best");
@@ -241,8 +246,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
           //if this compatible isn't a subset of anything in our current (and partial solution)
           if (newSolution.isUncoveredByAll(dependentId)) {
-            //try adding it to the list of compatibles we know we still need to cover
-            //it may not actually be added if it is already covered by an existing member
+            /* check if there is just a single maximal cover for this dependent. If so, we know we will need to add that cover
+             * to our solution, so may as well do it here. Otherwise try adding it to the list of compatibles we know we still need to cover
+             * it may not actually be added if it is already covered by an existing member */
+            /*mCompatibleBuffer.clear();
+            getCompatibleFromCache(dependentId, mCompatibleBuffer);
+
+            final TIntList singleMaximalCover = checkForSingleMaximalCoverOf(mCompatibleBuffer);
+            if (singleMaximalCover != null) {
+              singleMaximalCover.sort();
+              newSolution.add(mCompatibleCache.add(singleMaximalCover));
+            }
+            else {
+              newDependencies.add(dependentId);
+            }*/
             newDependencies.add(dependentId);
           }
         }
@@ -350,7 +367,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     return true;
   }
-
 
   private void bronKerboschWithDegeneracyOrdering(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final TIntList maximalCliquesIdsToFill) {
     //if we have exhausted all possibilities, this must be the largest clique we have seen
@@ -500,6 +516,52 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
+  private TIntList checkForSingleMaximalCoverOf(final int state) {
+    final TIntList neighbours = new TIntArrayList(mNumStates);
+    getNeighboursOf(state, neighbours);
+    final int neighboursSize = neighbours.size();
+    boolean allMutualNeighbours = true;
+    for (int i = 0; i < neighboursSize && allMutualNeighbours; i++) {
+      final int n1 = neighbours.get(i);
+      for (int j = 0; j < neighboursSize && allMutualNeighbours; j++) {
+        final int n2 = neighbours.get(j);
+        if (n1 < n2 && !isNeighbour(n1, n2)) {
+          allMutualNeighbours = false;
+        }
+      }
+    }
+    if (allMutualNeighbours) {
+      neighbours.add(state);
+      return neighbours;
+    }
+    else {
+      return null;
+    }
+  }
+
+  private TIntList checkForSingleMaximalCoverOf(final TIntList compatible) {
+    final TIntList neighbours = new TIntArrayList(mNumStates);
+    getNeighboursOf(compatible, neighbours);
+    final int neighboursSize = neighbours.size();
+    boolean allMutualNeighbours = true;
+    for (int i = 0; i < neighboursSize && allMutualNeighbours; i++) {
+      final int n1 = neighbours.get(i);
+      for (int j = 0; j < neighboursSize && allMutualNeighbours; j++) {
+        final int n2 = neighbours.get(j);
+        if (n1 < n2 && !isNeighbour(n1, n2)) {
+          allMutualNeighbours = false;
+        }
+      }
+    }
+    if (allMutualNeighbours) {
+      neighbours.addAll(compatible);
+      return neighbours;
+    }
+    else {
+      return null;
+    }
+  }
+
   private void getNeighboursOf(final TIntList compatible, final TIntList neighboursToFill) {
     if (compatible.size() > 0) {
       //we need to figure out the initial valid set of states that could be included to our compatible
@@ -526,7 +588,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private TIntList getCoversOf(final TIntList compatible) {
-    final TIntList possibleAdditions = new TIntArrayList();
+    final TIntList possibleAdditions = new TIntArrayList(mNumStates);
     getNeighboursOf(compatible, possibleAdditions);
 
     //actually get the cover compatibles
@@ -715,30 +777,46 @@ public class CliqueBasedSupervisorReductionTRSimplifier
    * systematically.
    * @author Jordan Schroder
    */
-  private class CompatibleDependenciesSet extends LinkedHashSet<Integer> {
+  private class CompatibleDependenciesSet {
 
-    private static final long serialVersionUID = -4434294284951063515L;
+    private final PriorityQueue<Integer> dependenciesQueue;
+    private final TIntSet dependenciesSet;
 
     public CompatibleDependenciesSet() {
-      super();
+      dependenciesQueue = new PriorityQueue<>(new Comparator<Integer>() {
+
+        @Override
+        public int compare(final Integer o1, final Integer o2)
+        {
+          return Integer.compare(mCompatibleCache.size(o1), mCompatibleCache.size(o2));
+        }
+      });
+      dependenciesSet = new TIntHashSet();
     }
 
-    public CompatibleDependenciesSet(final Collection<Integer> compatibleIdSet) {
-      super(compatibleIdSet);
+    public CompatibleDependenciesSet(final CompatibleDependenciesSet compatibleIdSet) {
+      this();
+      for (final int compatibleId : compatibleIdSet.getQueue()) {
+        add(compatibleId);
+      }
+    }
+
+    public PriorityQueue<Integer> getQueue() {
+      return dependenciesQueue;
     }
 
     /**
      * Gets the next compatible id, based on insertion order and removes it from the set.
-     * @return The next compatible id to process, or -1 if the set is empty.
+     * @return The next compatible id to process, or null if the set is empty.
      */
     public int pop() {
-      final Iterator<Integer> iterator = iterator();
-      if (iterator.hasNext()) {
-        final Integer popped = iterator.next();
-        iterator.remove();
-        return popped;
-      }
-      return -1;
+      final int poppedId = dependenciesQueue.poll();
+      dependenciesSet.remove(poppedId);
+      return poppedId;
+    }
+
+    public int size() {
+      return dependenciesQueue.size();
     }
 
     /**
@@ -751,10 +829,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      * @param applicantId the unique id corresponding to a compatible stored in an IntSetBuffer
      * @return true if and only if the compatible referenced by applicantId is not covered by existing members
      */
-    @Override
-    public boolean add(final Integer applicantId) {
+    public boolean add(final int applicantId) {
       if (size() == 0) {
-        return super.add(applicantId);
+        dependenciesQueue.add(applicantId);
+        dependenciesSet.add(applicantId);
       }
 
       //check if the applicant is a strict subset of any existing members
@@ -763,7 +841,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //not covered by any existing members, we want to add it.
       //now kick out any members the applicant covers
       removeAllCoveredBy(applicantId);
-      return super.add(applicantId);
+      dependenciesQueue.add(applicantId);
+
+      if (dependenciesSet.add(applicantId)) {
+        dependenciesQueue.add(applicantId);
+        return true;
+      }
+
+      return false;
     }
 
     /**
@@ -773,8 +858,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      * @return true if and only if the compatible is not covered by any existing compatibles.
      */
     public boolean isUncoveredByAll(final int xId) {
-      for (final Iterator<Integer> compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
-        if (isCover(compatibleIdsIterator.next(), xId)) { return false; }
+      for (final int compatibleId : dependenciesQueue) {
+        if (isCover(compatibleId, xId)) { return false; }
       }
       return true;
     }
@@ -784,8 +869,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      * @param xId The id of a compatible
      */
     public void removeAllCoveredBy(final int xId) {
-      for (final Iterator<Integer> compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
-        if (isCover(xId, compatibleIdsIterator.next())) { compatibleIdsIterator.remove(); }
+      for (final Iterator<Integer> compatibleIdsIterator = dependenciesQueue.iterator(); compatibleIdsIterator.hasNext();) {
+        final int compatibleId = compatibleIdsIterator.next();
+        if (isCover(xId, compatibleId)) {
+          compatibleIdsIterator.remove();
+          dependenciesSet.remove(compatibleId);
+        }
       }
     }
 
@@ -794,18 +883,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     public String toString()
     {
       final Integer[] compatibleIdBuffer = new Integer[size()];
-      this.toArray(compatibleIdBuffer);
+      dependenciesQueue.toArray(compatibleIdBuffer);
       return Arrays.toString(compatibleIdBuffer);
     }
 
     @Override
     public int hashCode()
     {
-      int hash = 0;
-      for (final Iterator<Integer> compatibleIdsIterator = iterator(); compatibleIdsIterator.hasNext();) {
-        hash += HashFunctions.hash(compatibleIdsIterator.next());
-      }
-      return hash;
+      return dependenciesSet.hashCode();
     }
 
     @Override
@@ -816,34 +901,21 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       final CompatibleDependenciesSet otherSet = (CompatibleDependenciesSet)o;
-      if (size() != otherSet.size()) {
-        return false;
-      }
-
-      return containsAll(otherSet);
+      return dependenciesSet.equals(otherSet.dependenciesSet);
     }
   }
 
-  private class CompatibleSet extends TIntHashSet implements Comparable<CompatibleSet> {
+  private class CompatibleSet extends TIntHashSet {
     private final CompatibleDependenciesSet dependenciesSet;
-
-    public CompatibleSet() {
-      super();
-      dependenciesSet = new CompatibleDependenciesSet();
-    }
 
     public CompatibleSet(final int capacity) {
       super(capacity);
       dependenciesSet = new CompatibleDependenciesSet();
     }
 
-    private CompatibleSet(final TIntCollection existingCompatibles, final Collection<Integer> existingDependencies) {
+    private CompatibleSet(final TIntCollection existingCompatibles, final CompatibleDependenciesSet existingDependencies) {
       super(existingCompatibles);
       dependenciesSet = new CompatibleDependenciesSet(existingDependencies);
-    }
-
-    public CompatibleSet(final CompatibleSet compatibleSet) {
-      this(compatibleSet, compatibleSet.dependenciesSet);
     }
 
     public CompatibleDependenciesSet getDependencies() {
@@ -863,12 +935,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final int[] set = toArray();
       Arrays.sort(set);
       return Arrays.toString(set);
-    }
-
-    @Override
-    public int compareTo(final CompatibleSet anotherSet)
-    {
-      return Integer.compare(size() + dependenciesSet.size(), anotherSet.size() + anotherSet.getDependencies().size());
     }
   }
 
