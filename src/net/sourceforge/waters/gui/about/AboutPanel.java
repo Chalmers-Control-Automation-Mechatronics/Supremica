@@ -173,6 +173,9 @@ public class AboutPanel
     builder.append("<H1 STYLE=\"text-align: center; color: #00008d; font-style: italic;\">");
     builder.append(version.getTitle());
     builder.append("</H1>");
+    builder.append("<P STYLE=\"text-align: center;\"><STRONG>");
+    builder.append("<A HREF=\"release_notes.html\">What's new in this version</A>");
+    builder.append("</STRONG></P>");
     builder.append("<P>Waters/Supremica is a joint project between the Department ");
     builder.append("of Signals and Systems, Chalmers University of Technology, ");
     builder.append("Sweden and the Department of Computer Science, University ");
