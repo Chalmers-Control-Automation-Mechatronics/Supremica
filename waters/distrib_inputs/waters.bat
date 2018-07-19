@@ -5,6 +5,7 @@ call :FindJava
 set javaCmd=%result%
 if "!javaCmd!" == "" (
   echo Could not find Java 8, 9, or 10 - please ensure it is installed correctly.
+  pause
   exit 1
 )
 
@@ -12,17 +13,17 @@ if "!javaCmd!" == "" (
 :: Now check for properties file and launch Waters ...
 
 if "%1" == "-p" (
-  :: Use properties file from command line
+  rem Use properties file from command line
   %javaCmd% -classpath %~dp0\Supremica.jar org.supremica.gui.ide.IDE %1 %2 %3 %4 %5 %6 %7 %8 %9
 ) else (
-  :: Install properties file to home directory
+  rem Install properties file to home directory
   set HOME=%HOMEDRIVE%%HOMEPATH%
   set PROPFILE="!HOME!\waters.properties"
   if not exist !PROPFILE! copy waters.properties !PROPFILE!
-  %javaCmd% -classpath %~dp0\Supremica.jar org.supremica.gui.ide.IDE -p %PROPFILE% %1 %2 %3 %4 %5 %6 %7 %8 %9
+  %javaCmd% -classpath %~dp0\Supremica.jar org.supremica.gui.ide.IDE -p !PROPFILE! %1 %2 %3 %4 %5 %6 %7 %8 %9
 )
 
-exit
+exit /b
 
 
 ::FUNCTION
