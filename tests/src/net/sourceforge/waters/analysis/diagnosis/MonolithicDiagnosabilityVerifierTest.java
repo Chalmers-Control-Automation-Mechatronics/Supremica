@@ -212,6 +212,13 @@ public class MonolithicDiagnosabilityVerifierTest
     runModelVerifier(des, false);
   }
 
+  public void testNotDiag11() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_11.wmod");
+    runModelVerifier(des, false);
+  }
+
 
   public void testSmallFactory2nd() throws Exception
   {

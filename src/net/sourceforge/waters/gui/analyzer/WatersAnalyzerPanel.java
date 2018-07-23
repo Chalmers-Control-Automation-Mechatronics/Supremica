@@ -48,10 +48,14 @@ import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
+import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.apache.logging.log4j.LogManager;
@@ -77,16 +81,18 @@ public class WatersAnalyzerPanel extends MainPanel
     mModuleContainer = moduleContainer;
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mSimpleExpressionCompiler = new SimpleExpressionCompiler(factory, optable);
+    mSimpleExpressionCompiler =
+      new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    // TODO mAutomataPanel is empty white panel.
+    // TODO It can be a local variable, and does not need scroll bars
     final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
     scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
     setRightComponent(scrollDisplay);
   }
-
 
   //#########################################################################
   //# Simple Access
@@ -105,7 +111,6 @@ public class WatersAnalyzerPanel extends MainPanel
     return mSimpleExpressionCompiler;
   }
 
-
   //#########################################################################
   //# Focus Switching
   @Override
@@ -114,15 +119,14 @@ public class WatersAnalyzerPanel extends MainPanel
     FocusTracker.requestFocusFor(mAutomataTable);
   }
 
-
   //#########################################################################
   //# Callbacks
-  void displaySelectedAutomata(final AutomatonProxy aut)
+  void displaySelectedAutomaton(final AutomatonProxy aut)
   {
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
-    // TODO Not all automata have source info ...
+    // TODO Instead of instanceof, check whether info is null
     final Proxy source = info.getSourceObject();
     if (source instanceof SimpleComponentSubject) {
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
@@ -139,9 +143,40 @@ public class WatersAnalyzerPanel extends MainPanel
         final String msg = exception.getMessage(comp);
         logger.error(msg);
       }
+    } else if (source instanceof AutomatonProxy) {
+      final AutomatonProxy ap = (AutomatonProxy) source;
+      SimpleComponentSubject comp = null;
+      if (mDisplayMap.containsKey(ap)) {
+        comp = (SimpleComponentSubject) mDisplayMap.get(ap);
+      } else {
+        try {
+          final ModuleProxyFactory factory =
+            ModuleSubjectFactory.getInstance();
+          final ProductDESImporter importer = new ProductDESImporter(factory);
+          comp = (SimpleComponentSubject) importer.importComponent(ap);
+          mDisplayMap.put(ap, comp);
+        } catch (final ParseException exception) {
+          final Logger logger = LogManager.getLogger();
+          logger.error(exception.getMessage());
+          return;
+        }
+      }
+      // TODO Move common code out of if-statement; use null if no bindings
+      final GraphSubject graph = comp.getGraph();
+      final BindingContext bindings = info.getBindingContext();
+      try {
+        mAutomataDisplayPane =
+          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                                   mSimpleExpressionCompiler, aut);
+        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+        setRightComponent(scroll);
+      } catch (final GeometryAbsentException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage(comp);
+        logger.error(msg);
+      }
     }
   }
-
 
   //#########################################################################
   //# Data Members
@@ -150,8 +185,11 @@ public class WatersAnalyzerPanel extends MainPanel
 
   private final JPanel mAutomataPanel = new JPanel();
   private final JTable mAutomataTable;
+  // TODO Instance variable mAutomataDisplayPane not needed?
   private AutomatonDisplayPane mAutomataDisplayPane;
-
+  // TODO Display map should be reset when a new model is loaded
+  // TODO This is easier when it is in AutomataTableModel
+  private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
 
   //#########################################################################
   //# Class Constants

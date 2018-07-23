@@ -72,7 +72,6 @@ import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -193,7 +192,7 @@ class AutomataTable extends JTable implements SelectionOwner
   @SuppressWarnings("unused")
   private boolean containsEqualIdentifier(final Proxy proxy)
   {
-    // TODO Remove this method (for now)
+    // TODO Change to containsName(String) and reprogram
     /*
      * final AutomataTableModel model = getModel(); if (proxy instanceof
      * IdentifierSubject) { final IdentifierSubject ident =
@@ -380,25 +379,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public boolean canPaste(final Transferable transferable)
   {
-    try {
-      if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON)) {
-        // TODO Just return true
-        @SuppressWarnings("unchecked")
-        final List<Proxy> data = (List<Proxy>) transferable
-          .getTransferData(WatersDataFlavor.AUTOMATON);
-        for (@SuppressWarnings("unused")
-        final Proxy proxy : data) {
-          return true;
-        }
-        return false;
-      } else {
-        return false;
-      }
-    } catch (final IOException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final UnsupportedFlavorException exception) {
-      throw new WatersRuntimeException(exception);
-    }
+    if (transferable.isDataFlavorSupported(WatersDataFlavor.AUTOMATON))
+      return true;
+    else
+      return false;
   }
 
   @Override
@@ -452,9 +436,10 @@ class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void insertItems(final List<InsertInfo> inserts)
   {
-    final List<AutomatonProxy> insertAutomatonList = new ArrayList<AutomatonProxy>();
+    final List<AutomatonProxy> insertAutomatonList =
+      new ArrayList<AutomatonProxy>();
     final AutomataTableModel model = getModel();
-    for(final InsertInfo info : inserts) {
+    for (final InsertInfo info : inserts) {
       final Proxy proxy = info.getProxy();
       if (proxy instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) proxy;
@@ -585,7 +570,7 @@ class AutomataTable extends JTable implements SelectionOwner
             final AutomataTableModel model = getModel();
             model.getAutomaton(getSelectedRows()[0]);
           } else {
-            mParent.displaySelectedAutomata(aut);
+            mParent.displaySelectedAutomaton(aut);
           }
         }
       }

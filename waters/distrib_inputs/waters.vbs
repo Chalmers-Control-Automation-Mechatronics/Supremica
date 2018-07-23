@@ -6,17 +6,8 @@ set ENV = SHO.Environment("Process")
 set REG = GetObject("winmgmts:{impersonationLevel=impersonate}!\\" &_ 
                     strComputer & "\root\default:StdRegProv")
 
-Home = ENV("HOMEDRIVE") & ENV("HOMEPATH")
-
 set ScriptFile = FSO.GetFile(WScript.ScriptFullName)
 ScriptDir = FSO.GetParentFolderName(ScriptFile)
-
-PropName = "waters.properties"
-PropPath = HOME & "\" & PropName
-IF NOT FSO.FileExists(PropPath) THEN
-	SourcePath = ScriptDir &  "\" & PropName
-	FSO.CopyFile SourcePath, PropPath 	
-END IF
 
 q = """"
 javaCmd = FindJava()
@@ -25,12 +16,22 @@ IF javaCmd = "" THEN
   Wscript.Quit(1)
 END IF
 Jar = ScriptDir & "\Supremica.jar"
+
+Home = ENV("HOMEDRIVE") & ENV("HOMEPATH")
+PropName = "waters.properties"
+PropPath = HOME & "\" & PropName
+IF NOT FSO.FileExists(PropPath) THEN
+	SourcePath = ScriptDir &  "\" & PropName
+	FSO.CopyFile SourcePath, PropPath 	
+END IF
+
 WatersCmd = javaCmd & " -classpath " & q & Jar & q & " org.supremica.gui.ide.IDE -p " & q & PropPath & q
 limit = WScript.Arguments.Count - 1
 FOR i = 0 to limit
   arg = WScript.Arguments.Item(i)
   WatersCmd = WatersCmd & " " & q & arg & q
 NEXT
+
 SHO.Run WatersCmd, 0, False
 
 

@@ -262,6 +262,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return reducedSupervisor;
   }
 
+  @SuppressWarnings("unused")
   private void ProcessDependencies(final CompatibleSet solution, final TIntList dependentIds) {
     final CompatibleDependenciesSet dependencies = solution.getDependencies();
 
@@ -403,6 +404,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return true;
   }
 
+  @SuppressWarnings("unused")
   private void bronKerboschWithDegeneracyOrdering(final TIntList clique, final TIntList possibleAdditions, final TIntList alreadyChecked, final TIntList maximalCliquesIdsToFill) {
     //if we have exhausted all possibilities, this must be the largest clique we have seen
     if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
@@ -551,6 +553,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
+  @SuppressWarnings("unused")
   private TIntList checkForSingleMaximalCoverOf(final int state) {
     final TIntList neighbours = new TIntArrayList(mNumStates);
     getNeighboursOf(state, neighbours);
@@ -941,11 +944,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private class CompatibleSet extends TIntHashSet {
     private final CompatibleDependenciesSet dependenciesSet;
-
-    public CompatibleSet(final int capacity) {
-      super(capacity);
-      dependenciesSet = new CompatibleDependenciesSet();
-    }
 
     private CompatibleSet(final TIntCollection existingCompatibles, final CompatibleDependenciesSet existingDependencies) {
       super(existingCompatibles);
