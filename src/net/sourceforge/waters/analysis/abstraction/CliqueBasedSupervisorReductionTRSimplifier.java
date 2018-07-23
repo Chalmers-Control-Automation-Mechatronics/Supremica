@@ -42,13 +42,14 @@ import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
 import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -90,33 +91,29 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     super.setUp();
 
-    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final ListBufferTransitionRelation relation = getTransitionRelation();
 
-    mDumpState = rel.getDumpStateIndex();
+    mDumpState = relation.getDumpStateIndex();
     final int supervisedEvent = getSupervisedEvent();
 
-    mNumStates = rel.getNumberOfStates();
+    mNumStates = relation.getNumberOfStates();
     final StateOutput[] stateOutputs = new StateOutput[mNumStates];
 
-    final TIntList initialCompatible = new TIntArrayList();
-    mReducedSupervisor = new CompatibleSet(mNumStates);
+
     mCompatibleCache = new IntSetBuffer(mNumStates);
     //mCoversCache = new TIntObjectHashMap<>();
 
     mCompatibleBuffer = new TIntArrayList(mNumStates);
     mDependencyIdBuffer = new TIntArrayList();
-    mEnabledEventsBuffer = new TIntHashSet(rel.getNumberOfProperEvents());
+    mEnabledEventsBuffer = new TIntHashSet(relation.getNumberOfProperEvents());
 
+    final TIntList initialCompatible = new TIntArrayList();
     for (int s = 0; s < mNumStates; s++) {
-      //set the reduced supervisor to the current set of states
-      final TIntList oneStateCompatible = new TIntArrayList();
-      oneStateCompatible.add(s);
-      mReducedSupervisor.add(mCompatibleCache.add(oneStateCompatible));
-
-      if (rel.isInitial(s)) {
+      if (relation.isInitial(s)) {
         initialCompatible.add(s);
       }
 
+      //set the reduced supervisor to the current set of states
       final int successorState = getSuccessorState(s, supervisedEvent);
       if (successorState == -1) {
         stateOutputs[s] = StateOutput.IGNORE;
@@ -126,7 +123,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         stateOutputs[s] = StateOutput.ENABLE;
       }
     }
-
     mInitialCompatibleId = mCompatibleCache.add(initialCompatible);
     mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
 
@@ -146,9 +142,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    for (int s = 0; s < mNumStates; s++) {
 
-    }
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<CompatibleSet> searchSpace = new PriorityQueue<>(new Comparator<CompatibleSet>() {
       @Override
@@ -159,47 +153,54 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     });
 
     final CompatibleDependenciesSet dependencies = new CompatibleDependenciesSet();
+    final TIntSet startingSolution = new TIntHashSet(mNumStates);
+    for (int s = 0; s < mNumStates; s++) {
 
-    dependencies.add(mInitialCompatibleId);
-    searchSpace.add(new CompatibleSet(new TIntHashSet(), dependencies));
-    reduce(searchSpace);
-    System.out.print("\n#Reduced: " + mReducedSupervisor.size() + " #Initial: " + mNumStates);
-
-    //account for the dump state which is included in the initial automaton but not in our compatibles
-    if (mReducedSupervisor.size() + 1 >= mNumStates) {
-      return false;
     }
 
+    dependencies.add(mInitialCompatibleId);
+    searchSpace.add(new CompatibleSet(startingSolution, dependencies));
+
+    final CompatibleSet reducedSupervisor = reduce(searchSpace);
+
+    if (reducedSupervisor == null) {
+      System.out.println("\nCould not reduce supervisor");
+      return false;
+    }
+    System.out.print("\n#Reduced: " + reducedSupervisor.size() + " #Initial: " + mNumStates);
+
+
+    if (reducedSupervisor.size() + 1 >= mNumStates) {
+      return false;
+    }
     else {
       //we managed to reduce the supervisor
-       return buildReducedSupervisor();
+       return buildReducedSupervisor(reducedSupervisor);
     }
   }
 
-  private void reduce(final PriorityQueue<CompatibleSet> searchSpace) {
-    while (true) {
+  private CompatibleSet reduce(final PriorityQueue<CompatibleSet> searchSpace) {
+    CompatibleSet reducedSupervisor = null;
+    int reducedSupervisorSize = mNumStates;
+
+    while (!searchSpace.isEmpty()) {
       //get the most promising partial solution
       final CompatibleSet currentSolution = searchSpace.poll();
-
-      //if we are empty, done
-      if (currentSolution == null) {
-        System.out.print("\nExhausted search space");
-        break;
-      }
 
       final CompatibleDependenciesSet currentDependencies = currentSolution.getDependencies();
       System.out.print("\nC: " + currentSolution.toString() + " D: " + currentDependencies + " L: " + currentSolution.size());
 
       //if we are too big skip (we could stop the search if our ordering of the queue were just based on solution size)
-      if (currentSolution.size() + 1 >= mReducedSupervisor.size()) {
+      if (currentSolution.size() + 1 >= reducedSupervisorSize) {
         System.out.print("-- Too big.");
         continue;
       }
 
       //if solution is complete and more reduced, save it
-      if (currentSolution.size() < mReducedSupervisor.size() && currentDependencies.size() == 0) {
+      if (currentSolution.size() < reducedSupervisorSize && currentDependencies.size() == 0) {
       //if we got here we know our solution is better than the current best
-        mReducedSupervisor = currentSolution;
+        reducedSupervisor = currentSolution;
+        reducedSupervisorSize = reducedSupervisor.size();
         System.out.print("-- New Best");
         continue;
       }
@@ -219,6 +220,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         //get the id of a cover
         final int coverId = coverIds.get(c);
 
+        //copy the current solution and dependencies.
+        final CompatibleSet newSolution = new CompatibleSet(currentSolution, currentDependencies);
+        final CompatibleDependenciesSet newDependencies = newSolution.getDependencies();
+
+        //we now need to add the cover and update dependencies to include the cover's successors
+        newSolution.add(coverId);
+        //now that we have added the associate compatible to the partial solution, anything covered by it in the dependencies is no longer needed
+        newDependencies.removeAllCoveredBy(coverId);
+
         mCompatibleBuffer.clear();
         mDependencyIdBuffer.clear();
         mEnabledEventsBuffer.clear();
@@ -230,14 +240,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer, mDependencyIdBuffer);
         final int dependentIdsSize = mDependencyIdBuffer.size();
 
-        //copy the current solution and dependencies.
-        final CompatibleSet newSolution = new CompatibleSet(currentSolution, currentDependencies);
-        final CompatibleDependenciesSet newDependencies = newSolution.getDependencies();
-
-        //we now need to add the cover and update dependencies to include the cover's successors
-        newSolution.add(coverId);
-        //now that we have added the associate compatible to the partial solution, anything covered by it in the dependencies is no longer needed
-        newDependencies.removeAllCoveredBy(coverId);
+        //ProcessDependencies(newSolution, mDependencyIdBuffer);
 
         //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
         for (int d = 0; d < dependentIdsSize; d++) {
@@ -249,17 +252,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             /* check if there is just a single maximal cover for this dependent. If so, we know we will need to add that cover
              * to our solution, so may as well do it here. Otherwise try adding it to the list of compatibles we know we still need to cover
              * it may not actually be added if it is already covered by an existing member */
-            /*mCompatibleBuffer.clear();
-            getCompatibleFromCache(dependentId, mCompatibleBuffer);
-
-            final TIntList singleMaximalCover = checkForSingleMaximalCoverOf(mCompatibleBuffer);
-            if (singleMaximalCover != null) {
-              singleMaximalCover.sort();
-              newSolution.add(mCompatibleCache.add(singleMaximalCover));
-            }
-            else {
-              newDependencies.add(dependentId);
-            }*/
             newDependencies.add(dependentId);
           }
         }
@@ -267,19 +259,62 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         searchSpace.add(newSolution);
       }
     }
+    return reducedSupervisor;
   }
 
-  private boolean buildReducedSupervisor() throws OverflowException {
+  private void ProcessDependencies(final CompatibleSet solution, final TIntList dependentIds) {
+    final CompatibleDependenciesSet dependencies = solution.getDependencies();
+
+    final TIntStack toProcessIds = new TIntArrayStack();
+    final TIntSet alreadyAddedIds = new TIntHashSet();
+    for (int i = 0; i < dependentIds.size(); i++) {
+      final int id = dependentIds.get(i);
+      toProcessIds.push(id);
+      alreadyAddedIds.add(id);
+    }
+
+    while (toProcessIds.size() > 0) {
+      final int dependentId = toProcessIds.pop();
+
+      mCompatibleBuffer.clear();
+      getCompatibleFromCache(dependentId, mCompatibleBuffer);
+
+      final TIntList singleMaximalCover = checkForSingleMaximalCoverOf(mCompatibleBuffer);
+      if (singleMaximalCover != null) {
+        singleMaximalCover.sort();
+        if (solution.add(mCompatibleCache.add(singleMaximalCover))) {
+          dependencies.removeAllCoveredBy(dependentId);
+
+          mDependencyIdBuffer.clear();
+          mEnabledEventsBuffer.clear();
+
+          //get the compatible ids of its successors
+          getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer, mDependencyIdBuffer);
+          for (int j = 0; j < mDependencyIdBuffer.size(); j++) {
+            final int id = mDependencyIdBuffer.get(j);
+            if (alreadyAddedIds.add(id)) {
+              toProcessIds.push(id);
+            }
+          }
+        }
+      }
+      else {
+        dependencies.add(dependentId);
+      }
+    }
+  }
+
+  private boolean buildReducedSupervisor(final CompatibleSet reducedSupervisor) throws OverflowException {
 
     final ListBufferTransitionRelation relation = getTransitionRelation();
     final AbstractStateBuffer oldStateBuffer = relation.getStateBuffer();
 
     //translate set of compatible ids which comprise the reduced supervisor into the compatibles themselves
-    final TIntSet[] reducedSupervisor = new TIntHashSet[mReducedSupervisor.size()];
+    final TIntSet[] newSupervisor = new TIntHashSet[reducedSupervisor.size()];
     int i = 0;
-    for (final TIntIterator compatibleIdIterator = mReducedSupervisor.iterator(); compatibleIdIterator.hasNext(); i++) {
-      reducedSupervisor[i] = new TIntHashSet();
-      getCompatibleFromCache(compatibleIdIterator.next(), reducedSupervisor[i]);
+    for (final TIntIterator compatibleIdIterator = reducedSupervisor.iterator(); compatibleIdIterator.hasNext(); i++) {
+      newSupervisor[i] = new TIntHashSet();
+      getCompatibleFromCache(compatibleIdIterator.next(), newSupervisor[i]);
     }
 
     final TIntList initialCompatible = new TIntArrayList();
@@ -288,8 +323,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //we have the set of compatibles, now we need to construct a new automaton based off them
     //find a compatible containing the initial set of states (it may could be a cover if a larger clique was found)
     int startStateIndexOffset = 0;
-    for (; startStateIndexOffset < reducedSupervisor.length; startStateIndexOffset++) {
-      final TIntSet currentCompatible = reducedSupervisor[startStateIndexOffset];
+    for (; startStateIndexOffset < newSupervisor.length; startStateIndexOffset++) {
+      final TIntSet currentCompatible = newSupervisor[startStateIndexOffset];
       if (currentCompatible.containsAll(initialCompatible)) { break; }
     }
 
@@ -300,9 +335,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     boolean hasExplicitDumpState = false;
     final TIntSet enabledEvents = new TIntHashSet();
 
-    for (int state = 0; state < reducedSupervisor.length; state++) {
-      final int compatibleIndex = (state + startStateIndexOffset) % reducedSupervisor.length;
-      final TIntSet compatible = reducedSupervisor[compatibleIndex];
+    for (int state = 0; state < newSupervisor.length; state++) {
+      final int compatibleIndex = (state + startStateIndexOffset) % newSupervisor.length;
+      final TIntSet compatible = newSupervisor[compatibleIndex];
 
       //get the union of all events among the compatible's states (from the original automaton definition)
       enabledEvents.clear();
@@ -325,13 +360,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
         //map the dump state to a special state index
         if (successorCompatible.size() == 1 && successorCompatible.contains(mDumpState)) {
-          successorState = reducedSupervisor.length;
+          successorState = newSupervisor.length;
           hasExplicitDumpState = true;
         }
         else {
-          for (; successorState < reducedSupervisor.length; successorState++) {
-            final int successorCompatibleIndex = (successorState + startStateIndexOffset) % reducedSupervisor.length;
-            if (reducedSupervisor[successorCompatibleIndex].containsAll(successorCompatible)) {
+          for (; successorState < newSupervisor.length; successorState++) {
+            final int successorCompatibleIndex = (successorState + startStateIndexOffset) % newSupervisor.length;
+            if (newSupervisor[successorCompatibleIndex].containsAll(successorCompatible)) {
               break;
             }
           }
@@ -342,9 +377,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     //explicitly identify the dump state
-    relation.reset(reducedSupervisor.length + 1, reducedSupervisor.length, transitionBuffer.size(), getPreferredInputConfiguration());
+    relation.reset(newSupervisor.length + 1, newSupervisor.length, transitionBuffer.size(), getPreferredInputConfiguration());
     //set the dump state as reachable only if there is actually a transition to it from our cliques
-    relation.setReachable(reducedSupervisor.length, hasExplicitDumpState);
+    relation.setReachable(newSupervisor.length, hasExplicitDumpState);
 
     relation.setInitial(0, true);
 
@@ -353,9 +388,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     relation.removeEvent(EventEncoding.TAU);
     relation.removeProperSelfLoopEvents();
 
-    for (int state = 0; state < reducedSupervisor.length; state++) {
-      final int compatibleIndex = (state + startStateIndexOffset) % reducedSupervisor.length;
-      final TIntSet compatible = reducedSupervisor[compatibleIndex];
+    for (int state = 0; state < newSupervisor.length; state++) {
+      final int compatibleIndex = (state + startStateIndexOffset) % newSupervisor.length;
+      final TIntSet compatible = newSupervisor[compatibleIndex];
       long newStateMarkings = relation.createMarkings();
 
       for (final TIntIterator compatibleIterator = compatible.iterator(); compatibleIterator.hasNext();) {
@@ -841,7 +876,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //not covered by any existing members, we want to add it.
       //now kick out any members the applicant covers
       removeAllCoveredBy(applicantId);
-      dependenciesQueue.add(applicantId);
 
       if (dependenciesSet.add(applicantId)) {
         dependenciesQueue.add(applicantId);
@@ -957,7 +991,4 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private TIntIntMap mStateToNeighbourCountMap;
 
   //private TIntObjectHashMap<TIntCollection> mCoversCache;
-  private CompatibleSet mReducedSupervisor;
-
-  private static Random sRandom = new Random(1);
 }
