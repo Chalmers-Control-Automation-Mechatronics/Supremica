@@ -48,6 +48,7 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -65,6 +66,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     mModuleContainer.attach(this);
     mCompiledDES = ModContainer.getCompiledDES();
     updateCompiledDES();
+    mDisplayMap = new HashMap<AutomatonProxy,SimpleComponentProxy>();
     if (mCompiledDES != null) {
       mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
     } else {
@@ -130,16 +132,20 @@ class AutomataTableModel extends AbstractTableModel implements Observer
       if (start == -1) {
         start = end = position;
       } else if (position > (end + 1)) {
-        for (int q = start; q >= end; q--)
+        for (int q = start; q >= end; q--) {
+          removeFromDisplayMap(mAutomataList.get(q));
           mAutomataList.remove(q);
+        }
         fireTableRowsDeleted(end, start);
         start = end = position;
       } else {
         end = position;
       }
     }
-    for (int q = start; q >= end; q--)
+    for (int q = start; q >= end; q--) {
+      removeFromDisplayMap(mAutomataList.get(q));
       mAutomataList.remove(q);
+    }
     fireTableRowsDeleted(end, start);
   }
 
@@ -150,6 +156,29 @@ class AutomataTableModel extends AbstractTableModel implements Observer
       mAutomataList.add(aut);
     }
     fireTableRowsInserted(count, count+insertList.size());
+  }
+
+  public boolean containsAutomatonName(final String name) {
+    for(final AutomatonProxy aut : mAutomataList)
+      if(aut.getName().equals(name) == true)
+        return true;
+    return false;
+  }
+
+  public boolean containsDisplayMap(final AutomatonProxy aut) {
+    return mDisplayMap.containsKey(aut);
+  }
+
+  public SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut) {
+    return mDisplayMap.get(aut);
+  }
+
+  public void addToDisplayMap(final AutomatonProxy aut, final SimpleComponentProxy comp) {
+    mDisplayMap.put(aut, comp);
+  }
+
+  public void removeFromDisplayMap(final AutomatonProxy aut) {
+    mDisplayMap.remove(aut);
   }
 
   public void Close()
@@ -237,6 +266,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
     if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH
         && mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
       updateCompiledDES();
+      mDisplayMap = new HashMap<AutomatonProxy,SimpleComponentProxy>();
     }
   }
 
@@ -257,6 +287,7 @@ class AutomataTableModel extends AbstractTableModel implements Observer
   private List<AutomatonProxy> mAutomataList;
   private final ModuleContainer mModuleContainer;
   private Map<String,EventProxy> mEventMap;
+  private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
 
   //#########################################################################
   //# Class Constants

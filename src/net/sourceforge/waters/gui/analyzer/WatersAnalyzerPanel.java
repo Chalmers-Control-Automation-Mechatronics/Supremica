@@ -51,7 +51,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -126,55 +125,43 @@ public class WatersAnalyzerPanel extends MainPanel
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
-    // TODO Instead of instanceof, check whether info is null
-    final Proxy source = info.getSourceObject();
-    if (source instanceof SimpleComponentSubject) {
+    BindingContext bindings = null;
+    GraphSubject graph = null;
+    final AutomataTableModel autModel = (AutomataTableModel) mAutomataTable.getModel();
+    if (info != null) {
+      final Proxy source = info.getSourceObject();
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
-      final GraphSubject graph = comp.getGraph();
-      final BindingContext bindings = info.getBindingContext();
-      try {
-        mAutomataDisplayPane =
-          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
-                                   mSimpleExpressionCompiler, aut);
-        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
-        setRightComponent(scroll);
-      } catch (final GeometryAbsentException exception) {
-        final Logger logger = LogManager.getLogger();
-        final String msg = exception.getMessage(comp);
-        logger.error(msg);
-      }
-    } else if (source instanceof AutomatonProxy) {
-      final AutomatonProxy ap = (AutomatonProxy) source;
+      graph = comp.getGraph();
+      bindings = info.getBindingContext();
+    } else {
       SimpleComponentSubject comp = null;
-      if (mDisplayMap.containsKey(ap)) {
-        comp = (SimpleComponentSubject) mDisplayMap.get(ap);
+      if (autModel.containsDisplayMap(aut)) {
+        comp = (SimpleComponentSubject) autModel.getCompFromDisplayMap(aut);
       } else {
         try {
           final ModuleProxyFactory factory =
             ModuleSubjectFactory.getInstance();
           final ProductDESImporter importer = new ProductDESImporter(factory);
-          comp = (SimpleComponentSubject) importer.importComponent(ap);
-          mDisplayMap.put(ap, comp);
+          comp = (SimpleComponentSubject) importer.importComponent(aut);
+          autModel.addToDisplayMap(aut, comp);
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
           logger.error(exception.getMessage());
           return;
         }
       }
-      // TODO Move common code out of if-statement; use null if no bindings
-      final GraphSubject graph = comp.getGraph();
-      final BindingContext bindings = info.getBindingContext();
-      try {
-        mAutomataDisplayPane =
-          new AutomatonDisplayPane(graph, bindings, mModuleContainer,
-                                   mSimpleExpressionCompiler, aut);
-        final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
-        setRightComponent(scroll);
-      } catch (final GeometryAbsentException exception) {
-        final Logger logger = LogManager.getLogger();
-        final String msg = exception.getMessage(comp);
-        logger.error(msg);
-      }
+      graph = comp.getGraph();
+    }
+    try {
+      final AutomatonDisplayPane mAutomataDisplayPane =
+        new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                                 mSimpleExpressionCompiler, aut);
+      final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+      setRightComponent(scroll);
+    } catch (final GeometryAbsentException exception) {
+      final Logger logger = LogManager.getLogger();
+      final String msg = exception.getMessage();
+      logger.error(msg);
     }
   }
 
@@ -185,11 +172,6 @@ public class WatersAnalyzerPanel extends MainPanel
 
   private final JPanel mAutomataPanel = new JPanel();
   private final JTable mAutomataTable;
-  // TODO Instance variable mAutomataDisplayPane not needed?
-  private AutomatonDisplayPane mAutomataDisplayPane;
-  // TODO Display map should be reset when a new model is loaded
-  // TODO This is easier when it is in AutomataTableModel
-  private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
 
   //#########################################################################
   //# Class Constants
