@@ -85,6 +85,8 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    // TODO mAutomataPanel is empty white panel.
+    // TODO It can be a local variable, and does not need scroll bars
     final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
     scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
@@ -119,11 +121,12 @@ public class WatersAnalyzerPanel extends MainPanel
 
   //#########################################################################
   //# Callbacks
-  void displaySelectedAutomata(final AutomatonProxy aut)
+  void displaySelectedAutomaton(final AutomatonProxy aut)
   {
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
+    // TODO Instead of instanceof, check whether info is null
     final Proxy source = info.getSourceObject();
     if (source instanceof SimpleComponentSubject) {
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
@@ -153,8 +156,12 @@ public class WatersAnalyzerPanel extends MainPanel
           comp = (SimpleComponentSubject) importer.importComponent(ap);
           mDisplayMap.put(ap, comp);
         } catch (final ParseException exception) {
+          final Logger logger = LogManager.getLogger();
+          logger.error(exception.getMessage());
+          return;
         }
       }
+      // TODO Move common code out of if-statement; use null if no bindings
       final GraphSubject graph = comp.getGraph();
       final BindingContext bindings = info.getBindingContext();
       try {
@@ -178,7 +185,10 @@ public class WatersAnalyzerPanel extends MainPanel
 
   private final JPanel mAutomataPanel = new JPanel();
   private final JTable mAutomataTable;
+  // TODO Instance variable mAutomataDisplayPane not needed?
   private AutomatonDisplayPane mAutomataDisplayPane;
+  // TODO Display map should be reset when a new model is loaded
+  // TODO This is easier when it is in AutomataTableModel
   private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
 
   //#########################################################################
