@@ -74,7 +74,7 @@ public class AutomataCloner
   public AutomatonProxy clone(final AutomatonProxy aut, final String newName)
   {
     final AutomatonProxy clonedAut;
-    final Map<StateProxy,StateProxy> mStateMap = new HashMap<StateProxy,StateProxy>();
+    final Map<StateProxy,StateProxy> stateMap = new HashMap<StateProxy,StateProxy>();
     final Set<EventProxy> eventList = aut.getEvents();
     final Set<StateProxy> stateList = aut.getStates();
     final Collection<TransitionProxy> transitionList = aut.getTransitions();
@@ -100,26 +100,27 @@ public class AutomataCloner
     for (final StateProxy sp : stateList) {
       final Collection<EventProxy> copiedPropostions =
         new ArrayList<EventProxy>();
+      // TODO new ArrayList<>(<size>)
       for (final EventProxy ep : sp.getPropositions())
         copiedPropostions.add(mEventMap.get(ep.getName()));
       final StateProxy copiedSP = mFactory
         .createStateProxy(sp.getName(), sp.isInitial(), copiedPropostions);
       copiedStates.add(copiedSP);
-      mStateMap.put(sp, copiedSP);
+      stateMap.put(sp, copiedSP);
     }
     for (final TransitionProxy tp : transitionList) {
       final StateProxy source = tp.getSource();
       final StateProxy target = tp.getTarget();
       final EventProxy event = tp.getEvent();
-      final StateProxy newSource = mStateMap.get(source);
-      final StateProxy newTarget = mStateMap.get(target);
+      final StateProxy newSource = stateMap.get(source);
+      final StateProxy newTarget = stateMap.get(target);
       final EventProxy newEvent = mEventMap.get(event.getName());
 
       final TransitionProxy copiedTP =
         mFactory.createTransitionProxy(newSource, newEvent, newTarget);
       copiedTranisitions.add(copiedTP);
     }
-
+    // TODO pass aut.getName() into method
     if (newName == null)
       clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
                                                 copiedEvents, copiedStates,
