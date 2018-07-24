@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="supred_02" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
-    <ns2:Comment>A simple test for the alpha-removal rule. This is the first example from the paper "A Compositional Approach for Verifying Generalised Nonblocking" by Robi Malik and Ryan Leduc, ICCA 2009.</ns2:Comment>
+    <ns2:Comment>A test for the supervisor reduction.
+A reduced supervisor is obtained using the overlapping maximal cliques of compatibles {S0,S1} and {S1,S2}.
+No reduction is possible without overlapping.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="c"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="u"/>

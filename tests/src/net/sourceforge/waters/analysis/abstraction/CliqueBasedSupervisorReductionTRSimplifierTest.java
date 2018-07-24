@@ -195,6 +195,14 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
     runTransitionRelationSimplifier(group, subdir, name);
   }
 
+  public void test_supred_04() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "supred_04.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
   /**
    * A test to see whether a single transition relation simplifier
    * object can perform multiple abstractions in sequence.
