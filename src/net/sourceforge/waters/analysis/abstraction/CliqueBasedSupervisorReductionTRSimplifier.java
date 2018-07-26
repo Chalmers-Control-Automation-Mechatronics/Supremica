@@ -94,10 +94,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final ListBufferTransitionRelation relation = getTransitionRelation();
 
     mDumpState = relation.getDumpStateIndex();
-    final int supervisedEvent = getSupervisedEvent();
-
     mNumStates = relation.getNumberOfStates();
-    final StateOutput[] stateOutputs = new StateOutput[mNumStates];
 
     mCompatibleCache = new IntSetBuffer(mNumStates);
 
@@ -105,40 +102,22 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mDependencyIdBuffer = new TIntArrayList();
     mEnabledEventsBuffer =
       new TIntHashSet(relation.getNumberOfProperEvents());
+    mStackBuffer = new TIntArrayStack();
+    mAlreadyExaminedIdsBuffer = new TIntHashSet();
+
+    mIncompatibilityRelation = getIncompatibilityRelation(getSupervisedEvent());
 
     final TIntList initialCompatible = new TIntArrayList();
-    for (int s = 0; s < mNumStates; s++) {
-
-      if (relation.isInitial(s)) {
-        initialCompatible.add(s);
-      }
-      //set the reduced supervisor to the current set of states
-      final int successorState = getSuccessorState(s, supervisedEvent);
-      if (successorState == -1) {
-        stateOutputs[s] = StateOutput.IGNORE;
-      } else if (successorState == mDumpState) {
-        stateOutputs[s] = StateOutput.DISABLE;
-      } else {
-        stateOutputs[s] = StateOutput.ENABLE;
-      }
-    }
-
-    mIncompatibilityRelation = getIncompatibilityRelation(stateOutputs);
-
     mStateToNeighbourCountMap = new TIntIntHashMap(mNumStates);
-
     for (int s = 0; s < mNumStates; s++) {
       int numNeighbours = 0;
       for (int i = 0; i < mNumStates; i++) {
         if (!mIncompatibilityRelation[s][i]) {
           numNeighbours++;
         }
-        if (numNeighbours == mNumStates) {
-
-        } else {
-
-
-        }
+      }
+      if (relation.isInitial(s)) {
+        initialCompatible.add(s);
       }
       mStateToNeighbourCountMap.put(s, numNeighbours);
     }
@@ -155,8 +134,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         @Override
         public int compare(final Candidate o1, final Candidate o2)
         {
-          return Integer.compare(o1.size() + o1.getDependencies().size(),
-                                 o2.size() + o2.getDependencies().size());
+          return Integer.compare(o1.size() + o1.dependenciesSize(),
+                                 o2.size() + o2.dependenciesSize());
         }
       });
 
@@ -190,9 +169,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //get the most promising partial solution
       final Candidate candidateSolution = searchSpace.poll();
 
-      System.out.print("\nC: " + candidateSolution.toString() + " D: "
-                       + candidateSolution.getDependencies() + " L: "
-                       + candidateSolution.size());
+      System.out.print("\n" + candidateSolution);
 
       //if solution is complete and more reduced, save it
       if (candidateSolution.size() < reducedSupervisorSize
@@ -242,15 +219,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer,
                                   mDependencyIdBuffer);
 
-        //processNewDependencies(newSolution, mDependencyIdBuffer);
+        processNewDependencies(newSolution, mDependencyIdBuffer);
 
         //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
-
-        final int dependentIdsSize = mDependencyIdBuffer.size();
-        for (int d = 0; d < dependentIdsSize; d++) {
-          newSolution.addDependency(mDependencyIdBuffer.get(d));
-        }
-
         searchSpace.add(newSolution);
       }
     }
@@ -373,40 +344,50 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return true;
   }
 
+  /**
+   * Determines which of the dependent compatibles only has one maximal cover.
+   * These can be added directly to the candidate solution rather than the
+   * queue of dependencies. Adding a compatible to the candidate solution may
+   * introduce more dependencies, so this is done until saturation.
+   * @param candidate The candidate solution to which we want to add compatibles
+   * @param dependentIds The initial set of compatibles we know we need to cover in our solution.
+   */
   public void processNewDependencies(final Candidate candidate,
                                      final TIntList dependentIds)
   {
-    final TIntStack toProcessIds = new TIntArrayStack();
-    final TIntSet alreadyAddedIds = new TIntHashSet();
+    mAlreadyExaminedIdsBuffer.clear();
+    mStackBuffer.clear();
     for (int i = 0; i < dependentIds.size(); i++) {
       final int id = dependentIds.get(i);
-      toProcessIds.push(id);
-      alreadyAddedIds.add(id);
+      mStackBuffer.push(id);
+      mAlreadyExaminedIdsBuffer.add(id);
     }
 
-    while (toProcessIds.size() > 0) {
-      final int dependentId = toProcessIds.pop();
+    while (mStackBuffer.size() > 0) {
+      final int dependentId = mStackBuffer.pop();
 
       mCompatibleBuffer.clear();
       getCompatibleFromCache(dependentId, mCompatibleBuffer);
 
       final TIntList singleMaximalCover =
         checkForSingleMaximalCoverOf(mCompatibleBuffer);
+
       if (singleMaximalCover == null) {
         candidate.addDependency(dependentId);
       } else {
         singleMaximalCover.sort();
         if (candidate.add(mCompatibleCache.add(singleMaximalCover))) {
+
           mDependencyIdBuffer.clear();
           mEnabledEventsBuffer.clear();
-
           //get the compatible ids of its successors
-          getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer,
+          getSuccessorCompatiblesOf(singleMaximalCover, mEnabledEventsBuffer,
                                     mDependencyIdBuffer);
+
           for (int j = 0; j < mDependencyIdBuffer.size(); j++) {
             final int id = mDependencyIdBuffer.get(j);
-            if (alreadyAddedIds.add(id)) {
-              toProcessIds.push(id);
+            if (mAlreadyExaminedIdsBuffer.add(id)) {
+              mStackBuffer.push(id);
             }
           }
         }
@@ -451,13 +432,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    //introduce for more pruning
-    /*
-     * final int pivotIndex = sRandom.nextInt(initialPossibleAdditionsSize +
-     * alreadyChecked.size()); final int pivot = pivotIndex <
-     * initialPossibleAdditionsSize ? possibleAdditions.get(pivotIndex) :
-     * alreadyChecked.get(pivotIndex - initialPossibleAdditionsSize);
-     */
 
     //go through each state we haven't tried adding yet
     for (int a = initialPossibleAdditionsSize - 1; a >= 0; a--) {
@@ -527,17 +501,25 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
+  /**
+   * Determines whether the specified compatible can be covered by just one maximal compatible.
+   * This performs a mini BronKerbosch search that can exit early once it determines there is more
+   * than one maximal cover.
+   * @param compatible The compatible we would like check
+   * @return null if there is more than one maximal cover, otherwise it returns the single maximal cover.
+   */
   private TIntList checkForSingleMaximalCoverOf(final TIntList compatible)
   {
     final TIntList neighbours = new TIntArrayList(mNumStates);
     getNeighboursOf(compatible, neighbours);
     final int neighboursSize = neighbours.size();
+
     boolean allMutualNeighbours = true;
     for (int i = 0; i < neighboursSize && allMutualNeighbours; i++) {
       final int n1 = neighbours.get(i);
       for (int j = 0; j < neighboursSize && allMutualNeighbours; j++) {
         final int n2 = neighbours.get(j);
-        if (n1 < n2 && !isNeighbour(n1, n2)) {
+        if (n1 != n2 && !isNeighbour(n1, n2)) {
           allMutualNeighbours = false;
         }
       }
@@ -565,14 +547,26 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         final int neighbour = neighboursToFill.get(n);
 
         boolean allNeighbours = true;
-        for (int s = 1; s < compatible.size() && allNeighbours; s++) {
+        for (int s = 1; s < compatible.size(); s++) {
           if (!isNeighbour(neighbour, compatible.get(s))) {
             allNeighbours = false;
+            break;
           }
         }
         if (!allNeighbours) {
           neighboursToFill.removeAt(n);
         }
+      }
+    }
+  }
+
+  private void getNeighboursOf(final int state,
+                               final TIntList neighboursToFill)
+  {
+    for (int s = 0; s < mNumStates; s++) {
+      //if the two states are compatible and not the same state, add to neighbours
+      if (isNeighbour(state, s)) {
+        neighboursToFill.add(s);
       }
     }
   }
@@ -601,16 +595,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return !mIncompatibilityRelation[state1][state2] && state1 != state2;
   }
 
-  private void getNeighboursOf(final int state,
-                               final TIntList neighboursToFill)
-  {
-    for (int s = 0; s < mNumStates; s++) {
-      //if the two states are compatible and not the same state, add to neighbours
-      if (isNeighbour(state, s)) {
-        neighboursToFill.add(s);
-      }
-    }
-  }
 
   private void getSuccessorCompatiblesOf(final TIntList compatible,
                                          final TIntSet enabledEventsBuffer,
@@ -634,13 +618,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       }
 
-      //we now have our successor compatible, but we must document this compatible in our cache.
-      //we need to insert into the cache sorted
-      final TIntList sortedSuccessor = new TIntArrayList(successorCompatible);
-      sortedSuccessor.sort();
+      if (!successorCompatible.isEmpty()) {
+        //we now have our successor compatible, but we must document this compatible in our cache.
+        //we need to insert into the cache sorted
+        final TIntList sortedSuccessor = new TIntArrayList(successorCompatible);
+        sortedSuccessor.sort();
 
-      //add the id associated with this compatible to the set of successor compatible ids
-      successorIdsToFill.add(mCompatibleCache.add(sortedSuccessor));
+        //add the id associated with this compatible to the set of successor compatible ids
+        successorIdsToFill.add(mCompatibleCache.add(sortedSuccessor));
+      }
     }
   }
 
@@ -689,7 +675,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private boolean[][] getIncompatibilityRelation(final StateOutput[] stateOutputs)
+  private boolean[][] getIncompatibilityRelation(final int supervisedEvent)
   {
     //to avoid having to loop through the entire matrix to assume each state pair is compatible,
     //we will just reverse interpretation of the entire matrix
@@ -702,12 +688,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     final TransitionIterator yPredecessorIterator =
       relation.createPredecessorsReadOnlyIterator();
 
+
     for (int x = 0; x < mNumStates; x++) {
 
-      final StateOutput outputX = stateOutputs[x];
+      final int successorStateX = getSuccessorState(x, supervisedEvent);
 
       //if this state doesn't care about supervisor event, skip all its pairs
-      if (outputX.equals(StateOutput.IGNORE)) {
+      if (successorStateX == -1) {
         continue;
       }
 
@@ -718,12 +705,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           continue;
         }
 
-        final StateOutput outputY = stateOutputs[y];
-        if (outputY.equals(StateOutput.IGNORE)) {
+        final int successorStateY = getSuccessorState(y, supervisedEvent);
+        if (successorStateY == -1) {
           continue;
         }
 
-        if (!outputX.equals(outputY)) {
+        if ((successorStateX == mDumpState && successorStateY != mDumpState) || (successorStateX != mDumpState && successorStateY == mDumpState)) {
           //not compatible
           final TLongArrayStack incompatiblesToMark = new TLongArrayStack();
           //top 32 bits is x, bottom 32 is y
@@ -778,23 +765,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     return (int) (statePair & 0xFFFFFFFF);
   }
-
-  /**
-   * Determines whether a compatible (referenced by its index in
-   * mCompatibleCache) is a superset of another compatible
-   *
-   * @param xId
-   *          The compatible we want the cover status of
-   * @param yId
-   *          The compatible we check is being covered (or not)
-   * @return true if the first compatible is a superset of the second,
-   *         otherwise false.
-   */
-  private boolean isCover(final int xId, final int yId)
-  {
-    return mCompatibleCache.containsAll(xId, yId);
-  }
-
 
   /**
    * Contains a set of ints that each represent a Compatible (a set of
@@ -909,7 +879,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     public boolean isUncoveredByAll(final int xId)
     {
       for (final int compatibleId : dependenciesQueue) {
-        if (isCover(compatibleId, xId)) {
+        if (mCompatibleCache.containsAll(compatibleId, xId)) {
           return false;
         }
       }
@@ -928,7 +898,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       for (final Iterator<Integer> compatibleIdsIterator =
         dependenciesQueue.iterator(); compatibleIdsIterator.hasNext();) {
         final int compatibleId = compatibleIdsIterator.next();
-        if (isCover(xId, compatibleId)) {
+        if (mCompatibleCache.containsAll(xId, compatibleId)) {
           compatibleIdsIterator.remove();
           dependenciesSet.remove(compatibleId);
         }
@@ -941,6 +911,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       final Integer[] compatibleIdBuffer = new Integer[size()];
       dependenciesQueue.toArray(compatibleIdBuffer);
       return Arrays.toString(compatibleIdBuffer);
+    }
+
+    public String prettyPrint() {
+      final Integer[] set = new Integer[dependenciesQueue.size()];
+      dependenciesQueue.toArray(set);
+      final StringBuilder out = new StringBuilder();
+      final TIntList compatible = new TIntArrayList();
+      out.append("Dependencies\n");
+      for (int i = 0; i < set.length; i++) {
+        compatible.clear();
+        getCompatibleFromCache(set[i], compatible);
+        out.append(compatible).append("\n");
+      }
+      return out.toString();
     }
 
     @Override
@@ -1020,7 +1004,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       for (final TIntIterator compatibleIdsIterator =
         iterator(); compatibleIdsIterator.hasNext();) {
-        if (isCover(compatibleIdsIterator.next(), xId)) {
+        if (mCompatibleCache.containsAll(compatibleIdsIterator.next(), xId)) {
           return false;
         }
       }
@@ -1032,14 +1016,22 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       final int[] set = toArray();
       Arrays.sort(set);
-      return Arrays.toString(set);
+      return "C: " + Arrays.toString(set) + " D: " + dependencies.toString();
     }
-  }
 
-
-  private enum StateOutput
-  {
-    ENABLE, DISABLE, IGNORE
+    public String prettyPrint() {
+      final int[] set = toArray();
+      final StringBuilder out = new StringBuilder();
+      final TIntList compatible = new TIntArrayList();
+      out.append("Solution\n");
+      for (int i = 0; i < set.length; i++) {
+        compatible.clear();
+        getCompatibleFromCache(set[i], compatible);
+        out.append(compatible).append("\n");
+      }
+      out.append(dependencies.prettyPrint());
+      return out.toString();
+    }
   }
 
   //#########################################################################
@@ -1052,7 +1044,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private TIntList mCompatibleBuffer;
   private TIntList mDependencyIdBuffer;
   private TIntSet mEnabledEventsBuffer;
-  //private TIntList mStates;
-  //private TIntList mIgnoredStates;
+  private TIntSet mAlreadyExaminedIdsBuffer;
+  private TIntStack mStackBuffer;
   private TIntIntMap mStateToNeighbourCountMap;
 }
