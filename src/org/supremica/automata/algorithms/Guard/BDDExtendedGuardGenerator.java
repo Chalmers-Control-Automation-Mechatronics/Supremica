@@ -1,8 +1,6 @@
 package org.supremica.automata.algorithms.Guard;
 
 import java.io.File;
-//###########################################################################
-//# Java standard imports
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -166,6 +164,18 @@ public final class BDDExtendedGuardGenerator {
       statesEnablingSigmaBDD =
         forwardMonolithicTransitionsBDD.relprod(sigmaBDD, quantifiedVars);
 
+      // update edge2BDDMap by removing entries where the edge is disabled
+      // in the synchronized transition relation. This prevents generating "0"
+      // the edges that are already forbidden through synchronization.
+      final HashSet<EdgeProxy> edgesForbidden = new HashSet<>();
+      for (final EdgeProxy edge: edge2BDDMap.keySet()) {
+        if (edge2BDDMap.get(edge).and(statesEnablingSigmaBDD).isZero()) {
+          edgesForbidden.add(edge);
+        }
+      }
+      for (final EdgeProxy edge: edgesForbidden)
+        edge2BDDMap.remove(edge);
+
       safeStatesEnablingSigmaBDD = safeStatesBDD.and(statesEnablingSigmaBDD);
 
       computeStatesLeading2ForbiddenStates();
@@ -242,6 +252,8 @@ public final class BDDExtendedGuardGenerator {
         }
       } else {
         for (final EdgeProxy edge: edge2BDDMap.keySet()) {
+          if (edge2GuardMap.containsKey(edge))
+            continue;
           final BDD mustForbiddenStates = edgesMustForbiddenStates.get(edge);
           final String forbiddenGuard =
             generateGuard(edge, mustForbiddenStates);
@@ -282,19 +294,7 @@ public final class BDDExtendedGuardGenerator {
       }
     }
 
-    // for debugging purposes, will be cleaned up after the testing.
-//    for (final Map.Entry<String, Set<EdgeProxy>> e:
-//         guard2EdgesMap.entrySet()) {
-//      final String guard = e.getKey();
-//      logger.info("The following edges have the same guard: " + guard);
-//      for (final EdgeProxy edge: e.getValue()) {
-//        logger.info("<" + edge.getSource().getName() + ", "
-//                    + edge.getTarget().getName() + ">");
-//      }
-//    }
-
-    for (final Map.Entry<String,Set<EdgeProxy>> e:
-          guard2EdgesMap.entrySet()) {
+    for (final Map.Entry<String,Set<EdgeProxy>> e:guard2EdgesMap.entrySet()) {
       final String guard = e.getKey();
       final ArrayList<EdgeProxy> edgeList = new ArrayList<>(e.getValue());
       // sort based on the sizes of existing guards. If two has the same size,
@@ -309,7 +309,7 @@ public final class BDDExtendedGuardGenerator {
                 !e1.getGuardActionBlock().getGuards().isEmpty()) {
               final SimpleExpressionProxy existingGuard =
                 e1.getGuardActionBlock().getGuards().get(0);
-              e1GuardSize = existingGuard.getPlainText().length();
+              e1GuardSize = existingGuard.toString().length();
             }
           }
           int e2GuardSize = 0;
@@ -318,7 +318,7 @@ public final class BDDExtendedGuardGenerator {
                 !e2.getGuardActionBlock().getGuards().isEmpty()) {
               final SimpleExpressionProxy existingGuard =
                 e2.getGuardActionBlock().getGuards().get(0);
-              e2GuardSize = existingGuard.getPlainText().length();
+              e2GuardSize = existingGuard.toString().length();
             }
           }
           if (e1GuardSize == e2GuardSize) {
@@ -353,6 +353,9 @@ public final class BDDExtendedGuardGenerator {
 
   //#########################################################################
   //# BDD states and transitions manipulations
+
+  /* Compute the set of states S that can reach reachable forbidden states.
+   * */
   private void computeStatesLeading2ForbiddenStates()
   {
     BDD forbiddenAndReachableStatesBDD =
@@ -398,7 +401,7 @@ public final class BDDExtendedGuardGenerator {
   private void computeMustForbiddenSates()
   {
     mustForbiddenStatesBDD =
-      safeStatesEnablingSigmaBDD.and(mustAllowedStatesBDD.not());
+      safeStatesEnablingSigmaBDD.and(statesLeading2ForbiddenBDD);
   }
 
   private void computeEdgesMustForbiddenStates() {
