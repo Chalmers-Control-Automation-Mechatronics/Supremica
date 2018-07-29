@@ -321,10 +321,21 @@ public abstract class BDDAbstractManager {
                     final Set<String> nonIntegerVarNameSet = bddExAutomata.orgExAutomata.getNonIntegerVarNameSet();
                     final ResultOverflows roLeft = expr2BDDBitVec(left, false, updatedVariables);
                     ResultOverflows roRight = null;
-                    if (nonIntegerVarNameSet.contains(left.toString()) &&
+
+                    String leftVarName = null;
+                    if (left instanceof UnaryExpressionProxy) {
+                      final UnaryExpressionProxy unExpr = (UnaryExpressionProxy) left;
+                      if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNextOperator())) {
+                        leftVarName = unExpr.getSubTerm().toString();
+                      }
+                    } else {
+                      leftVarName = left.toString();
+                    }
+
+                    if (nonIntegerVarNameSet.contains(leftVarName) &&
                         !nonIntegerVarNameSet.contains(right.toString())) {
                       final Map<String, String> var2InstIntMap =
-                        bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
+                        bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(leftVarName);
                       final IntConstantProxy mappedIntProxy =
                         new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
                       roRight = expr2BDDBitVec(mappedIntProxy, false, updatedVariables);
