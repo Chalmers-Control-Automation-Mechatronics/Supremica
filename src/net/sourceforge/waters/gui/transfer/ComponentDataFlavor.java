@@ -120,19 +120,26 @@ class ComponentDataFlavor extends ModuleDataFlavor
   {
     final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-    final ProductDESImporter importer = new ProductDESImporter(factory);
     final ProxyCloner cloner = factory.getCloner();
+    ProductDESImporter importer = null;
     for (final Proxy p : data) {
-      if (p instanceof AutomatonProxy)
+      if (p instanceof AutomatonProxy) {
+        if (importer == null) {
+          importer = new ProductDESImporter(factory);
+        }
         try {
+          // TODO Use AutomatonTools.createProductDESProxy() to make a DES
+          // TODO Import the DES to get a module
+          // TODO Include the components and events from the module
           proxyList.add(importer.importComponent((AutomatonProxy)p));
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
           final String msg = exception.getMessage();
           logger.error(msg);
         }
-      else
+      } else {
         proxyList.add(cloner.getClone(p));
+      }
     }
     return proxyList;
   }

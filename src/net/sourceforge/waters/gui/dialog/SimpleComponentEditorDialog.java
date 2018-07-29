@@ -353,14 +353,16 @@ public class SimpleComponentEditorDialog
   //# Action Listeners
   /**
    * Commits the contents of this dialog to the model.
-   * This method is attached to action listener of the 'OK' button
+   * This method is attached to the action listener of the 'OK' button
    * of the event editor dialog.
    */
   public void commitDialog()
   {
     if (isInputLocked()) {
-      // nothing
+      // There is invalid input and an error message has been displayed.
+      // Do not try to commit.
     } else {
+      // Read the data from the dialog ...
       final IdentifierSubject ident0 =
         (IdentifierSubject) mNameInput.getValue();
       final IdentifierSubject ident =
@@ -382,6 +384,7 @@ public class SimpleComponentEditorDialog
       final GraphSubject graph =
         new GraphSubject(deterministic, null, null, null);
       if (mComponent == null) {
+        // Create new component and insert
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
         final SelectionOwner panel = mRoot.getComponentsPanel();
@@ -391,6 +394,7 @@ public class SimpleComponentEditorDialog
         mComponent = template;
         mRoot.getUndoInterface().executeCommand(command);
       } else {
+        // Modify existing component using data from dialog
         graph.setDeterministic(deterministic);
         final SimpleComponentSubject template =
           new SimpleComponentSubject(ident, kind, graph, attribs);
@@ -403,6 +407,7 @@ public class SimpleComponentEditorDialog
         boundary.add(mComponent.getGraph().getNodesModifiable());
         boundary.add(mComponent.getGraph().getEdgesModifiable());
         final UndoInfo info = mComponent.createUndoInfo(template, boundary);
+        // Modify only if something has changed
         if (info != null) {
           final SelectionOwner panel = mRoot.getComponentsPanel();
           final Command command =
@@ -410,6 +415,7 @@ public class SimpleComponentEditorDialog
           mRoot.getUndoInterface().executeCommand(command);
         }
       }
+      // Close the dialog
       dispose();
     }
   }
@@ -418,12 +424,12 @@ public class SimpleComponentEditorDialog
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether it is unsafe the current input to commit the currently
+   * Checks whether it is unsafe to commit the currently
    * edited text field. If this method returns <CODE>true</CODE>, it is
    * unsafe to commit the current dialog contents, and shifting the focus
    * is to be avoided.
    * @return <CODE>true</CODE> if the component currently owning the focus
-   *         is to be parsed and has been found to contain invalid information,
+   *         has been found to contain invalid information,
    *         <CODE>false</CODE> otherwise.
    */
   private boolean isInputLocked()
@@ -455,7 +461,7 @@ public class SimpleComponentEditorDialog
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3597766255951309896L;
 
   }
 
@@ -488,7 +494,7 @@ public class SimpleComponentEditorDialog
    *
    * <P>This is a reference to the actual object that is being edited.  If
    * a new component is being created, it is <CODE>null</CODE>
-   * until the dialog is commited and the actually created subject is
+   * until the dialog is committed and the actually created subject is
    * assigned.</P>
    *
    * <P>The edited state is stored only in the dialog. Changes are only
@@ -500,7 +506,7 @@ public class SimpleComponentEditorDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 5606299929823517586L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final GraphSubject GRAPH_TEMPLATE = new GraphSubject();
   private static final SimpleComponentSubject COMPONENT_TEMPLATE =

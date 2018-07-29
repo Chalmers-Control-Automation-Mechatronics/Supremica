@@ -71,9 +71,10 @@ public class AutomataCloner
 
   //#########################################################################
   //# Invocation
-  public AutomatonProxy clone(final AutomatonProxy aut)
+  public AutomatonProxy clone(final AutomatonProxy aut, final String newName)
   {
     final AutomatonProxy clonedAut;
+    final Map<StateProxy,StateProxy> stateMap = new HashMap<StateProxy,StateProxy>();
     final Set<EventProxy> eventList = aut.getEvents();
     final Set<StateProxy> stateList = aut.getStates();
     final Collection<TransitionProxy> transitionList = aut.getTransitions();
@@ -97,32 +98,44 @@ public class AutomataCloner
       copiedEvents.add(newEvent);
     }
     for (final StateProxy sp : stateList) {
-      // TODO Replace propositions using event map
+      final Collection<EventProxy> copiedPropostions =
+        new ArrayList<EventProxy>();
+      // TODO new ArrayList<>(<size>)
+      for (final EventProxy ep : sp.getPropositions())
+        copiedPropostions.add(mEventMap.get(ep.getName()));
       final StateProxy copiedSP = mFactory
-        .createStateProxy(sp.getName(), sp.isInitial(), sp.getPropositions());
+        .createStateProxy(sp.getName(), sp.isInitial(), copiedPropostions);
       copiedStates.add(copiedSP);
-      if (mStateMap == null)
-        mStateMap = new HashMap<StateProxy,StateProxy>();
-      mStateMap.put(sp, copiedSP);
+      stateMap.put(sp, copiedSP);
     }
     for (final TransitionProxy tp : transitionList) {
       final StateProxy source = tp.getSource();
       final StateProxy target = tp.getTarget();
       final EventProxy event = tp.getEvent();
-      final StateProxy newSource = mStateMap.get(source);
-      final StateProxy newTarget = mStateMap.get(target);
+      final StateProxy newSource = stateMap.get(source);
+      final StateProxy newTarget = stateMap.get(target);
       final EventProxy newEvent = mEventMap.get(event.getName());
 
       final TransitionProxy copiedTP =
         mFactory.createTransitionProxy(newSource, newEvent, newTarget);
       copiedTranisitions.add(copiedTP);
     }
-
-    clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
-                                              copiedEvents, copiedStates,
-                                              copiedTranisitions);
+    // TODO pass aut.getName() into method
+    if (newName == null)
+      clonedAut = mFactory.createAutomatonProxy(aut.getName(), aut.getKind(),
+                                                copiedEvents, copiedStates,
+                                                copiedTranisitions);
+    else
+      clonedAut =
+        mFactory.createAutomatonProxy(newName, aut.getKind(), copiedEvents,
+                                      copiedStates, copiedTranisitions);
 
     return clonedAut;
+  }
+
+  public AutomatonProxy clone(final AutomatonProxy aut)
+  {
+    return clone(aut, null);
   }
 
   public List<Proxy> getClonedList(final Collection<? extends Proxy> autList)
@@ -138,7 +151,5 @@ public class AutomataCloner
   //# Data Members
   private final ProductDESProxyFactory mFactory;
   private final Map<String,EventProxy> mEventMap;
-  // TODO State map should be local variable---must be reset for each automaton
-  private Map<StateProxy,StateProxy> mStateMap;
 
 }

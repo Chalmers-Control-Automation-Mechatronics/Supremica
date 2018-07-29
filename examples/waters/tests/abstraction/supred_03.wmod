@@ -4,7 +4,7 @@
 The result of supervisor reduction is probably not unique.
 The after automaton is what the algorithm seems to produce at the moment.
 
-Possible improvemnts:
+Possible improvements:
 finish2 is an uncontrollable selfloop-only event and can be removed.
 finish1 and start2 are probably not possible in S2 (after back-composition with before) and can be removed.</ns2:Comment>
     <EventDeclList>
