@@ -1,9 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.math.BigInteger;
@@ -38,9 +34,15 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
+
+/**
+ * @author Sajed Miremadi, Zhennan Fei
+ */
 public class BDDExtendedAutomaton {
 
+    @SuppressWarnings("unused")
     private static Logger logger = LogManager.getLogger(BDDExtendedAutomaton.class);
+
     ExtendedAutomaton theExAutomaton;
     BDDExtendedAutomata bddExAutomata;
     BDDExtendedManager manager;
