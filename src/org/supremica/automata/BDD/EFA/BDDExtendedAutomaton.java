@@ -40,6 +40,7 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 public class BDDExtendedAutomaton {
 
+    @SuppressWarnings("unused")
     private static Logger logger = LogManager.getLogger(BDDExtendedAutomaton.class);
     ExtendedAutomaton theExAutomaton;
     BDDExtendedAutomata bddExAutomata;

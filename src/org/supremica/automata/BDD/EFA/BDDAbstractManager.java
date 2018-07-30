@@ -25,6 +25,7 @@ import net.sourceforge.waters.subject.module.IntConstantSubject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.PSupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.ResultOverflows;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
@@ -306,11 +307,13 @@ public abstract class BDDAbstractManager {
                 SupremicaBDDBitVector tmp = null;
                 BDD leftOverflows = getZeroBDD();
                 BDD rightOverflows = getZeroBDD();
-                if (bexpr.getLeft().toString().contains(bddExAutomata.getLocVarSuffix())) {
+                if (isAutVar(bexpr.getLeft().toString())) {
                     final String leftString = bexpr.getLeft().toString();
                     final String locName = bexpr.getRight().toString();
                     final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
-                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, false, bddExAutomata.getSourceLocationDomain(autName));
+                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                                                      false,
+                                                      bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName));
                     tmp.setBit(0, locBDD);
@@ -352,11 +355,13 @@ public abstract class BDDAbstractManager {
                 SupremicaBDDBitVector tmp = null;
                 BDD leftOverflows = getZeroBDD();
                 BDD rightOverflows = getZeroBDD();
-                if (bexpr.getLeft().toString().contains(bddExAutomata.getLocVarSuffix())) {
+                if (isAutVar(bexpr.getLeft().toString())) {
                     final String leftString = bexpr.getLeft().toString();
                     final String locName = bexpr.getRight().toString();
                     final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
-                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, false, bddExAutomata.getSourceLocationDomain(autName));
+                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
+                                                      false,
+                                                      bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName)).not();
                     tmp.setBit(0, locBDD);
@@ -467,6 +472,24 @@ public abstract class BDDAbstractManager {
         }
 
         throw new IllegalArgumentException("Type of expression not known!");
+    }
+
+    private boolean isAutVar(final String str)
+    {
+      // check if the variable with the suffix "_curr" is the
+      // variable for an automaton or just a regular variable
+      boolean autVar = false;
+      if (str.contains(bddExAutomata.getLocVarSuffix())) {
+        final ExtendedAutomata exAut = bddExAutomata.getExtendedAutomata();
+        final Set<String> autNameSet = exAut.getStringToExAutomaton().keySet();
+        for (final String name : autNameSet) {
+          if (str.contains(name)) {
+            autVar = true;
+            break;
+          }
+        }
+      }
+      return autVar;
     }
 
     public void addLocation(final BDD bdd, final int locationIndex, final BDDDomain domain) {
