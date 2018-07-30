@@ -67,14 +67,12 @@ public class WatersPopupActionManager
     mIDE = ide;
   }
 
-
   //#########################################################################
   //# Simple Access
   public IDE getIDE()
   {
     return mIDE;
   }
-
 
   //#########################################################################
   //# Installing and Using Actions
@@ -101,17 +99,18 @@ public class WatersPopupActionManager
     }
   }
 
-
   //#########################################################################
   //# Access to Actions
   /**
-   * Creates an action to toggle a {@link BooleanProperty} from
-   * Supremica's configuration.
-   * @param property  The property affected by the action.
-   * @param shortName A short name to describe the action. The short name
-   *                  is displayed when the action appears in the menu,
-   *                  and the (longer) comment of the property is used as a
-   *                  tool tip.
+   * Creates an action to toggle a {@link BooleanProperty} from Supremica's
+   * configuration.
+   *
+   * @param property
+   *          The property affected by the action.
+   * @param shortName
+   *          A short name to describe the action. The short name is displayed
+   *          when the action appears in the menu, and the (longer) comment of
+   *          the property is used as a tool tip.
    */
   public IDEAction getConfigBooleanPropertyAction(final BooleanProperty property,
                                                   final String shortName)
@@ -121,17 +120,19 @@ public class WatersPopupActionManager
 
   /**
    * Creates a new enumeration property action.
-   * @param property  The property affected by the action.
-   * @param value     The value assigned to the property when the action
-   *                  is triggered.
-   * @param comment   A comment to explain the action. Menu items are
-   *                  labelled by the string representation of the value,
-   *                  while the comment is used as a tool tip.
+   *
+   * @param property
+   *          The property affected by the action.
+   * @param value
+   *          The value assigned to the property when the action is triggered.
+   * @param comment
+   *          A comment to explain the action. Menu items are labelled by the
+   *          string representation of the value, while the comment is used as
+   *          a tool tip.
    */
-  public <E extends Enum<E>>
-  IDEAction getConfigEnumPropertyAction(final ObjectProperty<E> property,
-                                        final E value,
-                                        final String comment)
+  public <E extends Enum<E>> IDEAction getConfigEnumPropertyAction(final ObjectProperty<E> property,
+                                                                   final E value,
+                                                                   final String comment)
   {
     return new ConfigEnumPropertyAction<E>(mIDE, property, value, comment);
   }
@@ -321,7 +322,8 @@ public class WatersPopupActionManager
     return new DesktopOpenWindowAction(mIDE, auto);
   }
 
-  public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton, final Proxy highlighted)
+  public IDEAction getDesktopExecuteAction(final AutomatonProxy automaton,
+                                           final Proxy highlighted)
   {
     return new DesktopExecuteAction(mIDE, automaton, highlighted);
   }
@@ -390,6 +392,11 @@ public class WatersPopupActionManager
     return new DesktopSwitchStateAction(mIDE, automaton, node);
   }
 
+  public IDEAction getAnalyzerSynchronousProductAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerSynchronousProductAction.class);
+  }
 
   //#########################################################################
   //# Data Members
