@@ -337,8 +337,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             }
         }
 
-//        System.out.println("domain: "+orgExAutomata.getDomain());
-
         setVariableOrdering();
 
         if(synType.equals(SynthesisAlgorithm.MINIMALITY_C)
@@ -361,14 +359,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             variableOrderingNames.add("1");
         }
 
-        //Manually set the variable ordering. In this case, tha bove setVariableOrdering() should be commented out.
-//        manuallySetVariableOrderingNames();
-//        setVariableOrdering(variableOrderingNames);
-
         for (final Object obj : variableOrdering) {
             if (obj instanceof List<?> && !((List<?>) obj).isEmpty()) {
                 eventDomain = manager.createDomain(((List<EventDeclProxy>) obj).size());
-//                eventDomain.setName("Events");
+
                 numberOfUsedBDDVariables += eventDomain.varNum();
 
                 for (final EventDeclProxy event : ((List<EventDeclProxy>) obj)) {
@@ -606,63 +600,6 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 }
             }
         }
-    }
-
-    void manuallySetVariableOrderingNames() {
-        variableOrderingNames = new ArrayList<String>();
-        //Timed manufacturing cell
-        variableOrderingNames.add("Events");
-        variableOrderingNames.add("M1");
-        variableOrderingNames.add("c1");
-        variableOrderingNames.add("Spec2");
-        variableOrderingNames.add("Spec1");
-        variableOrderingNames.add("Spec4");
-        variableOrderingNames.add("Spec3");
-//        variableOrderingNames.add("Spec6");
-//        variableOrderingNames.add("Spec5");
-        variableOrderingNames.add("M2");
-        variableOrderingNames.add("c2");
-        variableOrderingNames.add("1");
-        //Oil example
-//        variableOrderingNames.add("Events");
-//        variableOrderingNames.add("Machine");
-//        variableOrderingNames.add("MachLoc");
-//        variableOrderingNames.add("Scheduler");
-//        variableOrderingNames.add("time");
-//        variableOrderingNames.add("V");
-////        variableOrderingNames.add("V_acc");
-//        variableOrderingNames.add("clock_t");
-//        variableOrderingNames.add("i");
-//        variableOrderingNames.add("Pump");
-//        variableOrderingNames.add("clock_w");
-//        variableOrderingNames.add("PumpLoc");
-//        variableOrderingNames.add("clock_z");
-//        variableOrderingNames.add("clock_y");
-//        variableOrderingNames.add("1");
-
-        //Fisher thompson
-//        variableOrderingNames.add("Events");
-//        variableOrderingNames.add("Clock");
-//        variableOrderingNames.add("time");
-//        variableOrderingNames.add("m0");
-//        variableOrderingNames.add("m1");
-//        variableOrderingNames.add("m2");
-//        variableOrderingNames.add("m3");
-//        variableOrderingNames.add("m4");
-//        variableOrderingNames.add("m5");
-//        variableOrderingNames.add("P2");
-//        variableOrderingNames.add("c2");
-//        variableOrderingNames.add("P5");
-//        variableOrderingNames.add("c5");
-//        variableOrderingNames.add("P6");
-//        variableOrderingNames.add("c6");
-//        variableOrderingNames.add("P4");
-//        variableOrderingNames.add("c4");
-//        variableOrderingNames.add("P3");
-//        variableOrderingNames.add("c3");
-//        variableOrderingNames.add("P1");
-//        variableOrderingNames.add("c1");
-//        variableOrderingNames.add("1");
     }
 
     public void setPathRoot(final String pr) {

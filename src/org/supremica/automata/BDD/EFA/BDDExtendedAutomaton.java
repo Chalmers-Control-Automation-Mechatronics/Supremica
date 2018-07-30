@@ -1,9 +1,5 @@
 package org.supremica.automata.BDD.EFA;
 
-/**
- *
- * @author Sajed Miremadi, Zhennan Fei
- */
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.math.BigInteger;
@@ -32,10 +28,20 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
+
+/**
+ * @author Sajed Miremadi, Zhennan Fei
+ */
 public class BDDExtendedAutomaton {
+
+    @SuppressWarnings("unused")
+    private static Logger logger = LogManager.getLogger(BDDExtendedAutomaton.class);
 
     ExtendedAutomaton theExAutomaton;
     BDDExtendedAutomata bddExAutomata;
@@ -136,17 +142,22 @@ public class BDDExtendedAutomaton {
                   final int srcLocIndex = bddExAutomata.getLocationIndex(theExAutomaton, edge.getSource());
                   final BDD srcLocBDD = factory.buildCube(srcLocIndex, sourceLocationDomain.vars());
                   List<SimpleExpressionProxy> guards = null;
-                  final BDD guardBDD = manager.getOneBDD();
-                  if (edge.getGuardActionBlock() != null)
+                  BDD guardBDD = manager.getOneBDD();
+                  if (edge.getGuardActionBlock() != null) {
                     guards = edge.getGuardActionBlock().getGuards();
-                  if (guards != null && guards.isEmpty())
-                    guardBDD.and(manager.guard2BDD(guards.get(0)));
+                  }
+                  if (guards != null && guards.size() > 0) {
+                      guardBDD = manager.guard2BDD(guards.get(0));
+                  }
+
                   final Iterator<Proxy> eventIterator = edge.getLabelBlock().getEventIdentifierList().iterator();
                   while (eventIterator.hasNext()) {
                     final String eventName = ((SimpleIdentifierSubject) eventIterator.next()).getName();
                     final HashMap<EdgeProxy, BDD> eventsEdge2BDDMap =
                       bddExAutomata.getEventName2EdgeBDDMap().get(eventName);
-                    eventsEdge2BDDMap.put(edge, srcLocBDD.and(guardBDD));
+                    if (!guardBDD.isZero()) {
+                      eventsEdge2BDDMap.put(edge, srcLocBDD.and(guardBDD));
+                    }
                   }
                   bddExAutomata.getEdge2ExAutomatonMap().put(edge, theExAutomaton);
                 }

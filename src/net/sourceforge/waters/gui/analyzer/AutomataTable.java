@@ -101,9 +101,6 @@ class AutomataTable extends JTable implements SelectionOwner
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
-
-    //    this.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ENTER"), "none");
-
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
     final int columnGap = IconAndFontLoader.getTableColumnGap();
@@ -189,20 +186,16 @@ class AutomataTable extends JTable implements SelectionOwner
     }
   }
 
-  @SuppressWarnings("unused")
-  private boolean containsEqualIdentifier(final Proxy proxy)
+  private void maybeShowPopup(final MouseEvent event)
   {
-    // TODO Change to containsName(String) and reprogram
-    /*
-     * final AutomataTableModel model = getModel(); if (proxy instanceof
-     * IdentifierSubject) { final IdentifierSubject ident =
-     * (IdentifierSubject) proxy; return model.containsEqualIdentifier(ident);
-     * } else if (proxy instanceof IdentifierProxy) { final ModuleProxyCloner
-     * cloner = ModuleSubjectFactory.getCloningInstance(); final
-     * IdentifierSubject ident = (IdentifierSubject) cloner.getClone(proxy);
-     * return model.containsEqualIdentifier(ident); } else { return false; }
-     */
-    return false;
+    final AutomatonProxy clicked = getAutomaton(event);
+    if ((clicked == null)) {
+      clearSelection();
+    }
+    final IDE ide = mModuleContainer.getIDE();
+    final WatersPopupActionManager manager = ide.getPopupActionManager();
+    final AnalyzerPopupFactory pop = new AnalyzerPopupFactory(manager);
+    pop.maybeShowPopup(this, event, clicked);
   }
 
   //#########################################################################
@@ -400,7 +393,25 @@ class AutomataTable extends JTable implements SelectionOwner
       final List<Proxy> data = (List<Proxy>) transferable
         .getTransferData(WatersDataFlavor.AUTOMATON);
       for (final Proxy proxy : data) {
-        final AutomatonProxy cloned = cloner.clone((AutomatonProxy) proxy);
+        final AutomatonProxy aut = (AutomatonProxy) proxy;
+        final AutomataTableModel model = getModel();
+        final String originalName = aut.getName();
+        String newName = aut.getName();
+        int count = 1;
+        while (model.containsAutomatonName(newName)) {
+          if (count == 1) {
+            newName = "copy_of_" + originalName;
+          } else {
+            newName = "copy" + count + "_of_" + originalName;
+          }
+          count++;
+        }
+        final AutomatonProxy cloned;
+        if (count == 1)
+          cloned = cloner.clone(aut);
+        else
+          cloned = cloner.clone(aut, newName);
+
         final InsertInfo insert = new InsertInfo(cloned);
         inserts.add(insert);
       }
@@ -574,6 +585,19 @@ class AutomataTable extends JTable implements SelectionOwner
           }
         }
       }
+    }
+
+    @Override
+    public void mousePressed(final MouseEvent event)
+    {
+      requestFocusInWindow();
+      maybeShowPopup(event);
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent event)
+    {
+      maybeShowPopup(event);
     }
   }
 

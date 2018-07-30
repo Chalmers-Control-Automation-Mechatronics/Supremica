@@ -44,6 +44,9 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ComponentProxy;
@@ -56,12 +59,14 @@ import net.sourceforge.waters.model.module.IdentifiedProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
@@ -120,19 +125,31 @@ class ComponentDataFlavor extends ModuleDataFlavor
   {
     final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
-    final ProductDESImporter importer = new ProductDESImporter(factory);
+    final ProductDESProxyFactory factoryDES =
+      ProductDESElementFactory.getInstance();
     final ProxyCloner cloner = factory.getCloner();
+    ProductDESImporter importer = null;
     for (final Proxy p : data) {
-      if (p instanceof AutomatonProxy)
+      if (p instanceof AutomatonProxy) {
+        if (importer == null) {
+          importer = new ProductDESImporter(factory);
+        }
         try {
-          proxyList.add(importer.importComponent((AutomatonProxy)p));
+          // TODO Use AutomatonTools.createProductDESProxy() to make a DES
+          // TODO Import the DES to get a module
+          // TODO Include the components and events from the module
+          final ProductDESProxy product = AutomatonTools
+            .createProductDESProxy((AutomatonProxy) p, factoryDES);
+          final ModuleProxy module = importer.importModule(product);
+          proxyList.add(module);
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
           final String msg = exception.getMessage();
           logger.error(msg);
         }
-      else
+      } else {
         proxyList.add(cloner.getClone(p));
+      }
     }
     return proxyList;
   }

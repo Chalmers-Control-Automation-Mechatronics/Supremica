@@ -33,26 +33,16 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -60,77 +50,56 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.command.Command;
-import net.sourceforge.waters.gui.command.EditCommand;
-import net.sourceforge.waters.gui.command.InsertCommand;
-import net.sourceforge.waters.gui.transfer.InsertInfo;
-import net.sourceforge.waters.gui.transfer.SelectionOwner;
-import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.subject.base.Subject;
-import net.sourceforge.waters.subject.base.UndoInfo;
-import net.sourceforge.waters.subject.module.GraphSubject;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
-import net.sourceforge.waters.subject.module.LabelBlockSubject;
-import net.sourceforge.waters.subject.module.SimpleComponentSubject;
-import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * @author Robi Malik
+ * @author Carly Hona
  */
 
-public class SimpleComponentEditorDialog
-  extends JDialog
+public class AutomatonSynchronousProductDialog extends JDialog
 {
 
-  //#########################################################################
-  //# Constructors
-  public SimpleComponentEditorDialog(final ModuleWindowInterface root)
-  {
-    this(root, null);
-  }
+  //#######################################################################
+  //# Constructor
 
-  public SimpleComponentEditorDialog(final ModuleWindowInterface root,
-                                     final SimpleComponentSubject comp)
+  public AutomatonSynchronousProductDialog(final ModuleWindowInterface root,
+                               final AutomatonProxy aut)
   {
-    super(root.getRootWindow());
-    if (comp == null) {
-      setTitle("Creating new automaton");
-    } else {
-      final IdentifierSubject ident = comp.getIdentifier();
-      setTitle("Editing automaton '" + ident.toString() + "'");
-    }
     mRoot = root;
-    mComponent = comp;
+    mAutomaton = aut;
+    setTitle("Editing automaton '" + aut.getName() + "'");
     createComponents();
     layoutComponents();
+
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
   }
 
-
   //#########################################################################
   //# Access to Created Item
   /**
    * Gets the Waters subject edited by this dialog.
+   *
    * @return A reference to the component being edited by this dialog.
    */
-  public SimpleComponentSubject getEditedItem()
+  public AutomatonProxy getEditedItem()
   {
-    return mComponent;
+    return mAutomaton;
   }
-
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -139,36 +108,25 @@ public class SimpleComponentEditorDialog
    */
   private void createComponents()
   {
-    final SimpleComponentSubject template;
-    if (mComponent == null) {
-      try {
-        template = COMPONENT_TEMPLATE;
-        final SelectionOwner panel = mRoot.getComponentsPanel();
-        final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
-        final InsertInfo insert = inserts.get(0);
-        mInsertPosition = insert.getInsertPosition();
-      } catch (final IOException exception) {
-        throw new WatersRuntimeException(exception);
-      } catch (final UnsupportedFlavorException exception) {
-        throw new WatersRuntimeException(exception);
-      }
-    } else {
-      template = mComponent;
-    }
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
     final ActionListener commithandler = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          commitDialog();
-        }
-      };
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        commitDialog();
+      }
+    };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    final IdentifierProxy oldname = template.getIdentifier();
+    IdentifierProxy oldname = null;
+    try {
+      oldname = parser.parseIdentifier(mAutomaton.getName());
+    } catch (final ParseException exception) {
+      exception.printStackTrace();
+    }
     final FormattedInputParser nameparser =
       new ComponentNameInputParser(oldname, context, parser);
     mNameInput = new SimpleExpressionCell(oldname, nameparser);
@@ -176,9 +134,8 @@ public class SimpleComponentEditorDialog
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
-    mPlantButton =
-      new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
-                          mKindGroup, 'p');
+    mPlantButton = new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
+                                       mKindGroup, 'p');
     mPropertyButton =
       new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
                           mKindGroup, 'o');
@@ -188,7 +145,7 @@ public class SimpleComponentEditorDialog
     mSupervisorButton =
       new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
                           mKindGroup, 'u');
-    switch (template.getKind()) {
+    switch (mAutomaton.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
       break;
@@ -202,15 +159,6 @@ public class SimpleComponentEditorDialog
       mSupervisorButton.setSelected(true);
       break;
     }
-    mDeterministicLabel = new JLabel("Deterministic:");
-    final GraphSubject graph = template.getGraph();
-    final boolean deterministic = graph.isDeterministic();
-    mDeterministicButton = new JCheckBox((String) null, deterministic);
-    mDeterministicButton.setRequestFocusEnabled(false);
-
-    // Attributes panel ...
-    mAttributesPanel =
-      new SimpleComponentAttributesPanel(template.getAttributes());
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -235,9 +183,9 @@ public class SimpleComponentEditorDialog
   }
 
   /**
-   * Fill the panels and layout all buttons and components.
-   * It is assumed that all needed components have been
-   * created by a call to {@link #createComponents()} before.
+   * Fill the panels and layout all buttons and components. It is assumed that
+   * all needed components have been created by a call to
+   * {@link #createComponents()} before.
    */
   private void layoutComponents()
   {
@@ -291,37 +239,37 @@ public class SimpleComponentEditorDialog
     mainlayout.setConstraints(mSupervisorButton, constraints);
     mMainPanel.add(mSupervisorButton);
     // mDeterministicLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mDeterministicLabel, constraints);
-    mMainPanel.add(mDeterministicLabel);
+    //    constraints.gridx = 0;
+    //    constraints.gridy++;
+    //    constraints.weightx = 0.0;
+    //    constraints.fill = GridBagConstraints.NONE;
+    //    mainlayout.setConstraints(mDeterministicLabel, constraints);
+    //    mMainPanel.add(mDeterministicLabel);
     // mDeterministicButton
-    constraints.gridx++;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mDeterministicButton, constraints);
-    mMainPanel.add(mDeterministicButton);
+    //    constraints.gridx++;
+    //    constraints.gridwidth = 2;
+    //    constraints.weightx = 3.0;
+    //    constraints.fill = GridBagConstraints.HORIZONTAL;
+    //    mainlayout.setConstraints(mDeterministicButton, constraints);
+    //    mMainPanel.add(mDeterministicButton);
 
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.gridwidth = 1;
-    constraints.weightx = 0.0;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.NONE;
-    constraints.anchor = GridBagConstraints.NORTHWEST;
-    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
-    mainlayout.setConstraints(attributesLabel, constraints);
-    mMainPanel.add(attributesLabel);
+    //    constraints.gridx = 0;
+    //    constraints.gridy++;
+    //    constraints.gridwidth = 1;
+    //    constraints.weightx = 0.0;
+    //    constraints.weighty = 1.0;
+    //    constraints.fill = GridBagConstraints.NONE;
+    //    constraints.anchor = GridBagConstraints.NORTHWEST;
+    //    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
+    //    mainlayout.setConstraints(attributesLabel, constraints);
+    //    mMainPanel.add(attributesLabel);
 
-    constraints.gridx++;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    mainlayout.setConstraints(mAttributesPanel, constraints);
-    mMainPanel.add(mAttributesPanel);
+//    constraints.gridx++;
+//    constraints.gridwidth = 2;
+//    constraints.weightx = 3.0;
+//    constraints.fill = GridBagConstraints.BOTH;
+//    mainlayout.setConstraints(mAttributesPanel, constraints);
+//    mMainPanel.add(mAttributesPanel);
     // Attributes, error, and buttons panel do not need layouting.
 
     // Finally, build the full dialog ...
@@ -338,7 +286,6 @@ public class SimpleComponentEditorDialog
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
 
-
     constraints.weighty = 0.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mErrorPanel, constraints);
@@ -348,16 +295,16 @@ public class SimpleComponentEditorDialog
     pack();
   }
 
-
   //#########################################################################
   //# Action Listeners
   /**
-   * Commits the contents of this dialog to the model.
-   * This method is attached to the action listener of the 'OK' button
-   * of the event editor dialog.
+   * Commits the contents of this dialog to the model. This method is attached
+   * to the action listener of the 'OK' button of the event editor dialog.
    */
   public void commitDialog()
   {
+    final ProductDESProxyFactory factory =
+      ProductDESElementFactory.getInstance();
     if (isInputLocked()) {
       // There is invalid input and an error message has been displayed.
       // Do not try to commit.
@@ -379,90 +326,32 @@ public class SimpleComponentEditorDialog
       } else {
         throw new IllegalStateException("Component kind not selected!");
       }
-      final boolean deterministic = mDeterministicButton.isSelected();
-      final Map<String,String> attribs = mAttributesPanel.getTableData();
-      final GraphSubject graph =
-        new GraphSubject(deterministic, null, null, null);
-      if (mComponent == null) {
-        // Create new component and insert
-        final SimpleComponentSubject template =
-          new SimpleComponentSubject(ident, kind, graph, attribs);
-        final SelectionOwner panel = mRoot.getComponentsPanel();
-        final InsertInfo insert = new InsertInfo(template, mInsertPosition);
-        final List<InsertInfo> list = Collections.singletonList(insert);
-        final Command command = new InsertCommand(list, panel, mRoot);
-        mComponent = template;
-        mRoot.getUndoInterface().executeCommand(command);
-      } else {
-        // Modify existing component using data from dialog
-        graph.setDeterministic(deterministic);
-        final SimpleComponentSubject template =
-          new SimpleComponentSubject(ident, kind, graph, attribs);
-        final Set<Subject> boundary = new THashSet<Subject>(3);
-        final LabelBlockSubject blocked =
-          mComponent.getGraph().getBlockedEvents();
-        if (blocked != null) {
-          boundary.add(blocked);
-        }
-        boundary.add(mComponent.getGraph().getNodesModifiable());
-        boundary.add(mComponent.getGraph().getEdgesModifiable());
-        final UndoInfo info = mComponent.createUndoInfo(template, boundary);
-        // Modify only if something has changed
-        if (info != null) {
-          final SelectionOwner panel = mRoot.getComponentsPanel();
-          final Command command =
-            new EditCommand(mComponent, info, panel, null);
-          mRoot.getUndoInterface().executeCommand(command);
-        }
-      }
+
+      final AutomatonProxy newAut = factory
+        .createAutomatonProxy(ident.getPlainText(), kind,
+                              mAutomaton.getEvents(), mAutomaton.getStates(),
+                              mAutomaton.getTransitions(),
+                              mAutomaton.getAttributes());
+      mAutomaton = newAut;
       // Close the dialog
       dispose();
     }
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether it is unsafe to commit the currently
-   * edited text field. If this method returns <CODE>true</CODE>, it is
-   * unsafe to commit the current dialog contents, and shifting the focus
-   * is to be avoided.
-   * @return <CODE>true</CODE> if the component currently owning the focus
-   *         has been found to contain invalid information,
-   *         <CODE>false</CODE> otherwise.
+   * Checks whether it is unsafe to commit the currently edited text field. If
+   * this method returns <CODE>true</CODE>, it is unsafe to commit the current
+   * dialog contents, and shifting the focus is to be avoided.
+   *
+   * @return <CODE>true</CODE> if the component currently owning the focus has
+   *         been found to contain invalid information, <CODE>false</CODE>
+   *         otherwise.
    */
   private boolean isInputLocked()
   {
-    return
-      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
-  }
-
-
-  //#########################################################################
-  //# Inner Class SimpleComponentAttributesPanel
-  private class SimpleComponentAttributesPanel extends AttributesPanel
-  {
-
-    //#######################################################################
-    //# Constructor
-    private SimpleComponentAttributesPanel(final Map<String,String> attribs)
-    {
-      super(SimpleComponentProxy.class, attribs);
-    }
-
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.AttributesPanel
-    @Override
-    boolean isInputLocked()
-    {
-      return SimpleComponentEditorDialog.this.isInputLocked();
-    }
-
-    //#######################################################################
-    //# Class Constants
-    private static final long serialVersionUID = -3597766255951309896L;
-
+    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
   }
 
 
@@ -475,45 +364,32 @@ public class SimpleComponentEditorDialog
   private JPanel mMainPanel;
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
-  private JLabel mDeterministicLabel;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
   private IconRadioButton mPlantButton;
   private IconRadioButton mPropertyButton;
   private IconRadioButton mSpecButton;
   private IconRadioButton mSupervisorButton;
-  private JCheckBox mDeterministicButton;
-  private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
   // Created Item
   /**
-   * <P>The Waters component subject edited by this dialog.</P>
+   * <P>
+   * The Waters Automaton edited by this dialog.
+   * </P>
    *
-   * <P>This is a reference to the actual object that is being edited.  If
-   * a new component is being created, it is <CODE>null</CODE>
-   * until the dialog is committed and the actually created subject is
-   * assigned.</P>
-   *
-   * <P>The edited state is stored only in the dialog. Changes are only
-   * committed to the model when the OK button is pressed.</P>
+   * <P>
+   * The edited automaton is stored only in the dialog. Changes are only committed
+   * to the original automaton when the OK button is pressed.
+   * </P>
    */
-  private SimpleComponentSubject mComponent;
-  private Object mInsertPosition;
-
+  private AutomatonProxy mAutomaton;
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 5606299929823517586L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final GraphSubject GRAPH_TEMPLATE = new GraphSubject();
-  private static final SimpleComponentSubject COMPONENT_TEMPLATE =
-    new SimpleComponentSubject(new SimpleIdentifierSubject(""),
-                               ComponentKind.PLANT,
-                               GRAPH_TEMPLATE);
-  private static final Transferable TRANSFERABLE =
-    WatersDataFlavor.createTransferable(COMPONENT_TEMPLATE);
 
 }
