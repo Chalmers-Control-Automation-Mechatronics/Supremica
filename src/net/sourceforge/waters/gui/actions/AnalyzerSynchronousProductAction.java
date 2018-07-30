@@ -31,39 +31,55 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.actions;
 
-import javax.swing.JPopupMenu;
+import java.awt.event.ActionEvent;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
+import net.sourceforge.waters.gui.dialog.InstanceEditorDialog;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+
+import org.supremica.gui.ide.IDE;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+/**
+ * The action to create a new instance for a module. This action merely popups
+ * the instance creation dialog ({@link InstanceEditorDialog}); the actual
+ * instance creation is done when the dialog is committed.
+ *
+ * @author Carly Hona
+ */
+
+public class AnalyzerSynchronousProductAction extends WatersAction
 {
 
   //#########################################################################
-  //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  //# Constructors
+  AnalyzerSynchronousProductAction(final IDE ide)
   {
-    super(master);
+    super(ide);
+    putValue(Action.NAME, "New Instance ...");
+    putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
   }
 
   //#########################################################################
-  //# Shared Menu Items
+  //# Interface java.awt.event.ActionListener
   @Override
-  protected void addCommonMenuItems()
+  public void actionPerformed(final ActionEvent event)
   {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
-    popup.add(showSychronous);
+    final AutomatonProxy syncAutomaton = null;
+    //TODO cant use modulewinodwinterface
+    final ModuleWindowInterface root = getActiveModuleWindowInterface();
+    if (root != null) {
+      new AutomatonSynchronousProductDialog(root, syncAutomaton);
+    }
   }
-  //#######################################################################
-  //# Data Members
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

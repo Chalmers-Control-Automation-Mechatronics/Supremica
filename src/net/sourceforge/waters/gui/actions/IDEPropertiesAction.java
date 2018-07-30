@@ -40,6 +40,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
@@ -56,6 +57,7 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultProductDESAndModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
@@ -319,6 +321,19 @@ public class IDEPropertiesAction
         final VariableComponentSubject subject =
           (VariableComponentSubject) var;
         new VariableEditorDialog(root, subject);
+      }
+      return true;
+    }
+
+    @Override
+    public Boolean visitAutomatonProxy
+      (final AutomatonProxy aut)
+    {
+      if (mDoEdit) {
+        //TODO cant use moduleWindow, what to use instead?
+
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        new AutomatonSynchronousProductDialog(root, aut);
       }
       return true;
     }

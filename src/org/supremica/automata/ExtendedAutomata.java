@@ -88,10 +88,15 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.module.ScopeKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.BDD.EFA.ForcibleEventAttributeFactory;
 
 public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 {
+    private static Logger logger =
+      LogManager.getLogger(ExtendedAutomata.class);
     private final ModuleSubjectFactory factory;
     private ModuleSubject module;
 
@@ -220,6 +225,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
 
+        final Map<String, VariableComponentProxy> autCandidateName2Var = new HashMap<>();
+
         for (final Proxy sub : components) {
             if (sub instanceof VariableComponentProxy) {
 
@@ -267,6 +274,11 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     }
                     nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
                     nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
+
+                    if (varName.contains(LOCAL_VAR_SUFFIX)) {
+                      final String nonSuffix = varName.substring(0, varName.indexOf(LOCAL_VAR_SUFFIX));
+                      autCandidateName2Var.put(nonSuffix, var);
+                    }
                 } else {
                     throw new IllegalArgumentException("The variable domain is not defined!");
                 }
@@ -327,10 +339,25 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     plantAlphabet.addAll(exAutomaton.getAlphabet());
                     modelHasNoPlants = false;
                 }
+
+                final String autName = exAutomaton.getName();
                 theExAutomata.add(exAutomaton);
                 exAutomatonToIndex.put(exAutomaton, nbrOfExAutomata);
-                stringToExAutomaton.put(exAutomaton.getName(), exAutomaton);
+                stringToExAutomaton.put(autName, exAutomaton);
                 nbrOfExAutomata++;
+
+                if (autCandidateName2Var.containsKey(autName)) {
+                  final Set<String> locations = exAutomaton.getNameToLocationMap().keySet();
+                  final VariableComponentProxy var = autCandidateName2Var.get(autName);
+                  final StringTokenizer token =
+                    new StringTokenizer(var.getType().toString(), ", [ ]");
+                  while(token.hasMoreTokens()) {
+                    final String anInstance = token.nextToken();
+                    if (!locations.contains(anInstance)) {
+                      logger.warn(anInstance + " is not a location name of automaton " + autName);
+                    }
+                  }
+                }
             }
         }
 
