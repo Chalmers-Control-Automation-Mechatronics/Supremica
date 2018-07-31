@@ -66,13 +66,41 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 public class CliqueBasedSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
 {
+  public enum HaltMechanism {
+    FIND_FIRST,
+    FIND_ALL
+  }
+
   public CliqueBasedSupervisorReductionTRSimplifier()
   {
+    mHaltMechanism = HaltMechanism.FIND_ALL;
   }
 
   public CliqueBasedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
+    mHaltMechanism = HaltMechanism.FIND_ALL;
+  }
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Retrieves the halt mechanism used by the algorithm in its search of a reduced
+   * supervisor.
+   * @return The halt mechanism.
+   */
+  public HaltMechanism getHaltMechanism() {
+    return mHaltMechanism;
+  }
+
+  /**
+   * Sets the halt mechanism for the algorithm's search of a reduced supervisor.
+   * FIND_ALL (default) performs a full search of the candidate solutions.
+   * FIND_FIRST stops the search after the first reduced supervisor is found.
+   * @param haltMechanism The mechanism used to stop the reduced supervisor search.
+   */
+  public void setHaltMechanism(final HaltMechanism haltMechanism) {
+    mHaltMechanism = haltMechanism;
   }
 
   //#########################################################################
@@ -186,7 +214,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         reducedSupervisor = candidateSolution;
         reducedSupervisorSize = reducedSupervisor.size();
         System.out.print("-- New Best");
-        continue;
+        if (mHaltMechanism == HaltMechanism.FIND_FIRST) {
+          break;
+        }
+        else {
+          continue;
+        }
       }
 
       //if we are too big skip (we could stop the search if our ordering of the queue were just based on solution size)
@@ -1044,6 +1077,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private HaltMechanism mHaltMechanism;
   private int mDumpState;
   private int mNumStates;
   private boolean[][] mIncompatibilityRelation;

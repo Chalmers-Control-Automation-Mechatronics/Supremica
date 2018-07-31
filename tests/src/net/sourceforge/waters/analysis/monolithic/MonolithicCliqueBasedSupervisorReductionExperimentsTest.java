@@ -41,7 +41,10 @@ import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
-public class MonolithicCliqueBasedSupervisorReductionTest
+/**
+ * @author Pwnbot
+ */
+public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   extends AbstractSupervisorSynthesizerTest
 {
 
@@ -62,19 +65,18 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setHaltMechanism(CliqueBasedSupervisorReductionTRSimplifier.HaltMechanism.FIND_ALL);
+    simplifier.setHaltMechanism(CliqueBasedSupervisorReductionTRSimplifier.HaltMechanism.FIND_FIRST);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
 
-
-  //#########################################################################
+//#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicCliqueBasedSupervisorReductionTest.class);
+      new TestSuite(MonolithicCliqueBasedSupervisorReductionExperimentsTest.class);
     return testSuite;
   }
 
@@ -172,4 +174,5 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   public void testIMS() throws Exception
   {
   }
+
 }
