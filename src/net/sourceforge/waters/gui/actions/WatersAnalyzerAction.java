@@ -33,50 +33,35 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
+import org.supremica.gui.ide.ModuleContainer;
 
 
-/**
- * The action to invoke the synchronous product dialog in the Waters analyser.
- *
- * @author George Hewlett
- */
-
-public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
+public abstract class WatersAnalyzerAction
+  extends WatersAction
 {
-
-  //#########################################################################
-  //# Constructors
-  AnalyzerSynchronousProductAction(final IDE ide)
+  protected WatersAnalyzerAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "New Instance ...");
-    putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
   }
 
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
+  protected AutomataTableModel getAnalyzerTableModel()
   {
-    final AutomatonProxy syncAutomaton = null;
-    //TODO cant use modulewinodwinterface
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    if (root != null) {
-      new AutomatonSynchronousProductDialog(root, syncAutomaton);
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
     }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+    return analyzer.getAutomataTableModel();
   }
 
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
-
+  private static final long serialVersionUID = -8684703946705836025L;
 }

@@ -54,7 +54,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTableModel extends AbstractTableModel implements Observer
+public class AutomataTableModel extends AbstractTableModel implements Observer
 {
 
   //#########################################################################

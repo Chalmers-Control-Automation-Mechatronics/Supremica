@@ -172,7 +172,6 @@ public class IDEPropertiesAction
   private class PropertiesVisitor
     extends DefaultProductDESAndModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private boolean canEditProperties(final Proxy proxy)
@@ -196,7 +195,7 @@ public class IDEPropertiesAction
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
     public Boolean visitProxy(final Proxy proxy)
     {
@@ -204,7 +203,22 @@ public class IDEPropertiesAction
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    @Override
+    public Boolean visitAutomatonProxy(final AutomatonProxy aut)
+    {
+      if (mDoEdit) {
+        // TODO Can't use moduleWindow, what to use instead? --- getIDE()
+        final ModuleWindowInterface root = getActiveModuleWindowInterface();
+        // TODO Properties action should trigger properties dialog
+        // TODO (not synchronous product)
+        new AutomatonSynchronousProductDialog(root, aut);
+      }
+      return true;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public Boolean visitConstantAliasProxy(final ConstantAliasProxy decl)
     {
@@ -325,23 +339,9 @@ public class IDEPropertiesAction
       return true;
     }
 
-    @Override
-    public Boolean visitAutomatonProxy
-      (final AutomatonProxy aut)
-    {
-      if (mDoEdit) {
-        //TODO cant use moduleWindow, what to use instead?
-
-        final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        new AutomatonSynchronousProductDialog(root, aut);
-      }
-      return true;
-    }
-
     //#######################################################################
     //# Data Members
     private boolean mDoEdit;
-
   }
 
 

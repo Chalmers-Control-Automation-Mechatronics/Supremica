@@ -131,16 +131,16 @@ class ComponentDataFlavor extends ModuleDataFlavor
     ProductDESImporter importer = null;
     for (final Proxy p : data) {
       if (p instanceof AutomatonProxy) {
+        final AutomatonProxy aut = (AutomatonProxy) p;
         if (importer == null) {
           importer = new ProductDESImporter(factory);
         }
         try {
-          // TODO Use AutomatonTools.createProductDESProxy() to make a DES
-          // TODO Import the DES to get a module
-          // TODO Include the components and events from the module
-          final ProductDESProxy product = AutomatonTools
-            .createProductDESProxy((AutomatonProxy) p, factoryDES);
+          final ProductDESProxy product =
+            AutomatonTools.createProductDESProxy(aut, factoryDES);
           final ModuleProxy module = importer.importModule(product);
+          // TODO Find the components and event declarations within the module
+          // TODO and add them to the list using addAll()
           proxyList.add(module);
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
