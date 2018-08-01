@@ -65,18 +65,18 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * @author Carly Hona
+ * @author George Hewlett, Carly Hona
  */
-
+// TODO Rename as AutomatonPropertiesDialog
 public class AutomatonSynchronousProductDialog extends JDialog
 {
 
   //#######################################################################
   //# Constructor
-
   public AutomatonSynchronousProductDialog(final ModuleWindowInterface root,
                                final AutomatonProxy aut)
   {
+    // TODO Pass in IDE. Retrieve analyser and remember in constructor
     mRoot = root;
     mAutomaton = aut;
     setTitle("Editing automaton '" + aut.getName() + "'");
@@ -90,11 +90,10 @@ public class AutomatonSynchronousProductDialog extends JDialog
   }
 
   //#########################################################################
-  //# Access to Created Item
+  //# Access to Edited Item
   /**
-   * Gets the Waters subject edited by this dialog.
-   *
-   * @return A reference to the component being edited by this dialog.
+   * Gets the automaton edited by this dialog.
+   * @return A reference to the automaton being edited by this dialog.
    */
   public AutomatonProxy getEditedItem()
   {
@@ -253,6 +252,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     //    mainlayout.setConstraints(mDeterministicButton, constraints);
     //    mMainPanel.add(mDeterministicButton);
 
+    // TODO We want attributes in the properties dialog!
     //    constraints.gridx = 0;
     //    constraints.gridy++;
     //    constraints.gridwidth = 1;
@@ -326,12 +326,14 @@ public class AutomatonSynchronousProductDialog extends JDialog
       } else {
         throw new IllegalStateException("Component kind not selected!");
       }
-
+      // TODO We want attributes in the properties dialog!
+      // TODO Check if any of the above are different from mAutomaton
       final AutomatonProxy newAut = factory
         .createAutomatonProxy(ident.getPlainText(), kind,
                               mAutomaton.getEvents(), mAutomaton.getStates(),
                               mAutomaton.getTransitions(),
                               mAutomaton.getAttributes());
+      // TODO Replace the automaton in the analyser (remembered from constructor)
       mAutomaton = newAut;
       // Close the dialog
       dispose();
@@ -389,7 +391,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 5606299929823517586L;
+  private static final long serialVersionUID = 6159733639861131531L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
 
 }
