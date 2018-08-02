@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,10 +69,6 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -655,6 +655,19 @@ public abstract class TRAbstractModelAnalyzer
   }
 
   /**
+   * Retrieves an array contain the automata from the input model that are
+   * used by the analyser. If the input model contains {@link TRAutomatonProxy}
+   * objects, this array contains the same objects as {@link #getTRAutomata()},
+   * otherwise this is not guaranteed.
+   * @return The array of input automata in the order in which they are
+   *         used in state tuples.
+   */
+  protected AutomatonProxy[] getInputAutomata()
+  {
+    return mInputAutomata;
+  }
+
+  /**
    * Retrieves a {@link TRAutomatonProxy} object used during analysis.
    * If the input model contains {@link TRAutomatonProxy} objects,
    * this method returns the same objects as {@link #getInputAutomaton(int)
@@ -676,7 +689,9 @@ public abstract class TRAbstractModelAnalyzer
    * selected for analysis, possibly converted to {@link TRAutomatonProxy}.
    * If the input model already contains {@link TRAutomatonProxy} objects,
    * the array returned by this method contains the same objects as
-   * provided the input model, otherwise this is not guaranteed.
+   * the input model, otherwise this is not guaranteed.
+   * @return The array of {@link TRAutomatonProxy} objects in the order in
+   *         which they are used in state tuples.
    */
   protected TRAutomatonProxy[] getTRAutomata()
   {

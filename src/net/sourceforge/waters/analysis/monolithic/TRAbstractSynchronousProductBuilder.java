@@ -420,7 +420,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       final TRAutomatonProxy aut = new TRAutomatonProxy(outputEnc, rel);
       final TRSynchronousProductResult result = getAnalysisResult();
       result.setComputedAutomaton(aut);
-      final Collection<AutomatonProxy> automata = getModel().getAutomata();
+      final AutomatonProxy[] automata = getInputAutomata();
       final TRSynchronousProductStateMap stateMap =
         new TRSynchronousProductStateMap(automata, tupleEnc, stateSpace);
       result.setStateMap(stateMap);

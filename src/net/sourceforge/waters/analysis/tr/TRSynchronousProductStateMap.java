@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
-import java.util.ArrayList;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -41,8 +43,6 @@ import net.sourceforge.waters.analysis.monolithic.StateTupleEncoding;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 
 /**
@@ -54,12 +54,11 @@ public class TRSynchronousProductStateMap
 
   //#########################################################################
   //# Constructor
-  public TRSynchronousProductStateMap(final Collection<AutomatonProxy> inputAutomata,
+  public TRSynchronousProductStateMap(final AutomatonProxy[] inputAutomata,
                                       final StateTupleEncoding stateTupleEncoding,
                                       final IntArrayBuffer stateSpace)
   {
-    this(new ArrayList<AutomatonProxy>(inputAutomata),
-         stateTupleEncoding, stateSpace);
+    this(Arrays.asList(inputAutomata), stateTupleEncoding, stateSpace);
   }
 
   public TRSynchronousProductStateMap(final List<AutomatonProxy> inputAutomata,
@@ -115,6 +114,7 @@ public class TRSynchronousProductStateMap
     return mStateSpace.getIndex(mEncodedTuple);
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   private int getInputAutomatonIndex(final AutomatonProxy aut)
@@ -142,8 +142,10 @@ public class TRSynchronousProductStateMap
       mStateArrays = new StateProxy[mInputAutomata.size()][];
     }
     if (mStateArrays[autIndex] == null) {
+      final Collection<StateProxy> states = aut.getStates();
+      mStateArrays[autIndex] = new StateProxy[states.size()];
       int s = 0;
-      for (final StateProxy state : aut.getStates()) {
+      for (final StateProxy state : states) {
         mStateArrays[autIndex][s++] = state;
       }
     }
