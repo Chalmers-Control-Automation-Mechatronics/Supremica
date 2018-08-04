@@ -65,7 +65,7 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setHaltMechanism(CliqueBasedSupervisorReductionTRSimplifier.HaltMechanism.FIND_FIRST);
+    simplifier.setSearchStrategy(CliqueBasedSupervisorReductionTRSimplifier.SearchStrategy.HEURISTIC_FIND_FIRST);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
@@ -86,10 +86,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }
 
   //92 states, 56 events, 336 transitions
-  @Override
+/*  @Override
   public void testCatMouseUnsup1() throws Exception
   {
-  }
+  }*/
 
   //698 states, 72 events, 4272 transitions
   @Override
@@ -98,10 +98,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }
 
   //410 states, 12 events, 1494 transitions
-  @Override
+/*  @Override
   public void testTransferLine2() throws Exception
   {
-  }
+  }*/
 
   //5992 states, 17 events, 29749 transitions
   @Override

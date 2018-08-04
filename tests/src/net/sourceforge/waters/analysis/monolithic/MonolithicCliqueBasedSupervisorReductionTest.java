@@ -62,7 +62,7 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setHaltMechanism(CliqueBasedSupervisorReductionTRSimplifier.HaltMechanism.FIND_ALL);
+    simplifier.setSearchStrategy(CliqueBasedSupervisorReductionTRSimplifier.SearchStrategy.FIND_BEST);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
