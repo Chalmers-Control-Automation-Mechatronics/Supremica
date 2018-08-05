@@ -655,7 +655,7 @@ public abstract class TRAbstractModelAnalyzer
   }
 
   /**
-   * Retrieves an array contain the automata from the input model that are
+   * Retrieves an array containing the automata from the input model that are
    * used by the analyser. If the input model contains {@link TRAutomatonProxy}
    * objects, this array contains the same objects as {@link #getTRAutomata()},
    * otherwise this is not guaranteed.
