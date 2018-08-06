@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 
@@ -49,6 +50,19 @@ public abstract class WatersAnalyzerAction
     super(ide);
   }
 
+  protected WatersAnalyzerPanel getAnalyzerPanel()
+  {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    return (WatersAnalyzerPanel) panel;
+  }
+
   protected AutomataTableModel getAnalyzerTableModel()
   {
     final ModuleContainer container = getActiveModuleContainer();
@@ -61,6 +75,28 @@ public abstract class WatersAnalyzerAction
     }
     final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
     return analyzer.getAutomataTableModel();
+  }
+
+  protected int getSelectedRowCount()
+  {
+    //TODO cant call getSelectedRows before model open, how to check if null before call??
+    //final AutomataTable table = getAnalyzerTable();
+    //return table.getSelectedRowCount();
+    return 0;
+  }
+
+  protected AutomataTable getAnalyzerTable()
+  {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+    return analyzer.getAutomataTable();
   }
 
   private static final long serialVersionUID = -8684703946705836025L;

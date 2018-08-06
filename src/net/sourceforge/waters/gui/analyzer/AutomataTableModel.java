@@ -165,6 +165,18 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     return false;
   }
 
+  public void replaceAutomaton(final AutomatonProxy oldAut, final AutomatonProxy newAut) {
+    int i = 0;
+    for(final AutomatonProxy aut : mAutomataList) {
+      if(aut.getName().equals(oldAut.getName()) == true) {
+        mAutomataList.remove(i);
+        mAutomataList.add(i, newAut);
+        break;
+      }
+      i++;
+    }
+  }
+
   public boolean containsDisplayMap(final AutomatonProxy aut) {
     return mDisplayMap.containsKey(aut);
   }

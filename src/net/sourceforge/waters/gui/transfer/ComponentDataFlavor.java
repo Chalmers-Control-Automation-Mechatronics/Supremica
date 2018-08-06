@@ -141,7 +141,8 @@ class ComponentDataFlavor extends ModuleDataFlavor
           final ModuleProxy module = importer.importModule(product);
           // TODO Find the components and event declarations within the module
           // TODO and add them to the list using addAll()
-          proxyList.add(module);
+          proxyList.addAll(module.getComponentList());
+          proxyList.addAll(module.getEventDeclList());
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
           final String msg = exception.getMessage();

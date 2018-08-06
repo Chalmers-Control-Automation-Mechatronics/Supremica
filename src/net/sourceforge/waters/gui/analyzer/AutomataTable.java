@@ -82,7 +82,7 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTable extends JTable implements SelectionOwner
+public class AutomataTable extends JTable implements SelectionOwner
 {
 
   //#########################################################################

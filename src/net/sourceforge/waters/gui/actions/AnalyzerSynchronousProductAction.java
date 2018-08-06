@@ -37,9 +37,7 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 
 import org.supremica.gui.ide.IDE;
 
@@ -58,8 +56,9 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
   AnalyzerSynchronousProductAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "New Instance ...");
-    putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
+    this.setEnabled(shouldBeTrue());
+    putValue(Action.NAME, "Synchronize...");
+    putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automatas");
   }
 
   //#########################################################################
@@ -67,12 +66,16 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    final AutomatonProxy syncAutomaton = null;
-    //TODO cant use modulewinodwinterface
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    if (root != null) {
-      new AutomatonSynchronousProductDialog(root, syncAutomaton);
+    final IDE ide = getIDE();
+    if (ide != null) {
+      new AutomatonSynchronousProductDialog(ide, getAnalyzerPanel());
     }
+  }
+
+  public Boolean shouldBeTrue() {
+    if(getSelectedRowCount() >= 2)
+      return true;
+    return false;
   }
 
   //#########################################################################

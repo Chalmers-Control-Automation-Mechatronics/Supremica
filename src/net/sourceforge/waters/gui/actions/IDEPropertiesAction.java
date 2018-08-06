@@ -40,7 +40,8 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.dialog.AutomatonPropertiesDialog;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
@@ -81,24 +82,27 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
- * <P>The action associated with the 'properties' menu buttons.</P>
+ * <P>
+ * The action associated with the 'properties' menu buttons.
+ * </P>
  *
- * <P>This action pops up a dialog box to edit the currently focused
- * item, if that item is of a supported type. To support this action,
- * components that hold editable items must implement the {@link
- * SelectionOwner} interface and return the item to be edited through
- * their {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()}
- * method.</P>
+ * <P>
+ * This action pops up a dialog box to edit the currently focused item, if
+ * that item is of a supported type. To support this action, components that
+ * hold editable items must implement the {@link SelectionOwner} interface and
+ * return the item to be edited through their
+ * {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()} method.
+ * </P>
  *
  * @author Robi Malik
  */
 
-public class IDEPropertiesAction
-  extends WatersAction
+public class IDEPropertiesAction extends WatersAction
 {
 
   //#########################################################################
@@ -117,7 +121,6 @@ public class IDEPropertiesAction
     updateEnabledStatus();
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
@@ -126,7 +129,6 @@ public class IDEPropertiesAction
     final Proxy proxy = getActionArgument();
     mVisitor.editProperties(proxy);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
@@ -138,13 +140,13 @@ public class IDEPropertiesAction
     }
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();
-    final boolean enabled = proxy != null && mVisitor.canEditProperties(proxy);
+    final boolean enabled =
+      proxy != null && mVisitor.canEditProperties(proxy);
     setEnabled(enabled);
     if (enabled) {
       final String name = ProxyNamer.getItemClassName(proxy);
@@ -208,11 +210,30 @@ public class IDEPropertiesAction
     public Boolean visitAutomatonProxy(final AutomatonProxy aut)
     {
       if (mDoEdit) {
-        // TODO Can't use moduleWindow, what to use instead? --- getIDE()
-        final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        // TODO Properties action should trigger properties dialog
-        // TODO (not synchronous product)
-        new AutomatonSynchronousProductDialog(root, aut);
+        //        final IDE ide = getIDE();
+        //        final DocumentContainer container = ide.getActiveDocumentContainer();
+        //        if (container == null || !(container instanceof ModuleContainer)) {
+        //          return null;
+        //        }
+        //        final Component panel = container.getActivePanel();
+        //        if (panel instanceof EditorPanel) {
+        //          return (ModuleWindowInterface) panel;
+        //        } else {
+        //          return null;
+        //        }
+        //TODO container always null but documentcontainer isnt.
+        //     should Document container hold watersanalyzer too???
+        final ModuleContainer container = getActiveModuleContainer();
+        if (container == null) {
+          return false;
+        }
+        final MainPanel panel = container.getActivePanel();
+        if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+          return false;
+        }
+        final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+        new AutomatonPropertiesDialog(getActiveModuleWindowInterface(),
+                                      analyzer, aut);
       }
       return true;
     }
@@ -292,15 +313,15 @@ public class IDEPropertiesAction
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        final ParameterBindingSubject subject = (ParameterBindingSubject) binding;
-        new ParameterBindingEditorDialog(root,subject);
+        final ParameterBindingSubject subject =
+          (ParameterBindingSubject) binding;
+        new ParameterBindingEditorDialog(root, subject);
       }
       return true;
     }
 
     @Override
-    public Boolean visitSimpleComponentProxy
-      (final SimpleComponentProxy comp)
+    public Boolean visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
@@ -327,8 +348,7 @@ public class IDEPropertiesAction
     }
 
     @Override
-    public Boolean visitVariableComponentProxy
-      (final VariableComponentProxy var)
+    public Boolean visitVariableComponentProxy(final VariableComponentProxy var)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
@@ -344,12 +364,10 @@ public class IDEPropertiesAction
     private boolean mDoEdit;
   }
 
-
   //#########################################################################
   //# Data Members
   private final Proxy mActionArgument;
   private final PropertiesVisitor mVisitor;
-
 
   //#########################################################################
   //# Class Constants
