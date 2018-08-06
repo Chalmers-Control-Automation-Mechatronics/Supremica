@@ -221,7 +221,7 @@ public final class Config
 			  "Remove redundant events, transitions, and components " +
               "when compiling");
     public static final BooleanProperty NORMALIZING_COMPILER =
-      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", true,
+      new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
               "Use normalising EFSM compiler");
     public static final BooleanProperty INCLUDE_RAS_SUPPORT =
       new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,

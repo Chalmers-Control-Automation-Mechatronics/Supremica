@@ -38,7 +38,6 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -110,6 +109,12 @@ public class WatersAnalyzerPanel extends MainPanel
     return mSimpleExpressionCompiler;
   }
 
+  public AutomataTableModel getAutomataTableModel()
+  {
+    return mAutomataTable.getModel();
+  }
+
+
   //#########################################################################
   //# Focus Switching
   @Override
@@ -127,7 +132,7 @@ public class WatersAnalyzerPanel extends MainPanel
     final SourceInfo info = infoMap.get(aut);
     BindingContext bindings = null;
     GraphSubject graph = null;
-    final AutomataTableModel autModel = (AutomataTableModel) mAutomataTable.getModel();
+    final AutomataTableModel autModel = mAutomataTable.getModel();
     if (info != null) {
       final Proxy source = info.getSourceObject();
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
@@ -171,7 +176,7 @@ public class WatersAnalyzerPanel extends MainPanel
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
   private final JPanel mAutomataPanel = new JPanel();
-  private final JTable mAutomataTable;
+  private final AutomataTable mAutomataTable;
 
   //#########################################################################
   //# Class Constants
