@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -66,6 +67,7 @@ import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.AutomatonRef;
 import net.sourceforge.waters.xsd.des.ConflictCounterExample;
 import net.sourceforge.waters.xsd.des.CounterExampleType;
+import net.sourceforge.waters.xsd.des.DualCounterExample;
 import net.sourceforge.waters.xsd.des.Event;
 import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.FirstTraceStateTuple;
@@ -115,6 +117,16 @@ abstract class JAXBProductDESElementExporter
     throws VisitorException
   {
     return visitDocumentProxy(proxy);
+  }
+
+  @Override
+  public Object visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    final DualCounterExample element = mFactory.createDualCounterExample();
+    copyDualCounterExampleProxy(proxy, element);
+    return element;
   }
 
   @Override
@@ -267,6 +279,13 @@ abstract class JAXBProductDESElementExporter
       mCounterExampleAutomata = null;
       mProductDESEventRefExporter = null;
     }
+  }
+
+  private void copyDualCounterExampleProxy(final DualCounterExampleProxy proxy,
+                                           final DualCounterExample element)
+    throws VisitorException
+  {
+    copyCounterExampleProxy(proxy, element);
   }
 
   private void copyEventProxy(final EventProxy proxy, final Event element)

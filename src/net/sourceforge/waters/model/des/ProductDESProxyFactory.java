@@ -154,6 +154,35 @@ public interface ProductDESProxyFactory
 
 
   /**
+   * Creates a new dual counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
+   *                      or <CODE>null</CODE>.
+   * @param  location     The URI to be associated with the new
+   *                      document, or <CODE>null</CODE>.
+   * @param  des          The product DES for which this counterexample is
+   *                      generated.
+   * @param  automata     The set of automata for the new counterexample,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  trace1       The first of the two traces that define the dual
+   *                      counterexample.
+   * @param  trace2       The second of the two traces that define the dual
+   *                      counterexample.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      automata, events, or states cannot be found
+   *                      in the product DES.
+   */
+  public DualCounterExampleProxy createDualCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     ProductDESProxy des,
+     Collection<? extends AutomatonProxy> automata,
+     TraceProxy trace1,
+     TraceProxy trace2);
+
+
+  /**
    * Creates a new event.
    * @param name         The name of the new event.
    * @param kind         The kind of the new event.

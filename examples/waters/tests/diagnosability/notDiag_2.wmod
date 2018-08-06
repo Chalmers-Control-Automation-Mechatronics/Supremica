@@ -2,7 +2,7 @@
 <Module Name="notDiag_2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Test for diagnosability check.
 
-Not diagnosable.
+Fault event ed is not diagnosable.
 
 Taken from:
 C. Cassandras, S. Lafortune. Introduction to Discrete Event Systems.</ns2:Comment>
@@ -21,7 +21,7 @@ C. Cassandras, S. Lafortune. Introduction to Discrete Event Systems.</ns2:Commen
         <EventDecl Kind="CONTROLLABLE" Observable="false" Name="v"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="notDiag_1">
+        <SimpleComponent Kind="PLANT" Name="notDiag_2">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">

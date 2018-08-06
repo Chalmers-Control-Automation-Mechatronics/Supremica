@@ -78,16 +78,28 @@ public abstract class AbstractCounterExampleTest
     testMarshal("handwritten", "small_factory_2-uncont1");
   }
 
-  public void testParse_looptrace()
+  public void testParse_loop()
     throws Exception
   {
     testParse("tests", "nasty", "the_vicious_loop1");
   }
 
-  public void testMarshal_looptrace()
+  public void testMarshal_loop()
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
     testMarshal("tests", "nasty", "the_vicious_loop1");
+  }
+
+  public void testParse_dual()
+    throws Exception
+  {
+    testParse("tests", "diagnosability", "notDiag_2");
+  }
+
+  public void testMarshal_dual()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("tests", "diagnosability", "notDiag_2");
   }
 
 

@@ -38,7 +38,7 @@ package net.sourceforge.waters.model.des;
  *
  * <P>A loop counterexample contains a single trace that starts from the
  * initial state and ends up performing cyclic behaviour. It is guaranteed
- * that the traces loop index ({@link TraceProxy#getLoopIndex()} is set.
+ * that the traces loop index ({@link TraceProxy#getLoopIndex()} is set.</P>
  *
  * <UL>
  * <LI>A <I>control-loop</I> counterexample has a loop trace where all events

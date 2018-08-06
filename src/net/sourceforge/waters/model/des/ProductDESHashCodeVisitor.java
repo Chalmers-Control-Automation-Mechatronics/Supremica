@@ -122,6 +122,14 @@ public class ProductDESHashCodeVisitor
   }
 
   @Override
+  public Integer visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Integer visitEventProxy(final EventProxy event)
       throws VisitorException
   {

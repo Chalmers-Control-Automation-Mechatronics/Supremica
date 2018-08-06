@@ -44,6 +44,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -122,13 +123,17 @@ public class ProductDESProxyPrinter
   {
     print("COUNTEREXAMPLE ");
     print(counter.getName());
-    printCounterExampleHeader(counter);
-    int i = 1;
-    for (final TraceProxy trace : counter.getTraces()) {
-      println();
-      printTraceProxy(trace, i++);
-    }
-    return null;
+    return printCounterExample(counter);
+  }
+
+  @Override
+  public Object visitDualCounterExampleProxy
+    (final DualCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("DUAL COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
   }
 
   @Override
@@ -253,6 +258,17 @@ public class ProductDESProxyPrinter
 
   //#########################################################################
   //# Auxiliary Methods
+  private Object printCounterExample(final CounterExampleProxy counter)
+    throws VisitorException
+  {
+    printCounterExampleHeader(counter);
+    int i = 1;
+    for (final TraceProxy trace : counter.getTraces()) {
+      printTraceProxy(trace, i++);
+    }
+    return null;
+  }
+
   private void printCounterExampleHeader(final CounterExampleProxy counter)
     throws VisitorException
   {

@@ -78,6 +78,14 @@ public class DefaultProductDESProxyVisitor
   }
 
   @Override
+  public Object visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Object visitEventProxy(final EventProxy proxy)
     throws VisitorException
   {

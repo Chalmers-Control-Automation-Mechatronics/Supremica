@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -210,6 +211,14 @@ public class ProductDESEqualityVisitor
   }
 
   @Override
+  public Boolean visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Boolean visitEventProxy(final EventProxy event)
       throws VisitorException
   {
@@ -304,7 +313,7 @@ public class ProductDESEqualityVisitor
       final TraceProxy expected = (TraceProxy) getSecondProxy();
       final String name1 = trace.getName();
       final String name2 = expected.getName();
-      if (!name1.equals(name2)) {
+      if (!ProxyTools.equals(name1, name2)) {
         return reportAttributeMismatch("trace name", name1, name2);
       }
       final List<TraceStepProxy> steps1 = trace.getTraceSteps();

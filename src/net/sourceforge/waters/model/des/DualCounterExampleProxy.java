@@ -33,49 +33,24 @@
 
 package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.model.base.ProxyVisitor;
-import net.sourceforge.waters.model.base.VisitorException;
+/**
+ * <P>A counterexample consisting of two traces.</P>
+ *
+ * <P>This class is used by model verifiers for several properties of discrete
+ * event system, particularly does concerned with observability of events,
+ * that are refuted by a pair of traces.</P>
+ *
+ * <UL>
+ * <LI>A <I>diagnosability</I> counterexample consists of two cyclic traces,
+ * both accepted by the model, and both using the same sequence of observable
+ * events. In addition, one of the two traces includes the fault event in
+ * question, while the other does not.</LI>
+ * </UL>
+ *
+ * @author Robi Malik
+ */
 
-
-public interface ProductDESProxyVisitor
-  extends ProxyVisitor
+public interface DualCounterExampleProxy
+extends CounterExampleProxy
 {
-
-  public Object visitAutomatonProxy(AutomatonProxy proxy)
-    throws VisitorException;
-
-  public Object visitConflictCounterExampleProxy
-    (ConflictCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitCounterExampleProxy(CounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitDualCounterExampleProxy(DualCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitEventProxy(EventProxy proxy)
-    throws VisitorException;
-
-  public Object visitLoopCounterExampleProxy(LoopCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitProductDESProxy(ProductDESProxy proxy)
-    throws VisitorException;
-
-  public Object visitSafetyCounterExampleProxy(SafetyCounterExampleProxy proxy)
-    throws VisitorException;
-
-  public Object visitStateProxy(StateProxy proxy)
-    throws VisitorException;
-
-  public Object visitTraceProxy(TraceProxy proxy)
-    throws VisitorException;
-
-  public Object visitTraceStepProxy(TraceStepProxy proxy)
-    throws VisitorException;
-
-  public Object visitTransitionProxy(TransitionProxy proxy)
-    throws VisitorException;
-
 }

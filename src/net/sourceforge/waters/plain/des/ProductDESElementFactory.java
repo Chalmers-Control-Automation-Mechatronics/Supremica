@@ -43,6 +43,7 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -133,6 +134,21 @@ public class ProductDESElementFactory
   {
     final TraceProxy trace = createTraceProxyDeterministic(events);
     return new ConflictCounterExampleElement(name, des, trace, kind);
+  }
+
+
+  @Override
+  public DualCounterExampleProxy createDualCounterExampleProxy
+    (final String name,
+     final String comment,
+     final URI location,
+     final ProductDESProxy des,
+     final Collection<? extends AutomatonProxy> automata,
+     final TraceProxy trace1,
+     final TraceProxy trace2)
+  {
+    return new DualCounterExampleElement(name, comment, location, des,
+                                         automata, trace1, trace2);
   }
 
 

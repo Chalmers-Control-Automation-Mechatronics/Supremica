@@ -263,6 +263,14 @@
   </xs:complexType>
 </xs:element>
 
+<xs:element name="DualCounterExample">
+  <xs:complexType>
+    <xs:complexContent>
+      <xs:extension base="D:CounterExampleType"/>
+    </xs:complexContent>
+  </xs:complexType>
+</xs:element>
+
 <xs:element name="TraceList">
   <xs:complexType>
     <xs:complexContent>
