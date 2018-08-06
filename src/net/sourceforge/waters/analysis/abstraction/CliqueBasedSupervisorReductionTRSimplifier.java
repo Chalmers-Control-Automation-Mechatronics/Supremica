@@ -615,12 +615,18 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return;
     }
 
-    while (!possibleAdditions.isEmpty()) {
-      int bestIndex = -1;
-      int lowestCost = Integer.MAX_VALUE;
-      int numPredecessors = -1;
-      for (int i = 0; i < possibleAdditions.size(); i++) {
-        final int state = possibleAdditions.get(i);
+    final Integer[] additionsArray = Arrays.stream(possibleAdditions.toArray()).boxed().toArray(Integer[]::new);
+    Arrays.sort(additionsArray, new Comparator<Integer>() {
+
+      @Override
+      public int compare(final Integer state1, final Integer state2)
+      {
+        final int cost1 = successorCost(state1) + predecessorCost(state1);
+        final int cost2 = successorCost(state2) + predecessorCost(state2);
+        return Integer.compare(cost1, cost2);
+      }
+
+      private int successorCost(final int state) {
         mSetBuffer.clear();
         getSuccessorStates(state, mSetBuffer);
         int matches = 0;
@@ -629,17 +635,18 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             matches++;
           }
         }
-        final int cost = Math.abs(mSetBuffer.size() - matches);
+        return mSetBuffer.size() - matches;
+      }
+
+      private int predecessorCost(final int state) {
         mSetBuffer.clear();
         getPredecessorStates(state, mSetBuffer);
-        if (cost < lowestCost
-            || (cost == lowestCost && numPredecessors > mSetBuffer.size())) {
-          lowestCost = cost;
-          bestIndex = i;
-          numPredecessors = mSetBuffer.size();
-        }
+        return mSetBuffer.size() / 4;
       }
-      final int addition = possibleAdditions.get(bestIndex);
+    });
+
+    for (int a = 0; a < additionsArray.length; a++) {
+      final int addition = additionsArray[a];
 
       //create a copy with the new vertex
       final TIntList newClique = new TIntArrayList(clique);
@@ -647,9 +654,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
       //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
       final TIntList newPossibleAdditions =
-        new TIntArrayList(possibleAdditions.size());
-      for (int i = 0; i < possibleAdditions.size(); i++) {
-        final int oldPossibleAddition = possibleAdditions.get(i);
+        new TIntArrayList(additionsArray.length - a);
+      for (int i = a; i < additionsArray.length; i++) {
+        final int oldPossibleAddition = additionsArray[i];
         if (isNeighbour(addition, oldPossibleAddition)) {
           newPossibleAdditions.add(oldPossibleAddition);
         }
@@ -664,9 +671,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       if (maximalCliquesIdsToFill.size() >= 3) {
         return;
       }
-
-      //remove the current candidate state from further consideration
-      possibleAdditions.removeAt(bestIndex);
     }
   }
 
