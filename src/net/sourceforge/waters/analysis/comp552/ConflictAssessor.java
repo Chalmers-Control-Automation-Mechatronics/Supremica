@@ -38,7 +38,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -85,12 +85,13 @@ public class ConflictAssessor extends AbstractAssessor
   }
 
   @Override
-  ConflictTraceProxy createAlternateTrace(final String name,
-                                          final ProductDESProxy des,
-                                          final List<EventProxy> events)
+  ConflictCounterExampleProxy createAlternateCounterExample
+    (final String name,
+     final ProductDESProxy des,
+     final List<EventProxy> events)
   {
     final ProductDESProxyFactory factory = getFactory();
-    return factory.createConflictTraceProxy
+    return factory.createConflictCounterExampleProxy
       (name, des, events, ConflictKind.CONFLICT);
   }
 

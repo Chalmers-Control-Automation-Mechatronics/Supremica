@@ -38,7 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -185,7 +185,7 @@ public class ConflictChecker extends ModelChecker
    *         event objects.
    */
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
     // Just return a stored counterexample. This is the recommended way
     // of doing this, because we may no longer be able to use the
@@ -202,7 +202,7 @@ public class ConflictChecker extends ModelChecker
    * uses BDD operations to build the counterexample.
    * @return The computed counterexample.
    */
-  private ConflictTraceProxy computeCounterExample()
+  private ConflictCounterExampleProxy computeCounterExample()
   {
     // The following creates a trace that consists of all the events in
     // the input model.
@@ -220,10 +220,8 @@ public class ConflictChecker extends ModelChecker
     }
     // Note. The conflict kind field of the trace is optional for
     // this assignment---it will not be tested.
-    final ConflictTraceProxy trace =
-      desFactory.createConflictTraceProxy(tracename, model, tracelist,
-                                          ConflictKind.CONFLICT);
-    return trace;
+    return desFactory.createConflictCounterExampleProxy
+      (tracename, model, tracelist, ConflictKind.CONFLICT);
   }
 
 
@@ -262,6 +260,6 @@ public class ConflictChecker extends ModelChecker
   /**
    * The computed counterexample or null if the model is nonblocking.
    */
-  private ConflictTraceProxy mCounterExample;
+  private ConflictCounterExampleProxy mCounterExample;
 
 }

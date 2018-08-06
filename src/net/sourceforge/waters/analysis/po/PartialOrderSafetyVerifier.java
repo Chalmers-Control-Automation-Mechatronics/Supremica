@@ -63,8 +63,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -291,14 +292,15 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
       }
       if (initUncontrollable != null) {
         final ProductDESProxyFactory factory = getFactory();
-        final String tracename = getTraceName();
+        final String traceName = getTraceName();
         final String comment =
           getTraceComment(null, initUncontrollable, null);
         final TraceStepProxy step = factory.createTraceStepProxy(null);
         final List<TraceStepProxy> steps = Collections.singletonList(step);
-        final SafetyTraceProxy counterexample =
-          factory.createSafetyTraceProxy(tracename, comment, null, model,
-                                         automata, steps);
+        final TraceProxy trace = factory.createTraceProxy(steps);
+        final SafetyCounterExampleProxy counterexample =
+          factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                  model, automata, trace);
         return setFailedResult(counterexample);
       }
 
@@ -459,8 +461,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
         return setSatisfiedResult();
       } else {
         convertToBredthFirst();
-        final SafetyTraceProxy counterexample = computePOCounterExample();
-        return setFailedResult(counterexample);
+        final SafetyCounterExampleProxy counter = computePOCounterExample();
+        return setFailedResult(counter);
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -1046,7 +1048,8 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     //assert false;
   }
 
-  private SafetyTraceProxy computePOCounterExample() throws AnalysisAbortException
+  private SafetyCounterExampleProxy computePOCounterExample()
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -1101,13 +1104,12 @@ public class PartialOrderSafetyVerifier extends AbstractSafetyVerifier
     }
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
-    final String tracename = getTraceName();
+    final String traceName = getTraceName();
     final String comment = getTraceComment(errorEvent,errorAut,errorState);
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final SafetyTraceProxy trace =
-      factory.createSafetyTraceProxy(tracename, comment, null, des, automata,
-                                     steps);
-    return trace;
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                   des, automata, trace);
   }
 
 

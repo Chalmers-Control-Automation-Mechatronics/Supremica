@@ -48,7 +48,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -147,9 +147,9 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   }
 
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
   @Override
@@ -368,7 +368,8 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
   }
 
   @Override
-  protected TraceProxy computePOCounterExample() throws AnalysisAbortException
+  protected ConflictCounterExampleProxy computePOCounterExample()
+    throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -416,18 +417,19 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     }
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
-    final String tracename = getTraceName();
+    final String traceName = getTraceName();
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final ConflictTraceProxy trace =
-      factory.createConflictTraceProxy(tracename, null, null, des, automata,
-                                     steps,getConflictResult());
-    return trace;
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createConflictCounterExampleProxy(traceName, null, null,
+                                                     des, automata, trace,
+                                                     getConflictResult());
   }
 
   @Override
-  protected TraceProxy noInitialCounterexample(final AutomatonProxy ap,
-                                    final ProductDESProxy model,
-                                    final Collection<AutomatonProxy> automata)
+  protected ConflictCounterExampleProxy noInitialCounterexample
+    (final AutomatonProxy ap,
+     final ProductDESProxy model,
+     final Collection<AutomatonProxy> automata)
   {
     return null;
   }

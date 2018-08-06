@@ -58,10 +58,11 @@ import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -134,9 +135,9 @@ public class CompositionalSafetyVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return (SafetyTraceProxy) super.getCounterExample();
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
   @Override
@@ -313,22 +314,19 @@ public class CompositionalSafetyVerifier
   }
 
   @Override
-  protected SafetyTraceProxy createTrace
+  protected CounterExampleProxy createCounterExample
     (final Collection<AutomatonProxy> automata,
      final List<TraceStepProxy> steps)
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy model = getModel();
-    final String tracename = mDiagnostics.getTraceName(model);
+    final String traceName = mDiagnostics.getTraceName(model);
     final CompositionalVerificationResult result = getAnalysisResult();
-    final TraceProxy trace = result.getCounterExample();
-    final String comment = trace.getComment();
-    return factory.createSafetyTraceProxy(tracename,
-                                          comment,
-                                          null,
-                                          model,
-                                          automata,
-                                          steps);
+    final CounterExampleProxy counter = result.getCounterExample();
+    final String comment = counter.getComment();
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy
+      (traceName, comment, null, model, automata, trace);
   }
 
   @Override
@@ -338,7 +336,7 @@ public class CompositionalSafetyVerifier
     throws AnalysisException
   {
     final KindTranslator translator = getKindTranslator();
-    TraceChecker.checkSafetyCounterExample(steps, automata, true, translator);
+    TraceChecker.checkSafetyTrace(steps, automata, true, translator);
   }
 
   @Override

@@ -40,8 +40,9 @@ import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -632,16 +633,14 @@ public abstract class AbstractControlLoopCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
   {
-    final LoopTraceProxy counterexample = (LoopTraceProxy) trace;
-    final Collection<AutomatonProxy> automata = des.getAutomata();
-    final List<EventProxy> eventlist = counterexample.getEvents();
+    final LoopCounterExampleProxy castTest = (LoopCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
+    final List<EventProxy> eventlist = trace.getEvents();
     final int len = eventlist.size();
-    final int loopIndex = counterexample.getLoopIndex();
-
-    // General: if counterexample is null
-    assertNotNull(counterexample);
+    final int loopIndex = trace.getLoopIndex();
+    final Collection<AutomatonProxy> automata = des.getAutomata();
 
     // General: if counterexample is empty
     assertTrue("Empty Counterexample!", len > 0);

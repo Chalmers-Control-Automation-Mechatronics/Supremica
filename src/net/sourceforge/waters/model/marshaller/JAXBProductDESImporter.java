@@ -46,14 +46,13 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
 import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.Automaton;
-import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.Event;
+import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.ProductDES;
 import net.sourceforge.waters.xsd.des.State;
 import net.sourceforge.waters.xsd.des.Transition;
@@ -73,6 +72,7 @@ class JAXBProductDESImporter
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBImporter
+  @Override
   Proxy importElement(final ElementType element)
     throws WatersUnmarshalException
   {
@@ -93,10 +93,12 @@ class JAXBProductDESImporter
     }
   }
 
+  @Override
   public ProductDESProxy importDocument(final ProductDES element,
                                         final URI uri)
     throws WatersUnmarshalException
   {
+    // TODO Support import of counterexamples
     return importProductDES(element, uri);
   }
 
@@ -210,6 +212,7 @@ class JAXBProductDESImporter
 
     //#######################################################################
     //# Overrides for Abstract Base Class JAXBImporter
+    @Override
     EventProxy importElement(final ElementType element)
     {
       final EventRef eventref = (EventRef) element;

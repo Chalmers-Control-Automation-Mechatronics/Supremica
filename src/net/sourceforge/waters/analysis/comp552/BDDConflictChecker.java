@@ -39,7 +39,7 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -238,7 +238,7 @@ public class BDDConflictChecker extends ModelChecker
    *         event objects.
    */
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
     // Just return a stored counterexample. This is the recommended way
     // of doing this, because we can no longer use the BDD factory after
@@ -255,7 +255,7 @@ public class BDDConflictChecker extends ModelChecker
    * uses BDD operations to build the counterexample.
    * @return The computed counterexample.
    */
-  private ConflictTraceProxy computeCounterExample()
+  private ConflictCounterExampleProxy computeCounterExample()
   {
     // The following creates a trace that consists of the first three events
     // in the input model.
@@ -282,10 +282,8 @@ public class BDDConflictChecker extends ModelChecker
     // Note. The conflict kind field of the trace is optional for
     // this assignment---it will not be tested.
     final ProductDESProxyFactory desFactory = getFactory();
-    final ConflictTraceProxy trace =
-      desFactory.createConflictTraceProxy(traceName, model, traceList,
-                                          ConflictKind.CONFLICT);
-    return trace;
+    return desFactory.createConflictCounterExampleProxy
+      (traceName, model, traceList, ConflictKind.CONFLICT);
   }
 
 
@@ -361,6 +359,6 @@ public class BDDConflictChecker extends ModelChecker
   /**
    * The computed counterexample or null if the model is nonblocking.
    */
-  private ConflictTraceProxy mCounterExample;
+  private ConflictCounterExampleProxy mCounterExample;
 
 }

@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -115,9 +115,9 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   }
 
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return (SafetyTraceProxy) super.getCounterExample();
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
   //#########################################################################
@@ -229,22 +229,24 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
   }
 
   @Override
-  protected TraceProxy noInitialCounterexample(final AutomatonProxy ap,
-                                    final ProductDESProxy model,
-                                    final Collection<AutomatonProxy> automata)
+  protected SafetyCounterExampleProxy noInitialCounterexample
+    (final AutomatonProxy ap,
+     final ProductDESProxy model,
+     final Collection<AutomatonProxy> automata)
   {
     final ProductDESProxyFactory factory = getFactory();
-    final String tracename = getTraceName();
+    final String traceName = getTraceName();
     final String comment =
       getTraceComment(null, ap, null);
     final TraceStepProxy step = factory.createTraceStepProxy(null);
     final List<TraceStepProxy> steps = Collections.singletonList(step);
-    return factory.createSafetyTraceProxy(tracename, comment, null, model,
-                                          automata, steps);
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                   model, automata, trace);
   }
 
   @Override
-  protected TraceProxy computePOCounterExample() throws AnalysisAbortException
+  protected SafetyCounterExampleProxy computePOCounterExample() throws AnalysisAbortException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
@@ -300,13 +302,12 @@ extends PartialOrderComponentsModelVerifier implements SafetyVerifier
     }
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
-    final String tracename = getTraceName();
+    final String traceName = getTraceName();
     final String comment = getTraceComment(errorEvent,errorAut,errorState);
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final SafetyTraceProxy trace =
-      factory.createSafetyTraceProxy(tracename, comment, null, des, automata,
-                                     steps);
-    return trace;
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                   des, automata, trace);
   }
 
   /**

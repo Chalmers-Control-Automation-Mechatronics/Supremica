@@ -33,16 +33,40 @@
 
 package net.sourceforge.waters.model.des;
 
+import net.sourceforge.waters.xsd.des.ConflictKind;
 
 /**
- * <P>A safety counterexample trace for some automata of a product DES.</P>
+ * <P>A counterexample that shows that a model is blocking or has a
+ * deadlock.</P>
  *
- * @see ProductDESProxy
+ * <P>A conflict counterexample contains a single trace that takes the system
+ * from an initial state to a non-coreachable or deadlock state. In addition,
+ * the counterexample may provide {@link ConflictKind} information to indicate
+ * whether the behaviour represents a livelock or deadlock.</P>
  *
  * @author Robi Malik
  */
 
-public interface SafetyTraceProxy
-  extends TraceProxy
+public interface ConflictCounterExampleProxy
+  extends CounterExampleProxy
 {
+
+  //#########################################################################
+  //# Getters
+  /**
+   * Gets the type of this conflict trace.
+   * @return One of {@link ConflictKind#CONFLICT},
+   *         {@link ConflictKind#DEADLOCK}, or
+   *         {@link ConflictKind#LIVELOCK}.
+   */
+  public ConflictKind getKind();
+
+  /**
+   * Gets the single trace that constitutes this counterexample.
+   * This method simply returns the first of the counterexample's
+   * traces.
+   * @see CounterExampleProxy#getTraces()
+   */
+  public TraceProxy getTrace();
+
 }

@@ -39,7 +39,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -50,7 +50,7 @@ import net.sourceforge.waters.xsd.des.ConflictKind;
  */
 public class TRConflictTraceProxy
   extends TRTraceProxy
-  implements ConflictTraceProxy
+  implements ConflictCounterExampleProxy
 {
 
   //#########################################################################
@@ -104,7 +104,7 @@ public class TRConflictTraceProxy
   @Override
   public Class<? extends Proxy> getProxyInterface()
   {
-    return ConflictTraceProxy.class;
+    return ConflictCounterExampleProxy.class;
   }
 
   @Override
@@ -112,7 +112,7 @@ public class TRConflictTraceProxy
     throws VisitorException
   {
     final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
-    return desVisitor.visitConflictTraceProxy(this);
+    return desVisitor.visitConflictCounterExampleProxy(this);
   }
 
 

@@ -57,12 +57,12 @@ import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -122,7 +122,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     mControllabilityChecker = new NativeControllabilityChecker(factory);
     mLanguageInclusionChecker = new NativeLanguageInclusionChecker(factory);
     mConflictChecker = new NativeConflictChecker(factory);
-    mTraceMarshaller = new JAXBTraceMarshaller(factory);
+    mTraceMarshaller = new JAXBCounterExampleMarshaller(factory);
     setNodeLimit();
   }
 
@@ -822,14 +822,14 @@ public abstract class AbstractSupervisorSynthesizerTest
     }
     verifier.run();
     if (!verifier.isSatisfied()) {
-      final TraceProxy counterexample = verifier.getCounterExample();
+      final CounterExampleProxy counterexample = verifier.getCounterExample();
       final File file = saveCounterExample(counterexample);
       fail("Synthesis result is not " + propname +
            "!\nCounterexample saved to " + file);
     }
   }
 
-  private File saveCounterExample(final TraceProxy counterexample)
+  private File saveCounterExample(final CounterExampleProxy counterexample)
     throws Exception
   {
     assertNotNull(counterexample);
@@ -912,7 +912,7 @@ public abstract class AbstractSupervisorSynthesizerTest
   private ControllabilityChecker mControllabilityChecker;
   private LanguageInclusionChecker mLanguageInclusionChecker;
   private ConflictChecker mConflictChecker;
-  private JAXBTraceMarshaller mTraceMarshaller;
+  private JAXBCounterExampleMarshaller mTraceMarshaller;
   private List<ParameterBindingProxy> mBindings;
 
 }

@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 
 
@@ -90,15 +90,16 @@ public abstract class AbstractSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  @Override
   public SafetyDiagnostics getDiagnostics()
   {
     return mDiagnostics;
   }
 
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return (SafetyTraceProxy) super.getCounterExample();
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
 

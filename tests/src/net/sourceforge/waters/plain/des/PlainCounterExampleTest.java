@@ -36,27 +36,28 @@ package net.sourceforge.waters.plain.des;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.des.AbstractTraceTest;
+import net.sourceforge.waters.model.des.AbstractCounterExampleTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class PlainTraceTest extends AbstractTraceTest
+public class PlainCounterExampleTest extends AbstractCounterExampleTest
 {
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
   public static Test suite() {
-    return new TestSuite(PlainTraceTest.class);
+    return new TestSuite(PlainCounterExampleTest.class);
   }
 
-  public static void main(String args[]) {
+  public static void main(final String args[]) {
     junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
   //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.des.TraceTest
+  //# net.sourceforge.waters.model.des.AbstractCounterExampleTest
+  @Override
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {
     return ProductDESElementFactory.getInstance();

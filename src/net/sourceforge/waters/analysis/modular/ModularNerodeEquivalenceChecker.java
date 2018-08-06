@@ -48,8 +48,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
+import net.sourceforge.waters.analysis.monolithic.MonolithicNerodeEChecker;
 import net.sourceforge.waters.analysis.sd.NerodeEquVerificationResult;
 import net.sourceforge.waters.analysis.sd.NerodeKindTranslator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -57,10 +57,11 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -103,6 +104,10 @@ public class ModularNerodeEquivalenceChecker
 
   //#########################################################################
   //# Invocation
+  /**
+   *
+   */
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -113,6 +118,7 @@ public class ModularNerodeEquivalenceChecker
     //final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
+      @Override
       public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
@@ -171,11 +177,13 @@ public class ModularNerodeEquivalenceChecker
       mChecker.setModel(comp);
       mChecker.setKindTranslator(new KindTranslator()
       {
+        @Override
         public EventKind getEventKind(final EventProxy e)
         {
           return getKindTranslator().getEventKind(e);
         }
 
+        @Override
         public ComponentKind getComponentKind(final AutomatonProxy a)
         {
           return specs.contains(a) ? ComponentKind.SPEC
@@ -186,24 +194,20 @@ public class ModularNerodeEquivalenceChecker
       while (!mChecker.run()) {
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
         final NerodeEquVerificationResult result = mChecker.getAnalysisResult();
-        final SafetyTraceProxy counterExample1 = mChecker.getCounterExample();
-        final SafetyTraceProxy counterExample2 = result.getCounterExample2();
+        final SafetyCounterExampleProxy counterExample1 = mChecker.getCounterExample();
+        final SafetyCounterExampleProxy counterExample2 = result.getCounterExample2();
         unProcessedAut.remove(Current);
         if(ProcessedAut.contains(Current))
               ProcessedAut.remove(Current);
 
         final Collection<AutomatonProxy> newComp =
-                     heur(comp,
-                         unProcessedAut,
-                         ProcessedAut,
-                         counterExample1,
-                         counterExample2
-                         );
+          heur(comp, unProcessedAut, ProcessedAut,
+               counterExample1, counterExample2);
         if (newComp == null) {
           final ProductDESProxyFactory factory = getFactory();
-          final SafetyTraceProxy trace = mChecker.getCounterExample();
-          final SafetyTraceProxy extended =
-            extendTrace(factory, trace, automata);
+          final SafetyCounterExampleProxy counter = mChecker.getCounterExample();
+          final SafetyCounterExampleProxy extended =
+            extendTrace(factory, counter, automata);
           return setFailedResult(extended);
         }
         for (final AutomatonProxy automaton : newComp) {
@@ -228,6 +232,7 @@ public class ModularNerodeEquivalenceChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return mChecker.supportsNondeterminism();
@@ -238,17 +243,17 @@ public class ModularNerodeEquivalenceChecker
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  protected boolean setFailedResult(final CounterExampleProxy counterexample)
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String tracename = desname + "-nerode";
     final Collection<AutomatonProxy> automata = counterexample.getAutomata();
-    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
-    final SafetyTraceProxy wrapper =
-      factory.createSafetyTraceProxy(tracename, null, null,
-                                     des, automata, steps);
+    final TraceProxy trace = counterexample.getTraces().get(0);
+    final SafetyCounterExampleProxy wrapper =
+      factory.createSafetyCounterExampleProxy(tracename, null, null,
+                                              des, automata, trace);
     return super.setFailedResult(wrapper);
   }
 
@@ -266,25 +271,28 @@ public class ModularNerodeEquivalenceChecker
   private final static class AutomatonComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getName().compareTo(a2.getName());
     }
   }
-  public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
-                                         final Set<AutomatonProxy> unProcessedAut,
-                                         final Set<AutomatonProxy> ProcessedAut,
-                                         final SafetyTraceProxy counterExample1,
-                                         final SafetyTraceProxy counterExample2)
+  public Collection<AutomatonProxy> heur
+    (final ProductDESProxy composition,
+     final Set<AutomatonProxy> unProcessedAut,
+     final Set<AutomatonProxy> ProcessedAut,
+     final SafetyCounterExampleProxy counterExample1,
+     final SafetyCounterExampleProxy counterExample2)
   {
-    AutomatonProxy automaton = checkAutomata( unProcessedAut,
+    final TraceProxy trace1 = counterExample1.getTrace();
+    final TraceProxy trace2 = counterExample2.getTrace();
+    AutomatonProxy automaton = checkAutomata(unProcessedAut,
                                              new MaxEventComparator(composition),
-                                             counterExample1, counterExample2);
+                                             trace1, trace2);
     if (automaton == null ) {
-
       automaton = checkAutomata(automaton, ProcessedAut,
                                 new MaxEventComparator(composition),
-                                counterExample1,counterExample2);
+                                trace1, trace2);
     }
 
     return automaton == null ? null : Collections.singleton(automaton);
@@ -300,6 +308,7 @@ public class ModularNerodeEquivalenceChecker
       mEvents = composition.getEvents();
     }
 
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       int count1 = 0;
@@ -330,12 +339,13 @@ public class ModularNerodeEquivalenceChecker
     }
   }
 
-  public SafetyTraceProxy extendTrace(final ProductDESProxyFactory factory,
-                                      final SafetyTraceProxy trace,
-                                      final List<AutomatonProxy> automata)
+  public SafetyCounterExampleProxy extendTrace
+    (final ProductDESProxyFactory factory,
+     final SafetyCounterExampleProxy counter,
+     final List<AutomatonProxy> automata)
   {
     final Set<AutomatonProxy> oldAutomata =
-      new THashSet<AutomatonProxy>(trace.getAutomata());
+      new THashSet<AutomatonProxy>(counter.getAutomata());
     boolean done = false;
     boolean det = true;
     for (final AutomatonProxy aut : automata) {
@@ -346,17 +356,18 @@ public class ModularNerodeEquivalenceChecker
       }
     }
     if (done) {
-      return trace;
+      return counter;
     }
-    final String name = trace.getName();
-    final String comment = trace.getComment();
-    final URI location = trace.getLocation();
-    final ProductDESProxy des = trace.getProductDES();
-    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
+    final String name = counter.getName();
+    final String comment = counter.getComment();
+    final URI location = counter.getLocation();
+    final ProductDESProxy des = counter.getProductDES();
+    final TraceProxy trace = counter.getTrace();
     if (det) {
-      return factory.createSafetyTraceProxy(name, comment, location,
-                                            des, automata, oldSteps);
+      return factory.createSafetyCounterExampleProxy(name, comment, location,
+                                                     des, automata, trace);
     }
+    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
     final int numSteps = oldSteps.size();
     final List<TraceStepProxy> newSteps = new ArrayList<TraceStepProxy>(numSteps);
     int depth = 0;
@@ -385,8 +396,9 @@ public class ModularNerodeEquivalenceChecker
       }
       depth++;
     }
-    return factory.createSafetyTraceProxy(name, comment, location,
-                                          des, automata, newSteps);
+    final TraceProxy extendedTrace = factory.createTraceProxy(newSteps);
+    return factory.createSafetyCounterExampleProxy(name, comment, location,
+                                                   des, automata, extendedTrace);
   }
 
 
@@ -394,8 +406,8 @@ public class ModularNerodeEquivalenceChecker
   //# Auxiliary Methods
   AutomatonProxy checkAutomata(final Set<AutomatonProxy> automata,
                                final Comparator<AutomatonProxy> comp,
-                               final SafetyTraceProxy counterExample1,
-                               final SafetyTraceProxy counterExample2)
+                               final TraceProxy counterExample1,
+                               final TraceProxy counterExample2)
   {
     return checkAutomata
       (null, automata, comp, counterExample1, counterExample2);
@@ -404,8 +416,8 @@ public class ModularNerodeEquivalenceChecker
   AutomatonProxy checkAutomata(AutomatonProxy bestautomaton,
                                final Set<AutomatonProxy> automata,
                                final Comparator<AutomatonProxy> comp,
-                               final SafetyTraceProxy counterExample1,
-                               final SafetyTraceProxy counterExample2)
+                               final TraceProxy counterExample1,
+                               final TraceProxy counterExample2)
   { boolean mark = false;
     final List<TraceStepProxy> oldSteps = counterExample1.getTraceSteps();
     final int last = oldSteps.size();

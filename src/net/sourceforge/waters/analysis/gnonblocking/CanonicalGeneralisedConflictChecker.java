@@ -69,11 +69,11 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -197,8 +197,9 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     }
     if (!result) {
       final List<EventProxy> e = new ArrayList<EventProxy>();
-      final TraceProxy counter = getFactory().createSafetyTraceProxy(getModel().getName(),
-                                                               getModel(), e);
+      final SafetyCounterExampleProxy counter =
+        getFactory().createSafetyCounterExampleProxy(getModel().getName(),
+                                                     getModel(), e);
       System.out.println();
       setFailedResult(counter);
     } else {
@@ -245,7 +246,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
   }
 
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
     return null;
   }
@@ -1053,38 +1054,9 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     return p;
   }*/
 
-  @SuppressWarnings("unused")
-  private boolean setFailedResult(final TraceProxy counterexample,
-                                  final Map<EventProxy,EventProxy> uncont)
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
-    final List<EventProxy> events = counterexample.getEvents();
-    final int len = events.size();
-    final List<EventProxy> modevents = new ArrayList<EventProxy>(len);
-    final Iterator<EventProxy> iter = events.iterator();
-    EventProxy event = iter.next();
-    while (iter.hasNext()) {
-      modevents.add(event);
-      event = iter.next();
-    }
-    for (final Map.Entry<EventProxy,EventProxy> entry : uncont.entrySet()) {
-      if (entry.getValue() == event) {
-        final EventProxy key = entry.getKey();
-        modevents.add(key);
-        break;
-      }
-    }
-    final SafetyTraceProxy wrapper =
-        factory.createSafetyTraceProxy(tracename, des, modevents);
-    return super.setFailedResult(wrapper);
-  }
 
-
-  // #########################################################################
-  // # Inner Class ProjectionList
+  //#########################################################################
+  //# Inner Class ProjectionList
   private class ProjectionList
   {
     final SortedSet<AutomatonProxy> mAutomata;
@@ -1582,7 +1554,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
       }
       stateList = null;
       final ProductDESProxy mod = mParent == null ? model : mParent.getModel();
-      trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
+      trace = getFactory().createTraceProxyDeterministic(place.getTrace());
       return mParent == null ? trace : mParent.getTrace(trace, model);
     }
 

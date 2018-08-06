@@ -98,22 +98,20 @@ public interface ProductDESProxyFactory
       (String name,
        ComponentKind kind);
 
+
   /**
-   * Creates a new conflict trace.
-   * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
+   * Creates a new conflict counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
+   * @param  des          The product DES for which this counterexample is
    *                      generated.
-   * @param  automata     The set of automata for the new trace,
+   * @param  automata     The set of automata for the new counterexample,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
-   *                      new trace. This list may not be empty, because
-   *                      the first step must always represent the
-   *                      initial state.
-   * @param  kind         The type of this conflict trace,
+   * @param  trace        The trace that defines the new counterexample.
+   * @param  kind         The type of this conflict counterexample,
    *                      one of {@link ConflictKind#CONFLICT},
    *                      {@link ConflictKind#DEADLOCK}, or
    *                      {@link ConflictKind#LIVELOCK}.
@@ -121,38 +119,39 @@ public interface ProductDESProxyFactory
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
-  public ConflictTraceProxy createConflictTraceProxy
+  public ConflictCounterExampleProxy createConflictCounterExampleProxy
     (String name,
      String comment,
      URI location,
      ProductDESProxy des,
      Collection<? extends AutomatonProxy> automata,
-     List<? extends TraceStepProxy> steps,
+     TraceProxy trace,
      ConflictKind kind);
 
   /**
-   * Creates a new conflict trace using default values. This constructor
-   * provides a simple interface to create a trace for a deterministic
-   * product DES. It creates a trace with a <CODE>null</CODE> file
+   * Creates a new conflict counterexample using default values. This method
+   * provides a simple interface to create a counterexample for a deterministic
+   * product DES. It creates a counterexample with a <CODE>null</CODE> file
    * location, with no comment, with a set of automata equal to that of the
    * product DES, and without any state information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
+   * @param  name         The name to be given to the new counterexample.
+   * @param  des          The product DES for which the new counterexample is
    *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
-   * @param  kind         The type of this conflict trace,
+   * @param  events       The list of events constituting the new
+   *                      counterexample, or <CODE>null</CODE> if empty.
+   * @param  kind         The type of this conflict counterexample,
    *                      one of {@link ConflictKind#CONFLICT},
    *                      {@link ConflictKind#DEADLOCK}, or
    *                      {@link ConflictKind#LIVELOCK}.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      events cannot be found in the product DES.
    */
-  public ConflictTraceProxy createConflictTraceProxy
+  public ConflictCounterExampleProxy createConflictCounterExampleProxy
     (String name,
      ProductDESProxy des,
      List<? extends EventProxy> events,
      ConflictKind kind);
+
 
   /**
    * Creates a new event.
@@ -166,7 +165,6 @@ public interface ProductDESProxyFactory
        EventKind kind,
        boolean observable,
        Map<String,String> attribs);
-
 
   /**
    * Creates a new event without attributes.
@@ -189,55 +187,52 @@ public interface ProductDESProxyFactory
       (String name,
        EventKind kind);
 
+
   /**
-   * Creates a new loop trace.
-   * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
+   * Creates a new loop counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
+   * @param  des          The product DES for which this counterexample is
    *                      generated.
-   * @param  automata     The set of automata for the new trace,
+   * @param  automata     The set of automata for the new counterexample,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
-   *                      new trace. This list may not be empty, because
-   *                      the first step must always represent the
-   *                      initial state.
-   * @param  index        The loop index of the new trace.
+   * @param  trace        The trace that defines the new counterexample.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
-  public LoopTraceProxy createLoopTraceProxy
+  public LoopCounterExampleProxy createLoopCounterExampleProxy
     (String name,
      String comment,
      URI location,
      ProductDESProxy des,
      Collection<? extends AutomatonProxy> automata,
-     List<? extends TraceStepProxy> steps,
-     int index);
+     TraceProxy trace);
 
   /**
-   * Creates a new loop trace using default values.  This constructor
-   * provides a simple interface to create a trace for a deterministic
-   * product DES. It creates a trace with a <CODE>null</CODE> file
+   * Creates a new loop counterexample using default values. This method
+   * provides a simple interface to create a counterexample for a deterministic
+   * product DES. It creates a counterexample with a <CODE>null</CODE> file
    * location, with no comment, with a set of automata equal to that of
    * the product DES, and without any state information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
+   * @param  name         The name to be given to the new counterexample.
+   * @param  des          The product DES for which the new counterexample is
    *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
-   * @param  index        The loop index of the new trace.
+   * @param  events       The list of events constituting the new
+   *                      counterexample, or <CODE>null</CODE> if empty.
+   * @param  index        The loop index of the new counterexample.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      events cannot be found in the product DES.
    */
-  public LoopTraceProxy createLoopTraceProxy
+  public LoopCounterExampleProxy createLoopCounterExampleProxy
     (String name,
      ProductDESProxy des,
      List<? extends EventProxy> events,
      int index);
+
 
   /**
    * Creates a new product DES.
@@ -282,70 +277,70 @@ public interface ProductDESProxyFactory
   public ProductDESProxy createProductDESProxy
       (String name);
 
+
   /**
-   * Creates a new safety trace.
-   * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
+   * Creates a new safety counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
+   * @param  des          The product DES for which this counterexample is
    *                      generated.
-   * @param  automata     The set of automata for the new trace,
+   * @param  automata     The set of automata for the new counterexample,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
-   *                      new trace. This list may not be empty, because
-   *                      the first step must always represent the
-   *                      initial state.
+   * @param  trace        The trace that defines the new counterexample.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (String name,
      String comment,
      URI location,
      ProductDESProxy des,
      Collection<? extends AutomatonProxy> automata,
-     List<? extends TraceStepProxy> steps);
+     TraceProxy trace);
 
   /**
-   * Creates a new safety trace using default values. This method provides
-   * a simple interface to create a trace for a deterministic product DES.
-   * It creates a trace with a <CODE>null</CODE> file location, with no
-   * comment, with a set of automata equal to that of the product DES, and
-   * without any state information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
+   * Creates a new safety counterexample using default values. This method
+   * provides a simple interface to create a counterexample for a
+   * deterministic product DES. It creates a counterexample with a
+   * <CODE>null</CODE> file location, with no comment, with a set of automata
+   * equal to that of the product DES, and without any state information in
+   * the trace steps.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  des          The product DES for which the new counterexample is
    *                      generated.
-   * @param  events       The list of events constituting the new trace,
+   * @param  events       The list of events constituting the new counterexample,
    *                      or <CODE>null</CODE> if empty.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      events cannot be found in the product DES.
    */
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (String name,
      ProductDESProxy des,
      List<? extends EventProxy> events);
 
   /**
-   * Creates a new safety trace using default values.  This method
-   * provides a simple interface to create a controllability error trace
+   * Creates a new safety counterexample using default values. This method
+   * provides a simple interface to create a controllability counterexample
    * for a deterministic product DES. It creates a trace with a
    * <CODE>null</CODE> file location, with the name of the product DES
-   * catenated with <CODE>&quot;uncontrollable&quot;</CODE>, with a set of
+   * concatenated with <CODE>&quot;uncontrollable&quot;</CODE>, with a set of
    * automata equal to that of the product DES, and without any state
    * information in the trace steps.
-   * @param  des          The product DES for which the new trace is
+   * @param  des          The product DES for which the new counterexample is
    *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
+   * @param  events       The list of events constituting the new
+   *                      counterexample, or <CODE>null</CODE> if empty.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      events cannot be found in the product DES.
    */
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (ProductDESProxy des,
      List<? extends EventProxy> events);
+
 
   /**
    * Creates a new state.
@@ -366,6 +361,72 @@ public interface ProductDESProxyFactory
    */
   public StateProxy createStateProxy
       (String name);
+
+
+  /**
+   * Creates a new trace.
+   * @param  name         The name to be given to the new trace.
+   * @param  steps        The list of trace steps constituting the
+   *                      new trace. This list may not be empty, because
+   *                      the first step must always represent the
+   *                      initial state.
+   * @param  loopIndex    The loop index of the new trace.
+   */
+  public TraceProxy createTraceProxy(String name,
+                                     List<? extends TraceStepProxy> steps,
+                                     int loopIndex);
+
+  /**
+   * Creates a new trace with default settings.
+   * This method creates a trace, which may include a cycle, using an
+   * empty string as its name.
+   * @param  steps        The list of trace steps constituting the
+   *                      new trace. This list may not be empty, because
+   *                      the first step must always represent the
+   *                      initial state.
+   * @param  loopIndex    The loop index of the new trace.
+   */
+  public TraceProxy createTraceProxy(List<? extends TraceStepProxy> steps,
+                                     int loopIndex);
+
+  /**
+   * Creates a new trace with default settings.
+   * This method creates a trace without cycle, using an empty string as
+   * its name.
+   * @param  steps        The list of trace steps constituting the
+   *                      new trace. This list may not be empty, because
+   *                      the first step must always represent the
+   *                      initial state.
+   */
+  public TraceProxy createTraceProxy(List<? extends TraceStepProxy> steps);
+
+  /**
+   * Creates a new trace using default values. This method
+   * provides a simple interface to create a trace for a deterministic
+   * system. It creates a trace, which may include a cycle, without any state
+   * information in the trace steps and using an empty string as its name.
+   * @param  events       The list of events constituting the new trace,
+   *                      or <CODE>null</CODE> if empty.
+   * @param  loopIndex    The loop index of the new trace.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      events cannot be found in the product DES.
+   */
+  public TraceProxy createTraceProxyDeterministic
+    (List<? extends EventProxy> events, int loopIndex);
+
+  /**
+   * Creates a new trace using default values. This method
+   * provides a simple interface to create a trace for a deterministic
+   * system. It creates a trace without cycle, without any state
+   * information in the trace steps and using an empty string as its name.
+   * @param  events       The list of events constituting the new trace,
+   *                      or <CODE>null</CODE> if empty.
+   * @throws ItemNotFoundException to indicate that one of the given
+   *                      events cannot be found in the product DES.
+   */
+  public TraceProxy createTraceProxyDeterministic
+    (List<? extends EventProxy> events);
+
 
   /**
    * Creates a new trace step.

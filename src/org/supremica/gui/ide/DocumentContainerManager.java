@@ -69,7 +69,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProductDESToModuleUnmarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
@@ -142,8 +142,8 @@ public class DocumentContainerManager
       new TCTUnmarshaller(factory);
     final ProductDESProxyFactory desfactory =
       ProductDESElementFactory.getInstance();
-    final JAXBTraceMarshaller traceMarshaller =
-      new JAXBTraceMarshaller(desfactory);
+    final JAXBCounterExampleMarshaller traceMarshaller =
+      new JAXBCounterExampleMarshaller(desfactory);
     // Add marshallers in order of importance ...
     mDocumentManager.registerMarshaller(moduleMarshaller);
     mDocumentManager.registerMarshaller(supremicaMarshaller);

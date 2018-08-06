@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<LoopTrace LoopIndex="1" ProductDES="the_vicious_loop1"
-           Name="the_vicious_loop1"
-	   xmlns="http://waters.sourceforge.net/xsd/des">
-    <AutomatonRefList>
-        <AutomatonRef Name="the_vicious_loop"/>
-    </AutomatonRefList>
+<LoopCounterExample ProductDES="the_vicious_loop1"
+		    Name="the_vicious_loop1"
+		    xmlns="http://waters.sourceforge.net/xsd/des">
+<AutomatonRefList>
+  <AutomatonRef Name="the_vicious_loop"/>
+</AutomatonRefList>
+<TraceList>
+  <Trace LoopIndex="1">
     <TraceStepList>
-        <EventRef Name="b"/>
-        <EventRef Name="loop"/>
+      <EventRef Name="b"/>
+      <EventRef Name="loop"/>
     </TraceStepList>
-</LoopTrace>
+  </Trace>
+</TraceList>
+</LoopCounterExample>
 

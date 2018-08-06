@@ -31,32 +31,59 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.des;
+package net.sourceforge.waters.model.marshaller;
 
-import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
+import java.util.List;
+
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
+import net.sourceforge.waters.xsd.des.ObjectFactory;
+import net.sourceforge.waters.xsd.des.Trace;
+import net.sourceforge.waters.xsd.des.TraceList;
 
 
-public class TraceIntegrityChecker
-  extends DocumentIntegrityChecker<TraceProxy>
+class CounterExampleTraceListHandler
+  extends JAXBListHandler<CounterExampleType,TraceList,TraceProxy>
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static TraceIntegrityChecker getInstance()
+  //# Constructors
+  CounterExampleTraceListHandler()
   {
-    return SingletonHolder.INSTANCE;
+    this(null);
   }
 
-  private static class SingletonHolder {
-    private static final TraceIntegrityChecker INSTANCE =
-      new TraceIntegrityChecker();
+  CounterExampleTraceListHandler(final ObjectFactory factory)
+  {
+    mFactory = factory;
   }
 
 
   //#########################################################################
-  //# Constructor
-  protected TraceIntegrityChecker()
+  //# Overrides for Abstract Base Class JAXBListHandler
+  @Override
+  TraceList createListElement(final CounterExampleType container)
   {
+    final TraceList listelem = mFactory.createTraceList();
+    container.setTraceList(listelem);
+    return listelem;
   }
+
+  @Override
+  TraceList getListElement(final CounterExampleType container)
+  {
+    return container.getTraceList();
+  }
+
+  @Override
+  List<Trace> getList(final TraceList listElem)
+  {
+    return listElem.getList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ObjectFactory mFactory;
 
 }

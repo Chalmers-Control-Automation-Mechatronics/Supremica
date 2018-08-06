@@ -44,10 +44,12 @@ import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -312,27 +314,29 @@ public abstract class AbstractSICProperty5VerifierTest
   /**
    * Checks the correctness of a conflict counterexample which is converted back
    * to the original model by SICPropertyVBuilder. A conflict counterexample has
-   * to be a {@link ConflictTraceProxy}, its event sequence has to be accepted
-   * by all automata in the original model. Also the trace must put all
+   * to be a {@link ConflictCounterExampleProxy}, its event sequence has to be
+   * accepted by all automata in the original model. Also the trace must put all
    * interfaces in a state where the answer in question is enabled. Furthermore,
    * when a state has a nondeterministic choice it is verified whether the
    * counter example includes correct state information.
-   *
-   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,CounterExampleProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
+    throws Exception
   {
-    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
+    final ConflictCounterExampleProxy castTest =
+      (ConflictCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
         new HashMap<AutomatonProxy,StateProxy>(size);
     final EventProxy failedAnswer = getModelVerifier().getFailedAnswer();
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, counterexample);
+      final StateProxy state = checkCounterExample(aut, trace);
       assertNotNull("Counterexample not accepted by automaton " + aut.getName()
           + "!", state);
       tuple.put(aut, state);
@@ -351,7 +355,7 @@ public abstract class AbstractSICProperty5VerifierTest
           }
         }
         if (!answerEnabled) {
-          final File filename = saveCounterExample(trace);
+          final File filename = saveCounterExample(counter);
           fail("Counterexample leads to a state where the interface "
               + aut.getName() + " does not have the answer event "
               + failedAnswer.getName() + " enabled (trace written to "
@@ -367,7 +371,7 @@ public abstract class AbstractSICProperty5VerifierTest
         createLanguageInclusionChecker(ldes, factory);
     final boolean blocking = lchecker.run();
     if (!blocking) {
-      final TraceProxy ltrace = lchecker.getCounterExample();
+      final SafetyCounterExampleProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
       fail("Counterexample does not lead to a state where the answer event "
           + failedAnswer.getName()

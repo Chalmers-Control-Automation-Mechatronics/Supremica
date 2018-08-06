@@ -31,76 +31,24 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.marshaller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
 
-import javax.swing.Action;
-import javax.swing.KeyStroke;
 
-import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.TraceProxy;
-
-import org.supremica.gui.ide.IDE;
-
-public class SimulationReplayStepAction
-  extends WatersSimulationAction
-  implements SimulationObserver
+class JAXBCounterExampleExporter
+  extends JAXBProductDESElementExporter<CounterExampleProxy,CounterExampleType>
 {
 
   //#########################################################################
-  //# Constructor
-  SimulationReplayStepAction(final IDE ide)
-  {
-    super(ide);
-    putValue(Action.NAME, "Replay Step");
-    putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
-    putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-    updateEnabledStatus();
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Overrides for Abstract Base Class JAXBExporter
   @Override
-  public void actionPerformed(final ActionEvent event)
+  CounterExampleType exportDocument(final CounterExampleProxy proxy)
+    throws VisitorException
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel != null) {
-      final Simulation sim = panel.getSimulation();
-      sim.replayStep();
-    }
+    return (CounterExampleType) exportProxy(proxy);
   }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  @Override
-  void updateEnabledStatus()
-  {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel == null) {
-      setEnabled(false);
-      return;
-    }
-    final Simulation sim = panel.getSimulation();
-    if (sim.getCurrentTime() < sim.getHistorySize() - 1) {
-      setEnabled(true);
-      return;
-    }
-    final TraceProxy trace = sim.getTrace();
-    setEnabled(trace != null && trace.getLoopIndex() >= 0);
-  }
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
 
 }

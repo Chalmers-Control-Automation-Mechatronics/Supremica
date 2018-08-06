@@ -31,57 +31,35 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.model.des;
 
-import java.util.List;
+/**
+ * <P>A counterexample that shows that a model fails a liveness property.</P>
+ *
+ * <P>A loop counterexample contains a single trace that starts from the
+ * initial state and ends up performing cyclic behaviour. It is guaranteed
+ * that the traces loop index ({@link TraceProxy#getLoopIndex()} is set.
+ *
+ * <UL>
+ * <LI>A <I>control-loop</I> counterexample has a loop trace where all events
+ * in the loop are controllable.</LI>
+ * </UL>
+ *
+ * @author Robi Malik
+ */
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-
-import net.sourceforge.waters.xsd.des.AutomatonRef;
-import net.sourceforge.waters.xsd.des.TraceType;
-import net.sourceforge.waters.xsd.des.AutomatonRefList;
-import net.sourceforge.waters.xsd.des.ObjectFactory;
-
-
-class TraceAutomatonRefListHandler
-  extends JAXBCheckedListHandler<TraceType,AutomatonRefList,AutomatonProxy>
+public interface LoopCounterExampleProxy
+extends CounterExampleProxy
 {
 
   //#########################################################################
-  //# Constructors
-  TraceAutomatonRefListHandler()
-  {
-    this(null);
-  }
-
-  TraceAutomatonRefListHandler(final ObjectFactory factory)
-  {
-    mFactory = factory;
-  }
-
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class JAXBListHandler
-  AutomatonRefList createListElement(TraceType container)
-  {
-    final AutomatonRefList listelem = mFactory.createAutomatonRefList();
-    container.setAutomatonRefList(listelem);
-    return listelem;
-  }
-
-  AutomatonRefList getListElement(TraceType container)
-  {
-    return container.getAutomatonRefList();
-  }
-
-  List<AutomatonRef> getList(AutomatonRefList listelem)
-  {
-    return listelem.getList();
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final ObjectFactory mFactory;
+  //# Getters
+  /**
+   * Gets the single trace that constitutes this counterexample.
+   * This method simply returns the first of the counterexample's
+   * traces.
+   * @see CounterExampleProxy#getTraces()
+   */
+  public TraceProxy getTrace();
 
 }

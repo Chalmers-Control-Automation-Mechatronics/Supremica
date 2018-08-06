@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,15 +50,14 @@ import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -182,7 +183,7 @@ public class ModularControlLoopChecker
               return true;
             }
             mTranslator.removeLoopEvents(nonLoop);
-            final LoopTraceProxy loop = testOne(group);
+            final LoopCounterExampleProxy loop = testOne(group);
             if (loop != null) {
               setLiftedLoopTrace(loop);
               return false;
@@ -190,7 +191,7 @@ public class ModularControlLoopChecker
           }
         }
         while (removedLoopEvents);
-        final LoopTraceProxy loop = testAll();
+        final LoopCounterExampleProxy loop = testAll();
         if (loop != null) {
           return setLiftedLoopTrace(loop);
         }
@@ -377,9 +378,9 @@ public class ModularControlLoopChecker
     }
   }
 
-  private LoopTraceProxy testAll()
+  private LoopCounterExampleProxy testAll()
   {
-    LoopTraceProxy output = null;
+    LoopCounterExampleProxy output = null;
     for (final AutomataGroup auto : mAutoSets) {
       output = testOne(auto);
       if (output != null) {
@@ -389,7 +390,7 @@ public class ModularControlLoopChecker
     return null;
   }
 
-  private LoopTraceProxy testOne(final AutomataGroup group)
+  private LoopCounterExampleProxy testOne(final AutomataGroup group)
   {
     if (group.getTrace() != null) {
       for (final AutomataGroup checkLoop : mAutoSets) {
@@ -399,7 +400,7 @@ public class ModularControlLoopChecker
           return null;
         }
       }
-      return group.getLoopTraceProxy();
+      return group.getCounterExample();
     }
     return null;
   }
@@ -422,12 +423,13 @@ public class ModularControlLoopChecker
     return setLoopTrace(null, automata, steps, 0);
   }
 
-  private boolean setLiftedLoopTrace(final LoopTraceProxy loop)
+  private boolean setLiftedLoopTrace(final LoopCounterExampleProxy loop)
   {
     final String comment = loop.getComment();
     final Collection<AutomatonProxy> automata = loop.getAutomata();
-    final List<TraceStepProxy> steps = loop.getTraceSteps();
-    final int index = loop.getLoopIndex();
+    final TraceProxy trace = loop.getTrace();
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    final int index = trace.getLoopIndex();
     return setLoopTrace(comment, automata, steps, index);
   }
 
@@ -439,10 +441,11 @@ public class ModularControlLoopChecker
     final ProductDESProxyFactory factory = getFactory();
     final String name = getTraceName();
     final ProductDESProxy model = getModel();
-    final LoopTraceProxy trace =
-      factory.createLoopTraceProxy(name, comment, null,
-                                   model, automata, steps, index);
-    return setFailedResult(trace);
+    final TraceProxy trace = factory.createTraceProxy(steps, index);
+    final LoopCounterExampleProxy counter =
+      factory.createLoopCounterExampleProxy(name, comment, null, model,
+                                            automata, trace);
+    return setFailedResult(counter);
   }
 
 

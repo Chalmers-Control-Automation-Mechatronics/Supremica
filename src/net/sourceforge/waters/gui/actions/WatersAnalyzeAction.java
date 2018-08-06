@@ -56,9 +56,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.logging.log4j.LogManager;
@@ -261,7 +261,7 @@ public abstract class WatersAnalyzeAction
           AnalyzerDialog.this.dispose();
         }
       });
-      final TraceProxy counterexample = mVerifier.getCounterExample();
+      final CounterExampleProxy counterexample = mVerifier.getCounterExample();
       String comment = null;
       if (counterexample != null) {
         traceButton = new JButton("Show Trace");

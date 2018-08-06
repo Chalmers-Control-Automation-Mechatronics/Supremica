@@ -35,13 +35,14 @@ package net.sourceforge.waters.model.module;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -77,10 +78,19 @@ public class DefaultProductDESAndModuleProxyVisitor
   }
 
   @Override
-  public Object visitConflictTraceProxy(final ConflictTraceProxy proxy)
+  public Object visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
+  public Object visitCounterExampleProxy
+    (final CounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitDocumentProxy(proxy);
   }
 
   @Override
@@ -91,10 +101,11 @@ public class DefaultProductDESAndModuleProxyVisitor
   }
 
   @Override
-  public Object visitLoopTraceProxy(final LoopTraceProxy proxy)
+  public Object visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
   }
 
   @Override
@@ -105,10 +116,11 @@ public class DefaultProductDESAndModuleProxyVisitor
   }
 
   @Override
-  public Object visitSafetyTraceProxy(final SafetyTraceProxy proxy)
+  public Object visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
   }
 
   @Override
@@ -122,7 +134,7 @@ public class DefaultProductDESAndModuleProxyVisitor
   public Object visitTraceProxy(final TraceProxy proxy)
     throws VisitorException
   {
-    return visitDocumentProxy(proxy);
+    return visitProxy(proxy);
   }
 
   @Override

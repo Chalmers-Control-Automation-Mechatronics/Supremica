@@ -81,7 +81,8 @@ public abstract class Element
    * copying. All contained objects are shared between an element and its
    * clones.
    */
-  public Element clone()
+  @Override
+  public Proxy clone()
   {
     try {
       return (Element) super.clone();
@@ -93,6 +94,7 @@ public abstract class Element
 
   //#########################################################################
   //# Printing
+  @Override
   public String toString()
   {
     return ProxyPrinter.getPrintString(this);

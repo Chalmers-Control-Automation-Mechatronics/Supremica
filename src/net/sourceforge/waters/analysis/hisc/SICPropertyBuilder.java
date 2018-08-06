@@ -41,22 +41,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
-import net.sourceforge.waters.analysis.hisc.HISCAttributeFactory;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 
 
 /**
@@ -380,8 +380,8 @@ public class SICPropertyBuilder
     return newModel;
   }
 
-  public ConflictTraceProxy convertTraceToOriginalModel
-    (final ConflictTraceProxy conflictTrace, final EventProxy answer)
+  public ConflictCounterExampleProxy convertTraceToOriginalModel
+    (final ConflictCounterExampleProxy counter, final EventProxy answer)
   {
     // creates a map of the original model's automaton names to the object for
     // that automaton and a map of the names of the states for that automaton to
@@ -402,7 +402,8 @@ public class SICPropertyBuilder
       }
       stateMap.put(autName, innerStateMap);
     }
-    final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+    final TraceProxy trace = counter.getTrace();
+    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
     for (final TraceStepProxy step : traceSteps) {
       final EventProxy event = step.getEvent();
@@ -429,23 +430,23 @@ public class SICPropertyBuilder
       }
     }
     final String modelname = mModel.getName();
-    final String tracename;
+    final String traceName;
     String comment;
     if (answer != null) {
-      tracename = modelname + "-sic5";
+      traceName = modelname + "-sic5";
       comment = modelname + " does not satisfy SIC Property V. " +
         "The answer event " + answer.getName() +
         " can no longer be executed, although it is required by the interface.";
     } else {
-      tracename = modelname + "-sic6";
+      traceName = modelname + "-sic6";
       comment = modelname + " does not satisfy SIC Property VI.";
     }
-    final ConflictKind kind = conflictTrace.getKind();
-    final ConflictTraceProxy convertedTrace =
-      mFactory.createConflictTraceProxy(tracename, comment, null,
-                                        mModel, mModel.getAutomata(),
-                                        convertedSteps, kind);
-    return convertedTrace;
+    final TraceProxy convertedTrace = mFactory.createTraceProxy(convertedSteps);
+    final ConflictKind kind = counter.getKind();
+    return
+      mFactory.createConflictCounterExampleProxy(traceName, comment, null,
+                                                 mModel, mModel.getAutomata(),
+                                                 convertedTrace, kind);
   }
 
 

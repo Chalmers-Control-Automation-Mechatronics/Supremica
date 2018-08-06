@@ -31,76 +31,77 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.marshaller;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import javax.xml.bind.JAXBException;
 
-import javax.swing.Action;
-import javax.swing.KeyStroke;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
 
-import net.sourceforge.waters.gui.simulator.Simulation;
-import net.sourceforge.waters.gui.simulator.SimulationObserver;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.TraceProxy;
+import org.xml.sax.SAXException;
 
-import org.supremica.gui.ide.IDE;
 
-public class SimulationReplayStepAction
-  extends WatersSimulationAction
-  implements SimulationObserver
+public class JAXBCounterExampleMarshaller
+  extends JAXBMarshaller<CounterExampleProxy,CounterExampleType>
 {
 
   //#########################################################################
-  //# Constructor
-  SimulationReplayStepAction(final IDE ide)
+  //# Constructors
+  public JAXBCounterExampleMarshaller(final ProductDESProxyFactory factory)
+    throws JAXBException, SAXException
   {
-    super(ide);
-    putValue(Action.NAME, "Replay Step");
-    putValue(Action.SHORT_DESCRIPTION, "Replay the next event");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_SIMULATOR_REPLAY);
-    putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-    updateEnabledStatus();
+    super(new JAXBCounterExampleExporter(),
+          new JAXBCounterExampleImporter(factory),
+          "net.sourceforge.waters.xsd.des",
+          "waters-des.xsd");
   }
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Configuration
+  /**
+   * Sets the product DES corresponding to a counterexample to be unmarshalled.
+   * If non-<CODE>null</CODE> the name of the product DES in the
+   * <CODE>.wtra</CODE> must match the name of the given product DES,
+   * so the counterexample automata can be taken from the given product DES.
+   * If <CODE>null</CODE>, the product DES will be obtained using the
+   * document manager, and an appropriate <CODE>.wdes</CODE> file must
+   * exist.
+   */
+  public void setProductDES(final ProductDESProxy des)
+  {
+    final JAXBCounterExampleImporter importer =
+      (JAXBCounterExampleImporter) getImporter();
+    importer.setProductDES(des);
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBMarshaller
   @Override
-  public void actionPerformed(final ActionEvent event)
+  public String getDefaultExtension()
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel != null) {
-      final Simulation sim = panel.getSimulation();
-      sim.replayStep();
-    }
+    return ".wtra";
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
   @Override
-  void updateEnabledStatus()
+  public Class<CounterExampleProxy> getDocumentClass()
   {
-    final SimulatorPanel panel = getObservedSimulatorPanel();
-    if (panel == null) {
-      setEnabled(false);
-      return;
-    }
-    final Simulation sim = panel.getSimulation();
-    if (sim.getCurrentTime() < sim.getHistorySize() - 1) {
-      setEnabled(true);
-      return;
-    }
-    final TraceProxy trace = sim.getTrace();
-    setEnabled(trace != null && trace.getLoopIndex() >= 0);
+    return CounterExampleProxy.class;
   }
 
+  @Override
+  public String getDescription()
+  {
+      return "Waters Trace files [*.wtra]";
+  }
 
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
+  @Override
+  public Class<CounterExampleType> getElementClass()
+  {
+    return CounterExampleType.class;
+  }
 
 }

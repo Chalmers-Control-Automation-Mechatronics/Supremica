@@ -52,9 +52,8 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -208,7 +207,7 @@ public class ModularLanguageInclusionChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean setFailedResult(final TraceProxy counterexample,
+  private boolean setFailedResult(final SafetyCounterExampleProxy counter,
                                   final AutomatonProxy property)
   {
     final ProductDESProxyFactory factory = getFactory();
@@ -217,11 +216,11 @@ public class ModularLanguageInclusionChecker
     final String propname = property.getName();
     final String cleanedname = propname.replaceAll(":", "-");
     final String tracename = desname + '-' + cleanedname;
-    final Collection<AutomatonProxy> automata = counterexample.getAutomata();
-    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
-    final SafetyTraceProxy wrapper =
-      factory.createSafetyTraceProxy(tracename, null, null,
-                                     des, automata, steps);
+    final Collection<AutomatonProxy> automata = counter.getAutomata();
+    final TraceProxy trace = counter.getTrace();
+    final SafetyCounterExampleProxy wrapper =
+      factory.createSafetyCounterExampleProxy(tracename, null, null,
+                                              des, automata, trace);
     return setFailedResult(wrapper);
   }
 

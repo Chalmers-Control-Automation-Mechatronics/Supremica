@@ -33,29 +33,39 @@
 
 package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.xsd.des.ConflictKind;
-
-
 /**
- * <P>A conflict counterexample trace for some automata of a product DES.</P>
+ * <P>A counterexample that shows that a model fails a safety property.</P>
  *
- * @see ProductDESProxy
+ * <P>A safety counterexample contains a single trace that takes the system
+ * from an initial state to an undesirable state. In addition, the trace
+ * contains a final step ({@link TraceStepProxy}) that can only be executed
+ * by some of the automata in the model, thus showing how the property is
+ * violated.</P>
+ *
+ * <UL>
+ * <LI>A <I>controllability</I> counterexample has a final trace step with an
+ * uncontrollable event that can be executed by all plants, but is disabled
+ * in at least one specification.</LI>
+ * <LI>A <I>language inclusion</I> counterexample has a final trace step
+ * that can be executed by all plants, specifications, and supervisors in
+ * the model, but is disabled in at least one property automaton.</LI>
+ * </UL>
  *
  * @author Robi Malik
  */
 
-public interface ConflictTraceProxy
-  extends TraceProxy
+public interface SafetyCounterExampleProxy
+extends CounterExampleProxy
 {
 
   //#########################################################################
   //# Getters
   /**
-   * Gets the type of this conflict trace.
-   * @return One of {@link ConflictKind#CONFLICT},
-   *         {@link ConflictKind#DEADLOCK}, or
-   *         {@link ConflictKind#LIVELOCK}.
+   * Gets the single trace that constitutes this counterexample.
+   * This method simply returns the first of the counterexample's
+   * traces.
+   * @see CounterExampleProxy#getTraces()
    */
-  public ConflictKind getKind();
+  public TraceProxy getTrace();
 
 }

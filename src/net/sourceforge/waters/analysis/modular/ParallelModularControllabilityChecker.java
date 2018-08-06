@@ -58,6 +58,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -88,6 +89,7 @@ public class ParallelModularControllabilityChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
@@ -97,6 +99,7 @@ public class ParallelModularControllabilityChecker
     final Set<AutomatonProxy> specplants = new HashSet<AutomatonProxy>();
     final SortedSet<AutomatonProxy> specs =
       new TreeSet<AutomatonProxy>(new Comparator<AutomatonProxy>() {
+      @Override
       public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
       {
         if (a1.getStates().size() < a2.getStates().size()) {
@@ -136,6 +139,7 @@ public class ParallelModularControllabilityChecker
       final Queue<ParallelRun> runs = new PriorityQueue<ParallelRun>(specs.size(),
                                                                      new Comparator<ParallelRun>()
       {
+        @Override
         public int compare(final ParallelRun p1, final ParallelRun p2)
         {
           if (p1.mStates < p2.mStates) {
@@ -158,11 +162,13 @@ public class ParallelModularControllabilityChecker
         mChecker.setModel(run.mModel);
         mChecker.setKindTranslator(new KindTranslator()
         {
+          @Override
           public EventKind getEventKind(final EventProxy e)
           {
             return getKindTranslator().getEventKind(e);
           }
 
+          @Override
           public ComponentKind getComponentKind(final AutomatonProxy a)
           {
             return specs.contains(a) ? ComponentKind.SPEC
@@ -189,12 +195,13 @@ public class ParallelModularControllabilityChecker
           uncomposedspecplants.removeAll(cplants);
           uncomposedspecs.addAll(specs);
           uncomposedplants.removeAll(cspecs);
+          final SafetyCounterExampleProxy counter = mChecker.getCounterExample();
           final Collection<AutomatonProxy> newComp =
             mHeuristic.heur(run.mModel,
                             uncomposedplants,
                             uncomposedspecplants,
                             uncomposedspecs,
-                            mChecker.getCounterExample());
+                            counter);
           if (newComp == null) {
             mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
             setFailedResult(mChecker.getCounterExample());
@@ -217,7 +224,7 @@ public class ParallelModularControllabilityChecker
           newStates -= mChecker.getAnalysisResult().getTotalNumberOfStates();
           newStates *= (newEvents / numevents);
           newStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-          run.mCounter = mChecker.getCounterExample();
+          run.mCounter = counter.getTrace();
           run = new ParallelRun(cspecs, cplants, newStates,
                                 newComp, run, events);
           if (lookedat.add(run)) {
@@ -278,6 +285,7 @@ public class ParallelModularControllabilityChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -348,11 +356,13 @@ public class ParallelModularControllabilityChecker
       mModel = getFactory().createProductDESProxy("comp", events, model);
     }
 
+    @Override
     public int hashCode()
     {
       return 17 + mSpecs.hashCode() * 31 + mPlants.hashCode() * 31;
     }
 
+    @Override
     public boolean equals(final Object o)
     {
       if (o instanceof ParallelRun) {

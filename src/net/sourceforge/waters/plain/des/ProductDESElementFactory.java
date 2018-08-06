@@ -35,18 +35,21 @@ package net.sourceforge.waters.plain.des;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -89,14 +92,14 @@ public class ProductDESElementFactory
 
   @Override
   public AutomatonProxy createAutomatonProxy
-  (final String name,
-   final ComponentKind kind,
-   final Collection<? extends EventProxy> events,
-   final Collection<? extends StateProxy> states,
-   final Collection<? extends TransitionProxy> transitions)
-{
-  return new AutomatonElement(name, kind, events, states, transitions);
-}
+    (final String name,
+     final ComponentKind kind,
+     final Collection<? extends EventProxy> events,
+     final Collection<? extends StateProxy> states,
+     final Collection<? extends TransitionProxy> transitions)
+  {
+    return new AutomatonElement(name, kind, events, states, transitions);
+  }
 
   @Override
   public AutomatonProxy createAutomatonProxy
@@ -106,29 +109,32 @@ public class ProductDESElementFactory
     return new AutomatonElement(name, kind);
   }
 
+
   @Override
-  public ConflictTraceProxy createConflictTraceProxy
+  public ConflictCounterExampleProxy createConflictCounterExampleProxy
     (final String name,
      final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps,
+     final TraceProxy trace,
      final ConflictKind kind)
   {
-    return new ConflictTraceElement(name, comment, location, des,
-                                    automata, steps, kind);
+    return new ConflictCounterExampleElement(name, comment, location,
+                                             des, automata, trace, kind);
   }
 
   @Override
-  public ConflictTraceProxy createConflictTraceProxy
+  public ConflictCounterExampleProxy createConflictCounterExampleProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events,
      final ConflictKind kind)
   {
-    return new ConflictTraceElement(name, des, events, kind);
+    final TraceProxy trace = createTraceProxyDeterministic(events);
+    return new ConflictCounterExampleElement(name, des, trace, kind);
   }
+
 
   @Override
   public EventProxy createEventProxy
@@ -155,29 +161,31 @@ public class ProductDESElementFactory
     return new EventElement(name, kind);
   }
 
+
   @Override
-  public LoopTraceProxy createLoopTraceProxy
+  public LoopCounterExampleProxy createLoopCounterExampleProxy
     (final String name,
      final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps,
-     final int index)
+     final TraceProxy trace)
   {
-    return new LoopTraceElement(name, comment, location, des,
-                                automata, steps, index);
+    return new LoopCounterExampleElement(name, comment, location,
+                                         des, automata, trace);
   }
 
   @Override
-  public LoopTraceProxy createLoopTraceProxy
+  public LoopCounterExampleProxy createLoopCounterExampleProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events,
      final int index)
   {
-    return new LoopTraceElement(name, des, events, index);
+    final TraceProxy trace = createTraceProxyDeterministic(events, index);
+    return new LoopCounterExampleElement(name, des, trace);
   }
+
 
   @Override
   public ProductDESProxy createProductDESProxy
@@ -205,35 +213,39 @@ public class ProductDESElementFactory
     return new ProductDESElement(name);
   }
 
+
   @Override
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (final String name,
      final String comment,
      final URI location,
      final ProductDESProxy des,
      final Collection<? extends AutomatonProxy> automata,
-     final List<? extends TraceStepProxy> steps)
+     final TraceProxy trace)
   {
-    return new SafetyTraceElement(name, comment, location, des,
-                                  automata, steps);
+    return new SafetyCounterExampleElement(name, comment, location,
+                                           des, automata, trace);
   }
 
   @Override
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (final String name,
      final ProductDESProxy des,
      final List<? extends EventProxy> events)
   {
-    return new SafetyTraceElement(name, des, events);
+    final TraceProxy trace = createTraceProxyDeterministic(events);
+    return new SafetyCounterExampleElement(name, des, trace);
   }
 
   @Override
-  public SafetyTraceProxy createSafetyTraceProxy
+  public SafetyCounterExampleProxy createSafetyCounterExampleProxy
     (final ProductDESProxy des,
      final List<? extends EventProxy> events)
   {
-    return new SafetyTraceElement(des, events);
+    final TraceProxy trace = createTraceProxyDeterministic(events);
+    return new SafetyCounterExampleElement(des, trace);
   }
+
 
   @Override
   public StateProxy createStateProxy
@@ -249,6 +261,56 @@ public class ProductDESElementFactory
   {
     return new StateElement(name);
   }
+
+
+  @Override
+  public TraceProxy createTraceProxy(final String name,
+                                     final List<? extends TraceStepProxy> steps,
+                                     final int loopIndex)
+  {
+    return new TraceElement(name, steps, loopIndex);
+  }
+
+  @Override
+  public TraceProxy createTraceProxy(final List<? extends TraceStepProxy> steps,
+                                     final int loopIndex)
+  {
+    return createTraceProxy("", steps, loopIndex);
+  }
+
+  @Override
+  public TraceProxy createTraceProxy(final List<? extends TraceStepProxy> steps)
+  {
+    return createTraceProxy(steps, -1);
+  }
+
+  @Override
+  public TraceProxy createTraceProxyDeterministic
+    (final List<? extends EventProxy> events, final int loopIndex)
+  {
+    final List<TraceStepProxy> steps;
+    final TraceStepProxy step0 = createTraceStepProxy(null);
+    if (events == null) {
+      steps = Collections.singletonList(step0);
+    } else {
+      final int numSteps = events.size() + 1;
+      steps = new ArrayList<>(numSteps);
+      steps.add(step0);
+      for (final EventProxy event : events) {
+        final TraceStepProxy step = createTraceStepProxy(event);
+        steps.add(step);
+      }
+    }
+    return createTraceProxy("", steps, loopIndex);
+  }
+
+  @Override
+  public TraceProxy createTraceProxyDeterministic
+    (final List<? extends EventProxy> events)
+  {
+    return createTraceProxyDeterministic(events, -1);
+  }
+
 
   @Override
   public TraceStepProxy createTraceStepProxy
@@ -282,6 +344,6 @@ public class ProductDESElementFactory
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -2720284230092108697L;
 
 }

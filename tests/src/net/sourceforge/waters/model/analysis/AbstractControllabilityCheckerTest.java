@@ -41,10 +41,11 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
@@ -921,13 +922,14 @@ public abstract class AbstractControllabilityCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws Exception
   {
-    super.checkCounterExample(des, trace);
-    final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
-
-    final List<EventProxy> eventlist = counterexample.getEvents();
+    super.checkCounterExample(des, counter);
+    final SafetyCounterExampleProxy castTest =
+      (SafetyCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
+    final List<EventProxy> eventlist = trace.getEvents();
     final int len = eventlist.size();
     assertTrue("Empty Counterexample!", len > 0);
 

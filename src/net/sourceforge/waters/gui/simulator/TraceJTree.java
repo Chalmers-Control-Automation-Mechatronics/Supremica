@@ -45,6 +45,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,7 +62,6 @@ import javax.swing.tree.TreeSelectionModel;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
@@ -89,6 +89,7 @@ public class TraceJTree
     setToggleClickCount(0);
     mPopupFactory = new SimulatorPopupFactory(sim);
     this.addMouseListener(new MouseAdapter(){
+      @Override
       public void mouseClicked(final MouseEvent event)
       {
         if (event.getButton() == MouseEvent.BUTTON1 &&
@@ -110,11 +111,13 @@ public class TraceJTree
         }
       }
 
+      @Override
       public void mousePressed(final MouseEvent event)
       {
         maybeShowPopup(event);
       }
 
+      @Override
       public void mouseReleased(final MouseEvent event)
       {
         maybeShowPopup(event);
@@ -122,15 +125,17 @@ public class TraceJTree
     });
     this.addTreeWillExpandListener(new TreeWillExpandListener(){
 
+      @Override
       public void treeWillCollapse(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
         if (event.getPath().getLastPathComponent() instanceof TraceStepTreeNode)
         {
-          mExpandedIndexes.remove((Integer)(((TraceStepTreeNode)event.getPath().getLastPathComponent()).getTime()));
+          mExpandedIndexes.remove((((TraceStepTreeNode)event.getPath().getLastPathComponent()).getTime()));
         }
       }
 
+      @Override
       public void treeWillExpand(final TreeExpansionEvent event)
           throws ExpandVetoException
       {
@@ -146,12 +151,14 @@ public class TraceJTree
     });
     this.addMouseMotionListener(new MouseMotionListener(){
 
+      @Override
       public void mouseDragged(final MouseEvent e)
       {
         // Do nothing
 
       }
 
+      @Override
       public void mouseMoved(final MouseEvent e)
       {
         final TreePath path = TraceJTree.this.getClosestPathForLocation(e.getX(), e.getY());
@@ -203,6 +210,7 @@ public class TraceJTree
 
   //#########################################################################
   //# Interface InternalFrameObserver
+  @Override
   public void onFrameEvent(final InternalFrameEvent event)
   {
     if (event.isOpeningEvent())
@@ -224,21 +232,25 @@ public class TraceJTree
 
   //########################################################################
   // # Interface ComponentListener
+  @Override
   public void componentHidden(final ComponentEvent e)
   {
     //Do nothing
   }
 
+  @Override
   public void componentMoved(final ComponentEvent e)
   {
     // Do nothing
   }
 
+  @Override
   public void componentResized(final ComponentEvent e)
   {
     forceRecalculation();
   }
 
+  @Override
   public void componentShown(final ComponentEvent e)
   {
     forceRecalculation();
@@ -290,6 +302,7 @@ public class TraceJTree
 
     //#######################################################################
     //# Interface javax.swing.tree.TreeCellRenderer
+    @Override
     public Component getTreeCellRendererComponent
       (final JTree tree, final Object value, final boolean sel,
        final boolean expanded, final boolean leaf,
@@ -307,11 +320,8 @@ public class TraceJTree
         buffer.append(". ");
         buffer.append(node.getText());
         final TraceProxy trace = mSim.getTrace();
-        if (trace instanceof LoopTraceProxy) {
-          final LoopTraceProxy loop = (LoopTraceProxy) trace;
-          if (time == loop.getLoopIndex()) {
-            buffer.append(" <---");
-          }
+        if (time == trace.getLoopIndex()) {
+          buffer.append(" <---");
         }
         mEventNameLabel.setText(buffer.toString());
         final Icon icon = node.getIcon();

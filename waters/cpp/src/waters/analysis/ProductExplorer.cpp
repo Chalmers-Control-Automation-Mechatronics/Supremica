@@ -54,14 +54,14 @@
 #include "jni/cache/PreJavaException.h"
 #include "jni/glue/CollectionGlue.h"
 #include "jni/glue/ConflictCheckModeGlue.h"
+#include "jni/glue/ConflictCounterExampleGlue.h"
 #include "jni/glue/ConflictKindGlue.h"
-#include "jni/glue/ConflictTraceGlue.h"
 #include "jni/glue/ExceptionGlue.h"
 #include "jni/glue/Glue.h"
 #include "jni/glue/HashMapGlue.h"
-#include "jni/glue/ListGlue.h"
 #include "jni/glue/LinkedListGlue.h"
-#include "jni/glue/LoopTraceGlue.h"
+#include "jni/glue/ListGlue.h"
+#include "jni/glue/LoopCounterExampleGlue.h"
 #include "jni/glue/NativeConflictCheckerGlue.h"
 #include "jni/glue/NativeControlLoopCheckerGlue.h"
 #include "jni/glue/NativeDeadlockCheckerGlue.h"
@@ -69,8 +69,9 @@
 #include "jni/glue/NativeStateCounterGlue.h"
 #include "jni/glue/NativeVerificationResultGlue.h"
 #include "jni/glue/OverflowExceptionGlue.h"
-#include "jni/glue/SafetyTraceGlue.h"
+#include "jni/glue/SafetyCounterExampleGlue.h"
 #include "jni/glue/SetGlue.h"
+#include "jni/glue/TraceGlue.h"
 #include "jni/glue/TraceStepGlue.h"
 
 #include "waters/analysis/EventRecord.h"
@@ -452,7 +453,7 @@ runStateCount()
 }
 
 
-jni::SafetyTraceGlue ProductExplorer::
+jni::SafetyCounterExampleGlue ProductExplorer::
 getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
   const
 {
@@ -465,31 +466,37 @@ getSafetyCounterExample(const jni::NativeSafetyVerifierGlue& gchecker)
       (&mJavaTraceEvent, &mJavaTraceAutomaton, &mJavaTraceState);
   }
   const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
-  return mFactory.createSafetyTraceProxyGlue
-    (name, comment, 0, &mModel, &automata, mTraceList, mCache);
+  const jni::TraceGlue trace =
+    mFactory.createTraceProxyGlue(mTraceList, mCache);
+  return mFactory.createSafetyCounterExampleProxyGlue
+    (name, comment, 0, &mModel, &automata, &trace, mCache);
 }
 
 
-jni::ConflictTraceGlue ProductExplorer::
+jni::ConflictCounterExampleGlue ProductExplorer::
 getConflictCounterExample(const jni::NativeModelVerifierGlue& gchecker)
   const
 {
   jstring name = gchecker.getTraceName();
   const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
+  const jni::TraceGlue trace =
+    mFactory.createTraceProxyGlue(mTraceList, mCache);
   const jni::ConflictKindGlue kind(mConflictKind, mCache);
-  return mFactory.createConflictTraceProxyGlue
-    (name, 0, 0, &mModel, &automata, mTraceList, &kind, mCache);
+  return mFactory.createConflictCounterExampleProxyGlue
+    (name, 0, 0, &mModel, &automata, &trace, &kind, mCache);
 }
 
 
-jni::LoopTraceGlue ProductExplorer::
+jni::LoopCounterExampleGlue ProductExplorer::
 getLoopCounterExample(const jni::NativeControlLoopCheckerGlue& gchecker)
   const
 {
   jstring name = gchecker.getTraceName();
   const jni::SetGlue automata = mModel.getAutomataGlue(mCache);
-  return mFactory.createLoopTraceProxyGlue
-    (name, 0, 0, &mModel, &automata, mTraceList, mLoopIndex, mCache);
+  const jni::TraceGlue trace =
+    mFactory.createTraceProxyGlue(mTraceList, mLoopIndex, mCache);
+  return mFactory.createLoopCounterExampleProxyGlue
+    (name, 0, 0, &mModel, &automata, &trace, mCache);
 }
 
 
@@ -1677,7 +1684,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeSafetyVerifier_runNativeAlgorithm
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     } else {
-      jni::SafetyTraceGlue trace = checker->getSafetyCounterExample(gchecker);
+      jni::SafetyCounterExampleGlue trace =
+        checker->getSafetyCounterExample(gchecker);
       vresult.setCounterExample(&trace);
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
@@ -1729,7 +1737,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeConflictChecker_runNativeAlgorith
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     } else {
-      jni::ConflictTraceGlue trace =
+      jni::ConflictCounterExampleGlue trace =
         checker->getConflictCounterExample(gchecker);
       vresult.setCounterExample(&trace);
       checker->addStatistics(vresult);
@@ -1774,7 +1782,7 @@ Java_net_sourceforge_waters_cpp_analysis_NativeDeadlockChecker_runNativeAlgorith
     if (result) {
       vresult.setSatisfied(true);
     } else {
-      jni::ConflictTraceGlue trace =
+      jni::ConflictCounterExampleGlue trace =
         checker->getConflictCounterExample(gchecker);
       vresult.setCounterExample(&trace);
     }
@@ -1821,7 +1829,8 @@ Java_net_sourceforge_waters_cpp_analysis_NativeControlLoopChecker_runNativeAlgor
       checker->addStatistics(vresult);
       return vresult.returnJavaObject();
     } else {
-      jni::LoopTraceGlue trace = checker->getLoopCounterExample(gchecker);
+      jni::LoopCounterExampleGlue trace =
+        checker->getLoopCounterExample(gchecker);
       vresult.setCounterExample(&trace);
       vresult.setSatisfied(false);
       checker->addStatistics(vresult);

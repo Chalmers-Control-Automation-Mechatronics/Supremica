@@ -33,17 +33,18 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.model.des.EventProxy;
-import java.util.Comparator;
-import net.sourceforge.waters.model.des.TraceProxy;
-import java.util.Set;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-
-import java.util.Collections;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Set;
+
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class MaxCommonUncontrollableEventsHeuristic
   extends AbstractModularHeuristic
@@ -64,28 +65,30 @@ public class MaxCommonUncontrollableEventsHeuristic
     mType = type;
   }
 
+  @Override
   public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
                                          final Set<AutomatonProxy> nonComposedPlants,
                                          final Set<AutomatonProxy> nonComposedSpecPlants,
                                          final Set<AutomatonProxy> nonComposedSpecs,
-                                         final TraceProxy counterExample)
+                                         final SafetyCounterExampleProxy counterExample)
   {
+    final TraceProxy trace = counterExample.getTrace();
     final KindTranslator translator = getKindTranslator();
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MaxEventComparator(composition, translator),
-                                             counterExample);
+                                             trace);
     final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
     if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants,
                                 new MaxEventComparator(composition, translator),
-                                counterExample);
+                                trace);
     }
     if (automaton == null ||
         mType == ModularHeuristicFactory.Preference.NOPREF ||
         runspecs) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs,
                                 new MaxEventComparator(composition, translator),
-                                counterExample);
+                                trace);
     }
     return automaton == null ? null : Collections.singleton(automaton);
   }
@@ -103,6 +106,7 @@ public class MaxCommonUncontrollableEventsHeuristic
       mTranslator = translator;
     }
 
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       int count1 = 0;

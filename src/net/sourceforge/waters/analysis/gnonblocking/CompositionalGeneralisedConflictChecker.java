@@ -69,11 +69,12 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -394,15 +395,15 @@ public class CompositionalGeneralisedConflictChecker
       if (result) {
         setSatisfiedResult();
       } else {
-        final ConflictTraceProxy counterexample = checker.getCounterExample();
+        final ConflictCounterExampleProxy trace =
+          checker.getCounterExample();
         final int size = modifyingSteps.size();
-        ConflictTraceProxy convertedTrace = counterexample;
-        convertedTrace = saturateTrace(counterexample);
+        ConflictCounterExampleProxy convertedTrace = saturateTrace(trace);
         // TraceChecker.checkCounterExample(convertedTrace, true);
         final ListIterator<Step> iter = modifyingSteps.listIterator(size);
         while (iter.hasPrevious()) {
           final Step step = iter.previous();
-          final ConflictTraceProxy newTrace = step.convertTrace(convertedTrace);
+          final ConflictCounterExampleProxy newTrace = step.convertTrace(convertedTrace);
           // TraceChecker.checkCounterExample(newTrace, true);
           convertedTrace = newTrace;
         }
@@ -536,15 +537,16 @@ public class CompositionalGeneralisedConflictChecker
    * Fills in the target states in the state maps for each step of the trace for
    * all automata.
    */
-  private ConflictTraceProxy saturateTrace(
-                                           final ConflictTraceProxy counterexample)
+  private ConflictCounterExampleProxy saturateTrace
+    (final ConflictCounterExampleProxy counter)
   {
-    Set<AutomatonProxy> traceAutomata = counterexample.getAutomata();
+    Set<AutomatonProxy> traceAutomata = counter.getAutomata();
     if (mTrivialAbstractedAutomata.size() > 0) {
-      traceAutomata = new HashSet<AutomatonProxy>(counterexample.getAutomata());
+      traceAutomata = new THashSet<AutomatonProxy>(traceAutomata);
       traceAutomata.addAll(mTrivialAbstractedAutomata);
     }
-    final List<TraceStepProxy> traceSteps = counterexample.getTraceSteps();
+    final TraceProxy trace = counter.getTrace();
+    final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final List<TraceStepProxy> convertedSteps = new ArrayList<TraceStepProxy>();
     Map<AutomatonProxy,StateProxy> prevStepMap = null;
 
@@ -570,14 +572,15 @@ public class CompositionalGeneralisedConflictChecker
       convertedSteps.add(convertedStep);
       prevStepMap = new HashMap<AutomatonProxy,StateProxy>(stepMap);
     }
-    final ConflictTraceProxy saturatedCounterexample =
-        getFactory().createConflictTraceProxy(counterexample.getName(),
-                                              counterexample.getComment(),
-                                              counterexample.getLocation(),
-                                              counterexample.getProductDES(),
-                                              traceAutomata, convertedSteps,
-                                              counterexample.getKind());
-    return saturatedCounterexample;
+    final ProductDESProxyFactory factory = getFactory();
+    final TraceProxy saturatedTrace = factory.createTraceProxy(convertedSteps);
+    return factory.createConflictCounterExampleProxy(counter.getName(),
+                                                     counter.getComment(),
+                                                     counter.getLocation(),
+                                                     counter.getProductDES(),
+                                                     traceAutomata,
+                                                     saturatedTrace,
+                                                     ConflictKind.CONFLICT);
   }
 
   /**
@@ -1996,27 +1999,28 @@ public class CompositionalGeneralisedConflictChecker
       }
     }
 
-    // #######################################################################
-    ConflictTraceProxy createConvertedTrace(
-                                            final List<AutomatonProxy> traceAutomata,
-                                            final List<TraceStepProxy> convertedSteps)
-    {
-      final String traceName = getModel().getName() + "-conflicting";
-      final ConflictTraceProxy convertedTrace =
-          getFactory().createConflictTraceProxy(traceName, null, null,
-                                                getModel(), traceAutomata,
-                                                convertedSteps,
-                                                ConflictKind.CONFLICT);
-      return convertedTrace;
-    }
-
-    // #######################################################################
-    // # Trace Computation
+    //#######################################################################
+    //# Trace Computation
     /**
      * Assumes that a saturated trace is being passed.
      */
-    abstract ConflictTraceProxy convertTrace(
-                                             final ConflictTraceProxy counterexample);
+    abstract ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counterexample);
+
+    ConflictCounterExampleProxy createCounterExample
+      (final List<AutomatonProxy> traceAutomata,
+       final List<TraceStepProxy> convertedSteps)
+    {
+      final ProductDESProxyFactory factory = getFactory();
+      final ProductDESProxy des = getModel();
+      final String traceName = des.getName() + "-conflicting";
+      final TraceProxy trace = factory.createTraceProxy(convertedSteps);
+      final ConflictCounterExampleProxy result =
+        factory.createConflictCounterExampleProxy(traceName, null, null, des,
+                                                  traceAutomata, trace,
+                                                  ConflictKind.CONFLICT);
+      return result;
+    }
 
     // #######################################################################
     // # Data Members
@@ -2043,15 +2047,16 @@ public class CompositionalGeneralisedConflictChecker
     // #######################################################################
     // # Trace Computation
     @Override
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counter)
     {
       final AutomatonProxy composed = getResultAutomaton();
       final Collection<AutomatonProxy> autOfComposition =
           mStateMap.getInputAutomata();
 
       final List<AutomatonProxy> traceAutomata =
-          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size() - 1);
-      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+          new ArrayList<AutomatonProxy>(counter.getAutomata().size() - 1);
+      for (final AutomatonProxy aut : counter.getAutomata()) {
         if (aut != getResultAutomaton()) {
           traceAutomata.add(aut);
         }
@@ -2060,9 +2065,9 @@ public class CompositionalGeneralisedConflictChecker
         traceAutomata.add(aut);
       }
 
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>();
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final List<TraceStepProxy> convertedSteps = new ArrayList<>();
+      final TraceProxy trace = counter.getTrace();
+      final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
       for (final TraceStepProxy step : traceSteps) {
         final Map<AutomatonProxy,StateProxy> stepMap = step.getStateMap();
         if (stepMap.containsKey(composed)) {
@@ -2084,7 +2089,7 @@ public class CompositionalGeneralisedConflictChecker
           convertedSteps.add(step);
         }
       }
-      return createConvertedTrace(traceAutomata, convertedSteps);
+      return createCounterExample(traceAutomata, convertedSteps);
     }
 
     // #######################################################################
@@ -2112,11 +2117,12 @@ public class CompositionalGeneralisedConflictChecker
     // #######################################################################
     // # Trace Computation
     @Override
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counter)
     {
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>();
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final List<TraceStepProxy> convertedSteps = new ArrayList<>();
+      final TraceProxy trace = counter.getTrace();
+      final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
       StateProxy sourceState =
           getInitialState(getResultAutomaton(), traceSteps.get(0));
       for (final TraceStepProxy step : traceSteps) {
@@ -2155,15 +2161,14 @@ public class CompositionalGeneralisedConflictChecker
         }
       }
       final List<AutomatonProxy> traceAutomata =
-          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
-      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+          new ArrayList<AutomatonProxy>(counter.getAutomata().size());
+      for (final AutomatonProxy aut : counter.getAutomata()) {
         if (aut != getResultAutomaton()) {
           traceAutomata.add(aut);
         }
       }
       traceAutomata.add(getOriginalAutomaton());
-      return createConvertedTrace(traceAutomata, convertedSteps);
-
+      return createCounterExample(traceAutomata, convertedSteps);
     }
 
     /**
@@ -2282,12 +2287,13 @@ public class CompositionalGeneralisedConflictChecker
      * This performs a forward search over trace steps to convert a given trace.
      */
     @Override
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counter)
     {
       createTransitionRelation();
-      final List<TraceStepProxy> convertedSteps =
-          new ArrayList<TraceStepProxy>();
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final List<TraceStepProxy> convertedSteps = new ArrayList<>();
+      final TraceProxy trace = counter.getTrace();
+      final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
 
       // makes the trace begin in the correct initial state
       StateProxy originalAutSource = beginTrace(traceSteps, convertedSteps);
@@ -2305,9 +2311,9 @@ public class CompositionalGeneralisedConflictChecker
         stepsPrevStateMap.remove(getResultAutomaton());
       }
       // makes the trace end in the correct state
-      endTrace(conflictTrace, originalAutSource, convertedSteps);
+      endTrace(trace, originalAutSource, convertedSteps);
       clearTransitionRelation();
-      return buildTrace(conflictTrace, convertedSteps);
+      return buildTrace(counter, convertedSteps);
     }
 
     /**
@@ -2325,8 +2331,7 @@ public class CompositionalGeneralisedConflictChecker
      * @return The state in the original automaton to search from in the next
      *         step.
      */
-    protected StateProxy expandStep(
-                                    final TraceStepProxy traceStep,
+    protected StateProxy expandStep(final TraceStepProxy traceStep,
                                     StateProxy originalAutSource,
                                     final Map<AutomatonProxy,StateProxy> stepsPrevStateMap,
                                     final List<TraceStepProxy> convertedSteps)
@@ -2374,7 +2379,7 @@ public class CompositionalGeneralisedConflictChecker
      * state of the trace according to the subclasses requirements. Steps are
      * then created for these final steps.
      */
-    protected void endTrace(final ConflictTraceProxy conflictTrace,
+    protected void endTrace(final TraceProxy conflictTrace,
                             final StateProxy originalAutSource,
                             final List<TraceStepProxy> convertedSteps)
     {
@@ -2399,19 +2404,19 @@ public class CompositionalGeneralisedConflictChecker
      *
      * @return Converted conflict trace.
      */
-    protected ConflictTraceProxy buildTrace(
-                                            final ConflictTraceProxy conflictTrace,
-                                            final List<TraceStepProxy> convertedSteps)
+    protected ConflictCounterExampleProxy buildTrace
+      (final ConflictCounterExampleProxy counter,
+       final List<TraceStepProxy> convertedSteps)
     {
       final List<AutomatonProxy> traceAutomata =
-          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
-      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+          new ArrayList<AutomatonProxy>(counter.getAutomata().size());
+      for (final AutomatonProxy aut : counter.getAutomata()) {
         if (aut != getResultAutomaton()) {
           traceAutomata.add(aut);
         }
       }
       traceAutomata.add(getOriginalAutomaton());
-      return createConvertedTrace(traceAutomata, convertedSteps);
+      return createCounterExample(traceAutomata, convertedSteps);
     }
 
     /**
@@ -2828,10 +2833,12 @@ public class CompositionalGeneralisedConflictChecker
      * trace.
      */
     @Override
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counter)
     {
       createTransitionRelation();
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final TraceProxy trace = counter.getTrace();
+      final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
       final int stepCount = traceSteps.size();
       final ListIterator<TraceStepProxy> iter =
           traceSteps.listIterator(stepCount);
@@ -2872,10 +2879,10 @@ public class CompositionalGeneralisedConflictChecker
         step = pred;
       }
       createInitialSteps(step, convertedSteps);
-      final ConflictTraceProxy trace =
-          buildTrace(conflictTrace, convertedSteps);
+      final ConflictCounterExampleProxy result =
+        buildTrace(counter, convertedSteps);
       clearTransitionRelation();
-      return trace;
+      return result;
     }
 
     /**
@@ -3095,9 +3102,11 @@ public class CompositionalGeneralisedConflictChecker
     }
 
     @Override
-    ConflictTraceProxy convertTrace(final ConflictTraceProxy conflictTrace)
+    ConflictCounterExampleProxy convertTrace
+      (final ConflictCounterExampleProxy counter)
     {
-      final List<TraceStepProxy> traceSteps = conflictTrace.getTraceSteps();
+      final TraceProxy trace = counter.getTrace();
+      final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
       final int numSteps = traceSteps.size();
       final List<TraceStepProxy> convertedSteps =
           new ArrayList<TraceStepProxy>(numSteps);
@@ -3117,15 +3126,14 @@ public class CompositionalGeneralisedConflictChecker
         convertedSteps.add(convertedStep);
       }
       final List<AutomatonProxy> traceAutomata =
-          new ArrayList<AutomatonProxy>(conflictTrace.getAutomata().size());
-      for (final AutomatonProxy aut : conflictTrace.getAutomata()) {
+          new ArrayList<AutomatonProxy>(counter.getAutomata().size());
+      for (final AutomatonProxy aut : counter.getAutomata()) {
         if (aut != getResultAutomaton()) {
           traceAutomata.add(aut);
         }
       }
       traceAutomata.add(getOriginalAutomaton());
-      return createConvertedTrace(traceAutomata, convertedSteps);
-
+      return createCounterExample(traceAutomata, convertedSteps);
     }
 
     // #######################################################################

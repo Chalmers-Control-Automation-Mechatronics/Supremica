@@ -44,7 +44,7 @@ import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
 
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.MainPanel;
@@ -78,9 +78,9 @@ public class SimulatorPanel
     return mSimulation;
   }
 
-  public void switchToTraceMode(final TraceProxy trace)
+  public void switchToTraceMode(final CounterExampleProxy counterexample)
   {
-    mSimulation.switchToTraceMode(trace);
+    mSimulation.switchToTraceMode(counterexample);
     mTabbedPane.setSelectedIndex(2);
   }
 

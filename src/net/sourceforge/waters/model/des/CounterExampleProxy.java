@@ -33,28 +33,55 @@
 
 package net.sourceforge.waters.model.des;
 
+import java.util.List;
+import java.util.Set;
+
+import net.sourceforge.waters.model.base.DocumentProxy;
+
 
 /**
- * <P>A loop counterexample trace for some automata of a product DES.</P>
+ * <P>A counterexample to show that a model fails to satisfy some property.</P>
  *
- * @see ProductDESProxy
+ * <P>Counterexamples are typically produced by model verifiers and contain
+ * traces that show how the system can perform undesired behaviour. Each
+ * trace ({@link TraceProxy}) contains a sequence of events that can be
+ * executed by the model, possibly with associated state information.</P>
+ *
+ * <P>This interface has only abstract classes to implement it. There are
+ * different properties that lead to different types counterexamples
+ * represented by subtypes of this interface. Most counterexamples contain of
+ * a single trace of undesired behaviour, but some properties (such as
+ * diagnosability) require more than one trace.</P>
  *
  * @author Robi Malik
  */
 
-public interface LoopTraceProxy
-  extends TraceProxy
+public interface CounterExampleProxy
+  extends DocumentProxy
 {
 
   //#########################################################################
   //# Getters
   /**
-   * Gets the loop index of this trace.
-   * The loop index identifies the number of the step (starting at&nbsp;0)
-   * in the trace where the loop starts. If the trace has steps 0,...,<I>n</I>,
-   * and the loop index is at position&nbsp;<I>i</I>, then it represents the
-   * loop 0,...,<I>n</I>,<I>i</I>,...,<I>n</I>,...
+   * Gets the product DES for which this counterexample has been generated.
    */
-  public int getLoopIndex();
+  public ProductDESProxy getProductDES();
+
+  /**
+   * Gets the list of automata for this counterexample.
+   * All the traces in the counterexample can be restricted to use only the
+   * automata in this list.
+   * @return  An unmodifiable set of objects of type {@link AutomatonProxy}.
+   */
+  public Set<AutomatonProxy> getAutomata();
+
+  /**
+   * Gets the list of traces constituting this counterexample. Most
+   * counterexamples contain of a single trace of undesired behaviour,
+   * but some properties (such as diagnosability) require more than one
+   * trace.
+   * @return  An unmodifiable list of objects of type {@link TraceProxy}.
+   */
+  public List<TraceProxy> getTraces();
 
 }

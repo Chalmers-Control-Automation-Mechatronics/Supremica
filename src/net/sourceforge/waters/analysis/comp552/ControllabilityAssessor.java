@@ -44,12 +44,12 @@ import javax.xml.bind.JAXBException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.logging.log4j.LogManager;
@@ -95,12 +95,13 @@ public class ControllabilityAssessor extends AbstractAssessor
   }
 
   @Override
-  SafetyTraceProxy createAlternateTrace(final String name,
-                                        final ProductDESProxy des,
-                                        final List<EventProxy> events)
+  SafetyCounterExampleProxy createAlternateCounterExample
+    (final String name,
+     final ProductDESProxy des,
+     final List<EventProxy> events)
   {
     final ProductDESProxyFactory factory = getFactory();
-    return factory.createSafetyTraceProxy(name, des, events);
+    return factory.createSafetyCounterExampleProxy(name, des, events);
   }
 
   @Override
@@ -114,7 +115,7 @@ public class ControllabilityAssessor extends AbstractAssessor
   //# Counterexample Verification
   @Override
   boolean isHalfCorrectCounterExample(final ProductDESProxy des,
-                                      final TraceProxy trace,
+                                      final CounterExampleProxy counter,
                                       final AbstractCounterExampleChecker checker)
     throws AnalysisException
   {
@@ -123,10 +124,10 @@ public class ControllabilityAssessor extends AbstractAssessor
     final Map<AutomatonProxy,StateProxy> endState = cChecker.getEndState();
     if (endState != null && isUncontrollableState(des, endState)) {
       printMalformedCounterExample
-        (trace, "is missing the final uncontrollable event");
+        (counter, "is missing the final uncontrollable event");
       return true;
     }
-    return super.isHalfCorrectCounterExample(des, trace, checker);
+    return super.isHalfCorrectCounterExample(des, counter, checker);
   }
 
   private boolean isUncontrollableState(final ProductDESProxy des,

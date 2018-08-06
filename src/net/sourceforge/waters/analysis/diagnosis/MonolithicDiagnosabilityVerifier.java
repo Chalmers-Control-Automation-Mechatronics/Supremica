@@ -61,8 +61,8 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -188,7 +188,7 @@ public class MonolithicDiagnosabilityVerifier
             }else{
               contStack.pop();
               if(!close(i,p)) {
-                final LoopTraceProxy counterExample = computeCounterExample();
+                final CounterExampleProxy counterExample = computeCounterExample();
                 return setFailedResult(counterExample);
               }
             }
@@ -381,7 +381,7 @@ public class MonolithicDiagnosabilityVerifier
     return true;
   }
 
-  private LoopTraceProxy computeCounterExample()
+  private CounterExampleProxy computeCounterExample()
     throws OverflowException
   {
     contStack.clear();
@@ -425,6 +425,7 @@ public class MonolithicDiagnosabilityVerifier
     final long succState = indexStateMap.get(sccRoot);
     int succA = ((int)(succState>>>32));
     int succB = ((int)succState);
+    @SuppressWarnings("unused")
     int event,predA,predB,loopIndexA,loopIndexB;
     do{
       expandBack(succA,succB,backProcessor);
@@ -468,6 +469,8 @@ public class MonolithicDiagnosabilityVerifier
       succA = predA;
       succB = predB;
     }
+    /*
+     * TODO Use DualCounterExampleProxy
     final String nameA = getModel().getName()+"DiagFaultTrace";
     final String nameB = getModel().getName()+"DiagFaultFreeTrace";
     final LoopTraceProxy counterExampleA
@@ -476,6 +479,8 @@ public class MonolithicDiagnosabilityVerifier
     final LoopTraceProxy counterExampleB
       = getFactory().createLoopTraceProxy(nameB, null, null, getModel(), spStateMap.getInputAutomata(),traceB , loopIndexB);
     return counterExampleA;
+    */
+    return null;
   }
 
   private void addStep(final int stateIndex, final int eventIndex, final List<TraceStepProxy> trace)
@@ -491,6 +496,7 @@ public class MonolithicDiagnosabilityVerifier
     final TraceStepProxy step = getFactory().createTraceStepProxy(event, autStateMap);
     trace.add(0, step);
   }
+
 
   //#########################################################################
   //# Instance Variables

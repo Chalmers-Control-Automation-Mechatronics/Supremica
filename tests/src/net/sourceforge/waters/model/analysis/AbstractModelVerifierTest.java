@@ -42,6 +42,7 @@ import java.util.Map;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -49,7 +50,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -72,7 +73,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mTraceMarshaller = new JAXBTraceMarshaller(factory);
+    mTraceMarshaller = new JAXBCounterExampleMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
     setNodeLimit(mModelVerifier);
   }
@@ -205,18 +206,21 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    * Performs preliminary checks on the counterexample.
    * This method performs some simple checks on the counterexample to make
    * sure that it can be saved. The more advanced semantic checks are
-   * performed by {@link #checkCounterExample(ProductDESProxy,TraceProxy)
+   * performed by {@link #checkCounterExample(ProductDESProxy,CounterExampleProxy)
    * checkCounterExample()} after the counterexample has been written to a file.
-   * @param trace The counterexample to be checked.
+   * @param  counter  The counterexample to be checked.
    * @throws junit.framework.AssertionFailedError to indicate that the
    *   counterexample does not pass the test.
    */
-  protected void precheckCounterExample(final TraceProxy trace)
+  protected void precheckCounterExample(final CounterExampleProxy counter)
   {
-    assertNotNull("Counterexample is NULL!", trace);
-    assertNotNull("NULL product DES in trace!", trace.getProductDES());
-    assertFalse("NULL automaton in trace!", trace.getAutomata().contains(null));
-    assertFalse("NULL event in trace!", trace.getEvents().contains(null));
+    assertNotNull("Counterexample is NULL!", counter);
+    assertNotNull("NULL product DES in counterexample!", counter.getProductDES());
+    assertFalse("NULL automaton in counterexample!", counter.getAutomata().contains(null));
+    for (final TraceProxy trace : counter.getTraces()) {
+      assertNotNull("NULL trace in counterexample!", trace);
+      assertFalse("NULL event in trace!", trace.getEvents().contains(null));
+    }
   }
 
   /**
@@ -229,33 +233,37 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    *
    * @param des
    *          The model to be verified.
-   * @param trace
+   * @param counter
    *          The counterexample obtained by from the model checker under test.
    * @throws junit.framework.AssertionFailedError
    *           to indicate that the counterexample is not a correct
    *           counterexample for the property.
    */
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
+    throws Exception
   {
     assertSame("Product DES in trace is not the original model!",
-               des, trace.getProductDES());
+               des, counter.getProductDES());
     final String desName = des.getName();
-    final String traceName = trace.getName();
-    assertTrue("Trace name '" + traceName + "' does not match model name '" +
+    final String traceName = counter.getName();
+    assertTrue("Counterexample name '" + traceName +
+               "' does not match model name '" +
                desName + "'!", traceName.startsWith(desName));
     final Collection<AutomatonProxy> automata = des.getAutomata();
-    for (final AutomatonProxy aut : trace.getAutomata()) {
+    for (final AutomatonProxy aut : counter.getAutomata()) {
       if (!automata.contains(aut)) {
-        fail("Trace automaton '" + aut.getName()
-            + "' does not match any in product DES!");
+        fail("Counterexample automaton '" + aut.getName() +
+             "' does not match any in product DES!");
       }
     }
     final Collection<EventProxy> events = des.getEvents();
-    for (final EventProxy event : trace.getEvents()) {
-      if (!events.contains(event)) {
-        fail("Trace event '" + event.getName()
-            + "' does not match any in product DES!");
+    for (final TraceProxy trace : counter.getTraces()) {
+      for (final EventProxy event : trace.getEvents()) {
+        if (!events.contains(event)) {
+          fail("Counterexample event '" + event.getName() +
+               "' does not match any in product DES!");
+        }
       }
     }
   }
@@ -353,11 +361,11 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     return current;
   }
 
-  protected File saveCounterExample(final TraceProxy counterexample)
+  protected File saveCounterExample(final CounterExampleProxy counter)
       throws Exception
   {
-    assertNotNull(counterexample);
-    final String name = counterexample.getName();
+    assertNotNull(counter);
+    final String name = counter.getName();
     final String ext = mTraceMarshaller.getDefaultExtension();
     final StringBuilder buffer = new StringBuilder(name);
     if (mBindings != null) {
@@ -376,7 +384,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
-    mTraceMarshaller.marshal(counterexample, filename);
+    mTraceMarshaller.marshal(counter, filename);
     return filename;
   }
 
@@ -424,7 +432,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     try {
       configureModelVerifier(des);
       final boolean result = mModelVerifier.run();
-      TraceProxy counterexample = null;
+      CounterExampleProxy counterexample = null;
       if (!result && mModelVerifier.isCounterExampleEnabled()) {
         counterexample = mModelVerifier.getCounterExample();
         precheckCounterExample(counterexample);
@@ -455,7 +463,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# Data Members
-  private JAXBTraceMarshaller mTraceMarshaller;
+  private JAXBCounterExampleMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
   private List<ParameterBindingProxy> mBindings;
 

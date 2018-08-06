@@ -39,8 +39,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.JAXBException;
 
+import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
@@ -50,18 +52,17 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import net.sourceforge.waters.junit.AbstractWatersTest;
 
 
 public abstract class AbstractMazeTest extends AbstractWatersTest
@@ -430,7 +431,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final File outmodulefile = module.getFileLocation();
     final URI outmoduleuri = outmodulefile.toURI();
     final ModuleProxy read =
-      (ModuleProxy) mModuleMarshaller.unmarshal(outmoduleuri);
+      mModuleMarshaller.unmarshal(outmoduleuri);
     assertModuleProxyEquals("Module changed after reading back in!",
                             read, module);
 
@@ -443,9 +444,9 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final VerificationResult result =
       checkLanguageInclusion(des, mProductDESFactory);
     final boolean controllable = result.isSatisfied();
-    SafetyTraceProxy counterexample = null;
+    SafetyCounterExampleProxy counterexample = null;
     if (!controllable) {
-      counterexample = (SafetyTraceProxy) result.getCounterExample();
+      counterexample = (SafetyCounterExampleProxy) result.getCounterExample();
       final String tracename = name + mTraceMarshaller.getDefaultExtension();
       final File dir = getOutputDirectory();
       final File tracefilename = new File(dir, tracename);
@@ -472,9 +473,10 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     return checker.getAnalysisResult();
   }
 
-  private List<Point> extractMoves(final SafetyTraceProxy counterexample)
+  private List<Point> extractMoves(final SafetyCounterExampleProxy counter)
   {
-    final List<EventProxy> events = counterexample.getEvents();
+    final TraceProxy trace = counter.getTrace();
+    final List<EventProxy> events = trace.getEvents();
     final int len = events.size();
     assertTrue("Empty counterexample!", len > 0);
     final List<Point> result = new ArrayList<Point>(len + 1);
@@ -521,7 +523,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
     mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-    mTraceMarshaller = new JAXBTraceMarshaller(mProductDESFactory);
+    mTraceMarshaller = new JAXBCounterExampleMarshaller(mProductDESFactory);
     // mMazeCompiler.setUseLanguageInclusion(false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
@@ -555,7 +557,7 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
   private ProductDESProxyFactory mProductDESFactory;
   private JAXBModuleMarshaller mModuleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
-  private JAXBTraceMarshaller mTraceMarshaller;
+  private JAXBCounterExampleMarshaller mTraceMarshaller;
   private MazeCompiler mMazeCompiler;
   private DocumentManager mDocumentManager;
 

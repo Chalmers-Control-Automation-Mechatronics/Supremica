@@ -46,9 +46,10 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
@@ -62,21 +63,21 @@ public class AutomataGroup
     {
       mSensitiveEvents.addAll(auto.getEvents());
     }
-    mLoopTraceProxy = null;
+    mCounterExample = null;
   }
   public AutomataGroup(final AutomatonProxy initial)
   {
     mAllAutomata = new THashSet<AutomatonProxy>();
     mAllAutomata.add(initial);
     mSensitiveEvents = new THashSet<EventProxy>(initial.getEvents());
-    mLoopTraceProxy = null;
+    mCounterExample = null;
   }
 
   public void merge(final AutomataGroup newGroup)
   {
     mAllAutomata.addAll(newGroup.mAllAutomata);
     mSensitiveEvents.addAll(newGroup.mSensitiveEvents);
-    mLoopTraceProxy = null;
+    mCounterExample = null;
     mValidRun = false;
     mValidStats = false;
   }
@@ -85,14 +86,14 @@ public class AutomataGroup
   {
     mAllAutomata.add(auto);
     mSensitiveEvents.addAll(auto.getEvents());
-    mLoopTraceProxy = null;
+    mCounterExample = null;
     mValidRun = false;
     mValidStats = false;
   }
 
-  public void setCounterExample(final LoopTraceProxy lProxy)
+  public void setCounterExample(final LoopCounterExampleProxy lProxy)
   {
-    mLoopTraceProxy = lProxy;
+    mCounterExample = lProxy;
     mValidRun = false;
     mValidStats = false;
   }
@@ -108,23 +109,27 @@ public class AutomataGroup
 
   public int getLoopIndex()
   {
-    if (mLoopTraceProxy != null)
-      return mLoopTraceProxy.getLoopIndex();
-    else
+    if (mCounterExample != null) {
+      final TraceProxy trace = mCounterExample.getTrace();
+      return trace.getLoopIndex();
+    } else {
       return -1;
+    }
   }
 
   public List<EventProxy> getTrace()
   {
-    if (mLoopTraceProxy != null)
-      return mLoopTraceProxy.getEvents();
-    else
+    if (mCounterExample != null) {
+      final TraceProxy trace = mCounterExample.getTrace();
+      return trace.getEvents();
+    } else {
       return null;
+    }
   }
 
-  public LoopTraceProxy getLoopTraceProxy()
+  public LoopCounterExampleProxy getCounterExample()
   {
-    return mLoopTraceProxy;
+    return mCounterExample;
   }
 
   public Collection<EventProxy> getNonLoopEvents()
@@ -148,7 +153,7 @@ public class AutomataGroup
    */
   public int getScore()
   {
-    if (getLoopTraceProxy() == null)
+    if (getCounterExample() == null)
       return Integer.MIN_VALUE;
     switch (SELECT_VERSION)
     {
@@ -339,11 +344,11 @@ public class AutomataGroup
     checker.setNodeLimit(spaceLeft);
     if (checker.run())
     {
-      mLoopTraceProxy = null;
+      mCounterExample = null;
     }
     else
     {
-      mLoopTraceProxy = checker.getCounterExample();
+      mCounterExample = checker.getCounterExample();
     }
     spaceLeft = (int) (spaceLeft - checker.getAnalysisResult().getTotalNumberOfStates());
     mNonLoopEvents = checker.getNonLoopEvents();
@@ -422,7 +427,7 @@ public class AutomataGroup
 
   Collection<EventProxy> mNonLoopEvents;
   Set<AutomatonProxy> mAllAutomata;
-  LoopTraceProxy mLoopTraceProxy;
+  LoopCounterExampleProxy mCounterExample;
   Set<EventProxy> mSensitiveEvents;
   VerificationResult mStats;
   /** This is used to ensure that the MonolithicSCCControl Loop Checker is not run a second time, when no data has changed

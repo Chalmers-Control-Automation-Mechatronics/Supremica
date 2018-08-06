@@ -31,24 +31,32 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.TraceProxy;
-
-import net.sourceforge.waters.xsd.des.TraceType;
+import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 
 
-class JAXBTraceExporter
-  extends JAXBProductDESElementExporter<TraceProxy,TraceType>
+public class CounterExampleIntegrityChecker
+  extends DocumentIntegrityChecker<CounterExampleProxy>
 {
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBExporter
-  TraceType exportDocument(final TraceProxy proxy)
-    throws VisitorException
+  //# Singleton Pattern
+  public static CounterExampleIntegrityChecker getInstance()
   {
-    return (TraceType) exportProxy(proxy);
+    return SingletonHolder.INSTANCE;
+  }
+
+  private static class SingletonHolder {
+    private static final CounterExampleIntegrityChecker INSTANCE =
+      new CounterExampleIntegrityChecker();
+  }
+
+
+  //#########################################################################
+  //# Constructor
+  protected CounterExampleIntegrityChecker()
+  {
   }
 
 }

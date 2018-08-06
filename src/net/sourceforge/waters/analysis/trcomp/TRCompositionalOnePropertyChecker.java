@@ -66,10 +66,11 @@ import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -159,10 +160,10 @@ class TRCompositionalOnePropertyChecker
   }
 
   @Override
-  public TRSafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
     final VerificationResult result = getAnalysisResult();
-    return (TRSafetyTraceProxy) result.getCounterExample();
+    return (SafetyCounterExampleProxy) result.getCounterExample();
   }
 
 
@@ -394,9 +395,9 @@ class TRCompositionalOnePropertyChecker
       if (isCounterExampleEnabled()) {
         dropPendingSubsystems();
         final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
-        final TraceProxy trace = mono.getCounterExample();
+        final CounterExampleProxy counter = mono.getCounterExample();
         final TRTraceProxy extension =
-          TRAbstractionStepMonolithic.createTraceExtension(trace, preds, this);
+          TRAbstractionStepMonolithic.createTraceExtension(counter, preds, this);
         final TRAbstractionStep step =
           new TRAbstractionStepMonolithic(name, extension);
         addAbstractionStep(step);

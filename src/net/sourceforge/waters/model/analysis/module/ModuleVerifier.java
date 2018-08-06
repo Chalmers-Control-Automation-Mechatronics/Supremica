@@ -35,7 +35,7 @@ package net.sourceforge.waters.model.analysis.module;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 
 
 /**
@@ -80,7 +80,7 @@ public interface ModuleVerifier extends ModuleAnalyzer
    *         found that the property is satisfied and there is no
    *         counterexample.
    */
-  public TraceProxy getCounterExample();
+  public CounterExampleProxy getCounterExample();
 
   @Override
   public VerificationResult getAnalysisResult();

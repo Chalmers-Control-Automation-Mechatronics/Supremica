@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -172,7 +172,7 @@ public class ControllabilityChecker extends ModelChecker
    *         event objects.
    */
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
     // Just return a stored counterexample. This is the recommended way
     // of doing this, because we may no longer be able to use the
@@ -190,7 +190,7 @@ public class ControllabilityChecker extends ModelChecker
    * counterexample are still available.
    * @return The computed counterexample.
    */
-  private SafetyTraceProxy computeCounterExample()
+  private SafetyCounterExampleProxy computeCounterExample()
   {
     // The following creates a trace that consists of all the events in
     // the input model.
@@ -206,9 +206,8 @@ public class ControllabilityChecker extends ModelChecker
     for (final EventProxy event : events) {
       traceList.add(event);
     }
-    final SafetyTraceProxy trace =
-      desFactory.createSafetyTraceProxy(traceName, des, traceList);
-    return trace;
+    return
+      desFactory.createSafetyCounterExampleProxy(traceName, des, traceList);
   }
 
 
@@ -217,6 +216,6 @@ public class ControllabilityChecker extends ModelChecker
   /**
    * The computed counterexample or null if the model is controllable.
    */
-  private SafetyTraceProxy mCounterExample;
+  private SafetyCounterExampleProxy mCounterExample;
 
 }

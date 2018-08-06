@@ -46,38 +46,39 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DefaultProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-
 import net.sourceforge.waters.xsd.base.AttributeMap;
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.base.NamedType;
 import net.sourceforge.waters.xsd.des.Automaton;
 import net.sourceforge.waters.xsd.des.AutomatonRef;
-import net.sourceforge.waters.xsd.des.ConflictTrace;
+import net.sourceforge.waters.xsd.des.ConflictCounterExample;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
 import net.sourceforge.waters.xsd.des.Event;
 import net.sourceforge.waters.xsd.des.EventRef;
 import net.sourceforge.waters.xsd.des.FirstTraceStateTuple;
-import net.sourceforge.waters.xsd.des.LoopTrace;
+import net.sourceforge.waters.xsd.des.LoopCounterExample;
 import net.sourceforge.waters.xsd.des.NextTraceStateTuple;
 import net.sourceforge.waters.xsd.des.ObjectFactory;
 import net.sourceforge.waters.xsd.des.ProductDES;
-import net.sourceforge.waters.xsd.des.SafetyTrace;
+import net.sourceforge.waters.xsd.des.SafetyCounterExample;
 import net.sourceforge.waters.xsd.des.State;
+import net.sourceforge.waters.xsd.des.Trace;
 import net.sourceforge.waters.xsd.des.TraceState;
 import net.sourceforge.waters.xsd.des.TraceStateTupleType;
 import net.sourceforge.waters.xsd.des.TraceStepList;
-import net.sourceforge.waters.xsd.des.TraceType;
 import net.sourceforge.waters.xsd.des.Transition;
 
 
@@ -89,6 +90,7 @@ abstract class JAXBProductDESElementExporter
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+  @Override
   public Automaton visitAutomatonProxy(final AutomatonProxy proxy)
     throws VisitorException
   {
@@ -97,14 +99,25 @@ abstract class JAXBProductDESElementExporter
     return element;
   }
 
-  public ConflictTrace visitConflictTraceProxy(final ConflictTraceProxy proxy)
+  @Override
+  public Object visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy proxy)
     throws VisitorException
   {
-    final ConflictTrace element = mFactory.createConflictTrace();
-    copyConflictTraceProxy(proxy, element);
+    final ConflictCounterExample element =
+      mFactory.createConflictCounterExample();
+    copyConflictCounterExampleProxy(proxy, element);
     return element;
   }
 
+  @Override
+  public Object visitCounterExampleProxy(final CounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitDocumentProxy(proxy);
+  }
+
+  @Override
   public Event visitEventProxy(final EventProxy proxy)
     throws VisitorException
   {
@@ -113,14 +126,17 @@ abstract class JAXBProductDESElementExporter
     return element;
  }
 
-  public LoopTrace visitLoopTraceProxy(final LoopTraceProxy proxy)
+  @Override
+  public Object visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy proxy)
     throws VisitorException
   {
-    final LoopTrace element = mFactory.createLoopTrace();
-    copyLoopTraceProxy(proxy, element);
+    final LoopCounterExample element = mFactory.createLoopCounterExample();
+    copyLoopCounterExampleProxy(proxy, element);
     return element;
   }
 
+  @Override
   public ProductDES visitProductDESProxy(final ProductDESProxy proxy)
     throws VisitorException
   {
@@ -129,6 +145,18 @@ abstract class JAXBProductDESElementExporter
     return element;
   }
 
+  @Override
+  public Object visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    final SafetyCounterExample element =
+      mFactory.createSafetyCounterExample();
+    copySafetyCounterExampleProxy(proxy, element);
+    return element;
+  }
+
+  @Override
   public State visitStateProxy(final StateProxy proxy)
     throws VisitorException
   {
@@ -137,20 +165,16 @@ abstract class JAXBProductDESElementExporter
     return element;
   }
 
-  public SafetyTrace visitSafetyTraceProxy(final SafetyTraceProxy proxy)
-    throws VisitorException
-  {
-    final SafetyTrace element = mFactory.createSafetyTrace();
-    copySafetyTraceProxy(proxy, element);
-    return element;
-  }
-
+  @Override
   public Object visitTraceProxy(final TraceProxy proxy)
     throws VisitorException
   {
-    return visitDocumentProxy(proxy);
+    final Trace element = mFactory.createTrace();
+    copyTraceProxy(proxy, element);
+    return element;
   }
 
+  @Override
   public TraceStateTupleType visitTraceStepProxy(final TraceStepProxy proxy)
     throws VisitorException
   {
@@ -167,6 +191,7 @@ abstract class JAXBProductDESElementExporter
     }
   }
 
+  @Override
   public Transition visitTransitionProxy(final TransitionProxy proxy)
     throws VisitorException
   {
@@ -207,12 +232,41 @@ abstract class JAXBProductDESElementExporter
     }
   }
 
-  private void copyConflictTraceProxy(final ConflictTraceProxy proxy,
-                                      final ConflictTrace element)
+  private void copyConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy proxy,
+     final ConflictCounterExample element)
     throws VisitorException
   {
     element.setKind(proxy.getKind());
-    copyTraceProxy(proxy, element);
+    copyCounterExampleProxy(proxy, element);
+  }
+
+  private void copyCounterExampleProxy(final CounterExampleProxy proxy,
+                                       final CounterExampleType element)
+    throws VisitorException
+  {
+    copyDocumentProxy(proxy, element);
+    try {
+      final ProductDESProxy des = proxy.getProductDES();
+      element.setProductDES(des.getName());
+      final IndexedList<AutomatonProxy> automata =
+        new CheckedExportList<AutomatonProxy>
+          (des.getAutomata(), proxy, "automaton");
+      final RefExporter<AutomatonProxy> autexporter =
+        new RefExporter<AutomatonProxy>(automata);
+      mCounterExampleAutomata = new CheckedExportList<AutomatonProxy>
+        (proxy.getAutomata(), proxy, "automaton");
+      mCounterExampleAutomatonRefListHandler.toJAXB
+        (autexporter, mCounterExampleAutomata, element);
+      final IndexedList<EventProxy> events =
+        new CheckedExportList<EventProxy>(des.getEvents(), proxy, "event");
+      mProductDESEventRefExporter = new RefExporter<EventProxy>(events);
+      final Collection<TraceProxy> traces = proxy.getTraces();
+      mCounterExampleTraceListHandler.toJAXB(this, traces, element);
+    } finally {
+      mCounterExampleAutomata = null;
+      mProductDESEventRefExporter = null;
+    }
   }
 
   private void copyEventProxy(final EventProxy proxy, final Event element)
@@ -227,12 +281,12 @@ abstract class JAXBProductDESElementExporter
     element.setAttributeMap(attribsElement);
   }
 
-  private void copyLoopTraceProxy(final LoopTraceProxy proxy,
-                                  final LoopTrace element)
+  private void copyLoopCounterExampleProxy
+    (final LoopCounterExampleProxy proxy,
+     final LoopCounterExample element)
     throws VisitorException
   {
-    element.setLoopIndex(proxy.getLoopIndex());
-    copyTraceProxy(proxy, element);
+    copyCounterExampleProxy(proxy, element);
   }
 
   private void copyProductDESProxy(final ProductDESProxy proxy,
@@ -256,11 +310,12 @@ abstract class JAXBProductDESElementExporter
     }
   }
 
-  private void copySafetyTraceProxy(final SafetyTraceProxy proxy,
-                                    final SafetyTrace element)
+  private void copySafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy proxy,
+     final SafetyCounterExample element)
     throws VisitorException
   {
-    copyTraceProxy(proxy, element);
+    copyCounterExampleProxy(proxy, element);
   }
 
   private void copyStateProxy(final StateProxy proxy, final State element)
@@ -276,55 +331,44 @@ abstract class JAXBProductDESElementExporter
   }
 
   private void copyTraceProxy(final TraceProxy proxy,
-                              final TraceType element)
+                              final Trace element)
     throws VisitorException
   {
-    copyDocumentProxy(proxy, element);
-    try {
-      final ProductDESProxy des = proxy.getProductDES();
-      element.setProductDES(des.getName());
-      final IndexedList<EventProxy> events =
-        new CheckedExportList<EventProxy>(des.getEvents(), proxy, "event");
-      final RefExporter<EventProxy> eventexporter =
-        new RefExporter<EventProxy>(events);
-      final IndexedList<AutomatonProxy> automata =
-        new CheckedExportList<AutomatonProxy>
-          (des.getAutomata(), proxy, "automaton");
-      final RefExporter<AutomatonProxy> autexporter =
-        new RefExporter<AutomatonProxy>(automata);
-      mTraceAutomata = new CheckedExportList<AutomatonProxy>
-        (proxy.getAutomata(), proxy, "automaton");
-      mTraceAutomatonRefListHandler.toJAXB
-        (autexporter, mTraceAutomata, element);
-      final List<TraceStepProxy> steps = proxy.getTraceSteps();
-      final Iterator<TraceStepProxy> iter = steps.iterator();
-      final TraceStepProxy step0 = iter.next();
-      mIsFirstTraceStep = true;
-      final FirstTraceStateTuple tracestate0 =
-        (FirstTraceStateTuple) visitTraceStepProxy(step0);
-      if (tracestate0 != null || iter.hasNext()) {
-        final TraceStepList listelem = mFactory.createTraceStepList();
-        element.setTraceStepList(listelem);
-        if (tracestate0 != null) {
-          listelem.setInitialState(tracestate0);
-        }
-        mIsFirstTraceStep = false;
-        final List<ElementType> outlist =
-          listelem.getEventRefAndNextTraceStateTuple();
-        while (iter.hasNext()) {
-          final TraceStepProxy step = iter.next();
-          final EventProxy event = step.getEvent();
-          final EventRef eventref = eventexporter.visitEventProxy(event);
-          outlist.add(eventref);
-          final NextTraceStateTuple tracestate =
-            (NextTraceStateTuple) visitTraceStepProxy(step);
-          if (tracestate != null) {
-            outlist.add(tracestate);
-          }
+    final String name = proxy.getName();
+    if (name != null && !name.equals("")) {
+      element.setName(name);
+    }
+    final List<TraceStepProxy> steps = proxy.getTraceSteps();
+    final Iterator<TraceStepProxy> iter = steps.iterator();
+    final TraceStepProxy step0 = iter.next();
+    mIsFirstTraceStep = true;
+    final FirstTraceStateTuple tracestate0 =
+      (FirstTraceStateTuple) visitTraceStepProxy(step0);
+    if (tracestate0 != null || iter.hasNext()) {
+      final TraceStepList listelem = mFactory.createTraceStepList();
+      element.setTraceStepList(listelem);
+      if (tracestate0 != null) {
+        listelem.setInitialState(tracestate0);
+      }
+      mIsFirstTraceStep = false;
+      final List<ElementType> outlist =
+        listelem.getEventRefAndNextTraceStateTuple();
+      while (iter.hasNext()) {
+        final TraceStepProxy step = iter.next();
+        final EventProxy event = step.getEvent();
+        final EventRef eventref =
+          mProductDESEventRefExporter.visitEventProxy(event);
+        outlist.add(eventref);
+        final NextTraceStateTuple tracestate =
+          (NextTraceStateTuple) visitTraceStepProxy(step);
+        if (tracestate != null) {
+          outlist.add(tracestate);
         }
       }
-    } finally {
-      mTraceAutomata = null;
+    }
+    final int loop = proxy.getLoopIndex();
+    if (loop >= 0) {
+      element.setLoopIndex(loop);
     }
   }
 
@@ -338,7 +382,7 @@ abstract class JAXBProductDESElementExporter
     final List<AutomatonProxy> sorted = new ArrayList<AutomatonProxy>(keyset);
     Collections.sort(sorted);
     for (final AutomatonProxy aut : sorted) {
-      mTraceAutomata.checkUnique(aut);
+      mCounterExampleAutomata.checkUnique(aut);
       final StateProxy state = statemap.get(aut);
       if (state != null) {
         // TODO Check whether automaton contains state
@@ -382,6 +426,7 @@ abstract class JAXBProductDESElementExporter
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    @Override
     public AutomatonRef visitAutomatonProxy(final AutomatonProxy proxy)
       throws VisitorException
     {
@@ -391,6 +436,7 @@ abstract class JAXBProductDESElementExporter
       return element;
     }
 
+    @Override
     public EventRef visitEventProxy(final EventProxy proxy)
       throws VisitorException
     {
@@ -412,7 +458,7 @@ abstract class JAXBProductDESElementExporter
   private IndexedList<EventProxy> mProductDESEvents;
   private IndexedList<EventProxy> mAutomatonEvents;
   private IndexedList<StateProxy> mAutomatonStates;
-  private IndexedList<AutomatonProxy> mTraceAutomata;
+  private IndexedList<AutomatonProxy> mCounterExampleAutomata;
   private RefExporter<EventProxy> mProductDESEventRefExporter;
   private RefExporter<EventProxy> mAutomatonEventRefExporter;
   private boolean mIsFirstTraceStep;
@@ -431,8 +477,12 @@ abstract class JAXBProductDESElementExporter
     new AutomatonTransitionListHandler(mFactory);
   private final StateEventRefListHandler
     mStateEventRefListHandler = new StateEventRefListHandler(mFactory);
-  private final TraceAutomatonRefListHandler
-    mTraceAutomatonRefListHandler = new TraceAutomatonRefListHandler(mFactory);
+  private final CounterExampleAutomatonRefListHandler
+    mCounterExampleAutomatonRefListHandler =
+    new CounterExampleAutomatonRefListHandler(mFactory);
+  private final CounterExampleTraceListHandler
+    mCounterExampleTraceListHandler =
+    new CounterExampleTraceListHandler(mFactory);
 
   private static final ObjectFactory mFactory = new ObjectFactory();
 
