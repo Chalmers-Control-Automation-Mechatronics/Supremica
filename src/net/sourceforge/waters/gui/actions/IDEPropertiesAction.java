@@ -210,19 +210,6 @@ public class IDEPropertiesAction extends WatersAction
     public Boolean visitAutomatonProxy(final AutomatonProxy aut)
     {
       if (mDoEdit) {
-        //        final IDE ide = getIDE();
-        //        final DocumentContainer container = ide.getActiveDocumentContainer();
-        //        if (container == null || !(container instanceof ModuleContainer)) {
-        //          return null;
-        //        }
-        //        final Component panel = container.getActivePanel();
-        //        if (panel instanceof EditorPanel) {
-        //          return (ModuleWindowInterface) panel;
-        //        } else {
-        //          return null;
-        //        }
-        //TODO container always null but documentcontainer isnt.
-        //     should Document container hold watersanalyzer too???
         final ModuleContainer container = getActiveModuleContainer();
         if (container == null) {
           return false;
@@ -232,8 +219,8 @@ public class IDEPropertiesAction extends WatersAction
           return false;
         }
         final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
-        new AutomatonPropertiesDialog(getActiveModuleWindowInterface(),
-                                      analyzer, aut);
+        new AutomatonPropertiesDialog(analyzer,
+                                      aut);
       }
       return true;
     }

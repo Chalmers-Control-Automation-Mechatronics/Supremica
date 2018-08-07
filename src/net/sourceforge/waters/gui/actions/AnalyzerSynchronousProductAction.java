@@ -37,7 +37,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.IDE;
 
@@ -52,13 +54,13 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
-  //# Constructors
+  //# Constructor
   AnalyzerSynchronousProductAction(final IDE ide)
   {
     super(ide);
-    this.setEnabled(shouldBeTrue());
-    putValue(Action.NAME, "Synchronize...");
-    putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automatas");
+    putValue(Action.NAME, "Synchronise ...");
+    putValue(Action.SHORT_DESCRIPTION, "Synchronise the selected automata");
+    updateEnabledStatus();
   }
 
   //#########################################################################
@@ -72,14 +74,30 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
     }
   }
 
-  public Boolean shouldBeTrue() {
-    if(getSelectedRowCount() >= 2)
-      return true;
-    return false;
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
+    }
+  }
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    boolean enabled = false;
+    final AutomataTable table = getAnalyzerTable();
+    if (table != null) {
+      enabled = (table.getSelectedRowCount() >= 2);
+    }
+    setEnabled(enabled);
   }
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 8082126929036001591L;
 
 }

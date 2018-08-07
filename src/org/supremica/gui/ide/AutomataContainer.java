@@ -77,7 +77,7 @@ public class AutomataContainer
     }
 
     @Override
-    public Component getActivePanel()
+    public MainPanel getActivePanel()
     {
         return mAnalyzerPanel;
     }

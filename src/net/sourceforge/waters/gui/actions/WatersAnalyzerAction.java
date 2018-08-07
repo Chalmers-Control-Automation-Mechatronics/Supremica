@@ -45,11 +45,17 @@ import org.supremica.gui.ide.ModuleContainer;
 public abstract class WatersAnalyzerAction
   extends WatersAction
 {
+
+  //#########################################################################
+  //# Constructor
   protected WatersAnalyzerAction(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Accessing the Waters Analyser Panel
   protected WatersAnalyzerPanel getAnalyzerPanel()
   {
     final ModuleContainer container = getActiveModuleContainer();
@@ -63,8 +69,24 @@ public abstract class WatersAnalyzerAction
     return (WatersAnalyzerPanel) panel;
   }
 
+  protected AutomataTable getAnalyzerTable()
+  {
+    // TODO Use getAnalyzerPanel() method
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+    return analyzer.getAutomataTable();
+  }
+
   protected AutomataTableModel getAnalyzerTableModel()
   {
+    // TODO Use getAnalyzerPanel() method
     final ModuleContainer container = getActiveModuleContainer();
     if (container == null) {
       return null;
@@ -80,24 +102,13 @@ public abstract class WatersAnalyzerAction
   protected int getSelectedRowCount()
   {
     //TODO cant call getSelectedRows before model open, how to check if null before call??
-    //final AutomataTable table = getAnalyzerTable();
-    //return table.getSelectedRowCount();
-    return 0;
+    final AutomataTable table = getAnalyzerTable();
+    return table.getSelectedRowCount();
   }
 
-  protected AutomataTable getAnalyzerTable()
-  {
-    final ModuleContainer container = getActiveModuleContainer();
-    if (container == null) {
-      return null;
-    }
-    final MainPanel panel = container.getActivePanel();
-    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
-      return null;
-    }
-    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
-    return analyzer.getAutomataTable();
-  }
 
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -8684703946705836025L;
+
 }

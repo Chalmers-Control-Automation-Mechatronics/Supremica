@@ -135,12 +135,11 @@ class ComponentDataFlavor extends ModuleDataFlavor
         if (importer == null) {
           importer = new ProductDESImporter(factory);
         }
+        // TODO Fix bug if the same event is in more than one automaton
         try {
           final ProductDESProxy product =
             AutomatonTools.createProductDESProxy(aut, factoryDES);
           final ModuleProxy module = importer.importModule(product);
-          // TODO Find the components and event declarations within the module
-          // TODO and add them to the list using addAll()
           proxyList.addAll(module.getComponentList());
           proxyList.addAll(module.getEventDeclList());
         } catch (final ParseException exception) {

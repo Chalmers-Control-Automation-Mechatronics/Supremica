@@ -49,8 +49,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -60,8 +58,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -75,17 +72,15 @@ public class AutomatonPropertiesDialog extends JDialog
 
   //#######################################################################
   //# Constructor
-  public AutomatonPropertiesDialog(final ModuleWindowInterface root, final WatersAnalyzerPanel panel,
-                                           final AutomatonProxy aut)
+  public AutomatonPropertiesDialog(final WatersAnalyzerPanel panel,
+                                   final AutomatonProxy aut)
   {
-    mRoot = root;
     mAutomaton = aut;
     mAnalyzerPanel = panel;
     setTitle("Editing automaton '" + aut.getName() + "'");
     createComponents();
     layoutComponents();
-
-    setLocationRelativeTo(mRoot.getRootWindow());
+    setLocationRelativeTo(panel.getTopLevelAncestor());
     mNameInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
@@ -110,8 +105,8 @@ public class AutomatonPropertiesDialog extends JDialog
    */
   private void createComponents()
   {
-    final ModuleContext context = mRoot.getModuleContext();
-    final ExpressionParser parser = mRoot.getExpressionParser();
+    // TODO Make parser
+    final ExpressionParser parser = null;
     final ActionListener commithandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -123,16 +118,16 @@ public class AutomatonPropertiesDialog extends JDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
+    /*
     IdentifierProxy oldname = null;
     try {
       oldname = parser.parseIdentifier(mAutomaton.getName());
     } catch (final ParseException exception) {
       exception.printStackTrace();
     }
-    final FormattedInputParser nameparser =
-      new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionCell(oldname, nameparser);
-    mNameInput = new SimpleExpressionCell(parser);
+    mNameInput = new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
+    */
+    mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -354,8 +349,6 @@ public class AutomatonPropertiesDialog extends JDialog
   //#########################################################################
   //# Data Members
   // Dialog state
-  //private final IDE mIDE;
-  private final ModuleWindowInterface mRoot;
   private final WatersAnalyzerPanel mAnalyzerPanel;
 
   // Swing components

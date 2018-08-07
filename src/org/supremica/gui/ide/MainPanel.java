@@ -130,6 +130,11 @@ public abstract class MainPanel extends JPanel
     return mEmptyRightPanel;
   }
 
+  public boolean isWatersPanel()
+  {
+    return true;
+  }
+
 
   //#########################################################################
   //# Focus Switching
