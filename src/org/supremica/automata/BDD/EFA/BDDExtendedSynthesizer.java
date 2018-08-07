@@ -5,6 +5,8 @@ import gnu.trove.list.array.TIntArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
@@ -40,7 +42,8 @@ import org.supremica.automata.algorithms.Guard.GeneticMinimizer.Chromosome;
 import org.supremica.util.ActionTimer;
 
 /**
- * @author Sajed Miremadi, Zhennan Fei
+ * @author Zhennan Fei
+ * @author Sajed Miremadi
  */
 
 public class BDDExtendedSynthesizer
@@ -69,6 +72,7 @@ public class BDDExtendedSynthesizer
                                 final EditorSynthesizerOptions options)
   {
     this.theAutomata = theAutomata;
+    // create an instance of BDDExtendedAutomata
     this.bddAutomata = new BDDExtendedAutomata(theAutomata, options);
     this.factory = ModuleSubjectFactory.getInstance();
     this.parser =
@@ -151,13 +155,16 @@ public class BDDExtendedSynthesizer
 
   //#########################################################################
   //# Methods handling guard generation
-  public void generateGuard(Vector<String> eventNames,
+  public void generateGuard(final Vector<String> eventNames,
                             final EditorSynthesizerOptions options)
   {
-    // Users choose events for which guards should be generated
+    // make a copy of eventNames first
+    final List<String> cpyEventNames = new LinkedList<String>(eventNames);
+
+    // Users choose a single event for which guard should be generated
     if (!options.getEvent().equals("")) {
-      eventNames = new Vector<String>();
-      eventNames.add(options.getEvent());
+      cpyEventNames.clear();
+      cpyEventNames.add(options.getEvent());
     }
 
     BDDExtendedGuardGenerator bddgg = null;
@@ -166,7 +173,7 @@ public class BDDExtendedSynthesizer
 
     guardTimer = new ActionTimer();
 
-    final Iterator<String> it = eventNames.iterator();
+    final Iterator<String> it = cpyEventNames.iterator();
     guardTimer.start();
     while (it.hasNext()) {
       final String sigmaName = it.next();
@@ -278,9 +285,9 @@ public class BDDExtendedSynthesizer
                                         aut.getNameToLocationMap().keySet(),
                                         aut.getInitialLocation().getName(),
                                         markedValues);
-
-      for (final EdgeSubject edge : aut.getComponent().getGraph()
-        .getEdgesModifiable()) {
+      // add an action in the form of "A_curr = location"
+      final GraphSubject graph = aut.getComponent().getGraph();
+      for (final EdgeSubject edge : graph.getEdgesModifiable()) {
         final String sourceState = edge.getSource().getName();
         final String targetState = edge.getTarget().getName();
         // No need to add assignment to self-loop
@@ -298,6 +305,16 @@ public class BDDExtendedSynthesizer
         edge.getGuardActionBlock().getActionsModifiable()
           .add((BinaryExpressionSubject) assignmentAsAction);
       }
+    }
+  }
+
+  //#########################################################################
+  //# Cleanup
+  public void done()
+  {
+    if (bddAutomata != null) {
+      bddAutomata.done();
+      bddAutomata = null;
     }
   }
 
@@ -341,13 +358,5 @@ public class BDDExtendedSynthesizer
                                    bddAutomata.BDD2valuations(mSafeStates,
                                                               variable));
     return formula;
-  }
-
-  public void done()
-  {
-    if (bddAutomata != null) {
-      bddAutomata.done();
-      bddAutomata = null;
-    }
   }
 }
