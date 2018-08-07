@@ -472,6 +472,7 @@ public class MonolithicDiagnosabilityVerifier
     final String nameB = getModel().getName()+"DiagFaultFreeTrace";
     final LoopTraceProxy counterExampleA
       = getFactory().createLoopTraceProxy(nameA, null, null, getModel(), spStateMap.getInputAutomata(),traceA , loopIndexA);
+    @SuppressWarnings("unused")
     final LoopTraceProxy counterExampleB
       = getFactory().createLoopTraceProxy(nameB, null, null, getModel(), spStateMap.getInputAutomata(),traceB , loopIndexB);
     return counterExampleA;

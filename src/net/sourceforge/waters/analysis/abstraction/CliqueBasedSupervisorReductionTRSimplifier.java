@@ -194,9 +194,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //TODO pre-compute the successors of the compatible formed by the all-compatible states cos we will always need to add these to successors
     final Candidate startingCandidate = new Candidate(mNumStates);
     startingCandidate.addDependency(mInitialCompatibleId);
-    final ListBufferTransitionRelation relation = getTransitionRelation();
 
     //when in heuristic mode we don't explore all options so want to make sure we have covered all states in our solution
+    /*
     if (isHeuristicMode()) {
       for (int s = 0; s < mNumStates; s++) {
         if (mStatesCompatibleWithAll.contains(s)) {
@@ -204,9 +204,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
         startingCandidate.addDependency(mCompatibleCache.add(new int[] {s}));
       }
-
     }
-
+    */
     searchSpace.add(startingCandidate);
 
     final Candidate reducedSupervisor = reduce(searchSpace);
@@ -845,9 +844,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                                   final TIntSet successorEventsToFill)
   {
     final TransitionIterator successorIterator =
-      getTransitionRelation().createSuccessorsReadOnlyIterator();
-    successorIterator.resetState(source);
-
+      getTransitionRelation().createSuccessorsReadOnlyIterator(source);
     while (successorIterator.advance()) {
       successorEventsToFill.add(successorIterator.getCurrentEvent());
     }
