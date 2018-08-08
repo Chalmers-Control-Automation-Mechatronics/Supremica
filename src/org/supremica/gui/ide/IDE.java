@@ -377,8 +377,12 @@ public class IDE
     final DocumentContainer active = getActiveDocumentContainer();
     if (active == null) {
       return null;
+    }
+    final EditorPanel panel = active.getEditorPanel();
+    if (panel == null) {
+      return null;
     } else {
-      return active.getEditorPanel().getActiveComponentEditorPanel();
+      return panel.getActiveComponentEditorPanel();
     }
   }
 
