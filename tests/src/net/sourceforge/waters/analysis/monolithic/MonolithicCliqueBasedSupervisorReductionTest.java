@@ -37,6 +37,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -62,7 +63,8 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setSearchStrategy(CliqueBasedSupervisorReductionTRSimplifier.SearchStrategy.FIND_BEST);
+    simplifier.setIsFindFirst(false);
+    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.NONE);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;

@@ -65,7 +65,7 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setSearchStrategy(CliqueBasedSupervisorReductionTRSimplifier.SearchStrategy.HEURISTIC_FIND_FIRST);
+    simplifier.setIsFindFirst(true);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
