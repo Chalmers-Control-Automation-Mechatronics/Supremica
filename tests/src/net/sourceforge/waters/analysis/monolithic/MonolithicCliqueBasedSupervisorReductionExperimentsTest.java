@@ -66,9 +66,11 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
+
     simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.STRATEGY_1);
     simplifier.setIsFindFirst(true);
     simplifier.setMaxHeuristicCovers(2);
+
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
@@ -149,10 +151,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }
 
   //419 states, 22 events, 972 transitions
-  @Override
+/*  @Override
   public void testCT3() throws Exception
   {
-  }
+  }*/
 
   //4675 states, 36 events, 20752 transitions (can be reduced to 2 states?)
   @Override

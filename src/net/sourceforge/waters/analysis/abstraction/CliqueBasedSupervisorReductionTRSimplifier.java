@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -79,7 +80,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   public enum HeuristicCoverStrategy
   {
-    NONE, STRATEGY_1, STRATEGY_2
+    NONE, STRATEGY_1, STRATEGY_2, STRATEGY_3
   }
 
   //#########################################################################
@@ -170,8 +171,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mDependencyIdBuffer = new TIntArrayList();
     mEnabledEventsBuffer =
       new TIntHashSet(relation.getNumberOfProperEvents());
+
     mStackBuffer = new TIntArrayStack();
     mSetBuffer = new TIntHashSet();
+    mListBuffer = new TIntArrayList();
 
     mIncompatibilityRelation =
       getIncompatibilityRelation(getSupervisedEvent());
@@ -201,7 +204,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    System.out.println("*** Starting reduction ***");
+    System.out.println("*** Starting reduction on supervised event " + getSupervisedEvent() + " ***");
+    getLogger().info(getTransitionRelation().getName() + ", " + getSupervisedEvent() + ", " + mNumStates);
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<Candidate> searchSpace =
       new PriorityQueue<>(new Comparator<Candidate>() {
@@ -213,7 +217,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       });
 
-    //TODO pre-compute the successors of the compatible formed by the all-compatible states cos we will always need to add these to successors
     final Candidate startingCandidate = new Candidate(mNumStates);
     startingCandidate.addDependency(mInitialCompatibleId);
 
@@ -226,6 +229,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     if (reducedSupervisor == null
         || reducedSupervisor.size() + 1 >= mNumStates) {
       System.out.println("\nCould not reduce supervisor");
+      getLogger().info("Could not reduce supervisor");
       return false;
     }
 
@@ -236,17 +240,22 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected void tearDown()
   {
-    super.tearDown();
     mDependencyIdBuffer = null;
     mCompatibleBuffer = null;
+    mEnabledEventsBuffer = null;
+
+    mStackBuffer = null;
+    mSetBuffer = null;
+    mListBuffer = null;
+
     mCompatibleCache = null;
     mStatesCompatibleWithAll = null;
     mStateToNeighbourCountMap = null;
-    mStackBuffer = null;
-    mEnabledEventsBuffer = null;
+
     mIncompatibilityRelation = null;
     mPredecessorTransitionIterator = null;
     mSuccessorTransitionIterator = null;
+    super.tearDown();
   }
 
   private class Searcher {
@@ -268,26 +277,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         final Candidate candidateSolution = searchSpace.poll();
 
         System.out.print("\n" + candidateSolution);
-
-        //if solution is complete and more reduced, save it
-        if (candidateSolution.size() < reducedSupervisorSize
-            && candidateSolution.dependenciesSize() == 0) {
-          //if we got here we know our solution is better than the current best
-          reducedSupervisor = candidateSolution;
-          reducedSupervisorSize = reducedSupervisor.size();
-          System.out.print("-- New Best");
-          if (getIsFindFirst()) {
-            break;
-          } else {
-            continue;
-          }
-        }
-
-        //if we are too big skip (we could stop the search if our ordering of the queue were just based on solution size)
-        if (candidateSolution.size() + 1 >= reducedSupervisorSize) {
-          System.out.print("-- Too big.");
-          continue;
-        }
 
         //our container for the actual compatible being processed at any given time
         mCompatibleBuffer.clear();
@@ -321,9 +310,28 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer,
                                     mDependencyIdBuffer);
 
+          //apply the new things we know we need to cover to the solution using the specified strategy
           dependencyStrategy.processNewDependencies(newSolution, mDependencyIdBuffer);
 
-          //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
+          //if solution is complete and more reduced, save it
+          if (newSolution.size() < reducedSupervisorSize
+              && newSolution.dependenciesSize() == 0) {
+            //if we got here we know our solution is better than the current best
+            reducedSupervisor = newSolution;
+            reducedSupervisorSize = reducedSupervisor.size();
+            System.out.print("-- New Best");
+            if (mIsFindFirst) {
+              break;
+            } else {
+              continue;
+            }
+          }
+
+          //if we aren't done yet we know we need to add at least 1 compatible to make it 'done', so discard if too big
+          if (newSolution.size() + 1 >= reducedSupervisorSize) {
+            continue;
+          }
+
           searchSpace.add(newSolution);
         }
       }
@@ -534,8 +542,16 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     private final StateComparator activeComparator;
 
     public HeuristicBronKerboschCoverStrategy() {
-      //TODO: switch on cover strategy
-      activeComparator = new Strategy1StateComparator();
+      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.STRATEGY_1) {
+        activeComparator = new Strategy1StateComparator();
+      }
+      else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.STRATEGY_2){
+        activeComparator = new Strategy2StateComparator();
+      }
+      else {
+        activeComparator = new Strategy3StateComparator();
+      }
+
     }
 
     @Override
@@ -558,8 +574,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                                        final WatersIntHeap possibleAdditions,
                                        final TIntSet maximalCliquesIdsToFill)
     {
-      //TODO: check the
-
       //if we have exhausted all possibilities, this must be the largest clique we have seen
       if (possibleAdditions.isEmpty()) {
         clique.sort();
@@ -598,23 +612,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     private abstract class StateComparator implements WatersIntComparator {
       protected TIntList clique;
+      protected final Random random = new Random(1);
 
       public void setClique(final TIntList clique) {
         this.clique = clique;
       }
-    }
 
-    private class Strategy1StateComparator extends StateComparator {
-
-      @Override
-      public int compare(final int state1, final int state2)
-      {
-        final int cost1 = successorCost(state1) + predecessorCost(state1);
-        final int cost2 = successorCost(state2) + predecessorCost(state2);
-        return Integer.compare(cost1, cost2);
-      }
-
-      private int successorCost(final int state) {
+      protected int successorCostSingle(final int state) {
         mSetBuffer.clear();
         getSuccessorStates(state, mSetBuffer);
         int matches = 0;
@@ -626,7 +630,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
-      private int predecessorCost(final int state) {
+      protected int predecessorCostSingle(final int state) {
         mSetBuffer.clear();
         getPredecessorStates(state, mSetBuffer);
         int matches = 0;
@@ -636,6 +640,64 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           }
         }
         return matches;
+      }
+
+      protected int successorCostMultiple(final int state) {
+        mListBuffer.clear();
+        getSuccessorStates(state, mListBuffer);
+        int matches = 0;
+        for (int s = 0; s < mListBuffer.size(); s++) {
+          if (!clique.contains(mListBuffer.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+      protected int predecessorCostMultiple(final int state) {
+        mListBuffer.clear();
+        getPredecessorStates(state, mListBuffer);
+        int matches = 0;
+        for (int s = 0; s < mListBuffer.size(); s++) {
+          if (!clique.contains(mListBuffer.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+      @SuppressWarnings("unused")
+      protected int neighbourCost(final int state) {
+        return mStateToNeighbourCountMap.get(state);
+      }
+    }
+
+    private class Strategy1StateComparator extends StateComparator {
+
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        final int cost1 = successorCostSingle(state1) + predecessorCostSingle(state1);
+        final int cost2 = successorCostSingle(state2) + predecessorCostSingle(state2);
+        return Integer.compare(cost1, cost2);
+      }
+    }
+
+    private class Strategy2StateComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        final int cost1 = successorCostMultiple(state1) + predecessorCostMultiple(state1);
+        final int cost2 = successorCostMultiple(state2) + predecessorCostMultiple(state2);
+        return Integer.compare(cost1, cost2);
+      }
+    }
+
+    private class Strategy3StateComparator extends StateComparator {
+      @Override
+      public int compare(final int val1, final int val2)
+      {
+        return Integer.compare(random.nextInt(), random.nextInt());
       }
     }
   }
@@ -754,12 +816,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       relation.setAllMarkings(s, newStateMarkings);
     }
 
-
     relation.checkReachability();
     if (relation.removeUnreachableTransitions()) {
       System.out.println("Removed " + (newSupervisor.length - relation.getNumberOfStates()) + " unreachable states");
     }
 
+    getLogger().info(relation.getNumberOfStates());
     System.out.println("Reduced to " + relation.getNumberOfStates() + " states from " + mNumStates);
 
     return true;
@@ -876,7 +938,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private void getSuccessorStates(final int source,
-                                  final TIntSet successorStatesToFill)
+                                  final TIntCollection successorStatesToFill)
   {
     mSuccessorTransitionIterator.reset(source, -1);
     while (mSuccessorTransitionIterator.advance()) {
@@ -885,7 +947,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   private void getPredecessorStates(final int source,
-                                    final TIntSet predecessorStatesToFill)
+                                    final TIntCollection predecessorStatesToFill)
   {
     mPredecessorTransitionIterator.reset(source, -1);
     while (mPredecessorTransitionIterator.advance()) {
@@ -1281,6 +1343,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private TIntList mCompatibleBuffer;
   private TIntList mDependencyIdBuffer;
   private TIntSet mEnabledEventsBuffer;
+
+  private TIntList mListBuffer;
   private TIntSet mSetBuffer;
   private TIntStack mStackBuffer;
 

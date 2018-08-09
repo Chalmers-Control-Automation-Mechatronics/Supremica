@@ -33,14 +33,21 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.io.PrintWriter;
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 public class MonolithicCliqueBasedSupervisorReductionTest
   extends AbstractSupervisorSynthesizerTest
@@ -70,6 +77,34 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     return synthesizer;
   }
 
+  @Override
+  protected ProductDESResult runSynthesizer(final ProductDESProxy des,
+                                            final List<ParameterBindingProxy> bindings,
+                                            final boolean expect)
+    throws Exception
+  {
+    final MonolithicSynthesisResult result = (MonolithicSynthesisResult)super.runSynthesizer(des, bindings, expect);
+
+    //I want this name (calling relation.getName() just gives 'supervisor')
+    System.out.println(des.getName());
+    final List<TRSimplifierStatistics> allStatistics = result.getSimplifierStatistics();
+    TRSimplifierStatistics reductionStatistics = null;
+    for (int i = 0; i < allStatistics.size(); i++) {
+      final TRSimplifierStatistics statisticsForSimplifier = allStatistics.get(i);
+      if (statisticsForSimplifier.getSimplifierClass().equals(CliqueBasedSupervisorReductionTRSimplifier.class)) {
+        reductionStatistics = statisticsForSimplifier;
+        break;
+      }
+    }
+
+    if (reductionStatistics != null) {
+      //a System.out.println(reductionStatistics.toString()) just gives me the default .toString() implementation
+      final PrintWriter writer = new PrintWriter(System.out);
+      reductionStatistics.print(writer);
+      writer.flush();
+    }
+    return result;
+  }
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase
