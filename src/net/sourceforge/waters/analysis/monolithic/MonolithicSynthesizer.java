@@ -834,12 +834,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         final EventEncoding enc = new EventEncoding(mEventEncoding);
         final ListBufferTransitionRelation supervisor =
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
+        final EventProxy event = mEventEncoding.getProperEvent(e);
+        supervisor.setName("sup:" + event.getName());
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
         supervisor.removeDumpStateTransitions();
         supervisor.removeRedundantPropositions();
-        final EventProxy event = mEventEncoding.getProperEvent(e);
-        supervisor.setName("sup:" + event.getName());
         AutomatonProxy aut = new TRAutomatonProxy(enc, supervisor);
         for (final AutomatonProxy existing : supervisors) {
           if (checker.checkBisimulation(aut, existing)) {
