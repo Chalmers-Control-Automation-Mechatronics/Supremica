@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -411,6 +412,15 @@ public class TRSimplifierStatistics
 
   //#########################################################################
   //# Printing
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter stream = new PrintWriter(writer);
+    print(stream);
+    return writer.toString();
+  }
+
   public void print(final PrintWriter writer)
   {
     @SuppressWarnings("resource")
