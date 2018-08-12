@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import java.io.PrintWriter;
 import java.util.List;
 
 import junit.framework.Test;
@@ -85,8 +84,7 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   {
     final MonolithicSynthesisResult result = (MonolithicSynthesisResult)super.runSynthesizer(des, bindings, expect);
 
-    //I want this name (calling relation.getName() just gives 'supervisor')
-    System.out.println(des.getName());
+
     final List<TRSimplifierStatistics> allStatistics = result.getSimplifierStatistics();
     TRSimplifierStatistics reductionStatistics = null;
     for (int i = 0; i < allStatistics.size(); i++) {
@@ -98,10 +96,9 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     }
 
     if (reductionStatistics != null) {
+      System.out.println("Overall stats for " + des.getName());
       //a System.out.println(reductionStatistics.toString()) just gives me the default .toString() implementation
-      final PrintWriter writer = new PrintWriter(System.out);
-      reductionStatistics.print(writer);
-      writer.flush();
+      System.out.println(reductionStatistics.toString());
     }
     return result;
   }

@@ -205,7 +205,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   protected boolean runSimplifier() throws AnalysisException
   {
     System.out.println("*** Starting reduction on supervised event " + getSupervisedEvent() + " ***");
-    getLogger().info(getTransitionRelation().getName() + ", " + getSupervisedEvent() + ", " + mNumStates);
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<Candidate> searchSpace =
       new PriorityQueue<>(new Comparator<Candidate>() {
@@ -229,7 +228,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     if (reducedSupervisor == null
         || reducedSupervisor.size() + 1 >= mNumStates) {
       System.out.println("\nCould not reduce supervisor");
-      getLogger().info("Could not reduce supervisor");
       return false;
     }
 
@@ -276,7 +274,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         //get the most promising partial solution
         final Candidate candidateSolution = searchSpace.poll();
 
-        System.out.print("\n" + candidateSolution);
+        System.out.println("Picked " + candidateSolution);
 
         //our container for the actual compatible being processed at any given time
         mCompatibleBuffer.clear();
@@ -319,11 +317,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             //if we got here we know our solution is better than the current best
             reducedSupervisor = newSolution;
             reducedSupervisorSize = reducedSupervisor.size();
-            System.out.print("-- New Best");
+            System.out.println(newSolution + " -- New Best");
             if (mIsFindFirst) {
-              break;
-            } else {
-              continue;
+              searchSpace.clear();
+              return reducedSupervisor;
             }
           }
 
@@ -331,7 +328,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           if (newSolution.size() + 1 >= reducedSupervisorSize) {
             continue;
           }
-
           searchSpace.add(newSolution);
         }
       }

@@ -103,10 +103,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }
 
   //410 states, 12 events, 1494 transitions
-/*  @Override
+  @Override
   public void testTransferLine2() throws Exception
   {
-  }*/
+  }
 
   //5992 states, 17 events, 29749 transitions
   @Override
@@ -157,10 +157,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }*/
 
   //4675 states, 36 events, 20752 transitions (can be reduced to 2 states?)
-  @Override
+/*  @Override
   public void testRobotAssemblyCell() throws Exception
   {
-  }
+  }*/
 
   //6288 states, 26 events, 35308 transitions
   @Override
