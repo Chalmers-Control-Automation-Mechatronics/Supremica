@@ -49,6 +49,7 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -70,14 +71,14 @@ import org.supremica.gui.ide.IDE;
  * <P>A popup menu action to add or remove a proposition to or from multiple
  * selected nodes in a graph.</P>
  *
- * <P>This action is invoked with a selected node in a graph and the name
- * of a proposition chosen from a submenu. The effects of the action depend
- * on the state of the node and the selection in the graph at the time when
- * the action is created, i.e., when the popup menu appears.</P>
+ * <P>This action is invoked with a selected action argument node in a graph
+ * and the name of a proposition chosen from a submenu. The effects of the
+ * action depend on the state of the node and the selection in the graph at
+ * the time when the action is created, i.e., when the popup menu appears.</P>
  *
- * <P>If the selected node is marked with the proposition, then the action
- * removes the proposition from the node and all other nodes selected in
- * the graph. Otherwise, if the selected node is not marked with the
+ * <P>If the action argument node is marked with the proposition, then the
+ * action removes the proposition from the node and all other nodes selected
+ * in the graph. Otherwise, if the action argument node is not marked with the
  * proposition, then the action marks the node and all other selected nodes
  * with the proposition.</P>
  *
@@ -112,7 +113,7 @@ public class EditNodeMarkingAction
       }
     }
     final String description =
-      mNodes.size() == 1 ? "this node" : "selected nodes";
+      mNodes.size() == 1 ? "this state" : "the selected states";
     if (mAdding) {
       putValue(Action.SHORT_DESCRIPTION,
                "Mark " + description + " as " + name);
@@ -134,8 +135,10 @@ public class EditNodeMarkingAction
   {
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    final String name = mAdding ? "Node Marking" : "Node Unmarking";
-    final List<Command> commands = new ArrayList<>(mNodes.size() + 1);
+    final String name = mAdding ? "State Marking" : "State Unmarking";
+    final int numNodes = mNodes.size();
+    final List<Command> commands = new ArrayList<>(numNodes);
+    final List<NodeSubject> changed = new ArrayList<>(numNodes);
     for (final NodeSubject node : mNodes) {
       final List<AbstractSubject> props =
         node.getPropositions().getEventIdentifierListModifiable();
@@ -169,32 +172,38 @@ public class EditNodeMarkingAction
         }
       }
       final Command cmd = new EditCommand(node, cloned, mPanel, name);
+      cmd.setUpdatesSelection(false);
       commands.add(cmd);
+      changed.add(node);
     }
     if (commands.isEmpty()) {
       return;
     }
+    final CompoundCommand compound =
+      new UpdateCommand(changed, mPanel, name, true);
     if (mAdding) {
       final Command cmd = getCreateDefaultPropositionCommand();
       if (cmd != null) {
-        commands.add(cmd);
+        compound.addCommand(cmd);
       }
     }
-    final Command cmd;
-    if (commands.size() == 1) {
-      cmd = commands.get(0);
-    } else {
-      final CompoundCommand compound = new CompoundCommand(name);
-      compound.addCommands(commands);
-      cmd = compound;
-    }
-    final UndoInterface undoer = getActiveUndoInterface();
-    undoer.executeCommand(cmd);
+    compound.addCommands(commands);
+    final UndoInterface undoer = mPanel.getUndoInterface(this);
+    undoer.executeCommand(compound);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Creates a command to add a default proposition to the module.
+   * The default propositions ":accepting" and ":forbidden" appear in the
+   * popup menu, but they are only added to the module when used for the
+   * first time. This method checks whether the action is concerned with
+   * a default proposition which is missing from the module, and in that
+   * case creates and returns a command to add it.
+   * @return Command to add proposition to module, or <CODE>null</CODE>.
+   */
   private Command getCreateDefaultPropositionCommand()
   {
     if (!(mIdentifier instanceof SimpleIdentifierSubject)) {
