@@ -33,13 +33,21 @@
 
 package net.sourceforge.waters.analysis.diagnosis;
 
+import java.util.List;
+import java.util.Map;
+
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
 public class MonolithicDiagnosabilityVerifierTest
@@ -244,5 +252,78 @@ public class MonolithicDiagnosabilityVerifierTest
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     return new MonolithicDiagnosabilityVerifier(factory, translator);
   }
+
+  @Override
+  protected void checkCounterExample(final ProductDESProxy des,
+                                     final CounterExampleProxy counter)
+  {
+    final DualCounterExampleProxy dual = (DualCounterExampleProxy) counter;
+    final List<TraceProxy> traces = dual.getTraces();
+    final TraceProxy traceA = traces.get(0);
+    final TraceProxy traceB = traces.get(1);
+    final List<TraceStepProxy> stepsA = traceA.getTraceSteps();
+    final List<TraceStepProxy> stepsB = traceB.getTraceSteps();
+    final int loopIndexA = traceA.getLoopIndex();
+    final int loopIndexB = traceB.getLoopIndex();
+    final int lenA = stepsA.size();
+    final int lenB = stepsB.size();
+
+    // Both traces are not empty
+    assertTrue("TraceA is empty", lenA > 0);
+    assertTrue("TraceB is empty", lenB > 0);
+
+    // Both loops are not empty
+    assertTrue("TraceA loop is empty", lenA - loopIndexA > 0);
+    assertTrue("TraceB loop is empty", lenB - loopIndexB > 0);
+
+    // Both loops have identical observable events
+    int iA=1,iB=1;
+    EventProxy eventA = null;
+    EventProxy eventB = null;
+    while(iA<lenA||iA<lenB) {
+      if(iA<lenA)
+        eventA = stepsA.get(iA++).getEvent();
+      if(iB<lenB)
+        eventB = stepsB.get(iB++).getEvent();
+      while(!eventA.isObservable()&&iA<lenA) {
+        eventA = stepsA.get(iA++).getEvent();
+      }
+      while(!eventB.isObservable()&&iB<lenB) {
+        eventB = stepsB.get(iB++).getEvent();
+      }
+      assertTrue("Traces do not have identical observable events"
+                 , eventA.equals(eventB));
+    }
+
+    // traceA has fault event
+    final String[] split = dual.getComment().split(" ");
+    final String faultClass = split[2];
+    String eventFC;
+    Map<String,String> attrib;
+    iA = 1;
+    boolean foundFault = false;
+    while(iA < lenA) {
+      eventA = stepsA.get(iA++).getEvent();
+      attrib = eventA.getAttributes();
+      eventFC = attrib.get("FAULT");
+      if(faultClass.equals(eventFC))
+        foundFault = true;
+    }
+    assertTrue("TraceA has no fault event", foundFault);
+    // traceB has no fault event
+    iB = 1;
+    foundFault = false;
+    while(iB < lenB) {
+      eventB = stepsB.get(iB++).getEvent();
+      attrib = eventB.getAttributes();
+      eventFC = attrib.get("FAULT");
+      if(faultClass.equals(eventFC))
+        foundFault = true;
+    }
+    assertFalse("TraceB has a fault event", foundFault);
+
+  }
+
+
 
 }
