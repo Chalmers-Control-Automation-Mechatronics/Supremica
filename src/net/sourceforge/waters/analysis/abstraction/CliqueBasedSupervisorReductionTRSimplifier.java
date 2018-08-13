@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.TIntCollection;
+import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -49,7 +50,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -80,7 +80,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   public enum HeuristicCoverStrategy
   {
-    NONE, STRATEGY_1, STRATEGY_2, STRATEGY_3
+    NONE, SUCCESSOR, PREDECESSOR, SUCCESSOR_PREDECESSOR, NEIGHBOUR, RANDOM
   }
 
   //#########################################################################
@@ -538,16 +538,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     private final StateComparator activeComparator;
 
     public HeuristicBronKerboschCoverStrategy() {
-      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.STRATEGY_1) {
-        activeComparator = new Strategy1StateComparator();
+      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR) {
+        activeComparator = new SuccessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.PREDECESSOR) {
+        activeComparator = new PredecessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR_PREDECESSOR) {
+        activeComparator = new SuccessorPredecessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.NEIGHBOUR) {
+        activeComparator = new MostCompatibleComparator();
+      } else {
+        activeComparator = new RandomComparator();
       }
-      else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.STRATEGY_2){
-        activeComparator = new Strategy2StateComparator();
-      }
-      else {
-        activeComparator = new Strategy3StateComparator();
-      }
-
     }
 
     @Override
@@ -608,7 +609,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     private abstract class StateComparator implements WatersIntComparator {
       protected TIntList clique;
-      protected final Random random = new Random(1);
 
       public void setClique(final TIntList clique) {
         this.clique = clique;
@@ -638,6 +638,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
+      @SuppressWarnings("unused")
       protected int successorCostMultiple(final int state) {
         mListBuffer.clear();
         getSuccessorStates(state, mListBuffer);
@@ -650,6 +651,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
+
+      @SuppressWarnings("unused")
       protected int predecessorCostMultiple(final int state) {
         mListBuffer.clear();
         getPredecessorStates(state, mListBuffer);
@@ -662,13 +665,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
-      @SuppressWarnings("unused")
       protected int neighbourCost(final int state) {
-        return mStateToNeighbourCountMap.get(state);
+        return mNumStates - mStateToNeighbourCountMap.get(state);
       }
     }
 
-    private class Strategy1StateComparator extends StateComparator {
+    private class SuccessorPredecessorComparator extends StateComparator {
 
       @Override
       public int compare(final int state1, final int state2)
@@ -679,21 +681,36 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
-    private class Strategy2StateComparator extends StateComparator {
+    private class SuccessorComparator extends StateComparator {
       @Override
       public int compare(final int state1, final int state2)
       {
-        final int cost1 = successorCostMultiple(state1) + predecessorCostMultiple(state1);
-        final int cost2 = successorCostMultiple(state2) + predecessorCostMultiple(state2);
-        return Integer.compare(cost1, cost2);
+        return Integer.compare(successorCostSingle(state1), successorCostSingle(state2));
       }
     }
 
-    private class Strategy3StateComparator extends StateComparator {
+    private class PredecessorComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer.compare(predecessorCostSingle(state1), predecessorCostSingle(state2));
+      }
+    }
+
+    private class MostCompatibleComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer.compare(neighbourCost(state1), neighbourCost(state2));
+      }
+
+    }
+
+    private class RandomComparator extends StateComparator {
       @Override
       public int compare(final int val1, final int val2)
       {
-        return Integer.compare(random.nextInt(), random.nextInt());
+        return Integer.compare(HashFunctions.hash(val1), HashFunctions.hash(val1));
       }
     }
   }

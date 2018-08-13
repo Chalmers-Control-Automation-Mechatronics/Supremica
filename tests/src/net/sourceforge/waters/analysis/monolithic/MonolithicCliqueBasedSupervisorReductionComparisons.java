@@ -654,7 +654,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     final CliqueBasedSupervisorReductionTRSimplifier simplifier =
       new CliqueBasedSupervisorReductionTRSimplifier();
     simplifier.setIsFindFirst(true);
-    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.STRATEGY_1);
+    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.RANDOM);
     simplifier.setMaxHeuristicCovers(5);
     return simplifier;
   }

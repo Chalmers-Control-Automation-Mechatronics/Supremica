@@ -67,7 +67,7 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
 
-    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.STRATEGY_1);
+    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.SUCCESSOR_PREDECESSOR);
     simplifier.setIsFindFirst(true);
     simplifier.setMaxHeuristicCovers(2);
 
