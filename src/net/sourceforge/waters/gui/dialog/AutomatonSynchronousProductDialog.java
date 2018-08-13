@@ -49,23 +49,32 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
+import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.Operator;
+import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.subject.module.IdentifierSubject;
+import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.supremica.gui.ide.IDE;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 /**
@@ -76,9 +85,8 @@ public class AutomatonSynchronousProductDialog extends JDialog
 
   //#######################################################################
   //# Constructor
-  public AutomatonSynchronousProductDialog(final IDE ide, final WatersAnalyzerPanel panel)
+  public AutomatonSynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
-    mIDE = ide;
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 
@@ -86,7 +94,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     createComponents();
     layoutComponents();
 
-    setLocationRelativeTo(mIDE.getRootPane());
+    setLocationRelativeTo(panel.getTopLevelAncestor());
     mNameInput.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
@@ -99,10 +107,11 @@ public class AutomatonSynchronousProductDialog extends JDialog
    *
    * @return A reference to the automaton being edited by this dialog.
    */
-  public AutomatonProxy getEditedItem()
+  public List<AutomatonProxy> getEditedItem()
   {
-    //TODO fix this
-    return null;//mAutomaton;
+    final List<AutomatonProxy> autList =
+      mAnalyzerPanel.getAutomataTable().getCurrentSelection();
+    return autList;
   }
 
   //#########################################################################
@@ -113,10 +122,9 @@ public class AutomatonSynchronousProductDialog extends JDialog
   @SuppressWarnings("null")
   private void createComponents()
   {
-    final ModuleWindowInterface rootModule =
-      mIDE.getActiveComponentEditorPanel().getModuleWindowInterface();
-    final ModuleContext context = rootModule.getModuleContext();
-    final ExpressionParser parser = rootModule.getExpressionParser();
+    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+    final OperatorTable optable = CompilerOperatorTable.getInstance();
+    final ExpressionParser parser = new ExpressionParser(factory, optable);
     final ActionListener commithandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -124,21 +132,18 @@ public class AutomatonSynchronousProductDialog extends JDialog
         commitDialog();
       }
     };
-
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     IdentifierProxy oldname = null;
     try {
-      //TODO put new name in this field
-      oldname = parser.parseIdentifier("newAutomaton");
+      oldname = parser.parseIdentifier(getNewName());
     } catch (final ParseException exception) {
       exception.printStackTrace();
     }
-    final FormattedInputParser nameparser =
-      new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionCell(oldname, nameparser);
-    mNameInput = new SimpleExpressionCell(parser);
+    mNameInput =
+      new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
+    //mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -155,7 +160,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
       new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
                           mKindGroup, 'u');
 
-    final ComponentKind kind = null;
+    final ComponentKind kind = getKind();
     switch (kind) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -250,23 +255,23 @@ public class AutomatonSynchronousProductDialog extends JDialog
     mainlayout.setConstraints(mSupervisorButton, constraints);
     mMainPanel.add(mSupervisorButton);
 
-//    constraints.gridx = 0;
-//    constraints.gridy++;
-//    constraints.gridwidth = 1;
-//    constraints.weightx = 0.0;
-//    constraints.weighty = 1.0;
-//    constraints.fill = GridBagConstraints.NONE;
-//    constraints.anchor = GridBagConstraints.NORTHWEST;
-//    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
-//    mainlayout.setConstraints(attributesLabel, constraints);
-//    mMainPanel.add(attributesLabel);
-//
-//    constraints.gridx++;
-//    constraints.gridwidth = 2;
-//    constraints.weightx = 3.0;
-//    constraints.fill = GridBagConstraints.BOTH;
-//    mainlayout.setConstraints(mAttributesPanel, constraints);
-//    mMainPanel.add(mAttributesPanel);
+    //    constraints.gridx = 0;
+    //    constraints.gridy++;
+    //    constraints.gridwidth = 1;
+    //    constraints.weightx = 0.0;
+    //    constraints.weighty = 1.0;
+    //    constraints.fill = GridBagConstraints.NONE;
+    //    constraints.anchor = GridBagConstraints.NORTHWEST;
+    //    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
+    //    mainlayout.setConstraints(attributesLabel, constraints);
+    //    mMainPanel.add(attributesLabel);
+    //
+    //    constraints.gridx++;
+    //    constraints.gridwidth = 2;
+    //    constraints.weightx = 3.0;
+    //    constraints.fill = GridBagConstraints.BOTH;
+    //    mainlayout.setConstraints(mAttributesPanel, constraints);
+    //    mMainPanel.add(mAttributesPanel);
     // Attributes, error, and buttons panel do not need layouting.
 
     // Finally, build the full dialog ...
@@ -300,7 +305,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
    */
   public void commitDialog()
   {
-    @SuppressWarnings("unused")
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
     if (isInputLocked()) {
@@ -308,12 +312,11 @@ public class AutomatonSynchronousProductDialog extends JDialog
       // Do not try to commit.
     } else {
       // Read the data from the dialog ...
-      final IdentifierSubject ident0 =
-        (IdentifierSubject) mNameInput.getValue();
-      @SuppressWarnings("unused")
-      final IdentifierSubject ident =
-        ident0.getParent() == null ? ident0 : ident0.clone();
-      @SuppressWarnings("unused")
+      //      final IdentifierSubject ident0 =
+      //        (IdentifierSubject) mNameInput.getValue();
+      //      final IdentifierSubject ident =
+      //        ident0.getParent() == null ? ident0 : ident0.clone();
+      final String name = mNameInput.getText();
       final ComponentKind kind;
       if (mPlantButton.isSelected()) {
         kind = ComponentKind.PLANT;
@@ -326,21 +329,26 @@ public class AutomatonSynchronousProductDialog extends JDialog
       } else {
         throw new IllegalStateException("Component kind not selected!");
       }
-//      final Map<String,String> attribs = mAttributesPanel.getTableData();
-//      final Map<String,String> autAttribs = mAutomaton.getAttributes();
-//      if (!attribs.equals(autAttribs) || !kind.equals(mAutomaton.getKind())
-//          || !ident.getPlainText().equals(mAutomaton.getName())) {
-//        final AutomatonProxy newAut =
-//          factory.createAutomatonProxy(ident.getPlainText(), kind,
-//                                       mAutomaton.getEvents(),
-//                                       mAutomaton.getStates(),
-//                                       mAutomaton.getTransitions(),
-//                                       mAutomaton.getAttributes());
-//
-//        final AutomataTableModel model =
-//          mAnalyzerPanel.getAutomataTableModel();
-//        model.replaceAutomaton(mAutomaton, newAut);
-//      }
+
+      final ProductDESProxy des =
+        AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
+                                             mAutomatonList, factory);
+      final TRSynchronousProductBuilder builder =
+        new TRSynchronousProductBuilder(des);
+      builder.setOutputName(name);
+      builder.setOutputKind(kind);
+      try {
+        builder.run();
+      } catch (final AnalysisException exception) {
+        final Logger logger = LogManager.getLogger();
+        final String msg = exception.getMessage();
+        logger.error(msg);
+      }
+      final TRSynchronousProductResult result = builder.getAnalysisResult();
+      final AutomatonProxy aut = result.getComputedProxy();
+      final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
+      model.insertRow(aut);
+
       // Close the dialog
       dispose();
     }
@@ -362,10 +370,57 @@ public class AutomatonSynchronousProductDialog extends JDialog
     return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
   }
 
+  private String getNewName()
+  {
+    String name = "";
+    if (mAutomatonList.size() <= 4)
+      for (final AutomatonProxy aut : mAutomatonList) {
+        if (aut.equals(mAutomatonList.get((mAutomatonList.size() - 1))))
+          name += aut.getName();
+        else
+          name += aut.getName() + "_";
+      }
+    else
+      name = "New Automaton";
+    return name;
+  }
+
+  private ComponentKind getKind()
+  {
+    int plantCount = 0;
+    int propCount = 0;
+    int specCount = 0;
+    int superCount = 0;
+    for (final AutomatonProxy aut : mAutomatonList) {
+      switch (aut.getKind()) {
+      case PLANT:
+        plantCount++;
+        break;
+      case PROPERTY:
+        propCount++;
+        break;
+      case SPEC:
+        specCount++;
+        break;
+      case SUPERVISOR:
+        superCount++;
+        break;
+      }
+
+    }
+    if(plantCount > specCount || plantCount > propCount ||plantCount > superCount)
+      return ComponentKind.PLANT;
+    else if(propCount > specCount || propCount > plantCount ||propCount > superCount)
+      return ComponentKind.PROPERTY;
+    else if(specCount > plantCount || specCount > propCount ||specCount > superCount)
+      return ComponentKind.SPEC;
+    else
+      return ComponentKind.SUPERVISOR;
+  }
+
   //#########################################################################
   //# Data Members
   // Dialog state
-  private final IDE mIDE;
   private final WatersAnalyzerPanel mAnalyzerPanel;
   @SuppressWarnings("unused")
   private final List<AutomatonProxy> mAutomatonList;

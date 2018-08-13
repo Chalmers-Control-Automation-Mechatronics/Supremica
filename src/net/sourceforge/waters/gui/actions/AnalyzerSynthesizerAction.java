@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
+import net.sourceforge.waters.gui.dialog.AutomatonSynthesizerDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.IDE;
@@ -50,16 +50,16 @@ import org.supremica.gui.ide.IDE;
  * @author George Hewlett
  */
 
-public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
+public class AnalyzerSynthesizerAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
   //# Constructor
-  AnalyzerSynchronousProductAction(final IDE ide)
+  AnalyzerSynthesizerAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Synchronise ...");
-    putValue(Action.SHORT_DESCRIPTION, "Synchronise the selected automata");
+    putValue(Action.NAME, "Synthesize ...");
+    putValue(Action.SHORT_DESCRIPTION, "Synthesize the selected automata");
     updateEnabledStatus();
   }
 
@@ -70,7 +70,7 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      new AutomatonSynchronousProductDialog(getAnalyzerPanel());
+      new AutomatonSynthesizerDialog(getAnalyzerPanel());
     }
   }
 
@@ -91,7 +91,7 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
     boolean enabled = false;
     final AutomataTable table = getAnalyzerTable();
     if (table != null) {
-      enabled = (table.getSelectedRowCount() >= 2);
+      enabled = (table.getSelectedRowCount() == 1);
     }
     setEnabled(enabled);
   }
