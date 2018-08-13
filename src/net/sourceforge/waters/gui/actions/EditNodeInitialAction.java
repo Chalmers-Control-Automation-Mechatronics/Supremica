@@ -35,8 +35,11 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphTools;
@@ -57,7 +60,25 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * <P>An action to change the initial-state status of a node.</P>
+ * <P>A popup menu action change the initial-state status of multiple
+ * selected nodes in a graph.</P>
+ *
+ * <P>This action is invoked with a selected action argument node in a graph.
+ * The effects of the action depend on the state of the node and the selection
+ * in the graph at the time when the action is created, i.e., when the popup
+ * menu appears, and on whether the automaton being edited is deterministic.</P>
+ * <UL>
+ * <LI>In a deterministic automaton, the action sets the argument node to
+ * initial and removes the initial state status from all other nodes in the
+ * graph. If the action argument already is the only initial node, the action
+ * is disabled.</LI>
+ * <LI>If the action argument node is not initial in a nondeterministic
+ * automaton, the initial status is added to the action argument node and all
+ * other nodes selected in the graph.</LI>
+ * <LI>If the action argument node is initial in a nondeterministic automaton,
+ * the initial status is removed from the action argument node and all other
+ * nodes selected in the graph.</LI>
+ * </UL>
  *
  * @author Robi Malik
  */
@@ -71,111 +92,132 @@ public class EditNodeInitialAction
   EditNodeInitialAction(final IDE ide, final Proxy arg)
   {
     super(ide);
-    mActionArgument = arg;
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_I);
-    updateEnabledStatus();
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  public void actionPerformed(final ActionEvent event)
-  {
-    final SimpleNodeSubject node = (SimpleNodeSubject) mActionArgument;
+    final SimpleNodeSubject node = (SimpleNodeSubject) arg;
+    mInitial = node.isInitial();
     final GraphSubject graph = (GraphSubject) node.getParent().getParent();
-    final EditCommand toggle = createToggleCommand(node);
-    Command cmd = toggle;
-    if (graph.isDeterministic()) {
-      if (node.isInitial()) {
-        if (!GraphTools.hasMultipleInitialStates(graph)) {
-          return;
-        }
-      } else {
-        final List<Command> cmds = new LinkedList<Command>();
-        final List<SimpleNodeSubject> changed =
-          new LinkedList<SimpleNodeSubject>();
-        for (final NodeSubject other : graph.getNodesModifiable()) {
-          if (other instanceof SimpleNodeSubject) {
-            final SimpleNodeSubject simple = (SimpleNodeSubject) other;
-            if (simple.isInitial()) {
-              final EditCommand edit = createToggleCommand(simple);
-              edit.setUpdatesSelection(false);
-              cmds.add(edit);
-              changed.add(simple);
-            }
-          }
-        }
-        if (!cmds.isEmpty()) {
-          changed.add(node);
-          final SelectionOwner panel = getCurrentSelectionOwner();
-          final String name = cmd.getName();
-          final CompoundCommand compound =
-            new UpdateCommand(changed, panel, name, true);
-          compound.addCommands(cmds);
-          toggle.setUpdatesSelection(false);
-          compound.addCommand(toggle);
-          cmd = compound;
-        }
-      }
-    }
-    final UndoInterface undoer = getActiveUndoInterface();
-    undoer.executeCommand(cmd);
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
-  {
-    final SimpleNodeSubject node = (SimpleNodeSubject) mActionArgument;
-    final GraphSubject graph = (GraphSubject) node.getParent().getParent();
-    if (graph.isDeterministic()) {
-      if (node.isInitial() && GraphTools.hasMultipleInitialStates(graph)) {
-        putValue(Action.NAME, "Clear Initial");
-        putValue(Action.SHORT_DESCRIPTION,
-                 "Remove the initial-state status of this node");
+    mDeterministic = graph.isDeterministic();
+    mPanel = getCurrentSelectionOwner();
+    if (mDeterministic) {
+      putValue(Action.NAME, "Set Initial");
+      putValue(Action.SHORT_DESCRIPTION,
+               "Set this state to be the initial state");
+      if (!mInitial || GraphTools.hasMultipleInitialStates(graph)) {
         setEnabled(true);
+        mNodes = Collections.singletonList(node);
       } else {
-        putValue(Action.NAME, "Set Initial");
-        putValue(Action.SHORT_DESCRIPTION,
-                 "Set this node to be the initial state");
-        setEnabled(!node.isInitial());
+        mNodes = null;
       }
     } else {
-      if (node.isInitial()) {
+      mNodes = new ArrayList<>();
+      mNodes.add(node);
+      for (final Proxy proxy : mPanel.getCurrentSelection()) {
+        if (proxy instanceof SimpleNodeSubject && proxy != node) {
+          final SimpleNodeSubject otherNode = (SimpleNodeSubject) proxy;
+          mNodes.add(otherNode);
+        }
+      }
+      final String description =
+        mNodes.size() == 1 ? "this state" : "the selected states";
+      if (mInitial) {
         putValue(Action.NAME, "Clear Initial");
         putValue(Action.SHORT_DESCRIPTION,
-                 "Remove the initial-state status of this node");
+                 "Remove the initial state status from " + description);
       } else {
         putValue(Action.NAME, "Set Initial");
         putValue(Action.SHORT_DESCRIPTION,
-                 "Set this node to be an initial state");
+                 "Set " + description + " to be initial");
       }
       setEnabled(true);
     }
   }
 
-  private EditCommand createToggleCommand(final SimpleNodeSubject node)
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent event)
   {
-    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-    final SimpleNodeSubject cloned = (SimpleNodeSubject) cloner.getClone(node);
-    final boolean initial = cloned.isInitial();
-    cloned.setInitial(!initial);
-    if (initial) {
-      cloned.setInitialArrowGeometry(null);
+    final List<SimpleNodeSubject> changed = new LinkedList<>();
+    final List<Command> commands = new LinkedList<Command>();
+    final String name;
+    if (mDeterministic) {
+      final SimpleNodeSubject node = mNodes.get(0);
+      createCommand(node, true, changed, commands);
+      final GraphSubject graph = (GraphSubject) node.getParent().getParent();
+      for (final NodeSubject other : graph.getNodesModifiable()) {
+        if (other != node && other instanceof SimpleNodeSubject) {
+          final SimpleNodeSubject simple = (SimpleNodeSubject) other;
+          createCommand(simple, false, changed, commands);
+        }
+      }
+      name = "Initial State Change";
+    } else {
+      final boolean newState = !mInitial;
+      for (final SimpleNodeSubject node : mNodes) {
+        createCommand(node, newState, changed, commands);
+      }
+      final String action = mInitial ? "Clear" : "Set";
+      name = action + " Initial State";
     }
-    final SelectionOwner panel = getCurrentSelectionOwner();
-    return new EditCommand(node, cloned, panel, "Initial State Change");
+    if (!commands.isEmpty()) {
+      final CompoundCommand compound =
+        new UpdateCommand(changed, mPanel, name, true);
+      compound.addCommands(commands);
+      final UndoInterface undoer = mPanel.getUndoInterface(this);
+      undoer.executeCommand(compound);
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void createCommand(final SimpleNodeSubject node,
+                             final boolean newState,
+                             final List<SimpleNodeSubject> changed,
+                             final List<Command> commands)
+  {
+    final boolean initial = node.isInitial();
+    if (initial != newState) {
+      changed.add(node);
+      final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+      final SimpleNodeSubject cloned = (SimpleNodeSubject) cloner.getClone(node);
+      cloned.setInitial(newState);
+      cloned.setInitialArrowGeometry(null);
+      final SelectionOwner panel = getCurrentSelectionOwner();
+      final Command cmd =
+        new EditCommand(node, cloned, panel, "Initial State Change");
+      cmd.setUpdatesSelection(false);
+      commands.add(cmd);
+    }
   }
 
 
   //#########################################################################
   //# Data Members
-  private final Proxy mActionArgument;
+  /**
+   * Whether or not the action argument node has the initial state status
+   * at the time the action is invoked.
+   */
+  private final boolean mInitial;
+  /**
+   * Whether or not the edited graph is deterministic at the time the
+   * action is invoked.
+   */
+  private final boolean mDeterministic;
+  /**
+   * The selected nodes that should be modified by the action.
+   * The action argument appears first in the list.
+   */
+  private final List<SimpleNodeSubject> mNodes;
+  /**
+   * The graph editor panel containing the nodes to be modified.
+   */
+  private final SelectionOwner mPanel;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -1299013497320466998L;
 
 }
