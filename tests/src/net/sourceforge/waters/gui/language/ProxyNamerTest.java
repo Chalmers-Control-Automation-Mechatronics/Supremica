@@ -38,6 +38,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -53,9 +56,6 @@ import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 public class ProxyNamerTest extends AbstractWatersTest
@@ -217,7 +217,7 @@ public class ProxyNamerTest extends AbstractWatersTest
   {
     final SimpleNodeProxy simple = mFactory.createSimpleNodeProxy("s0");
     final GroupNodeProxy group = mFactory.createGroupNodeProxy("g0");
-    testName("Nodes", simple, group);
+    testName("States", simple, group);
   }
 
 
