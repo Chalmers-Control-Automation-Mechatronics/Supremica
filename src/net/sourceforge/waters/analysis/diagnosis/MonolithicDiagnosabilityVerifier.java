@@ -62,10 +62,12 @@ import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
@@ -425,7 +427,6 @@ public class MonolithicDiagnosabilityVerifier
     final long succState = indexStateMap.get(sccRoot);
     int succA = ((int)(succState>>>32));
     int succB = ((int)succState);
-    @SuppressWarnings("unused")
     int event,predA,predB,loopIndexA,loopIndexB;
     do{
       expandBack(succA,succB,backProcessor);
@@ -455,8 +456,7 @@ public class MonolithicDiagnosabilityVerifier
       if(eventObservable[event]) {
         addStep((succA&MsbMask),event,traceA);
         addStep((succB&MsbMask),event,traceB);
-        loopIndexA++;
-        loopIndexB++;
+        loopIndexA++;loopIndexB++;
       }else {
         if(succA!=predA) {
           addStep((succA&MsbMask),event,traceA);
@@ -469,18 +469,21 @@ public class MonolithicDiagnosabilityVerifier
       succA = predA;
       succB = predB;
     }
-    /*
-     * TODO Use DualCounterExampleProxy
-    final String nameA = getModel().getName()+"DiagFaultTrace";
-    final String nameB = getModel().getName()+"DiagFaultFreeTrace";
-    final LoopTraceProxy counterExampleA
-      = getFactory().createLoopTraceProxy(nameA, null, null, getModel(), spStateMap.getInputAutomata(),traceA , loopIndexA);
-    @SuppressWarnings("unused")
-    final LoopTraceProxy counterExampleB
-      = getFactory().createLoopTraceProxy(nameB, null, null, getModel(), spStateMap.getInputAutomata(),traceB , loopIndexB);
-    return counterExampleA;
-    */
-    return null;
+    addStep((succA&MsbMask),-1,traceA);
+    addStep((succB&MsbMask),-1,traceB);
+    loopIndexA++;loopIndexB++;
+
+    final String nameA = "faulty";
+    final String nameB = "non-faulty";
+    final String ceName = getModel().getName()+"-undiagnosable";
+    final String ceComment = "The fault-class "+faultClass+" is not diagnosable.";
+    final TraceProxy tpA
+      = getFactory().createTraceProxy(nameA, traceA, loopIndexA);
+    final TraceProxy tpB
+      = getFactory().createTraceProxy(nameB, traceB, loopIndexB);
+    final DualCounterExampleProxy counterExample
+      = getFactory().createDualCounterExampleProxy(ceName, ceComment, null, getModel(), spStateMap.getInputAutomata(), tpA, tpB);
+    return counterExample;
   }
 
   private void addStep(final int stateIndex, final int eventIndex, final List<TraceStepProxy> trace)
@@ -488,7 +491,12 @@ public class MonolithicDiagnosabilityVerifier
     final Map<AutomatonProxy,StateProxy> autStateMap = new HashMap<AutomatonProxy,StateProxy>();
     final Collection<AutomatonProxy> auts = spStateMap.getInputAutomata();
     final StateProxy state = sp.getState(stateIndex);
-    final EventProxy event = spEvents.getProperEvent(eventIndex);
+    final EventProxy event;
+    if(eventIndex != -1) {
+      event = spEvents.getProperEvent(eventIndex);
+    }else {
+      event = null;
+    }
     for(final AutomatonProxy a : auts) {
       final StateProxy s = spStateMap.getOriginalState(state, a);
       autStateMap.put(a, s);
