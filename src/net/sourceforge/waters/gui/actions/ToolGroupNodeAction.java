@@ -47,7 +47,7 @@ public class ToolGroupNodeAction
   //# Constructors
   public ToolGroupNodeAction(final IDE ide)
   {
-    super(ide, "Group nodes", "Create group nodes",
+    super(ide, "Group states", "Create group states",
           IconAndFontLoader.ICON_TOOL_GROUP_NODE, IDEToolBar.Tool.GROUPNODE);
   }
 
