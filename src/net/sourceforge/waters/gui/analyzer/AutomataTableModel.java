@@ -175,9 +175,9 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   public void replaceAutomaton(final AutomatonProxy oldAut, final AutomatonProxy newAut) {
     int i = 0;
     for(final AutomatonProxy aut : mAutomataList) {
+      // TODO Use object identity, not name
       if(aut.getName().equals(oldAut.getName()) == true) {
-        mAutomataList.remove(i);
-        mAutomataList.add(i, newAut);
+        mAutomataList.set(i, newAut);
         break;
       }
       i++;

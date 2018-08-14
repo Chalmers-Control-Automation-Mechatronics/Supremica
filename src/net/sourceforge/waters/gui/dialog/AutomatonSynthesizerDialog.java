@@ -230,6 +230,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     constraints.fill = GridBagConstraints.HORIZONTAL;
     mainlayout.setConstraints(mNameInput, constraints);
     mMainPanel.add(mNameInput);
+    // TODO No selection of kind in synthesis
     // mKindLabel
     constraints.gridx = 0;
     constraints.gridy++;
@@ -256,25 +257,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     constraints.gridx++;
     mainlayout.setConstraints(mSupervisorButton, constraints);
     mMainPanel.add(mSupervisorButton);
-
-    //    constraints.gridx = 0;
-    //    constraints.gridy++;
-    //    constraints.gridwidth = 1;
-    //    constraints.weightx = 0.0;
-    //    constraints.weighty = 1.0;
-    //    constraints.fill = GridBagConstraints.NONE;
-    //    constraints.anchor = GridBagConstraints.NORTHWEST;
-    //    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
-    //    mainlayout.setConstraints(attributesLabel, constraints);
-    //    mMainPanel.add(attributesLabel);
-    //
-    //    constraints.gridx++;
-    //    constraints.gridwidth = 2;
-    //    constraints.weightx = 3.0;
-    //    constraints.fill = GridBagConstraints.BOTH;
-    //    mainlayout.setConstraints(mAttributesPanel, constraints);
-    //    mMainPanel.add(mAttributesPanel);
-    // Attributes, error, and buttons panel do not need layouting.
 
     // Finally, build the full dialog ...
     final Container contents = getContentPane();
@@ -430,7 +412,6 @@ public class AutomatonSynthesizerDialog extends JDialog
   //# Data Members
   // Dialog state
   private final WatersAnalyzerPanel mAnalyzerPanel;
-  @SuppressWarnings("unused")
   private final List<AutomatonProxy> mAutomatonList;
 
   // Swing components
@@ -447,17 +428,6 @@ public class AutomatonSynthesizerDialog extends JDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  // Created Item
-  /**
-   * <P>
-   * The Waters Automaton edited by this dialog.
-   * </P>
-   *
-   * <P>
-   * The edited automaton is stored only in the dialog. Changes are only
-   * committed to the original automaton when the OK button is pressed.
-   * </P>
-   */
 
   //#########################################################################
   //# Class Constants

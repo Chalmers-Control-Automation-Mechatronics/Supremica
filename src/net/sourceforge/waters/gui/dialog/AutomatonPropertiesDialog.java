@@ -111,7 +111,6 @@ public class AutomatonPropertiesDialog extends JDialog
    */
   private void createComponents()
   {
-    // TODO Make parser
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final ExpressionParser parser = new ExpressionParser(factory, optable);
@@ -133,7 +132,6 @@ public class AutomatonPropertiesDialog extends JDialog
     }
     mNameInput =
       new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
-    //mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -164,6 +162,7 @@ public class AutomatonPropertiesDialog extends JDialog
       break;
     }
 
+    // Attributes panel ...
     mAttributesPanel =
       new AutomatonAttributesPanel(mAutomaton.getAttributes());
 
@@ -303,10 +302,6 @@ public class AutomatonPropertiesDialog extends JDialog
       // Do not try to commit.
     } else {
       // Read the data from the dialog ...
-//      final IdentifierSubject ident0 =
-//        (IdentifierSubject) mNameInput.getValue();
-//      final IdentifierSubject ident =
-//        ident0.getParent() == null ? ident0 : ident0.clone();
       final String name = mNameInput.getText();
       final ComponentKind kind;
       if (mPlantButton.isSelected()) {
@@ -320,6 +315,7 @@ public class AutomatonPropertiesDialog extends JDialog
       } else {
         throw new IllegalStateException("Component kind not selected!");
       }
+      // TODO Use attributes from dialog
       final Map<String,String> attribs = mAttributesPanel.getTableData();
       final Map<String,String> autAttribs = mAutomaton.getAttributes();
       if (!attribs.equals(autAttribs) || !kind.equals(mAutomaton.getKind())

@@ -150,6 +150,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractSupervisorSimplifier
+  @Override
+  public boolean isSupervisedEventRequired()
+  {
+    return true;
+  }
+
+
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override

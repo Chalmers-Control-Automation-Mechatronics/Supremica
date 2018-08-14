@@ -90,7 +90,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 
-    setTitle("Synchronizing automatons'");
+    setTitle("Synchronous product");
     createComponents();
     layoutComponents();
 
@@ -119,7 +119,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
   /**
    * Initialise buttons and components.
    */
-  @SuppressWarnings("null")
   private void createComponents()
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -255,25 +254,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
     mainlayout.setConstraints(mSupervisorButton, constraints);
     mMainPanel.add(mSupervisorButton);
 
-    //    constraints.gridx = 0;
-    //    constraints.gridy++;
-    //    constraints.gridwidth = 1;
-    //    constraints.weightx = 0.0;
-    //    constraints.weighty = 1.0;
-    //    constraints.fill = GridBagConstraints.NONE;
-    //    constraints.anchor = GridBagConstraints.NORTHWEST;
-    //    final JLabel attributesLabel = new JLabel(AttributesPanel.LABEL_NAME);
-    //    mainlayout.setConstraints(attributesLabel, constraints);
-    //    mMainPanel.add(attributesLabel);
-    //
-    //    constraints.gridx++;
-    //    constraints.gridwidth = 2;
-    //    constraints.weightx = 3.0;
-    //    constraints.fill = GridBagConstraints.BOTH;
-    //    mainlayout.setConstraints(mAttributesPanel, constraints);
-    //    mMainPanel.add(mAttributesPanel);
-    // Attributes, error, and buttons panel do not need layouting.
-
     // Finally, build the full dialog ...
     final Container contents = getContentPane();
     final GridBagLayout layout = new GridBagLayout();
@@ -312,10 +292,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
       // Do not try to commit.
     } else {
       // Read the data from the dialog ...
-      //      final IdentifierSubject ident0 =
-      //        (IdentifierSubject) mNameInput.getValue();
-      //      final IdentifierSubject ident =
-      //        ident0.getParent() == null ? ident0 : ident0.clone();
       final String name = mNameInput.getText();
       final ComponentKind kind;
       if (mPlantButton.isSelected()) {
@@ -381,7 +357,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
           name += aut.getName() + "_";
       }
     else
-      name = "New Automaton";
+      name = "sync";
     return name;
   }
 
@@ -408,6 +384,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
       }
 
     }
+    // TODO if (plantCount > 0) then PLANT; else if (specCount > 0) ...
     if(plantCount > specCount || plantCount > propCount ||plantCount > superCount)
       return ComponentKind.PLANT;
     else if(propCount > specCount || propCount > plantCount ||propCount > superCount)
@@ -422,7 +399,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
   //# Data Members
   // Dialog state
   private final WatersAnalyzerPanel mAnalyzerPanel;
-  @SuppressWarnings("unused")
   private final List<AutomatonProxy> mAutomatonList;
 
   // Swing components
@@ -439,17 +415,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
-  // Created Item
-  /**
-   * <P>
-   * The Waters Automaton edited by this dialog.
-   * </P>
-   *
-   * <P>
-   * The edited automaton is stored only in the dialog. Changes are only
-   * committed to the original automaton when the OK button is pressed.
-   * </P>
-   */
 
   //#########################################################################
   //# Class Constants
