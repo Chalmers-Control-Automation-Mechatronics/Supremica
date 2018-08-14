@@ -722,7 +722,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // re-encode states (make only one bad state)
       final int markingID = 0;
       mTransitionRelation =
-        new ListBufferTransitionRelation("supervisor",
+        new ListBufferTransitionRelation(getOutputName(),
                                          ComponentKind.SUPERVISOR,
                                          mEventEncoding,
                                          mNumGoodStates,
