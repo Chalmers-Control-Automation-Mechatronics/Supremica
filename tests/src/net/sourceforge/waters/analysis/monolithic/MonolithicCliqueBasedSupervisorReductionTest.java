@@ -96,9 +96,9 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     }
 
     if (reductionStatistics != null) {
-      System.out.println("Overall stats for " + des.getName());
+      //System.out.println("Overall stats for " + des.getName());
       //a System.out.println(reductionStatistics.toString()) just gives me the default .toString() implementation
-      System.out.println(reductionStatistics.toString());
+      //System.out.println(reductionStatistics.toString());
     }
     return result;
   }

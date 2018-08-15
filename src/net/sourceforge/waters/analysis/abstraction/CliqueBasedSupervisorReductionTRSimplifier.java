@@ -34,7 +34,6 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.TIntCollection;
-import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -50,6 +49,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Random;
 
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -78,16 +78,19 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     super(rel);
   }
 
+
   public enum HeuristicCoverStrategy
   {
-    NONE, SUCCESSOR, PREDECESSOR, SUCCESSOR_PREDECESSOR, NEIGHBOUR, RANDOM
+    NONE, CONNECTIVITY, NEIGHBOUR, AGE, MIXED
   }
 
   //#########################################################################
   //# Configuration
   /**
-   * Retrieves the search strategy for finding maximal covers.
-   * If this is set to NONE then no heuristics are used to speed up the clique cover search and a full search is performed.
+   * Retrieves the search strategy for finding maximal covers. If this is set
+   * to NONE then no heuristics are used to speed up the clique cover search
+   * and a full search is performed.
+   *
    * @return The strategy used to produce clique covers.
    */
   public HeuristicCoverStrategy getHeuristicCoverStrategy()
@@ -96,8 +99,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   /**
-   * Sets the search strategy for finding maximal covers.
-   * If this is set to NONE then no heuristics are used to speed up the clique cover search and a full search is performed, and
+   * Sets the search strategy for finding maximal covers. If this is set to
+   * NONE then no heuristics are used to speed up the clique cover search and
+   * a full search is performed, and
    *
    * @param heuristicCoverStrategy
    *          The strategy used to produce clique covers.
@@ -108,36 +112,57 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   /**
-   * Retrieves whether the algorithm finishes after it first finds a valid reduced solution.
-   * @return Whether the algorithm finishes after finding its first valid reduced solution, or explores all solutions for the most reduced.
+   * Retrieves whether the algorithm finishes after it first finds a valid
+   * reduced solution.
+   *
+   * @return Whether the algorithm finishes after finding its first valid
+   *         reduced solution, or explores all solutions for the most reduced.
    */
-  public boolean getIsFindFirst() {
+  public boolean getIsFindFirst()
+  {
     return mIsFindFirst;
   }
 
   /**
-   * Sets whether the algorithm finishes after it first finds a valid reduced solution.
-   * @param isFindFirst Whether the algorithm should finish after finding its first valid reduced solution, or explore all solutions for the most reduced.
+   * Sets whether the algorithm finishes after it first finds a valid reduced
+   * solution.
+   *
+   * @param isFindFirst
+   *          Whether the algorithm should finish after finding its first
+   *          valid reduced solution, or explore all solutions for the most
+   *          reduced.
    */
-  public void setIsFindFirst(final boolean isFindFirst) {
+  public void setIsFindFirst(final boolean isFindFirst)
+  {
     mIsFindFirst = isFindFirst;
   }
 
   /**
-   * Retrieves the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
-   * This value is ignored if the HeuristicCoverStrategy is set to NONE because a full maximal clique search is performed.
-   * @return the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   * Retrieves the maximum number of covers to be collected by heuristic
+   * variants of the clique cover algorithm. This value is ignored if the
+   * HeuristicCoverStrategy is set to NONE because a full maximal clique
+   * search is performed.
+   *
+   * @return the maximum number of covers to be collected by heuristic
+   *         variants of the clique cover algorithm.
    */
-  public int getMaxHeuristicCovers() {
+  public int getMaxHeuristicCovers()
+  {
     return mMaxHeuristicCovers;
   }
 
   /**
-   * Sets the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
-   * This value is ignored if the HeuristicCoverStrategy is set to NONE because a full maximal clique search is performed.
-   * @param maxHeuristicCovers the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   * Sets the maximum number of covers to be collected by heuristic variants
+   * of the clique cover algorithm. This value is ignored if the
+   * HeuristicCoverStrategy is set to NONE because a full maximal clique
+   * search is performed.
+   *
+   * @param maxHeuristicCovers
+   *          the maximum number of covers to be collected by heuristic
+   *          variants of the clique cover algorithm.
    */
-  public void setMaxHeuristicCovers(final int maxHeuristicCovers) {
+  public void setMaxHeuristicCovers(final int maxHeuristicCovers)
+  {
     mMaxHeuristicCovers = maxHeuristicCovers;
   }
 
@@ -150,7 +175,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-
   //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.analysis.abstraction.AbstractSupervisorSimplifier
@@ -159,7 +183,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     return true;
   }
-
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -170,8 +193,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     final ListBufferTransitionRelation relation = getTransitionRelation();
 
-    mSuccessorTransitionIterator = relation.createSuccessorsReadOnlyIterator();
-    mPredecessorTransitionIterator = relation.createPredecessorsReadOnlyIterator();
+    mSuccessorTransitionIterator =
+      relation.createSuccessorsReadOnlyIterator();
+    mPredecessorTransitionIterator =
+      relation.createPredecessorsReadOnlyIterator();
 
     mDumpState = relation.getDumpStateIndex();
     mNumStates = relation.getNumberOfStates();
@@ -215,7 +240,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    System.out.println("*** Starting reduction on supervised event " + getSupervisedEvent() + " ***");
+    System.out.println("*** Starting reduction on supervised event "
+                       + getSupervisedEvent() + " ***");
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<Candidate> searchSpace =
       new PriorityQueue<>(new Comparator<Candidate>() {
@@ -227,23 +253,50 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       });
 
-    final Candidate startingCandidate = new Candidate(mNumStates);
-    startingCandidate.addDependency(mInitialCompatibleId);
+    final Candidate searchCandidate = new Candidate(mNumStates);
+    searchCandidate.addDependency(mInitialCompatibleId);
+    searchSpace.add(searchCandidate);
 
-    searchSpace.add(startingCandidate);
+    final CoverStrategy coverStrategy =
+      mHeuristicCoverStrategy == HeuristicCoverStrategy.NONE
+        ? new BronKerboschCoverStrategy()
+        : new HeuristicBronKerboschCoverStrategy();
+    final Searcher searcher =
+      new Searcher(coverStrategy, new RecursiveDependencyStrategy(),
+                   !mIsFindFirst);
+    final Candidate closedSolution = searcher.reduce(searchSpace, mNumStates);
 
-    final CoverStrategy coverStrategy = mHeuristicCoverStrategy == HeuristicCoverStrategy.NONE ? new BronKerboschCoverStrategy() : new HeuristicBronKerboschCoverStrategy();
-    final Searcher searcher = new Searcher(coverStrategy, new RecursiveDependencyStrategy());
-    final Candidate reducedSupervisor = searcher.reduce(searchSpace, mNumStates);
-
-    if (reducedSupervisor == null
-        || reducedSupervisor.size() + 1 >= mNumStates) {
+    if (closedSolution == null) {
       System.out.println("\nCould not reduce supervisor");
       return false;
     }
 
     System.out.println("");
-    return buildReducedSupervisor(reducedSupervisor);
+    System.out.println("Completed initial search with " + closedSolution);
+
+    searchSpace.clear();
+    final Candidate optimiserCandidate = new Candidate(closedSolution.size());
+    optimiserCandidate.addDependency(mInitialCompatibleId);
+    searchSpace.add(optimiserCandidate);
+
+    final Searcher optimiser =
+      new Searcher(new PrecomputedCoverStrategy(closedSolution.toArray()),
+                   new SimpleDependencyStrategy(), true);
+    final Candidate optimisedSupervisor =
+      optimiser.reduce(searchSpace, closedSolution.size());
+
+    if (optimisedSupervisor == null
+        && closedSolution.size() + 1 < mNumStates) {
+      buildReducedSupervisor(closedSolution);
+      return true;
+    } else if (optimisedSupervisor != null
+               && optimisedSupervisor.size() + 1 < mNumStates) {
+      buildReducedSupervisor(optimisedSupervisor);
+      return true;
+    }
+
+    System.out.println("\nCould not reduce supervisor");
+    return false;
   }
 
   @Override
@@ -267,17 +320,26 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     super.tearDown();
   }
 
-  private class Searcher {
+
+  private class Searcher
+  {
 
     private final CoverStrategy coverStrategy;
     private final DependencyStrategy dependencyStrategy;
+    private final boolean isFullSearch;
 
-    public Searcher(final CoverStrategy coverStrategy, final DependencyStrategy dependencyStrategy) {
+    public Searcher(final CoverStrategy coverStrategy,
+                    final DependencyStrategy dependencyStrategy,
+                    final boolean isFullSearch)
+    {
       this.coverStrategy = coverStrategy;
       this.dependencyStrategy = dependencyStrategy;
+      this.isFullSearch = isFullSearch;
     }
 
-    public Candidate reduce(final PriorityQueue<Candidate> searchSpace, final int maximumSize) {
+    public Candidate reduce(final PriorityQueue<Candidate> searchSpace,
+                            final int maximumSize)
+    {
       Candidate reducedSupervisor = null;
       int reducedSupervisorSize = maximumSize;
 
@@ -295,7 +357,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
         //get all ids of compatibles covering this compatible
         getCompatibleFromCache(nextCompatibleId, mCompatibleBuffer);
-        final TIntList coverIds = coverStrategy.getCoversOf(mCompatibleBuffer);
+        final TIntList coverIds =
+          coverStrategy.getCoversOf(mCompatibleBuffer);
         final int coverIdsSize = coverIds.size();
 
         for (int c = 0; c < coverIdsSize; c++) {
@@ -320,7 +383,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                                     mDependencyIdBuffer);
 
           //apply the new things we know we need to cover to the solution using the specified strategy
-          dependencyStrategy.processNewDependencies(newSolution, mDependencyIdBuffer);
+          dependencyStrategy.processNewDependencies(newSolution,
+                                                    mDependencyIdBuffer);
 
           //if solution is complete and more reduced, save it
           if (newSolution.size() < reducedSupervisorSize
@@ -329,7 +393,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             reducedSupervisor = newSolution;
             reducedSupervisorSize = reducedSupervisor.size();
             System.out.println(newSolution + " -- New Best");
-            if (mIsFindFirst) {
+            if (isFullSearch) {
+              continue;
+            } else {
               searchSpace.clear();
               return reducedSupervisor;
             }
@@ -339,6 +405,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           if (newSolution.size() + 1 >= reducedSupervisorSize) {
             continue;
           }
+
+          //only add to search space if we didn't encounter a complete solution that was smaller, or a solution that was too big
           searchSpace.add(newSolution);
         }
       }
@@ -346,21 +414,42 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private interface CoverStrategy {
+
+  private interface CoverStrategy
+  {
     public TIntList getCoversOf(TIntList compatible);
   }
 
-  private interface DependencyStrategy {
-    public void processNewDependencies(Candidate solution, TIntList newDependencies);
+
+  private interface DependencyStrategy
+  {
+    public void processNewDependencies(Candidate solution,
+                                       TIntList newDependencies);
   }
 
-  private class RecursiveDependencyStrategy implements DependencyStrategy {
+
+  private class SimpleDependencyStrategy implements DependencyStrategy
+  {
+
+    @Override
+    public void processNewDependencies(final Candidate solution,
+                                       final TIntList newDependencies)
+    {
+      solution.addAllDependencies(newDependencies);
+    }
+
+  }
+
+
+  private class RecursiveDependencyStrategy implements DependencyStrategy
+  {
 
     /**
-     * Determines which of the dependent compatibles only has one maximal cover.
-     * These can be added directly to the candidate solution rather than the
-     * queue of dependencies. Adding a compatible to the candidate solution may
-     * introduce more dependencies, so this is done until saturation.
+     * Determines which of the dependent compatibles only has one maximal
+     * cover. These can be added directly to the candidate solution rather
+     * than the queue of dependencies. Adding a compatible to the candidate
+     * solution may introduce more dependencies, so this is done until
+     * saturation.
      *
      * @param candidate
      *          The candidate solution to which we want to add compatibles
@@ -398,7 +487,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             mDependencyIdBuffer.clear();
             mEnabledEventsBuffer.clear();
             //get the compatible ids of its successors
-            getSuccessorCompatiblesOf(singleMaximalCover, mEnabledEventsBuffer,
+            getSuccessorCompatiblesOf(singleMaximalCover,
+                                      mEnabledEventsBuffer,
                                       mDependencyIdBuffer);
 
             for (int j = 0; j < mDependencyIdBuffer.size(); j++) {
@@ -448,7 +538,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private class BronKerboschCoverStrategy implements CoverStrategy {
+
+  private class BronKerboschCoverStrategy implements CoverStrategy
+  {
 
     @Override
     public TIntList getCoversOf(final TIntList compatible)
@@ -545,20 +637,21 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private class HeuristicBronKerboschCoverStrategy implements CoverStrategy {
-    private final StateComparator activeComparator;
 
-    public HeuristicBronKerboschCoverStrategy() {
-      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR) {
-        activeComparator = new SuccessorComparator();
-      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.PREDECESSOR) {
-        activeComparator = new PredecessorComparator();
-      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR_PREDECESSOR) {
-        activeComparator = new SuccessorPredecessorComparator();
+  private class HeuristicBronKerboschCoverStrategy implements CoverStrategy
+  {
+    private StateComparator activeComparator;
+
+    public HeuristicBronKerboschCoverStrategy()
+    {
+      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.CONNECTIVITY) {
+        activeComparator = new ConnectivityComparator();
       } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.NEIGHBOUR) {
-        activeComparator = new MostCompatibleComparator();
+        activeComparator = new NeighbourComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.AGE) {
+        activeComparator = new AgeComparator();
       } else {
-        activeComparator = new RandomComparator();
+        activeComparator = new MixedComparator();
       }
     }
 
@@ -570,7 +663,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       getNeighboursOf(compatible, possibleAdditions);
 
       activeComparator.setClique(compatible);
-      final WatersIntHeap sortedAdditions = new WatersIntHeap(possibleAdditions.toArray(), activeComparator);
+      final WatersIntHeap sortedAdditions =
+        new WatersIntHeap(possibleAdditions.toArray(), activeComparator);
 
       final TIntSet maximalCompatibleIdsSet = new TIntHashSet();
       heuristicBronKerbosch(compatible, sortedAdditions,
@@ -598,7 +692,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
         activeComparator.setClique(newClique);
         //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
-        final WatersIntHeap newPossibleAdditions = new WatersIntHeap(possibleAdditions.size(), activeComparator);
+        final WatersIntHeap newPossibleAdditions =
+          new WatersIntHeap(possibleAdditions.size(), activeComparator);
         final int[] additionsArray = possibleAdditions.toArray();
         for (int i = 0; i < additionsArray.length; i++) {
           final int oldPossibleAddition = additionsArray[i];
@@ -612,20 +707,26 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                               maximalCliquesIdsToFill);
 
         //exit early if we have found enough
-        if ((mMaxHeuristicCovers < 1 && !maximalCliquesIdsToFill.isEmpty()) || (mMaxHeuristicCovers > 1 && maximalCliquesIdsToFill.size() >= mMaxHeuristicCovers)) {
+        if ((mMaxHeuristicCovers < 1 && !maximalCliquesIdsToFill.isEmpty())
+            || (mMaxHeuristicCovers > 1
+                && maximalCliquesIdsToFill.size() >= mMaxHeuristicCovers)) {
           return;
         }
       }
     }
 
-    private abstract class StateComparator implements WatersIntComparator {
+
+    private abstract class StateComparator implements WatersIntComparator
+    {
       protected TIntList clique;
 
-      public void setClique(final TIntList clique) {
+      public void setClique(final TIntList clique)
+      {
         this.clique = clique;
       }
 
-      protected int successorCostSingle(final int state) {
+      protected int successorCostSingle(final int state)
+      {
         mSetBuffer.clear();
         getSuccessorStates(state, mSetBuffer);
         int matches = 0;
@@ -637,7 +738,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
-      protected int predecessorCostSingle(final int state) {
+      protected int predecessorCostSingle(final int state)
+      {
         mSetBuffer.clear();
         getPredecessorStates(state, mSetBuffer);
         int matches = 0;
@@ -650,7 +752,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       @SuppressWarnings("unused")
-      protected int successorCostMultiple(final int state) {
+      protected int successorCostMultiple(final int state)
+      {
         mListBuffer.clear();
         getSuccessorStates(state, mListBuffer);
         int matches = 0;
@@ -662,9 +765,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
-
       @SuppressWarnings("unused")
-      protected int predecessorCostMultiple(final int state) {
+      protected int predecessorCostMultiple(final int state)
+      {
         mListBuffer.clear();
         getPredecessorStates(state, mListBuffer);
         int matches = 0;
@@ -676,53 +779,95 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         return matches;
       }
 
-      protected int neighbourCost(final int state) {
+      protected int neighbourCost(final int state)
+      {
         return mNumStates - mStateToNeighbourCountMap.get(state);
       }
     }
 
-    private class SuccessorPredecessorComparator extends StateComparator {
+
+    private class ConnectivityComparator extends StateComparator
+    {
 
       @Override
       public int compare(final int state1, final int state2)
       {
-        final int cost1 = successorCostSingle(state1) + predecessorCostSingle(state1);
-        final int cost2 = successorCostSingle(state2) + predecessorCostSingle(state2);
-        return Integer.compare(cost1, cost2);
+        return Integer
+          .compare(successorCostSingle(state1)
+                   + predecessorCostSingle(state1),
+                   successorCostSingle(state2) + predecessorCostSingle(state2));
       }
     }
 
-    private class SuccessorComparator extends StateComparator {
-      @Override
-      public int compare(final int state1, final int state2)
-      {
-        return Integer.compare(successorCostSingle(state1), successorCostSingle(state2));
-      }
-    }
-
-    private class PredecessorComparator extends StateComparator {
-      @Override
-      public int compare(final int state1, final int state2)
-      {
-        return Integer.compare(predecessorCostSingle(state1), predecessorCostSingle(state2));
-      }
-    }
-
-    private class MostCompatibleComparator extends StateComparator {
+    private class NeighbourComparator extends StateComparator
+    {
       @Override
       public int compare(final int state1, final int state2)
       {
         return Integer.compare(neighbourCost(state1), neighbourCost(state2));
       }
-
     }
 
-    private class RandomComparator extends StateComparator {
+
+    private class AgeComparator extends StateComparator
+    {
       @Override
-      public int compare(final int val1, final int val2)
+      public int compare(final int state1, final int state2)
       {
-        return Integer.compare(HashFunctions.hash(val1), HashFunctions.hash(val1));
+        return Integer.compare(state1, state2);
       }
+    }
+
+    private class MixedComparator extends StateComparator {
+      private StateComparator innerComparator = new ConnectivityComparator();
+      private final Random random = new Random(1);
+
+      @Override
+      public void setClique(final TIntList clique)
+      {
+        final double randomValue = random.nextDouble();
+        if (randomValue < 0.5) {
+          innerComparator = new ConnectivityComparator();
+        } else if (randomValue < 0.7) {
+          innerComparator = new AgeComparator();
+        } else if (randomValue < 0.9) {
+          innerComparator = new NeighbourComparator();
+        }
+        innerComparator.setClique(clique);
+      }
+
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return innerComparator.compare(state1, state2);
+      }
+    }
+  }
+
+
+  private class PrecomputedCoverStrategy implements CoverStrategy
+  {
+    private final int[] precomputedCompatibleIds;
+
+    public PrecomputedCoverStrategy(final int[] precomputedCompatibleIds)
+    {
+      this.precomputedCompatibleIds = precomputedCompatibleIds;
+    }
+
+    @Override
+    public TIntList getCoversOf(final TIntList compatible)
+    {
+      compatible.sort();
+      final int compatibleId = mCompatibleCache.add(compatible);
+      final TIntList coverIds =
+        new TIntArrayList(precomputedCompatibleIds.length);
+      for (int i = 0; i < precomputedCompatibleIds.length; i++) {
+        final int potentialCoverId = precomputedCompatibleIds[i];
+        if (mCompatibleCache.containsAll(potentialCoverId, compatibleId)) {
+          coverIds.add(potentialCoverId);
+        }
+      }
+      return coverIds;
     }
   }
 
@@ -842,11 +987,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     relation.checkReachability();
     if (relation.removeUnreachableTransitions()) {
-      System.out.println("Removed " + (newSupervisor.length - relation.getNumberOfStates()) + " unreachable states");
+      System.out
+        .println("Removed "
+                 + (newSupervisor.length - relation.getNumberOfStates())
+                 + " unreachable states");
     }
 
     getLogger().info(relation.getNumberOfStates());
-    System.out.println("Reduced to " + relation.getNumberOfStates() + " states from " + mNumStates);
+    System.out.println("Reduced to " + relation.getNumberOfStates()
+                       + " states from " + mNumStates);
 
     return true;
   }
@@ -966,7 +1115,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     mSuccessorTransitionIterator.reset(source, -1);
     while (mSuccessorTransitionIterator.advance()) {
-      successorStatesToFill.add(mSuccessorTransitionIterator.getCurrentTargetState());
+      successorStatesToFill
+        .add(mSuccessorTransitionIterator.getCurrentTargetState());
     }
   }
 
@@ -985,7 +1135,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     mSuccessorTransitionIterator.reset(source, -1);
     while (mSuccessorTransitionIterator.advance()) {
-      successorEventsToFill.add(mSuccessorTransitionIterator.getCurrentEvent());
+      successorEventsToFill
+        .add(mSuccessorTransitionIterator.getCurrentEvent());
     }
   }
 
@@ -1307,6 +1458,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return false;
     }
 
+    public void addAllDependencies(final TIntList dependencyList)
+    {
+      for (int i = 0; i < dependencyList.size(); i++) {
+        addDependency(dependencyList.get(i));
+      }
+    }
+
     public int dependenciesSize()
     {
       return dependencies.size();
@@ -1351,7 +1509,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mIsFindFirst = false;
-  private HeuristicCoverStrategy mHeuristicCoverStrategy = HeuristicCoverStrategy.NONE;
+  private HeuristicCoverStrategy mHeuristicCoverStrategy =
+    HeuristicCoverStrategy.NONE;
   private int mMaxHeuristicCovers = -1;
 
   private TransitionIterator mPredecessorTransitionIterator;
