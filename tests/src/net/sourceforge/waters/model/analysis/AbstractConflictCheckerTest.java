@@ -117,14 +117,15 @@ public abstract class AbstractConflictCheckerTest extends
     final ConflictCounterExampleProxy castTest =
       (ConflictCounterExampleProxy) counter;
     final TraceProxy trace = castTest.getTrace();
+    assertTrue("Conflict counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
+
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
         new HashMap<AutomatonProxy,StateProxy>(size);
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, trace);
-      assertNotNull("Counterexample not accepted by automaton " +
-                    aut.getName() + "!", state);
+      final StateProxy state = checkTrace(aut, trace);
       tuple.put(aut, state);
     }
     final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);

@@ -324,7 +324,7 @@ public abstract class AbstractSICProperty6VerifierTest extends
     for (final AutomatonProxy aut : automata) {
       final Map<String,String> attribs = aut.getAttributes();
       if (HISCAttributeFactory.isInterface(attribs)) {
-        final StateProxy state = checkCounterExample(aut, trace);
+        final StateProxy state = checkTrace(aut, trace);
         final Collection<EventProxy> props = state.getPropositions();
         assertTrue("Counterexample takes interface automaton " +
                    aut.getName() + " to state " + state.getName() +
