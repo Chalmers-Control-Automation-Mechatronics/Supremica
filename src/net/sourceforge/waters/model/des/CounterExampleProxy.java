@@ -31,57 +31,57 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.model.des;
 
 import java.util.List;
+import java.util.Set;
 
-import net.sourceforge.waters.model.des.AutomatonProxy;
-
-import net.sourceforge.waters.xsd.des.AutomatonRef;
-import net.sourceforge.waters.xsd.des.TraceType;
-import net.sourceforge.waters.xsd.des.AutomatonRefList;
-import net.sourceforge.waters.xsd.des.ObjectFactory;
+import net.sourceforge.waters.model.base.DocumentProxy;
 
 
-class TraceAutomatonRefListHandler
-  extends JAXBCheckedListHandler<TraceType,AutomatonRefList,AutomatonProxy>
+/**
+ * <P>A counterexample to show that a model fails to satisfy some property.</P>
+ *
+ * <P>Counterexamples are typically produced by model verifiers and contain
+ * traces that show how the system can perform undesired behaviour. Each
+ * trace ({@link TraceProxy}) contains a sequence of events that can be
+ * executed by the model, possibly with associated state information.</P>
+ *
+ * <P>This interface has only abstract classes to implement it. There are
+ * different properties that lead to different types counterexamples
+ * represented by subtypes of this interface. Most counterexamples contain of
+ * a single trace of undesired behaviour, but some properties (such as
+ * diagnosability) require more than one trace.</P>
+ *
+ * @author Robi Malik
+ */
+
+public interface CounterExampleProxy
+  extends DocumentProxy
 {
 
   //#########################################################################
-  //# Constructors
-  TraceAutomatonRefListHandler()
-  {
-    this(null);
-  }
+  //# Getters
+  /**
+   * Gets the product DES for which this counterexample has been generated.
+   */
+  public ProductDESProxy getProductDES();
 
-  TraceAutomatonRefListHandler(final ObjectFactory factory)
-  {
-    mFactory = factory;
-  }
+  /**
+   * Gets the list of automata for this counterexample.
+   * All the traces in the counterexample can be restricted to use only the
+   * automata in this list.
+   * @return  An unmodifiable set of objects of type {@link AutomatonProxy}.
+   */
+  public Set<AutomatonProxy> getAutomata();
 
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class JAXBListHandler
-  AutomatonRefList createListElement(TraceType container)
-  {
-    final AutomatonRefList listelem = mFactory.createAutomatonRefList();
-    container.setAutomatonRefList(listelem);
-    return listelem;
-  }
-
-  AutomatonRefList getListElement(TraceType container)
-  {
-    return container.getAutomatonRefList();
-  }
-
-  List<AutomatonRef> getList(AutomatonRefList listelem)
-  {
-    return listelem.getList();
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final ObjectFactory mFactory;
+  /**
+   * Gets the list of traces constituting this counterexample. Most
+   * counterexamples contain of a single trace of undesired behaviour,
+   * but some properties (such as diagnosability) require more than one
+   * trace.
+   * @return  An unmodifiable list of objects of type {@link TraceProxy}.
+   */
+  public List<TraceProxy> getTraces();
 
 }

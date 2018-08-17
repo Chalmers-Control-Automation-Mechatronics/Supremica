@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -134,7 +135,7 @@ public interface ModelVerifier extends ModelAnalyzer
    *         found that the property is satisfied and there is no
    *         counterexample, or counterexamples are disabled.
    */
-  public TraceProxy getCounterExample();
+  public CounterExampleProxy getCounterExample();
 
   /**
    * Sets whether counterexample computation is enabled.

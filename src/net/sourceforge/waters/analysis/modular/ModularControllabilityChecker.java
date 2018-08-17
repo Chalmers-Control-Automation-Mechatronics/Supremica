@@ -57,10 +57,11 @@ import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -189,7 +190,7 @@ public class ModularControllabilityChecker
       final ProductDESProxyFactory factory = getFactory();
       final SafetyVerifier mono = getMonolithicVerifier();
       final ModularHeuristic heuristic = getHeuristic();
-      SafetyTraceProxy trace = null;
+      SafetyCounterExampleProxy counter = null;
       final Collection<AutomatonProxy> subsystem = new ArrayList<>(numAutomata);
       specLoop:
       while (!specs.isEmpty()) {
@@ -229,15 +230,15 @@ public class ModularControllabilityChecker
                            mono.getCounterExample());
           checkAbort();
           if (selectedAutomata == null) {
-            if (trace == null) {
-              trace = mono.getCounterExample();
-              trace = extendTrace(heuristic, trace, automata);
-              setFailedResult(trace);
+            if (counter == null) {
+              counter = mono.getCounterExample();
+              counter = extendTrace(heuristic, counter, automata);
+              setFailedResult(counter);
             }
             if (mCollectsFailedSpecs) {
-              trace = mono.getCounterExample();
+              counter = mono.getCounterExample();
               final Collection<AutomatonProxy> failedSpecs =
-                collectFailedSpecs(heuristic, trace);
+                collectFailedSpecs(heuristic, counter);
               specs.removeAll(failedSpecs);
               if (!failedSpecs.contains(spec)) {
                 specs.add(spec);
@@ -262,7 +263,7 @@ public class ModularControllabilityChecker
           }
         }
       }
-      if (trace != null) {
+      if (counter != null) {
         return false;
       } else {
         return setSatisfiedResult();
@@ -298,17 +299,17 @@ public class ModularControllabilityChecker
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelVerifier
   @Override
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  protected boolean setFailedResult(final CounterExampleProxy counterexample)
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
     final String tracename = desname + "-uncontrollable";
     final Collection<AutomatonProxy> automata = counterexample.getAutomata();
-    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
-    final SafetyTraceProxy wrapper =
-      factory.createSafetyTraceProxy(tracename, null, null,
-                                     des, automata, steps);
+    final TraceProxy trace = counterexample.getTraces().get(0);
+    final SafetyCounterExampleProxy wrapper =
+      factory.createSafetyCounterExampleProxy(tracename, null, null,
+                                              des, automata, trace);
     return super.setFailedResult(wrapper);
   }
 
@@ -316,14 +317,14 @@ public class ModularControllabilityChecker
   //#########################################################################
   //# Trace Computation
   private Collection<AutomatonProxy> collectFailedSpecs
-    (final ModularHeuristic heuristic, final SafetyTraceProxy trace)
+    (final ModularHeuristic heuristic, final SafetyCounterExampleProxy counter)
   {
     final KindTranslator translator = getKindTranslator();
     final Collection<AutomatonProxy> failedSpecs = new LinkedList<>();
-    for (final AutomatonProxy aut : trace.getAutomata()) {
+    for (final AutomatonProxy aut : counter.getAutomata()) {
       if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         final TraceFinder finder = heuristic.getTraceFinder(aut);
-        if (finder.isRejectingSpec(trace)) {
+        if (finder.isRejectingSpec(counter)) {
           failedSpecs.add(aut);
         }
       }
@@ -334,12 +335,12 @@ public class ModularControllabilityChecker
     return failedSpecs;
   }
 
-  private SafetyTraceProxy extendTrace(final ModularHeuristic heuristic,
-                                       final SafetyTraceProxy trace,
-                                       final List<AutomatonProxy> automata)
+  private SafetyCounterExampleProxy extendTrace(final ModularHeuristic heuristic,
+                                                final SafetyCounterExampleProxy counter,
+                                                final List<AutomatonProxy> automata)
     throws AnalysisException
   {
-    final Set<AutomatonProxy> oldAutomata = new THashSet<>(trace.getAutomata());
+    final Set<AutomatonProxy> oldAutomata = new THashSet<>(counter.getAutomata());
     boolean done = false;
     boolean det = true;
     for (final AutomatonProxy aut : automata) {
@@ -350,18 +351,19 @@ public class ModularControllabilityChecker
       }
     }
     if (done) {
-      return trace;
+      return counter;
     }
     final ProductDESProxyFactory factory = getFactory();
-    final String name = trace.getName();
-    final String comment = trace.getComment();
-    final URI location = trace.getLocation();
-    final ProductDESProxy des = trace.getProductDES();
-    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
+    final String name = counter.getName();
+    final String comment = counter.getComment();
+    final URI location = counter.getLocation();
+    final ProductDESProxy des = counter.getProductDES();
+    final TraceProxy trace = counter.getTrace();
     if (det) {
-      return factory.createSafetyTraceProxy(name, comment, location,
-                                            des, automata, oldSteps);
+      return factory.createSafetyCounterExampleProxy(name, comment, location,
+                                                     des, automata, trace);
     }
+    final List<TraceStepProxy> oldSteps = trace.getTraceSteps();
     final int numSteps = oldSteps.size();
     final KindTranslator translator = getKindTranslator();
     final List<TraceStepProxy> newSteps = new ArrayList<>(numSteps);
@@ -402,8 +404,9 @@ public class ModularControllabilityChecker
       }
       depth++;
     }
-    return factory.createSafetyTraceProxy(name, comment, location,
-                                          des, automata, newSteps);
+    final TraceProxy extended = factory.createTraceProxy(newSteps);
+    return factory.createSafetyCounterExampleProxy(name, comment, location,
+                                                   des, automata, extended);
   }
 
 

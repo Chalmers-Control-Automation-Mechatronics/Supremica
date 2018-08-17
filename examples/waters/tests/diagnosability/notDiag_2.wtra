@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<DualCounterExample ProductDES="notDiag_2"
+		    Name="notDiag_2"
+		    xmlns:ns2="http://waters.sourceforge.net/xsd/base"
+		    xmlns="http://waters.sourceforge.net/xsd/des">
+<ns2:Comment>Fault 'ed' is not disgnosable.</ns2:Comment>
+<AutomatonRefList>
+  <AutomatonRef Name="notDiag_2"/>
+</AutomatonRefList>
+<TraceList>
+  <Trace Name="Faulty" LoopIndex="1">
+    <TraceStepList>
+      <EventRef Name="ed"/>
+      <EventRef Name="a"/>
+      <EventRef Name="b"/>
+      <EventRef Name="d"/>
+    </TraceStepList>
+  </Trace>
+  <Trace Name="Non-faulty" LoopIndex="0">
+    <TraceStepList>
+      <EventRef Name="a"/>
+      <EventRef Name="b"/>
+      <EventRef Name="d"/>
+    </TraceStepList>
+  </Trace>
+</TraceList>
+</DualCounterExample>
+

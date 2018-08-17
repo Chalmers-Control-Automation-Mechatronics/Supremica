@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -182,9 +182,9 @@ public class NativeConflictChecker
   }
 
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 

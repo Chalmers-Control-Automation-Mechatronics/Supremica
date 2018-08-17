@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -51,6 +53,7 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -60,8 +63,6 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 
 import org.apache.logging.log4j.LogManager;
-
-import gnu.trove.set.hash.THashSet;
 
 
 /**
@@ -214,7 +215,7 @@ public abstract class AbstractCompositionalModelVerifier
    * @param  counterexample The counterexample obtained by verification.
    * @return <CODE>false</CODE>
    */
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  protected boolean setFailedResult(final CounterExampleProxy counterexample)
   {
     final VerificationResult result = getAnalysisResult();
     result.setCounterExample(counterexample);
@@ -237,9 +238,9 @@ public abstract class AbstractCompositionalModelVerifier
         final AbstractionProcedure proc = getAbstractionProcedure();
         proc.resetStatistics();
         if (isCounterExampleEnabled()) {
-          TraceProxy trace = result.getCounterExample();
-          trace = expandTrace(trace);
-          return setFailedResult(trace);
+          CounterExampleProxy counter = result.getCounterExample();
+          counter = expandCounterExample(counter);
+          return setFailedResult(counter);
         } else {
           return setFailedResult(null);
         }
@@ -282,7 +283,7 @@ public abstract class AbstractCompositionalModelVerifier
   }
 
   @Override
-  public TraceProxy getCounterExample()
+  public CounterExampleProxy getCounterExample()
   {
     if (isSatisfied()) {
       throw new IllegalStateException("No trace for satisfied property!");
@@ -404,8 +405,9 @@ public abstract class AbstractCompositionalModelVerifier
         return true;
       } else {
         final CompositionalVerificationResult result = getAnalysisResult();
-        final TraceProxy trace = monolithicVerifier.getCounterExample();
-        result.setCounterExample(trace);
+        final CounterExampleProxy counter =
+          monolithicVerifier.getCounterExample();
+        result.setCounterExample(counter);
         final boolean confirmed = confirmMonolithicCounterExample();
         return !confirmed;
       }
@@ -435,7 +437,7 @@ public abstract class AbstractCompositionalModelVerifier
    * @param  automata     Automata to be put in the counterexample.
    * @param  steps        List of steps constituting the counterexample.
    */
-  protected abstract TraceProxy createTrace
+  protected abstract CounterExampleProxy createCounterExample
     (final Collection<AutomatonProxy> automata,
      final List<TraceStepProxy> steps);
 
@@ -460,10 +462,12 @@ public abstract class AbstractCompositionalModelVerifier
 
   //#########################################################################
   //# Trace Computation
-  private TraceProxy expandTrace(final TraceProxy trace)
+  private CounterExampleProxy expandCounterExample
+    (final CounterExampleProxy counter)
     throws AnalysisException
   {
     LogManager.getLogger().debug("Property NOT satisfied --- expanding trace ...");
+    final TraceProxy trace = counter.getTraces().get(0);
     final List<TraceStepProxy> unsat = trace.getTraceSteps();
     final Collection<AutomatonProxy> currentAutomata = getAllTraceAutomata();
     List<TraceStepProxy> traceSteps =
@@ -489,7 +493,7 @@ public abstract class AbstractCompositionalModelVerifier
     }
     final ProductDESProxy model = getModel();
     final Collection<AutomatonProxy> modelAutomata = model.getAutomata();
-    return createTrace(modelAutomata, traceSteps);
+    return createCounterExample(modelAutomata, traceSteps);
   }
 
   /**

@@ -40,6 +40,7 @@ import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -53,6 +54,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
@@ -70,7 +72,7 @@ import net.sourceforge.waters.plain.base.NamedElement;
 
 public abstract class TRTraceProxy
   extends NamedElement
-  implements TraceProxy
+  implements CounterExampleProxy
 {
 
   //#########################################################################
@@ -186,7 +188,7 @@ public abstract class TRTraceProxy
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.des.TraceProxy
+  //# Interface net.sourceforge.waters.model.des.CounterExampleProxy
   @Override
   public ProductDESProxy getProductDES()
   {
@@ -200,17 +202,16 @@ public abstract class TRTraceProxy
   }
 
   @Override
-  public List<EventProxy> getEvents()
+  public List<TraceProxy> getTraces()
   {
-    return Arrays.asList(mEvents);
+    final TraceProxy trace = getTrace();
+    return Collections.singletonList(trace);
   }
 
-  @Override
-  public List<TraceStepProxy> getTraceSteps()
+  public TraceProxy getTrace()
   {
-    return new TraceStepList();
+    return new TraceView();
   }
-
 
   //#########################################################################
   //# Interface java.lang.Cloneable
@@ -248,6 +249,11 @@ public abstract class TRTraceProxy
     return mEvents.length + 1;
   }
 
+  List<EventProxy> getEvents()
+  {
+    return Arrays.asList(mEvents);
+  }
+
   public Set<TRAbstractionStep> getCoveredAbstractionSteps()
   {
     return mTraceData.keySet();
@@ -280,7 +286,7 @@ public abstract class TRTraceProxy
 
   //#########################################################################
   //# Trace Expansion
-  public void reset(final List<EventProxy> events)
+  void reset(final List<EventProxy> events)
   {
     mEvents = new EventProxy[events.size()];
     events.toArray(mEvents);
@@ -478,6 +484,67 @@ public abstract class TRTraceProxy
     } else {
       return false;
     }
+  }
+
+
+  //#########################################################################
+  //# Inner Class TraceView
+  private class TraceView
+    extends Element
+    implements TraceProxy
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
+    public TraceProxy clone()
+    {
+      return (TraceProxy) super.clone();
+    }
+
+    @Override
+    public Class<? extends Proxy> getProxyInterface()
+    {
+      return TraceProxy.class;
+    }
+
+    @Override
+    public Object acceptVisitor(final ProxyVisitor visitor)
+      throws VisitorException
+    {
+      final ProductDESProxyVisitor desVisitor =
+        (ProductDESProxyVisitor) visitor;
+      return desVisitor.visitTraceProxy(this);
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.des.TraceProxy
+    @Override
+    public String getName()
+    {
+      return "";
+    }
+
+    @Override
+    public List<EventProxy> getEvents()
+    {
+      return TRTraceProxy.this.getEvents();
+    }
+
+    @Override
+    public List<TraceStepProxy> getTraceSteps()
+    {
+      return new TraceStepList();
+    }
+
+    @Override
+    public int getLoopIndex()
+    {
+      return -1;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 1116434926776416284L;
   }
 
 

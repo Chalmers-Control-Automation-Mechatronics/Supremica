@@ -114,6 +114,10 @@ public class WatersAnalyzerPanel extends MainPanel
     return mAutomataTable.getModel();
   }
 
+  public AutomataTable getAutomataTable()
+  {
+    return mAutomataTable;
+  }
 
   //#########################################################################
   //# Focus Switching

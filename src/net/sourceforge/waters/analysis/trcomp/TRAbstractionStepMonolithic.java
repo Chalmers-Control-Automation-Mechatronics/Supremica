@@ -45,9 +45,10 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -106,19 +107,20 @@ class TRAbstractionStepMonolithic
   //#########################################################################
   //# Debugging
   static TRTraceProxy createTraceExtension
-    (final TraceProxy trace,
+    (final CounterExampleProxy counter,
      final Collection<TRAbstractionStep> preds,
      final AbstractTRCompositionalAnalyzer analyzer)
     throws AnalysisException
   {
-    final ProductDESProxy des = trace.getProductDES();
+    final ProductDESProxy des = counter.getProductDES();
+    final TraceProxy trace = counter.getTraces().get(0);
     final List<EventProxy> events = trace.getEvents();
     final int numSteps = events.size() + 1;
     final TRTraceProxy extension = new TRConflictTraceProxy(des, events);
 
     final Map<String,TRAutomatonProxy> traceAutomataMap =
       new HashMap<>(preds.size());
-    for (final AutomatonProxy aut : trace.getAutomata()) {
+    for (final AutomatonProxy aut : counter.getAutomata()) {
       final String name = aut.getName();
       final TRAutomatonProxy tr = (TRAutomatonProxy) aut;
       traceAutomataMap.put(name, tr);
@@ -141,7 +143,7 @@ class TRAbstractionStepMonolithic
           current = aut.getStateIndex(state);
         } else if (stepIndex == 0) {
           current = rel.getFirstInitialState();
-          assert current >= 0 || trace instanceof SafetyTraceProxy :
+          assert current >= 0 || counter instanceof SafetyCounterExampleProxy :
             "No initial state found in trace for automaton " + name + "!";
         } else if (current >= 0){
           final EventProxy event = step.getEvent();
@@ -157,7 +159,7 @@ class TRAbstractionStepMonolithic
                   "in automaton " + name + "!";
               } else {
                 current = -1;
-                assert trace instanceof SafetyTraceProxy :
+                assert counter instanceof SafetyCounterExampleProxy :
                   "No successor state found in trace for automaton " +
                   name + "!";
               }

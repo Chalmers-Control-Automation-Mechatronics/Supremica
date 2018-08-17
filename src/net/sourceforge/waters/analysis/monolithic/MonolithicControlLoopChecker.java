@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -143,7 +143,7 @@ public class MonolithicControlLoopChecker
       if (mControlLoopFree) {
         return setSatisfiedResult();
       } else {
-        final LoopTraceProxy counterexample = computeCounterExample();
+        final LoopCounterExampleProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
     } finally {
@@ -164,9 +164,9 @@ public class MonolithicControlLoopChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
   @Override
-  public LoopTraceProxy getCounterExample()
+  public LoopCounterExampleProxy getCounterExample()
   {
-    return (LoopTraceProxy) super.getCounterExample();
+    return (LoopCounterExampleProxy) super.getCounterExample();
   }
 
   @Override
@@ -484,13 +484,13 @@ public class MonolithicControlLoopChecker
     return true;
   }
 
-  private LoopTraceProxy computeCounterExample()
+  private LoopCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy des = getModel();
     final String desname = des.getName();
-    final String tracename = desname + "-loop";
+    final String traceName = desname + "-loop";
     final List<EventProxy> tracelist = new LinkedList<EventProxy>();
 
     /* FIND COUNTEREXAMPLE TRACE HERE */
@@ -674,9 +674,8 @@ public class MonolithicControlLoopChecker
         }
       }
     }
-    final LoopTraceProxy trace =
-      factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
-    return trace;
+    return
+      factory.createLoopCounterExampleProxy(traceName, des, tracelist, loopIndex);
   }
 
   /**

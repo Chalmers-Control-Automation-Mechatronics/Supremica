@@ -31,30 +31,59 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.des;
+package net.sourceforge.waters.model.marshaller;
+
+import java.util.List;
+
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.xsd.des.AutomatonRef;
+import net.sourceforge.waters.xsd.des.AutomatonRefList;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
+import net.sourceforge.waters.xsd.des.ObjectFactory;
 
 
-/**
- * <P>A loop counterexample trace for some automata of a product DES.</P>
- *
- * @see ProductDESProxy
- *
- * @author Robi Malik
- */
-
-public interface LoopTraceProxy
-  extends TraceProxy
+class CounterExampleAutomatonRefListHandler
+  extends JAXBCheckedListHandler<CounterExampleType,AutomatonRefList,AutomatonProxy>
 {
 
   //#########################################################################
-  //# Getters
-  /**
-   * Gets the loop index of this trace.
-   * The loop index identifies the number of the step (starting at&nbsp;0)
-   * in the trace where the loop starts. If the trace has steps 0,...,<I>n</I>,
-   * and the loop index is at position&nbsp;<I>i</I>, then it represents the
-   * loop 0,...,<I>n</I>,<I>i</I>,...,<I>n</I>,...
-   */
-  public int getLoopIndex();
+  //# Constructors
+  CounterExampleAutomatonRefListHandler()
+  {
+    this(null);
+  }
+
+  CounterExampleAutomatonRefListHandler(final ObjectFactory factory)
+  {
+    mFactory = factory;
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBListHandler
+  @Override
+  AutomatonRefList createListElement(final CounterExampleType container)
+  {
+    final AutomatonRefList listelem = mFactory.createAutomatonRefList();
+    container.setAutomatonRefList(listelem);
+    return listelem;
+  }
+
+  @Override
+  AutomatonRefList getListElement(final CounterExampleType container)
+  {
+    return container.getAutomatonRefList();
+  }
+
+  @Override
+  List<AutomatonRef> getList(final AutomatonRefList listelem)
+  {
+    return listelem.getList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ObjectFactory mFactory;
 
 }

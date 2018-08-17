@@ -43,7 +43,6 @@ import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulationObserver;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 import org.supremica.gui.ide.IDE;
@@ -96,7 +95,7 @@ public class SimulationReplayStepAction
       return;
     }
     final TraceProxy trace = sim.getTrace();
-    setEnabled(trace != null && trace instanceof LoopTraceProxy);
+    setEnabled(trace != null && trace.getLoopIndex() >= 0);
   }
 
 

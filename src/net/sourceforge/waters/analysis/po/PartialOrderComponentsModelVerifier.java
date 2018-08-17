@@ -59,11 +59,11 @@ import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -296,8 +296,8 @@ public abstract class PartialOrderComponentsModelVerifier
         }
       }
       if (initUncontrollable != null) {
-        return setFailedResult(noInitialCounterexample(initUncontrollable
-                                                        ,model,automata));
+        return setFailedResult(noInitialCounterexample(initUncontrollable,
+                                                       model, automata));
       }
       setupDependencies(automataContainingEvents);
       // Set the mCodePosition list
@@ -317,7 +317,7 @@ public abstract class PartialOrderComponentsModelVerifier
         return setSatisfiedResult();
       } else {
         convertToBreadthFirst();
-        final TraceProxy counterexample = computePOCounterExample();
+        final CounterExampleProxy counterexample = computePOCounterExample();
         return setFailedResult(counterexample);
       }
     } catch (final AnalysisException exception) {
@@ -532,9 +532,10 @@ public abstract class PartialOrderComponentsModelVerifier
     return automataContainingEvents;
   }
 
-  protected abstract TraceProxy noInitialCounterexample(AutomatonProxy ap,
-                                          ProductDESProxy model,
-                                          Collection<AutomatonProxy> automata);
+  protected abstract CounterExampleProxy noInitialCounterexample
+    (AutomatonProxy ap,
+     ProductDESProxy model,
+     Collection<AutomatonProxy> automata);
 
   /**
    * Finds and returns the index of a given automaton in a given array
@@ -860,7 +861,7 @@ public abstract class PartialOrderComponentsModelVerifier
 
   protected abstract boolean isErrorState(final PartialOrderStateTuple current);
 
-  protected abstract TraceProxy computePOCounterExample()
+  protected abstract CounterExampleProxy computePOCounterExample()
     throws AnalysisAbortException;
 
   protected abstract int[][] setupTransitions(List<StateProxy> codes,

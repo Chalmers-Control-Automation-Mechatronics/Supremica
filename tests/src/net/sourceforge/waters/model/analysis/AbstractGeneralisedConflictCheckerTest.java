@@ -345,10 +345,10 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   }
 
   @Override
-  protected StateProxy checkCounterExample(final AutomatonProxy aut,
-                                           final TraceProxy trace)
+  protected StateProxy checkTrace(final AutomatonProxy aut,
+                                  final TraceProxy trace)
   {
-    final StateProxy endstate = super.checkCounterExample(aut, trace);
+    final StateProxy endstate = super.checkTrace(aut, trace);
     if (endstate != null &&
         !endstate.getPropositions().contains(mAlpha) &&
         aut.getEvents().contains(mAlpha)) {

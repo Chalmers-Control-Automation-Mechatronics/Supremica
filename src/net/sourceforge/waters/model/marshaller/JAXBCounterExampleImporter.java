@@ -45,36 +45,39 @@ import java.util.Map;
 import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-
 import net.sourceforge.waters.xsd.base.ElementType;
 import net.sourceforge.waters.xsd.des.AutomatonRef;
+import net.sourceforge.waters.xsd.des.ConflictCounterExample;
 import net.sourceforge.waters.xsd.des.ConflictKind;
-import net.sourceforge.waters.xsd.des.ConflictTrace;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
+import net.sourceforge.waters.xsd.des.DualCounterExample;
 import net.sourceforge.waters.xsd.des.EventRef;
-import net.sourceforge.waters.xsd.des.LoopTrace;
-import net.sourceforge.waters.xsd.des.SafetyTrace;
+import net.sourceforge.waters.xsd.des.LoopCounterExample;
+import net.sourceforge.waters.xsd.des.SafetyCounterExample;
+import net.sourceforge.waters.xsd.des.Trace;
 import net.sourceforge.waters.xsd.des.TraceState;
 import net.sourceforge.waters.xsd.des.TraceStateTupleType;
 import net.sourceforge.waters.xsd.des.TraceStepList;
-import net.sourceforge.waters.xsd.des.TraceType;
 
 
-class JAXBTraceImporter
-  extends JAXBDocumentImporter<TraceProxy,TraceType>
+class JAXBCounterExampleImporter
+  extends JAXBDocumentImporter<CounterExampleProxy,CounterExampleType>
 {
 
   //#########################################################################
   //# Constructors
-  public JAXBTraceImporter(final ProductDESProxyFactory factory)
+  public JAXBCounterExampleImporter(final ProductDESProxyFactory factory)
   {
     mFactory = factory;
   }
@@ -90,26 +93,30 @@ class JAXBTraceImporter
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBImporter
+  @Override
   Proxy importElement(final ElementType element)
   {
     throw new ClassCastException
-      ("JAXBTraceImporter cannot handle element of type " +
+      ("JAXBCounterExampleImporter cannot handle element of type " +
        element.getClass().getName() + "!");
   }
 
-  public TraceProxy importDocument(final TraceType element,
-                                   final URI uri)
+  @Override
+  public CounterExampleProxy importDocument(final CounterExampleType element,
+                                            final URI uri)
     throws WatersUnmarshalException
   {
-    if (element instanceof SafetyTrace) {
-      return importSafetyTrace((SafetyTrace) element, uri);
-    } else if (element instanceof ConflictTrace) {
-      return importConflictTrace((ConflictTrace) element, uri);
-    } if (element instanceof LoopTrace) {
-      return importLoopTrace((LoopTrace) element, uri);
+    if (element instanceof SafetyCounterExample) {
+      return importSafetyCounterExample((SafetyCounterExample) element, uri);
+    } else if (element instanceof ConflictCounterExample) {
+      return importConflictCounterExample((ConflictCounterExample) element, uri);
+    } if (element instanceof LoopCounterExample) {
+      return importLoopCounterExample((LoopCounterExample) element, uri);
+    } if (element instanceof DualCounterExample) {
+      return importDualCounterExample((DualCounterExample) element, uri);
     } else {
       throw new ClassCastException
-        ("JAXBTraceImporter cannot handle trace element of type " +
+        ("JAXBCounterExampleImporter cannot handle counterexample element of type " +
          element.getClass().getName() + "!");
     }
   }
@@ -117,54 +124,72 @@ class JAXBTraceImporter
 
   //#########################################################################
   //# Importing Elements
-  private ConflictTraceProxy importConflictTrace(final ConflictTrace element,
-                                                 final URI uri)
+  private ConflictCounterExampleProxy importConflictCounterExample
+    (final ConflictCounterExample element, final URI uri)
     throws WatersUnmarshalException
   {
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
-    final TraceStepList listelem = element.getTraceStepList();
-    final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
+    final TraceProxy trace = getUniqueTrace(element, des, automata);
     final ConflictKind kind = element.getKind();
-    return mFactory.createConflictTraceProxy
-      (name, comment, uri, des, automata, steps, kind);
+    return mFactory.createConflictCounterExampleProxy
+      (name, comment, uri, des, automata, trace, kind);
   }
 
-  private LoopTraceProxy importLoopTrace(final LoopTrace element,
-                                         final URI uri)
+  private LoopCounterExampleProxy importLoopCounterExample
+    (final LoopCounterExample element, final URI uri)
     throws WatersUnmarshalException
   {
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
-    final TraceStepList listelem = element.getTraceStepList();
-    final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
-    final int loopindex = element.getLoopIndex();
-    return mFactory.createLoopTraceProxy
-      (name, comment, uri, des, automata, steps, loopindex);
+    final TraceProxy trace = getUniqueTrace(element, des, automata);
+    return mFactory.createLoopCounterExampleProxy
+      (name, comment, uri, des, automata, trace);
   }
 
-  private SafetyTraceProxy importSafetyTrace(final SafetyTrace element,
-                                             final URI uri)
+  private SafetyCounterExampleProxy importSafetyCounterExample
+    (final SafetyCounterExample element, final URI uri)
     throws WatersUnmarshalException
   {
     final String name = element.getName();
     final String comment = element.getComment();
     final ProductDESProxy des = getProductDES(element, uri);
     final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
-    final TraceStepList listelem = element.getTraceStepList();
-    final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
-    return mFactory.createSafetyTraceProxy
-      (name, comment, uri, des, automata, steps);
+    final TraceProxy trace = getUniqueTrace(element, des, automata);
+    return mFactory.createSafetyCounterExampleProxy
+      (name, comment, uri, des, automata, trace);
+  }
+
+  private DualCounterExampleProxy importDualCounterExample
+    (final DualCounterExample element, final URI uri)
+    throws WatersUnmarshalException
+  {
+    final String name = element.getName();
+    final String comment = element.getComment();
+    final ProductDESProxy des = getProductDES(element, uri);
+    final IndexedList<AutomatonProxy> automata = getAutomata(element, des);
+    final List<Trace> traceElemList = element.getTraceList().getList();
+    if (traceElemList.size() != 2) {
+      final String msg = "Dual counterexample '" + element.getName() +
+                         " does not contain exactly two traces!";
+      throw new WatersUnmarshalException(msg);
+    }
+    final Trace traceElem1 = traceElemList.get(0);
+    final TraceProxy traceProxy1 = getTrace(traceElem1, des, automata);
+    final Trace traceElem2 = traceElemList.get(1);
+    final TraceProxy traceProxy2 = getTrace(traceElem2, des, automata);
+    return mFactory.createDualCounterExampleProxy
+      (name, comment, uri, des, automata, traceProxy1, traceProxy2);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private ProductDESProxy getProductDES(final TraceType element,
+  private ProductDESProxy getProductDES(final CounterExampleType element,
                                         final URI uri)
     throws WatersUnmarshalException
   {
@@ -180,7 +205,7 @@ class JAXBTraceImporter
       } else {
         final String msg =
           "Product DES name '" + name +
-          "' in trace does not match name of provided product DES '" +
+          "' in counterexample does not match name of provided product DES '" +
           mProductDES.getName() + "'!";
         throw new WatersUnmarshalException(msg);
       }
@@ -189,8 +214,8 @@ class JAXBTraceImporter
     }
   }
 
-  private IndexedList<AutomatonProxy> getAutomata(final TraceType element,
-                                                 final ProductDESProxy des)
+  private IndexedList<AutomatonProxy> getAutomata
+    (final CounterExampleType element, final ProductDESProxy des)
     throws WatersUnmarshalException
   {
     final String name = element.getName();
@@ -201,9 +226,36 @@ class JAXBTraceImporter
     final IndexedList<AutomatonProxy> automata1 =
       new CheckedImportList<AutomatonProxy>
         (TraceProxy.class, name, "automaton");
-    mTraceAutomatonRefListHandler.fromJAXBChecked
+    mAutomatonRefListHandler.fromJAXBChecked
       (importer, element, automata1);
     return automata1;
+  }
+
+  private TraceProxy getUniqueTrace(final CounterExampleType element,
+                                    final ProductDESProxy des,
+                                    final IndexedList<AutomatonProxy> automata)
+    throws WatersUnmarshalException
+  {
+    final List<Trace> traceElemList = element.getTraceList().getList();
+    if (traceElemList.size() != 1) {
+      final String msg = "Counterexample '" + element.getName() +
+                         " does not contain exactly one trace!";
+      throw new WatersUnmarshalException(msg);
+    }
+    final Trace traceElem = traceElemList.get(0);
+    return getTrace(traceElem, des, automata);
+  }
+
+
+  private TraceProxy getTrace(final Trace element,
+                              final ProductDESProxy des,
+                              final IndexedList<AutomatonProxy> automata)
+  {
+    final String name = element.getName();
+    final TraceStepList listelem = element.getTraceStepList();
+    final List<TraceStepProxy> steps = getTraceSteps(listelem, des, automata);
+    final int loopIndex = element.getLoopIndex();
+    return mFactory.createTraceProxy(name, steps, loopIndex);
   }
 
   private List<TraceStepProxy> getTraceSteps
@@ -313,6 +365,7 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Overrides for Abstract Base Class JAXBImporter
+    @Override
     AutomatonProxy importElement(final ElementType element)
     {
       return importAutomatonRef((AutomatonRef) element);
@@ -348,6 +401,7 @@ class JAXBTraceImporter
 
     //#######################################################################
     //# Overrides for Abstract Base Class JAXBImporter
+    @Override
     EventProxy importElement(final ElementType element)
     {
       return importEventRef((EventRef) element);
@@ -371,8 +425,8 @@ class JAXBTraceImporter
   //#########################################################################
   //# Data Members
   private final ProductDESProxyFactory mFactory;
-  private final TraceAutomatonRefListHandler
-    mTraceAutomatonRefListHandler = new TraceAutomatonRefListHandler();
+  private final CounterExampleAutomatonRefListHandler
+    mAutomatonRefListHandler = new CounterExampleAutomatonRefListHandler();
 
   private ProductDESProxy mProductDES;
   private Map<AutomatonProxy,IndexedList<StateProxy>> mStateCaches;

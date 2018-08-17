@@ -33,14 +33,15 @@
 
 package net.sourceforge.waters.analysis.sd;
 
+import java.util.Collection;
+
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import java.util.Collection;
 
 /**
  * A model verifier to check SD point ii.b.
@@ -81,6 +82,7 @@ public class SDCTwobVerifier extends AbstractSDConflictChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     setUp();
@@ -113,10 +115,10 @@ public class SDCTwobVerifier extends AbstractSDConflictChecker
         setAnalysisResult(result);
                   }
       if (result.isSatisfied()) {
-
         return true;
       } else {
-        final ConflictTraceProxy counterexample = checker.getCounterExample();
+        final ConflictCounterExampleProxy counterexample =
+          checker.getCounterExample();
         return setFailedResult(counterexample);
       }
     } finally {
@@ -128,6 +130,7 @@ public class SDCTwobVerifier extends AbstractSDConflictChecker
 
 //#########################################################################
 //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+@Override
 public boolean supportsNondeterminism()
 {
   return false;

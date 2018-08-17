@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -106,7 +106,8 @@ public class SDThreeOneVerifier extends AbstractSDLanguageInclusionChecker
         result1 = verifier1.getAnalysisResult();
       }
       if (!result1.isSatisfied()) {
-        final SafetyTraceProxy counterexample = verifier1.getCounterExample();
+        final SafetyCounterExampleProxy counterexample =
+          verifier1.getCounterExample();
         return setFailedResult(counterexample);
       }
       final SDCThree1BVerifier verifier2 =
@@ -118,12 +119,12 @@ public class SDThreeOneVerifier extends AbstractSDLanguageInclusionChecker
         result2 = verifier2.getAnalysisResult();
       }
       if (!result2.isSatisfied()) {
-        final SafetyTraceProxy counterexample = verifier2.getCounterExample();
+        final SafetyCounterExampleProxy counterexample =
+          verifier2.getCounterExample();
         return setFailedResult(counterexample);
       }
       result2.merge(result1);
       return setSatisfiedResult();
-
     } finally {
       tearDown();
     }

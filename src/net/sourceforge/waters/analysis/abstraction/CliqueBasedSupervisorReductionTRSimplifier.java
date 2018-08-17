@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.TIntCollection;
+import gnu.trove.impl.HashFunctions;
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -56,6 +57,8 @@ import net.sourceforge.waters.analysis.tr.IntSetBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersIntComparator;
+import net.sourceforge.waters.analysis.tr.WatersIntHeap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
@@ -75,6 +78,69 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     super(rel);
   }
 
+  public enum HeuristicCoverStrategy
+  {
+    NONE, SUCCESSOR, PREDECESSOR, SUCCESSOR_PREDECESSOR, NEIGHBOUR, RANDOM
+  }
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Retrieves the search strategy for finding maximal covers.
+   * If this is set to NONE then no heuristics are used to speed up the clique cover search and a full search is performed.
+   * @return The strategy used to produce clique covers.
+   */
+  public HeuristicCoverStrategy getHeuristicCoverStrategy()
+  {
+    return mHeuristicCoverStrategy;
+  }
+
+  /**
+   * Sets the search strategy for finding maximal covers.
+   * If this is set to NONE then no heuristics are used to speed up the clique cover search and a full search is performed, and
+   *
+   * @param heuristicCoverStrategy
+   *          The strategy used to produce clique covers.
+   */
+  public void setHeuristicCoverStrategy(final HeuristicCoverStrategy heuristicCoverStrategy)
+  {
+    mHeuristicCoverStrategy = heuristicCoverStrategy;
+  }
+
+  /**
+   * Retrieves whether the algorithm finishes after it first finds a valid reduced solution.
+   * @return Whether the algorithm finishes after finding its first valid reduced solution, or explores all solutions for the most reduced.
+   */
+  public boolean getIsFindFirst() {
+    return mIsFindFirst;
+  }
+
+  /**
+   * Sets whether the algorithm finishes after it first finds a valid reduced solution.
+   * @param isFindFirst Whether the algorithm should finish after finding its first valid reduced solution, or explore all solutions for the most reduced.
+   */
+  public void setIsFindFirst(final boolean isFindFirst) {
+    mIsFindFirst = isFindFirst;
+  }
+
+  /**
+   * Retrieves the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   * This value is ignored if the HeuristicCoverStrategy is set to NONE because a full maximal clique search is performed.
+   * @return the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   */
+  public int getMaxHeuristicCovers() {
+    return mMaxHeuristicCovers;
+  }
+
+  /**
+   * Sets the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   * This value is ignored if the HeuristicCoverStrategy is set to NONE because a full maximal clique search is performed.
+   * @param maxHeuristicCovers the maximum number of covers to be collected by heuristic variants of the clique cover algorithm.
+   */
+  public void setMaxHeuristicCovers(final int maxHeuristicCovers) {
+    mMaxHeuristicCovers = maxHeuristicCovers;
+  }
+
   //#########################################################################
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -83,6 +149,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractSupervisorSimplifier
+  @Override
+  public boolean isSupervisedEventRequired()
+  {
+    return true;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
@@ -93,6 +170,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     final ListBufferTransitionRelation relation = getTransitionRelation();
 
+    mSuccessorTransitionIterator = relation.createSuccessorsReadOnlyIterator();
+    mPredecessorTransitionIterator = relation.createPredecessorsReadOnlyIterator();
+
     mDumpState = relation.getDumpStateIndex();
     mNumStates = relation.getNumberOfStates();
 
@@ -102,8 +182,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mDependencyIdBuffer = new TIntArrayList();
     mEnabledEventsBuffer =
       new TIntHashSet(relation.getNumberOfProperEvents());
+
     mStackBuffer = new TIntArrayStack();
-    mAlreadyExaminedIdsBuffer = new TIntHashSet();
+    mSetBuffer = new TIntHashSet();
+    mListBuffer = new TIntArrayList();
 
     mIncompatibilityRelation =
       getIncompatibilityRelation(getSupervisedEvent());
@@ -133,7 +215,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-
+    System.out.println("*** Starting reduction on supervised event " + getSupervisedEvent() + " ***");
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<Candidate> searchSpace =
       new PriorityQueue<>(new Comparator<Candidate>() {
@@ -145,95 +227,503 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       });
 
-    //TODO precompute the successors of the compatible formed by the all-compatible states cos we will always need to add these to successors
     final Candidate startingCandidate = new Candidate(mNumStates);
     startingCandidate.addDependency(mInitialCompatibleId);
 
     searchSpace.add(startingCandidate);
 
-    final Candidate reducedSupervisor = reduce(searchSpace);
+    final CoverStrategy coverStrategy = mHeuristicCoverStrategy == HeuristicCoverStrategy.NONE ? new BronKerboschCoverStrategy() : new HeuristicBronKerboschCoverStrategy();
+    final Searcher searcher = new Searcher(coverStrategy, new RecursiveDependencyStrategy());
+    final Candidate reducedSupervisor = searcher.reduce(searchSpace, mNumStates);
 
-    if (reducedSupervisor == null) {
+    if (reducedSupervisor == null
+        || reducedSupervisor.size() + 1 >= mNumStates) {
       System.out.println("\nCould not reduce supervisor");
       return false;
     }
-    System.out.print("\n#Reduced: " + reducedSupervisor.size() + " #Initial: "
-                     + mNumStates);
 
-    if (reducedSupervisor.size() + 1 >= mNumStates) {
-      return false;
-    } else {
-      //we managed to reduce the supervisor
-      return buildReducedSupervisor(reducedSupervisor);
+    System.out.println("");
+    return buildReducedSupervisor(reducedSupervisor);
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    mDependencyIdBuffer = null;
+    mCompatibleBuffer = null;
+    mEnabledEventsBuffer = null;
+
+    mStackBuffer = null;
+    mSetBuffer = null;
+    mListBuffer = null;
+
+    mCompatibleCache = null;
+    mStatesCompatibleWithAll = null;
+    mStateToNeighbourCountMap = null;
+
+    mIncompatibilityRelation = null;
+    mPredecessorTransitionIterator = null;
+    mSuccessorTransitionIterator = null;
+    super.tearDown();
+  }
+
+  private class Searcher {
+
+    private final CoverStrategy coverStrategy;
+    private final DependencyStrategy dependencyStrategy;
+
+    public Searcher(final CoverStrategy coverStrategy, final DependencyStrategy dependencyStrategy) {
+      this.coverStrategy = coverStrategy;
+      this.dependencyStrategy = dependencyStrategy;
+    }
+
+    public Candidate reduce(final PriorityQueue<Candidate> searchSpace, final int maximumSize) {
+      Candidate reducedSupervisor = null;
+      int reducedSupervisorSize = maximumSize;
+
+      while (!searchSpace.isEmpty()) {
+        //get the most promising partial solution
+        final Candidate candidateSolution = searchSpace.poll();
+
+        System.out.println("Picked " + candidateSolution);
+
+        //our container for the actual compatible being processed at any given time
+        mCompatibleBuffer.clear();
+
+        //get the id of next compatible we need to add
+        final int nextCompatibleId = candidateSolution.popDependency();
+
+        //get all ids of compatibles covering this compatible
+        getCompatibleFromCache(nextCompatibleId, mCompatibleBuffer);
+        final TIntList coverIds = coverStrategy.getCoversOf(mCompatibleBuffer);
+        final int coverIdsSize = coverIds.size();
+
+        for (int c = 0; c < coverIdsSize; c++) {
+          //get the id of a cover
+          final int coverId = coverIds.get(c);
+
+          //copy the current solution and dependencies.
+          final Candidate newSolution = new Candidate(candidateSolution);
+
+          //we now need to add the cover and update dependencies to include the cover's successors
+          newSolution.add(coverId);
+
+          mCompatibleBuffer.clear();
+          mDependencyIdBuffer.clear();
+          mEnabledEventsBuffer.clear();
+
+          //get the actual compatible for the cover id
+          getCompatibleFromCache(coverId, mCompatibleBuffer);
+
+          //get the compatible ids of its successors
+          getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer,
+                                    mDependencyIdBuffer);
+
+          //apply the new things we know we need to cover to the solution using the specified strategy
+          dependencyStrategy.processNewDependencies(newSolution, mDependencyIdBuffer);
+
+          //if solution is complete and more reduced, save it
+          if (newSolution.size() < reducedSupervisorSize
+              && newSolution.dependenciesSize() == 0) {
+            //if we got here we know our solution is better than the current best
+            reducedSupervisor = newSolution;
+            reducedSupervisorSize = reducedSupervisor.size();
+            System.out.println(newSolution + " -- New Best");
+            if (mIsFindFirst) {
+              searchSpace.clear();
+              return reducedSupervisor;
+            }
+          }
+
+          //if we aren't done yet we know we need to add at least 1 compatible to make it 'done', so discard if too big
+          if (newSolution.size() + 1 >= reducedSupervisorSize) {
+            continue;
+          }
+          searchSpace.add(newSolution);
+        }
+      }
+      return reducedSupervisor;
     }
   }
 
-  private Candidate reduce(final PriorityQueue<Candidate> searchSpace)
-  {
-    Candidate reducedSupervisor = null;
-    int reducedSupervisorSize = mNumStates;
+  private interface CoverStrategy {
+    public TIntList getCoversOf(TIntList compatible);
+  }
 
-    while (!searchSpace.isEmpty()) {
-      //get the most promising partial solution
-      final Candidate candidateSolution = searchSpace.poll();
+  private interface DependencyStrategy {
+    public void processNewDependencies(Candidate solution, TIntList newDependencies);
+  }
 
-      System.out.print("\n" + candidateSolution);
+  private class RecursiveDependencyStrategy implements DependencyStrategy {
 
-      //if solution is complete and more reduced, save it
-      if (candidateSolution.size() < reducedSupervisorSize
-          && candidateSolution.dependenciesSize() == 0) {
-        //if we got here we know our solution is better than the current best
-        reducedSupervisor = candidateSolution;
-        reducedSupervisorSize = reducedSupervisor.size();
-        System.out.print("-- New Best");
-        continue;
+    /**
+     * Determines which of the dependent compatibles only has one maximal cover.
+     * These can be added directly to the candidate solution rather than the
+     * queue of dependencies. Adding a compatible to the candidate solution may
+     * introduce more dependencies, so this is done until saturation.
+     *
+     * @param candidate
+     *          The candidate solution to which we want to add compatibles
+     * @param dependentIds
+     *          The initial set of compatibles we know we need to cover in our
+     *          solution.
+     */
+    @Override
+    public void processNewDependencies(final Candidate candidate,
+                                       final TIntList dependentIds)
+    {
+      mSetBuffer.clear();
+      mStackBuffer.clear();
+      for (int i = 0; i < dependentIds.size(); i++) {
+        final int id = dependentIds.get(i);
+        mStackBuffer.push(id);
+        mSetBuffer.add(id);
       }
 
-      //if we are too big skip (we could stop the search if our ordering of the queue were just based on solution size)
-      if (candidateSolution.size() + 1 >= reducedSupervisorSize) {
-        System.out.print("-- Too big.");
-        continue;
-      }
-
-      //our container for the actual compatible being processed at any given time
-      mCompatibleBuffer.clear();
-
-      //get the id of next compatible we need to add
-      final int nextCompatibleId = candidateSolution.popDependency();
-
-      //get all ids of compatibles covering this compatible
-      getCompatibleFromCache(nextCompatibleId, mCompatibleBuffer);
-      final TIntList coverIds = getCoversOf(mCompatibleBuffer);
-      final int coverIdsSize = coverIds.size();
-
-      for (int c = 0; c < coverIdsSize; c++) {
-        //get the id of a cover
-        final int coverId = coverIds.get(c);
-
-        //copy the current solution and dependencies.
-        final Candidate newSolution = new Candidate(candidateSolution);
-
-        //we now need to add the cover and update dependencies to include the cover's successors
-        newSolution.add(coverId);
+      while (mStackBuffer.size() > 0) {
+        final int dependentId = mStackBuffer.pop();
 
         mCompatibleBuffer.clear();
-        mDependencyIdBuffer.clear();
-        mEnabledEventsBuffer.clear();
+        getCompatibleFromCache(dependentId, mCompatibleBuffer);
 
-        //get the actual compatible for the cover id
-        getCompatibleFromCache(coverId, mCompatibleBuffer);
+        final TIntList singleMaximalCover =
+          checkForSingleMaximalCoverOf(mCompatibleBuffer);
 
-        //get the compatible ids of its successors
-        getSuccessorCompatiblesOf(mCompatibleBuffer, mEnabledEventsBuffer,
-                                  mDependencyIdBuffer);
+        if (singleMaximalCover == null) {
+          candidate.addDependency(dependentId);
+        } else {
+          singleMaximalCover.sort();
+          if (candidate.add(mCompatibleCache.add(singleMaximalCover))) {
 
-        processNewDependencies(newSolution, mDependencyIdBuffer);
+            mDependencyIdBuffer.clear();
+            mEnabledEventsBuffer.clear();
+            //get the compatible ids of its successors
+            getSuccessorCompatiblesOf(singleMaximalCover, mEnabledEventsBuffer,
+                                      mDependencyIdBuffer);
 
-        //now go through all the successors of our cover - we need to all of these (or covers of) in our final solution
-        searchSpace.add(newSolution);
+            for (int j = 0; j < mDependencyIdBuffer.size(); j++) {
+              final int id = mDependencyIdBuffer.get(j);
+              if (mSetBuffer.add(id)) {
+                mStackBuffer.push(id);
+              }
+            }
+          }
+
+        }
       }
     }
-    return reducedSupervisor;
+
+    /**
+     * Determines whether the specified compatible can be covered by just one
+     * maximal compatible. This performs a mini BronKerbosch search that can
+     * exit early once it determines there is more than one maximal cover.
+     *
+     * @param compatible
+     *          The compatible we would like check
+     * @return null if there is more than one maximal cover, otherwise it
+     *         returns the single maximal cover.
+     */
+    private TIntList checkForSingleMaximalCoverOf(final TIntList compatible)
+    {
+      final TIntList neighbours = new TIntArrayList(mNumStates);
+      getNeighboursOf(compatible, neighbours);
+      final int neighboursSize = neighbours.size();
+
+      boolean allMutualNeighbours = true;
+      for (int i = 0; i < neighboursSize && allMutualNeighbours; i++) {
+        final int n1 = neighbours.get(i);
+        for (int j = 0; j < neighboursSize && allMutualNeighbours; j++) {
+          final int n2 = neighbours.get(j);
+          if (!isNeighbour(n1, n2)) {
+            allMutualNeighbours = false;
+          }
+        }
+      }
+      if (allMutualNeighbours) {
+        neighbours.addAll(compatible);
+        return neighbours;
+      } else {
+        return null;
+      }
+    }
+  }
+
+  private class BronKerboschCoverStrategy implements CoverStrategy {
+
+    @Override
+    public TIntList getCoversOf(final TIntList compatible)
+    {
+      final TIntList possibleAdditions =
+        new TIntArrayList(mNumStates - mStatesCompatibleWithAll.size());
+      getNeighboursOf(compatible, possibleAdditions);
+
+      final TIntList maximalCompatibleIds = new TIntArrayList();
+      bronKerboschWithPivot(compatible, possibleAdditions,
+                            new TIntArrayList(possibleAdditions.size()),
+                            maximalCompatibleIds);
+      return maximalCompatibleIds;
+    }
+
+    private void bronKerboschWithPivot(final TIntList clique,
+                                       final TIntList possibleAdditions,
+                                       final TIntList alreadyChecked,
+                                       final TIntList maximalCliquesIdsToFill)
+    {
+
+      //if we have exhausted all possibilities, this must be the largest clique we have seen
+      if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
+        clique.sort();
+        maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
+        return;
+      }
+
+      final int initialPossibleAdditionsSize = possibleAdditions.size();
+
+      int pivot = 0;
+      int mostNeighbours = 0;
+
+      for (int i = 0; i < initialPossibleAdditionsSize; i++) {
+        final int state = possibleAdditions.get(i);
+        final int numNeighbours = mStateToNeighbourCountMap.get(state);
+        if (numNeighbours > mostNeighbours) {
+          mostNeighbours = numNeighbours;
+          pivot = state;
+        }
+      }
+
+      for (int i = 0; i < alreadyChecked.size(); i++) {
+        final int state = alreadyChecked.get(i);
+        final int numNeighbours = mStateToNeighbourCountMap.get(state);
+        if (numNeighbours > mostNeighbours) {
+          mostNeighbours = numNeighbours;
+          pivot = state;
+        }
+      }
+
+      //go through each state we haven't tried adding yet
+      for (int a = initialPossibleAdditionsSize - 1; a >= 0; a--) {
+        final int addition = possibleAdditions.get(a);
+
+        //any search path trying to add a neighbour of the pivot will already be explored when the pivot is chosen as the addition, so skip
+        if (isNeighbour(pivot, addition)) {
+          continue;
+        }
+
+        //create a copy with the new vertex
+        final TIntList newClique = new TIntArrayList(clique);
+        newClique.add(addition);
+
+        //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
+        final TIntList newPossibleAdditions =
+          new TIntArrayList(possibleAdditions.size());
+        for (int i = 0; i < possibleAdditions.size(); i++) {
+          final int oldPossibleAddition = possibleAdditions.get(i);
+          if (isNeighbour(addition, oldPossibleAddition)) {
+            newPossibleAdditions.add(oldPossibleAddition);
+          }
+        }
+
+        final TIntList newAlreadyChecked =
+          new TIntArrayList(alreadyChecked.size());
+        for (int i = 0; i < alreadyChecked.size(); i++) {
+          final int oldAlreadyChecked = alreadyChecked.get(i);
+          if (isNeighbour(addition, oldAlreadyChecked)) {
+            newAlreadyChecked.add(oldAlreadyChecked);
+          }
+        }
+
+        //find any maximal cliques based on newCliques and add them to the object referenced by cliques
+        bronKerboschWithPivot(newClique, newPossibleAdditions,
+                              newAlreadyChecked, maximalCliquesIdsToFill);
+
+        //remove the current candidate state from further consideration
+        possibleAdditions.removeAt(a);
+
+        //add to the list of states we have already checked
+        alreadyChecked.add(addition);
+      }
+    }
+  }
+
+  private class HeuristicBronKerboschCoverStrategy implements CoverStrategy {
+    private final StateComparator activeComparator;
+
+    public HeuristicBronKerboschCoverStrategy() {
+      if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR) {
+        activeComparator = new SuccessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.PREDECESSOR) {
+        activeComparator = new PredecessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.SUCCESSOR_PREDECESSOR) {
+        activeComparator = new SuccessorPredecessorComparator();
+      } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.NEIGHBOUR) {
+        activeComparator = new MostCompatibleComparator();
+      } else {
+        activeComparator = new RandomComparator();
+      }
+    }
+
+    @Override
+    public TIntList getCoversOf(final TIntList compatible)
+    {
+      final TIntList possibleAdditions =
+        new TIntArrayList(mNumStates - mStatesCompatibleWithAll.size());
+      getNeighboursOf(compatible, possibleAdditions);
+
+      activeComparator.setClique(compatible);
+      final WatersIntHeap sortedAdditions = new WatersIntHeap(possibleAdditions.toArray(), activeComparator);
+
+      final TIntSet maximalCompatibleIdsSet = new TIntHashSet();
+      heuristicBronKerbosch(compatible, sortedAdditions,
+                            maximalCompatibleIdsSet);
+      return new TIntArrayList(maximalCompatibleIdsSet);
+    }
+
+    private void heuristicBronKerbosch(final TIntList clique,
+                                       final WatersIntHeap possibleAdditions,
+                                       final TIntSet maximalCliquesIdsToFill)
+    {
+      //if we have exhausted all possibilities, this must be the largest clique we have seen
+      if (possibleAdditions.isEmpty()) {
+        clique.sort();
+        maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
+        return;
+      }
+
+      for (int a = 0; a < possibleAdditions.size(); a++) {
+        final int addition = possibleAdditions.removeFirst();
+
+        //create a copy with the new vertex
+        final TIntList newClique = new TIntArrayList(clique);
+        newClique.add(addition);
+
+        activeComparator.setClique(newClique);
+        //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
+        final WatersIntHeap newPossibleAdditions = new WatersIntHeap(possibleAdditions.size(), activeComparator);
+        final int[] additionsArray = possibleAdditions.toArray();
+        for (int i = 0; i < additionsArray.length; i++) {
+          final int oldPossibleAddition = additionsArray[i];
+          if (isNeighbour(addition, oldPossibleAddition)) {
+            newPossibleAdditions.add(oldPossibleAddition);
+          }
+        }
+
+        //find any maximal cliques based on newCliques and add them to the object referenced by cliques
+        heuristicBronKerbosch(newClique, newPossibleAdditions,
+                              maximalCliquesIdsToFill);
+
+        //exit early if we have found enough
+        if ((mMaxHeuristicCovers < 1 && !maximalCliquesIdsToFill.isEmpty()) || (mMaxHeuristicCovers > 1 && maximalCliquesIdsToFill.size() >= mMaxHeuristicCovers)) {
+          return;
+        }
+      }
+    }
+
+    private abstract class StateComparator implements WatersIntComparator {
+      protected TIntList clique;
+
+      public void setClique(final TIntList clique) {
+        this.clique = clique;
+      }
+
+      protected int successorCostSingle(final int state) {
+        mSetBuffer.clear();
+        getSuccessorStates(state, mSetBuffer);
+        int matches = 0;
+        for (int s = 0; s < clique.size(); s++) {
+          if (!mSetBuffer.contains(clique.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+      protected int predecessorCostSingle(final int state) {
+        mSetBuffer.clear();
+        getPredecessorStates(state, mSetBuffer);
+        int matches = 0;
+        for (int s = 0; s < clique.size(); s++) {
+          if (!mSetBuffer.contains(clique.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+      @SuppressWarnings("unused")
+      protected int successorCostMultiple(final int state) {
+        mListBuffer.clear();
+        getSuccessorStates(state, mListBuffer);
+        int matches = 0;
+        for (int s = 0; s < mListBuffer.size(); s++) {
+          if (!clique.contains(mListBuffer.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+
+      @SuppressWarnings("unused")
+      protected int predecessorCostMultiple(final int state) {
+        mListBuffer.clear();
+        getPredecessorStates(state, mListBuffer);
+        int matches = 0;
+        for (int s = 0; s < mListBuffer.size(); s++) {
+          if (!clique.contains(mListBuffer.get(s))) {
+            matches++;
+          }
+        }
+        return matches;
+      }
+
+      protected int neighbourCost(final int state) {
+        return mNumStates - mStateToNeighbourCountMap.get(state);
+      }
+    }
+
+    private class SuccessorPredecessorComparator extends StateComparator {
+
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        final int cost1 = successorCostSingle(state1) + predecessorCostSingle(state1);
+        final int cost2 = successorCostSingle(state2) + predecessorCostSingle(state2);
+        return Integer.compare(cost1, cost2);
+      }
+    }
+
+    private class SuccessorComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer.compare(successorCostSingle(state1), successorCostSingle(state2));
+      }
+    }
+
+    private class PredecessorComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer.compare(predecessorCostSingle(state1), predecessorCostSingle(state2));
+      }
+    }
+
+    private class MostCompatibleComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer.compare(neighbourCost(state1), neighbourCost(state2));
+      }
+
+    }
+
+    private class RandomComparator extends StateComparator {
+      @Override
+      public int compare(final int val1, final int val2)
+      {
+        return Integer.compare(HashFunctions.hash(val1), HashFunctions.hash(val1));
+      }
+    }
   }
 
   private boolean buildReducedSupervisor(final Candidate reducedSupervisor)
@@ -270,6 +760,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     //however we want the initial state to have index 0 so we will offset all values by that amount
     final PreTransitionBuffer transitionBuffer =
       new PreTransitionBuffer(relation.getNumberOfProperEvents());
+
     boolean hasExplicitDumpState = false;
 
     for (int s = 0; s < newSupervisor.length; s++) {
@@ -297,7 +788,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
 
         //map this successorCompatible to its index in our list of compatibles
-        int successorState = 0;
+        int successorState = -1;
 
         //map the dump state to a special state index
         if (successorCompatible.size() == 1
@@ -305,11 +796,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           successorState = newSupervisor.length;
           hasExplicitDumpState = true;
         } else {
-          for (; successorState < newSupervisor.length; successorState++) {
+          for (int j = 0; j < newSupervisor.length; j++) {
             final int successorCompatibleIndex =
-              (successorState + startStateIndexOffset) % newSupervisor.length;
+              (j + startStateIndexOffset) % newSupervisor.length;
             if (newSupervisor[successorCompatibleIndex]
               .containsAll(successorCompatible)) {
+              successorState = j;
               break;
             }
           }
@@ -348,202 +840,15 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       relation.setAllMarkings(s, newStateMarkings);
     }
 
+    relation.checkReachability();
+    if (relation.removeUnreachableTransitions()) {
+      System.out.println("Removed " + (newSupervisor.length - relation.getNumberOfStates()) + " unreachable states");
+    }
+
+    getLogger().info(relation.getNumberOfStates());
+    System.out.println("Reduced to " + relation.getNumberOfStates() + " states from " + mNumStates);
+
     return true;
-  }
-
-  /**
-   * Determines which of the dependent compatibles only has one maximal cover.
-   * These can be added directly to the candidate solution rather than the
-   * queue of dependencies. Adding a compatible to the candidate solution may
-   * introduce more dependencies, so this is done until saturation.
-   *
-   * @param candidate
-   *          The candidate solution to which we want to add compatibles
-   * @param dependentIds
-   *          The initial set of compatibles we know we need to cover in our
-   *          solution.
-   */
-  public void processNewDependencies(final Candidate candidate,
-                                     final TIntList dependentIds)
-  {
-    mAlreadyExaminedIdsBuffer.clear();
-    mStackBuffer.clear();
-    for (int i = 0; i < dependentIds.size(); i++) {
-      final int id = dependentIds.get(i);
-      mStackBuffer.push(id);
-      mAlreadyExaminedIdsBuffer.add(id);
-    }
-    processNewDependencies(candidate, mStackBuffer, mAlreadyExaminedIdsBuffer);
-  }
-
-  /**
-   * Determines which of the dependent compatibles only has one maximal cover.
-   * These can be added directly to the candidate solution rather than the
-   * queue of dependencies. Adding a compatible to the candidate solution may
-   * introduce more dependencies, so this is done until saturation.
-   *
-   * @param candidate
-   *          The candidate solution to which we want to add compatibles
-   * @param dependentId A compatible id we know we need to cover in our final solution.
-   */
-  public void processNewDependencies(final Candidate candidate,
-                                     final int dependentId)
-  {
-    mAlreadyExaminedIdsBuffer.clear();
-    mStackBuffer.clear();
-    mStackBuffer.push(dependentId);
-    mAlreadyExaminedIdsBuffer.add(dependentId);
-    processNewDependencies(candidate, mStackBuffer, mAlreadyExaminedIdsBuffer);
-  }
-
-  public void processNewDependencies(final Candidate candidate,
-                                     final TIntStack dependentIdStack,
-                                     final TIntSet alreadyProcessedIds) {
-    while (dependentIdStack.size() > 0) {
-      final int dependentId = dependentIdStack.pop();
-
-      mCompatibleBuffer.clear();
-      getCompatibleFromCache(dependentId, mCompatibleBuffer);
-
-      final TIntList singleMaximalCover =
-        checkForSingleMaximalCoverOf(mCompatibleBuffer);
-
-      if (singleMaximalCover == null) {
-        candidate.addDependency(dependentId);
-      } else {
-        singleMaximalCover.sort();
-        if (candidate.add(mCompatibleCache.add(singleMaximalCover))) {
-
-          mDependencyIdBuffer.clear();
-          mEnabledEventsBuffer.clear();
-          //get the compatible ids of its successors
-          getSuccessorCompatiblesOf(singleMaximalCover, mEnabledEventsBuffer,
-                                    mDependencyIdBuffer);
-
-          for (int j = 0; j < mDependencyIdBuffer.size(); j++) {
-            final int id = mDependencyIdBuffer.get(j);
-            if (alreadyProcessedIds.add(id)) {
-              dependentIdStack.push(id);
-            }
-          }
-        }
-
-      }
-    }
-  }
-
-  private void bronKerboschWithPivot(final TIntList clique,
-                                     final TIntList possibleAdditions,
-                                     final TIntList alreadyChecked,
-                                     final TIntList maximalCliquesIdsToFill)
-  {
-
-    //if we have exhausted all possibilities, this must be the largest clique we have seen
-    if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
-      clique.sort();
-      maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
-      return;
-    }
-
-    final int initialPossibleAdditionsSize = possibleAdditions.size();
-
-    int pivot = 0;
-    int mostNeighbours = 0;
-
-    for (int i = 0; i < initialPossibleAdditionsSize; i++) {
-      final int state = possibleAdditions.get(i);
-      final int numNeighbours = mStateToNeighbourCountMap.get(state);
-      if (numNeighbours > mostNeighbours) {
-        mostNeighbours = numNeighbours;
-        pivot = state;
-      }
-    }
-
-    for (int i = 0; i < alreadyChecked.size(); i++) {
-      final int state = alreadyChecked.get(i);
-      final int numNeighbours = mStateToNeighbourCountMap.get(state);
-      if (numNeighbours > mostNeighbours) {
-        mostNeighbours = numNeighbours;
-        pivot = state;
-      }
-    }
-
-    //go through each state we haven't tried adding yet
-    for (int a = initialPossibleAdditionsSize - 1; a >= 0; a--) {
-      final int addition = possibleAdditions.get(a);
-
-      //any search path trying to add a neighbour of the pivot will already be explored when the pivot is chosen as the addition, so skip
-      if (isNeighbour(pivot, addition)) {
-        continue;
-      }
-
-      //create a copy with the new vertex
-      final TIntList newClique = new TIntArrayList(clique);
-      newClique.add(addition);
-
-      //create a copy with a restricted set of neighbours: they have to also be neighbours of the state we are adding
-      final TIntList newPossibleAdditions =
-        new TIntArrayList(possibleAdditions.size());
-      for (int i = 0; i < possibleAdditions.size(); i++) {
-        final int oldPossibleAddition = possibleAdditions.get(i);
-        if (isNeighbour(addition, oldPossibleAddition)) {
-          newPossibleAdditions.add(oldPossibleAddition);
-        }
-      }
-
-      final TIntList newAlreadyChecked =
-        new TIntArrayList(alreadyChecked.size());
-      for (int i = 0; i < alreadyChecked.size(); i++) {
-        final int oldAlreadyChecked = alreadyChecked.get(i);
-        if (isNeighbour(addition, oldAlreadyChecked)) {
-          newAlreadyChecked.add(oldAlreadyChecked);
-        }
-      }
-
-      //find any maximal cliques based on newCliques and add them to the object referenced by cliques
-      bronKerboschWithPivot(newClique, newPossibleAdditions,
-                            newAlreadyChecked, maximalCliquesIdsToFill);
-
-      //remove the current candidate state from further consideration
-      possibleAdditions.removeAt(a);
-
-      //add to the list of states we have already checked
-      alreadyChecked.add(addition);
-    }
-  }
-
-  /**
-   * Determines whether the specified compatible can be covered by just one
-   * maximal compatible. This performs a mini BronKerbosch search that can
-   * exit early once it determines there is more than one maximal cover.
-   *
-   * @param compatible
-   *          The compatible we would like check
-   * @return null if there is more than one maximal cover, otherwise it
-   *         returns the single maximal cover.
-   */
-  private TIntList checkForSingleMaximalCoverOf(final TIntList compatible)
-  {
-    final TIntList neighbours = new TIntArrayList(mNumStates);
-    getNeighboursOf(compatible, neighbours);
-    final int neighboursSize = neighbours.size();
-
-    boolean allMutualNeighbours = true;
-    for (int i = 0; i < neighboursSize && allMutualNeighbours; i++) {
-      final int n1 = neighbours.get(i);
-      for (int j = 0; j < neighboursSize && allMutualNeighbours; j++) {
-        final int n2 = neighbours.get(j);
-        if (!isNeighbour(n1, n2)) {
-          allMutualNeighbours = false;
-        }
-      }
-    }
-    if (allMutualNeighbours) {
-      neighbours.addAll(compatible);
-      return neighbours;
-    } else {
-      return null;
-    }
   }
 
   private void getNeighboursOf(final TIntList compatible,
@@ -583,19 +888,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         neighboursToFill.add(s);
       }
     }
-  }
-
-  private TIntList getCoversOf(final TIntList compatible)
-  {
-    final TIntList possibleAdditions = new TIntArrayList(mNumStates);
-    getNeighboursOf(compatible, possibleAdditions);
-
-    //actually get the cover compatibles
-    final TIntList maximalCompatibleIds = new TIntArrayList();
-    bronKerboschWithPivot(compatible, possibleAdditions, new TIntArrayList(),
-                          maximalCompatibleIds);
-
-    return maximalCompatibleIds;
   }
 
   private void getCompatibleFromCache(final int compatibleId,
@@ -660,26 +952,40 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private int getSuccessorState(final int source, final int event)
   {
-    final TransitionIterator successorIterator =
-      getTransitionRelation().createSuccessorsReadOnlyIterator();
-    successorIterator.reset(source, event);
+    mSuccessorTransitionIterator.reset(source, event);
 
-    if (successorIterator.advance()) {
-      return successorIterator.getCurrentTargetState();
+    if (mSuccessorTransitionIterator.advance()) {
+      return mSuccessorTransitionIterator.getCurrentTargetState();
     } else {
       return -1;
+    }
+  }
+
+  private void getSuccessorStates(final int source,
+                                  final TIntCollection successorStatesToFill)
+  {
+    mSuccessorTransitionIterator.reset(source, -1);
+    while (mSuccessorTransitionIterator.advance()) {
+      successorStatesToFill.add(mSuccessorTransitionIterator.getCurrentTargetState());
+    }
+  }
+
+  private void getPredecessorStates(final int source,
+                                    final TIntCollection predecessorStatesToFill)
+  {
+    mPredecessorTransitionIterator.reset(source, -1);
+    while (mPredecessorTransitionIterator.advance()) {
+      predecessorStatesToFill
+        .add(mPredecessorTransitionIterator.getCurrentSourceState());
     }
   }
 
   private void getSuccessorEvents(final int source,
                                   final TIntSet successorEventsToFill)
   {
-    final TransitionIterator successorIterator =
-      getTransitionRelation().createSuccessorsReadOnlyIterator();
-    successorIterator.resetState(source);
-
-    while (successorIterator.advance()) {
-      successorEventsToFill.add(successorIterator.getCurrentEvent());
+    mSuccessorTransitionIterator.reset(source, -1);
+    while (mSuccessorTransitionIterator.advance()) {
+      successorEventsToFill.add(mSuccessorTransitionIterator.getCurrentEvent());
     }
   }
 
@@ -1044,16 +1350,28 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mIsFindFirst = false;
+  private HeuristicCoverStrategy mHeuristicCoverStrategy = HeuristicCoverStrategy.NONE;
+  private int mMaxHeuristicCovers = -1;
+
+  private TransitionIterator mPredecessorTransitionIterator;
+  private TransitionIterator mSuccessorTransitionIterator;
+
   private int mDumpState;
   private int mNumStates;
+
   private boolean[][] mIncompatibilityRelation;
   private int mInitialCompatibleId;
   private IntSetBuffer mCompatibleCache;
+
   private TIntList mCompatibleBuffer;
   private TIntList mDependencyIdBuffer;
   private TIntSet mEnabledEventsBuffer;
-  private TIntSet mAlreadyExaminedIdsBuffer;
+
+  private TIntList mListBuffer;
+  private TIntSet mSetBuffer;
   private TIntStack mStackBuffer;
+
   private TIntIntMap mStateToNeighbourCountMap;
   private TIntSet mStatesCompatibleWithAll;
 }

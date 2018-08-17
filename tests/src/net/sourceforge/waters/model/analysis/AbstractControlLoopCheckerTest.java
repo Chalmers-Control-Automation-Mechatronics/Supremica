@@ -40,15 +40,13 @@ import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -632,92 +630,40 @@ public abstract class AbstractControlLoopCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
   {
-    final LoopTraceProxy counterexample = (LoopTraceProxy) trace;
+    final LoopCounterExampleProxy castTest = (LoopCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
+    final List<EventProxy> eventList = trace.getEvents();
+    final int len = eventList.size();
+    final int loopIndex = trace.getLoopIndex();
     final Collection<AutomatonProxy> automata = des.getAutomata();
-    final List<EventProxy> eventlist = counterexample.getEvents();
-    final int len = eventlist.size();
-    final int loopIndex = counterexample.getLoopIndex();
 
-    // General: if counterexample is null
-    assertNotNull(counterexample);
+    // 1. Counterexample must have non-empty loop
+    assertTrue("Empty control-loop counterexample!", len > 0);
+    assertTrue("Control-loop counterexample has no loop!", loopIndex >= 0);
+    assertTrue("Control-loop counterexample has empty loop!",
+               len - loopIndex > 0);
 
-    // General: if counterexample is empty
-    assertTrue("Empty Counterexample!", len > 0);
-
-    // 1. All events in the loops are controllable
-    for(int i = loopIndex; i < len; i++){
-      assertTrue("Event " + eventlist.get(i).getName() +
+    // 2. All events in the loop must be controllable
+    for (int i = loopIndex; i < len; i++){
+      final EventProxy event = eventList.get(i);
+      assertTrue("Event " + event.getName() +
                  "in loop is not controllable",
-                 eventlist.get(i).getKind() == EventKind.CONTROLLABLE);
+                 event.getKind() == EventKind.CONTROLLABLE);
     }
 
-    // 2. Loop must not be empty
-    assertTrue("Loop is empty!", len - loopIndex > 0);
-
-    // 3. Check trace is available in each automaton
-    // 3.1. Check control loop is actually a loop
-    for (final AutomatonProxy aProxy : automata) {
-      final ComponentKind kind = aProxy.getKind();
-      switch (kind) {
+    // 3. Trace must be accepted by each automaton
+    for (final AutomatonProxy aut : automata) {
+      switch (aut.getKind()) {
       case PLANT:
       case SPEC:
-        final boolean accepted =
-          checkCounterExample(aProxy, eventlist, loopIndex);
-        assertTrue("Counterexample not accepted by " +
-                   aProxy.getName(), accepted);
+        checkTrace(aut, trace);
         break;
       default:
         break;
       }
     }
-  }
-
-  private boolean checkCounterExample(final AutomatonProxy automaton,
-                                      final List<EventProxy> counterexample,
-                                      final int loopIndex)
-  {
-    final Collection<EventProxy> events = automaton.getEvents();
-    final Collection<StateProxy> states = automaton.getStates();
-    final Collection<TransitionProxy> transitions = automaton.getTransitions();
-
-    // Get initial state to current state
-    StateProxy currState = null;
-    for(final StateProxy sProxy: states){
-      if(sProxy.isInitial()){
-        currState = sProxy;
-        break;
-      }
-    }
-
-    if(currState == null){
-      return false;
-    }
-
-    int index = 0;
-    StateProxy loopStart = null;
-    for (final EventProxy eProxy: counterexample){
-      if (index++ == loopIndex) {
-        loopStart = currState;
-      }
-      if (events.contains(eProxy)) {
-        boolean found = false;
-        for (final TransitionProxy trans : transitions) {
-          if (trans.getSource() == currState && trans.getEvent() == eProxy) {
-            currState = trans.getTarget();
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          return false;
-        }
-      }
-    }
-
-    // check there is a loop
-    return (loopStart == currState);
   }
 
 }

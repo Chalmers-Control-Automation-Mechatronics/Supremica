@@ -273,6 +273,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_notDiag2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module = loadModule("tests", "diagnosability", "notDiag_2");
+    testCompile(module);
+  }
+
   public void testCompile_order()
     throws IOException, WatersException
   {

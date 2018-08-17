@@ -42,12 +42,14 @@ import java.util.Map;
 
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -78,22 +80,6 @@ public class ProductDESProxyPrinter
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
   @Override
-  public Object visitConflictTraceProxy(final ConflictTraceProxy trace)
-    throws VisitorException
-  {
-    print("CONFLICT TRACE ");
-    print(trace.getName());
-    final ConflictKind kind = trace.getKind();
-    if (kind != ConflictKind.CONFLICT) {
-      print(" (");
-      print(kind.toString());
-      print(')');
-    }
-    visitTraceProxy(trace);
-    return null;
-  }
-
-  @Override
   public Object visitAutomatonProxy(final AutomatonProxy aut)
     throws VisitorException
   {
@@ -114,6 +100,43 @@ public class ProductDESProxyPrinter
   }
 
   @Override
+  public Object visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("CONFLICT COUNTEREXAMPLE ");
+    print(counter.getName());
+    final ConflictKind kind = counter.getKind();
+    if (kind != ConflictKind.CONFLICT) {
+      print(" (");
+      print(kind.toString());
+      print(')');
+    }
+    printCounterExampleHeader(counter);
+    final TraceProxy trace = counter.getTrace();
+    return printTraceProxy(trace, 0);
+  }
+
+  @Override
+  public Object visitCounterExampleProxy(final CounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
+  }
+
+  @Override
+  public Object visitDualCounterExampleProxy
+    (final DualCounterExampleProxy counter)
+    throws VisitorException
+  {
+    print("DUAL COUNTEREXAMPLE ");
+    print(counter.getName());
+    return printCounterExample(counter);
+  }
+
+  @Override
   public Object visitEventProxy(final EventProxy event)
     throws VisitorException
   {
@@ -130,14 +153,15 @@ public class ProductDESProxyPrinter
   }
 
   @Override
-  public Object visitLoopTraceProxy(final LoopTraceProxy trace)
+  public Object visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy counter)
     throws VisitorException
   {
-    print("LOOP TRACE ");
-    print(trace.getName());
-    final int loop = trace.getLoopIndex();
-    visitTraceProxy(trace, loop);
-    return null;
+    print("LOOP COUNTEREXAMPLE ");
+    print(counter.getName());
+    printCounterExampleHeader(counter);
+    final TraceProxy trace = counter.getTrace();
+    return printTraceProxy(trace, 0);
   }
 
   @Override
@@ -153,13 +177,15 @@ public class ProductDESProxyPrinter
   }
 
   @Override
-  public Object visitSafetyTraceProxy(final SafetyTraceProxy trace)
+  public Object visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy counter)
     throws VisitorException
   {
-    print("SAFETY TRACE ");
-    print(trace.getName());
-    visitTraceProxy(trace);
-    return null;
+    print("SAFETY COUNTEREXAMPLE ");
+    print(counter.getName());
+    printCounterExampleHeader(counter);
+    final TraceProxy trace = counter.getTrace();
+    return printTraceProxy(trace, 0);
   }
 
   @Override
@@ -182,7 +208,7 @@ public class ProductDESProxyPrinter
   public Object visitTraceProxy(final TraceProxy trace)
     throws VisitorException
   {
-    visitTraceProxy(trace, -1);
+    printTraceProxy(trace, -1);
     return null;
   }
 
@@ -232,18 +258,45 @@ public class ProductDESProxyPrinter
 
   //#########################################################################
   //# Auxiliary Methods
-  public Object visitTraceProxy(final TraceProxy trace, final int loop)
+  private Object printCounterExample(final CounterExampleProxy counter)
     throws VisitorException
   {
-    println(" {");
-    indentIn();
-    printComment(trace);
-    final ProductDESProxy des = trace.getProductDES();
+    printCounterExampleHeader(counter);
+    int i = 1;
+    for (final TraceProxy trace : counter.getTraces()) {
+      printTraceProxy(trace, i++);
+    }
+    return null;
+  }
+
+  private void printCounterExampleHeader(final CounterExampleProxy counter)
+    throws VisitorException
+  {
+    println();
+    printComment(counter);
+    final ProductDESProxy des = counter.getProductDES();
     final List<ProductDESProxy> list = Collections.singletonList(des);
     printRefCollection("DES", list);
-    printRefCollection("AUTOMATA", trace.getAutomata());
-    println("STEPS {");
+    printRefCollection("AUTOMATA", counter.getAutomata());
+  }
+
+  private Object printTraceProxy(final TraceProxy trace,
+                                 final int traceNo)
+    throws VisitorException
+  {
+    print("TRACE");
+    if (traceNo > 0) {
+      print(" #");
+      print(traceNo);
+    }
+    final String name = trace.getName();
+    if (name != null && name.length() > 0) {
+      print(": ");
+      print(name);
+    }
+    println(" {");
     indentIn();
+    final int loop = trace.getLoopIndex();
     int index = 0;
     for (final TraceStepProxy step : trace.getTraceSteps()) {
       visitTraceStepProxy(step);
@@ -251,8 +304,6 @@ public class ProductDESProxyPrinter
         println("Loop begins here:");
       }
     }
-    indentOut();
-    println('}');
     indentOut();
     println('}');
     return null;

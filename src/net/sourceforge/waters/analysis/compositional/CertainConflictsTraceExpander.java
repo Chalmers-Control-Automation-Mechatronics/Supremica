@@ -61,8 +61,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -391,8 +392,9 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
     if (mSafetyVerifier.run()) {
       return -1;
     } else {
-      final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
-      final int state = getTestAutomatonEndState(trace);
+      final SafetyCounterExampleProxy counter =
+        mSafetyVerifier.getCounterExample();
+      final int state = getTestAutomatonEndState(counter);
       return state;
     }
   }
@@ -450,14 +452,16 @@ public class CertainConflictsTraceExpander extends TRTraceExpander
     return current;
   }
 
-  private int getTestAutomatonEndState(final SafetyTraceProxy trace)
+  private int getTestAutomatonEndState(final SafetyCounterExampleProxy counter)
   {
+    final TraceProxy trace = counter.getTrace();
     return getTestAutomatonEndState(trace.getTraceSteps());
   }
 
   private List<TraceStepProxy> getAdditionalSteps() throws AnalysisException
   {
-    final SafetyTraceProxy trace = mSafetyVerifier.getCounterExample();
+    final SafetyCounterExampleProxy counter = mSafetyVerifier.getCounterExample();
+    final TraceProxy trace = counter.getTrace();
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     final List<TraceStepProxy> saturatedSteps =
       getSaturatedTraceSteps(steps, mCheckAutomata);

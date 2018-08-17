@@ -81,8 +81,8 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -1405,7 +1405,8 @@ public class ModelAssessor
     @Override
     void printDiagnostics()
     {
-      final TraceProxy trace = mVerifier.getCounterExample();
+      final CounterExampleProxy counter = mVerifier.getCounterExample();
+      final TraceProxy trace = counter.getTraces().get(0);
       if (trace != null) {
         mOutput.print("--- counterexample: ");
         final List<EventProxy> events = trace.getEvents();
@@ -1421,13 +1422,10 @@ public class ModelAssessor
             } else {
               mOutput.print(", ");
             }
-            if (trace instanceof LoopTraceProxy) {
-              final LoopTraceProxy loop = (LoopTraceProxy) trace;
-              if (step == loop.getLoopIndex()) {
-                mOutput.print("$\\langle$loop begins here$\\rangle$ ");
-              }
-              step++;
+            if (step == trace.getLoopIndex()) {
+              mOutput.print("$\\langle$loop begins here$\\rangle$ ");
             }
+            step++;
             final String name = event.getName();
             final Matcher matcher = pattern.matcher(name);
             if (matcher.find()) {

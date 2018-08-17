@@ -39,8 +39,9 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
@@ -61,22 +62,24 @@ public class AllHeuristic
     mType = type;
   }
 
+  @Override
   public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
                                          final Set<AutomatonProxy> nonComposedPlants,
                                          final Set<AutomatonProxy> nonComposedSpecPlants,
                                          final Set<AutomatonProxy> nonComposedSpecs,
-                                         final TraceProxy counterExample)
+                                         final SafetyCounterExampleProxy counterExample)
   {
+    final TraceProxy trace = counterExample.getTrace();
     final Collection<AutomatonProxy> automata = new ArrayList<AutomatonProxy>();
     for (final AutomatonProxy automaton : nonComposedPlants) {
-      if (getNumberOfAcceptedEvents(automaton, counterExample) != counterExample.getEvents().size()) {
+      if (getNumberOfAcceptedEvents(automaton, trace) != trace.getEvents().size()) {
         automata.add(automaton);
       }
     }
     final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automata.isEmpty();
     if (automata.size() == 0 || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       for (final AutomatonProxy automaton : nonComposedSpecPlants) {
-        if (getNumberOfAcceptedEvents(automaton, counterExample) != counterExample.getEvents().size()) {
+        if (getNumberOfAcceptedEvents(automaton, trace) != trace.getEvents().size()) {
           automata.add(automaton);
         }
       }
@@ -86,9 +89,9 @@ public class AllHeuristic
         runspecs) {
       final KindTranslator translator = getKindTranslator();
       for (final AutomatonProxy automaton : nonComposedSpecs) {
-        final int i = getNumberOfAcceptedEvents(automaton, counterExample);
-        if (i != counterExample.getEvents().size()
-            && translator.getEventKind(counterExample.getEvents().get(i))
+        final int i = getNumberOfAcceptedEvents(automaton, trace);
+        if (i != trace.getEvents().size()
+            && translator.getEventKind(trace.getEvents().get(i))
             == EventKind.CONTROLLABLE) {
           automata.add(automaton);
         }

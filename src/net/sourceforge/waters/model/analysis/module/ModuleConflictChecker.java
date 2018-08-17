@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 
@@ -43,8 +43,8 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  * is <I>nonblocking</I>.
  * A conflict checker analyses the input model and returns with success if
  * the synchronous product of the automata in the model is nonblocking;
- * otherwise it returns with failure and produces a <I>conflict error
- * trace</I> ({@link ConflictTraceProxy}).</P>
+ * otherwise it returns with failure and produces a <I>conflict
+ * counterexample</I> ({@link ConflictCounterExampleProxy}).</P>
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -122,6 +122,6 @@ public interface ModuleConflictChecker extends ModuleVerifier
    *         property is satisfied and there is no counterexample.
    */
   @Override
-  public ConflictTraceProxy getCounterExample();
+  public ConflictCounterExampleProxy getCounterExample();
 
 }

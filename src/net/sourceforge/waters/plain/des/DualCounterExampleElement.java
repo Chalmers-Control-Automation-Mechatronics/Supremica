@@ -34,140 +34,97 @@
 package net.sourceforge.waters.plain.des;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
- * A counterexample trace for a loop property of a product DES.
- * This is a simple immutable implementation of the {@link LoopTraceProxy}
- * interface.
+ * A counterexample consisting of two traces.
+ * This is a simple immutable implementation of the {@link
+ * DualCounterExampleProxy} interface.
  *
  * @author Robi Malik
  */
 
-public final class LoopTraceElement
-  extends TraceElement
-  implements LoopTraceProxy
+public class DualCounterExampleElement
+  extends CounterExampleElement
+  implements DualCounterExampleProxy
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new loop trace.
-   * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
+   * Creates a new dual counterexample.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
    *                      document, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
+   * @param  des          The product DES for which this counterexample is
    *                      generated.
-   * @param  automata     The set of automata for the new trace,
+   * @param  automata     The set of automata for the new counterexample,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps consituting the
-   *                      new trace. This list may not be empty, because
-   *                      the first step must always represent the
-   *                      initial state.
-   * @param  index        The loop index of the new trace.
+   * @param  trace1       The first of the two traces that define the dual
+   *                      counterexample.
+   * @param  trace2       The second of the two traces that define the dual
+   *                      counterexample.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
-  LoopTraceElement(final String name,
-                   final String comment,
-                   final URI location,
-                   final ProductDESProxy des,
-                   final Collection<? extends AutomatonProxy> automata,
-                   final List<? extends TraceStepProxy> steps,
-                   final int index)
+  public DualCounterExampleElement(final String name,
+                                   final String comment,
+                                   final URI location,
+                                   final ProductDESProxy des,
+                                   final Collection<? extends AutomatonProxy> automata,
+                                   final TraceProxy trace1,
+                                   final TraceProxy trace2)
   {
-    super(name, comment, location, des, automata, steps);
-    mLoopIndex = index;
-  }
-
-  /**
-   * Creates a new loop trace using default values.  This constructor
-   * provides a simple interface to create a trace for a deterministic
-   * product DES. It creates a trace with a <CODE>null</CODE> file
-   * location, with a set of automata equal to that of the product DES, and
-   * without any state information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
-   *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
-   * @param  index        The loop index of the new trace.
-   * @throws ItemNotFoundException to indicate that one of the given
-   *                      events cannot be found in the product DES.
-   */
-  LoopTraceElement(final String name,
-                   final ProductDESProxy des,
-                   final List<? extends EventProxy> events,
-                   final int index)
-  {
-    super(name, des, events);
-    mLoopIndex = index;
+    super(name, comment, location, des, automata,
+          Arrays.asList(new TraceProxy[] {trace1, trace2}));
   }
 
 
   //#########################################################################
   //# Interface java.lang.Cloneable
   /**
-   * Returns a copy of this product DES.
+   * Returns a copy of this loop counterexample.
    */
   @Override
-  public LoopTraceElement clone()
+  public DualCounterExampleElement clone()
   {
-    return (LoopTraceElement) super.clone();
+    return (DualCounterExampleElement) super.clone();
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
   @Override
+  public Class<DualCounterExampleProxy> getProxyInterface()
+  {
+    return DualCounterExampleProxy.class;
+  }
+
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
-    final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-    return desvisitor.visitLoopTraceProxy(this);
+    final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
+    return desVisitor.visitDualCounterExampleProxy(this);
   }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.des.LoopTraceProxy
-  @Override
-  public int getLoopIndex()
-  {
-    return mLoopIndex;
-  }
-
-
-  //#########################################################################
-  //# Equals and Hashcode
-  @Override
-  public Class<LoopTraceProxy> getProxyInterface()
-  {
-    return LoopTraceProxy.class;
-  }
-
-
-  //#########################################################################
-  //# Data Members
-  private final int mLoopIndex;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -9128906018195923790L;
 
 }

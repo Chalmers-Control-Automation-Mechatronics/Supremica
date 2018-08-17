@@ -57,8 +57,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -259,14 +260,16 @@ public class MonolithicSafetyVerifier
       }
       if (initUncontrollable != null) {
         final ProductDESProxyFactory factory = getFactory();
-        final String tracename = getTraceName();
+        final String traceName = getTraceName();
         final String comment =
           getTraceComment(null, initUncontrollable, null);
         final TraceStepProxy step = factory.createTraceStepProxy(null);
         final List<TraceStepProxy> steps = Collections.singletonList(step);
-        final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
-          (tracename, comment, null, model, automata, steps);
-        return setFailedResult(counterexample);
+        final TraceProxy trace = factory.createTraceProxy(steps);
+        final SafetyCounterExampleProxy counter =
+          factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                  model, automata, trace);
+        return setFailedResult(counter);
       }
 
       // Set the mCodePosition list
@@ -285,8 +288,8 @@ public class MonolithicSafetyVerifier
       if (isControllable(mSystemState)) {
         return setSatisfiedResult();
       } else {
-        final SafetyTraceProxy counterexample = computeCounterExample();
-        return setFailedResult(counterexample);
+        final SafetyCounterExampleProxy counter = computeCounterExample();
+        return setFailedResult(counter);
       }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
@@ -533,7 +536,7 @@ public class MonolithicSafetyVerifier
    *         has been called, or model checking has found that the
    *         property is satisfied and there is no counterexample.
    */
-  private SafetyTraceProxy computeCounterExample()
+  private SafetyCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
@@ -617,13 +620,14 @@ public class MonolithicSafetyVerifier
     }
     final TraceStepProxy init = factory.createTraceStepProxy(null);
     steps.add(0, init);
-    final String tracename = getTraceName();
+    final String traceName = getTraceName();
     final String comment = getTraceComment(event0, aut, state0);
     final List<AutomatonProxy> automata = Arrays.asList(mAutomata);
-    final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-      (tracename, comment, null, des, automata, steps);
-    return trace;
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                   des, automata, trace);
   }
+
 
   //#########################################################################
   //# Data Members

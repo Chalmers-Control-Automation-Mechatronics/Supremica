@@ -62,8 +62,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -508,7 +509,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     {
       mCheckAutomata = mSafetyVerifier.getModel().getAutomata();
       mCheckStateMap = mReverseStateMap;
-      mTrace = mSafetyVerifier.getCounterExample();
+      mCounterExample = mSafetyVerifier.getCounterExample();
       mTestAutomaton = testAut;
       mTestAutomatonStateEncoding = stateEnc;
       final int state = getTestAutomatonEndState();
@@ -528,7 +529,8 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     private int getTestAutomatonEndState()
     {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final List<TraceStepProxy> steps = mTrace.getTraceSteps();
+      final TraceProxy trace = mCounterExample.getTrace();
+      final List<TraceStepProxy> steps = trace.getTraceSteps();
       final int numSteps = steps.size();
       final ListIterator<TraceStepProxy> iter = steps.listIterator(numSteps);
       int current = -1;
@@ -570,7 +572,8 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
     private List<TraceStepProxy> getAdditionalSteps()
       throws AnalysisException
     {
-      final List<TraceStepProxy> steps = mTrace.getTraceSteps();
+      final TraceProxy trace = mCounterExample.getTrace();
+      final List<TraceStepProxy> steps = trace.getTraceSteps();
       final List<TraceStepProxy> saturatedSteps =
         getSaturatedTraceSteps(steps, mCheckAutomata);
       final List<TraceStepProxy> relabelledSteps =
@@ -629,7 +632,7 @@ public class LimitedCertainConflictsTraceExpander extends TRTraceExpander
 
     //#######################################################################
     //# Data Members
-    private final SafetyTraceProxy mTrace;
+    private final SafetyCounterExampleProxy mCounterExample;
     private final Collection<AutomatonProxy> mCheckAutomata;
     /**
      * The reverse state map that was used when creating the language

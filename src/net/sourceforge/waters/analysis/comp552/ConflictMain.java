@@ -40,7 +40,7 @@ import java.util.Collections;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -144,7 +144,8 @@ public class ConflictMain
         } else {
           System.out.println("CONFLICTING");
           System.out.println("Counterexample:");
-          final ConflictTraceProxy counterex = checker.getCounterExample();
+          final ConflictCounterExampleProxy counterex =
+            checker.getCounterExample();
           System.out.println(counterex.toString());
         }
       }

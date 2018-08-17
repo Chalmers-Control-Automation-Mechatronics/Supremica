@@ -39,7 +39,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -88,6 +88,7 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run() throws AnalysisException
   {
     setUp();
@@ -112,12 +113,12 @@ public class SICProperty5Verifier extends AbstractSICConflictChecker
           recordStatistics(result);
         }
         if (!result.isSatisfied()) {
-          final ConflictTraceProxy counterexample =
-              checker.getCounterExample();
-          final ConflictTraceProxy convertedTrace =
-              builder.convertTraceToOriginalModel(counterexample, answer);
+          final ConflictCounterExampleProxy counterexample =
+            checker.getCounterExample();
+          final ConflictCounterExampleProxy converted =
+            builder.convertTraceToOriginalModel(counterexample, answer);
           mFailedAnswer = answer;
-          return setFailedResult(convertedTrace);
+          return setFailedResult(converted);
         }
       }
       return setSatisfiedResult();

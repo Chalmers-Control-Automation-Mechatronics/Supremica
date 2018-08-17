@@ -31,35 +31,32 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.plain.des;
+package net.sourceforge.waters.model.des;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
-import net.sourceforge.waters.model.des.AbstractTraceTest;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
 
 
-public class PlainTraceTest extends AbstractTraceTest
+public class CounterExampleIntegrityChecker
+  extends DocumentIntegrityChecker<CounterExampleProxy>
 {
 
   //#########################################################################
-  //# Overrides for junit.framework.TestCase
-  public static Test suite() {
-    return new TestSuite(PlainTraceTest.class);
+  //# Singleton Pattern
+  public static CounterExampleIntegrityChecker getInstance()
+  {
+    return SingletonHolder.INSTANCE;
   }
 
-  public static void main(String args[]) {
-    junit.textui.TestRunner.run(suite());
+  private static class SingletonHolder {
+    private static final CounterExampleIntegrityChecker INSTANCE =
+      new CounterExampleIntegrityChecker();
   }
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.des.TraceTest
-  protected ProductDESProxyFactory getProductDESProxyFactory()
+  //# Constructor
+  protected CounterExampleIntegrityChecker()
   {
-    return ProductDESElementFactory.getInstance();
   }
 
 }

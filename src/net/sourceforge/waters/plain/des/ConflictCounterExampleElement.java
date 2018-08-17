@@ -35,94 +35,82 @@ package net.sourceforge.waters.plain.des;
 
 import java.net.URI;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 
-import net.sourceforge.waters.model.base.ItemNotFoundException;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 /**
- * A counterexample trace for a conflict property of a product DES.
- * This is a simple immutable implementation of the {@link ConflictTraceProxy}
- * interface.
+ * A counterexample that shows that a model is blocking or has a deadlock.
+ * This is a simple immutable implementation of the {@link
+ * ConflictCounterExampleProxy} interface.
  *
  * @author Robi Malik
  */
 
-public class ConflictTraceElement
-  extends TraceElement
-  implements ConflictTraceProxy
+public class ConflictCounterExampleElement
+  extends CounterExampleElement
+  implements ConflictCounterExampleProxy
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new conflict trace.
-   * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
+   * Creates a new conflict counterexample by specifying all arguments.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  comment      A comment describing the new counterexample,
    *                      or <CODE>null</CODE>.
    * @param  location     The URI to be associated with the new
-   *                      document, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
+   *                      counterexample, or <CODE>null</CODE>.
+   * @param  des          The product DES for which this counterexample is
    *                      generated.
-   * @param  automata     The set of automata for the new trace,
+   * @param  automata     The set of automata for the new counterexample,
    *                      or <CODE>null</CODE> if empty.
-   * @param  steps        The list of trace steps constituting the
-   *                      new trace. This list may not be empty, because
-   *                      the first step must always represent the
-   *                      initial state.
-   * @param  kind         The type of this conflict trace,
+   * @param  trace        The trace that defines the new counterexample.
+   * @param  kind         The type of this conflict counterexample,
    *                      one of {@link ConflictKind#CONFLICT},
    *                      {@link ConflictKind#DEADLOCK}, or
    *                      {@link ConflictKind#LIVELOCK}.
-   * @throws ItemNotFoundException to indicate that one of the given
-   *                      automata, events, or states cannot be found
-   *                      in the product DES.
    */
-  ConflictTraceElement(final String name,
-                       final String comment,
-                       final URI location,
-                       final ProductDESProxy des,
-                       final Collection<? extends AutomatonProxy> automata,
-                       final List<? extends TraceStepProxy> steps,
-                       final ConflictKind kind)
+  ConflictCounterExampleElement(final String name,
+                                final String comment,
+                                final URI location,
+                                final ProductDESProxy des,
+                                final Collection<? extends AutomatonProxy> automata,
+                                final TraceProxy trace,
+                                final ConflictKind kind)
   {
-    super(name, comment, location, des, automata, steps);
+    super(name, comment, location,
+          des, automata, Collections.singletonList(trace));
     mKind = kind;
   }
 
   /**
-   * Creates a new conflict trace using default values.  This constructor
-   * provides a simple interface to create a trace for a deterministic
-   * product DES. It creates a trace with a <CODE>null</CODE> file
-   * location, with a set of automata equal to that of the product DES, and
-   * without any state information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
+   * Creates a new conflict counterexample using default values.
+   * This constructor provides a simple interface with a <CODE>null</CODE>
+   * file location, with a set of automata equal to that of the product DES.
+   * @param  name         The name to be given to the new counterexample.
+   * @param  des          The product DES for which the new counterexample is
    *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
-   * @param  kind         The type of this conflict trace,
+   * @param  trace        The trace that defines the new counterexample.
+   * @param  kind         The type of this conflict counterexample,
    *                      one of {@link ConflictKind#CONFLICT},
    *                      {@link ConflictKind#DEADLOCK}, or
    *                      {@link ConflictKind#LIVELOCK}.
-   * @throws ItemNotFoundException to indicate that one of the given
-   *                      events cannot be found in the product DES.
    */
-  ConflictTraceElement(final String name,
-                       final ProductDESProxy des,
-                       final List<? extends EventProxy> events,
-                       final ConflictKind kind)
+  ConflictCounterExampleElement(final String name,
+                                final ProductDESProxy des,
+                                final TraceProxy trace,
+                                final ConflictKind kind)
   {
-    super(name, des, events);
+    super(name, des, Collections.singletonList(trace));
     mKind = kind;
   }
 
@@ -130,41 +118,44 @@ public class ConflictTraceElement
   //#########################################################################
   //# Interface java.lang.Cloneable
   /**
-   * Returns a copy of this product DES.
+   * Returns a copy of this conflict counterexample.
    */
   @Override
-  public ConflictTraceElement clone()
+  public ConflictCounterExampleElement clone()
   {
-    return (ConflictTraceElement) super.clone();
+    return (ConflictCounterExampleElement) super.clone();
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.base.Proxy
   @Override
+  public Class<ConflictCounterExampleProxy> getProxyInterface()
+  {
+    return ConflictCounterExampleProxy.class;
+  }
+
+  @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
-    final ProductDESProxyVisitor desvisitor = (ProductDESProxyVisitor) visitor;
-    return desvisitor.visitConflictTraceProxy(this);
+    final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
+    return desVisitor.visitConflictCounterExampleProxy(this);
   }
 
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.des.ConflictTraceProxy
+ //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.ConflictCounterExampleProxy
   @Override
   public ConflictKind getKind()
   {
     return mKind;
   }
 
-
-  //#########################################################################
-  //# Equals and Hashcode
   @Override
-  public Class<ConflictTraceProxy> getProxyInterface()
+  public TraceProxy getTrace()
   {
-    return ConflictTraceProxy.class;
+    return getTraces().get(0);
   }
 
 
@@ -175,6 +166,6 @@ public class ConflictTraceElement
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 7202862385571680902L;
 
 }

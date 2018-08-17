@@ -54,60 +54,89 @@ public class DefaultProductDESProxyVisitor
   implements ProductDESProxyVisitor
 {
 
+  @Override
   public Object visitAutomatonProxy(final AutomatonProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
-  public Object visitConflictTraceProxy(final ConflictTraceProxy proxy)
+  @Override
+  public Object visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
   }
 
+  @Override
+  public Object visitCounterExampleProxy
+    (final CounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitDocumentProxy(proxy);
+  }
+
+  @Override
+  public Object visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Object visitEventProxy(final EventProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
-  public Object visitLoopTraceProxy(final LoopTraceProxy proxy)
+  @Override
+  public Object visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
   }
 
+  @Override
   public Object visitProductDESProxy(final ProductDESProxy proxy)
     throws VisitorException
   {
     return visitDocumentProxy(proxy);
   }
 
-  public Object visitSafetyTraceProxy(final SafetyTraceProxy proxy)
+  @Override
+  public Object visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy proxy)
     throws VisitorException
   {
-    return visitTraceProxy(proxy);
+    return visitCounterExampleProxy(proxy);
   }
 
+  @Override
   public Object visitStateProxy(final StateProxy proxy)
     throws VisitorException
   {
     return visitNamedProxy(proxy);
   }
 
+  @Override
   public Object visitTraceProxy(final TraceProxy proxy)
     throws VisitorException
   {
-    return visitDocumentProxy(proxy);
+    return visitProxy(proxy);
   }
 
+  @Override
   public Object visitTraceStepProxy(final TraceStepProxy proxy)
     throws VisitorException
   {
     return visitProxy(proxy);
   }
 
+  @Override
   public Object visitTransitionProxy(final TransitionProxy proxy)
     throws VisitorException
   {

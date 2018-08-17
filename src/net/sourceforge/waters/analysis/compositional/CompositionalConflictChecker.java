@@ -58,11 +58,12 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -217,9 +218,9 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -566,24 +567,21 @@ public class CompositionalConflictChecker
   }
 
   @Override
-  protected ConflictTraceProxy createTrace
+  protected ConflictCounterExampleProxy createCounterExample
     (final Collection<AutomatonProxy> automata,
      final List<TraceStepProxy> steps)
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy model = getModel();
-    final String tracename = AbstractConflictChecker.getTraceName(model);
+    final String traceName = AbstractConflictChecker.getTraceName(model);
     final CompositionalVerificationResult result = getAnalysisResult();
-    final ConflictTraceProxy trace =
-      (ConflictTraceProxy) result.getCounterExample();
-    final ConflictKind kind = trace.getKind();
-    return factory.createConflictTraceProxy(tracename,
-                                            null,  // comment?
-                                            null,
-                                            model,
-                                            automata,
-                                            steps,
-                                            kind);
+    final ConflictCounterExampleProxy oldCounter =
+      (ConflictCounterExampleProxy) result.getCounterExample();
+    final ConflictKind kind = oldCounter.getKind();
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return
+      factory.createConflictCounterExampleProxy(traceName, null, null,
+                                                model, automata, trace, kind);
   }
 
   @Override
@@ -595,7 +593,7 @@ public class CompositionalConflictChecker
     final KindTranslator translator = getKindTranslator();
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final EventProxy preconditionMarking = getUsedPreconditionMarking();
-    TraceChecker.checkConflictCounterExample(steps, automata,
+    TraceChecker.checkConflictTrace(steps, automata,
                                              preconditionMarking,
                                              defaultMarking,
                                              true, translator);
@@ -673,8 +671,8 @@ public class CompositionalConflictChecker
     final CompositionalVerificationResult result = getAnalysisResult();
     if (preconditionMarking == null) {
       if (result.getCounterExample() == null) {
-        final ConflictTraceProxy trace = createInitialStateTrace();
-        result.setCounterExample(trace);
+        final ConflictCounterExampleProxy counter = createInitialStateTrace();
+        result.setCounterExample(counter);
       }
       return true;
     } else {
@@ -684,32 +682,34 @@ public class CompositionalConflictChecker
         new PropositionPropertyBuilder(factory,
                                        preconditionMarking,
                                        translator);
-      final List<ConflictTraceProxy> traces =
-        new LinkedList<ConflictTraceProxy>();
-      final TraceProxy trace = result.getCounterExample();
-      if (trace != null) {
-        final ConflictTraceProxy conflict = (ConflictTraceProxy) trace;
-        traces.add(conflict);
+      final List<ConflictCounterExampleProxy> counterExamples =
+        new LinkedList<>();
+      final CounterExampleProxy counterExample = result.getCounterExample();
+      if (counterExample != null) {
+        final ConflictCounterExampleProxy conflict =
+          (ConflictCounterExampleProxy) counterExample;
+        counterExamples.add(conflict);
       }
       if (includeCurrent) {
-        if (!isAlphaReachable(builder, getCurrentAutomata(), traces)) {
+        if (!isAlphaReachable(builder, getCurrentAutomata(), counterExamples)) {
           result.setSatisfied(true);
           return false;
         }
       }
       for (final SubSystem subsys : getPostponedSubsystems()) {
-        if (!isAlphaReachable(builder, subsys, traces)) {
+        if (!isAlphaReachable(builder, subsys, counterExamples)) {
           result.setSatisfied(true);
           return false;
         }
       }
       for (final SubSystem subsys : getProcessedSubsystems()) {
-        if (!isAlphaReachable(builder, subsys, traces)) {
+        if (!isAlphaReachable(builder, subsys, counterExamples)) {
           result.setSatisfied(true);
           return false;
         }
       }
-      final ConflictTraceProxy merged = mergeLanguageInclusionTraces(traces);
+      final ConflictCounterExampleProxy merged =
+        mergeLanguageInclusionTraces(counterExamples);
       result.setCounterExample(merged);
       return true;
     }
@@ -717,16 +717,16 @@ public class CompositionalConflictChecker
 
   private boolean isAlphaReachable(final PropositionPropertyBuilder builder,
                                    final SubSystem subsys,
-                                   final List<ConflictTraceProxy> traces)
+                                   final List<ConflictCounterExampleProxy> counterExamples)
     throws AnalysisException
   {
     final List<AutomatonProxy> automata = subsys.getAutomata();
-    return isAlphaReachable(builder, automata, traces);
+    return isAlphaReachable(builder, automata, counterExamples);
   }
 
   private boolean isAlphaReachable(final PropositionPropertyBuilder builder,
                                    final List<AutomatonProxy> automata,
-                                   final List<ConflictTraceProxy> traces)
+                                   final List<ConflictCounterExampleProxy> counterExamples)
     throws AnalysisException
   {
     final ProductDESProxy des = createProductDESProxy(automata);
@@ -746,16 +746,16 @@ public class CompositionalConflictChecker
     if (checker.run()) {
       return false;
     } else {
-      final SafetyTraceProxy languageInclusionTrace =
+      final SafetyCounterExampleProxy languageInclusionTrace =
         checker.getCounterExample();
-      final ConflictTraceProxy conflictTrace =
+      final ConflictCounterExampleProxy conflict =
         builder.getConvertedConflictTrace(languageInclusionTrace);
-      traces.add(conflictTrace);
+      counterExamples.add(conflict);
       return true;
     }
   }
 
-  private ConflictTraceProxy createInitialStateTrace()
+  private ConflictCounterExampleProxy createInitialStateTrace()
   {
     final ProductDESProxyFactory factory = getFactory();
     final ProductDESProxy model = getModel();
@@ -775,17 +775,17 @@ public class CompositionalConflictChecker
     }
     final TraceStepProxy step = factory.createTraceStepProxy(null);
     final List<TraceStepProxy> steps = Collections.singletonList(step);
-    return factory.createConflictTraceProxy
-      (name, comment, null, model, automata, steps, ConflictKind.CONFLICT);
+    return createCounterExample(name, comment, automata, steps);
   }
 
-  private ConflictTraceProxy mergeLanguageInclusionTraces
-    (final Collection<ConflictTraceProxy> traces)
+  private ConflictCounterExampleProxy mergeLanguageInclusionTraces
+    (final List<ConflictCounterExampleProxy> counterExamples)
   {
     int numAutomata = 0;
     int numSteps = 1;
-    for (final ConflictTraceProxy trace : traces) {
-      numAutomata += trace.getAutomata().size();
+    for (final ConflictCounterExampleProxy counter : counterExamples) {
+      final TraceProxy trace = counter.getTrace();
+      numAutomata += counter.getAutomata().size();
       numSteps += trace.getTraceSteps().size() - 1;
     }
     final Collection<AutomatonProxy> automata =
@@ -794,8 +794,9 @@ public class CompositionalConflictChecker
       new HashMap<AutomatonProxy,StateProxy>(numAutomata);
     final List<TraceStepProxy> steps = new ArrayList<TraceStepProxy>(numSteps);
     steps.add(null);
-    for (final ConflictTraceProxy trace : traces) {
-      automata.addAll(trace.getAutomata());
+    for (final ConflictCounterExampleProxy counter : counterExamples) {
+      final TraceProxy trace = counter.getTrace();
+      automata.addAll(counter.getAutomata());
       final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
       final Iterator<TraceStepProxy> iter = traceSteps.iterator();
       final TraceStepProxy traceInitStep = iter.next();
@@ -810,8 +811,20 @@ public class CompositionalConflictChecker
     final ProductDESProxyFactory factory = getFactory();
     final TraceStepProxy initStep = factory.createTraceStepProxy(null, initMap);
     steps.set(0, initStep);
-    return factory.createConflictTraceProxy(name, null, null, model, automata,
-                                            steps, ConflictKind.CONFLICT);
+    return createCounterExample(name, null, automata, steps);
+  }
+
+  private ConflictCounterExampleProxy createCounterExample
+    (final String name,
+     final String comment,
+     final Collection<AutomatonProxy> automata,
+     final List<TraceStepProxy> steps)
+  {
+    final ProductDESProxyFactory factory = getFactory();
+    final ProductDESProxy model = getModel();
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createConflictCounterExampleProxy
+      (name, comment, null, model, automata, trace, ConflictKind.CONFLICT);
   }
 
 

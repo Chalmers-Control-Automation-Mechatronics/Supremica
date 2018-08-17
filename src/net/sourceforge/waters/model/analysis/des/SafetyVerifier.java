@@ -34,7 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -64,6 +64,7 @@ public interface SafetyVerifier extends ModelVerifier
 
   //#########################################################################
   //# More Specific Access to the Results
-  public SafetyTraceProxy getCounterExample();
+  @Override
+  public SafetyCounterExampleProxy getCounterExample();
 
 }

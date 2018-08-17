@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -223,21 +223,23 @@ public class TraceFinder
   }
 
   /**
-   * Determines whether the automaton rejects the given safety trace.
+   * Determines whether the automaton rejects the given safety counterexample.
    * This method determines whether the automaton can reach a state where
    * the next event from the trace is not enabled. The trace must include
    * information about the automaton, which is used to track the state in
    * case of nondeterminism.
-   * @param  trace  The trace to be checked.
-   * @return <CODE>true</CODE> if the remainder of trace is accepted starting
-   *         from the last recorded state for the automaton in the trace,
+   * @param  counter  The counterexample to be checked.
+   * @return <CODE>true</CODE> if the remainder of the counterexample is
+   *         accepted starting from the last recorded state for the automaton
+   *         in the trace;
    *         <CODE>false</CODE> otherwise.
    */
-  public boolean isRejectingSpec(final SafetyTraceProxy trace)
+  public boolean isRejectingSpec(final SafetyCounterExampleProxy counter)
   {
-    assert trace.getAutomata().contains(mAutomaton);
+    assert counter.getAutomata().contains(mAutomaton);
     assert mTransitionRelation.getKind() == ComponentKind.SPEC;
 
+    final TraceProxy trace = counter.getTrace();
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     final int numSteps = steps.size();
     final int numEvents = numSteps - 1;

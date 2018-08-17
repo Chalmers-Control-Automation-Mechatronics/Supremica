@@ -31,31 +31,36 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.des;
+package net.sourceforge.waters.plain.des;
 
-import net.sourceforge.waters.xsd.des.ConflictKind;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.des.AbstractCounterExampleTest;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-/**
- * <P>A conflict counterexample trace for some automata of a product DES.</P>
- *
- * @see ProductDESProxy
- *
- * @author Robi Malik
- */
-
-public interface ConflictTraceProxy
-  extends TraceProxy
+public class PlainCounterExampleTest extends AbstractCounterExampleTest
 {
 
   //#########################################################################
-  //# Getters
-  /**
-   * Gets the type of this conflict trace.
-   * @return One of {@link ConflictKind#CONFLICT},
-   *         {@link ConflictKind#DEADLOCK}, or
-   *         {@link ConflictKind#LIVELOCK}.
-   */
-  public ConflictKind getKind();
+  //# Overrides for junit.framework.TestCase
+  public static Test suite() {
+    return new TestSuite(PlainCounterExampleTest.class);
+  }
+
+  public static void main(final String args[]) {
+    junit.textui.TestRunner.run(suite());
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.des.AbstractCounterExampleTest
+  @Override
+  protected ProductDESProxyFactory getProductDESProxyFactory()
+  {
+    return ProductDESElementFactory.getInstance();
+  }
 
 }

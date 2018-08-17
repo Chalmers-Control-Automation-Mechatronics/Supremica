@@ -36,12 +36,10 @@ package net.sourceforge.waters.model.des;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
@@ -50,18 +48,13 @@ import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
-public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
+public abstract class AbstractCounterExampleTest
+  extends AbstractJAXBTest<CounterExampleProxy>
 {
 
   //#########################################################################
   //# Test Cases
   public void testParse_emptytrace()
-    throws Exception
-  {
-    testParse("handwritten", "emptytrace");
-  }
-
-  public void testJar_emptytrace()
     throws Exception
   {
     testParse("handwritten", "emptytrace");
@@ -79,81 +72,94 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
     testParse("handwritten", "small_factory_2-uncont1");
   }
 
-  public void testJar_small_factory_2__uncont1()
-    throws Exception
-  {
-    testParse("handwritten", "small_factory_2-uncont1");
-  }
-
   public void testMarshal_small_factory_2__uncont1()
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
     testMarshal("handwritten", "small_factory_2-uncont1");
   }
 
-  public void testParse_looptrace()
+  public void testParse_loop()
     throws Exception
   {
     testParse("tests", "nasty", "the_vicious_loop1");
   }
 
-  public void testMarshal_looptrace()
+  public void testMarshal_loop()
     throws WatersMarshalException, WatersUnmarshalException, IOException
   {
     testMarshal("tests", "nasty", "the_vicious_loop1");
   }
 
+  public void testParse_dual()
+    throws Exception
+  {
+    testParse("tests", "diagnosability", "notDiag_2");
+  }
+
+  public void testMarshal_dual()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("tests", "diagnosability", "notDiag_2");
+  }
+
 
   //#########################################################################
   //# Overrides for Abstract Base Class JAXBTestCase
-  protected ProxyMarshaller<TraceProxy> getProxyMarshaller()
+  @Override
+  protected ProxyMarshaller<CounterExampleProxy> getProxyMarshaller()
   {
-    return mTraceMarshaller;
+    return mCounterExampleMarshaller;
   }
 
-  protected ProxyUnmarshaller<TraceProxy> getProxyUnmarshaller()
+  @Override
+  protected ProxyUnmarshaller<CounterExampleProxy> getProxyUnmarshaller()
   {
-    return mTraceMarshaller;
+    return mCounterExampleMarshaller;
   }
 
+  @Override
   protected DocumentManager getDocumentManager()
   {
     return mDocumentManager;
   }
 
+  @Override
   protected ProxyPrinter getPrinter()
   {
     return mPrinter;
   }
 
-  protected TraceIntegrityChecker getIntegrityChecker()
+  @Override
+  protected CounterExampleIntegrityChecker getIntegrityChecker()
   {
-    return TraceIntegrityChecker.getInstance();
+    return CounterExampleIntegrityChecker.getInstance();
   }
 
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mTraceMarshaller = new JAXBTraceMarshaller(factory);
+    mCounterExampleMarshaller = new JAXBCounterExampleMarshaller(factory);
     mProductDESMarshaller = new JAXBProductDESMarshaller(factory);
     final PrintWriter writer = new PrintWriter(System.out);
     mDocumentManager = new DocumentManager();
-    mDocumentManager.registerMarshaller(mTraceMarshaller);
-    mDocumentManager.registerUnmarshaller(mTraceMarshaller);
+    mDocumentManager.registerMarshaller(mCounterExampleMarshaller);
+    mDocumentManager.registerUnmarshaller(mCounterExampleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mPrinter = new ProductDESProxyPrinter(writer);
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {
-    mTraceMarshaller = null;
+    mCounterExampleMarshaller = null;
     mProductDESMarshaller = null;
     mDocumentManager = null;
     mPrinter = null;
@@ -168,7 +174,7 @@ public abstract class AbstractTraceTest extends AbstractJAXBTest<TraceProxy>
 
   //#########################################################################
   //# Data Members
-  private JAXBTraceMarshaller mTraceMarshaller;
+  private JAXBCounterExampleMarshaller mCounterExampleMarshaller;
   private JAXBProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
   private ProxyPrinter mPrinter;

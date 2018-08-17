@@ -34,7 +34,7 @@
 package net.sourceforge.waters.model.analysis;
 
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 
 
 /**
@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.des.TraceProxy;
  * @author Robi Malik
  */
 
-public interface VerificationResult extends ProxyResult<TraceProxy>
+public interface VerificationResult extends ProxyResult<CounterExampleProxy>
 {
 
   //#########################################################################
@@ -54,13 +54,13 @@ public interface VerificationResult extends ProxyResult<TraceProxy>
    * Gets the counter example computed by the model checker, or
    * <CODE>null</CODE> if the property checked was true.
    */
-  public TraceProxy getCounterExample();
+  public CounterExampleProxy getCounterExample();
 
   /**
    * Sets the counterexample obtained from verification. Setting the
    * counterexample also marks the verification result as completed and sets the
    * Boolean result to <CODE>false</CODE>.
    */
-  public void setCounterExample(final TraceProxy trace);
+  public void setCounterExample(final CounterExampleProxy trace);
 
 }

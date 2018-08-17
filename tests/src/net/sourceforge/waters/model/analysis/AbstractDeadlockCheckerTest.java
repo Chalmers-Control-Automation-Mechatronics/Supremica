@@ -44,7 +44,8 @@ import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -1333,18 +1334,22 @@ public abstract class AbstractDeadlockCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws Exception
   {
-    super.checkCounterExample(des, trace);
-    final ConflictTraceProxy counterExample = (ConflictTraceProxy) trace;
-    assertEquals(counterExample.getKind(), ConflictKind.DEADLOCK);
+    super.checkCounterExample(des, counter);
+    final ConflictCounterExampleProxy castTest =
+      (ConflictCounterExampleProxy) counter;
+    assertEquals(castTest.getKind(), ConflictKind.DEADLOCK);
+    final TraceProxy trace = castTest.getTrace();
+    assertTrue("Deadlock counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
 
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int numAutomata = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple = new HashMap<>(numAutomata);
     for (final AutomatonProxy aut : automata){
-      final StateProxy state = checkCounterExample(aut, trace);
+      final StateProxy state = checkTrace(aut, trace);
       tuple.put(aut, state);
     }
 
@@ -1368,7 +1373,7 @@ public abstract class AbstractDeadlockCheckerTest
           }
         }
         fail("Event '" + event.getName() +
-             "' is enabled in end state of counterexample!");
+             "' is enabled in end state of deadlock counterexample!");
       }
     }
   }

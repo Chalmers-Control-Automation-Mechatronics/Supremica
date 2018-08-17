@@ -66,7 +66,6 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.ProxyResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
@@ -259,10 +258,22 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return mNondeterminismEnabled;
   }
 
+  @Override
+  public MonolithicSynthesisResult getAnalysisResult()
+  {
+    return (MonolithicSynthesisResult) super.getAnalysisResult();
+  }
+
 
   //#########################################################################
   //# Overrides for Base Class
   //# net.sourceforge.waters.model.analysis.AbstractModelAnalyser
+  @Override
+  public MonolithicSynthesisResult createAnalysisResult()
+  {
+    return new MonolithicSynthesisResult(this);
+  }
+
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -549,11 +560,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   protected void addStatistics()
   {
     super.addStatistics();
-    final ProxyResult<ProductDESProxy> result = getAnalysisResult();
+    final MonolithicSynthesisResult result = getAnalysisResult();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
     if (mTransitionBuffer != null) {
       result.setNumberOfTransitions(mTransitionBuffer.size() / 3);
+    }
+    if (mMinimizationChain != null) {
+      result.addSimplifierStatistics(mMinimizationChain);
+    }
+    if (mReductionChain != null) {
+      result.addSimplifierStatistics(mReductionChain);
     }
   }
 
@@ -705,7 +722,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // re-encode states (make only one bad state)
       final int markingID = 0;
       mTransitionRelation =
-        new ListBufferTransitionRelation("supervisor",
+        new ListBufferTransitionRelation(getOutputName(),
                                          ComponentKind.SUPERVISOR,
                                          mEventEncoding,
                                          mNumGoodStates,
@@ -817,12 +834,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         final EventEncoding enc = new EventEncoding(mEventEncoding);
         final ListBufferTransitionRelation supervisor =
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
+        final EventProxy event = mEventEncoding.getProperEvent(e);
+        supervisor.setName("sup:" + event.getName());
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
         supervisor.removeDumpStateTransitions();
         supervisor.removeRedundantPropositions();
-        final EventProxy event = mEventEncoding.getProperEvent(e);
-        supervisor.setName("sup:" + event.getName());
         AutomatonProxy aut = new TRAutomatonProxy(enc, supervisor);
         for (final AutomatonProxy existing : supervisors) {
           if (checker.checkBisimulation(aut, existing)) {

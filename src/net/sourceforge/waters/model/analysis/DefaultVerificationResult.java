@@ -37,7 +37,8 @@ import java.io.PrintWriter;
 
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -90,13 +91,13 @@ public class DefaultVerificationResult
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ProxyResult<TraceProxy>
   @Override
-  public TraceProxy getComputedProxy()
+  public CounterExampleProxy getComputedProxy()
   {
     return getCounterExample();
   }
 
   @Override
-  public void setComputedProxy(final TraceProxy counterexample)
+  public void setComputedProxy(final CounterExampleProxy counterexample)
   {
     setCounterExample(counterexample);
   }
@@ -111,13 +112,13 @@ public class DefaultVerificationResult
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.VerificationResult
   @Override
-  public TraceProxy getCounterExample()
+  public CounterExampleProxy getCounterExample()
   {
     return mCounterExample;
   }
 
   @Override
-  public void setCounterExample(final TraceProxy counterexample)
+  public void setCounterExample(final CounterExampleProxy counterexample)
   {
     super.setSatisfied(false);
     mCounterExample = counterexample;
@@ -144,7 +145,7 @@ public class DefaultVerificationResult
   {
     super.print(writer);
     if (mCounterExample != null) {
-      final int len = mCounterExample.getEvents().size();
+      final int len = getCounterExampleLength(mCounterExample);
       writer.println("Counterexample length: " + len);
     }
   }
@@ -155,17 +156,17 @@ public class DefaultVerificationResult
     super.printCSVHorizontal(writer);
     writer.print(',');
     if (mCounterExample != null) {
-      final int len = mCounterExample.getEvents().size();
+      final int len = getCounterExampleLength(mCounterExample);
       writer.print(len);
     }
     if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
       writer.print(',');
       if (mCounterExample == null) {
         writer.print("NONCONFLICTING");
-      } else if (mCounterExample instanceof ConflictTraceProxy) {
-        final ConflictTraceProxy conflictTrace =
-          (ConflictTraceProxy) mCounterExample;
-        writer.print(conflictTrace.getKind());
+      } else if (mCounterExample instanceof ConflictCounterExampleProxy) {
+        final ConflictCounterExampleProxy conflict =
+          (ConflictCounterExampleProxy) mCounterExample;
+        writer.print(conflict.getKind());
       }
     }
   }
@@ -182,7 +183,19 @@ public class DefaultVerificationResult
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  public static int getCounterExampleLength(final CounterExampleProxy counter)
+  {
+    int len = 0;
+    for (final TraceProxy trace : counter.getTraces()) {
+      len += trace.getEvents().size();
+    }
+    return len;
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private TraceProxy mCounterExample;
+  private CounterExampleProxy mCounterExample;
 
 }

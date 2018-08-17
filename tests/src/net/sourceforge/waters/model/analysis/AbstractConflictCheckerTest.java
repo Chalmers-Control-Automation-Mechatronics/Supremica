@@ -46,7 +46,8 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -97,30 +98,34 @@ public abstract class AbstractConflictCheckerTest extends
   // # net.sourceforge.waters.analysis.AbstractModelVerifierTest
   /**
    * Checks the correctness of a conflict counterexample. A conflict
-   * counterexample has to be a {@link ConflictTraceProxy}, its event sequence
-   * has to be accepted by all automata in the given model, and it must take the
-   * model to a blocking state. The latter condition is checked by means of a
-   * language inclusion check. Furthermore, when a state has a nondeterministic
-   * choice it is verified whether the counter example includes correct state
-   * information.
+   * counterexample has to be a {@link ConflictCounterExampleProxy}, its event
+   * sequence has to be accepted by all automata in the given model, and it
+   * must take the model to a blocking state. The latter condition is checked
+   * by means of a language inclusion check. Furthermore, when a state has a
+   * nondeterministic choice it is verified whether the counter example
+   * includes correct state information.
    *
-   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,CounterExampleProxy)
    * @see #createLanguageInclusionChecker(ProductDESProxy,ProductDESProxyFactory)
    */
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
+    throws Exception
   {
-    super.checkCounterExample(des, trace);
-    final ConflictTraceProxy counterexample = (ConflictTraceProxy) trace;
+    super.checkCounterExample(des, counter);
+    final ConflictCounterExampleProxy castTest =
+      (ConflictCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
+    assertTrue("Conflict counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
+
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
         new HashMap<AutomatonProxy,StateProxy>(size);
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, counterexample);
-      assertNotNull("Counterexample not accepted by automaton " + aut.getName()
-          + "!", state);
+      final StateProxy state = checkTrace(aut, trace);
       tuple.put(aut, state);
     }
     final ProductDESProxy ldes = createLanguageInclusionModel(des, tuple);
@@ -129,15 +134,15 @@ public abstract class AbstractConflictCheckerTest extends
         createLanguageInclusionChecker(ldes, factory);
     final boolean blocking = lchecker.run();
     if (!blocking) {
-      final TraceProxy ltrace = lchecker.getCounterExample();
+      final CounterExampleProxy ltrace = lchecker.getCounterExample();
       final File filename = saveCounterExample(ltrace);
-      fail("Counterexample does not lead to blocking state (trace written to"
-          + filename + ")!");
+      fail("Counterexample does not lead to blocking state (trace written to" +
+           filename + ")!");
     }
   }
 
-  // #########################################################################
-  // # May be Overridden by Subclasses
+  //#########################################################################
+  //# May be Overridden by Subclasses
   /**
    * <P>
    * Creates a language inclusion checker for counterexample verification.

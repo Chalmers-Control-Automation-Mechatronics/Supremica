@@ -158,11 +158,31 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     fireTableRowsInserted(count, count+insertList.size());
   }
 
+  public void insertRow(final AutomatonProxy insert)
+  {
+    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
+    autList.add(insert);
+    insertRows(autList);
+  }
+
   public boolean containsAutomatonName(final String name) {
     for(final AutomatonProxy aut : mAutomataList)
       if(aut.getName().equals(name) == true)
         return true;
     return false;
+  }
+
+  public void replaceAutomaton(final AutomatonProxy oldAut, final AutomatonProxy newAut) {
+    int i = 0;
+    for(final AutomatonProxy aut : mAutomataList) {
+      // TODO Use object identity, not name
+      if(aut.getName().equals(oldAut.getName()) == true) {
+        mAutomataList.set(i, newAut);
+        break;
+      }
+      i++;
+    }
+    fireTableRowsUpdated(i, i);
   }
 
   public boolean containsDisplayMap(final AutomatonProxy aut) {

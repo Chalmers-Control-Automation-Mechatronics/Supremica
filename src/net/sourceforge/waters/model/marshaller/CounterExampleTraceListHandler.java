@@ -31,18 +31,59 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.des;
+package net.sourceforge.waters.model.marshaller;
+
+import java.util.List;
+
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.xsd.des.CounterExampleType;
+import net.sourceforge.waters.xsd.des.ObjectFactory;
+import net.sourceforge.waters.xsd.des.Trace;
+import net.sourceforge.waters.xsd.des.TraceList;
 
 
-/**
- * <P>A safety counterexample trace for some automata of a product DES.</P>
- *
- * @see ProductDESProxy
- *
- * @author Robi Malik
- */
-
-public interface SafetyTraceProxy
-  extends TraceProxy
+class CounterExampleTraceListHandler
+  extends JAXBListHandler<CounterExampleType,TraceList,TraceProxy>
 {
+
+  //#########################################################################
+  //# Constructors
+  CounterExampleTraceListHandler()
+  {
+    this(null);
+  }
+
+  CounterExampleTraceListHandler(final ObjectFactory factory)
+  {
+    mFactory = factory;
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBListHandler
+  @Override
+  TraceList createListElement(final CounterExampleType container)
+  {
+    final TraceList listelem = mFactory.createTraceList();
+    container.setTraceList(listelem);
+    return listelem;
+  }
+
+  @Override
+  TraceList getListElement(final CounterExampleType container)
+  {
+    return container.getTraceList();
+  }
+
+  @Override
+  List<Trace> getList(final TraceList listElem)
+  {
+    return listElem.getList();
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final ObjectFactory mFactory;
+
 }

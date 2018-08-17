@@ -40,7 +40,6 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.AbstractHashCodeVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
-
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 import net.sourceforge.waters.xsd.des.ConflictKind;
@@ -70,16 +69,7 @@ public class ProductDESHashCodeVisitor
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
-  public Integer visitConflictTraceProxy(final ConflictTraceProxy trace)
-      throws VisitorException
-  {
-    int result = visitTraceProxy(trace);
-    final ConflictKind kind = trace.getKind();
-    result *= 5;
-    result += kind.hashCode();
-    return result;
-  }
-
+  @Override
   public Integer visitAutomatonProxy(final AutomatonProxy aut)
       throws VisitorException
   {
@@ -102,6 +92,44 @@ public class ProductDESHashCodeVisitor
     return result;
   }
 
+  @Override
+  public Integer visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy counter)
+    throws VisitorException
+  {
+    int result = visitCounterExampleProxy(counter);
+    final ConflictKind kind = counter.getKind();
+    result *= 5;
+    result += kind.hashCode();
+    return result;
+  }
+
+  @Override
+  public Integer visitCounterExampleProxy(final CounterExampleProxy counter)
+      throws VisitorException
+  {
+    int result = visitDocumentProxy(counter);
+    final ProductDESProxy des = counter.getProductDES();
+    result *= 5;
+    result += des.hashCode();
+    final Set<AutomatonProxy> automata = counter.getAutomata();
+    result *= 5;
+    result += computeRefCollectionHashCode(automata);
+    final List<TraceProxy> traces = counter.getTraces();
+    result *= 5;
+    result *= computeListHashCode(traces);
+    return result;
+  }
+
+  @Override
+  public Integer visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Integer visitEventProxy(final EventProxy event)
       throws VisitorException
   {
@@ -119,16 +147,15 @@ public class ProductDESHashCodeVisitor
     return result;
   }
 
-  public Integer visitLoopTraceProxy(final LoopTraceProxy trace)
-      throws VisitorException
+  @Override
+  public Integer visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy counter)
+    throws VisitorException
   {
-    int result = visitTraceProxy(trace);
-    final int loop = trace.getLoopIndex();
-    result *= 5;
-    result += loop;
-    return result;
+    return visitCounterExampleProxy(counter);
   }
 
+  @Override
   public Integer visitProductDESProxy(final ProductDESProxy des)
       throws VisitorException
   {
@@ -142,12 +169,15 @@ public class ProductDESHashCodeVisitor
     return result;
   }
 
-  public Integer visitSafetyTraceProxy(final SafetyTraceProxy trace)
-      throws VisitorException
+  @Override
+  public Integer visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy counter)
+    throws VisitorException
   {
-    return visitTraceProxy(trace);
+    return visitCounterExampleProxy(counter);
   }
 
+  @Override
   public Integer visitStateProxy(final StateProxy state)
       throws VisitorException
   {
@@ -162,22 +192,24 @@ public class ProductDESHashCodeVisitor
     return result;
   }
 
+  @Override
   public Integer visitTraceProxy(final TraceProxy trace)
       throws VisitorException
   {
-    int result = visitDocumentProxy(trace);
-    final ProductDESProxy des = trace.getProductDES();
+    int result = visitProxy(trace);
+    final String name = trace.getName();
     result *= 5;
-    result += des.hashCode();
-    final Set<AutomatonProxy> automata = trace.getAutomata();
-    result *= 5;
-    result += computeRefCollectionHashCode(automata);
+    result += name.hashCode();
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     result *= 5;
     result *= computeListHashCode(steps);
+    final int loop = trace.getLoopIndex();
+    result *= 5;
+    result += loop;
     return result;
   }
 
+  @Override
   public Integer visitTraceStepProxy(final TraceStepProxy step)
       throws VisitorException
   {
@@ -191,6 +223,7 @@ public class ProductDESHashCodeVisitor
     return result;
   }
 
+  @Override
   public Integer visitTransitionProxy(final TransitionProxy trans)
       throws VisitorException
   {

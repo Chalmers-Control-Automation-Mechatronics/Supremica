@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.analysis.comp552;
 
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -144,7 +144,7 @@ public abstract class ModelChecker
    *         has been called, or model checking has found that the
    *         property is satisfied and there is no counterexample.
    */
-  public abstract TraceProxy getCounterExample();
+  public abstract CounterExampleProxy getCounterExample();
 
 
   //#########################################################################

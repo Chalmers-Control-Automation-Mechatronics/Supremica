@@ -97,6 +97,18 @@ public class SupremicaAnalyzerPanel
         });
     }
 
+
+    //#######################################################################
+    //# Overrides for org.supremica.gui.ide.MainPanel
+    @Override
+    public boolean isWatersPanel()
+    {
+      return false;
+    }
+
+
+    //#######################################################################
+    //# Simple Access
     /**
      * Gets the selected automata. Returns a new list of the selected automata, changes to the selection
 	 * are not reflected into this list after it has been returned. This is very contrary to the below

@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.NamedProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
@@ -93,7 +94,7 @@ abstract class AbstractCounterExampleChecker
    * Checks whether the given trace is a counterexample to the property
    * this counterexample checker is concerned with.
    * @param  des       The product DES that was verified.
-   * @param  trace     The counterexample to be checked.
+   * @param  counter   The counterexample to be checked.
    * @return <CODE>true</CODE> if the given counterexample demonstrates that
    *         the given product DES violates the property at hand,
    *         <CODE>false</CODE> otherwise.
@@ -101,25 +102,26 @@ abstract class AbstractCounterExampleChecker
    *                   verify the counterexample.
    */
   public boolean checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws AnalysisException
   {
-    if (trace == null) {
-      reportMalformedCounterExample(trace, "is NULL", null);
+    if (counter == null) {
+      reportMalformedCounterExample(counter, "is NULL", null);
       return false;
     }
+    final TraceProxy trace = counter.getTraces().get(0);
     final List<EventProxy> traceEvents = trace.getEvents();
     final Collection<EventProxy> events = des.getEvents();
     int step = 0;
     for (final EventProxy event : traceEvents) {
       if (event == null) {
-        reportMalformedCounterExample(trace, "contains NULL event", null, step);
+        reportMalformedCounterExample(counter, "contains NULL event", null, step);
         return false;
       } else if (event.getKind() == EventKind.PROPOSITION) {
-        reportMalformedCounterExample(trace, "contains proposition", event, step);
+        reportMalformedCounterExample(counter, "contains proposition", event, step);
         return false;
       } else if (!events.contains(event)) {
-        reportMalformedCounterExample(trace, "contains unknown event", event, step);
+        reportMalformedCounterExample(counter, "contains unknown event", event, step);
         return false;
       }
       step++;
@@ -140,13 +142,13 @@ abstract class AbstractCounterExampleChecker
     mDiagnostics = null;
   }
 
-  void reportMalformedCounterExample(final TraceProxy trace,
+  void reportMalformedCounterExample(final CounterExampleProxy trace,
                                      final String msg)
   {
     reportMalformedCounterExample(trace, msg, null, -1);
   }
 
-  void reportMalformedCounterExample(final TraceProxy trace,
+  void reportMalformedCounterExample(final CounterExampleProxy trace,
                                      final String msg,
                                      final NamedProxy item)
   {
@@ -160,7 +162,7 @@ abstract class AbstractCounterExampleChecker
     mDiagnostics.append('.');
   }
 
-  void reportMalformedCounterExample(final TraceProxy trace,
+  void reportMalformedCounterExample(final CounterExampleProxy trace,
                                      final String msg,
                                      final NamedProxy item,
                                      final int step)
@@ -181,10 +183,12 @@ abstract class AbstractCounterExampleChecker
     }
   }
 
-  void reportCounterCounterExample(final String msg, final TraceProxy trace)
+  void reportCounterCounterExample(final String msg,
+                                   final CounterExampleProxy counter)
   {
     mDiagnostics.append("\n");
     mDiagnostics.append(msg);
+    final TraceProxy trace = counter.getTraces().get(0);
     final List<EventProxy> traceEvents = trace.getEvents();
     if (traceEvents.isEmpty()) {
       mDiagnostics.append("\n  <empty>");
@@ -208,16 +212,16 @@ abstract class AbstractCounterExampleChecker
     }
   }
 
-  void startDiagnostics(final TraceProxy trace)
+  void startDiagnostics(final CounterExampleProxy counter)
   {
     mDiagnostics = new StringBuilder();
     if (mFullDiagnostics) {
       mDiagnostics.append(getTraceLabel());
       mDiagnostics.append(" error trace ");
-      final String name = trace.getName();
+      final String name = counter.getName();
       if (name != null) {
         mDiagnostics.append('\'');
-        mDiagnostics.append(trace.getName());
+        mDiagnostics.append(counter.getName());
         mDiagnostics.append("' ");
       }
     }

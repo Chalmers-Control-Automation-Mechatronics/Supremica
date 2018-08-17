@@ -62,10 +62,10 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -377,11 +377,11 @@ public class Simulation implements ModelObserver, Observer
   public void replayStep()
   {
     if (mTrace != null) {
-      if (mTrace instanceof LoopTraceProxy && !mTraceInvalidated) {
+      if (mTrace.getLoopIndex() >= 0 && !mTraceInvalidated) {
         if (mCurrentTime == mStateHistory.size() - 1) {
           final Logger logger = LogManager.getLogger();
           logger.info(": Looping to start of control loop");
-          while (mCurrentTime != ((LoopTraceProxy) mTrace).getLoopIndex() + 1) {
+          while (mCurrentTime != mTrace.getLoopIndex() + 1) {
             stepBack();
           }
         } else {
@@ -395,9 +395,10 @@ public class Simulation implements ModelObserver, Observer
     }
   }
 
-  public void switchToTraceMode(final TraceProxy trace)
+  public void switchToTraceMode(final CounterExampleProxy counter)
   {
-    final boolean allowLast = !(trace instanceof SafetyTraceProxy);
+    final boolean allowLast = !(counter instanceof SafetyCounterExampleProxy);
+    final TraceProxy trace = counter.getTraces().get(0);
     executeTrace(trace, allowLast);
     final SimulationChangeEvent simEvent = new SimulationChangeEvent
       (this, SimulationChangeEvent.STATE_CHANGED);

@@ -336,7 +336,7 @@ class TRAbstractionStepCertainConflicts
         return null;
       } else {
         final TRTraceProxy trace =
-          mLanguageInclusionChecker.getCounterExample();
+          (TRTraceProxy) mLanguageInclusionChecker.getCounterExample();
         for (final LanguageInclusionAutomaton laut : mLanguageInclusionAutomata) {
           final TRAutomatonProxy aut = laut.getAutomaton();
           final TRAbstractionStep step = laut.getAbstractionStep();

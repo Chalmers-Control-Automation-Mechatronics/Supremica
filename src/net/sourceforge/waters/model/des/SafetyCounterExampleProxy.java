@@ -31,72 +31,41 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.model.des;
 
-import javax.xml.bind.JAXBException;
+/**
+ * <P>A counterexample that shows that a model fails a safety property.</P>
+ *
+ * <P>A safety counterexample contains a single trace that takes the system
+ * from an initial state to an undesirable state. In addition, the trace
+ * contains a final step ({@link TraceStepProxy}) that can only be executed
+ * by some of the automata in the model, thus showing how the property is
+ * violated.</P>
+ *
+ * <UL>
+ * <LI>A <I>controllability</I> counterexample has a final trace step with an
+ * uncontrollable event that can be executed by all plants, but is disabled
+ * in at least one specification.</LI>
+ * <LI>A <I>language inclusion</I> counterexample has a final trace step
+ * that can be executed by all plants, specifications, and supervisors in
+ * the model, but is disabled in at least one property automaton.</LI>
+ * </UL>
+ *
+ * @author Robi Malik
+ */
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.des.TraceType;
-
-import org.xml.sax.SAXException;
-
-
-public class JAXBTraceMarshaller
-  extends JAXBMarshaller<TraceProxy,TraceType>
+public interface SafetyCounterExampleProxy
+extends CounterExampleProxy
 {
 
   //#########################################################################
-  //# Constructors
-  public JAXBTraceMarshaller(final ProductDESProxyFactory factory)
-    throws JAXBException, SAXException
-  {
-    super(new JAXBTraceExporter(),
-          new JAXBTraceImporter(factory),
-          "net.sourceforge.waters.xsd.des",
-          "waters-des.xsd");
-  }
-
-
-  //#########################################################################
-  //# Configuration
+  //# Getters
   /**
-   * Sets the product DES corresponding to a trace to be unmarshalled.
-   * If non-<CODE>null</CODE> the name of the product DES in the
-   * <CODE>.wtra</CODE> must match the name of the given product DES,
-   * so the trace automata can be taken from the given product DES.
-   * If <CODE>null</CODE>, the product DES will be obtained using the
-   * document manager, and an appropriate <CODE>.wdes</CODE> file must
-   * exist.
+   * Gets the single trace that constitutes this counterexample.
+   * This method simply returns the first of the counterexample's
+   * traces.
+   * @see CounterExampleProxy#getTraces()
    */
-  public void setProductDES(final ProductDESProxy des)
-  {
-    final JAXBTraceImporter importer = (JAXBTraceImporter) getImporter();
-    importer.setProductDES(des);
-  }
-
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class JAXBMarshaller
-  public String getDefaultExtension()
-  {
-    return ".wtra";
-  }
-
-  public Class<TraceProxy> getDocumentClass()
-  {
-    return TraceProxy.class;
-  }
-
-  public String getDescription()
-  {
-      return "Waters Trace files [*.wtra]";
-  }
-
-  public Class<TraceType> getElementClass()
-  {
-    return TraceType.class;
-  }
+  public TraceProxy getTrace();
 
 }

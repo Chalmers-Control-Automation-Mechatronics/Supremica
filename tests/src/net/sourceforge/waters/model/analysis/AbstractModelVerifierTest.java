@@ -42,6 +42,7 @@ import java.util.Map;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -49,7 +50,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.JAXBTraceMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -72,7 +73,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mTraceMarshaller = new JAXBTraceMarshaller(factory);
+    mTraceMarshaller = new JAXBCounterExampleMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
     setNodeLimit(mModelVerifier);
   }
@@ -205,18 +206,21 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    * Performs preliminary checks on the counterexample.
    * This method performs some simple checks on the counterexample to make
    * sure that it can be saved. The more advanced semantic checks are
-   * performed by {@link #checkCounterExample(ProductDESProxy,TraceProxy)
+   * performed by {@link #checkCounterExample(ProductDESProxy,CounterExampleProxy)
    * checkCounterExample()} after the counterexample has been written to a file.
-   * @param trace The counterexample to be checked.
+   * @param  counter  The counterexample to be checked.
    * @throws junit.framework.AssertionFailedError to indicate that the
    *   counterexample does not pass the test.
    */
-  protected void precheckCounterExample(final TraceProxy trace)
+  protected void precheckCounterExample(final CounterExampleProxy counter)
   {
-    assertNotNull("Counterexample is NULL!", trace);
-    assertNotNull("NULL product DES in trace!", trace.getProductDES());
-    assertFalse("NULL automaton in trace!", trace.getAutomata().contains(null));
-    assertFalse("NULL event in trace!", trace.getEvents().contains(null));
+    assertNotNull("Counterexample is NULL!", counter);
+    assertNotNull("NULL product DES in counterexample!", counter.getProductDES());
+    assertFalse("NULL automaton in counterexample!", counter.getAutomata().contains(null));
+    for (final TraceProxy trace : counter.getTraces()) {
+      assertNotNull("NULL trace in counterexample!", trace);
+      assertFalse("NULL event in trace!", trace.getEvents().contains(null));
+    }
   }
 
   /**
@@ -229,52 +233,94 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
    *
    * @param des
    *          The model to be verified.
-   * @param trace
+   * @param counter
    *          The counterexample obtained by from the model checker under test.
    * @throws junit.framework.AssertionFailedError
    *           to indicate that the counterexample is not a correct
    *           counterexample for the property.
    */
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
+    throws Exception
   {
     assertSame("Product DES in trace is not the original model!",
-               des, trace.getProductDES());
+               des, counter.getProductDES());
     final String desName = des.getName();
-    final String traceName = trace.getName();
-    assertTrue("Trace name '" + traceName + "' does not match model name '" +
+    final String traceName = counter.getName();
+    assertTrue("Counterexample name '" + traceName +
+               "' does not match model name '" +
                desName + "'!", traceName.startsWith(desName));
     final Collection<AutomatonProxy> automata = des.getAutomata();
-    for (final AutomatonProxy aut : trace.getAutomata()) {
+    for (final AutomatonProxy aut : counter.getAutomata()) {
       if (!automata.contains(aut)) {
-        fail("Trace automaton '" + aut.getName()
-            + "' does not match any in product DES!");
+        fail("Counterexample automaton '" + aut.getName() +
+             "' does not match any in product DES!");
       }
     }
     final Collection<EventProxy> events = des.getEvents();
-    for (final EventProxy event : trace.getEvents()) {
-      if (!events.contains(event)) {
-        fail("Trace event '" + event.getName()
-            + "' does not match any in product DES!");
+    for (final TraceProxy trace : counter.getTraces()) {
+      for (final EventProxy event : trace.getEvents()) {
+        if (!events.contains(event)) {
+          fail("Counterexample event '" + event.getName() +
+               "' does not match any in product DES!");
+        }
       }
     }
   }
 
-  protected StateProxy checkCounterExample(final AutomatonProxy aut,
-                                           final TraceProxy trace)
+  /**
+   * Checks whether a counterexample trace is accepted by an automaton.
+   * This method checks whether the given automaton can perform all steps in
+   * the given trace, which must contain state information in all cases
+   * where the automaton is nondeterministic. If the trace is marked as
+   * a loop, the end state must also be equal to the state at the start of
+   * the loop. If any of these conditions is not satisfied, the method fails
+   * with a JUnit assertion.
+   * @param  aut    The automaton to be checked.
+   * @param  trace  The trace to be checked.
+   * @return The end state reached by the automaton after executing the trace.
+   */
+  protected StateProxy checkTrace(final AutomatonProxy aut,
+                                  final TraceProxy trace)
   {
-    return checkCounterExample(aut, trace, false);
+    return checkTrace(aut, trace, false);
   }
 
-  protected StateProxy checkCounterExample(final AutomatonProxy aut,
-                                           final TraceProxy trace,
-                                           final boolean spec)
+  /**
+   * Checks whether a counterexample trace is accepted by an automaton,
+   * with special support for safety verification.
+   * This method checks whether the given automaton can perform all steps in
+   * the given trace, which must contain state information in all cases
+   * where the automaton is nondeterministic. If the trace is marked as
+   * a loop, the end state must also be equal to the state at the start of
+   * the loop. If any of these conditions is not satisfied, the method fails
+   * with a JUnit assertion.
+   * @param  aut    The automaton to be checked.
+   * @param  trace  The trace to be checked.
+   * @param  spec   Whether the automaton is to be considered as a
+   *                specification or property in safety verification.
+   *                If <CODE>true</CODE>, the last event of the trace
+   *                does not need to be accepted.
+   * @return The end state reached by the automaton after executing the trace,
+   *         or <CODE>null</CODE> if <CODE>spec</CODE> is <CODE>true</CODE>
+   *         and the last event is not accepted by the automaton.
+   */
+  protected StateProxy checkTrace(final AutomatonProxy aut,
+                                  final TraceProxy trace,
+                                  final boolean spec)
   {
     final Collection<EventProxy> events = aut.getEvents();
     final Collection<StateProxy> states = aut.getStates();
     final Collection<TransitionProxy> transitions = aut.getTransitions();
+    final String traceName = trace.getName();
+    final boolean named = traceName != null && !traceName.equals("");
+    final String traceLabelL =
+      named ? "trace " + traceName : "counterexample trace";
+    final String traceLabelU =
+      named ? "Trace " + traceName : "Counterexample trace";
     final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final Iterator<TraceStepProxy> iter = traceSteps.iterator();
+    // check initial state
     final TraceStepProxy initStep = iter.next();
     final Map<AutomatonProxy,StateProxy> initMap = initStep.getStateMap();
     StateProxy current = initMap.get(aut);
@@ -284,7 +330,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
           if (current == null) {
             current = state;
           } else {
-            fail("Trace specifies no initial state for automaton " +
+            fail(traceLabelU + " specifies no initial state for automaton " +
                  aut.getName() + ", which has more than one initial state!");
           }
         }
@@ -292,12 +338,21 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
       assertNotNull("The automaton " + aut.getName() +
                     " has no initial state!", current);
     } else {
-      assertTrue("Trace initial state " + current.getName() +
+      assertTrue(traceLabelU + "specifies initial state " + current.getName() +
                  " for automaton " + aut.getName() +
-                 " is not an initial state of the automaton!",
+                 ", which is not an initial state of this automaton!",
                  current.isInitial());
     }
+    // check trace steps
+    final int loopIndex = trace.getLoopIndex();
+    assertTrue("The safety " + traceLabelL + " includes a loop!",
+               !spec || loopIndex < 0);
+    int step = 0;
+    StateProxy loopEntryState = null;
     while (iter.hasNext()) {
+      if (step++ == loopIndex) {
+        loopEntryState = current;
+      }
       final TraceStepProxy traceStep = iter.next();
       final EventProxy event = traceStep.getEvent();
       final Map<AutomatonProxy,StateProxy> stepMap = traceStep.getStateMap();
@@ -307,23 +362,19 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
           StateProxy next = null;
           for (final TransitionProxy trans : transitions) {
             if (trans.getSource() == current && trans.getEvent() == event) {
-              if (next == null) {
-                next = trans.getTarget();
-              } else {
-                fail("The counterexample trace does not contain a " +
-                     "successor state for the nondeterministic transition" +
-                     " in automaton " + aut.getName() + " from source state " +
-                     current.getName() + " with event " + event.getName() +
-                     "!");
-              }
+              assertNull(traceLabelU + " does not contain a successor state " +
+                         "for the nondeterministic transition in automaton " +
+                         aut.getName() + " from source state " +
+                         current.getName() + " with event " + event.getName() +
+                         "!", next);
+              next = trans.getTarget();
             }
           }
           if (!spec || iter.hasNext()) {
             assertNotNull("The automaton " + aut.getName() +
                           " has no successor state for event " +
                           event.getName() + " from state " +
-                          current.getName() + "!",
-                          next);
+                          current.getName() + "!", next);
           }
           current = next;
         }
@@ -339,25 +390,33 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
           assertTrue("There is no transition from state " + current.getName() +
                      " to state " + target.getName() + " with event " +
                      event.getName() + " in automaton " + aut.getName() +
-                     " as specified in the counterexample trace!", found);
+                     " as specified in the " + traceLabelL + "!", found);
           current = target;
         } else {
-          assertSame("The target state specified in the counterexample " +
-                     "for the selflooped event " + event.getName() +
+          assertSame("The target state specified in the " + traceLabelL +
+                     " for the selflooped event " + event.getName() +
                      " is different from the current state of automaton " +
                      aut.getName() + "!", current, target);
         }
       }
     }
-    // returns the end state of the counterexample trace
+    // check loop entry state
+    if (loopIndex >= 0) {
+      assertNotNull(traceLabelU + " includes empty loop!", loopEntryState);
+      assertSame("The end state " + current.getName() +
+                 " reached by automaton " + aut.getName() + " in the " +
+                 traceLabelL + " is not the same as the loop entry state " +
+                 loopEntryState.getName() + "!", current, loopEntryState);
+    }
+    // return the end state of the counterexample trace
     return current;
   }
 
-  protected File saveCounterExample(final TraceProxy counterexample)
+  protected File saveCounterExample(final CounterExampleProxy counter)
       throws Exception
   {
-    assertNotNull(counterexample);
-    final String name = counterexample.getName();
+    assertNotNull(counter);
+    final String name = counter.getName();
     final String ext = mTraceMarshaller.getDefaultExtension();
     final StringBuilder buffer = new StringBuilder(name);
     if (mBindings != null) {
@@ -376,7 +435,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
                extname.indexOf(':') < 0);
     final File dir = getOutputDirectory();
     final File filename = new File(dir, extname);
-    mTraceMarshaller.marshal(counterexample, filename);
+    mTraceMarshaller.marshal(counter, filename);
     return filename;
   }
 
@@ -424,7 +483,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     try {
       configureModelVerifier(des);
       final boolean result = mModelVerifier.run();
-      TraceProxy counterexample = null;
+      CounterExampleProxy counterexample = null;
       if (!result && mModelVerifier.isCounterExampleEnabled()) {
         counterexample = mModelVerifier.getCounterExample();
         precheckCounterExample(counterexample);
@@ -455,7 +514,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# Data Members
-  private JAXBTraceMarshaller mTraceMarshaller;
+  private JAXBCounterExampleMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
   private List<ParameterBindingProxy> mBindings;
 

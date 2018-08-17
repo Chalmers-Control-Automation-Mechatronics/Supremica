@@ -37,6 +37,7 @@ import java.util.List;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -48,10 +49,11 @@ import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -175,9 +177,9 @@ public class BDDConflictChecker
   }
 
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -228,7 +230,7 @@ public class BDDConflictChecker
       } else if (earlyDeadlockEnabled) {
         coreachable.free();
         mConflictKind = ConflictKind.LIVELOCK;
-        final ConflictTraceProxy counterExample =
+        final ConflictCounterExampleProxy counterExample =
           computeCounterExample(mBadStatesBDD);
         return setFailedResult(counterExample);
       } else {
@@ -299,7 +301,7 @@ public class BDDConflictChecker
     if (mPreconditionBDD == null && mMarkingBDD.isZero()) {
       mConflictKind = ConflictKind.CONFLICT;
       final BDD init = createInitialStateBDD(true);
-      final ConflictTraceProxy counterexample =
+      final ConflictCounterExampleProxy counterexample =
         computeCounterExample(init, 0);
       setFailedResult(counterexample);
       return;
@@ -340,7 +342,7 @@ public class BDDConflictChecker
       final BDD bad = reached.and(mBadStatesBDD);
       if (!bad.isZero()) {
         final int level = getDepth();
-        final ConflictTraceProxy counterExample =
+        final ConflictCounterExampleProxy counterExample =
           computeCounterExample(bad, level);
         setFailedResult(counterExample);
         return true;
@@ -403,7 +405,7 @@ public class BDDConflictChecker
     return mUsedMarking;
   }
 
-  private ConflictTraceProxy computeCounterExample(final BDD bad,
+  private ConflictCounterExampleProxy computeCounterExample(final BDD bad,
                                                    final int index)
     throws AnalysisAbortException, OverflowException
   {
@@ -415,7 +417,7 @@ public class BDDConflictChecker
     }
   }
 
-  private ConflictTraceProxy computeCounterExample(final BDD bad)
+  private ConflictCounterExampleProxy computeCounterExample(final BDD bad)
     throws AnalysisAbortException, OverflowException
   {
     if (isDetailedOutputEnabled()) {
@@ -426,14 +428,15 @@ public class BDDConflictChecker
     }
   }
 
-  private ConflictTraceProxy createCounterExample
-    (final List<TraceStepProxy> trace)
+  private ConflictCounterExampleProxy createCounterExample
+    (final List<TraceStepProxy> steps)
   {
     final ProductDESProxyFactory desfactory = getFactory();
     final ProductDESProxy des = getModel();
     final String name = AbstractConflictChecker.getTraceName(des);
     final List<AutomatonProxy> automata = getAutomata();
-    return desfactory.createConflictTraceProxy
+    final TraceProxy trace = desfactory.createTraceProxy(steps);
+    return desfactory.createConflictCounterExampleProxy
       (name, null, null, des, automata, trace, mConflictKind);
   }
 

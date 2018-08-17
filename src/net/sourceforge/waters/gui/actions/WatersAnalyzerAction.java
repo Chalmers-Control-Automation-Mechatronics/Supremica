@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 
@@ -44,13 +45,48 @@ import org.supremica.gui.ide.ModuleContainer;
 public abstract class WatersAnalyzerAction
   extends WatersAction
 {
+
+  //#########################################################################
+  //# Constructor
   protected WatersAnalyzerAction(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Accessing the Waters Analyser Panel
+  protected WatersAnalyzerPanel getAnalyzerPanel()
+  {
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    return (WatersAnalyzerPanel) panel;
+  }
+
+  protected AutomataTable getAnalyzerTable()
+  {
+    // TODO Use getAnalyzerPanel() method
+    final ModuleContainer container = getActiveModuleContainer();
+    if (container == null) {
+      return null;
+    }
+    final MainPanel panel = container.getActivePanel();
+    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+      return null;
+    }
+    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+    return analyzer.getAutomataTable();
+  }
+
   protected AutomataTableModel getAnalyzerTableModel()
   {
+    // TODO Use getAnalyzerPanel() method
     final ModuleContainer container = getActiveModuleContainer();
     if (container == null) {
       return null;
@@ -63,5 +99,16 @@ public abstract class WatersAnalyzerAction
     return analyzer.getAutomataTableModel();
   }
 
+  protected int getSelectedRowCount()
+  {
+    //TODO cant call getSelectedRows before model open, how to check if null before call??
+    final AutomataTable table = getAnalyzerTable();
+    return table.getSelectedRowCount();
+  }
+
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -8684703946705836025L;
+
 }

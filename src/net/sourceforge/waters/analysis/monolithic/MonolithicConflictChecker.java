@@ -55,11 +55,12 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -176,7 +177,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
                               preconditionMarking);
       final AutomatonSchema[] automata = stateSchema.getOrdering();
       if (firstBlockingState >= 0) {
-        final ConflictTraceProxy counterexample =
+        final ConflictCounterExampleProxy counterexample =
           buildCounterExample(firstBlockingState, ConflictKind.DEADLOCK,
                               model, stateSchema, automata);
         return setFailedResult(counterexample);
@@ -245,9 +246,9 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       } else {
         final ConflictKind kind = preconditionMarking == null ?
                             ConflictKind.LIVELOCK : ConflictKind.CONFLICT;
-        final ConflictTraceProxy counterexample =
-            buildCounterExample(firstBlockingState, kind,
-                                model, stateSchema, automata);
+        final ConflictCounterExampleProxy counterexample =
+          buildCounterExample(firstBlockingState, kind,
+                              model, stateSchema, automata);
         return setFailedResult(counterexample);
       }
 
@@ -301,7 +302,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private ConflictTraceProxy buildCounterExample
+  private ConflictCounterExampleProxy buildCounterExample
     (final int firstBlockingState,
      final ConflictKind kind,
      final ProductDESProxy model,
@@ -350,11 +351,12 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       }
       steps.add(0, step);
     } while (current >= 0);
-    final String tracename = getTraceName();
-    final ConflictTraceProxy trace =
-        factory.createConflictTraceProxy(tracename, null, null, model,
-                                         model.getAutomata(), steps, kind);
-    return trace;
+    final String traceName = getTraceName();
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return
+      factory.createConflictCounterExampleProxy(traceName, null, null, model,
+                                                model.getAutomata(), trace,
+                                                kind);
   }
 
   /**

@@ -37,7 +37,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 
 
 /**
@@ -71,7 +71,7 @@ public interface ControlLoopChecker extends ModelVerifier
    *         property is satisfied and there is no counterexample.
    */
   @Override
-  public LoopTraceProxy getCounterExample();
+  public LoopCounterExampleProxy getCounterExample();
 
   /**
    * Gets a collection of events that are guaranteed not to be

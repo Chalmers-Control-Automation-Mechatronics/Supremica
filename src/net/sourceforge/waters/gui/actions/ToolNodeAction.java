@@ -47,7 +47,7 @@ public class ToolNodeAction
   //# Constructors
   public ToolNodeAction(final IDE ide)
   {
-    super(ide, "Nodes", "Create simple nodes", IconAndFontLoader.ICON_TOOL_NODE,
+    super(ide, "States", "Create states", IconAndFontLoader.ICON_TOOL_NODE,
           IDEToolBar.Tool.NODE);
   }
 

@@ -66,7 +66,7 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -309,14 +309,16 @@ public class ProjectingSafetyVerifier
     }
     if (initUncontrollable != null) {
       final ProductDESProxyFactory factory = getFactory();
-      final String tracename = getTraceName();
+      final String traceName = getTraceName();
       final String comment =
         getTraceComment(null, initUncontrollable, null);
       final TraceStepProxy step = factory.createTraceStepProxy(null);
       final List<TraceStepProxy> steps = Collections.singletonList(step);
-      final SafetyTraceProxy counterexample = factory.createSafetyTraceProxy
-        (tracename, comment, null, model, automata, steps);
-      return setFailedResult(counterexample);
+      final TraceProxy trace = factory.createTraceProxy(steps);
+      final SafetyCounterExampleProxy counter =
+        factory.createSafetyCounterExampleProxy(traceName, comment, null,
+                                                model, automata, trace);
+      return setFailedResult(counter);
     }
 
     int l = 0;
@@ -370,12 +372,14 @@ public class ProjectingSafetyVerifier
     } else {
       //mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
       mStates = (int) mChecker.getAnalysisResult().getTotalNumberOfStates();
-      TraceProxy counter = mChecker.getCounterExample();
-      counter = list.getTrace(counter, newModel);
-      final List<EventProxy> e = new ArrayList<EventProxy>(counter.getEvents());
+      SafetyCounterExampleProxy counter = mChecker.getCounterExample();
+      TraceProxy trace = counter.getTrace();
+      trace = list.getTrace(trace, newModel);
+      final List<EventProxy> e = new ArrayList<>(trace.getEvents());
       e.set(e.size() - 1, forbtouncont.get(e.get(e.size() - 1)));
-      counter = getFactory().createSafetyTraceProxy(model.getName(),
-                                                    model, e);
+      final ProductDESProxyFactory factory = getFactory();
+      final String name = model.getName();
+      counter = factory.createSafetyCounterExampleProxy(name, model, e);
       return setFailedResult(counter);
     }
   }
@@ -565,35 +569,6 @@ public class ProjectingSafetyVerifier
       }
     }
     return p;
-  }
-
-  @SuppressWarnings("unused")
-  private boolean setFailedResult(final TraceProxy counterexample,
-                                  final Map<EventProxy,EventProxy> uncont)
-  {
-    final ProductDESProxyFactory factory = getFactory();
-    final ProductDESProxy des = getModel();
-    final String desname = des.getName();
-    final String tracename = desname + ":uncontrollable";
-    final List<EventProxy> events = counterexample.getEvents();
-    final int len = events.size();
-    final List<EventProxy> modevents = new ArrayList<EventProxy>(len);
-    final Iterator<EventProxy> iter = events.iterator();
-    EventProxy event = iter.next();
-    while (iter.hasNext()) {
-      modevents.add(event);
-      event = iter.next();
-    }
-    for (final Map.Entry<EventProxy,EventProxy> entry : uncont.entrySet()) {
-      if (entry.getValue() == event) {
-        final EventProxy key = entry.getKey();
-        modevents.add(key);
-        break;
-      }
-    }
-    final SafetyTraceProxy wrapper =
-      factory.createSafetyTraceProxy(tracename, des, modevents);
-    return super.setFailedResult(wrapper);
   }
 
 
@@ -797,8 +772,7 @@ public class ProjectingSafetyVerifier
         assert(!stateList.isEmpty());
       }
       stateList = null;
-      final ProductDESProxy mod = mParent == null ? model : mParent.getModel();
-      trace = getFactory().createSafetyTraceProxy(mod, place.getTrace());
+      trace = getFactory().createTraceProxyDeterministic(place.getTrace());
       return mParent == null ? trace : mParent.getTrace(trace, model);
     }
 

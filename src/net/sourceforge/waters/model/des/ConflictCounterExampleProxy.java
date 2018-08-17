@@ -31,24 +31,42 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.xsd.des.ConflictKind;
 
-import net.sourceforge.waters.xsd.des.TraceType;
+/**
+ * <P>A counterexample that shows that a model is blocking or has a
+ * deadlock.</P>
+ *
+ * <P>A conflict counterexample contains a single trace that takes the system
+ * from an initial state to a non-coreachable or deadlock state. In addition,
+ * the counterexample may provide {@link ConflictKind} information to indicate
+ * whether the behaviour represents a livelock or deadlock.</P>
+ *
+ * @author Robi Malik
+ */
 
-
-class JAXBTraceExporter
-  extends JAXBProductDESElementExporter<TraceProxy,TraceType>
+public interface ConflictCounterExampleProxy
+  extends CounterExampleProxy
 {
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBExporter
-  TraceType exportDocument(final TraceProxy proxy)
-    throws VisitorException
-  {
-    return (TraceType) exportProxy(proxy);
-  }
+  //# Getters
+  /**
+   * Gets the type of this conflict trace.
+   * @return One of {@link ConflictKind#CONFLICT},
+   *         {@link ConflictKind#DEADLOCK}, or
+   *         {@link ConflictKind#LIVELOCK}.
+   */
+  public ConflictKind getKind();
+
+  /**
+   * Gets the single trace that constitutes this counterexample.
+   * This method simply returns the first of the counterexample's
+   * traces.
+   * @see CounterExampleProxy#getTraces()
+   */
+  public TraceProxy getTrace();
 
 }

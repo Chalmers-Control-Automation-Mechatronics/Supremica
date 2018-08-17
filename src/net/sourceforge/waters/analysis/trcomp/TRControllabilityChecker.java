@@ -267,7 +267,8 @@ public class TRControllabilityChecker
         final VerificationResult subResult = delegate.getAnalysisResult();
         result.merge(subResult);
          if (!subResult.isSatisfied()) {
-          final TRTraceProxy trace = delegate.getCounterExample();
+          final TRTraceProxy trace =
+            (TRTraceProxy) delegate.getCounterExample();
           convertCounterExample(trace, event);
           return setFailedResult(trace);
         }

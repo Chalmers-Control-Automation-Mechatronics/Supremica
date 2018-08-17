@@ -33,13 +33,20 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.List;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
+import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 public class MonolithicCliqueBasedSupervisorReductionTest
   extends AbstractSupervisorSynthesizerTest
@@ -61,11 +68,40 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionSimplifier(new CliqueBasedSupervisorReductionTRSimplifier());
+    final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
+    simplifier.setIsFindFirst(false);
+    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.NONE);
+    synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
 
+  @Override
+  protected ProductDESResult runSynthesizer(final ProductDESProxy des,
+                                            final List<ParameterBindingProxy> bindings,
+                                            final boolean expect)
+    throws Exception
+  {
+    final MonolithicSynthesisResult result = (MonolithicSynthesisResult)super.runSynthesizer(des, bindings, expect);
+
+
+    final List<TRSimplifierStatistics> allStatistics = result.getSimplifierStatistics();
+    TRSimplifierStatistics reductionStatistics = null;
+    for (int i = 0; i < allStatistics.size(); i++) {
+      final TRSimplifierStatistics statisticsForSimplifier = allStatistics.get(i);
+      if (statisticsForSimplifier.getSimplifierClass().equals(CliqueBasedSupervisorReductionTRSimplifier.class)) {
+        reductionStatistics = statisticsForSimplifier;
+        break;
+      }
+    }
+
+    if (reductionStatistics != null) {
+      System.out.println("Overall stats for " + des.getName());
+      //a System.out.println(reductionStatistics.toString()) just gives me the default .toString() implementation
+      System.out.println(reductionStatistics.toString());
+    }
+    return result;
+  }
 
   //#########################################################################
   //# Entry points in junit.framework.TestCase

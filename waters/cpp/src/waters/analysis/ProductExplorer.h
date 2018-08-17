@@ -64,14 +64,14 @@
 
 namespace jni {
   class ClassCache;
-  class ConflictTraceGlue;
+  class ConflictCounterExampleGlue;
   class ListGlue;
-  class LoopTraceGlue;
+  class LoopCounterExampleGlue;
   class NativeConflictCheckerGlue;
   class NativeControlLoopCheckerGlue;
   class NativeModelVerifierGlue;
   class NativeSafetyVerifierGlue;
-  class SafetyTraceGlue;
+  class SafetyCounterExampleGlue;
   class NativeVerificationResultGlue;
 }
 
@@ -140,11 +140,11 @@ public:
   virtual bool runDeadlockCheck();
   virtual bool runLoopCheck();
   virtual void runStateCount();
-  virtual jni::SafetyTraceGlue getSafetyCounterExample
+  virtual jni::SafetyCounterExampleGlue getSafetyCounterExample
     (const jni::NativeSafetyVerifierGlue& gchecker) const;
-  virtual jni::ConflictTraceGlue getConflictCounterExample
+  virtual jni::ConflictCounterExampleGlue getConflictCounterExample
     (const jni::NativeModelVerifierGlue& gchecker) const;
-  virtual jni::LoopTraceGlue getLoopCounterExample
+  virtual jni::LoopCounterExampleGlue getLoopCounterExample
     (const jni::NativeControlLoopCheckerGlue& gchecker) const;
   virtual void addStatistics
     (const jni::NativeVerificationResultGlue& vresult) const;

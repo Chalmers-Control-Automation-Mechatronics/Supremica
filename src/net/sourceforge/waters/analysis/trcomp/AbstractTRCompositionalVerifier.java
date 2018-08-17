@@ -42,8 +42,8 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -158,7 +158,7 @@ public abstract class AbstractTRCompositionalVerifier
    * @param  counterexample The counterexample obtained by verification.
    * @return <CODE>false</CODE>
    */
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  protected boolean setFailedResult(final CounterExampleProxy counterexample)
   {
     final VerificationResult result = getAnalysisResult();
     result.setCounterExample(counterexample);

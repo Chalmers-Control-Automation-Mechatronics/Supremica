@@ -36,16 +36,16 @@ package net.sourceforge.waters.analysis.hisc;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 /**
@@ -87,13 +87,13 @@ public class HISCCPInterfaceConsistencyCheckerTest
   }
 
   @Override
-  protected void precheckCounterExample(final TraceProxy trace)
+  protected void precheckCounterExample(final CounterExampleProxy counter)
   {
   }
 
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
   {
   }
 

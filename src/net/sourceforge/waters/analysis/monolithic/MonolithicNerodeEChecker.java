@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -53,14 +55,13 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 /**
  * <P>A monolithic implementation of Nerode Equivalence checker.</P>
@@ -154,7 +155,7 @@ public class MonolithicNerodeEChecker
         for (int i = 0; i < mNumEvent; i++)  // for all events
           if (eventAvailable(currTuple1, i))
                { mErrorEvent = i;}
-        final SafetyTraceProxy counterexample = computeCounterExample();
+        final SafetyCounterExampleProxy counterexample = computeCounterExample();
         mSystemState = currTuple2;
         for (int i = 0; i < mNumEvent; i++)  // for all events
           if (eventAvailable(currTuple2, i))
@@ -760,7 +761,7 @@ public class MonolithicNerodeEChecker
    *         has been called, or model checking has found that the
    *         property is satisfied and there is no counterexample.
    */
-  private SafetyTraceProxy computeCounterExample()
+  private SafetyCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
@@ -817,16 +818,16 @@ public class MonolithicNerodeEChecker
     steps.add(0, init);
     final String tracename = getTraceName();
     final String comment = getTraceComment(event0, aut, state0);
-    final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-      (tracename, comment, null, des, null, steps);
-    return trace;
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy
+      (tracename, comment, null, des, null, trace);
   }
 
   /**
    * Computation for the second counterexample...
    * This is to be used by the Modular checker.
    */
-  private SafetyTraceProxy computeCounterExample2()
+  private SafetyCounterExampleProxy computeCounterExample2()
       throws AnalysisAbortException, OverflowException
     {
       final ProductDESProxyFactory factory = getFactory();
@@ -880,14 +881,16 @@ public class MonolithicNerodeEChecker
      steps.add(append);
      event0 = marking;
     }
-      final TraceStepProxy init = factory.createTraceStepProxy(null);
-      steps.add(0, init);
-      final String tracename = getTraceName();
-      final String comment = getTraceComment(event0, aut, state0);
-      final SafetyTraceProxy trace = factory.createSafetyTraceProxy
-        (tracename, comment, null, des, null, steps);
-      return trace;
-    }
+    final TraceStepProxy init = factory.createTraceStepProxy(null);
+    steps.add(0, init);
+    final String tracename = getTraceName();
+    final String comment = getTraceComment(event0, aut, state0);
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return factory.createSafetyCounterExampleProxy
+      (tracename, comment, null, des, null, trace);
+  }
+
+
   //#########################################################################
   //# Data Members
   /** a sentinel that states if the model is control loop free. */
@@ -947,7 +950,7 @@ public class MonolithicNerodeEChecker
   private int mErrorAutomaton;
   private StateTuplePair errorPair;
   private boolean errorMark;
-  private SafetyTraceProxy tCounterExample;
+  private SafetyCounterExampleProxy tCounterExample;
 
   //#########################################################################
   //# Variables used for encoding/decoding
@@ -957,7 +960,7 @@ public class MonolithicNerodeEChecker
   /** a list contains masks needed for each automaton */
   private int mNumBitsMasks[];
 
-  /** a number of integers used to encode synchronized state */
+  /** a number of integers used to encode synchronised state */
   private int mNumInts;
 
   /** an index of first automaton in each integer buffer */
