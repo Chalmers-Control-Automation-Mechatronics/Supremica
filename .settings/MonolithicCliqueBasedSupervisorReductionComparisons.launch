@@ -10,6 +10,7 @@
 <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.sourceforge.waters.analysis.monolithic.MonolithicCliqueBasedSupervisorReductionComparisons"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="s"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="waters"/>
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dwaters.test.inputdir=&quot;${workspace_loc:waters}/examples&quot;&#13;&#10;-Dwaters.test.outputdir=&quot;${workspace_loc:waters}/logs/results&quot;&#13;&#10;-Djava.library.path=&quot;${workspace_loc:waters}/dist&quot;&#13;&#10;-Xmx512m&#10;-enableassertions"/>
 </launchConfiguration>

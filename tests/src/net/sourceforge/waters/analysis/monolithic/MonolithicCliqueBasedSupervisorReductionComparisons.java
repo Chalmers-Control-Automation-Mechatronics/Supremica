@@ -25,13 +25,61 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
 {
   public static void main(final String[] args) throws Exception
   {
-    final MonolithicCliqueBasedSupervisorReductionComparisons comparisons =
-      args.length == 0
-        ? new MonolithicCliqueBasedSupervisorReductionComparisons()
-        : new MonolithicCliqueBasedSupervisorReductionComparisons(args[0]);
+    if (args.length == 0) {
+      Run(new MonolithicCliqueBasedSupervisorReductionComparisons(), false);
+    } else {
+      final int[] maxNumberOfCoversValues = new int[] {2, 5};
+      final HeuristicCoverStrategy[] strategies = HeuristicCoverStrategy.values();
+      for (final int maxNumberOfCovers : maxNumberOfCoversValues) {
+        for (final HeuristicCoverStrategy coverStrategy : strategies) {
+          final String baseOutputName = coverStrategy.name() + "_" + maxNumberOfCovers + ".csv";
+          final MonolithicCliqueBasedSupervisorReductionComparisons findAllComparisons =
+            new MonolithicCliqueBasedSupervisorReductionComparisons("all_" + baseOutputName, coverStrategy, false, maxNumberOfCovers);
+
+          final MonolithicCliqueBasedSupervisorReductionComparisons findFirstComparisons =
+            new MonolithicCliqueBasedSupervisorReductionComparisons("first_" + baseOutputName, coverStrategy, true, maxNumberOfCovers);
+
+          final boolean shouldDoAllTests = !coverStrategy.equals(HeuristicCoverStrategy.NONE);
+          Run(findAllComparisons, shouldDoAllTests);
+          Run(findFirstComparisons, shouldDoAllTests);
+        }
+      }
+
+    }
+  }
+
+  private static void Run(final MonolithicCliqueBasedSupervisorReductionComparisons comparisons, final boolean doAllTests) throws Exception {
     comparisons.setUp();
     comparisons.writeHeader();
 
+    if (doAllTests) {
+      DoAllTests(comparisons);
+    }
+    else {
+      DoBasicTests(comparisons);
+    }
+    comparisons.tearDown();
+  }
+
+  private static void DoAllTests(final MonolithicCliqueBasedSupervisorReductionComparisons comparisons) throws Exception {
+    DoBasicTests(comparisons);
+    comparisons.testCellSwitch();
+    comparisons.testTransferLine2();
+    //comparisons.testCatMouseUnsup2();
+    //comparisons.testCT3();
+    //comparisons.testIMS();
+    //comparisons.testIPC();
+    //comparisons.testIPCcswitch();
+    //comparisons.testIPClswitch();
+    //comparisons.testIPCuswicth();
+    //comparisons.testRobotAssemblyCell();
+    //comparisons.testTransferLine3();
+    //comparisons.testTictactoe();
+    //comparisons.test2LinkAlt();
+    //comparisons.test2LinkAltBatch();
+  }
+
+  private static void DoBasicTests(final MonolithicCliqueBasedSupervisorReductionComparisons comparisons) throws Exception {
     comparisons.testAip0Sub1P0();
     comparisons.testBallProcess();
     comparisons.testBigFactory1();
@@ -39,19 +87,14 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     comparisons.testBigFactory3();
     comparisons.testCatMouse();
     comparisons.testCatMouseUnsup1();
-    //comparisons.testCatMouseUnsup2();
+
     comparisons.testCell();
-    comparisons.testCellSwitch();
-    //comparisons.testCertainUnsup();
+
     comparisons.testCoffeeMachine();
-    //comparisons.testCT3();
+
     comparisons.testDebounce();
     comparisons.testDosingUnit();
-    //comparisons.testIMS();
-    //comparisons.testIPC();
-    //comparisons.testIPCcswitch();
-    //comparisons.testIPClswitch();
-    //comparisons.testIPCuswicth();
+
     comparisons.testManufacturingSystem();
     comparisons.testManWolf();
     comparisons.testNoPlant1();
@@ -63,7 +106,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     comparisons.testPlantify();
     comparisons.testProfessorPen();
     comparisons.testPV35();
-    //comparisons.testRobotAssemblyCell();
+
     comparisons.testSajed();
     comparisons.testSelfloop1();
     comparisons.testSelfloop2();
@@ -76,22 +119,22 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     comparisons.testTbedMinsync();
     comparisons.testTeleNetwork();
     comparisons.testTransferLine1();
-    comparisons.testTransferLine2();
-    //comparisons.testTransferLine3();
-    //comparisons.testTictactoe();
-    //comparisons.test2LinkAlt();
-    //comparisons.test2LinkAltBatch();
-    comparisons.tearDown();
   }
 
   public MonolithicCliqueBasedSupervisorReductionComparisons()
   {
-    this.filename = getOutputDirectory() + "/comparisons.csv";
+    this.mFilename = getOutputDirectory() + "/comparisons.csv";
+    this.mCoverStrategy = HeuristicCoverStrategy.NONE;
+    this.mIsFindFirst = false;
+    this.mMaxNumberOfCovers = 0; //unused with non-heuristic
   }
 
-  public MonolithicCliqueBasedSupervisorReductionComparisons(final String filename)
+  public MonolithicCliqueBasedSupervisorReductionComparisons(final String filename, final HeuristicCoverStrategy coverStrategy, final boolean isFindFirst, final int maxNumberOfCovers)
   {
-    this.filename = filename;
+    this.mFilename = getOutputDirectory() + "/" + filename;
+    this.mCoverStrategy = coverStrategy;
+    this.mIsFindFirst = isFindFirst;
+    this.mMaxNumberOfCovers = maxNumberOfCovers;
   }
 
   @Override
@@ -99,7 +142,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   {
     super.setUp();
     mPrintWriter =
-      new PrintWriter(new BufferedWriter(new FileWriter(new File(filename))));
+      new PrintWriter(new BufferedWriter(new FileWriter(new File(mFilename))));
   }
 
   @Override
@@ -153,9 +196,9 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   {
     final CliqueBasedSupervisorReductionTRSimplifier simplifier =
       new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setIsFindFirst(false);
-    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.CONNECTIVITY);
-    simplifier.setMaxHeuristicCovers(2);
+    simplifier.setIsFindFirst(mIsFindFirst);
+    simplifier.setHeuristicCoverStrategy(mCoverStrategy);
+    simplifier.setMaxHeuristicCovers(mMaxNumberOfCovers);
     return simplifier;
   }
 
@@ -217,17 +260,17 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     mPrintWriter.write(des.getName() + ",");
     if (cliqueBasedStats == null && suWonhamStats == null) {
       for (int i = 0; i < 6; i++) {
-        mPrintWriter.write(noEntryValue + ",");
+        mPrintWriter.write(mNoEntryValue + ",");
       }
-      mPrintWriter.write(noEntryValue);
+      mPrintWriter.write(mNoEntryValue);
     } else if (cliqueBasedStats == null) {
      mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-     mPrintWriter.write(noEntryValue + "," + suWonhamStats.getOutputStates() + "," + noEntryValue +",");
-     mPrintWriter.write(noEntryValue + "," + suWonhamStats.getRunTime() + "," + noEntryValue);
+     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getOutputStates() + "," + mNoEntryValue +",");
+     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getRunTime() + "," + mNoEntryValue);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
-      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + noEntryValue + "," + noEntryValue + ",");
-      mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + noEntryValue + "," + noEntryValue);
+      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + mNoEntryValue + "," + mNoEntryValue + ",");
+      mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + mNoEntryValue + "," + mNoEntryValue);
     } else {
       final int swStates = suWonhamStats.getOutputStates();
       final int cbStates = cliqueBasedStats.getOutputStates();
@@ -276,7 +319,11 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
 
   //#########################################################################
   //# Data Members
-  private final String filename;
-  private final String noEntryValue = "-";
+  private final CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
+  private final int mMaxNumberOfCovers;
+  private final boolean mIsFindFirst;
+
+  private final String mFilename;
+  private final String mNoEntryValue = "-";
   private PrintWriter mPrintWriter;
 }
