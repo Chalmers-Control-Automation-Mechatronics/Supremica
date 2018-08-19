@@ -261,9 +261,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       mHeuristicCoverStrategy == HeuristicCoverStrategy.NONE
         ? new BronKerboschCoverStrategy()
         : new HeuristicBronKerboschCoverStrategy();
-    final Searcher searcher =
+    Searcher searcher =
       new Searcher(coverStrategy, new RecursiveDependencyStrategy(),
-                   !mIsFindFirst);
+                   new SimpleAddCandidateStrategy(), !mIsFindFirst);
     final Candidate closedSolution = searcher.reduce(searchSpace, mNumStates);
 
     if (closedSolution == null) {
@@ -279,11 +279,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     optimiserCandidate.addDependency(mInitialCompatibleId);
     searchSpace.add(optimiserCandidate);
 
-    final Searcher optimiser =
+    searcher =
       new Searcher(new PrecomputedCoverStrategy(closedSolution.toArray()),
-                   new SimpleDependencyStrategy(), true);
+                   new SimpleDependencyStrategy(), new SimpleAddCandidateStrategy(), true);
+
     final Candidate optimisedSupervisor =
-      optimiser.reduce(searchSpace, closedSolution.size());
+      searcher.reduce(searchSpace, closedSolution.size());
+
+    searcher = null;
 
     if (optimisedSupervisor == null
         && closedSolution.size() + 1 < mNumStates) {
@@ -326,14 +329,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     private final CoverStrategy coverStrategy;
     private final DependencyStrategy dependencyStrategy;
+    private final AddCandidateStrategy addCandidateStrategy;
     private final boolean isFullSearch;
 
     public Searcher(final CoverStrategy coverStrategy,
                     final DependencyStrategy dependencyStrategy,
+                    final AddCandidateStrategy addCandidateStrategy,
                     final boolean isFullSearch)
     {
       this.coverStrategy = coverStrategy;
       this.dependencyStrategy = dependencyStrategy;
+      this.addCandidateStrategy = addCandidateStrategy;
       this.isFullSearch = isFullSearch;
     }
 
@@ -401,13 +407,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             }
           }
 
-          //if we aren't done yet we know we need to add at least 1 compatible to make it 'done', so discard if too big
-          if (newSolution.size() + 1 >= reducedSupervisorSize) {
-            continue;
+          if (addCandidateStrategy.shouldAddCandidate(newSolution, reducedSupervisorSize)) {
+            searchSpace.add(newSolution);
           }
-
-          //only add to search space if we didn't encounter a complete solution that was smaller, or a solution that was too big
-          searchSpace.add(newSolution);
         }
       }
       return reducedSupervisor;
@@ -425,6 +427,46 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   {
     public void processNewDependencies(Candidate solution,
                                        TIntList newDependencies);
+  }
+
+  private interface AddCandidateStrategy {
+    public boolean shouldAddCandidate(Candidate solution, int currentBestSolutionSize);
+  }
+
+  private class SimpleAddCandidateStrategy implements AddCandidateStrategy {
+
+    @Override
+    public boolean shouldAddCandidate(final Candidate solution,
+                                      final int currentBestSolutionSize)
+    {
+      return solution.size() + 1 < currentBestSolutionSize;
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private class ProbabilisticAddCandidateStrategy extends SimpleAddCandidateStrategy {
+    private final TIntSet alreadySeenCandidates;
+    private final Random random;
+
+    public ProbabilisticAddCandidateStrategy()
+    {
+      alreadySeenCandidates = new TIntHashSet();
+      random = new Random(1);
+    }
+
+    @Override
+    public boolean shouldAddCandidate(final Candidate solution,
+                                      final int currentBestSolutionSize)
+    {
+      if (super.shouldAddCandidate(solution, currentBestSolutionSize)) {
+        //if we definitely haven't seen this solution before, add.
+        //if we may have, add with 50% probability
+        if (alreadySeenCandidates.add(solution.hashCode()) || random.nextBoolean()) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
 
@@ -1372,6 +1414,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
     }
 
+
     @Override
     public String toString()
     {
@@ -1479,6 +1522,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         }
       }
       return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      // TODO Auto-generated method stub
+      return super.hashCode() + dependencies.hashCode();
     }
 
     @Override

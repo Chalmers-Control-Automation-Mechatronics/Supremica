@@ -102,23 +102,11 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   {
   }
 
-  //410 states, 12 events, 1494 transitions
-/*  @Override
-  public void testTransferLine2() throws Exception
-  {
-  }*/
-
   //5992 states, 17 events, 29749 transitions
   @Override
   public void testTransferLine3() throws Exception
   {
   }
-
-  //672 states, 15 events, 2248 transitions
-/*  @Override
-  public void testCellSwitch() throws Exception
-  {
-  }*/
 
   //830 states, 16 events, 8432 transitions
   @Override
@@ -139,10 +127,10 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   }
 
   //852 states, 18 events, 2826 transitions
-  @Override
+/*  @Override
   public void testIPCuswicth() throws Exception
   {
-  }
+  }*/
 
   //2394 states, 35 events, 4381 transitions
   @Override
@@ -179,5 +167,4 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
   public void testIMS() throws Exception
   {
   }
-
 }
