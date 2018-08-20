@@ -1342,12 +1342,14 @@ public abstract class AbstractDeadlockCheckerTest
       (ConflictCounterExampleProxy) counter;
     assertEquals(castTest.getKind(), ConflictKind.DEADLOCK);
     final TraceProxy trace = castTest.getTrace();
+    assertTrue("Deadlock counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
 
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int numAutomata = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple = new HashMap<>(numAutomata);
     for (final AutomatonProxy aut : automata){
-      final StateProxy state = checkCounterExample(aut, trace);
+      final StateProxy state = checkTrace(aut, trace);
       tuple.put(aut, state);
     }
 
@@ -1371,7 +1373,7 @@ public abstract class AbstractDeadlockCheckerTest
           }
         }
         fail("Event '" + event.getName() +
-             "' is enabled in end state of counterexample!");
+             "' is enabled in end state of deadlock counterexample!");
       }
     }
   }

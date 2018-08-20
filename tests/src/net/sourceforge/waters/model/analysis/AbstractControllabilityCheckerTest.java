@@ -931,7 +931,9 @@ public abstract class AbstractControllabilityCheckerTest
     final TraceProxy trace = castTest.getTrace();
     final List<EventProxy> eventlist = trace.getEvents();
     final int len = eventlist.size();
-    assertTrue("Empty Counterexample!", len > 0);
+    assertTrue("Empty counterexample!", len > 0);
+    assertTrue("Safety counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
 
     final EventProxy last = eventlist.get(len-1);
     final EventKind ekind = last.getKind();
@@ -942,7 +944,7 @@ public abstract class AbstractControllabilityCheckerTest
     for (final AutomatonProxy aut : automata){
       final ComponentKind akind = aut.getKind();
       final StateProxy state =
-        checkCounterExample(aut, trace, akind == ComponentKind.SPEC);
+        checkTrace(aut, trace, akind == ComponentKind.SPEC);
       rejected |= state == null;
     }
     assertTrue("Counterexample not rejected by any spec!", rejected);

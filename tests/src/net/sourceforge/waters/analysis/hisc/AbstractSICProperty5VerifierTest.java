@@ -330,15 +330,16 @@ public abstract class AbstractSICProperty5VerifierTest
     final ConflictCounterExampleProxy castTest =
       (ConflictCounterExampleProxy) counter;
     final TraceProxy trace = castTest.getTrace();
+    assertTrue("SIC V counterexample trace includes a loop!",
+               trace.getLoopIndex() < 0);
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
-    final Map<AutomatonProxy,StateProxy> tuple =
-        new HashMap<AutomatonProxy,StateProxy>(size);
+    final Map<AutomatonProxy,StateProxy> tuple = new HashMap<>(size);
     final EventProxy failedAnswer = getModelVerifier().getFailedAnswer();
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, trace);
-      assertNotNull("Counterexample not accepted by automaton " + aut.getName()
-          + "!", state);
+      final StateProxy state = checkTrace(aut, trace);
+      assertNotNull("Counterexample not accepted by automaton " +
+                    aut.getName() + "!", state);
       tuple.put(aut, state);
 
       // tests that in the end state of the trace all interfaces have the answer
@@ -385,10 +386,10 @@ public abstract class AbstractSICProperty5VerifierTest
     return (SICProperty5Verifier) super.getModelVerifier();
   }
 
-  // #########################################################################
-  // # Coreachability Model
-  private ProductDESProxy createLanguageInclusionModel(
-                                                       final ProductDESProxy des,
+
+  //#########################################################################
+  //# Coreachability Model
+  private ProductDESProxy createLanguageInclusionModel(final ProductDESProxy des,
                                                        final Map<AutomatonProxy,StateProxy> inittuple,
                                                        final EventProxy answer)
   {
@@ -440,8 +441,7 @@ public abstract class AbstractSICProperty5VerifierTest
     return createDisablingAutomaton(name, ComponentKind.PLANT, disabledevents);
   }
 
-  private AutomatonProxy createLanguageInclusionAutomaton(
-                                                          final AutomatonProxy aut,
+  private AutomatonProxy createLanguageInclusionAutomaton(final AutomatonProxy aut,
                                                           final StateProxy newinit)
   {
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
