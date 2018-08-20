@@ -585,6 +585,12 @@ public class AutomataTable extends JTable implements SelectionOwner
           }
         }
       }
+      else if(event.getButton() == MouseEvent.BUTTON1) {
+        final AutomatonProxy aut = getAutomaton(event);
+        if(aut == null) {
+          clearSelection();
+        }
+      }
     }
 
     @Override

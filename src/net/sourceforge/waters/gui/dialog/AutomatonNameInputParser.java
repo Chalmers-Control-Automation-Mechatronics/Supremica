@@ -31,73 +31,66 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.gui.dialog;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.dialog.AutomatonSynthesizerDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-
-import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
- * The action to invoke the synchronous product dialog in the Waters analyser.
+ * An input parser for automaton names, for use with a
+ * {@link javax.swing.JFormattedTextField JFormattedTextField}. This parser
+ * allows entry of structured identifiers, and checks in addition whether an
+ * entered name is already used by a component in a given module context.
  *
- * @author George Hewlett
+ * @see SimpleExpressionCell
+ * @author Robi Malik
  */
 
-public class AnalyzerSynthesizerAction extends WatersAnalyzerAction
+class AutomatonNameInputParser extends IdentifierInputParser
 {
+
 
   //#########################################################################
   //# Constructor
-  AnalyzerSynthesizerAction(final IDE ide)
+  AutomatonNameInputParser(final IdentifierProxy oldname,
+                           final WatersAnalyzerPanel panel,
+                           final ExpressionParser parser,
+                           final boolean nameChange)
   {
-    super(ide);
-    putValue(Action.NAME, "Synthesize ...");
-    putValue(Action.SHORT_DESCRIPTION, "Synthesize the selected automata");
-    updateEnabledStatus();
+    super(oldname, parser);
+    mModel = panel.getAutomataTableModel();
+    mNameChange = nameChange;
+    final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldname;
+    mOldName = simple.getName();
   }
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
+  //# Interface net.sourceforge.waters.gui.FormattedInputParser
   @Override
-  public void actionPerformed(final ActionEvent event)
+  public IdentifierProxy parse(final String text) throws ParseException
   {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new AutomatonSynthesizerDialog(getAnalyzerPanel());
+    final IdentifierProxy ident = super.parse(text);
+    if (!mNameChange) {
+      if (ident != getOldIdentifier())
+        mModel.checkNewAutomatonName(ident);
     }
+    else if(mNameChange){
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String NewName = simple.getName();
+      if(!NewName.equals(mOldName))
+        mModel.checkNewAutomatonName(ident);
+    }
+    return ident;
   }
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
-  {
-    boolean enabled = false;
-    final AutomataTable table = getAnalyzerTable();
-    if (table != null) {
-      enabled = (table.getSelectedRowCount() >= 1);
-    }
-    setEnabled(enabled);
-  }
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 8082126929036001591L;
-
+  //#######################################################################
+  //# Data Members
+  private final AutomataTableModel mModel;
+  private final boolean mNameChange;
+  private final String mOldName;
 }

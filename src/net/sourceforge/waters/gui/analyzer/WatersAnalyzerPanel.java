@@ -38,6 +38,7 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JViewport;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -83,9 +84,9 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
-    // TODO mAutomataPanel is empty white panel.
-    // TODO It can be a local variable, and does not need scroll bars
-    final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
+    final JPanel mAutomataPanel = new JPanel();
+    final JViewport scrollDisplay = new JViewport();
+    scrollDisplay.add(mAutomataPanel);
     scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
@@ -179,7 +180,7 @@ public class WatersAnalyzerPanel extends MainPanel
   private final ModuleContainer mModuleContainer;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
-  private final JPanel mAutomataPanel = new JPanel();
+
   private final AutomataTable mAutomataTable;
 
   //#########################################################################

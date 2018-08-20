@@ -48,7 +48,10 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -172,11 +175,29 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     return false;
   }
 
+  public void checkNewAutomatonName(final IdentifierProxy ident)
+    throws ParseException
+  {
+    if (ident instanceof SimpleIdentifierProxy) {
+      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
+      final String name = simple.getName();
+      if (containsAutomatonName(name)) {
+        final StringBuilder buffer = new StringBuilder("Name '");
+        buffer.append(name);
+        buffer.append("' is already taken by ");
+        final String typename = "an Automaton";
+        buffer.append(typename);
+        buffer.append('!');
+        final String msg = buffer.toString();
+        throw new ParseException(msg, 0);
+      }
+    }
+  }
+
   public void replaceAutomaton(final AutomatonProxy oldAut, final AutomatonProxy newAut) {
     int i = 0;
     for(final AutomatonProxy aut : mAutomataList) {
-      // TODO Use object identity, not name
-      if(aut.getName().equals(oldAut.getName()) == true) {
+      if(aut.equals(oldAut) == true) {
         mAutomataList.set(i, newAut);
         break;
       }
