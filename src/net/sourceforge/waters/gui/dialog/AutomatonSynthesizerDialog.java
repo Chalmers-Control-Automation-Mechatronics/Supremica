@@ -90,7 +90,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 
-    setTitle("Synchronizing automatons'");
+    setTitle("Supervisor synthesis");
     createComponents();
     layoutComponents();
 
@@ -103,19 +103,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     mCliqueBased = new CliqueBasedSupervisorReductionTRSimplifier();
   }
 
-  //#########################################################################
-  //# Access to Edited Item
-  /**
-   * Gets the automaton edited by this dialog.
-   *
-   * @return A reference to the automaton being edited by this dialog.
-   */
-  public List<AutomatonProxy> getEditedItem()
-  {
-    final List<AutomatonProxy> autList =
-      mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-    return autList;
-  }
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -124,9 +111,6 @@ public class AutomatonSynthesizerDialog extends JDialog
    */
   private void createComponents()
   {
-    //final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-//    final OperatorTable optable = CompilerOperatorTable.getInstance();
-//    final ExpressionParser parser = new ExpressionParser(factory, optable);
     final ActionListener commithandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -170,13 +154,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     mSupReductionType.addActionListener(ReductionHandler);
     mLocalisedSupervisor = new JCheckBox("Localised Supervisors", false);
     mLocalisedSupervisor.setEnabled(false);
-
-
-    // Error panel ...
-//    mErrorPanel = new RaisedDialogPanel();
-//    mErrorLabel = new ErrorLabel();
-//    mErrorPanel.add(mErrorLabel);
-//    mNamePrefix.setErrorDisplay(mErrorLabel);
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
@@ -279,10 +256,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
 
-//    constraints.weighty = 0.0;
-//    constraints.fill = GridBagConstraints.HORIZONTAL;
-//    layout.setConstraints(mErrorPanel, constraints);
-//    contents.add(mErrorPanel);
     layout.setConstraints(mButtonsPanel, constraints);
     contents.add(mButtonsPanel);
     pack();
@@ -298,6 +271,7 @@ public class AutomatonSynthesizerDialog extends JDialog
   {
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
+    // TODO Doesn't work without parsers ...
     if (isInputLocked()) {
       // There is invalid input and an error message has been displayed.
       // Do not try to commit.
@@ -328,6 +302,7 @@ public class AutomatonSynthesizerDialog extends JDialog
         syn.setSupervisorReductionSimplifier(simplifier);
         syn.setSupervisorLocalizationEnabled(mLocalisedSupervisor
           .isSelected());
+        // TODO Synthesiser should take all automata in one product DES
         syn.setModel(aut);
         try {
           syn.run();
@@ -336,12 +311,14 @@ public class AutomatonSynthesizerDialog extends JDialog
           final String msg = exception.getMessage();
           logger.error(msg);
         }
+        // TODO Check for failed synthesis using result.isSatisfied()
         final MonolithicSynthesisResult result = syn.getAnalysisResult();
         final Collection<AutomatonProxy> resultList =
           result.getComputedAutomata();
-        final AutomataTableModel model =
-          mAnalyzerPanel.getAutomataTableModel();
         if (resultList != null) {
+          final AutomataTableModel model =
+            mAnalyzerPanel.getAutomataTableModel();
+          // TODO Let insertRows accept collection, avoid copy
           final List<AutomatonProxy> autList =
             new ArrayList<AutomatonProxy>(resultList);
           model.insertRows(autList);
@@ -407,21 +384,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     return mNamePrefix.isFocusOwner(); //&& !mNamePrefix.shouldYieldFocus();
   }
 
-  @SuppressWarnings("unused")
-  private String getNewName()
-  {
-    String name = "";
-    if (mAutomatonList.size() <= 4)
-      for (final AutomatonProxy aut : mAutomatonList) {
-        if (aut.equals(mAutomatonList.get((mAutomatonList.size() - 1))))
-          name += aut.getName();
-        else
-          name += aut.getName() + "_";
-      }
-    else
-      name = "New Automaton";
-    return name;
-  }
 
   //#########################################################################
   //# Data Members

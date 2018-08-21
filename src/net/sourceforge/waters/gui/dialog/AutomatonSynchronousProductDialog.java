@@ -99,19 +99,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
     setMinimumSize(getSize());
   }
 
-  //#########################################################################
-  //# Access to Edited Item
-  /**
-   * Gets the automaton edited by this dialog.
-   *
-   * @return A reference to the automaton being edited by this dialog.
-   */
-  public List<AutomatonProxy> getEditedItem()
-  {
-    final List<AutomatonProxy> autList =
-      mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-    return autList;
-  }
 
   //#########################################################################
   //# Initialisation and Layout of Components

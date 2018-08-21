@@ -38,7 +38,7 @@ import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 
 
 /**
@@ -65,9 +65,8 @@ class AutomatonNameInputParser extends IdentifierInputParser
     super(oldname, parser);
     mModel = panel.getAutomataTableModel();
     mNameChange = nameChange;
-    final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldname;
-    mOldName = simple.getName();
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.FormattedInputParser
@@ -76,21 +75,20 @@ class AutomatonNameInputParser extends IdentifierInputParser
   {
     final IdentifierProxy ident = super.parse(text);
     if (!mNameChange) {
-      if (ident != getOldIdentifier())
+      mModel.checkNewAutomatonName(ident);
+    } else {
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      if (!eq.equals(getOldIdentifier(), ident)) {
         mModel.checkNewAutomatonName(ident);
-    }
-    else if(mNameChange){
-      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
-      final String NewName = simple.getName();
-      if(!NewName.equals(mOldName))
-        mModel.checkNewAutomatonName(ident);
+      }
     }
     return ident;
   }
+
 
   //#######################################################################
   //# Data Members
   private final AutomataTableModel mModel;
   private final boolean mNameChange;
-  private final String mOldName;
+
 }

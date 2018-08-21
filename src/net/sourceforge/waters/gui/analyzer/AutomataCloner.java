@@ -99,9 +99,10 @@ public class AutomataCloner
       copiedEvents.add(newEvent);
     }
     for (final StateProxy sp : stateList) {
+      final Collection<EventProxy> propositions = sp.getPropositions();
       final Collection<EventProxy> copiedPropostions =
-        new ArrayList<EventProxy>(stateList.size());
-      for (final EventProxy ep : sp.getPropositions())
+        new ArrayList<EventProxy>(propositions.size());
+      for (final EventProxy ep : propositions)
         copiedPropostions.add(mEventMap.get(ep.getName()));
       final StateProxy copiedSP = mFactory
         .createStateProxy(sp.getName(), sp.isInitial(), copiedPropostions);
@@ -115,7 +116,6 @@ public class AutomataCloner
       final StateProxy newSource = stateMap.get(source);
       final StateProxy newTarget = stateMap.get(target);
       final EventProxy newEvent = mEventMap.get(event.getName());
-
       final TransitionProxy copiedTP =
         mFactory.createTransitionProxy(newSource, newEvent, newTarget);
       copiedTranisitions.add(copiedTP);

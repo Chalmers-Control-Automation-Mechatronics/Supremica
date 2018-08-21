@@ -101,6 +101,7 @@ public class AutomataTable extends JTable implements SelectionOwner
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
+    setFillsViewportHeight(true);
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
     final int columnGap = IconAndFontLoader.getTableColumnGap();
@@ -162,6 +163,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   @Override
   public String getToolTipText(final MouseEvent event)
   {
+    // TODO aut could be null if clicking blank space
     final AutomatonProxy aut = getAutomaton(event);
     final ComponentKind kind = aut.getKind();
     if (aut != null) {

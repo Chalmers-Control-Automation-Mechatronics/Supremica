@@ -127,7 +127,8 @@ public class AutomatonPropertiesDialog extends JDialog
     try {
       oldname = parser.parseIdentifier(mAutomaton.getName());
     } catch (final ParseException exception) {
-      exception.printStackTrace();
+      oldname = factory.createSimpleIdentifierProxy(mAutomaton.getName());
+      //exception.printStackTrace();
     }
     final FormattedInputParser nameparser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, true);
     mNameInput =

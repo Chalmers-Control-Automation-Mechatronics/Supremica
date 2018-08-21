@@ -152,12 +152,15 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     fireTableRowsDeleted(end, start);
   }
 
+  // TODO Method should accept Collection<? extends AutomatonProxy>
   public void insertRows(final List<AutomatonProxy> insertList)
   {
     final int count = mAutomataList.size()+1;
+    // TODO mAutomataList.addAll(insertList);
     for (final AutomatonProxy aut : insertList) {
       mAutomataList.add(aut);
     }
+    // TODO End is off by one?
     fireTableRowsInserted(count, count+insertList.size());
   }
 
@@ -178,6 +181,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   public void checkNewAutomatonName(final IdentifierProxy ident)
     throws ParseException
   {
+    // TODO Use ident.toString(), also if not simple identifier
     if (ident instanceof SimpleIdentifierProxy) {
       final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
       final String name = simple.getName();

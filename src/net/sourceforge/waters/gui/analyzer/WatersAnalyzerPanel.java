@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.awt.Color;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -84,10 +83,10 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
+    // TODO Just set the right component to be a white panel, no viewport
     final JPanel mAutomataPanel = new JPanel();
     final JViewport scrollDisplay = new JViewport();
     scrollDisplay.add(mAutomataPanel);
-    scroll.getViewport().setBackground(Color.white);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
     setRightComponent(scrollDisplay);
