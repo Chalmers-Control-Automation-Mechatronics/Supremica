@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.diagnosis;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +42,16 @@ import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
+import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class MonolithicDiagnosabilityVerifierTest
@@ -257,6 +261,11 @@ public class MonolithicDiagnosabilityVerifierTest
   protected void checkCounterExample(final ProductDESProxy des,
                                      final CounterExampleProxy counter)
   {
+    try {
+    super.checkCounterExample(des, counter);
+    }catch(final Exception e){
+
+    }
     final DualCounterExampleProxy dual = (DualCounterExampleProxy) counter;
     final List<TraceProxy> traces = dual.getTraces();
     final TraceProxy traceA = traces.get(0);
@@ -267,6 +276,7 @@ public class MonolithicDiagnosabilityVerifierTest
     final int loopIndexB = traceB.getLoopIndex();
     final int lenA = stepsA.size();
     final int lenB = stepsB.size();
+    final Collection<AutomatonProxy> automata = des.getAutomata();
 
     // Both traces are not empty
     assertTrue("TraceA is empty", lenA > 0);
@@ -276,10 +286,62 @@ public class MonolithicDiagnosabilityVerifierTest
     assertTrue("TraceA loop is empty", lenA - loopIndexA > 0);
     assertTrue("TraceB loop is empty", lenB - loopIndexB > 0);
 
-    // Both loops have identical observable events
-    int iA=1,iB=1;
+    // Both traces have valid loops
+    final Map<AutomatonProxy,StateProxy> lastMapA
+    = stepsA.get(lenA-1).getStateMap();
+    final Map<AutomatonProxy,StateProxy> lastMapB
+    = stepsB.get(lenB-1).getStateMap();
+    final Map<AutomatonProxy,StateProxy> loopMapA
+    = stepsA.get(loopIndexA).getStateMap();
+    final Map<AutomatonProxy,StateProxy> loopMapB
+    = stepsB.get(loopIndexB).getStateMap();
+    for(final AutomatonProxy aut : automata) {
+      System.out.println(loopMapA.get(aut).getName()+" "+lastMapA.get(aut).getName());
+      System.out.println(loopMapB.get(aut).getName()+" "+lastMapB.get(aut).getName());
+      System.out.println();
+      assertTrue("TraceA does not have a valid loop",
+                 lastMapA.get(aut)==loopMapA.get(aut));
+      assertTrue("TraceB does not have a valid loop",
+                 lastMapB.get(aut)==loopMapB.get(aut));
+    }
+
+    // traceA has fault event
+    int iA=1;
     EventProxy eventA = null;
+    final String[] split = dual.getComment().split(" ");
+    final String faultClass = split[2];
+    String eventFC;
+    Map<String,String> attrib;
+    boolean foundFault = false;
+    while(iA < lenA) {
+      eventA = stepsA.get(iA++).getEvent();
+      attrib = eventA.getAttributes();
+      eventFC = attrib.get("FAULT");
+      System.out.println(eventA.getName());
+      if(faultClass.equals(eventFC))
+        foundFault = true;
+    }
+    assertTrue("TraceA has no fault event", foundFault);
+    System.out.println();
+    // traceB has no fault event
+    int iB=1;
     EventProxy eventB = null;
+    foundFault = false;
+    while(iB < lenB) {
+      eventB = stepsB.get(iB++).getEvent();
+      attrib = eventB.getAttributes();
+      eventFC = attrib.get("FAULT");
+      System.out.println(eventB.getName());
+      if(faultClass.equals(eventFC))
+        foundFault = true;
+    }
+    assertFalse("TraceB has a fault event", foundFault);
+
+    // Both traces have identical observable events
+    iA=1;
+    iB=1;
+    eventA = null;
+    eventB = null;
     while(iA<lenA||iA<lenB) {
       if(iA<lenA)
         eventA = stepsA.get(iA++).getEvent();
@@ -295,33 +357,25 @@ public class MonolithicDiagnosabilityVerifierTest
                  , eventA.equals(eventB));
     }
 
-    // traceA has fault event
-    final String[] split = dual.getComment().split(" ");
-    final String faultClass = split[2];
-    String eventFC;
-    Map<String,String> attrib;
-    iA = 1;
-    boolean foundFault = false;
-    while(iA < lenA) {
-      eventA = stepsA.get(iA++).getEvent();
-      attrib = eventA.getAttributes();
-      eventFC = attrib.get("FAULT");
-      if(faultClass.equals(eventFC))
-        foundFault = true;
+    //both traces are possible
+    for(final AutomatonProxy aut : automata) {
+      final StateProxy lastA = lastMapA.get(aut);
+      final StateProxy lastB = lastMapB.get(aut);
+      final ComponentKind kind = aut.getKind();
+      switch (kind) {
+      case PLANT:
+        assertTrue("TraceA is not possible in automaton  "+aut.getName(),
+          lastA == super.checkTrace(aut, traceA));
+        assertTrue("TraceB is not possible in automaton  "+aut.getName(),
+          lastB == super.checkTrace(aut, traceB));
+      case SPEC:
+        assertTrue("TraceA is not possible in automaton  "+aut.getName(),
+          lastA == super.checkTrace(aut, traceA));
+        assertTrue("TraceB is not possible in automaton  "+aut.getName(),
+          lastB == super.checkTrace(aut, traceB));
+      default:
+      }
     }
-    assertTrue("TraceA has no fault event", foundFault);
-    // traceB has no fault event
-    iB = 1;
-    foundFault = false;
-    while(iB < lenB) {
-      eventB = stepsB.get(iB++).getEvent();
-      attrib = eventB.getAttributes();
-      eventFC = attrib.get("FAULT");
-      if(faultClass.equals(eventFC))
-        foundFault = true;
-    }
-    assertFalse("TraceB has a fault event", foundFault);
-
   }
 
 

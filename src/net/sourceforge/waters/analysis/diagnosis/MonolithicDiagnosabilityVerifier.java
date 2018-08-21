@@ -232,14 +232,11 @@ public class MonolithicDiagnosabilityVerifier
         iterB.reset((b&MsbMask),event);
         while(iterB.advance()) {
           targetB = iterB.getCurrentTargetState();
-          if(faultClass.equals(eventFaultClass[event])) {
-            newA = targetA|Msb1;
-            newB = targetB|Msb1;
-          }else {
+          if(!faultClass.equals(eventFaultClass[event])) {
             newA = targetA|(a&Msb1);
             newB = targetB|(b&Msb1);
+            process.newState(newA,newB,index);
           }
-          process.newState(newA,newB,index);
         }
       }
     }
@@ -273,11 +270,13 @@ public class MonolithicDiagnosabilityVerifier
       sourceA = iterA.getCurrentSourceState();
       if(!eventObservable[event]) {
         if(faultClass.equals(eventFaultClass[event])) {
-          newA = sourceA|Msb1;
-          newB = b;
-          process.newState(newA,newB,event);
-          newA = sourceA;
-          process.newState(newA,newB,event);
+          if((a&Msb1)!=0) {
+            newA = sourceA|Msb1;
+            newB = b;
+            process.newState(newA,newB,event);
+            newA = sourceA;
+            process.newState(newA,newB,event);
+          }
         }else {
           newA = sourceA|(a&Msb1);
           newB = b;
@@ -287,14 +286,7 @@ public class MonolithicDiagnosabilityVerifier
         iterB.reset((b&MsbMask),event);
         while(iterB.advance()) {
           sourceB = iterB.getCurrentSourceState();
-          if(faultClass.equals(eventFaultClass[event])) {
-            newA = sourceA|Msb1;
-            newB = sourceB|Msb1;
-            process.newState(newA,newB,event);
-            newA = sourceA;
-            newB = sourceB;
-            process.newState(newA,newB,event);
-          }else {
+          if(!faultClass.equals(eventFaultClass[event])) {
             newA = sourceA|(a&Msb1);
             newB = sourceB|(b&Msb1);
             process.newState(newA,newB,event);
@@ -308,11 +300,13 @@ public class MonolithicDiagnosabilityVerifier
       sourceB = iterA.getCurrentSourceState();
       if(!eventObservable[event]) {
         if(faultClass.equals(eventFaultClass[event])) {
-          newA = a;
-          newB = sourceB|Msb1;
-          process.newState(newA,newB,event);
-          newB = sourceB;
-          process.newState(newA,newB,event);
+          if((b&Msb1)!=0) {
+            newA = a;
+            newB = sourceB|Msb1;
+            process.newState(newA,newB,event);
+            newB = sourceB;
+            process.newState(newA,newB,event);
+          }
         }else {
           newA = a;
           newB = sourceB|(b&Msb1);
@@ -471,7 +465,7 @@ public class MonolithicDiagnosabilityVerifier
     }
     addStep((succA&MsbMask),-1,traceA);
     addStep((succB&MsbMask),-1,traceB);
-    loopIndexA++;loopIndexB++;
+
 
     final String nameA = "faulty";
     final String nameB = "non-faulty";
