@@ -320,7 +320,7 @@ public class TraceJTree
         buffer.append(". ");
         buffer.append(node.getText());
         final TraceProxy trace = mSim.getTrace();
-        if (time == trace.getLoopIndex()) {
+        if (trace != null && time == trace.getLoopIndex()) {
           buffer.append(" <---");
         }
         mEventNameLabel.setText(buffer.toString());
