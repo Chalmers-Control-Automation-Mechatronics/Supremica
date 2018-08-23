@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<Module Name="sup:e21" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="CT3_16" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="e1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="e2"/>
@@ -6588,3 +6588,4 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
+

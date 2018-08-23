@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<Module Name="sup:enable[1]" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="tbed_minsync_123" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="e123"/>
         <EventDecl Kind="CONTROLLABLE" Name="e124"/>
@@ -28,3 +28,4 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
+

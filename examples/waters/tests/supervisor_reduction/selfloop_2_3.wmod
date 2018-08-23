@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<Module Name="sup:a" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="selfloop_2_3" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="e2"/>
         <EventDecl Kind="CONTROLLABLE" Name="e3"/>
@@ -67,3 +67,4 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
+
