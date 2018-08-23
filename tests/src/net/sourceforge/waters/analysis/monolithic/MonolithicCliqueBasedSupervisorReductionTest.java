@@ -69,7 +69,6 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setIsFindFirst(false);
     simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.NONE);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
@@ -117,7 +116,7 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     junit.textui.TestRunner.run(suite());
   }
 
-  //92 states, 56 events, 336 transitions
+  /*//92 states, 56 events, 336 transitions
   @Override
   public void testCatMouseUnsup1() throws Exception
   {
@@ -205,5 +204,5 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   @Override
   public void testIMS() throws Exception
   {
-  }
+  }*/
 }
