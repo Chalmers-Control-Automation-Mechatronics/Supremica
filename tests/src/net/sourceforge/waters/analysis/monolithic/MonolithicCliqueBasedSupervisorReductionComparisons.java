@@ -105,7 +105,6 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     comparisons.testTeleNetwork();
     comparisons.testTrafficlights();
     comparisons.testTransferLine1();
-    comparisons.testThreeRobot();
 
     comparisons.testCellSwitch();
     comparisons.testTransferLine2();
@@ -344,8 +343,8 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   private final CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
   private final int mMaxNumberOfCovers;
   private final long mTimeout; //seconds;
-
   private final String mFilename;
-  private final String mNoEntryValue = "-";
   private PrintWriter mPrintWriter;
+
+  private final static String mNoEntryValue = "-";
 }
