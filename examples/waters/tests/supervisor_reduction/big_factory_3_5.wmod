@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="sup:start2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e6"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SUPERVISOR" Name="sup:start2">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1"/>
+                    <SimpleNode Name="S:2"/>
+                    <SimpleNode Name="S:3"/>
+                    <SimpleNode Name="S:4"/>
+                    <SimpleNode Name="S:5"/>
+                    <SimpleNode Name="S:6"/>
+                    <SimpleNode Name="S:7"/>
+                    <SimpleNode Name="S:8"/>
+                    <SimpleNode Name="S:9"/>
+                    <SimpleNode Name="S:10"/>
+                    <SimpleNode Name="S:11"/>
+                    <SimpleNode Name="S:12"/>
+                    <SimpleNode Name="S:13"/>
+                    <SimpleNode Name="S:14"/>
+                    <SimpleNode Name="S:15"/>
+                    <SimpleNode Name="S:16"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:0" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:10" Target="S:12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:10" Target="S:13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:10" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:11" Target="S:12">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:11" Target="S:13">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:11" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:12" Target="S:15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:12" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:12" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:13" Target="S:15">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:13" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:13" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:14" Target="S:10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:14" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:15" Target="S:14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:15" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:4" Target="S:6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:5" Target="S:8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:14">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:16">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:6" Target="S:9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:7" Target="S:9">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:8" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:8" Target="S:10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e1"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:8" Target="S:11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:9" Target="S:10">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:9" Target="S:11">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:9" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e3"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
