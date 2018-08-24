@@ -451,7 +451,7 @@ public abstract class AbstractTRSimplifierTest
 
   //#########################################################################
   //# Data Members
-  protected TransitionRelationSimplifier mSimplifier;
+  private TransitionRelationSimplifier mSimplifier;
   private ProductDESIntegrityChecker mIntegrityChecker;
   private IsomorphismChecker mIsomorphismChecker;
   private List<ParameterBindingProxy> mBindings;

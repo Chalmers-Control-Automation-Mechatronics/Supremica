@@ -17,12 +17,12 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.StateProxy;
 
 
 public class CliqueBasedReductionLocalisedComparisons
@@ -45,26 +45,38 @@ public class CliqueBasedReductionLocalisedComparisons
     runAllComparisons(timeout, maxNumberOfCoversValues);
   }
 
-  private static void runAllComparisons(final long timeout, final int[] maxNumberOfCoversValues) throws Exception {
-    final HeuristicCoverStrategy[] strategies = HeuristicCoverStrategy.values();
+  private static void runAllComparisons(final long timeout,
+                                        final int[] maxNumberOfCoversValues)
+    throws Exception
+  {
+    final HeuristicCoverStrategy[] strategies =
+      HeuristicCoverStrategy.values();
     for (final int maxNumberOfCovers : maxNumberOfCoversValues) {
       for (final HeuristicCoverStrategy coverStrategy : strategies) {
-        final String baseOutputName = coverStrategy.name() + "_" + maxNumberOfCovers + ".csv";
+        final String baseOutputName =
+          coverStrategy.name() + "_" + maxNumberOfCovers + ".csv";
         final CliqueBasedReductionLocalisedComparisons comparisons =
-          new CliqueBasedReductionLocalisedComparisons(baseOutputName, coverStrategy, maxNumberOfCovers, timeout);
+          new CliqueBasedReductionLocalisedComparisons(baseOutputName,
+                                                       coverStrategy,
+                                                       maxNumberOfCovers,
+                                                       timeout);
         run(comparisons);
       }
     }
   }
 
-  private static void run(final CliqueBasedReductionLocalisedComparisons comparisons) throws Exception {
+  private static void run(final CliqueBasedReductionLocalisedComparisons comparisons)
+    throws Exception
+  {
     comparisons.setUp();
     comparisons.writeHeader();
     doTests(comparisons);
     comparisons.tearDown();
   }
 
-  private static void doTests(final CliqueBasedReductionLocalisedComparisons comparisons) throws Exception {
+  private static void doTests(final CliqueBasedReductionLocalisedComparisons comparisons)
+    throws Exception
+  {
     comparisons.test2LinkAlt();
     comparisons.test2LinkAltBatch();
     comparisons.testBigFactory1();
@@ -83,7 +95,7 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testIPC();
     comparisons.testIPCcswitch();
     comparisons.testIPClswitch();
-    comparisons.testIPCuswitch();
+    comparisons.testIPCuswicth();
     comparisons.testManufacturingSystem();
     comparisons.testManWolf();
     comparisons.testNoPlant1();
@@ -105,12 +117,12 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testSupRed3();
     comparisons.testTankProcess();
     comparisons.testTbedMinsync();
-    comparisons.testTicTacToe();
+    comparisons.testTictactoe();
     comparisons.testTeleNetwork();
     comparisons.testTrafficlights();
     comparisons.testTransferLine1();
     comparisons.testTransferLine2();
-    comparisons.testTransferLine3();
+    //comparisons.testTransferLine3();
   }
 
   public CliqueBasedReductionLocalisedComparisons()
@@ -148,283 +160,452 @@ public class CliqueBasedReductionLocalisedComparisons
     super.tearDown();
   }
 
-  private void test2LinkAlt() throws Exception {
-    runTransitionRelationSimplifier("2linkalt_5.wmod");
-    runTransitionRelationSimplifier("2linkalt_6.wmod");
-    runTransitionRelationSimplifier("2linkalt_7.wmod");
+  //#########################################################################
+  //# Test Cases --- synthesis
+  public void testAip0Sub1P0() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "aip0sub1p0.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void test2LinkAltBatch() throws Exception {
-    runTransitionRelationSimplifier("2linkalt_batch_5.wmod");
-    runTransitionRelationSimplifier("2linkalt_batch_6.wmod");
-    runTransitionRelationSimplifier("2linkalt_batch_7.wmod");
+  public void testAGVMF() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "agv_mf.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testBigFactory1() throws Exception {
-    runTransitionRelationSimplifier("big_factory_1_4.wmod");
-    runTransitionRelationSimplifier("big_factory_1_5.wmod");
+  public void testBallProcess() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "ball_Process.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testBigFactory2() throws Exception {
-    runTransitionRelationSimplifier("big_factory_2_10.wmod");
-    runTransitionRelationSimplifier("big_factory_2_11.wmod");
+  public void testBigFactory1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory_1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testBigFactory3() throws Exception {
-    runTransitionRelationSimplifier("big_factory_3_4.wmod");
-    runTransitionRelationSimplifier("big_factory_3_5.wmod");
+  public void testBigFactory2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCatMouse() throws Exception {
-    runTransitionRelationSimplifier("cat_mouse_4.wmod");
-    runTransitionRelationSimplifier("cat_mouse_12.wmod");
+  public void testBigFactory3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "big_factory_3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCatMouseUnsup2() throws Exception {
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_530.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_531.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_536.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_540.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_546.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_547.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_552.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_2_556.wmod");
+  public void testCatMouse() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cat_mouse.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCatMouseUnsup1() throws Exception {
-    runTransitionRelationSimplifier("cat_mouse_unsup_1_530.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_1_531.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_1_536.wmod");
-    runTransitionRelationSimplifier("cat_mouse_unsup_1_540.wmod");
+  public void testCatMouseUnsup1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cat_mouse_unsup1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCell() throws Exception {
-    runTransitionRelationSimplifier("cell_4.wmod");
-    runTransitionRelationSimplifier("cell_6.wmod");
+  public void testCatMouseUnsup2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cat_mouse_unsup2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCellSwitch() throws Exception {
-    runTransitionRelationSimplifier("cell_switch_8.wmod");
-    runTransitionRelationSimplifier("cell_switch_11.wmod");
-    runTransitionRelationSimplifier("cell_switch_12.wmod");
+  public void testCell() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cell.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCertainUnsup() throws Exception {
-    runTransitionRelationSimplifier("certain_unsup_100.wmod");
+  public void testCellSwitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "cell_switch.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCoffeeMachine() throws Exception {
-    runTransitionRelationSimplifier("coffee_machine_5.wmod");
-    runTransitionRelationSimplifier("coffee_machine_7.wmod");
+  public void testCertainUnsup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "certainUnsup.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testCT3() throws Exception {
-    runTransitionRelationSimplifier("CT3_12.wmod");
-    runTransitionRelationSimplifier("CT3_14.wmod");
-    runTransitionRelationSimplifier("CT3_16.wmod");
-    runTransitionRelationSimplifier("CT3_17.wmod");
-    runTransitionRelationSimplifier("CT3_18.wmod");
+  public void testCoffeeMachine() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "coffee_machine.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testDosingUnit() throws Exception {
-    runTransitionRelationSimplifier("dosing_unit_8.wmod");
-    runTransitionRelationSimplifier("dosing_unit_9.wmod");
-    runTransitionRelationSimplifier("dosing_unit_12.wmod");
+  public void testCT3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "CT3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testIMS() throws Exception {
-    runTransitionRelationSimplifier("ims_14.wmod");
-    runTransitionRelationSimplifier("ims_15.wmod");
-    runTransitionRelationSimplifier("ims_16.wmod");
-    runTransitionRelationSimplifier("ims_17.wmod");
+  public void testDebounce() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "debounce.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testIPC() throws Exception {
-    runTransitionRelationSimplifier("IPC_7.wmod");
-    runTransitionRelationSimplifier("IPC_8.wmod");
-    runTransitionRelationSimplifier("IPC_9.wmod");
-    runTransitionRelationSimplifier("IPC_10.wmod");
-    runTransitionRelationSimplifier("IPC_11.wmod");
-    runTransitionRelationSimplifier("IPC_14.wmod");
-    runTransitionRelationSimplifier("IPC_15.wmod");
-    runTransitionRelationSimplifier("IPC_16.wmod");
+  public void testDosingUnit() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "dosing_unit.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testIPCcswitch() throws Exception {
-    runTransitionRelationSimplifier("IPC_cswitch_8.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_9.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_10.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_11.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_12.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_15.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_16.wmod");
-    runTransitionRelationSimplifier("IPC_cswitch_17.wmod");
+  public void testFalko() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "falko.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testIPClswitch() throws Exception {
-    runTransitionRelationSimplifier("IPC_lswitch_11.wmod");
-    runTransitionRelationSimplifier("IPC_lswitch_13.wmod");
-    runTransitionRelationSimplifier("IPC_lswitch_18.wmod");
-    runTransitionRelationSimplifier("IPC_lswitch_19.wmod");
-    runTransitionRelationSimplifier("IPC_lswitch_20.wmod");
+  public void testFTechnik() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "incremental_suite", "ftechnik.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testIPCuswitch() throws Exception {
-    runTransitionRelationSimplifier("IPC_uswitch_10.wmod");
-    runTransitionRelationSimplifier("IPC_uswitch_12.wmod");
-    runTransitionRelationSimplifier("IPC_uswitch_17.wmod");
-    runTransitionRelationSimplifier("IPC_uswitch_18.wmod");
+  public void testIMS() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "ims", "ims_uncont.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testManWolf() throws Exception {
-    runTransitionRelationSimplifier("man_wolf_5.wmod");
-    runTransitionRelationSimplifier("man_wolf_6.wmod");
-    runTransitionRelationSimplifier("man_wolf_7.wmod");
-    runTransitionRelationSimplifier("man_wolf_8.wmod");
-    runTransitionRelationSimplifier("man_wolf_11.wmod");
-    runTransitionRelationSimplifier("man_wolf_12.wmod");
+  public void testIPC() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testManufacturingSystem() throws Exception {
-    runTransitionRelationSimplifier("manufacturing_system_7.wmod");
+  public void testIPCcswitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_cswitch.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testNoPlant1() throws Exception {
-    runTransitionRelationSimplifier("no_plant_1_2.wmod");
-    runTransitionRelationSimplifier("no_plant_1_3.wmod");
+  public void testIPClswitch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_lswitch.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testNoPlant2() throws Exception {
-    runTransitionRelationSimplifier("no_plant_2_2.wmod");
-    runTransitionRelationSimplifier("no_plant_2_3.wmod");
+  public void testIPCuswicth() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "IPC_uswitch.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testNoPlant3() throws Exception {
-    runTransitionRelationSimplifier("no_plant_3_2.wmod");
+  public void testManufacturingSystem() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "manufacturing_system.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testNoPlant4() throws Exception {
-    runTransitionRelationSimplifier("no_plant_4_2.wmod");
-    runTransitionRelationSimplifier("no_plant_4_3.wmod");
+  public void testManWolf() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "man_wolf.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testOneStateSup() throws Exception {
-    runTransitionRelationSimplifier("one_state_sup_3.wmod");
-    runTransitionRelationSimplifier("one_state_sup_4.wmod");
+  public void testNoPlant1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testPathFinder() throws Exception {
-    runTransitionRelationSimplifier("path_finder_4.wmod");
+  public void testNoPlant2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testPlantify() throws Exception {
-    runTransitionRelationSimplifier("plantify_2.wmod");
+  public void testNoPlant3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant3.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testProfessorPen() throws Exception {
-    runTransitionRelationSimplifier("professor_pen_3.wmod");
-    runTransitionRelationSimplifier("professor_pen_4.wmod");
-    runTransitionRelationSimplifier("professor_pen_5.wmod");
-    runTransitionRelationSimplifier("professor_pen_6.wmod");
+  public void testNoPlant4() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "no_plant4.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testRobotAssemblyCell() throws Exception {
-    runTransitionRelationSimplifier("robot_assembly_cell_15.wmod");
-    runTransitionRelationSimplifier("robot_assembly_cell_27.wmod");
+  public void testOneStateSup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "one_state_sup.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSajed() throws Exception {
-    runTransitionRelationSimplifier("sajed_5.wmod");
+  public void testParrow() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "parrow.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSelfloop1() throws Exception {
-    runTransitionRelationSimplifier("selfloop_1_4.wmod");
+  public void testPathFinder() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "path_finder.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSelfloop2() throws Exception {
-    runTransitionRelationSimplifier("selfloop_2_3.wmod");
+  public void testPlantify() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "plantify.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSmallFactory2() throws Exception {
-    runTransitionRelationSimplifier("small_factory_2_7.wmod");
+  public void testProductionSystem() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "production_system.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSoeCont() throws Exception {
-    runTransitionRelationSimplifier("soe_cont_3.wmod");
-    runTransitionRelationSimplifier("soe_cont_4.wmod");
+  public void testProfessorPen() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "professor_pen.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSupRed3() throws Exception {
-    runTransitionRelationSimplifier("sup_red_3_2.wmod");
+  public void testPV35() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "pv35.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSupRed2() throws Exception {
-    runTransitionRelationSimplifier("sup_red_2_3.wmod");
+  public void testRobotAssemblyCell() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "robot_assembly_cell.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testSupRed1() throws Exception {
-    runTransitionRelationSimplifier("sup_red_1_3.wmod");
+  public void testSajed() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "sajed.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTankProcess() throws Exception {
-    runTransitionRelationSimplifier("tank_process_6.wmod");
-    runTransitionRelationSimplifier("tank_process_8.wmod");
-    runTransitionRelationSimplifier("tank_process_10.wmod");
+  public void testSelfloop1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTbedMinsync() throws Exception {
-    runTransitionRelationSimplifier("tbed_minsync_123.wmod");
-    runTransitionRelationSimplifier("tbed_minsync_124.wmod");
+  public void testSelfloop2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "selfloop2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTeleNetwork() throws Exception {
-    runTransitionRelationSimplifier("tele_network_4.wmod");
-    runTransitionRelationSimplifier("tele_network_5.wmod");
+  public void testSimpleManufacturingSystem() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis",
+                     "simple_manufacturing_system.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTicTacToe() throws Exception {
-    runTransitionRelationSimplifier("tictactoe_27.wmod");
-    runTransitionRelationSimplifier("tictactoe_28.wmod");
-    runTransitionRelationSimplifier("tictactoe_29.wmod");
-    runTransitionRelationSimplifier("tictactoe_30.wmod");
-    runTransitionRelationSimplifier("tictactoe_31.wmod");
-    runTransitionRelationSimplifier("tictactoe_32.wmod");
-    runTransitionRelationSimplifier("tictactoe_33.wmod");
-    runTransitionRelationSimplifier("tictactoe_34.wmod");
-    runTransitionRelationSimplifier("tictactoe_35.wmod");
+  public void testSmallFactory2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "small_factory_2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTrafficlights() throws Exception {
-    runTransitionRelationSimplifier("traffic_lights_7.wmod");
-    runTransitionRelationSimplifier("traffic_lights_8.wmod");
+  public void testSoeCont() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "soe_cont.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTransferLine1() throws Exception {
-    runTransitionRelationSimplifier("transfer_line_1_5.wmod");
-    runTransitionRelationSimplifier("transfer_line_1_6.wmod");
+  public void testSupRed1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred1.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTransferLine2() throws Exception {
-    runTransitionRelationSimplifier("transfer_line_2_8.wmod");
-    runTransitionRelationSimplifier("transfer_line_2_9.wmod");
-    runTransitionRelationSimplifier("transfer_line_2_10.wmod");
-    runTransitionRelationSimplifier("transfer_line_2_11.wmod");
+  public void testSupRed2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred2.wmod");
+    runTransitionRelationSimplifier(des);
   }
 
-  private void testTransferLine3() throws Exception {
-    runTransitionRelationSimplifier("transfer_line_3_11.wmod");
-    runTransitionRelationSimplifier("transfer_line_3_12.wmod");
-    runTransitionRelationSimplifier("transfer_line_3_13.wmod");
-    runTransitionRelationSimplifier("transfer_line_3_14.wmod");
-    runTransitionRelationSimplifier("transfer_line_3_15.wmod");
-    runTransitionRelationSimplifier("transfer_line_3_16.wmod");
+  public void testSupRed3() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "supred3.wmod");
+    runTransitionRelationSimplifier(des);
   }
+
+  public void testTankProcess() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tank_process.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testTbedMinsync() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tbed_minsync.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  //  public void testAGV() throws Exception
+  //  {
+  //    final ProductDESProxy des =
+  //      getCompiledDES("tests", "incremental_suite", "agv.wmod");
+  //    runTransitionRelationSimplifier(des, true);
+  //  }
+
+  public void testTeleNetwork() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tele_network.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testTrafficlights() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "trafficlights.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testTransferLine1() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "transferline_1.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testTransferLine2() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "transferline_2.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  /*
+   * public void testTransferLine3() throws Exception { checkTransferline(3);
+   * }
+   */
+
+  public void testTictactoe() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tictactoe.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testThreeRobot() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "three_robot.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void testZeroSup() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "test_zero_sup.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  public void test2LinkAlt() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "2linkalt.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  //#########################################################################
+  //# Test Cases --- BIG
+  /*
+   * Too slow (20min) for supervisor reduction public void testAip0Sub1P1()
+   * throws Exception { final ProductDESProxy des = getCompiledDES("tests",
+   * "synthesis", "aip0sub1p1.wmod"); runTransitionRelationSimplifier(des,
+   * true); }
+   */
+
+  public void test2LinkAltBatch() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "2linkalt_batch.wmod");
+    runTransitionRelationSimplifier(des);
+  }
+
+  /*
+   * This one is too big for monolithic synthesis. public void
+   * testKoordWspSynth() throws Exception { final ProductDESProxy des =
+   * getCompiledDES("tests", "synthesis", "koordwsp_synth.wmod");
+   * runTransitionRelationSimplifier(des, true); }
+   */
+
+  //#########################################################################
+  //# Parametrised tests
+  //TODO: add support for bindings
+  /*
+   * private void checkTransferline(final int n) throws Exception { final
+   * ParameterBindingProxy binding = createBinding("N", n); final
+   * List<ParameterBindingProxy> bindings =
+   * Collections.singletonList(binding); final ProductDESProxy des =
+   * getCompiledDES(bindings, "tests", "synthesis", "transferline_N.wmod");
+   * runSynthesizer(des, bindings, true); }
+   */
 
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
     throws AnalysisException
   {
-    // TODO Auto-generated method stub
     return null;
   }
 
@@ -432,25 +613,91 @@ public class CliqueBasedReductionLocalisedComparisons
   protected void runTransitionRelationSimplifier(final ProductDESProxy des)
     throws Exception
   {
-    mSimplifier = createCliqueBasedSimplifier(getRelationFromAutomaton(des));
-    final TRSimplifierStatistics cliqueBasedStats = applySimplifier(mSimplifier);
-    mSimplifier = createSuWonhamSimplifier(getRelationFromAutomaton(des));
-    final TRSimplifierStatistics suWonhamStats = applySimplifier(mSimplifier);
+    final ListBufferTransitionRelation relation =
+      getRelationFromAutomaton(des);
+    for (int e = EventEncoding.NONTAU; e < relation
+      .getNumberOfProperEvents(); e++) {
+      final byte status = relation.getProperEventStatus(e);
+      if (EventStatus.isControllableEvent(status)
+          && isEverDisabledEvent(relation, e)) {
+        final AbstractSupervisorReductionTRSimplifier cliqueBasedSimplifier =
+          createCliqueBasedSimplifier();
+        cliqueBasedSimplifier
+          .setTransitionRelation(new ListBufferTransitionRelation(relation,
+                                                                  cliqueBasedSimplifier
+                                                                    .getPreferredInputConfiguration()));
+        cliqueBasedSimplifier.setSupervisedEvent(e);
+        final TRSimplifierStatistics cliqueBasedStats =
+          applySimplifier(cliqueBasedSimplifier);
 
-    mPrintWriter.write(des.getName() + ",");
+        final AbstractSupervisorReductionTRSimplifier suWonhamSimplifier =
+          createSuWonhamSimplifier();
+        suWonhamSimplifier
+          .setTransitionRelation(new ListBufferTransitionRelation(relation,
+                                                                  suWonhamSimplifier
+                                                                    .getPreferredInputConfiguration()));
+        suWonhamSimplifier.setSupervisedEvent(e);
+        final TRSimplifierStatistics suWonhamStats =
+          applySimplifier(suWonhamSimplifier);
+
+        writeResults(des.getName() + "_" + e, cliqueBasedStats,
+                     suWonhamStats);
+      }
+    }
+  }
+
+  private TRSimplifierStatistics applySimplifier(final TransitionRelationSimplifier simplifier)
+  {
+    simplifier.createStatistics();
+    final ExecutorService singlePool = Executors.newSingleThreadExecutor();
+    Optional<Boolean> isReduced = null;
+    try {
+      isReduced = singlePool.submit(new Callable<Optional<Boolean>>() {
+
+        @Override
+        public Optional<Boolean> call() throws Exception
+        {
+          return Optional.of(simplifier.run());
+        }
+      }).get(mTimeout, TimeUnit.SECONDS);
+    } catch (final TimeoutException ex) {
+      System.err.println("Timeout");
+      simplifier.requestAbort();
+    } catch (final Exception ex) {
+      System.err.println(ex);
+    } finally {
+      singlePool.shutdown();
+    }
+
+    if (isReduced.isPresent()) {
+      return simplifier.getStatistics();
+    } else {
+      return null;
+    }
+  }
+
+  private void writeResults(final String name,
+                            final TRSimplifierStatistics cliqueBasedStats,
+                            final TRSimplifierStatistics suWonhamStats)
+  {
+    mPrintWriter.write(name + ",");
     if (cliqueBasedStats == null && suWonhamStats == null) {
       for (int i = 0; i < 6; i++) {
         mPrintWriter.write(NO_ENTRY + ",");
       }
       mPrintWriter.write(NO_ENTRY);
     } else if (cliqueBasedStats == null) {
-     mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-     mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getOutputStates() + "," + NO_ENTRY +",");
-     mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getRunTime() + "," + NO_ENTRY);
+      mPrintWriter.write(suWonhamStats.getInputStates() + ",");
+      mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getOutputStates()
+                         + "," + NO_ENTRY + ",");
+      mPrintWriter
+        .write(NO_ENTRY + "," + suWonhamStats.getRunTime() + "," + NO_ENTRY);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
-      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + NO_ENTRY + "," + NO_ENTRY + ",");
-      mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + NO_ENTRY + "," + NO_ENTRY);
+      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + NO_ENTRY
+                         + "," + NO_ENTRY + ",");
+      mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + NO_ENTRY + ","
+                         + NO_ENTRY);
     } else {
       final int swStates = suWonhamStats.getOutputStates();
       final int cbStates = cliqueBasedStats.getOutputStates();
@@ -458,8 +705,10 @@ public class CliqueBasedReductionLocalisedComparisons
       final long swRuntime = suWonhamStats.getRunTime();
 
       mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-      mPrintWriter.write(cbStates + "," + swStates + "," + (cbStates - swStates) + ",");
-      mPrintWriter.write(cbRuntime + "," + swRuntime + "," + (cbRuntime - swRuntime));
+      mPrintWriter
+        .write(cbStates + "," + swStates + "," + (cbStates - swStates) + ",");
+      mPrintWriter
+        .write(cbRuntime + "," + swRuntime + "," + (cbRuntime - swRuntime));
     }
 
     mPrintWriter.println();
@@ -489,6 +738,84 @@ public class CliqueBasedReductionLocalisedComparisons
     }
   }
 
+  public boolean isEverDisabledEvent(final ListBufferTransitionRelation relation,
+                                     final int e)
+  {
+    final int numStates = relation.getNumberOfStates();
+    final TransitionIterator iter = relation.createAnyReadOnlyIterator();
+    final int dump = relation.getDumpStateIndex();
+    for (int s = 0; s < numStates; s++) {
+      if (relation.isReachable(s)) {
+        iter.reset(s, e);
+        if (iter.advance() && iter.getCurrentTargetState() == dump) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private ListBufferTransitionRelation getRelationFromAutomaton(final ProductDESProxy des)
+    throws AnalysisException
+  {
+    final AutomatonProxy aut = getAutomaton(des, "");
+    if (aut == null) {
+      throw new AnalysisConfigurationException("DES contains "
+                                               + des.getAutomata().size()
+                                               + " automata");
+    }
+    final EventEncoding eventEnc = createEventEncoding(des, aut);
+    final StateEncoding inputStateEnc = new StateEncoding(aut);
+    final ListBufferTransitionRelation rel =
+      new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
+                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    rel.checkReachability();
+    final int newDumpState = rel.getDumpStateIndex();
+    int oldDumpState = -1;
+    final TransitionIterator successorIterator =
+      rel.createSuccessorsReadOnlyIterator();
+    for (int s = 0; s < rel.getNumberOfStates(); s++) {
+      if (s == newDumpState || !rel.isReachable(s)) {
+        continue;
+      }
+      successorIterator.resetState(s);
+      if (!successorIterator.advance()) {
+        oldDumpState = s;
+        break;
+      }
+    }
+    if (oldDumpState == -1) {
+      throw new AnalysisException("No dump state found");
+    } else {
+      final TransitionIterator predecessorIterator =
+        rel.createPredecessorsReadOnlyIterator(oldDumpState);
+      while (predecessorIterator.advance()) {
+        rel.addTransition(predecessorIterator.getCurrentSourceState(),
+                          predecessorIterator.getCurrentEvent(),
+                          newDumpState);
+      }
+    }
+    rel.setReachable(oldDumpState, false);
+    return rel;
+  }
+
+  private CliqueBasedSupervisorReductionTRSimplifier createCliqueBasedSimplifier()
+  {
+    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
+      new CliqueBasedSupervisorReductionTRSimplifier();
+    simplifier.setHeuristicCoverStrategy(mCoverStrategy);
+    simplifier.setMaxHeuristicCovers(mMaxNumberOfCovers);
+    return simplifier;
+  }
+
+  private SuWonhamSupervisorReductionTRSimplifier createSuWonhamSimplifier()
+  {
+    final SuWonhamSupervisorReductionTRSimplifier simplifier =
+      new SuWonhamSupervisorReductionTRSimplifier();
+    simplifier.setExperimentalMode(true);
+    return simplifier;
+  }
+
   private void writeHeader()
   {
     mPrintWriter.write("DES name,");
@@ -506,89 +833,6 @@ public class CliqueBasedReductionLocalisedComparisons
     mPrintWriter.flush();
   }
 
-  private ListBufferTransitionRelation getRelationFromAutomaton(final ProductDESProxy des)
-    throws AnalysisConfigurationException, OverflowException
-  {
-    final AutomatonProxy aut = getAutomaton(des, "");
-    if (aut == null) {
-      throw new AnalysisConfigurationException("DES contains "
-                                               + des.getAutomata().size()
-                                               + " automata");
-    }
-    final EventEncoding eventEnc = createEventEncoding(des, aut);
-    final StateEncoding inputStateEnc = new StateEncoding(aut);
-    final StateProxy dumpState = getState(aut, DUMP);
-    ListBufferTransitionRelation rel;
-    if (dumpState == null) {
-      rel =
-        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    } else {
-      rel =
-        new ListBufferTransitionRelation(aut, eventEnc, inputStateEnc,
-                                         dumpState,
-                                         ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    }
-    rel.checkReachability();
-    return rel;
-  }
-
-  private TRSimplifierStatistics applySimplifier(final TransitionRelationSimplifier simplifier)
-  {
-    final TRSimplifierStatistics simplifierStatistics = new TRSimplifierStatistics(simplifier, true, true, false);
-    simplifierStatistics.recordStart(simplifier.getTransitionRelation());
-    final ExecutorService singlePool = Executors.newSingleThreadExecutor();
-    final long startTime = System.currentTimeMillis();
-    Optional<Boolean> isReduced = null;
-    try {
-      isReduced = singlePool.submit(new Callable<Optional<Boolean>>() {
-
-        @Override
-        public Optional<Boolean> call() throws Exception
-        {
-          return Optional.of(simplifier.run());
-        }
-      }).get(mTimeout, TimeUnit.SECONDS);
-    } catch (final TimeoutException ex) {
-      System.err.println("Timeout");
-      simplifier.requestAbort();
-    } catch (final Exception ex) {
-      System.err.println(ex);
-    } finally {
-      singlePool.shutdown();
-    }
-    final long finishTIme = System.currentTimeMillis();
-
-    if (isReduced.isPresent()) {
-      simplifierStatistics.recordFinish(simplifier.getTransitionRelation(), isReduced.get());
-      simplifierStatistics.setRunTime(finishTIme - startTime);
-      return simplifierStatistics;
-    } else {
-      return null;
-    }
-  }
-
-  private CliqueBasedSupervisorReductionTRSimplifier createCliqueBasedSimplifier(final ListBufferTransitionRelation rel)
-  {
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
-      new CliqueBasedSupervisorReductionTRSimplifier(rel);
-    simplifier.setHeuristicCoverStrategy(mCoverStrategy);
-    simplifier.setMaxHeuristicCovers(mMaxNumberOfCovers);
-    return simplifier;
-  }
-
-  private SuWonhamSupervisorReductionTRSimplifier createSuWonhamSimplifier(final ListBufferTransitionRelation rel)
-  {
-    final SuWonhamSupervisorReductionTRSimplifier simplifier =
-      new SuWonhamSupervisorReductionTRSimplifier(rel);
-    simplifier.setExperimentalMode(true);
-    return simplifier;
-  }
-
-  private void runTransitionRelationSimplifier(final String desName) throws Exception {
-    runTransitionRelationSimplifier(GROUP, SUBDIR, desName);
-  }
-
   //#########################################################################
   //# Data Members
   private final CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
@@ -598,6 +842,4 @@ public class CliqueBasedReductionLocalisedComparisons
   private PrintWriter mPrintWriter;
 
   private static final String NO_ENTRY = "-";
-  private static final String GROUP = "tests";
-  private static final String SUBDIR = "supervisor_reduction";
 }
