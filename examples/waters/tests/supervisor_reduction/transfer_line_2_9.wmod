@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<Module Name="sup:machine_load[2]" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="transfer_line_2_9" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="e1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="e2"/>
@@ -8829,3 +8829,4 @@
         </SimpleComponent>
     </ComponentList>
 </Module>
+
