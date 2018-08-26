@@ -333,7 +333,6 @@ public class CliqueBasedReductionLocalisedComparisons
   private void testSoeCont() throws Exception
   {
     runTransitionRelationSimplifier("soe_cont.wmod");
-    runTransitionRelationSimplifier("soe_cont.wmod");
   }
 
   private void testSupRed3() throws Exception

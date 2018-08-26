@@ -110,6 +110,30 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //#########################################################################
   //# Configuration
   /**
+   * Sets how the simplifier detects disabled controllable events.
+   * If enabled (the default), controllable transitions to the transition
+   * relation's dump state indicate that that controllable event should be
+   * disabled at the transition's source state.
+   * If disabled, the simplifier checks for deadlock states based on the
+   * marking proposition. States that are not marked and have no outgoing
+   * transitions are considered as deadlock states, and controllable
+   * transitions to such states indicate that that controllable event should
+   * be disabled at the transition's source state. This setting requires
+   * the transition relation to use the configured default marking
+   * proposition.
+   * @see #setDefaultMarkingID(int) setDefaultMarkingID()
+   */
+  public void setUsingDumpState(final boolean use)
+  {
+    mUsingDumpState = use;
+  }
+
+  public boolean isUsingDumpState()
+  {
+    return mUsingDumpState;
+  }
+
+  /**
    * Enables or disables reordering of states based on distance to decision
    * states. This experimental optimisation by Fangqian Qiu only works with
    * supervisor localisation, i.e., when a supervised event is configured.
@@ -714,18 +738,23 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Auxiliary Methods
   private boolean findBadStates()
   {
-    mBadStateIndex = -1;
-    mNumBadStates = 0;
-    final int marking = getDefaultMarkingID();
-    if (marking >= 0) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      for (int s = 0; s < numStates; s++) {
-        if (rel.isReachable(s) && rel.isDeadlockState(s, marking)) {
-          if (mBadStateIndex < 0) {
-            mBadStateIndex = s;
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (mUsingDumpState) {
+      mBadStateIndex = rel.getDumpStateIndex();
+      mNumBadStates = 1;
+    } else {
+      mBadStateIndex = -1;
+      mNumBadStates = 0;
+      final int marking = getDefaultMarkingID();
+      if (marking >= 0) {
+        final int numStates = rel.getNumberOfStates();
+        for (int s = 0; s < numStates; s++) {
+          if (rel.isReachable(s) && rel.isDeadlockState(s, marking)) {
+            if (mBadStateIndex < 0) {
+              mBadStateIndex = s;
+            }
+            mNumBadStates++;
           }
-          mNumBadStates++;
         }
       }
     }
@@ -1013,6 +1042,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mUsingDumpState = true;
+  private boolean mExperimentalMode = false;
+
   private int mNumProperEvents;
   private int mBadStateIndex;
   private int mNumBadStates;
@@ -1020,7 +1052,6 @@ public class SuWonhamSupervisorReductionTRSimplifier
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
-  private boolean mExperimentalMode = false;
   private boolean mMerged;
   private int[] mStateMap;
   private int[] mInverseMap;
