@@ -315,6 +315,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
         System.err.println(ex);
       }
       finally {
+        mSynthesizer.requestAbort();
         singlePool.shutdown();
       }
 
