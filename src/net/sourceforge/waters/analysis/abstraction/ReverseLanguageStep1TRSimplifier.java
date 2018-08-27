@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.hash.TLongIntHashMap;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntSetBuffer;
@@ -45,11 +50,6 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
 import net.sourceforge.waters.model.base.ProxyTools;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.hash.TLongIntHashMap;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -380,10 +380,6 @@ public class ReverseLanguageStep1TRSimplifier
       final int numTrans = mPreTransitionBuffer.size();
       rel.reset(mDisablingFakePair + 1, mDisablingFakePair, numTrans,
                 ListBufferTransitionRelation.CONFIG_PREDECESSORS);
-      final int defaultMarking = getDefaultMarkingID();
-      for (int p = 0; p < numProps; p++) {
-        rel.setPropositionUsed(p, p == defaultMarking);
-      }
       for (int s = 0; s < numStates; s++) {
         final long pair = mPairList.get(s);
         final int set;
@@ -395,10 +391,6 @@ public class ReverseLanguageStep1TRSimplifier
         if (set == mFullSetIndex || mSetBuffer.contains(set, mInitialState)) {
           rel.setInitial(s, true);
         }
-        rel.setMarked(s, defaultMarking, true);
-      }
-      if (mEnablingFakePair >= 0) {
-        rel.setMarked(mEnablingFakePair, defaultMarking, true);
       }
       mPreTransitionBuffer.addIncomingTransitions(rel);
     }
