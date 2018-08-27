@@ -82,7 +82,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   public enum HeuristicCoverStrategy
   {
-    NONE, CONNECTIVITY, NEIGHBOUR, AGE, MIXED
+    NONE, CONNECTIVITY, CONNECTIVITY_WITH_REPEATS, NEIGHBOUR, AGE, MIXED
   }
 
   //#########################################################################
@@ -644,6 +644,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       if (mHeuristicCoverStrategy == HeuristicCoverStrategy.CONNECTIVITY) {
         activeComparator = new ConnectivityComparator();
+      }
+      else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.CONNECTIVITY_WITH_REPEATS){
+        activeComparator = new ConnectivityWithRepeatsComparator();
       } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.NEIGHBOUR) {
         activeComparator = new NeighbourComparator();
       } else if (mHeuristicCoverStrategy == HeuristicCoverStrategy.AGE) {
@@ -728,54 +731,55 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       {
         mSetBuffer.clear();
         getSuccessorStates(state, mSetBuffer);
-        int matches = 0;
+        int numSuccessorsOutsideClique = 0;
         for (int s = 0; s < clique.size(); s++) {
           if (!mSetBuffer.contains(clique.get(s))) {
-            matches++;
+            numSuccessorsOutsideClique++;
           }
         }
-        return matches;
+        return numSuccessorsOutsideClique;
       }
 
       protected int predecessorCostSingle(final int state)
       {
         mSetBuffer.clear();
         getPredecessorStates(state, mSetBuffer);
-        int matches = 0;
+        int numPredecessorsOutsideClique = 0;
         for (int s = 0; s < clique.size(); s++) {
           if (!mSetBuffer.contains(clique.get(s))) {
-            matches++;
+            numPredecessorsOutsideClique++;
           }
         }
-        return matches;
+        return numPredecessorsOutsideClique;
       }
 
-      @SuppressWarnings("unused")
       protected int successorCostMultiple(final int state)
       {
-        mListBuffer.clear();
-        getSuccessorStates(state, mListBuffer);
-        int matches = 0;
-        for (int s = 0; s < mListBuffer.size(); s++) {
-          if (!clique.contains(mListBuffer.get(s))) {
-            matches++;
+        mSetBuffer.clear();
+        mSetBuffer.addAll(clique);
+        mSuccessorTransitionIterator.reset(state, -1);
+        int numSuccessorsOutsideClique = 0;
+        while (mSuccessorTransitionIterator.advance()) {
+          if (!mSetBuffer.contains(mSuccessorTransitionIterator.getCurrentTargetState())) {
+            numSuccessorsOutsideClique++;
           }
         }
-        return matches;
+        return numSuccessorsOutsideClique;
       }
 
-      @SuppressWarnings("unused")
       protected int predecessorCostMultiple(final int state)
       {
-        mListBuffer.clear();
+        mSetBuffer.clear();
+        mSetBuffer.addAll(clique);
+        mSuccessorTransitionIterator.reset(state, -1);
         getPredecessorStates(state, mListBuffer);
-        int matches = 0;
-        for (int s = 0; s < mListBuffer.size(); s++) {
-          if (!clique.contains(mListBuffer.get(s))) {
-            matches++;
+        int numPredecessorsOutsideClique = 0;
+        while (mSuccessorTransitionIterator.advance()) {
+          if (!mSetBuffer.contains(mSuccessorTransitionIterator.getCurrentSourceState())) {
+            numPredecessorsOutsideClique++;
           }
         }
-        return matches;
+        return numPredecessorsOutsideClique;
       }
 
       protected int neighbourCost(final int state)
@@ -795,6 +799,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           .compare(successorCostSingle(state1)
                    + predecessorCostSingle(state1),
                    successorCostSingle(state2) + predecessorCostSingle(state2));
+      }
+    }
+
+    private class ConnectivityWithRepeatsComparator extends StateComparator {
+      @Override
+      public int compare(final int state1, final int state2)
+      {
+        return Integer
+          .compare(successorCostMultiple(state1)
+                   + predecessorCostMultiple(state1),
+                   successorCostMultiple(state2) + predecessorCostMultiple(state2));
       }
     }
 
@@ -825,11 +840,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       public void setClique(final TIntList clique)
       {
         final double randomValue = random.nextDouble();
-        if (randomValue < 0.5) {
+        if (randomValue < 0.2) {
           innerComparator = new ConnectivityComparator();
-        } else if (randomValue < 0.7) {
+        } else if (randomValue < 0.4) {
+          innerComparator = new ConnectivityWithRepeatsComparator();
+        } else if (randomValue < 0.6) {
           innerComparator = new AgeComparator();
-        } else if (randomValue < 0.9) {
+        } else if (randomValue < 0.8) {
           innerComparator = new NeighbourComparator();
         }
         innerComparator.setClique(clique);
@@ -1120,10 +1137,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
   }
 
-  private void getPredecessorStates(final int source,
+  private void getPredecessorStates(final int target,
                                     final TIntCollection predecessorStatesToFill)
   {
-    mPredecessorTransitionIterator.reset(source, -1);
+    mPredecessorTransitionIterator.reset(target, -1);
     while (mPredecessorTransitionIterator.advance()) {
       predecessorStatesToFill
         .add(mPredecessorTransitionIterator.getCurrentSourceState());

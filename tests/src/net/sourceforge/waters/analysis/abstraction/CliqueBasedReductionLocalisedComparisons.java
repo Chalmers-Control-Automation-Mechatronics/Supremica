@@ -607,6 +607,7 @@ public class CliqueBasedReductionLocalisedComparisons
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
+    simplifier.setUsingDumpState(true);
     simplifier.setExperimentalMode(true);
     return simplifier;
   }
