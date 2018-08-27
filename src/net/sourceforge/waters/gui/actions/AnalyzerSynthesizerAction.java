@@ -96,6 +96,7 @@ public class AnalyzerSynthesizerAction extends WatersAnalyzerAction
     setEnabled(enabled);
   }
 
+
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 8082126929036001591L;

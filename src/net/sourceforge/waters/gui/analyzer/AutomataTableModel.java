@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,7 +52,6 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
@@ -100,14 +100,10 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   {
     return mAutomataList.indexOf(aut);
     /*
-    for (int looper = 0; looper < this.getRowCount(); looper++) {
-      if ((mAutomataList.get(looper).getName())
-        .compareTo(aut.getName()) == 0) {
-        return looper;
-      }
-    }
-    return -1;
-    */
+     * for (int looper = 0; looper < this.getRowCount(); looper++) { if
+     * ((mAutomataList.get(looper).getName()) .compareTo(aut.getName()) == 0)
+     * { return looper; } } return -1;
+     */
   }
 
   Map<String,EventProxy> getEventMap()
@@ -152,16 +148,11 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     fireTableRowsDeleted(end, start);
   }
 
-  // TODO Method should accept Collection<? extends AutomatonProxy>
-  public void insertRows(final List<AutomatonProxy> insertList)
+  public void insertRows(final Collection<? extends AutomatonProxy> insertList)
   {
-    final int count = mAutomataList.size()+1;
-    // TODO mAutomataList.addAll(insertList);
-    for (final AutomatonProxy aut : insertList) {
-      mAutomataList.add(aut);
-    }
-    // TODO End is off by one?
-    fireTableRowsInserted(count, count+insertList.size());
+    final int count = mAutomataList.size();
+    mAutomataList.addAll(insertList);
+    fireTableRowsInserted(count, count + (insertList.size()-1));
   }
 
   public void insertRow(final AutomatonProxy insert)
@@ -171,9 +162,10 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     insertRows(autList);
   }
 
-  public boolean containsAutomatonName(final String name) {
-    for(final AutomatonProxy aut : mAutomataList)
-      if(aut.getName().equals(name) == true)
+  public boolean containsAutomatonName(final String name)
+  {
+    for (final AutomatonProxy aut : mAutomataList)
+      if (aut.getName().equals(name) == true)
         return true;
     return false;
   }
@@ -181,27 +173,25 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   public void checkNewAutomatonName(final IdentifierProxy ident)
     throws ParseException
   {
-    // TODO Use ident.toString(), also if not simple identifier
-    if (ident instanceof SimpleIdentifierProxy) {
-      final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) ident;
-      final String name = simple.getName();
-      if (containsAutomatonName(name)) {
-        final StringBuilder buffer = new StringBuilder("Name '");
-        buffer.append(name);
-        buffer.append("' is already taken by ");
-        final String typename = "an Automaton";
-        buffer.append(typename);
-        buffer.append('!');
-        final String msg = buffer.toString();
-        throw new ParseException(msg, 0);
-      }
+    final String name = ident.toString();
+    if (containsAutomatonName(name)) {
+      final StringBuilder buffer = new StringBuilder("Name '");
+      buffer.append(name);
+      buffer.append("' is already taken by ");
+      final String typename = "an Automaton";
+      buffer.append(typename);
+      buffer.append('!');
+      final String msg = buffer.toString();
+      throw new ParseException(msg, 0);
     }
   }
 
-  public void replaceAutomaton(final AutomatonProxy oldAut, final AutomatonProxy newAut) {
+  public void replaceAutomaton(final AutomatonProxy oldAut,
+                               final AutomatonProxy newAut)
+  {
     int i = 0;
-    for(final AutomatonProxy aut : mAutomataList) {
-      if(aut.equals(oldAut) == true) {
+    for (final AutomatonProxy aut : mAutomataList) {
+      if (aut.equals(oldAut) == true) {
         mAutomataList.set(i, newAut);
         break;
       }
@@ -210,19 +200,24 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     fireTableRowsUpdated(i, i);
   }
 
-  public boolean containsDisplayMap(final AutomatonProxy aut) {
+  public boolean containsDisplayMap(final AutomatonProxy aut)
+  {
     return mDisplayMap.containsKey(aut);
   }
 
-  public SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut) {
+  public SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut)
+  {
     return mDisplayMap.get(aut);
   }
 
-  public void addToDisplayMap(final AutomatonProxy aut, final SimpleComponentProxy comp) {
+  public void addToDisplayMap(final AutomatonProxy aut,
+                              final SimpleComponentProxy comp)
+  {
     mDisplayMap.put(aut, comp);
   }
 
-  public void removeFromDisplayMap(final AutomatonProxy aut) {
+  public void removeFromDisplayMap(final AutomatonProxy aut)
+  {
     mDisplayMap.remove(aut);
   }
 

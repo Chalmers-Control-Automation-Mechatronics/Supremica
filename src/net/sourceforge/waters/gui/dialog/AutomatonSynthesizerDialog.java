@@ -39,7 +39,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -102,7 +101,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     mSuWonHam = new SuWonhamSupervisorReductionTRSimplifier();
     mCliqueBased = new CliqueBasedSupervisorReductionTRSimplifier();
   }
-
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -271,62 +269,52 @@ public class AutomatonSynthesizerDialog extends JDialog
   {
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
-    // TODO Doesn't work without parsers ...
-    if (isInputLocked()) {
-      // There is invalid input and an error message has been displayed.
-      // Do not try to commit.
-    } else {
-      final String prefixName = mNamePrefix.getText();
+    final String prefixName = mNamePrefix.getText();
 
-      final ProductDESProxy des =
-        AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                             mAutomatonList, factory);
-      for (final AutomatonProxy aut : mAutomatonList) {
-        final MonolithicSynthesizer syn =
-          new MonolithicSynthesizer(des, factory);
-        syn.setOutputName(prefixName);
-        KindTranslator translator;
-        if (mControllable.isSelected())
-          translator = IdenticalKindTranslator.getInstance();
-        else
-          translator = ControllableSynthesisKindTranslator.getInstance();
-        syn.setKindTranslator(translator);
-        syn.setNonblockingSupported(mNonBlocking.isSelected());
-        AbstractSupervisorReductionTRSimplifier simplifier;
-        if (mSupReductionType.getSelectedIndex() == 0)
-          simplifier = null;
-        else if (mSupReductionType.getSelectedIndex() == 1)
-          simplifier = mSuWonHam;
-        else
-          simplifier = mCliqueBased;
-        syn.setSupervisorReductionSimplifier(simplifier);
-        syn.setSupervisorLocalizationEnabled(mLocalisedSupervisor
-          .isSelected());
-        // TODO Synthesiser should take all automata in one product DES
-        syn.setModel(aut);
-        try {
-          syn.run();
-        } catch (final AnalysisException exception) {
-          final Logger logger = LogManager.getLogger();
-          final String msg = exception.getMessage();
-          logger.error(msg);
-        }
-        // TODO Check for failed synthesis using result.isSatisfied()
-        final MonolithicSynthesisResult result = syn.getAnalysisResult();
-        final Collection<AutomatonProxy> resultList =
-          result.getComputedAutomata();
-        if (resultList != null) {
-          final AutomataTableModel model =
-            mAnalyzerPanel.getAutomataTableModel();
-          // TODO Let insertRows accept collection, avoid copy
-          final List<AutomatonProxy> autList =
-            new ArrayList<AutomatonProxy>(resultList);
-          model.insertRows(autList);
-        }
-      }
-      // Close the dialog
-      dispose();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
+                                           mAutomatonList, factory);
+
+    final MonolithicSynthesizer syn = new MonolithicSynthesizer(des, factory);
+    syn.setOutputName(prefixName);
+    KindTranslator translator;
+    if (mControllable.isSelected())
+      translator = IdenticalKindTranslator.getInstance();
+    else
+      translator = ControllableSynthesisKindTranslator.getInstance();
+    syn.setKindTranslator(translator);
+    syn.setNonblockingSupported(mNonBlocking.isSelected());
+    AbstractSupervisorReductionTRSimplifier simplifier;
+    if (mSupReductionType.getSelectedIndex() == 0)
+      simplifier = null;
+    else if (mSupReductionType.getSelectedIndex() == 1)
+      simplifier = mSuWonHam;
+    else
+      simplifier = mCliqueBased;
+    syn.setSupervisorReductionSimplifier(simplifier);
+    syn.setSupervisorLocalizationEnabled(mLocalisedSupervisor.isSelected());
+    syn.setModel(des);
+    try {
+      syn.run();
+    } catch (final AnalysisException exception) {
+      final Logger logger = LogManager.getLogger();
+      final String msg = exception.getMessage();
+      logger.error(msg);
     }
+    final MonolithicSynthesisResult result = syn.getAnalysisResult();
+    if (result.isSatisfied()) {
+      final Collection<AutomatonProxy> resultList =
+        result.getComputedAutomata();
+      if (resultList != null) {
+        final AutomataTableModel model =
+          mAnalyzerPanel.getAutomataTableModel();
+        model.insertRows(resultList);
+      }
+    } else {
+      //pop up window saying did not work
+    }
+    // Close the dialog
+    dispose();
   }
 
   private void reductionChanged()
@@ -355,35 +343,18 @@ public class AutomatonSynthesizerDialog extends JDialog
     }
   }
 
-  private void objectiveChanged(final JCheckBox checkbox) {
-    if(checkbox.equals(mControllable)) {
-      if(!mControllable.isSelected() && !mNonBlocking.isSelected()) {
+  private void objectiveChanged(final JCheckBox checkbox)
+  {
+    if (checkbox.equals(mControllable)) {
+      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
         mNonBlocking.setSelected(true);
       }
-    }
-    else {
-      if(!mControllable.isSelected() && !mNonBlocking.isSelected()) {
+    } else {
+      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
         mControllable.setSelected(true);
       }
     }
   }
-
-  //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether it is unsafe to commit the currently edited text field. If
-   * this method returns <CODE>true</CODE>, it is unsafe to commit the current
-   * dialog contents, and shifting the focus is to be avoided.
-   *
-   * @return <CODE>true</CODE> if the component currently owning the focus has
-   *         been found to contain invalid information, <CODE>false</CODE>
-   *         otherwise.
-   */
-  private boolean isInputLocked()
-  {
-    return mNamePrefix.isFocusOwner(); //&& !mNamePrefix.shouldYieldFocus();
-  }
-
 
   //#########################################################################
   //# Data Members
@@ -395,8 +366,8 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JPanel mMainPanel;
   private JLabel mNamePrefixLabel;
   private JTextField mNamePrefix;
-//  private JPanel mErrorPanel;
-//  private ErrorLabel mErrorLabel;
+  //  private JPanel mErrorPanel;
+  //  private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
   private JLabel mObjectLabel;
