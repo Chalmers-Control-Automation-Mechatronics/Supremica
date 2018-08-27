@@ -70,13 +70,21 @@ public abstract class WatersAnalyzerAction extends WatersAction
   protected AutomataTable getAnalyzerTable()
   {
     final WatersAnalyzerPanel analyzer = getAnalyzerPanel();
-    return analyzer.getAutomataTable();
+    if (analyzer == null) {
+      return null;
+    } else {
+      return analyzer.getAutomataTable();
+    }
   }
 
   protected AutomataTableModel getAnalyzerTableModel()
   {
     final WatersAnalyzerPanel analyzer = getAnalyzerPanel();
-    return analyzer.getAutomataTableModel();
+    if (analyzer == null) {
+      return null;
+    } else {
+      return analyzer.getAutomataTableModel();
+    }
   }
 
   protected int getSelectedRowCount()
