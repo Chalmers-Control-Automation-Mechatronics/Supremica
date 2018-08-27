@@ -145,6 +145,12 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
+  public boolean isPartitioning()
+  {
+    return false;
+  }
+
+  @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;

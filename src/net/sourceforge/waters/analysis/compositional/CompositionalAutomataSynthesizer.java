@@ -646,11 +646,23 @@ public class CompositionalAutomataSynthesizer
   {
     if (mSupervisorReductionEnabled) {
       try {
+        // TODO Creating dump state---could this have been done before?
         final EventProxy marking = getUsedDefaultMarking();
         final int markingID = mTempEventEncoding.getEventCode(marking);
-        mSupervisorSimplifier.setDefaultMarkingID(markingID);
-        mSupervisorSimplifier.setTransitionRelation(rel);//set TR
-        mSupervisorSimplifier.setSupervisedEvent(-1);//set event
+        final int dumpIndex = rel.getDumpStateIndex();
+        rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+        final TransitionIterator iter =
+          rel.createAllTransitionsModifyingIterator();
+        while (iter.advance()) {
+          final int target = iter.getCurrentToState();
+          if (target != dumpIndex && rel.isDeadlockState(target, markingID)) {
+            iter.setCurrentToState(dumpIndex);
+            rel.setReachable(target, false);
+            rel.setReachable(dumpIndex, true);
+          }
+        }
+        mSupervisorSimplifier.setTransitionRelation(rel);
+        mSupervisorSimplifier.setSupervisedEvent(-1);
         mSupervisorSimplifier.run();
         return mSupervisorSimplifier.getTransitionRelation();
       } catch (final OverflowException overflow) {
