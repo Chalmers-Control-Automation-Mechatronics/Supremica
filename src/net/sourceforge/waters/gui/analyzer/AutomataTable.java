@@ -163,10 +163,9 @@ public class AutomataTable extends JTable implements SelectionOwner
   @Override
   public String getToolTipText(final MouseEvent event)
   {
-    // TODO aut could be null if clicking blank space
     final AutomatonProxy aut = getAutomaton(event);
-    final ComponentKind kind = aut.getKind();
     if (aut != null) {
+      final ComponentKind kind = aut.getKind();
       String Tooltip = ModuleContext.getComponentKindToolTip(kind);
       Tooltip += (" " + aut.getName());
       return Tooltip;
@@ -586,10 +585,9 @@ public class AutomataTable extends JTable implements SelectionOwner
             mParent.displaySelectedAutomaton(aut);
           }
         }
-      }
-      else if(event.getButton() == MouseEvent.BUTTON1) {
+      } else if (event.getButton() == MouseEvent.BUTTON1) {
         final AutomatonProxy aut = getAutomaton(event);
-        if(aut == null) {
+        if (aut == null) {
           clearSelection();
         }
       }

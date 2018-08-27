@@ -42,8 +42,7 @@ import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public abstract class WatersAnalyzerAction
-  extends WatersAction
+public abstract class WatersAnalyzerAction extends WatersAction
 {
 
   //#########################################################################
@@ -52,7 +51,6 @@ public abstract class WatersAnalyzerAction
   {
     super(ide);
   }
-
 
   //#########################################################################
   //# Accessing the Waters Analyser Panel
@@ -71,41 +69,31 @@ public abstract class WatersAnalyzerAction
 
   protected AutomataTable getAnalyzerTable()
   {
-    // TODO Use getAnalyzerPanel() method
-    final ModuleContainer container = getActiveModuleContainer();
-    if (container == null) {
+    final WatersAnalyzerPanel analyzer = getAnalyzerPanel();
+    if (analyzer == null) {
       return null;
+    } else {
+      return analyzer.getAutomataTable();
     }
-    final MainPanel panel = container.getActivePanel();
-    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
-      return null;
-    }
-    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
-    return analyzer.getAutomataTable();
   }
 
   protected AutomataTableModel getAnalyzerTableModel()
   {
-    // TODO Use getAnalyzerPanel() method
-    final ModuleContainer container = getActiveModuleContainer();
-    if (container == null) {
+    final WatersAnalyzerPanel analyzer = getAnalyzerPanel();
+    if (analyzer == null) {
       return null;
+    } else {
+      return analyzer.getAutomataTableModel();
     }
-    final MainPanel panel = container.getActivePanel();
-    if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
-      return null;
-    }
-    final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
-    return analyzer.getAutomataTableModel();
   }
 
   protected int getSelectedRowCount()
   {
-    //TODO cant call getSelectedRows before model open, how to check if null before call??
     final AutomataTable table = getAnalyzerTable();
-    return table.getSelectedRowCount();
+    if (table != null)
+      return table.getSelectedRowCount();
+    return -1;
   }
-
 
   //#########################################################################
   //# Class Constants

@@ -33,11 +33,11 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.awt.Color;
 import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JViewport;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -83,9 +83,9 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
-    // TODO Just set the right component to be a white panel, no viewport
     final JPanel mAutomataPanel = new JPanel();
-    final JViewport scrollDisplay = new JViewport();
+    final JPanel scrollDisplay = new JPanel();
+    scrollDisplay.setBackground(Color.WHITE);
     scrollDisplay.add(mAutomataPanel);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
