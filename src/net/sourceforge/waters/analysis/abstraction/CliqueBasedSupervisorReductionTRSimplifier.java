@@ -565,9 +565,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                                        final TIntList alreadyChecked,
                                        final TIntList maximalCliquesIdsToFill) throws AnalysisAbortException
     {
+      checkAbort();
       //if we have exhausted all possibilities, this must be the largest clique we have seen
       if (possibleAdditions.isEmpty() && alreadyChecked.isEmpty()) {
-        checkAbort();
         clique.sort();
         maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
         return;
@@ -684,8 +684,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                                        final TIntSet maximalCliquesIdsToFill) throws AnalysisAbortException
     {
       //if we have exhausted all possibilities, this must be the largest clique we have seen
+      checkAbort();
       if (possibleAdditions.isEmpty()) {
-        checkAbort();
         clique.sort();
         maximalCliquesIdsToFill.add(mCompatibleCache.add(clique));
         return;

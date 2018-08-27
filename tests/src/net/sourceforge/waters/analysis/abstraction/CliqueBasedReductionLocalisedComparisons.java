@@ -55,12 +55,13 @@ public class CliqueBasedReductionLocalisedComparisons
       for (final HeuristicCoverStrategy coverStrategy : strategies) {
         final String baseOutputName =
           coverStrategy.name() + "_" + maxNumberOfCovers + ".csv";
-        final CliqueBasedReductionLocalisedComparisons comparisons =
+        CliqueBasedReductionLocalisedComparisons comparisons =
           new CliqueBasedReductionLocalisedComparisons(baseOutputName,
                                                        coverStrategy,
                                                        maxNumberOfCovers,
                                                        timeout);
         run(comparisons);
+        comparisons = null;
       }
     }
   }
@@ -82,6 +83,7 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testBigFactory1();
     comparisons.testBigFactory2();
     comparisons.testBigFactory3();
+    System.gc();
     comparisons.testCatMouse();
     comparisons.testCatMouseUnsup2();
     comparisons.testCatMouseUnsup1();
@@ -91,12 +93,15 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testCT3();
     comparisons.testCoffeeMachine();
     comparisons.testDosingUnit();
+    System.gc();
     comparisons.testIMS();
+    System.gc();
     comparisons.testIPC();
     comparisons.testIPCcswitch();
     comparisons.testIPClswitch();
     comparisons.testIPCuswitch();
     comparisons.testManufacturingSystem();
+    System.gc();
     comparisons.testManWolf();
     comparisons.testNoPlant1();
     comparisons.testNoPlant2();
@@ -117,12 +122,14 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testSupRed3();
     comparisons.testTankProcess();
     comparisons.testTbedMinsync();
+    System.gc();
     comparisons.testTicTacToe();
     comparisons.testTeleNetwork();
     comparisons.testTrafficlights();
     comparisons.testTransferLine1();
     comparisons.testTransferLine2();
     comparisons.testTransferLine3();
+    System.gc();
   }
 
   public CliqueBasedReductionLocalisedComparisons()
@@ -607,7 +614,6 @@ public class CliqueBasedReductionLocalisedComparisons
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
-    simplifier.setUsingDumpState(true);
     simplifier.setExperimentalMode(true);
     return simplifier;
   }
