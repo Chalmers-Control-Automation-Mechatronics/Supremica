@@ -184,7 +184,8 @@ public abstract class BDDAbstractManager {
     public BDD guard2BDD(final SimpleExpressionProxy expr,
                          final HashSet<String> updatedVars) {
       final ResultOverflows guardBDD = expr2BDDBitVec(expr, true, updatedVars);
-      return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
+      final BDD result = guardBDD.getResult().getBit(0);
+      return result;
     }
 
     public BDD action2BDD(final BinaryExpressionProxy expr)
