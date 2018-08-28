@@ -551,7 +551,7 @@ public abstract class BDDAbstractManager {
             bddExAutomata.getIndexMap().getEventAt(eventIndex).getName();
           final Map<EdgeProxy, BDD> eventEdge2BDDMap =
             bddExAutomata.getEventName2EdgeBDDMap().get(eventName);
-          final BDD edgeSourceBDD = guardBDD
+          final BDD edgeSourceBDD = sourceBDD
             .exist(bddExAutomata.getDestStatesVarSet())
             .exist(bddExAutomata.getEventVarSet());
           if (!edgeSourceBDD.isZero())

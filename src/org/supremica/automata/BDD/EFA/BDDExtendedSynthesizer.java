@@ -184,7 +184,8 @@ public class BDDExtendedSynthesizer
                                             edgeToBDDMap,
                                             statesAfterSynthesis,
                                             options);
-      event2GuardGen.put(sigmaName, bddgg);
+      if(!bddgg.getEdge2GuardMap().isEmpty())
+        event2GuardGen.put(sigmaName, bddgg);
     }
     guardTimer.stop();
   }
@@ -201,8 +202,6 @@ public class BDDExtendedSynthesizer
       for (final EdgeProxy edge: edgesGuards.keySet()) {
         final EdgeSubject edgeSub = (EdgeSubject) edge;
         final String generatedGuard = edgesGuards.get(edgeSub);
-        if (generatedGuard == BDDExtendedGuardGenerator.TRUE)
-          continue; // no need to attach "TRUE" in the guard section
         EdgeSubject manipulatedEdge = null;
         // get the event list from the edge subject
         final ListSubject<AbstractSubject> eventList =
