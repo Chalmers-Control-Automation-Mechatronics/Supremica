@@ -87,7 +87,7 @@ import org.apache.logging.log4j.Logger;
  * inclusion models and passing them to a {@link
  * TRCompositionalOnePropertyChecker}.</P>
  *
- * <P><I>References:</I><BR>
+ * <P><I>Reference:</I><BR>
  * Simon Ware, Robi Malik. The use of language projection for compositional
  * verification of discrete event systems. Proc. 9th International Workshop
  * on Discrete Event Systems (WODES'08), 322-327, G&ouml;teborg, Sweden,
