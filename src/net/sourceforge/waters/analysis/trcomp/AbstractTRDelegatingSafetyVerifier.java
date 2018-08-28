@@ -38,6 +38,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -74,10 +75,10 @@ public abstract class AbstractTRDelegatingSafetyVerifier
   }
 
   @Override
-  public TRSafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
     final VerificationResult result = getAnalysisResult();
-    return (TRSafetyTraceProxy) result.getCounterExample();
+    return (SafetyCounterExampleProxy) result.getCounterExample();
   }
 
 

@@ -37,32 +37,30 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ModuleWindowInterface;
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
-import net.sourceforge.waters.gui.dialog.InstanceEditorDialog;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to create a new instance for a module. This action merely popups
- * the instance creation dialog ({@link InstanceEditorDialog}); the actual
- * instance creation is done when the dialog is committed.
+ * The action to invoke the synchronous product dialog in the Waters analyser.
  *
- * @author Carly Hona
+ * @author George Hewlett
  */
 
-public class AnalyzerSynchronousProductAction extends WatersAction
+public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
-  //# Constructors
+  //# Constructor
   AnalyzerSynchronousProductAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "New Instance ...");
-    putValue(Action.SHORT_DESCRIPTION, "Add an instance to the module");
+    putValue(Action.NAME, "Synchronise ...");
+    putValue(Action.SHORT_DESCRIPTION, "Synchronise the selected automata");
+    updateEnabledStatus();
   }
 
   //#########################################################################
@@ -70,16 +68,36 @@ public class AnalyzerSynchronousProductAction extends WatersAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    final AutomatonProxy syncAutomaton = null;
-    //TODO cant use modulewinodwinterface
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    if (root != null) {
-      new AutomatonSynchronousProductDialog(root, syncAutomaton);
+    final IDE ide = getIDE();
+    if (ide != null) {
+      new AutomatonSynchronousProductDialog(getAnalyzerPanel());
     }
   }
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
+    }
+  }
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    boolean enabled = false;
+    final AutomataTable table = getAnalyzerTable();
+    if (table != null) {
+      enabled = (table.getSelectedRowCount() >= 2);
+    }
+    setEnabled(enabled);
+  }
+
+  //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 8082126929036001591L;
 
 }

@@ -39,7 +39,7 @@ import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -116,9 +116,9 @@ public abstract class AbstractControlLoopChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
   @Override
-  public LoopTraceProxy getCounterExample()
+  public LoopCounterExampleProxy getCounterExample()
   {
-    return (LoopTraceProxy) super.getCounterExample();
+    return (LoopCounterExampleProxy) super.getCounterExample();
   }
 
   @Override

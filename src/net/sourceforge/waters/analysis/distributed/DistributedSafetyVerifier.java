@@ -57,7 +57,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -85,6 +85,7 @@ public class DistributedSafetyVerifier
     super(model, translator, diag, factory);
   }
 
+  @Override
   public boolean run() throws AnalysisException
   {
     //These arguments should be mandatory.
@@ -163,35 +164,26 @@ public class DistributedSafetyVerifier
 
 
 	final Boolean b = result.getResult();
-	if (b == null)
-	  {
-	    throw new AnalysisException("Verification result was undefined!");
-	  }
-
-	if (b == true)
-	  {
-	    return setSatisfiedResult();
-	  }
-	else
-	  {
-	    //Get a counter-example from the job result
-	    EventProxy[] trace  = null;
-	    SafetyTraceProxy counterexample = null;
-	    if (result.getTrace() != null)
-	      {
-		trace = result.getTrace();
-
-		//'Sanitise' the trace. This ensures the EventProxy
-		//objects that are in the trace are the same objects
-		//as the ones in the original model, as is expected
-		//for Waters verifiers.
-		final List<EventProxy> tracelist = sanitiseTrace(trace);
-
-		counterexample = factory.createSafetyTraceProxy(model, tracelist);
-	      }
-	    return setFailedResult(counterexample);
-	  }
-
+      if (b == null) {
+        throw new AnalysisException("Verification result was undefined!");
+      } else if (b == true) {
+        return setSatisfiedResult();
+      } else {
+        //Get a counterexample from the job result
+        EventProxy[] trace = null;
+        SafetyCounterExampleProxy counterexample = null;
+        if (result.getTrace() != null) {
+          trace = result.getTrace();
+          //'Sanitise' the trace. This ensures the EventProxy
+          //objects that are in the trace are the same objects
+          //as the ones in the original model, as is expected
+          //for Waters verifiers.
+          final List<EventProxy> tracelist = sanitiseTrace(trace);
+          counterexample =
+            factory.createSafetyCounterExampleProxy(model, tracelist);
+        }
+        return setFailedResult(counterexample);
+      }
 
       }
     catch (final Exception e)
@@ -203,6 +195,7 @@ public class DistributedSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;
@@ -287,15 +280,17 @@ public class DistributedSafetyVerifier
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
+  @Override
   public void setKindTranslator(final KindTranslator translator)
   {
     super.setKindTranslator(translator);
     clearAnalysisResult();
   }
 
-  public SafetyTraceProxy getCounterExample()
+  @Override
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return (SafetyTraceProxy) super.getCounterExample();
+    return super.getCounterExample();
   }
 
 

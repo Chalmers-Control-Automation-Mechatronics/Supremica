@@ -39,7 +39,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -67,6 +67,6 @@ public interface ModularHeuristic
      Set<AutomatonProxy> nonComposedPlants,
      Set<AutomatonProxy> nonComposedSpecPlants,
      Set<AutomatonProxy> nonComposedSpecs,
-     TraceProxy counterExample);
+     SafetyCounterExampleProxy counterExample);
 
 }

@@ -40,7 +40,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -141,7 +141,8 @@ public class ControllabilityMain
         } else {
           System.out.println("NOT controllable");
           System.out.println("Counterexample:");
-          final SafetyTraceProxy counterex = checker.getCounterExample();
+          final SafetyCounterExampleProxy counterex =
+            checker.getCounterExample();
           System.out.println(counterex.toString());
         }
       }

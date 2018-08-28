@@ -41,9 +41,9 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
@@ -138,7 +138,8 @@ public class BDDConflictMain
         } else {
           System.out.println("CONFLICTING");
           System.out.println("Counterexample:");
-          final TraceProxy counterex = checker.getCounterExample();
+          final ConflictCounterExampleProxy counterex =
+            checker.getCounterExample();
           System.out.println(counterex.toString());
         }
         System.gc();  // Garbage collect all BDDs so init() can be called again.

@@ -46,12 +46,13 @@ import java.util.Map;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -215,8 +216,8 @@ public class PropositionPropertyBuilder
     return mOutputModel;
   }
 
-  public ConflictTraceProxy getConvertedConflictTrace
-    (final SafetyTraceProxy trace)
+  public ConflictCounterExampleProxy getConvertedConflictTrace
+    (final SafetyCounterExampleProxy counter)
   {
     final Collection<AutomatonProxy> inputAutomata = mInputModel.getAutomata();
     final Collection<AutomatonProxy> outputAutomata =
@@ -236,9 +237,9 @@ public class PropositionPropertyBuilder
         map.put(name, aut);
       }
     }
-    final String tracename = trace.getName();
-    final String comment = trace.getComment();
-    final Collection<AutomatonProxy> outTraceAutomata = trace.getAutomata();
+    final String traceName = counter.getName();
+    final String comment = counter.getComment();
+    final Collection<AutomatonProxy> outTraceAutomata = counter.getAutomata();
     final int numInTraceAutomata = outTraceAutomata.size();
     final Collection<AutomatonProxy> inTraceAutomata =
       new ArrayList<AutomatonProxy>(numInTraceAutomata);
@@ -249,6 +250,7 @@ public class PropositionPropertyBuilder
         inTraceAutomata.add(inAut);
       }
     }
+    final TraceProxy trace = counter.getTrace();
     final List<TraceStepProxy> outSteps = trace.getTraceSteps();
     final int numSteps = outSteps.size();
     final List<TraceStepProxy> inSteps =
@@ -276,9 +278,10 @@ public class PropositionPropertyBuilder
         inSteps.add(inStep);
       }
     }
-    return mFactory.createConflictTraceProxy(tracename, comment, null,
-                                             mInputModel, inTraceAutomata,
-                                             inSteps, ConflictKind.CONFLICT);
+    final TraceProxy converted = mFactory.createTraceProxy(inSteps);
+    return mFactory.createConflictCounterExampleProxy
+      (traceName, comment, null, mInputModel, inTraceAutomata,
+       converted, ConflictKind.CONFLICT);
   }
 
 
@@ -345,6 +348,7 @@ public class PropositionPropertyBuilder
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+    @Override
     public ComponentKind getComponentKind(final AutomatonProxy aut)
     {
       if (aut == mSpecification) {
@@ -354,6 +358,7 @@ public class PropositionPropertyBuilder
       }
     }
 
+    @Override
     public EventKind getEventKind(final EventProxy event)
     {
       if (mParentKindTranslator.getEventKind(event) == EventKind.PROPOSITION &&

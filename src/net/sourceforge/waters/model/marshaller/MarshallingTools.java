@@ -35,16 +35,19 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -56,8 +59,8 @@ import org.xml.sax.SAXException;
 
 
 /**
- * A collection of static methods to facilitate the writing of Waters
- * documents to files.
+ * A collection of static methods to facilitate the reading and writing of
+ * Waters documents from and to files.
  *
  * @author Robi Malik
  */
@@ -258,6 +261,88 @@ public class MarshallingTools
       filename += desExt;
       saveProductDES(des, filename);
     } catch (final JAXBException | SAXException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Unmarshalling
+  /**
+   * Loads a module from the a file.
+   * This is a convenience method to read a module from a file without a
+   * {@link DocumentManager}. The module is loaded directly and created
+   * using a {@link ModuleElementFactory}.
+   * @param  filename  The name of the file to load (typically with
+   *                   <CODE>.wmod</CODE> extension).
+   */
+  public static ModuleProxy loadModule(final String filename)
+  {
+    try {
+      final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final JAXBModuleMarshaller marshaller =
+        new JAXBModuleMarshaller(factory, optable, false);
+      final File file = new File(filename);
+      final URI uri = file.toURI();
+      return marshaller.unmarshal(uri);
+    } catch (final JAXBException | SAXException |
+                   WatersUnmarshalException | IOException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  /**
+   * Loads a module from the a file and compiles it to a product DES.
+   * This is a convenience method to read and compile a module without
+   * instantiating a {@link DocumentManager} or {@link ModuleCompiler}.
+   * @param  filename  The name of the file to load (typically with
+   *                   <CODE>.wmod</CODE> extension).
+   */
+  public static ProductDESProxy loadAndCompileModule(final String filename)
+  {
+    try {
+      final ModuleProxyFactory moduleFactory =
+        ModuleElementFactory.getInstance();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
+      final OperatorTable optable = CompilerOperatorTable.getInstance();
+      final JAXBModuleMarshaller marshaller =
+        new JAXBModuleMarshaller(moduleFactory, optable, false);
+      final DocumentManager docManager = new DocumentManager();
+      docManager.registerUnmarshaller(marshaller);
+      final File file = new File(filename);
+      final ModuleProxy module = (ModuleProxy) docManager.load(file);
+      final ModuleCompiler compiler =
+        new ModuleCompiler(docManager, desFactory, module);
+      return compiler.compile();
+    } catch (final JAXBException | SAXException |
+                   WatersUnmarshalException | IOException |
+                   EvalException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+  /**
+   * Loads a product DES from the a file.
+   * This is a convenience method to read a product DES from a file without a
+   * {@link DocumentManager}. The module is loaded directly and created
+   * using a {@link ProductDESElementFactory}.
+   * @param  filename  The name of the file to load (typically with
+   *                   <CODE>.wdes</CODE> extension).
+   */
+  public static ProductDESProxy loadProductDES(final String filename)
+  {
+    try {
+      final ProductDESProxyFactory factory =
+        ProductDESElementFactory.getInstance();
+      final JAXBProductDESMarshaller marshaller =
+        new JAXBProductDESMarshaller(factory);
+      final File file = new File(filename);
+      final URI uri = file.toURI();
+      return marshaller.unmarshal(uri);
+    } catch (final JAXBException | SAXException |
+                   WatersUnmarshalException | IOException exception) {
       throw new WatersRuntimeException(exception);
     }
   }

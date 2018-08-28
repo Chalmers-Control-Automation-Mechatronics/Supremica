@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="tictactoe" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Model of Tic-Tac-Toe game.
 Two players, white and black, take turns to occupy squares in 3x3 grid. The winner is the player who first occupies a horizontal, vertical, or diagonal row of three squares.
-The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.</ns2:Comment>
+The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.
+The model is not controllable and nonblocking.
+It has 6324 reachable states and the diamater is 73.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="winner_white_x">
             <RangeList>
@@ -76,10 +78,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="208"/>
+                            <Point X="208" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="6" X="13"/>
+                            <Point X="13" Y="6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="white">
@@ -87,34 +89,34 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="176" X="128"/>
+                            <Point X="128" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="5" X="-40"/>
+                            <Point X="-40" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="black" Source="white">
+                    <Edge Source="white" Target="black">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-19" X="-20"/>
+                                <Point X="-20" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="161" X="169"/>
+                            <Point X="169" Y="161"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="white" Source="black">
+                    <Edge Source="black" Target="white">
                         <LabelBlock>
                             <SimpleIdentifier Name="black"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="2" X="-18"/>
+                                <Point X="-18" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="191" X="167"/>
+                            <Point X="167" Y="191"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -144,10 +146,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                             <SimpleIdentifier Name=":accepting"/>
                                         </EventList>
                                         <PointGeometry>
-                                            <Point Y="128" X="240"/>
+                                            <Point X="240" Y="128"/>
                                         </PointGeometry>
                                         <LabelGeometry>
-                                            <Point Y="24" X="-7"/>
+                                            <Point X="-7" Y="24"/>
                                         </LabelGeometry>
                                     </SimpleNode>
                                     <SimpleNode Initial="true" Name="empty">
@@ -155,26 +157,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                                             <SimpleIdentifier Name=":accepting"/>
                                         </EventList>
                                         <PointGeometry>
-                                            <Point Y="128" X="160"/>
+                                            <Point X="160" Y="128"/>
                                         </PointGeometry>
                                         <LabelGeometry>
-                                            <Point Y="22" X="-17"/>
+                                            <Point X="-17" Y="22"/>
                                         </LabelGeometry>
                                     </SimpleNode>
                                 </NodeList>
                                 <EdgeList>
-                                    <Edge Target="full" Source="full">
+                                    <Edge Source="full" Target="full">
                                         <LabelBlock>
                                             <SimpleIdentifier Name="draw"/>
                                             <LabelGeometry Anchor="NW">
-                                                <Point Y="-30" X="-33"/>
+                                                <Point X="-33" Y="-30"/>
                                             </LabelGeometry>
                                         </LabelBlock>
                                         <SplineGeometry>
-                                            <Point Y="128" X="283"/>
+                                            <Point X="283" Y="128"/>
                                         </SplineGeometry>
                                     </Edge>
-                                    <Edge Target="full" Source="empty">
+                                    <Edge Source="empty" Target="full">
                                         <LabelBlock>
                                             <IndexedIdentifier Name="white">
                                                 <SimpleIdentifier Name="x"/>
@@ -185,7 +187,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                                                 <SimpleIdentifier Name="y"/>
                                             </IndexedIdentifier>
                                             <LabelGeometry Anchor="NW">
-                                                <Point Y="-36" X="-32"/>
+                                                <Point X="-32" Y="-36"/>
                                             </LabelGeometry>
                                         </LabelBlock>
                                     </Edge>
@@ -213,10 +215,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="80"/>
+                                    <Point X="80" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-8"/>
+                                    <Point X="-8" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s1">
@@ -224,10 +226,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="160"/>
+                                    <Point X="160" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-7"/>
+                                    <Point X="-7" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s2">
@@ -235,10 +237,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="240"/>
+                                    <Point X="240" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="8" X="-9"/>
+                                    <Point X="-9" Y="8"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s3">
@@ -246,26 +248,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="320"/>
+                                    <Point X="320" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="10" X="-8"/>
+                                    <Point X="-8" Y="10"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="s1" Source="s1">
+                            <Edge Source="s1" Target="s1">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="3" X="-20"/>
+                                        <Point X="-20" Y="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="149" X="160"/>
+                                    <Point X="160" Y="149"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s2" Source="s1">
+                            <Edge Source="s1" Target="s2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <SimpleIdentifier Name="x"/>
@@ -280,11 +282,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-48" X="-29"/>
+                                        <Point X="-29" Y="-48"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s1" Source="s0">
+                            <Edge Source="s0" Target="s1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <SimpleIdentifier Name="x"/>
@@ -299,35 +301,35 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-49" X="-31"/>
+                                        <Point X="-31" Y="-49"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s0" Source="s0">
+                            <Edge Source="s0" Target="s0">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="1" X="-19"/>
+                                        <Point X="-19" Y="1"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="150" X="79"/>
+                                    <Point X="79" Y="150"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s3" Source="s3">
+                            <Edge Source="s3" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="winner_black_x">
                                         <SimpleIdentifier Name="x"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="17" X="-29"/>
+                                        <Point X="-29" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="112" X="360"/>
+                                    <Point X="360" Y="112"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s3" Source="s2">
+                            <Edge Source="s2" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <SimpleIdentifier Name="x"/>
@@ -342,19 +344,19 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-49" X="-28"/>
+                                        <Point X="-28" Y="-49"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s2" Source="s2">
+                            <Edge Source="s2" Target="s2">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="2" X="-18"/>
+                                        <Point X="-18" Y="2"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="149" X="239"/>
+                                    <Point X="239" Y="149"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -371,10 +373,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="80"/>
+                                    <Point X="80" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="9" X="-8"/>
+                                    <Point X="-8" Y="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s1">
@@ -382,10 +384,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="160"/>
+                                    <Point X="160" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="9" X="-8"/>
+                                    <Point X="-8" Y="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s2">
@@ -393,10 +395,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="240"/>
+                                    <Point X="240" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="9" X="-8"/>
+                                    <Point X="-8" Y="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s3">
@@ -404,28 +406,28 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="320"/>
+                                    <Point X="320" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="9" X="-9"/>
+                                    <Point X="-9" Y="9"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="s3" Source="s3">
+                            <Edge Source="s3" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="winner_white_x">
                                         <SimpleIdentifier Name="x"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="17" X="-29"/>
+                                        <Point X="-29" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="112" X="360"/>
+                                    <Point X="360" Y="112"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s2" Source="s1">
+                            <Edge Source="s1" Target="s2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <SimpleIdentifier Name="x"/>
@@ -440,11 +442,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-49" X="-28"/>
+                                        <Point X="-28" Y="-49"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s3" Source="s2">
+                            <Edge Source="s2" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <SimpleIdentifier Name="x"/>
@@ -459,11 +461,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-49" X="-27"/>
+                                        <Point X="-27" Y="-49"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s1" Source="s0">
+                            <Edge Source="s0" Target="s1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <SimpleIdentifier Name="x"/>
@@ -478,7 +480,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <IntConstant Value="2"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-49" X="-31"/>
+                                        <Point X="-31" Y="-49"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
@@ -504,10 +506,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="80"/>
+                                    <Point X="80" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-8"/>
+                                    <Point X="-8" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s1">
@@ -515,10 +517,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="160"/>
+                                    <Point X="160" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="12" X="-9"/>
+                                    <Point X="-9" Y="12"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s2">
@@ -526,10 +528,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="240"/>
+                                    <Point X="240" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="12" X="-8"/>
+                                    <Point X="-8" Y="12"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s3">
@@ -537,28 +539,28 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="320"/>
+                                    <Point X="320" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-9"/>
+                                    <Point X="-9" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="s3" Source="s3">
+                            <Edge Source="s3" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="winner_black_y">
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="17" X="-29"/>
+                                        <Point X="-29" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="112" X="360"/>
+                                    <Point X="360" Y="112"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s3" Source="s2">
+                            <Edge Source="s2" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <IntConstant Value="0"/>
@@ -573,22 +575,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-50" X="-30"/>
+                                        <Point X="-30" Y="-50"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s2" Source="s2">
+                            <Edge Source="s2" Target="s2">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="2" X="-16"/>
+                                        <Point X="-16" Y="2"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="150" X="239"/>
+                                    <Point X="239" Y="150"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s2" Source="s1">
+                            <Edge Source="s1" Target="s2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <IntConstant Value="0"/>
@@ -603,22 +605,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-50" X="-30"/>
+                                        <Point X="-30" Y="-50"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s1" Source="s1">
+                            <Edge Source="s1" Target="s1">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="3" X="-19"/>
+                                        <Point X="-19" Y="3"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="149" X="161"/>
+                                    <Point X="161" Y="149"/>
                                 </SplineGeometry>
                             </Edge>
-                            <Edge Target="s1" Source="s0">
+                            <Edge Source="s0" Target="s1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="black">
                                         <IntConstant Value="0"/>
@@ -633,19 +635,19 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-51" X="-32"/>
+                                        <Point X="-32" Y="-51"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s0" Source="s0">
+                            <Edge Source="s0" Target="s0">
                                 <LabelBlock>
                                     <SimpleIdentifier Name="white"/>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="2" X="-21"/>
+                                        <Point X="-21" Y="2"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="152" X="80"/>
+                                    <Point X="80" Y="152"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -662,10 +664,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="320"/>
+                                    <Point X="320" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-9"/>
+                                    <Point X="-9" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s2">
@@ -673,10 +675,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="240"/>
+                                    <Point X="240" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-9"/>
+                                    <Point X="-9" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Name="s1">
@@ -684,10 +686,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="160"/>
+                                    <Point X="160" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="12" X="-8"/>
+                                    <Point X="-8" Y="12"/>
                                 </LabelGeometry>
                             </SimpleNode>
                             <SimpleNode Initial="true" Name="s0">
@@ -695,15 +697,15 @@ The control objective is to synthesise a strategy for the second player (black) 
                                     <SimpleIdentifier Name=":accepting"/>
                                 </EventList>
                                 <PointGeometry>
-                                    <Point Y="112" X="80"/>
+                                    <Point X="80" Y="112"/>
                                 </PointGeometry>
                                 <LabelGeometry>
-                                    <Point Y="11" X="-8"/>
+                                    <Point X="-8" Y="11"/>
                                 </LabelGeometry>
                             </SimpleNode>
                         </NodeList>
                         <EdgeList>
-                            <Edge Target="s2" Source="s1">
+                            <Edge Source="s1" Target="s2">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <IntConstant Value="0"/>
@@ -718,11 +720,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-52" X="-30"/>
+                                        <Point X="-30" Y="-52"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s3" Source="s2">
+                            <Edge Source="s2" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <IntConstant Value="0"/>
@@ -737,11 +739,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-51" X="-28"/>
+                                        <Point X="-28" Y="-51"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s1" Source="s0">
+                            <Edge Source="s0" Target="s1">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="white">
                                         <IntConstant Value="0"/>
@@ -756,21 +758,21 @@ The control objective is to synthesise a strategy for the second player (black) 
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="-52" X="-32"/>
+                                        <Point X="-32" Y="-52"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                             </Edge>
-                            <Edge Target="s3" Source="s3">
+                            <Edge Source="s3" Target="s3">
                                 <LabelBlock>
                                     <IndexedIdentifier Name="winner_white_y">
                                         <SimpleIdentifier Name="y"/>
                                     </IndexedIdentifier>
                                     <LabelGeometry Anchor="NW">
-                                        <Point Y="17" X="-29"/>
+                                        <Point X="-29" Y="17"/>
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point Y="112" X="360"/>
+                                    <Point X="360" Y="112"/>
                                 </SplineGeometry>
                             </Edge>
                         </EdgeList>
@@ -786,10 +788,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="320"/>
+                            <Point X="320" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-10"/>
+                            <Point X="-10" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
@@ -797,10 +799,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="240"/>
+                            <Point X="240" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="9" X="-9"/>
+                            <Point X="-9" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
@@ -808,10 +810,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="9" X="-9"/>
+                            <Point X="-9" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="s0">
@@ -819,26 +821,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="9" X="-9"/>
+                            <Point X="-9" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-20"/>
+                                <Point X="-20" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="148" X="159"/>
+                            <Point X="159" Y="148"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -853,22 +855,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-49" X="-29"/>
+                                <Point X="-29" Y="-49"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="winner_black_d1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-35"/>
+                                <Point X="-35" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="148" X="320"/>
+                            <Point X="320" Y="148"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -883,22 +885,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-50" X="-30"/>
+                                <Point X="-30" Y="-50"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-17"/>
+                                <Point X="-17" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="149" X="240"/>
+                            <Point X="240" Y="149"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -913,19 +915,19 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-50" X="-31"/>
+                                <Point X="-31" Y="-50"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-20"/>
+                                <Point X="-20" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="148" X="81"/>
+                            <Point X="81" Y="148"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -939,10 +941,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="320"/>
+                            <Point X="320" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-8"/>
+                            <Point X="-8" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
@@ -950,10 +952,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="240"/>
+                            <Point X="240" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-7"/>
+                            <Point X="-7" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
@@ -961,10 +963,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-8"/>
+                            <Point X="-8" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Initial="true" Name="s0">
@@ -972,15 +974,15 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="10" X="-8"/>
+                            <Point X="-8" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -995,11 +997,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-49" X="-34"/>
+                                <Point X="-34" Y="-49"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -1014,11 +1016,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-48" X="-31"/>
+                                <Point X="-31" Y="-48"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -1033,19 +1035,19 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="2"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-48" X="-33"/>
+                                <Point X="-33" Y="-48"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="winner_white_d1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-29"/>
+                                <Point X="-29" Y="17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="112" X="360"/>
+                            <Point X="360" Y="112"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -1059,10 +1061,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="9" X="-9"/>
+                            <Point X="-9" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
@@ -1070,10 +1072,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="8" X="-7"/>
+                            <Point X="-7" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
@@ -1081,10 +1083,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="240"/>
+                            <Point X="240" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="10" X="-8"/>
+                            <Point X="-8" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s3">
@@ -1092,26 +1094,26 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="320"/>
+                            <Point X="320" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="24" X="-8"/>
+                            <Point X="-8" Y="24"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s2" Source="s2">
+                    <Edge Source="s2" Target="s2">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="0" X="-18"/>
+                                <Point X="-18" Y="0"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="152" X="241"/>
+                            <Point X="241" Y="152"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -1126,22 +1128,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-46" X="-30"/>
+                                <Point X="-30" Y="-46"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s0" Source="s0">
+                    <Edge Source="s0" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-19"/>
+                                <Point X="-19" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="150" X="80"/>
+                            <Point X="80" Y="150"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -1156,11 +1158,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-47" X="-31"/>
+                                <Point X="-31" Y="-47"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <IndexedIdentifier Name="black">
                                 <IntConstant Value="0"/>
@@ -1175,30 +1177,30 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-47" X="-29"/>
+                                <Point X="-29" Y="-47"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s1" Source="s1">
+                    <Edge Source="s1" Target="s1">
                         <LabelBlock>
                             <SimpleIdentifier Name="white"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="1" X="-17"/>
+                                <Point X="-17" Y="1"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="151" X="161"/>
+                            <Point X="161" Y="151"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="winner_black_d2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-29"/>
+                                <Point X="-29" Y="17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="112" X="360"/>
+                            <Point X="360" Y="112"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -1212,10 +1214,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="80"/>
+                            <Point X="80" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="9" X="-8"/>
+                            <Point X="-8" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
@@ -1223,10 +1225,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="160"/>
+                            <Point X="160" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-8"/>
+                            <Point X="-8" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s2">
@@ -1234,10 +1236,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="240"/>
+                            <Point X="240" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-7"/>
+                            <Point X="-7" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s3">
@@ -1245,15 +1247,15 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="112" X="320"/>
+                            <Point X="320" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="12" X="-8"/>
+                            <Point X="-8" Y="12"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="s1" Source="s0">
+                    <Edge Source="s0" Target="s1">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -1268,22 +1270,22 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-48" X="-32"/>
+                                <Point X="-32" Y="-48"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s3">
+                    <Edge Source="s3" Target="s3">
                         <LabelBlock>
                             <SimpleIdentifier Name="winner_white_d2"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="17" X="-29"/>
+                                <Point X="-29" Y="17"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point Y="112" X="360"/>
+                            <Point X="360" Y="112"/>
                         </SplineGeometry>
                     </Edge>
-                    <Edge Target="s2" Source="s1">
+                    <Edge Source="s1" Target="s2">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -1298,11 +1300,11 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-49" X="-29"/>
+                                <Point X="-29" Y="-49"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Target="s3" Source="s2">
+                    <Edge Source="s2" Target="s3">
                         <LabelBlock>
                             <IndexedIdentifier Name="white">
                                 <IntConstant Value="0"/>
@@ -1317,7 +1319,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                                 <IntConstant Value="0"/>
                             </IndexedIdentifier>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-48" X="-31"/>
+                                <Point X="-31" Y="-48"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -1329,10 +1331,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                 <NodeList>
                     <SimpleNode Initial="true" Name="game">
                         <PointGeometry>
-                            <Point Y="160" X="64"/>
+                            <Point X="64" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="8" X="-19"/>
+                            <Point X="-19" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="over">
@@ -1340,15 +1342,15 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="160" X="192"/>
+                            <Point X="192" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="8" X="-12"/>
+                            <Point X="-12" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
                 <EdgeList>
-                    <Edge Target="over" Source="game">
+                    <Edge Source="game" Target="over">
                         <LabelBlock>
                             <SimpleIdentifier Name="winner_black_d1"/>
                             <SimpleIdentifier Name="winner_black_d2"/>
@@ -1360,7 +1362,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name="winner_white_y"/>
                             <SimpleIdentifier Name="draw"/>
                             <LabelGeometry Anchor="NW">
-                                <Point Y="-136" X="-49"/>
+                                <Point X="-49" Y="-136"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -1375,7 +1377,7 @@ The control objective is to synthesise a strategy for the second player (black) 
                     <SimpleIdentifier Name="winner_white_x"/>
                     <SimpleIdentifier Name="winner_white_y"/>
                     <LabelGeometry Anchor="NW">
-                        <Point Y="26" X="103"/>
+                        <Point X="103" Y="26"/>
                     </LabelGeometry>
                 </LabelBlock>
                 <NodeList>
@@ -1384,10 +1386,10 @@ The control objective is to synthesise a strategy for the second player (black) 
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point Y="48" X="64"/>
+                            <Point X="64" Y="48"/>
                         </PointGeometry>
                         <LabelGeometry>
-                            <Point Y="11" X="-8"/>
+                            <Point X="-8" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>

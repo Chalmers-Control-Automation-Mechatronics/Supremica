@@ -59,6 +59,7 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -240,9 +241,8 @@ abstract class AbstractAssessor
 
   abstract AbstractCounterExampleChecker createCounterExampleChecker();
 
-  abstract TraceProxy createAlternateTrace(String name,
-                                           ProductDESProxy des,
-                                           List<EventProxy> events);
+  abstract CounterExampleProxy createAlternateCounterExample
+    (String name, ProductDESProxy des, List<EventProxy> events);
 
   abstract String getResultText(boolean result);
 
@@ -434,10 +434,10 @@ abstract class AbstractAssessor
         mProgressPrinter.println("in " + index);
         mProgressPrinter.flush();
       }
-      TraceProxy trace;
+      CounterExampleProxy counter;
       try {
         mSecurityManager.setEnabled(true);
-        trace = checker.getCounterExample();
+        counter = checker.getCounterExample();
       } catch (final OutOfMemoryError error) {
         checker = null;
         System.gc();
@@ -454,7 +454,7 @@ abstract class AbstractAssessor
         mProgressPrinter.flush();
         mSecurityManager.setEnabled(false);
       }
-      checkCounterExample(des, trace);
+      checkCounterExample(des, counter);
       mProgressPrinter.println
         ("trace " + mNumCorrectTraces + " " + mNumHalfCorrectTraces);
     }
@@ -464,38 +464,39 @@ abstract class AbstractAssessor
   //#########################################################################
   //# Counterexample Verification
   boolean checkCounterExample(final ProductDESProxy des,
-                              final TraceProxy trace)
+                              final CounterExampleProxy counter)
     throws AnalysisException
   {
     final AbstractCounterExampleChecker checker = createCounterExampleChecker();
-    if (checker.checkCounterExample(des, trace)) {
+    if (checker.checkCounterExample(des, counter)) {
       mNumCorrectTraces++;
-      printGoodCounterExample(trace);
+      printGoodCounterExample(counter);
       return true;
     }
     final String diagnostics = checker.getDiagnostics();
-    if (trace != null && isHalfCorrectCounterExample(des, trace, checker)) {
+    if (counter != null && isHalfCorrectCounterExample(des, counter, checker)) {
       mNumHalfCorrectTraces++;
       return false;
     }
-    printMalformedCounterExample(trace, diagnostics);
+    printMalformedCounterExample(counter, diagnostics);
     return false;
   }
 
   boolean isHalfCorrectCounterExample(final ProductDESProxy des,
-                                      final TraceProxy trace,
+                                      final CounterExampleProxy counter,
                                       final AbstractCounterExampleChecker checker)
     throws AnalysisException
   {
-    final String name = trace.getName() + ":reversed";
+    final String name = counter.getName() + ":reversed";
     final List<EventProxy> reversedList = new LinkedList<>();
+    final TraceProxy trace = counter.getTraces().get(0);
     for (final EventProxy event : trace.getEvents()) {
       reversedList.add(0, event);
     }
-    final TraceProxy reversedTrace =
-      createAlternateTrace(name, des, reversedList);
-    if (checker.checkCounterExample(des, reversedTrace)) {
-      printMalformedCounterExample(trace, "is in reversed order");
+    final CounterExampleProxy reversed =
+      createAlternateCounterExample(name, des, reversedList);
+    if (checker.checkCounterExample(des, reversed)) {
+      printMalformedCounterExample(counter, "is in reversed order");
       return true;
     } else {
       return false;
@@ -503,7 +504,7 @@ abstract class AbstractAssessor
   }
 
   synchronized void printMalformedCounterExample
-    (final TraceProxy trace, final String msg)
+    (final CounterExampleProxy counter, final String msg)
   {
     final String line1, line2;
     final int splitPos = msg.indexOf('\n');
@@ -515,9 +516,9 @@ abstract class AbstractAssessor
       line2 = null;
     }
     mReportPrinter.print("BAD (" + line1 + ")");
-    if (trace != null) {
+    if (counter != null) {
       mReportPrinter.println(":");
-      printCounterExample(trace);
+      printCounterExample(counter);
       if (line2 != null) {
         mReportPrinter.println(line2);
       }
@@ -527,24 +528,25 @@ abstract class AbstractAssessor
   }
 
   synchronized void printGoodCounterExample
-    (final TraceProxy trace)
+    (final CounterExampleProxy counter)
   {
-    printGoodCounterExample(trace, null);
+    printGoodCounterExample(counter, null);
   }
 
   synchronized void printGoodCounterExample
-    (final TraceProxy trace, final String msg)
+    (final CounterExampleProxy counter, final String msg)
   {
     mReportPrinter.print("ok");
     if (msg != null) {
       mReportPrinter.print(msg);
     }
     mReportPrinter.println(':');
-    printCounterExample(trace);
+    printCounterExample(counter);
   }
 
-  private void printCounterExample(final TraceProxy trace)
+  private void printCounterExample(final CounterExampleProxy counter)
   {
+    final TraceProxy trace = counter.getTraces().get(0);
     final List<EventProxy> traceevents = trace.getEvents();
     if (traceevents.isEmpty()) {
       mReportPrinter.println("  <empty>");

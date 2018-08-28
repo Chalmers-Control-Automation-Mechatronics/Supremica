@@ -34,6 +34,8 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,7 +49,9 @@ import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
+import net.sourceforge.waters.gui.command.UpdateCommand;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
@@ -57,13 +61,26 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * <P>An action to add or remove a proposition to or from a node.</P>
+ * <P>A popup menu action to add or remove a proposition to or from multiple
+ * selected nodes in a graph.</P>
+ *
+ * <P>This action is invoked with a selected action argument node in a graph
+ * and the name of a proposition chosen from a submenu. The effects of the
+ * action depend on the state of the node and the selection in the graph at
+ * the time when the action is created, i.e., when the popup menu appears.</P>
+ *
+ * <P>If the action argument node is marked with the proposition, then the
+ * action removes the proposition from the node and all other nodes selected
+ * in the graph. Otherwise, if the action argument node is not marked with the
+ * proposition, then the action marks the node and all other selected nodes
+ * with the proposition.</P>
  *
  * @author Robi Malik
  */
@@ -79,17 +96,30 @@ public class EditNodeMarkingAction
                         final IdentifierSubject ident)
   {
     super(ide);
-    mNode = node;
     mIdentifier = ident;
     final String name = ident.toString();
     putValue(Action.NAME, name);
     final List<AbstractSubject> props =
       node.getPropositions().getEventIdentifierListModifiable();
-    if (props.contains(ident)) {
+    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    mAdding = !eq.contains(props, ident);
+    mNodes = new ArrayList<>();
+    mNodes.add(node);
+    mPanel = getCurrentSelectionOwner();
+    for (final Proxy proxy : mPanel.getCurrentSelection()) {
+      if (proxy instanceof SimpleNodeSubject && proxy != node) {
+        final NodeSubject otherNode = (NodeSubject) proxy;
+        mNodes.add(otherNode);
+      }
+    }
+    final String description =
+      mNodes.size() == 1 ? "this state" : "the selected states";
+    if (mAdding) {
       putValue(Action.SHORT_DESCRIPTION,
-               "Remove marking " + name + " from this node");
+               "Mark " + description + " as " + name);
     } else {
-      putValue(Action.SHORT_DESCRIPTION, "Mark this node as " + name);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Remove marking " + name + " from " + description);
     }
     final ModuleContext context = getModuleContext();
     final Icon icon = context.guessPropositionIcon(ident);
@@ -104,49 +134,76 @@ public class EditNodeMarkingAction
   public void actionPerformed(final ActionEvent event)
   {
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-    final NodeSubject cloned = (NodeSubject) cloner.getClone(mNode);
-    final List<AbstractSubject> props =
-      cloned.getPropositions().getEventIdentifierListModifiable();
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    final Iterator<AbstractSubject> iter = props.iterator();
-    boolean removed = false;
-    while (iter.hasNext()) {
-      final AbstractSubject prop = iter.next();
-      if (eq.equals(mIdentifier, prop)) {
-        iter.remove();
-        removed = true;
-        break;
+    final String name = mAdding ? "State Marking" : "State Unmarking";
+    final int numNodes = mNodes.size();
+    final List<Command> commands = new ArrayList<>(numNodes);
+    final List<NodeSubject> changed = new ArrayList<>(numNodes);
+    for (final NodeSubject node : mNodes) {
+      final List<AbstractSubject> props =
+        node.getPropositions().getEventIdentifierListModifiable();
+      final NodeSubject cloned;
+      if (mAdding) {
+        if (!eq.contains(props, mIdentifier)) {
+          cloned = (NodeSubject) cloner.getClone(node);
+          final List<AbstractSubject> clonedProps =
+            cloned.getPropositions().getEventIdentifierListModifiable();
+          final IdentifierSubject clonedIdent =
+            (IdentifierSubject) cloner.getClone(mIdentifier);
+          clonedProps.add(clonedIdent);
+        } else {
+          continue;
+        }
+      } else { // removing
+        if (eq.contains(props, mIdentifier)) {
+          cloned = (NodeSubject) cloner.getClone(node);
+          final List<AbstractSubject> clonedProps =
+            cloned.getPropositions().getEventIdentifierListModifiable();
+          final Iterator<AbstractSubject> iter = clonedProps.iterator();
+          while (iter.hasNext()) {
+            final AbstractSubject prop = iter.next();
+            if (eq.equals(prop, mIdentifier)) {
+              iter.remove();
+              break;
+            }
+          }
+        } else {
+          continue;
+        }
+      }
+      final Command cmd = new EditCommand(node, cloned, mPanel, name);
+      cmd.setUpdatesSelection(false);
+      commands.add(cmd);
+      changed.add(node);
+    }
+    if (commands.isEmpty()) {
+      return;
+    }
+    final CompoundCommand compound =
+      new UpdateCommand(changed, mPanel, name, true);
+    if (mAdding) {
+      final Command cmd = getCreateDefaultPropositionCommand();
+      if (cmd != null) {
+        compound.addCommand(cmd);
       }
     }
-    if (!removed) {
-      props.add(mIdentifier.clone());
-    }
-    final String name = removed ? "Node Unmarking" : "Node Marking";
-    final SelectionOwner panel = getCurrentSelectionOwner();
-    final Command editcmd = new EditCommand(mNode, cloned, panel, name);
-    final Command cmd;
-    if (removed) {
-      cmd = editcmd;
-    } else {
-      final Command declcmd = getCreateDefaultPropositionCommand();
-      if (declcmd == null) {
-        cmd = editcmd;
-      } else {
-        final CompoundCommand compound =
-          new CompoundCommand(editcmd.getName());
-        compound.addCommand(declcmd);
-        compound.addCommand(editcmd);
-        compound.end();
-        cmd = compound;
-      }
-    }
-    final UndoInterface undoer = getActiveUndoInterface();
-    undoer.executeCommand(cmd);
+    compound.addCommands(commands);
+    final UndoInterface undoer = mPanel.getUndoInterface(this);
+    undoer.executeCommand(compound);
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
+  /**
+   * Creates a command to add a default proposition to the module.
+   * The default propositions ":accepting" and ":forbidden" appear in the
+   * popup menu, but they are only added to the module when used for the
+   * first time. This method checks whether the action is concerned with
+   * a default proposition which is missing from the module, and in that
+   * case creates and returns a command to add it.
+   * @return Command to add proposition to module, or <CODE>null</CODE>.
+   */
   private Command getCreateDefaultPropositionCommand()
   {
     if (!(mIdentifier instanceof SimpleIdentifierSubject)) {
@@ -165,21 +222,36 @@ public class EditNodeMarkingAction
     if (decl != null) {
       return null;
     }
-    final EventDeclSubject newdecl =
+    final EventDeclSubject newDecl =
       new EventDeclSubject(mIdentifier, EventKind.PROPOSITION);
     final SelectionOwner panel = root.getEventsPanel();
-    return new InsertCommand(newdecl, panel, root, false);
+    return new InsertCommand(newDecl, panel, root, false);
   }
 
 
   //#########################################################################
   //# Data Members
-  private final NodeSubject mNode;
+  /**
+   * The identifier (name) of the proposition to be added or removed.
+   */
   private final IdentifierSubject mIdentifier;
+  /**
+   * Whether the proposition is added (<CODE>true</CODE>) or removed
+   * (<CODE>false</CODE>) from nodes.
+   */
+  private final boolean mAdding;
+  /**
+   * The selected nodes that should be modified by the action.
+   */
+  private final Collection<NodeSubject> mNodes;
+  /**
+   * The graph editor panel containing the nodes to be modified.
+   */
+  private final SelectionOwner mPanel;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 7156899409631245265L;
 
 }

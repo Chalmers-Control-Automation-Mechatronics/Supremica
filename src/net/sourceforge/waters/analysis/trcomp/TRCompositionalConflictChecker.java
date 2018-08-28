@@ -86,12 +86,12 @@ import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.TraceChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -185,10 +185,10 @@ public class TRCompositionalConflictChecker
   }
 
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
     final VerificationResult result = getAnalysisResult();
-    return (ConflictTraceProxy) result.getCounterExample();
+    return (ConflictCounterExampleProxy) result.getCounterExample();
   }
 
   /**
@@ -488,9 +488,9 @@ public class TRCompositionalConflictChecker
         combinedResult.setSatisfied(false);
         if (isCounterExampleEnabled()) {
           final List<TRAbstractionStep> preds = getAbstractionSteps(automata);
-          final TraceProxy trace = mono.getCounterExample();
+          final CounterExampleProxy counter = mono.getCounterExample();
           final TRTraceProxy extension =
-            TRAbstractionStepMonolithic.createTraceExtension(trace, preds, this);
+            TRAbstractionStepMonolithic.createTraceExtension(counter, preds, this);
           final TRAbstractionStep step =
             new TRAbstractionStepMonolithic(name, extension);
           addAbstractionStep(step);
@@ -651,7 +651,8 @@ public class TRCompositionalConflictChecker
       result.setSatisfied(true);
       return null;
     } else {
-      final TRSafetyTraceProxy langTrace = checker.getCounterExample();
+      final TRSafetyTraceProxy langTrace =
+        (TRSafetyTraceProxy) checker.getCounterExample();
       final TRConflictTraceProxy confTrace =
         new TRConflictTraceProxy(langTrace);
       for (final TRAutomatonProxy langAut : langAutomata) {

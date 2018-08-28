@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.diagnosis;
 
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
@@ -42,6 +41,10 @@ import gnu.trove.set.hash.THashSet;
 import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
@@ -56,15 +59,20 @@ import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.TraceStepProxy;
+
 
 
 /**
-
-  //#################################################
  * @author Nicholas McGrath
  */
 public class MonolithicDiagnosabilityVerifier
@@ -100,11 +108,6 @@ public class MonolithicDiagnosabilityVerifier
     return true;
   }
 
-  @Override
-  public boolean isCounterExampleEnabled() {
-    return false;
-  }
-
   //#########################################################################
   //# Invocation
   @Override
@@ -115,8 +118,9 @@ public class MonolithicDiagnosabilityVerifier
       final TRSynchronousProductBuilder spBuilder = new TRSynchronousProductBuilder(getModel());
       spBuilder.run();
       final TRSynchronousProductResult spResult = spBuilder.getAnalysisResult();
-      final TRAutomatonProxy sp = spResult.getComputedAutomaton();
-      final EventEncoding spEvents = sp.getEventEncoding();
+      sp = spResult.getComputedAutomaton();
+      spEvents = sp.getEventEncoding();
+      spStateMap = spResult.getStateMap();
       rel = sp.getTransitionRelation();
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
@@ -126,14 +130,14 @@ public class MonolithicDiagnosabilityVerifier
       eventFaultClass = new String[numEvents];
       final THashSet<String> faultClasses = new THashSet<String>();
       final TIntArrayList initStates = new TIntArrayList();
-      String faultLabel;
-      Map<String,String> attrib;
-      EventProxy event;
       for(int i = 0; i < numStates; i++){
         if(rel.isInitial(i)){
           initStates.add(i);
         }
       }
+      String faultLabel;
+      Map<String,String> attrib;
+      EventProxy event;
       for(int i= EventEncoding.NONTAU; i<numEvents; i++){
         event = spEvents.getProperEvent(i);
         if(event!=null) {
@@ -152,6 +156,7 @@ public class MonolithicDiagnosabilityVerifier
       }
       if(!faultClasses.isEmpty()) {
         final TObjectHashIterator<String> faultClassIter = faultClasses.iterator();
+        final StateProcessor processor = new VerifierStateProcessor();
         while(faultClassIter.hasNext()) {
           faultClass = faultClassIter.next();
           compStack.clear();
@@ -160,15 +165,17 @@ public class MonolithicDiagnosabilityVerifier
           stateIndexMap.clear();
           indexStateMap.clear();
           stateCount = 0;
-          final TIntIterator initIter = initStates.iterator();
-          while(initIter.hasNext()) {
-            final int init = initIter.next();
-            final long verifierInit = (((long)init)<<32)|init;
-            stateIndexMap.put(verifierInit,stateCount);
-            indexStateMap.add(verifierInit);
-            contStack.push(stateCount,stateCount);
-            lastVerInit = stateCount;
-            stateCount++;
+          for(int x=0; x<initStates.size(); x++) {
+            for(int y=0; y<=x; y++) {
+              final int initA = initStates.get(y);
+              final int initB = initStates.get(x);
+              final long verifierInit = (((long)initA)<<32)|initB;
+              stateIndexMap.put(verifierInit,stateCount);
+              indexStateMap.add(verifierInit);
+              contStack.push(stateCount,stateCount);
+              lastVerInit = stateCount;
+              stateCount++;
+            }
           }
           while(!contStack.isEmpty()) {
             final int i = contStack.getTopIndex();
@@ -177,11 +184,11 @@ public class MonolithicDiagnosabilityVerifier
               contStack.setTopIndex(compStack.size()|Msb1);
               link.set(i, (compStack.size()|Msb1));
               compStack.add(i);
-              expand(i,VERIFIER);
+              expand(i,processor);
             }else{
               contStack.pop();
               if(!close(i,p)) {
-                final LoopTraceProxy counterExample = computeCounterExample();
+                final CounterExampleProxy counterExample = computeCounterExample();
                 return setFailedResult(counterExample);
               }
             }
@@ -198,197 +205,110 @@ public class MonolithicDiagnosabilityVerifier
     return setSatisfiedResult();
   }
 
-  private void expand(final int index, final int mode) throws OverflowException
+  private void expand(final int index, final StateProcessor process) throws OverflowException
   {
     final long state = indexStateMap.get(index);
     final int a = (int)(state>>>32);
     final int b = (int)state;
-    if(a>=0||b>=0) {
-      iterA.resetState(a&MsbMask);
-      int event;
-      int targetA, targetB;
-      int newA, newB;
-      while(iterA.advance()) {
-        event = iterA.getCurrentEvent();
-        targetA = iterA.getCurrentTargetState();
-        if(!eventObservable[event]) {
-          if(faultClass.equals(eventFaultClass[event])) {
-            newA = targetA|Msb1;
-            newB = b;
-          }else {
+    int event;
+    int targetA, targetB;
+    int newA, newB;
+    iterA.resetState(a&MsbMask);
+    while(iterA.advance()) {
+      event = iterA.getCurrentEvent();
+      targetA = iterA.getCurrentTargetState();
+      if(!eventObservable[event]) {
+        if(faultClass.equals(eventFaultClass[event])) {
+          newA = targetA|Msb1;
+          newB = b;
+        }else {
+          newA = targetA|(a&Msb1);
+          newB = b;
+        }
+        process.newState(newA,newB,index);
+      }else {
+        iterB.reset((b&MsbMask),event);
+        while(iterB.advance()) {
+          targetB = iterB.getCurrentTargetState();
+          if(!faultClass.equals(eventFaultClass[event])) {
             newA = targetA|(a&Msb1);
-            newB = b;
-          }
-          newState(newA,newB,event,index,mode);
-        }else {
-          iterB.reset((b&MsbMask),event);
-          while(iterB.advance()) {
-            targetB = iterB.getCurrentTargetState();
-            if(faultClass.equals(eventFaultClass[event])) {
-              newA = targetA|Msb1;
-              newB = targetB|Msb1;
-            }else {
-              newA = targetA|(a&Msb1);
-              newB = targetB|(b&Msb1);
-            }
-            newState(newA,newB,event,index,mode);
-          }
-        }
-      }
-      iterA.resetState(b&MsbMask);
-      while(iterA.advance()) {
-        event = iterA.getCurrentEvent();
-        targetB = iterA.getCurrentTargetState();
-        if(!eventObservable[event]) {
-          if(faultClass.equals(eventFaultClass[event])) {
-            newA = a;
-            newB = targetB|Msb1;
-          }else {
-            newA = a;
             newB = targetB|(b&Msb1);
+            process.newState(newA,newB,index);
           }
-          newState(newA,newB,event,index,mode);
         }
       }
     }
-  }
-
-  private void expandBack(final int index, final int mode) throws OverflowException
-  {
-    predIndex = -1;
-    final long state = indexStateMap.get(index);
-    final int a = (int)(state>>>32);
-    final int b = (int)state;
-    if(a>=0||b>=0) {
-      iterA.resetState(a&MsbMask);
-      int event;
-      int sourceA, sourceB;
-      int newA, newB;
-      while(iterA.advance()) {
-        event = iterA.getCurrentEvent();
-        sourceA = iterA.getCurrentSourceState();
-        if(!eventObservable[event]) {
-          if(faultClass.equals(eventFaultClass[event])) {
-            if(mode==BACK_COMP_CARRY||mode==BACK_TRACE_CARRY)
-              newA = sourceA|Msb1;
-            else
-              newA = sourceA;
-            newB = b;
-          }else {
-            newA = sourceA|(a&Msb1);
-            newB = b;
-          }
-          newState(newA,newB,event,index,mode);
+    iterA.resetState(b&MsbMask);
+    while(iterA.advance()) {
+      event = iterA.getCurrentEvent();
+      targetB = iterA.getCurrentTargetState();
+      if(!eventObservable[event]) {
+        if(faultClass.equals(eventFaultClass[event])) {
+          newA = a;
+          newB = targetB|Msb1;
         }else {
-          iterB.reset((b&MsbMask),event);
-          while(iterB.advance()) {
-            sourceB = iterB.getCurrentSourceState();
-            if(faultClass.equals(eventFaultClass[event])) {
-              if(mode==BACK_COMP_CARRY||mode==BACK_TRACE_CARRY) {
-                newA = sourceA|Msb1;
-                newB = sourceB|Msb1;
-              }else {
-                newA = sourceA;
-                newB = sourceB;
-              }
-            }else {
-              newA = sourceA|(a&Msb1);
-              newB = sourceB|(b&Msb1);
-            }
-            newState(newA,newB,event,index,mode);
-          }
+          newA = a;
+          newB = targetB|(b&Msb1);
         }
-      }
-      iterA.resetState(b&MsbMask);
-      while(iterA.advance()) {
-        event = iterA.getCurrentEvent();
-        sourceB = iterA.getCurrentSourceState();
-        if(!eventObservable[event]) {
-          if(faultClass.equals(eventFaultClass[event])) {
-            newA = a;
-            if(mode==BACK_COMP_CARRY||mode==BACK_TRACE_CARRY)
-              newB = sourceB|Msb1;
-            else
-              newB = sourceB;
-          }else {
-            newA = a;
-            newB = sourceB|(b&Msb1);
-          }
-          newState(newA,newB,event,index,mode);
-        }
+        process.newState(newA,newB,index);
       }
     }
   }
 
-  private void newState(final int a, final int b, final int event, final int parentIndex, final int mode)
+  private void expandBack(final int a,final int b, final BackStateProcessor process)
     throws OverflowException
   {
-    long next;
-    if(a > b) {
-      next = (((long)b)<<32)|(a&0xffffffffL);
-    }else {
-      next = (((long)a)<<32)|(b&0xffffffffL);
+    process.reset();
+    int event;
+    int sourceA, sourceB;
+    int newA, newB;
+    iterA.resetState(a&MsbMask);
+    while(iterA.advance()) {
+      event = iterA.getCurrentEvent();
+      sourceA = iterA.getCurrentSourceState();
+      if(!eventObservable[event]) {
+        if(faultClass.equals(eventFaultClass[event])) {
+          if((a&Msb1)!=0) {
+            newA = sourceA|Msb1;
+            newB = b;
+            process.newState(newA,newB,event);
+            newA = sourceA;
+            process.newState(newA,newB,event);
+          }
+        }else {
+          newA = sourceA|(a&Msb1);
+          newB = b;
+          process.newState(newA,newB,event);
+        }
+      }else {
+        iterB.reset((b&MsbMask),event);
+        while(iterB.advance()) {
+          sourceB = iterB.getCurrentSourceState();
+          if(!faultClass.equals(eventFaultClass[event])) {
+            newA = sourceA|(a&Msb1);
+            newB = sourceB|(b&Msb1);
+            process.newState(newA,newB,event);
+          }
+        }
+      }
     }
-    int index = stateIndexMap.get(next);
-    if(mode == VERIFIER){
-      if(!stateIndexMap.containsKey(next)) {
-        stateIndexMap.put(next, stateCount);
-        indexStateMap.add(next);
-        index = stateCount;
-        stateCount++;
-        if(stateCount >= getNodeLimit()) {
-          throw new OverflowException(getNodeLimit());
-        }
-        contStack.push(index, parentIndex);
-      }else if((link.get(index)&Msb1)==0){
-        contStack.moveToTop(link.get(index));
-      }else if(link.get(index)!=-1) {
-        int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
-        newParentLink |= (link.get(parentIndex)&Msb1);
-        link.set(parentIndex, newParentLink);
-      }
-    }else if(mode == TRACE){
-      if(stateIndexMap.containsKey(next)) {
-        if(link.get(index)==-1) {
-          bfsQueue.add(index);
-          link.set(index, bfsIndex);
-          bfsIndex++;
-        }
-      }
-    }else if(mode == COMPONENT) {
-      if(scc.contains(index)) {
-        if(link.get(index)==-1) {
-          bfsQueue.add(index);
-          link.set(index, bfsIndex);
-          bfsIndex++;
-        }
-      }
-    }else if(mode >= BACK_TRACE) {
-      if(stateIndexMap.contains(next)) {
-        if(link.get(index)!=-1) {
-          if(predIndex==-1) {
-            predIndex=index;
-            predEvent=event;
-          }else {
-            if(link.get(index)<link.get(predIndex)) {
-              predIndex=index;
-              predEvent=event;
-            }
+    iterA.resetState(b&MsbMask);
+    while(iterA.advance()) {
+      event = iterA.getCurrentEvent();
+      sourceB = iterA.getCurrentSourceState();
+      if(!eventObservable[event]) {
+        if(faultClass.equals(eventFaultClass[event])) {
+          if((b&Msb1)!=0) {
+            newA = a;
+            newB = sourceB|Msb1;
+            process.newState(newA,newB,event);
+            newB = sourceB;
+            process.newState(newA,newB,event);
           }
-        }
-      }
-    }else if(mode >= BACK_COMP) {
-      if(scc.contains(index)) {
-        if(link.get(index)!=-1) {
-          if(predIndex==-1) {
-            predIndex=index;
-            predEvent=event;
-          }else {
-            if(link.get(index)<link.get(predIndex)) {
-              predIndex=index;
-              predEvent=event;
-            }
-          }
+        }else {
+          newA = a;
+          newB = sourceB|(b&Msb1);
+          process.newState(newA,newB,event);
         }
       }
     }
@@ -436,10 +356,10 @@ public class MonolithicDiagnosabilityVerifier
               }
             }
           }
-          iterB.resetState(b&MsbMask);
-          while(iterB.advance()) {
-            if(iterB.getCurrentTargetState()==(b&MsbMask)) {
-              event = iterB.getCurrentEvent();
+          iterA.resetState(b&MsbMask);
+          while(iterA.advance()) {
+            if(iterA.getCurrentTargetState()==(b&MsbMask)) {
+              event = iterA.getCurrentEvent();
               if(!eventObservable[event]) {
                 return false;
               }
@@ -455,64 +375,128 @@ public class MonolithicDiagnosabilityVerifier
     return true;
   }
 
-  private LoopTraceProxy computeCounterExample()
+  private CounterExampleProxy computeCounterExample()
     throws OverflowException
   {
     contStack.clear();
     compStack.clear();
+    bfsQueue.clear();
     System.gc();
+    int sccRoot = 0;
+    final StateProcessor processor = new BFSStateProcessor();
+    final BackStateProcessor backProcessor = new BackStateProcessor();
     for(int i = 0; i < link.size(); i++) {
       link.set(i, -1);
     }
-    bfsQueue.clear();
     for(int i = 0; i <= lastVerInit; i++) {
       bfsQueue.add(i);
       link.set(i, bfsIndex);
       bfsIndex++;
     }
-    int sccRoot = 0;
     while(!bfsQueue.isEmpty()) {
       final int current = bfsQueue.remove();
       if(scc.contains(current)) {
         sccRoot = current;
         break;
       }
-      expand(current,TRACE);
+      expand(current,processor);
     }
     bfsQueue.clear();
-    expand(sccRoot,COMPONENT);
+    expand(sccRoot,processor);
     while(!bfsQueue.isEmpty()) {
       final int current = bfsQueue.remove();
       if(current == sccRoot) {
         break;
       }
-      expand(current,COMPONENT);
+      expand(current,processor);
     }
     bfsQueue.clear();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     iterA = rel.createPredecessorsReadOnlyIterator();
     iterB = rel.createPredecessorsReadOnlyIterator();
-    //final List<TraceStepProxy> traceA = new ArrayList<TraceStepProxy>();
-    //final List<TraceStepProxy> traceB = new ArrayList<TraceStepProxy>();
-    int pred = sccRoot;
-     do {
-      expandBack(pred,BACK_COMP);
-      if(predIndex==-1)
-        expandBack(pred,BACK_COMP_CARRY);
-      System.out.println("TRACE: "+pred+" to "+predIndex+" via "+predEvent);
-      pred = predIndex;
-    }while(pred!=sccRoot);
-    while(pred>lastVerInit) {
-      expandBack(pred,BACK_TRACE);
-      if(predIndex==-1)
-        expandBack(pred,BACK_TRACE_CARRY);
-      System.out.println("TRACE: "+pred+" to "+predIndex+" via "+predEvent);
-      pred = predIndex;
+    final List<TraceStepProxy> traceA = new ArrayList<TraceStepProxy>();
+    final List<TraceStepProxy> traceB = new ArrayList<TraceStepProxy>();
+    final long succState = indexStateMap.get(sccRoot);
+    int succA = ((int)(succState>>>32));
+    int succB = ((int)succState);
+    int event,predA,predB,loopIndexA,loopIndexB;
+    do{
+      expandBack(succA,succB,backProcessor);
+      predA = backProcessor.predA;
+      predB = backProcessor.predB;
+      event = backProcessor.predEvent;
+      if(eventObservable[event]) {
+        addStep((succA&MsbMask),event,traceA);
+        addStep((succB&MsbMask),event,traceB);
+      }else {
+        if(succA!=predA) {
+          addStep((succA&MsbMask),event,traceA);
+        }else if(succB!=predB) {
+          addStep((succB&MsbMask),event,traceB);
+        }
+      }
+      succA = predA;
+      succB = predB;
+    }while(backProcessor.predIndex!=sccRoot);
+    loopIndexA = loopIndexB = 0;
+    backProcessor.inSCC=false;
+    while(backProcessor.predIndex>lastVerInit) {
+      expandBack(succA,succB,backProcessor);
+      predA = backProcessor.predA;
+      predB = backProcessor.predB;
+      event = backProcessor.predEvent;
+      if(eventObservable[event]) {
+        addStep((succA&MsbMask),event,traceA);
+        addStep((succB&MsbMask),event,traceB);
+        loopIndexA++;loopIndexB++;
+      }else {
+        if(succA!=predA) {
+          addStep((succA&MsbMask),event,traceA);
+          loopIndexA++;
+        }else if(succB!=predB) {
+          addStep((succB&MsbMask),event,traceB);
+          loopIndexB++;
+        }
+      }
+      succA = predA;
+      succB = predB;
     }
-    final LoopTraceProxy counterExample = null;
-    // getFactory().createLoopTraceProxy(name, getModel(), trace , loopIndex);
+    addStep((succA&MsbMask),-1,traceA);
+    addStep((succB&MsbMask),-1,traceB);
+
+
+    final String nameA = "faulty";
+    final String nameB = "non-faulty";
+    final String ceName = getModel().getName()+"-undiagnosable";
+    final String ceComment = "The fault-class "+faultClass+" is not diagnosable.";
+    final TraceProxy tpA
+      = getFactory().createTraceProxy(nameA, traceA, loopIndexA);
+    final TraceProxy tpB
+      = getFactory().createTraceProxy(nameB, traceB, loopIndexB);
+    final DualCounterExampleProxy counterExample
+      = getFactory().createDualCounterExampleProxy(ceName, ceComment, null, getModel(), spStateMap.getInputAutomata(), tpA, tpB);
     return counterExample;
   }
+
+  private void addStep(final int stateIndex, final int eventIndex, final List<TraceStepProxy> trace)
+  {
+    final Map<AutomatonProxy,StateProxy> autStateMap = new HashMap<AutomatonProxy,StateProxy>();
+    final Collection<AutomatonProxy> auts = spStateMap.getInputAutomata();
+    final StateProxy state = sp.getState(stateIndex);
+    final EventProxy event;
+    if(eventIndex != -1) {
+      event = spEvents.getProperEvent(eventIndex);
+    }else {
+      event = null;
+    }
+    for(final AutomatonProxy a : auts) {
+      final StateProxy s = spStateMap.getOriginalState(state, a);
+      autStateMap.put(a, s);
+    }
+    final TraceStepProxy step = getFactory().createTraceStepProxy(event, autStateMap);
+    trace.add(0, step);
+  }
+
 
   //#########################################################################
   //# Instance Variables
@@ -529,10 +513,11 @@ public class MonolithicDiagnosabilityVerifier
   private final TIntHashSet scc = new TIntHashSet();
   private final ArrayDeque<Integer> bfsQueue = new ArrayDeque<Integer>();
   private ListBufferTransitionRelation rel;
+  private SynchronousProductStateMap spStateMap;
+  private TRAutomatonProxy sp;
+  EventEncoding spEvents;
   private TransitionIterator iterA;
   private TransitionIterator iterB;
-  private int predIndex;
-  private int predEvent;
   private int lastVerInit;
 
 
@@ -540,13 +525,128 @@ public class MonolithicDiagnosabilityVerifier
   //# Constants
   final int Msb1 = -2147483648;
   final int MsbMask = 2147483647;
-  final int VERIFIER = 0;
-  final int TRACE = 1;
-  final int COMPONENT = 2;
-  final int BACK_COMP = 3;
-  final int BACK_COMP_CARRY = 4;
-  final int BACK_TRACE = 5;
-  final int BACK_TRACE_CARRY = 6;
+
+  abstract interface StateProcessor{
+    public void newState(final int a, final int b,final int parentIndex)
+      throws OverflowException;
+  }
+
+  private class VerifierStateProcessor
+    implements StateProcessor
+  {
+    @Override
+    public void newState(final int a, final int b, final int parentIndex)
+      throws OverflowException
+    {
+      long next;
+      if(a > b) {
+        next = (((long)b)<<32)|(a&0xffffffffL);
+      }else {
+        next = (((long)a)<<32)|(b&0xffffffffL);
+      }
+      if(a>=0||b>=0) {
+        int index = stateIndexMap.get(next);
+        if(!stateIndexMap.containsKey(next)) {
+          stateIndexMap.put(next, stateCount);
+          indexStateMap.add(next);
+          index = stateCount;
+          stateCount++;
+          if(stateCount >= getNodeLimit()) {
+            throw new OverflowException(getNodeLimit());
+          }
+          contStack.push(index, parentIndex);
+        }else if((link.get(index)&Msb1)==0){
+          contStack.moveToTop(link.get(index),parentIndex);
+        }else if(link.get(index)!=-1) {
+          int newParentLink = Math.min((link.get(parentIndex)&MsbMask), (link.get(index)&MsbMask));
+          newParentLink |= (link.get(parentIndex)&Msb1);
+          link.set(parentIndex, newParentLink);
+        }
+      }
+    }
+  }
+
+  private class BFSStateProcessor
+    implements StateProcessor
+  {
+    private boolean inSCC = false;
+    @Override
+    public void newState(final int a, final int b, final int parentIndex)
+      throws OverflowException
+    {
+      long next;
+      if(a > b) {
+        next = (((long)b)<<32)|(a&0xffffffffL);
+      }else {
+        next = (((long)a)<<32)|(b&0xffffffffL);
+      }
+      final int index = stateIndexMap.get(next);
+      if(!inSCC){
+        if(stateIndexMap.containsKey(next)) {
+          if(scc.contains(index)) {
+            bfsQueue.clear();
+            bfsQueue.add(index);
+            inSCC = true;
+          }
+          if(link.get(index)==-1) {
+            bfsQueue.add(index);
+            link.set(index, bfsIndex);
+            bfsIndex++;
+          }
+        }
+      }else{
+        if(scc.contains(index)) {
+          if(link.get(index)==-1) {
+            bfsQueue.add(index);
+            link.set(index, bfsIndex);
+            bfsIndex++;
+          }
+        }
+      }
+    }
+  }
+
+  private class BackStateProcessor
+    implements StateProcessor
+  {
+    private boolean inSCC = true;
+    private int predA = -1;
+    private int predB = -1;
+    private int predEvent = -1;
+    private int predIndex = -1;
+    @Override
+    public void newState(final int a, final int b, final int event)
+      throws OverflowException
+    {
+      long next;
+      if(a > b) {
+        next = (((long)b)<<32)|(a&0xffffffffL);
+      }else {
+        next = (((long)a)<<32)|(b&0xffffffffL);
+      }
+      final int index = stateIndexMap.get(next);
+      final boolean newInMap = stateIndexMap.contains(next);
+      final boolean newInSCC = scc.contains(index);
+      if((!inSCC && newInMap) || (inSCC && newInSCC)) {
+        if(link.get(index)!=-1) {
+          if(predIndex==-1) {
+            predIndex=index;
+            predEvent=event;
+            predA = a;
+            predB = b;
+          }else {
+            if(link.get(index)<link.get(predIndex)) {
+              predIndex=index;
+              predEvent=event;
+              predA = a;
+              predB = b;
+            }
+          }
+        }
+      }
+    }
+    public void reset() { predA = predB = predIndex = -1; }
+  }
 
   //#########################################################################
   //# Inner Class ControllStack
@@ -591,13 +691,14 @@ public class MonolithicDiagnosabilityVerifier
       stack.set(oldTop+2, -1);
     }
 
-    public void moveToTop(final int nextIndex) {
+    public void moveToTop(final int nextIndex, final int parentIndex) {
       if(nextIndex!=stack.size()) {
         final int index = stack.get(nextIndex+2);
         if(index!=-1) {
           final int prevIndex = stack.get(index+2);
           stack.set(nextIndex+2, prevIndex);
           stack.set(index+2, top);
+          stack.set(index+1, parentIndex);
           top = index;
           if(freeNodes.isEmpty()) {
             link.set(stack.get(index), stack.size());
@@ -615,14 +716,10 @@ public class MonolithicDiagnosabilityVerifier
     }
 
     public int getTopIndex() { return (stack.get(top)&MsbMask); }
-
     public int getTopParent() { return stack.get(top+1); }
-
     public void setTopIndex(final int entry1) { stack.set(top, entry1); }
-
-    public boolean isEmpty() { return (top==-1)?true:false; }
-
-    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0)?true:false; }
-
+    public boolean isEmpty() { return (top==-1); }
+    public boolean isTopExpanded() { return ((stack.get(top)&Msb1)!=0); }
   }
+
 }

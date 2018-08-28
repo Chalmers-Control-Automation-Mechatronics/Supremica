@@ -34,7 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -79,9 +79,9 @@ public abstract class AbstractDeadlockChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 

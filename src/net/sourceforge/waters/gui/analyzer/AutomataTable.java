@@ -82,7 +82,7 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-class AutomataTable extends JTable implements SelectionOwner
+public class AutomataTable extends JTable implements SelectionOwner
 {
 
   //#########################################################################
@@ -101,6 +101,7 @@ class AutomataTable extends JTable implements SelectionOwner
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
     setIntercellSpacing(new Dimension(0, 0));
+    setFillsViewportHeight(true);
     final AutomataTableModel tableModel = getModel();
     final TableColumnModel columnModel = getColumnModel();
     final int columnGap = IconAndFontLoader.getTableColumnGap();
@@ -163,8 +164,8 @@ class AutomataTable extends JTable implements SelectionOwner
   public String getToolTipText(final MouseEvent event)
   {
     final AutomatonProxy aut = getAutomaton(event);
-    final ComponentKind kind = aut.getKind();
     if (aut != null) {
+      final ComponentKind kind = aut.getKind();
       String Tooltip = ModuleContext.getComponentKindToolTip(kind);
       Tooltip += (" " + aut.getName());
       return Tooltip;
@@ -583,6 +584,11 @@ class AutomataTable extends JTable implements SelectionOwner
           } else {
             mParent.displaySelectedAutomaton(aut);
           }
+        }
+      } else if (event.getButton() == MouseEvent.BUTTON1) {
+        final AutomatonProxy aut = getAutomaton(event);
+        if (aut == null) {
+          clearSelection();
         }
       }
     }

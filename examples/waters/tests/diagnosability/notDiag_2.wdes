@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="notDiag_2" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>Test for diagnosability check.
+
+Fault event ed is not diagnosable.
+
+Taken from:
+C. Cassandras, S. Lafortune. Introduction to Discrete Event Systems.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="a"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="b"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="c"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="d"/>
+        <ns2:Event Kind="CONTROLLABLE" Observable="false" Name="ed">
+            <AttributeMap>
+                <Attribute Name="FAULT" Value="1"/>
+            </AttributeMap>
+        </ns2:Event>
+        <ns2:Event Kind="CONTROLLABLE" Name="g"/>
+        <ns2:Event Kind="CONTROLLABLE" Observable="false" Name="u"/>
+        <ns2:Event Kind="CONTROLLABLE" Observable="false" Name="v"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="notDiag_2">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="a"/>
+                <ns2:EventRef Name="b"/>
+                <ns2:EventRef Name="c"/>
+                <ns2:EventRef Name="d"/>
+                <ns2:EventRef Name="ed"/>
+                <ns2:EventRef Name="g"/>
+                <ns2:EventRef Name="u"/>
+                <ns2:EventRef Name="v"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+                <ns2:State Name="S1"/>
+                <ns2:State Name="S2"/>
+                <ns2:State Name="S3"/>
+                <ns2:State Name="S4"/>
+                <ns2:State Name="S5"/>
+                <ns2:State Name="S6"/>
+                <ns2:State Name="S7"/>
+                <ns2:State Name="S8"/>
+                <ns2:State Name="S9"/>
+                <ns2:State Name="S10"/>
+                <ns2:State Name="S11"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="S0" Event="a" Target="S3"/>
+                <ns2:Transition Source="S0" Event="ed" Target="S1"/>
+                <ns2:Transition Source="S1" Event="a" Target="S4"/>
+                <ns2:Transition Source="S1" Event="u" Target="S2"/>
+                <ns2:Transition Source="S10" Event="d" Target="S0"/>
+                <ns2:Transition Source="S11" Event="ed" Target="S10"/>
+                <ns2:Transition Source="S2" Event="c" Target="S6"/>
+                <ns2:Transition Source="S3" Event="b" Target="S7"/>
+                <ns2:Transition Source="S3" Event="ed" Target="S4"/>
+                <ns2:Transition Source="S4" Event="b" Target="S8"/>
+                <ns2:Transition Source="S4" Event="u" Target="S5"/>
+                <ns2:Transition Source="S5" Event="g" Target="S6"/>
+                <ns2:Transition Source="S6" Event="b" Target="S9"/>
+                <ns2:Transition Source="S6" Event="v" Target="S4"/>
+                <ns2:Transition Source="S7" Event="d" Target="S0"/>
+                <ns2:Transition Source="S7" Event="ed" Target="S8"/>
+                <ns2:Transition Source="S7" Event="v" Target="S11"/>
+                <ns2:Transition Source="S8" Event="d" Target="S1"/>
+                <ns2:Transition Source="S8" Event="u" Target="S9"/>
+                <ns2:Transition Source="S9" Event="d" Target="S2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

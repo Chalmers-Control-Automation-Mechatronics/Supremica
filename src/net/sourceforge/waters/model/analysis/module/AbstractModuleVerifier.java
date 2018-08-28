@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis.module;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.des.TraceProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
@@ -86,7 +86,7 @@ public abstract class AbstractModuleVerifier
   }
 
   @Override
-  public TraceProxy getCounterExample()
+  public CounterExampleProxy getCounterExample()
   {
     if (isSatisfied()) {
       throw new IllegalStateException("No trace for satisfied property!");
@@ -130,7 +130,7 @@ public abstract class AbstractModuleVerifier
    * @param  counterexample The counterexample obtained by verification.
    * @return <CODE>false</CODE>
    */
-  protected boolean setFailedResult(final TraceProxy counterexample)
+  protected boolean setFailedResult(final CounterExampleProxy counterexample)
   {
     final VerificationResult result = getAnalysisResult();
     result.setCounterExample(counterexample);

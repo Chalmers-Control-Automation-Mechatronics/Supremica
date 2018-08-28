@@ -343,7 +343,6 @@ public class DefaultAnalysisResult
     final PrintWriter stream = new PrintWriter(writer);
     print(stream);
     return writer.toString();
-
   }
 
   @Override

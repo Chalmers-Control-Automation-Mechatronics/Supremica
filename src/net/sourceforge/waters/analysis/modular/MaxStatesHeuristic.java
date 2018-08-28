@@ -41,6 +41,7 @@ import java.util.Set;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 
 
@@ -61,25 +62,27 @@ public class MaxStatesHeuristic
     mType = type;
   }
 
+  @Override
   public Collection<AutomatonProxy> heur(final ProductDESProxy composition,
                                          final Set<AutomatonProxy> nonComposedPlants,
                                          final Set<AutomatonProxy> nonComposedSpecPlants,
                                          final Set<AutomatonProxy> nonComposedSpecs,
-                                         final TraceProxy counterExample)
+                                         final SafetyCounterExampleProxy counterExample)
   {
+    final TraceProxy trace = counterExample.getTrace();
     AutomatonProxy automaton = checkAutomata(false, nonComposedPlants,
                                              new MaxStatesComparator(),
-                                             counterExample);
+                                             trace);
     final boolean runspecs = mType == ModularHeuristicFactory.Preference.PREFER_REAL_PLANT && automaton == null;
     if (automaton == null || mType != ModularHeuristicFactory.Preference.PREFER_REAL_PLANT) {
       automaton = checkAutomata(automaton, false, nonComposedSpecPlants,
                                 new MaxStatesComparator(),
-                                counterExample);
+                                trace);
     }
     if (automaton == null || mType == ModularHeuristicFactory.Preference.NOPREF || runspecs) {
       automaton = checkAutomata(automaton, true, nonComposedSpecs,
                                 new MaxStatesComparator(),
-                                counterExample);
+                                trace);
     }
     return automaton == null ? null : Collections.singleton(automaton);
   }
@@ -87,6 +90,7 @@ public class MaxStatesHeuristic
   private static class MaxStatesComparator
     implements Comparator<AutomatonProxy>
   {
+    @Override
     public int compare(final AutomatonProxy a1, final AutomatonProxy a2)
     {
       return a1.getStates().size() - a2.getStates().size();

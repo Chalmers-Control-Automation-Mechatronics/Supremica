@@ -38,7 +38,6 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
@@ -84,10 +83,10 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
-    // TODO mAutomataPanel is empty white panel.
-    // TODO It can be a local variable, and does not need scroll bars
-    final JScrollPane scrollDisplay = new JScrollPane(mAutomataPanel);
-    scroll.getViewport().setBackground(Color.white);
+    final JPanel mAutomataPanel = new JPanel();
+    final JPanel scrollDisplay = new JPanel();
+    scrollDisplay.setBackground(Color.WHITE);
+    scrollDisplay.add(mAutomataPanel);
     mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
     setRightComponent(scrollDisplay);
@@ -110,6 +109,16 @@ public class WatersAnalyzerPanel extends MainPanel
     return mSimpleExpressionCompiler;
   }
 
+  public AutomataTableModel getAutomataTableModel()
+  {
+    return mAutomataTable.getModel();
+  }
+
+  public AutomataTable getAutomataTable()
+  {
+    return mAutomataTable;
+  }
+
   //#########################################################################
   //# Focus Switching
   @Override
@@ -127,7 +136,7 @@ public class WatersAnalyzerPanel extends MainPanel
     final SourceInfo info = infoMap.get(aut);
     BindingContext bindings = null;
     GraphSubject graph = null;
-    final AutomataTableModel autModel = (AutomataTableModel) mAutomataTable.getModel();
+    final AutomataTableModel autModel = mAutomataTable.getModel();
     if (info != null) {
       final Proxy source = info.getSourceObject();
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
@@ -170,8 +179,8 @@ public class WatersAnalyzerPanel extends MainPanel
   private final ModuleContainer mModuleContainer;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
-  private final JPanel mAutomataPanel = new JPanel();
-  private final JTable mAutomataTable;
+
+  private final AutomataTable mAutomataTable;
 
   //#########################################################################
   //# Class Constants

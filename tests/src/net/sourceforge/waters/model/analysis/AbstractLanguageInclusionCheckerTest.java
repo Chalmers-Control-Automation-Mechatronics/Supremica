@@ -41,10 +41,11 @@ import java.util.List;
 
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -579,15 +580,15 @@ public abstract class AbstractLanguageInclusionCheckerTest
   //# net.sourceforge.waters.analysis.AbstractModelVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws Exception
   {
-    super.checkCounterExample(des, trace);
-    final SafetyTraceProxy counterexample = (SafetyTraceProxy) trace;
-
-    final List<TraceStepProxy> steps = counterexample.getTraceSteps();
+    super.checkCounterExample(des, counter);
+    final SafetyCounterExampleProxy castTest =
+      (SafetyCounterExampleProxy) counter;
+    final TraceProxy trace = castTest.getTrace();
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
     final int len = steps.size();
-
     final Collection<AutomatonProxy> automata = des.getAutomata();
     boolean rejected = false;
     for (final AutomatonProxy aut : automata) {

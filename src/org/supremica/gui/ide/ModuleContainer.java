@@ -69,8 +69,8 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -382,10 +382,10 @@ public class ModuleContainer
     return mComponentToPanelMap.get(comp);
   }
 
-  public void switchToTraceMode(final TraceProxy trace)
+  public void switchToTraceMode(final CounterExampleProxy counterexample)
   {
     mTabPanel.setSelectedComponent(mSimulatorPanel);
-    mSimulatorPanel.switchToTraceMode(trace);
+    mSimulatorPanel.switchToTraceMode(counterexample);
   }
 
   public JFrame getFrame()

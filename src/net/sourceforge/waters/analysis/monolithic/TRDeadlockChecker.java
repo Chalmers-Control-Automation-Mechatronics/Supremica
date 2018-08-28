@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,11 +49,12 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -88,9 +90,9 @@ public class TRDeadlockChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.DeadlockChecker
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -150,7 +152,7 @@ public class TRDeadlockChecker
       final DeadlockCallback deadlockCallback = new DeadlockCallback();
       setStateCallback(deadlockCallback);
       // Create counter example ..
-      final ConflictTraceProxy counterexample =
+      final ConflictCounterExampleProxy counterexample =
         buildCounterExample(deadlockCallback);
       setFailedResult(counterexample);
     }
@@ -195,7 +197,8 @@ public class TRDeadlockChecker
 
   //#########################################################################
   //# Methods to Build the Counterexample
-  private ConflictTraceProxy buildCounterExample(final DeadlockCallback callback)
+  private ConflictCounterExampleProxy buildCounterExample
+    (final DeadlockCallback callback)
     throws OverflowException
   {
 
@@ -245,12 +248,14 @@ public class TRDeadlockChecker
       }
       steps.add(0, step);
     } while (current >= 0);
-    final String tracename = getTraceName();
-    final ConflictTraceProxy trace =
-      factory.createConflictTraceProxy(tracename, null, null, getModel(),
-                                       getModel().getAutomata(),
-                                       steps, ConflictKind.DEADLOCK);
-    return trace;
+    final String traceName = getTraceName();
+    final ProductDESProxy des = getModel();
+    final Collection<AutomatonProxy> automata = des.getAutomata();
+    final TraceProxy trace = factory.createTraceProxy(steps);
+    return
+      factory.createConflictCounterExampleProxy(traceName, null, null, des,
+                                                automata, trace,
+                                                ConflictKind.DEADLOCK);
   }
 
   /**

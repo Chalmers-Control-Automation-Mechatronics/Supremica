@@ -33,17 +33,14 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.Component;
-
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 
 import org.supremica.gui.ide.DocumentContainer;
-import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -97,9 +94,15 @@ public abstract class WatersAction
   //#########################################################################
   //# Accessing the IDE
   /**
-   * Retrieves a references to the active module container.
+   * Retrieves a references to the active module container if a Waters
+   * panel is active. If the Supremica analyser is in use, it is assumed
+   * assumed that no module is available and this method returns
+   * <CODE>false</CODE>. This is used to disable actions from the Waters
+   * framework (such Copy/Paste) in the Supremica panels that do not
+   * support them.
    * @return  The current module container,
-   *          or <CODE>null</CODE> if no module container is currently active.
+   *          or <CODE>null</CODE> if no module container is currently active
+   *          or the Supremica analyser is active.
    */
   @Override
   ModuleContainer getActiveModuleContainer()
@@ -109,8 +112,8 @@ public abstract class WatersAction
     if (container == null || !(container instanceof ModuleContainer)) {
       return null;
     }
-    final Component panel = container.getActivePanel();
-    if (panel instanceof EditorPanel || panel instanceof SimulatorPanel) {
+    final MainPanel panel = container.getActivePanel();
+    if (panel.isWatersPanel()) {
       return (ModuleContainer) container;
     } else {
       return null;

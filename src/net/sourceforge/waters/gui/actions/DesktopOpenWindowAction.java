@@ -57,7 +57,7 @@ public class DesktopOpenWindowAction extends WatersDesktopAction
     if (compName.length() <= 32) {
       name = kindName + " " + compName;
     }
-    if (name.length() <= 32) {
+    if (name != null) {
       putValue(Action.NAME, "Show " + name);
     } else {
       putValue(Action.NAME, "Show " + kindName);

@@ -48,11 +48,12 @@ import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
@@ -76,18 +77,18 @@ public class TraceChecker
   //#########################################################################
   //# Invocation
   /**
-   * Checks whether the given trace is accepted by all its automata.
+   * Checks whether the given counterexample is accepted by all its automata.
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static void checkCounterExample(final TraceProxy trace)
+  public static void checkCounterExample(final CounterExampleProxy counter)
   {
-    checkCounterExample(trace, false);
+    checkCounterExample(counter, false);
   }
 
   /**
-   * Checks whether the given trace is accepted by all its automata.
-   * @param  trace    The trace to be checked.
+   * Checks whether the given counterexample is accepted by all its automata.
+   * @param  counter  The counterexample to be checked.
    * @param  sat      A flag, indicating that the trace is expected to be
    *                  saturated. If true, any missing step entry for
    *                  an automaton of the trace will also lead to an
@@ -95,44 +96,52 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static void checkCounterExample(final TraceProxy trace,
+  public static void checkCounterExample(final CounterExampleProxy counter,
                                          final boolean sat)
   {
-    for (final AutomatonProxy aut : trace.getAutomata()) {
-      checkCounterExample(trace, aut, sat);
+    for (final TraceProxy trace : counter.getTraces()) {
+      for (final AutomatonProxy aut : counter.getAutomata()) {
+        checkTrace(trace, aut, sat);
+      }
     }
   }
 
   /**
-   * Checks whether the given trace is accepted by the given automata.
+   * Checks whether the given counterexample is accepted by the given automata.
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
   public static void checkCounterExample
-    (final TraceProxy trace,
+    (final CounterExampleProxy counter,
      final Collection<AutomatonProxy> automata)
   {
-    checkCounterExample(trace, automata, false);
+    checkCounterExample(counter, automata, false);
   }
 
   /**
-   * Checks whether the given trace is accepted by the given automata.
-   * @param  trace    The trace to be checked.
+   * Checks whether the given counterexample is accepted by the given automata.
+   * @param  counter  The counterexample to be checked.
    * @param  automata Collection of automata for which the trace is to be
    *                  checked.
-   * @param  sat      A flag, indicating that the trace is expected to be
+   * @param  sat      A flag, indicating that the traces are expected to be
    *                  saturated. If true, any missing step entry for the
    *                  any of the given automata will also lead to an exception.
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
   public static void checkCounterExample
-    (final TraceProxy trace,
+    (final CounterExampleProxy counter,
      final Collection<AutomatonProxy> automata,
      final boolean sat)
   {
+    final Collection<AutomatonProxy> declared = counter.getAutomata();
     for (final AutomatonProxy aut : automata) {
-      checkCounterExample(trace, aut, sat);
+      assertTrue(declared.contains(aut),
+                 "Automaton " + aut.getName() +
+                 " is not mentioned in counterexample!");
+      for (final TraceProxy trace : counter.getTraces()) {
+        checkTrace(trace, aut, sat);
+      }
     }
   }
 
@@ -143,10 +152,10 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static StateProxy checkCounterExample(final TraceProxy trace,
-                                               final AutomatonProxy aut)
+  public static StateProxy checkTrace(final TraceProxy trace,
+                                      final AutomatonProxy aut)
   {
-    return checkCounterExample(trace, aut, false);
+    return checkTrace(trace, aut, false);
   }
 
   /**
@@ -161,12 +170,10 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static StateProxy checkCounterExample(final TraceProxy trace,
-                                               final AutomatonProxy aut,
-                                               final boolean sat)
+  public static StateProxy checkTrace(final TraceProxy trace,
+                                      final AutomatonProxy aut,
+                                      final boolean sat)
   {
-    assertTrue(trace.getAutomata().contains(aut),
-               "Automaton " + aut.getName() + " is not mentioned in trace!");
     final List<TraceStepProxy> steps = trace.getTraceSteps();
     return checkCounterExample(steps, aut, null, sat, false);
   }
@@ -231,11 +238,11 @@ public class TraceChecker
   }
 
   /**
-   * Checks whether the given trace forms a correct safety error trace for
-   * its automata. A safety error trace must be accepted by all its automata
+   * Checks whether the given counterexample forms a correct safety error trace
+   * for its automata. A safety error trace must be accepted by all its automata
    * except that at least one of the specifications must reject an
    * uncontrollable event in the final step.
-   * @param  trace      The counterexample to be checked.
+   * @param  counter    The counterexample to be checked.
    * @param  sat        A flag, indicating that the trace is expected to be
    *                    saturated. If true, any missing step entry for the
    *                    any of the given automata will also lead to an exception.
@@ -246,12 +253,13 @@ public class TraceChecker
    *                        trace.
    */
   public static void checkSafetyCounterExample
-    (final SafetyTraceProxy trace,
+    (final SafetyCounterExampleProxy counter,
      final boolean sat,
      final KindTranslator translator)
   {
-    checkSafetyCounterExample(trace.getTraceSteps(), trace.getAutomata(),
-                              sat, translator);
+    final TraceProxy trace = counter.getTrace();
+    checkSafetyTrace(trace.getTraceSteps(), counter.getAutomata(),
+                     sat, translator);
   }
 
   /**
@@ -271,7 +279,7 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static void checkSafetyCounterExample
+  public static void checkSafetyTrace
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata,
      final boolean sat,
@@ -305,7 +313,7 @@ public class TraceChecker
    * state must be blocking, i.e., it must not be possible to reach a terminal
    * state. The latter condition is verified using a language inclusion check,
    * which may be quite time consuming.
-   * @param  trace      The counterexample to be checked.
+   * @param  counter    The counterexample to be checked.
    * @param  premarking Precondition marking for generalised nonblocking or
    *                    <CODE>null</CODE>.
    * @param  marking    Marking proposition to identify terminal states.
@@ -318,15 +326,16 @@ public class TraceChecker
    *                        trace.
    */
   public static void checkConflictCounterExample
-    (final ConflictTraceProxy trace,
+    (final ConflictCounterExampleProxy counter,
      final EventProxy premarking,
      final EventProxy marking,
      final boolean sat,
      final KindTranslator translator)
   throws AnalysisException
   {
-    checkConflictCounterExample(trace.getTraceSteps(), trace.getAutomata(),
-                                premarking, marking, sat, translator);
+    final TraceProxy trace = counter.getTrace();
+    checkConflictTrace(trace.getTraceSteps(), counter.getAutomata(),
+                       premarking, marking, sat, translator);
   }
 
   /**
@@ -351,7 +360,7 @@ public class TraceChecker
    * @throws AssertionError to indicate that something is wrong with the
    *                        trace.
    */
-  public static void checkConflictCounterExample
+  public static void checkConflictTrace
     (final List<TraceStepProxy> steps,
      final Collection<AutomatonProxy> automata,
      final EventProxy premarking,

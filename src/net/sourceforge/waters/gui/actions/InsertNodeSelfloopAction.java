@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphTools;
@@ -67,7 +68,7 @@ public class InsertNodeSelfloopAction
     super(ide);
     mActionArgument = arg;
     putValue(Action.NAME, "Add Selfloop");
-    putValue(Action.SHORT_DESCRIPTION, "Add a selfloop to this node");
+    putValue(Action.SHORT_DESCRIPTION, "Add a selfloop to this state");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
     setEnabled(true);
   }
@@ -75,6 +76,7 @@ public class InsertNodeSelfloopAction
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  @Override
   public void actionPerformed(final ActionEvent event)
   {
     final SimpleNodeSubject node = (SimpleNodeSubject) mActionArgument;
@@ -95,6 +97,6 @@ public class InsertNodeSelfloopAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -7897001171481623369L;
 
 }

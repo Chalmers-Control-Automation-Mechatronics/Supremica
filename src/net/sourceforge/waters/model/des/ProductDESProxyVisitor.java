@@ -44,19 +44,26 @@ public interface ProductDESProxyVisitor
   public Object visitAutomatonProxy(AutomatonProxy proxy)
     throws VisitorException;
 
-  public Object visitConflictTraceProxy(ConflictTraceProxy proxy)
+  public Object visitConflictCounterExampleProxy
+    (ConflictCounterExampleProxy proxy)
+    throws VisitorException;
+
+  public Object visitCounterExampleProxy(CounterExampleProxy proxy)
+    throws VisitorException;
+
+  public Object visitDualCounterExampleProxy(DualCounterExampleProxy proxy)
     throws VisitorException;
 
   public Object visitEventProxy(EventProxy proxy)
     throws VisitorException;
 
-  public Object visitLoopTraceProxy(LoopTraceProxy proxy)
+  public Object visitLoopCounterExampleProxy(LoopCounterExampleProxy proxy)
     throws VisitorException;
 
   public Object visitProductDESProxy(ProductDESProxy proxy)
     throws VisitorException;
 
-  public Object visitSafetyTraceProxy(SafetyTraceProxy proxy)
+  public Object visitSafetyCounterExampleProxy(SafetyCounterExampleProxy proxy)
     throws VisitorException;
 
   public Object visitStateProxy(StateProxy proxy)

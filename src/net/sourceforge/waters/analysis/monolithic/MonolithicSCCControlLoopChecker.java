@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -52,15 +54,13 @@ import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.LoopTraceProxy;
+import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
-
-import gnu.trove.set.hash.THashSet;
 
 /**
  * <P>A monolithic implementation of a control-loop checker.</P>
@@ -146,7 +146,7 @@ public class MonolithicSCCControlLoopChecker
       if (mControlLoopFree) {
         return setSatisfiedResult();
       } else {
-        final LoopTraceProxy counterexample = computeCounterExample();
+        final LoopCounterExampleProxy counterexample = computeCounterExample();
         return setFailedResult(counterexample);
       }
     } catch (final OutOfMemoryError error) {
@@ -194,9 +194,9 @@ public class MonolithicSCCControlLoopChecker
    *         property is satisfied and there is no counterexample.
    */
   @Override
-  public LoopTraceProxy getCounterExample()
+  public LoopCounterExampleProxy getCounterExample()
   {
-    return (LoopTraceProxy) super.getCounterExample();
+    return (LoopCounterExampleProxy) super.getCounterExample();
   }
 
   @Override
@@ -571,7 +571,7 @@ public class MonolithicSCCControlLoopChecker
     return true;
   }
 
-  private LoopTraceProxy computeCounterExample()
+  private LoopCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     final ProductDESProxyFactory factory = getFactory();
@@ -610,9 +610,8 @@ public class MonolithicSCCControlLoopChecker
     loopStates = getTransitionProxies(temp.getFirst(), temp.getSecond());
     final int loopIndex = tracelist.size();
     tracelist = getSecondTraceList(tracelist, loopStates);
-    final LoopTraceProxy trace =
-      factory.createLoopTraceProxy(tracename, des, tracelist, loopIndex);
-    return trace;
+    return factory.createLoopCounterExampleProxy
+      (tracename, des, tracelist, loopIndex);
   }
 
   private Pair<ArrayList<EncodedStateTuple>, ArrayList<Integer>> findLoop() throws AnalysisAbortException

@@ -33,23 +33,20 @@
 
 package net.sourceforge.waters.plain.des;
 
-import java.net.URI;
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
-import net.sourceforge.waters.model.base.DuplicateNameException;
-import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyVisitor;
+import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.plain.base.DocumentElement;
+import net.sourceforge.waters.plain.base.Element;
 
 
 /**
@@ -60,8 +57,8 @@ import net.sourceforge.waters.plain.base.DocumentElement;
  * @author Robi Malik
  */
 
-public abstract class TraceElement
-  extends DocumentElement
+public class TraceElement
+  extends Element
   implements TraceProxy
 {
 
@@ -70,37 +67,20 @@ public abstract class TraceElement
   /**
    * Creates a new trace.
    * @param  name         The name to be given to the new trace.
-   * @param  comment      A comment describing the new trace,
-   *                      or <CODE>null</CODE>.
-   * @param  location     The URI to be associated with the new
-   *                      trace, or <CODE>null</CODE>.
-   * @param  des          The product DES for which this trace is
-   *                      generated.
-   * @param  automata     The set of automata for the new trace,
-   *                      or <CODE>null</CODE> if empty.
    * @param  steps        The list of trace steps constituting the
    *                      new trace. This list may not be empty, because
    *                      the first step must always represent the
    *                      initial state.
+   * @param  loopIndex    Start of loop, or <CODE>-1</CODE>.
    * @throws ItemNotFoundException to indicate that one of the given
    *                      automata, events, or states cannot be found
    *                      in the product DES.
    */
   TraceElement(final String name,
-               final String comment,
-               final URI location,
-               final ProductDESProxy des,
-               final Collection<? extends AutomatonProxy> automata,
-               final List<? extends TraceStepProxy> steps)
+               final List<? extends TraceStepProxy> steps,
+               final int loopIndex)
   {
-    super(name, comment, location);
-    mProductDES = des;
-    if (automata == null) {
-      mAutomata = Collections.emptySet();
-    } else {
-      final Set<AutomatonProxy> modifiable = new AutomataSet(automata);
-      mAutomata = Collections.unmodifiableSet(modifiable);
-    }
+    mName = name;
     final List<TraceStepProxy> stepscopy =
       new ArrayList<TraceStepProxy>(steps);
     if (steps.isEmpty()) {
@@ -108,49 +88,7 @@ public abstract class TraceElement
         ("Step list for trace may not be empty!");
     }
     mTraceSteps = Collections.unmodifiableList(stepscopy);
-  }
-
-  /**
-   * Creates a new trace using default values.  This constructor provides a
-   * simple interface to create a trace for a deterministic product DES. It
-   * creates a trace with a <CODE>null</CODE> file location, with a set of
-   * automata equal to that of the product DES, and without any state
-   * information in the trace steps.
-   * @param  name         The name to be given to the new trace.
-   * @param  des          The product DES for which the new trace is
-   *                      generated.
-   * @param  events       The list of events constituting the new trace,
-   *                      or <CODE>null</CODE> if empty.
-   * @throws ItemNotFoundException to indicate that one of the given
-   *                      events cannot be found in the product DES.
-   */
-  TraceElement(final String name,
-               final ProductDESProxy des,
-               final List<? extends EventProxy> events)
-  {
-    super(name);
-    mProductDES = des;
-    final Set<AutomatonProxy> automata = des.getAutomata();
-    if (des instanceof ProductDESElement) {
-      mAutomata = automata;
-    } else {
-      final Set<AutomatonProxy> modifiable = new AutomataSet(automata);
-      mAutomata = Collections.unmodifiableSet(modifiable);
-    }
-    final TraceStepProxy step0 = new TraceStepElement(null);
-    if (events == null) {
-      mTraceSteps = Collections.singletonList(step0);
-    } else {
-      final int numsteps = events.size() + 1;
-      final List<TraceStepProxy> steps =
-        new ArrayList<TraceStepProxy>(numsteps);
-      steps.add(step0);
-      for (final EventProxy event : events) {
-        final TraceStepProxy step = new TraceStepElement(event);
-        steps.add(step);
-      }
-      mTraceSteps = Collections.unmodifiableList(steps);
-    }
+    mLoopIndex = loopIndex;
   }
 
 
@@ -167,17 +105,28 @@ public abstract class TraceElement
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.des.TraceProxy
+  //# Interface net.sourceforge.waters.model.base.Proxy
   @Override
-  public ProductDESProxy getProductDES()
+  public Class<? extends Proxy> getProxyInterface()
   {
-    return mProductDES;
+    return TraceProxy.class;
   }
 
   @Override
-  public Set<AutomatonProxy> getAutomata()
+  public Object acceptVisitor(final ProxyVisitor visitor)
+    throws VisitorException
   {
-    return mAutomata;
+    final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
+    return desVisitor.visitTraceProxy(this);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.des.TraceProxy
+  @Override
+  public String getName()
+  {
+    return mName;
   }
 
   @Override
@@ -195,32 +144,10 @@ public abstract class TraceElement
     return mTraceEvents;
   }
 
-
-  //#########################################################################
-  //# Local Class AutomataSet
-  private class AutomataSet extends ImmutableOrderedSet<AutomatonProxy> {
-
-    //#######################################################################
-    //# Constructor
-    AutomataSet(final Collection<? extends AutomatonProxy> automata)
-    {
-      super(automata);
-    }
-
-    //#######################################################################
-    //# Overrides from abstract class
-    //# net.sourceforge.waters.model.base.ImmutableOrderedSet
-    @Override
-    protected DuplicateNameException createDuplicateName(final String name)
-    {
-      return new DuplicateNameException
-        ("Trace '" + getName() +
-         "' already contains an automaton named '" + name + "'!");
-    }
-
-    //#########################################################################
-    //# Class Constants
-    private static final long serialVersionUID = 1L;
+  @Override
+  public int getLoopIndex()
+  {
+    return mLoopIndex;
   }
 
 
@@ -264,14 +191,14 @@ public abstract class TraceElement
 
   //#########################################################################
   //# Data Members
-  private final ProductDESProxy mProductDES;
-  private final Set<AutomatonProxy> mAutomata;
+  private final String mName;
   private final List<TraceStepProxy> mTraceSteps;
   private List<EventProxy> mTraceEvents;
+  private final int mLoopIndex;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -8739583251600788986L;
 
 }

@@ -1,0 +1,182 @@
+//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
+//###########################################################################
+//# Copyright (C) 2004-2018 Robi Malik
+//###########################################################################
+//# This file is part of Waters.
+//# Waters is free software: you can redistribute it and/or modify it under
+//# the terms of the GNU General Public License as published by the Free
+//# Software Foundation, either version 2 of the License, or (at your option)
+//# any later version.
+//# Waters is distributed in the hope that it will be useful, but WITHOUT ANY
+//# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+//# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+//# details.
+//# You should have received a copy of the GNU General Public License along
+//# with Waters. If not, see <http://www.gnu.org/licenses/>.
+//#
+//# Linking Waters statically or dynamically with other modules is making a
+//# combined work based on Waters. Thus, the terms and conditions of the GNU
+//# General Public License cover the whole combination.
+//# In addition, as a special exception, the copyright holders of Waters give
+//# you permission to combine Waters with code included in the standard
+//# release of Supremica under the Supremica Software License Agreement (or
+//# modified versions of such code, with unchanged license). You may copy and
+//# distribute such a system following the terms of the GNU GPL for Waters and
+//# the licenses of the other code concerned.
+//# Note that people who make modified versions of Waters are not obligated to
+//# grant this special exception for their modified versions; it is their
+//# choice whether to do so. The GNU General Public License gives permission
+//# to release a modified version without this exception; this exception also
+//# makes it possible to release a modified version which carries forward this
+//# exception.
+//###########################################################################
+
+package net.sourceforge.waters.model.des;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
+import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
+import net.sourceforge.waters.model.printer.ProxyPrinter;
+
+
+public abstract class AbstractCounterExampleTest
+  extends AbstractJAXBTest<CounterExampleProxy>
+{
+
+  //#########################################################################
+  //# Test Cases
+  public void testParse_emptytrace()
+    throws Exception
+  {
+    testParse("handwritten", "emptytrace");
+  }
+
+  public void testMarshal_emptytrace()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("handwritten", "emptytrace");
+  }
+
+  public void testParse_small_factory_2__uncont1()
+    throws Exception
+  {
+    testParse("handwritten", "small_factory_2-uncont1");
+  }
+
+  public void testMarshal_small_factory_2__uncont1()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("handwritten", "small_factory_2-uncont1");
+  }
+
+  public void testParse_loop()
+    throws Exception
+  {
+    testParse("tests", "nasty", "the_vicious_loop1");
+  }
+
+  public void testMarshal_loop()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("tests", "nasty", "the_vicious_loop1");
+  }
+
+  public void testParse_dual()
+    throws Exception
+  {
+    testParse("tests", "diagnosability", "notDiag_2");
+  }
+
+  public void testMarshal_dual()
+    throws WatersMarshalException, WatersUnmarshalException, IOException
+  {
+    testMarshal("tests", "diagnosability", "notDiag_2");
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class JAXBTestCase
+  @Override
+  protected ProxyMarshaller<CounterExampleProxy> getProxyMarshaller()
+  {
+    return mCounterExampleMarshaller;
+  }
+
+  @Override
+  protected ProxyUnmarshaller<CounterExampleProxy> getProxyUnmarshaller()
+  {
+    return mCounterExampleMarshaller;
+  }
+
+  @Override
+  protected DocumentManager getDocumentManager()
+  {
+    return mDocumentManager;
+  }
+
+  @Override
+  protected ProxyPrinter getPrinter()
+  {
+    return mPrinter;
+  }
+
+  @Override
+  protected CounterExampleIntegrityChecker getIntegrityChecker()
+  {
+    return CounterExampleIntegrityChecker.getInstance();
+  }
+
+
+  //#########################################################################
+  //# Overrides for junit.framework.TestCase
+  @Override
+  protected void setUp()
+    throws Exception
+  {
+    super.setUp();
+    final ProductDESProxyFactory factory = getProductDESProxyFactory();
+    mCounterExampleMarshaller = new JAXBCounterExampleMarshaller(factory);
+    mProductDESMarshaller = new JAXBProductDESMarshaller(factory);
+    final PrintWriter writer = new PrintWriter(System.out);
+    mDocumentManager = new DocumentManager();
+    mDocumentManager.registerMarshaller(mCounterExampleMarshaller);
+    mDocumentManager.registerUnmarshaller(mCounterExampleMarshaller);
+    mDocumentManager.registerMarshaller(mProductDESMarshaller);
+    mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
+    mPrinter = new ProductDESProxyPrinter(writer);
+  }
+
+  @Override
+  protected void tearDown()
+    throws Exception
+  {
+    mCounterExampleMarshaller = null;
+    mProductDESMarshaller = null;
+    mDocumentManager = null;
+    mPrinter = null;
+    super.tearDown();
+  }
+
+
+  //#########################################################################
+  //# Provided by Subclasses
+  protected abstract ProductDESProxyFactory getProductDESProxyFactory();
+
+
+  //#########################################################################
+  //# Data Members
+  private JAXBCounterExampleMarshaller mCounterExampleMarshaller;
+  private JAXBProductDESMarshaller mProductDESMarshaller;
+  private DocumentManager mDocumentManager;
+  private ProxyPrinter mPrinter;
+
+}

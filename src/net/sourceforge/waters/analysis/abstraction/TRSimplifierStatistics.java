@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -181,7 +182,7 @@ public class TRSimplifierStatistics
    * Gets the sum of the number of output states for this rule when a reduction
    * occurred.
    */
-  public int getOutputStates()
+  public int getChangedOutputStates()
   {
     return mOutputStates;
   }
@@ -197,10 +198,10 @@ public class TRSimplifierStatistics
 
   /**
    * Gets the sum of the total number of output states for this rule. This
-   * includes output for when a reduction did occur and when a reduction did not
-   * occur.
+   * includes output for when a reduction did occur and when a reduction did
+   * not occur.
    */
-  public int getTotalOutputStates()
+  public int getOutputStates()
   {
     return mOutputStates + mUnchangedStates;
   }
@@ -217,7 +218,7 @@ public class TRSimplifierStatistics
    * Gets the sum of the number of output transitions for this rule when a
    * reduction occurred.
    */
-  public int getOutputTransitions()
+  public int getChangedOutputTransitions()
   {
     return mOutputTransitions;
   }
@@ -232,11 +233,11 @@ public class TRSimplifierStatistics
   }
 
   /**
-   * Gets the sum of the total number of output transitions for this rule. This
-   * includes output for when a reduction did occur and when a reduction did not
-   * occur.
+   * Gets the sum of the total number of output transitions for this rule.
+   * This includes output for when a reduction did occur and when a reduction
+   * did not occur.
    */
-  public int getTotalOutputTransitions()
+  public int getOutputTransitions()
   {
     return mOutputTransitions + mUnchangedTransitions;
   }
@@ -411,6 +412,15 @@ public class TRSimplifierStatistics
 
   //#########################################################################
   //# Printing
+  @Override
+  public String toString()
+  {
+    final StringWriter writer = new StringWriter();
+    final PrintWriter stream = new PrintWriter(writer);
+    print(stream);
+    return writer.toString();
+  }
+
   public void print(final PrintWriter writer)
   {
     @SuppressWarnings("resource")
@@ -433,13 +443,13 @@ public class TRSimplifierStatistics
       writer.print("Number of input states: ");
       writer.println(mInputStates);
       writer.print("Number of output states: ");
-      writer.println(getTotalOutputStates());
+      writer.println(getOutputStates());
     }
     if (mInputTransitions >= 0) {
       writer.print("Number of input transitions: ");
       writer.println(mInputTransitions);
       writer.print("Number of output transitions: ");
-      writer.println(getTotalOutputTransitions());
+      writer.println(getOutputTransitions());
     }
     if (mInputMarkings >= 0) {
       writer.print("Number of input markings: ");

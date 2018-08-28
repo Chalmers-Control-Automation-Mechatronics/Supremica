@@ -82,7 +82,7 @@ import net.sourceforge.waters.model.module.VariableMarkingProxy;
  * <P>Collections of items can get aggregate names, based on a <I>least
  * common supertype</I>. For example, a collection of {@link
  * SimpleNodeProxy} and {@link GroupNodeProxy} objects can be referred to
- * as "Nodes". The type hierarchy used here is introduced specifically for
+ * as "States". The type hierarchy used here is introduced specifically for
  * naming, and does not always correlate with the WATERS interface
  * hierarchy.</P>
  *
@@ -172,7 +172,7 @@ public class ProxyNamer {
                 SimpleComponentProxy.class);
     createEntry(GuardActionBlockProxy.class, "Guard/Action Block",
                 IdentifierProxy.class, EdgeProxy.class);
-    createEntry(GroupNodeProxy.class, "Group Node", NodeProxy.class);
+    createEntry(GroupNodeProxy.class, "Group State", NodeProxy.class);
     createEntry(IdentifierProxy.class, "Label", Proxy.class,
                 EventDeclProxy.class, LabelBlockProxy.class);
     createEntry(IndexedIdentifierProxy.class, "Label", IdentifierProxy.class);
@@ -182,7 +182,7 @@ public class ProxyNamer {
     createEntry(LabelBlockProxy.class, "Labels", "Labels",
                 EdgeProxy.class);
     createEntry(ModuleProxy.class, "Module", Proxy.class);
-    createEntry(NodeProxy.class, "Node", Proxy.class);
+    createEntry(NodeProxy.class, "State", Proxy.class);
     createEntry(ParameterBindingProxy.class, "Binding", Proxy.class,
                 InstanceProxy.class);
     createEntry(PointGeometryProxy.class, "Node Label", Proxy.class,
@@ -192,7 +192,7 @@ public class ProxyNamer {
     createEntry(SimpleComponentProxy.class, "Automaton", "Automata",
                 ComponentProxy.class);
     createEntry(SimpleIdentifierProxy.class, "Label", IdentifierProxy.class);
-    createEntry(SimpleNodeProxy.class, "Node", NodeProxy.class);
+    createEntry(SimpleNodeProxy.class, "State", NodeProxy.class);
     createEntry(VariableComponentProxy.class, "Variable",
                 ComponentProxy.class);
     createEntry(VariableMarkingProxy.class, "Marking", Proxy.class,

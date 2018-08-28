@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 
 /**
  * <P>A model verifier that checks whether a system of composed automata
@@ -41,8 +41,8 @@ import net.sourceforge.waters.model.des.ConflictTraceProxy;
  * A conflict checker analyses the input model and returns with success if
  * the synchronous product of the automata has no deadlock state, i.e.,
  * all states have at least one outgoing transition;
- * otherwise it returns with failure and produces a <I>conflict error
- * trace</I> ({@link ConflictTraceProxy}).</P>
+ * otherwise it returns with failure and produces a <I>conflict
+ * counterexample</I> ({@link ConflictCounterExampleProxy}).</P>
  *
  * @author Robi Malik
  */
@@ -54,7 +54,7 @@ public interface DeadlockChecker extends ModelVerifier
   //# More Specific Access to the Results
   /**
    * Gets a counterexample if the model was found contain a deadlock.
-   * A deadlock error trace is a sequence of events that takes the model to
+   * A deadlock counterexample is a sequence of events that takes the model to
    * a state without any enabled transitions.
    * @return A trace object representing the counterexample.
    *         The returned trace is constructed for the input product DES
@@ -66,6 +66,6 @@ public interface DeadlockChecker extends ModelVerifier
    *         property is satisfied and there is no counterexample.
    */
   @Override
-  public ConflictTraceProxy getCounterExample();
+  public ConflictCounterExampleProxy getCounterExample();
 
 }

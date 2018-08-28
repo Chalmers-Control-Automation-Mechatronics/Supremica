@@ -137,7 +137,7 @@ public abstract class DocumentContainer
 
   public abstract SupremicaAnalyzerPanel getSupremicaAnalyzerPanel();
 
-  public abstract Component getActivePanel();
+  public abstract MainPanel getActivePanel();
 
   public abstract String getTypeString();
 

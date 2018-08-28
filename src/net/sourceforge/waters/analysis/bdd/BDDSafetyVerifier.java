@@ -42,6 +42,7 @@ import java.util.Map;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -54,8 +55,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -221,9 +223,9 @@ public class BDDSafetyVerifier
   }
 
   @Override
-  public SafetyTraceProxy getCounterExample()
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    return (SafetyTraceProxy) super.getCounterExample();
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -329,9 +331,10 @@ public class BDDSafetyVerifier
         final List<AutomatonProxy> automata = getAutomata();
         final TraceStepProxy step = desFactory.createTraceStepProxy(null);
         final List<TraceStepProxy> steps = Collections.singletonList(step);
-        final SafetyTraceProxy counterexample =
-          desFactory.createSafetyTraceProxy
-          (tracename, comment, null, model, automata, steps);
+        final TraceProxy trace = desFactory.createTraceProxy(steps);
+        final SafetyCounterExampleProxy counterexample =
+          desFactory.createSafetyCounterExampleProxy
+          (tracename, comment, null, model, automata, trace);
         result.setCounterExample(counterexample);
       }
       return null;
@@ -373,25 +376,27 @@ public class BDDSafetyVerifier
     return false;
   }
 
-  private SafetyTraceProxy computeCounterExample()
+  private SafetyCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     for (final PartitionBDD part : mConditionBDDs) {
       part.dispose();
     }
     final int level = getDepth();
-    final List<TraceStepProxy> trace = computeTrace(mBadStateBDD, level);
-    final ProductDESProxyFactory desfactory = getFactory();
-    final TraceStepProxy step = desfactory.createTraceStepProxy(mBadEvent);
-    trace.add(step);
+    final List<TraceStepProxy> steps = computeTrace(mBadStateBDD, level);
+    final ProductDESProxyFactory desFactory = getFactory();
+    final TraceStepProxy step = desFactory.createTraceStepProxy(mBadEvent);
+    steps.add(step);
     final ProductDESProxy des = getModel();
-    final String name = getTraceName();
+    final String traceName = getTraceName();
     // TODO String comment = getTraceComment(mBadEvent, null, null);
     final List<AutomatonProxy> automata = getAutomata();
-    final SafetyTraceProxy counterex = desfactory.createSafetyTraceProxy
-      (name, null, null, des, automata, trace);
-    setFailedResult(counterex);
-    return counterex;
+    final TraceProxy trace = desFactory.createTraceProxy(steps);
+    final SafetyCounterExampleProxy counterexample =
+      desFactory.createSafetyCounterExampleProxy
+      (traceName, null, null, des, automata, trace);
+    setFailedResult(counterexample);
+    return counterexample;
   }
 
   /**

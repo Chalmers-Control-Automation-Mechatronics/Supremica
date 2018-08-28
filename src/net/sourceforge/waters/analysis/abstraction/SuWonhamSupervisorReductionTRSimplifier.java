@@ -101,6 +101,12 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
+  public boolean isPartitioning()
+  {
+    return true;
+  }
+
+  @Override
   public int getPreferredInputConfiguration()
   {
     return ListBufferTransitionRelation.CONFIG_ALL;
@@ -142,7 +148,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
   public boolean runSimplifier() throws AnalysisException
   {
     final TRPartition partition;
-    if (findBadStates()) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int dumpIndex = rel.getDumpStateIndex();
+    if (rel.isReachable(dumpIndex)) {
       final TIntArrayList enabDisabEvents = new TIntArrayList();
       final TIntArrayList disabEvents = new TIntArrayList();
       final int supervisedEvent = getSupervisedEvent();
@@ -160,7 +168,6 @@ public class SuWonhamSupervisorReductionTRSimplifier
         final TIntArrayList singletonList = new TIntArrayList(1);
         singletonList.add(supervisedEvent);
         if (mExperimentalMode) {
-          final ListBufferTransitionRelation rel = getTransitionRelation();
           final int numStates = rel.getNumberOfStates();
           mStateToClass = new int[numStates];
           mClasses = new IntListBuffer();
@@ -206,8 +213,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       }
     }
     // Remove ordinary full-selfloop events
-    final int marking = getDefaultMarkingID();
-    rel.removeProperSelfLoopEvents(marking);
+    rel.removeProperSelfLoopEvents();
     rel.removeRedundantPropositions();
   }
 
@@ -232,17 +238,15 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    final int marking = getDefaultMarkingID();
+    final int dumpIndex = rel.getDumpStateIndex();
     mMerged = false;
 
     for (int i = 0; i < numStates - 1; i++) {
-      if (!rel.isReachable(i) || rel.isDeadlockState(i, marking)
-          || i > getMinimum(i)) {
+      if (!rel.isReachable(i) || i == dumpIndex || i > getMinimum(i)) {
         continue;
       }
       for (int j = i + 1; j < numStates; j++) {
-        if (!rel.isReachable(j) || rel.isDeadlockState(j, marking)
-            || j > getMinimum(j)) {
+        if (!rel.isReachable(j) || j == dumpIndex || j > getMinimum(j)) {
           continue;
         }
         checkAbort();
@@ -299,7 +303,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     final int[] listY = mShadowClasses.toArray(ly);
 
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int marking = getDefaultMarkingID();
+    final int dumpIndex = rel.getDumpStateIndex();
     final TIntHashSet xSet = new TIntHashSet();
     final TIntHashSet ySet = new TIntHashSet();
     final TIntArrayList xList = new TIntArrayList();
@@ -317,7 +321,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
           if (xSet.add(xx)) {
             xList.add(xx);
           }
-          if (rel.isDeadlockState(succ, marking)) {
+          if (succ == dumpIndex) {
             disabled = true;
           } else {
             enabled = true;
@@ -327,7 +331,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       if (disabled) {
         for (final int yy : listY) {
           final int succ = getSuccessorState(yy, e);
-          if (succ >= 0 && !rel.isDeadlockState(succ, marking)) {
+          if (succ >= 0 && succ != dumpIndex) {
             return false;
           }
         }
@@ -335,7 +339,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       if (enabled) {
         for (final int yy : listY) {
           final int succ = getSuccessorState(yy, e);
-          if (succ >= 0 && rel.isDeadlockState(succ, marking)) {
+          if (succ == dumpIndex) {
             return false;
           }
         }
@@ -355,7 +359,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       yList.clear();
       for (final int xx : listX) {
         final int xSucc = getSuccessorState(xx, e);
-        if (xSucc >= 0 && !rel.isDeadlockState(xSucc, marking)) {
+        if (xSucc >= 0 && xSucc != dumpIndex) {
           final int xmin = getMinimum(xSucc);
           if (xSet.add(xmin)) {
             xList.add(xmin);
@@ -367,7 +371,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       }
       for (final int yy : listY) {
         final int ySucc = getSuccessorState(yy, e);
-        if (ySucc >= 0 && !rel.isDeadlockState(ySucc, marking)) {
+        if (ySucc >= 0 && ySucc != dumpIndex) {
           final int ymin = getMinimum(ySucc);
           if (ySet.add(ymin)) {
             yList.add(ymin);
@@ -391,7 +395,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    final int marking = getDefaultMarkingID();
+    final int dumpIndex = rel.getDumpStateIndex();
     mMerged = false;
 
     // find disabled states
@@ -403,7 +407,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     while (iter.advance()) {
       final int pre = iter.getCurrentSourceState();
       final int succ = iter.getCurrentTargetState();
-      if (rel.isDeadlockState(succ, marking)) {
+      if (succ == dumpIndex) {
         mQueue.add(pre);
         mSearchingBitSet.set(pre);
       }
@@ -417,7 +421,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       rel.createPredecessorsReadOnlyIterator();
     while (!mQueue.isEmpty()) {
       final int state = mQueue.remove().intValue();
-      if (rel.isDeadlockState(state, marking)) {
+      if (state == dumpIndex) {
         continue;
       }
       final int list = mClasses.createList();
@@ -452,8 +456,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
       final int lo = Math.max(0, sum - numStates + 1);
       for (int b = hi; b >= lo; b--) {
         final int a = sum - b;
-        if (rel.isReachable(a) && !rel.isDeadlockState(a, marking)
-            && rel.isReachable(b) && !rel.isDeadlockState(b, marking)) {
+        if (rel.isReachable(a) && a != dumpIndex &&
+            rel.isReachable(b) && b != dumpIndex) {
           if (mStateMap[a] > getMinimumExperimental(mStateMap[a])
               || mStateMap[b] > getMinimumExperimental(mStateMap[b])) {
             continue;
@@ -545,7 +549,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       final int[] listY = mShadowClasses.toArray(ly);
 
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int marking = getDefaultMarkingID();
+      final int dumpIndex = rel.getDumpStateIndex();
       final TIntHashSet xSet = new TIntHashSet();
       final TIntHashSet ySet = new TIntHashSet();
       final TIntArrayList xList = new TIntArrayList();
@@ -563,7 +567,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
             if (xSet.add(xx)) {
               xList.add(xx);
             }
-            if (rel.isDeadlockState(succ, marking)) {
+            if (succ == dumpIndex) {
               disabled = true;
             } else {
               enabled = true;
@@ -573,7 +577,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         if (disabled) {
           for (final int yy : listY) {
             final int succ = getSuccessorState(yy, e);
-            if (succ >= 0 && !rel.isDeadlockState(succ, marking)) {
+            if (succ >= 0 && succ != dumpIndex) {
               return false;
             }
           }
@@ -581,7 +585,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         if (enabled) {
           for (final int yy : listY) {
             final int succ = getSuccessorState(yy, e);
-            if (succ >= 0 && rel.isDeadlockState(succ, marking)) {
+            if (succ == dumpIndex) {
               return false;
             }
           }
@@ -600,7 +604,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         yList.clear();
         for (final int xx : listX) {
           final int xSucc = getSuccessorState(xx, e);
-          if (xSucc >= 0 && !rel.isDeadlockState(xSucc, marking)) {
+          if (xSucc >= 0 && xSucc != dumpIndex) {
             final int xmin = getMinimumExperimental(xSucc);
             if (xSet.add(xmin)) {
               xList.add(xmin);
@@ -612,7 +616,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         }
         for (final int yy : listY) {
           final int ySucc = getSuccessorState(yy, e);
-          if (ySucc >= 0 && !rel.isDeadlockState(ySucc, marking)) {
+          if (ySucc >= 0 && ySucc != dumpIndex) {
             final int ymin = getMinimumExperimental(ySucc);
             if (ySet.add(ymin)) {
               yList.add(ymin);
@@ -633,12 +637,12 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    final int marking = getDefaultMarkingID();
+    final int dumpIndex = rel.getDumpStateIndex();
     mStateToClass = new int[numStates];
     mClasses = new IntListBuffer();
     for (int s = 0; s < numStates; s++) {
       checkAbort();
-      if (rel.isDeadlockState(s, marking)) {
+      if (s == dumpIndex) {
         mStateToClass[s] = IntListBuffer.NULL;
       } else {
         final int list = mClasses.createList();
@@ -656,7 +660,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     disabEvents.clear();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     mNumProperEvents = rel.getNumberOfProperEvents();
-    final int marking = getDefaultMarkingID();
+    final int dumpIndex = rel.getDumpStateIndex();
     final TIntArrayList[] disabledEventsToStates =
       new TIntArrayList[mNumProperEvents];
     final TIntArrayList[] enabledEventsToStates =
@@ -670,7 +674,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       final int currentEvent = iter.getCurrentEvent();
       final int succ = iter.getCurrentTargetState();
       final int pre = iter.getCurrentSourceState();
-      if (rel.isDeadlockState(succ, marking)) {
+      if (succ == dumpIndex) {
         if (disabledEventsToStates[currentEvent] == null) {
           disabledEventsToStates[currentEvent] = new TIntArrayList();
         }
@@ -712,56 +716,31 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Auxiliary Methods
-  private boolean findBadStates()
-  {
-    mBadStateIndex = -1;
-    mNumBadStates = 0;
-    final int marking = getDefaultMarkingID();
-    if (marking >= 0) {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numStates = rel.getNumberOfStates();
-      for (int s = 0; s < numStates; s++) {
-        if (rel.isReachable(s) && rel.isDeadlockState(s, marking)) {
-          if (mBadStateIndex < 0) {
-            mBadStateIndex = s;
-          }
-          mNumBadStates++;
-        }
-      }
-    }
-    return mNumBadStates > 0;
-  }
-
   private TRPartition createResultPartition() throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
-    final int marking = getDefaultMarkingID();
-    final int[] badClass = mNumBadStates > 0 ? new int[mNumBadStates] : null;
-    int nextBad = 0;
+    final int dumpIndex = rel.getDumpStateIndex();
     final List<int[]> classes = new ArrayList<>();
-    boolean trChanged = mNumBadStates > 1;
+    boolean trChanged = false;
     for (int s = 0; s < numStates; s++) {
       checkAbort();
-      if (rel.isReachable(s)) {
-        if (rel.isDeadlockState(s, marking)) {
-          badClass[nextBad++] = s;
+      if (rel.isReachable(s) && s != dumpIndex) {
+        int listID = mStateToClass[s];
+        if (mInverseMap != null) { // experimental mode
+          listID = mStateToClass[mInverseMap[s]];
+        }
+        if (mClasses.getFirst(listID) == s) {
+          final int[] states = mClasses.toArray(listID);
+          classes.add(states);
         } else {
-          int listID = mStateToClass[s];
-          if (mInverseMap != null) { // experimental mode
-            listID = mStateToClass[mInverseMap[s]];
-          }
-          if (mClasses.getFirst(listID) == s) {
-            final int[] states = mClasses.toArray(listID);
-            classes.add(states);
-          } else {
-            trChanged = true;
-          }
+          trChanged = true;
         }
       }
     }
     if (trChanged) {
-      if (badClass != null) {
+      if (rel.isReachable(dumpIndex)) {
+        final int[] badClass = new int[] {dumpIndex};
         classes.add(badClass);
       }
       return new TRPartition(classes, numStates);
@@ -951,13 +930,13 @@ public class SuWonhamSupervisorReductionTRSimplifier
         rel.setMarked(0, p, true);
       }
     }
-    final int marking = getDefaultMarkingID();
+    final int oldDumpIndex = oldRel.getDumpStateIndex();
     final int oldNumStates = oldRel.getNumberOfStates();
     final int[] stateToClass = new int[oldNumStates];
     for (int s = 0; s < oldNumStates; s++) {
       if (!oldRel.isReachable(s)) {
         stateToClass[s] = -1;
-      } else if (!oldRel.isDeadlockState(s, marking)) {
+      } else if (s != oldDumpIndex) {
         stateToClass[s] = 0;
       } else {
         stateToClass[s] = 1;
@@ -1013,14 +992,13 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mExperimentalMode = false;
+
   private int mNumProperEvents;
-  private int mBadStateIndex;
-  private int mNumBadStates;
   private int[] mStateToClass;
   private IntListBuffer mClasses;
   private int[] mShadowStateToClass;
   private IntListBuffer mShadowClasses;
-  private boolean mExperimentalMode = false;
   private boolean mMerged;
   private int[] mStateMap;
   private int[] mInverseMap;

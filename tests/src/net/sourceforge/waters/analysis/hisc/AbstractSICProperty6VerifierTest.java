@@ -41,7 +41,8 @@ import net.sourceforge.waters.model.analysis.AbstractConflictCheckerTest;
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.StateProxy;
@@ -302,28 +303,28 @@ public abstract class AbstractSICProperty6VerifierTest extends
   /**
    * Checks the correctness of a conflict counterexample which is converted back
    * to the original model by {@link SICPropertyBuilder}. A SIC Property VI
-   * counterexample has to be a {@link ConflictTraceProxy}, and it has to be
-   * accepted by all automata in the model, and it has to take them to a state
-   * from which no marked state can be reached using only local (non-interface)
-   * events. In addition, the trace must put all interfaces in a state marked by
-   * the default marking proposition.
+   * counterexample has to be a {@link ConflictCounterExampleProxy}, and it has
+   * to be accepted by all automata in the model, and it has to take them to a
+   * state from which no marked state can be reached using only local
+   * (non-interface) events. In addition, the trace must put all interfaces
+   * in a state marked by the default marking proposition.
    *
-   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,TraceProxy)
+   * @see AbstractModelVerifierTest#checkCounterExample(ProductDESProxy,CounterExampleProxy)
    */
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace) throws Exception
+                                     final CounterExampleProxy counter)
+    throws Exception
   {
-    final ConflictTraceProxy conflictTrace = (ConflictTraceProxy) trace;
-    super.checkCounterExample(des, conflictTrace);
-
+    super.checkCounterExample(des, counter);
+    final TraceProxy trace = counter.getTraces().get(0);
     final EventProxy marking =
       findEvent(des, EventDeclProxy.DEFAULT_MARKING_NAME);
     final Collection<AutomatonProxy> automata = des.getAutomata();
     for (final AutomatonProxy aut : automata) {
       final Map<String,String> attribs = aut.getAttributes();
       if (HISCAttributeFactory.isInterface(attribs)) {
-        final StateProxy state = checkCounterExample(aut, conflictTrace);
+        final StateProxy state = checkTrace(aut, trace);
         final Collection<EventProxy> props = state.getPropositions();
         assertTrue("Counterexample takes interface automaton " +
                    aut.getName() + " to state " + state.getName() +

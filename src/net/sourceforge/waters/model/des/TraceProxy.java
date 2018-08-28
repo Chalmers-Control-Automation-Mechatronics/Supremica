@@ -34,35 +34,43 @@
 package net.sourceforge.waters.model.des;
 
 import java.util.List;
-import java.util.Set;
 
-import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
 
 
 /**
- * <P>A counterexample trace for some automata of a product DES.</P>
+ * <P>A execution sequence for some automata of a product DES.</P>
  *
- * @see ProductDESProxy
+ * <P>A trace consists of an alternating sequence of states and events
+ * that can be executed by several synchronised automata. The state
+ * information is optional for deterministic automata as it can be
+ * computed from the automata in this case.</P>
+ *
+ * <P>For nondeterministic automata, state information is required, and it
+ * is stored in a sequence of trace steps ({@link TraceStepProxy}) as follows.
+ * The first step represents the initial states of the automata, and each
+ * following step contains an event and the state reached by the automata
+ * after executing this event.</P>
+ *
+ * <P>Traces can be computed as part of counterexamples
+ * ({@link CounterExampleProxy}), or be obtained by simulation.</P>
  *
  * @author Robi Malik
  */
 
 public interface TraceProxy
-  extends DocumentProxy
+  extends Proxy
 {
 
   //#########################################################################
   //# Getters
   /**
-   * Gets the product DES for which this trace has been generated.
+   * Gets the name of this trace.
+   * The name can identify or describe a trace more precisely in
+   * counterexamples that have more than one trace. It may be an empty
+   * string in all other cases.
    */
-  public ProductDESProxy getProductDES();
-
-  /**
-   * Gets the list of automata for this trace.
-   * @return  An unmodifiable set of objects of type {@link AutomatonProxy}.
-   */
-  public Set<AutomatonProxy> getAutomata();
+  public String getName();
 
   /**
    * Gets the sequence of events constituting this trace.
@@ -80,5 +88,16 @@ public interface TraceProxy
    * @return  An unmodifiable list of objects of type {@link TraceStepProxy}.
    */
   public List<TraceStepProxy> getTraceSteps();
+
+  /**
+   * Gets the start position of the cycle in a cyclic trace.
+   * The loop index identifies the number of the step (starting at&nbsp;0)
+   * in the trace where the loop starts. If the trace has steps 0,...,<I>n</I>,
+   * and the loop index is at position&nbsp;<I>i</I>, then it represents the
+   * loop 0,...,<I>n</I>,<I>i</I>,...,<I>n</I>,...
+   * @return The index of the trace step starting a cycle,
+   *         or <CODE>-1</CODE< if it is not a cyclic trace.
+   */
+  public int getLoopIndex();
 
 }

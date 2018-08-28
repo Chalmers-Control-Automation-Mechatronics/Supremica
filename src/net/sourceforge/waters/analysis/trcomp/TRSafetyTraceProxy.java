@@ -43,8 +43,9 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
@@ -54,7 +55,7 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 
 public class TRSafetyTraceProxy
   extends TRTraceProxy
-  implements SafetyTraceProxy
+  implements SafetyCounterExampleProxy
 {
 
   //#########################################################################
@@ -88,16 +89,15 @@ public class TRSafetyTraceProxy
   @Override
   public Class<? extends Proxy> getProxyInterface()
   {
-    return SafetyTraceProxy.class;
+    return SafetyCounterExampleProxy.class;
   }
 
   @Override
   public Object acceptVisitor(final ProxyVisitor visitor)
     throws VisitorException
   {
-    final ProductDESProxyVisitor desVisitor =
-      (ProductDESProxyVisitor) visitor;
-    return desVisitor.visitSafetyTraceProxy(this);
+    final ProductDESProxyVisitor desVisitor = (ProductDESProxyVisitor) visitor;
+    return desVisitor.visitSafetyCounterExampleProxy(this);
   }
 
 
@@ -116,7 +116,8 @@ public class TRSafetyTraceProxy
   {
     final ProductDESProxy des = getProductDES();
     final int lastStep = getNumberOfSteps() - 1;
-    final TraceStepProxy step = getTraceSteps().get(lastStep);
+    final TraceProxy trace = getTrace();
+    final TraceStepProxy step = trace.getTraceSteps().get(lastStep);
     final EventProxy event = step.getEvent();
     AutomatonProxy foundAut = null;
     StateProxy foundState = null;

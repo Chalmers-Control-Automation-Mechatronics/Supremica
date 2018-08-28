@@ -42,20 +42,21 @@ import java.util.Map;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A tool to check whether a controllability error trace is a correct
+ * <P>A tool to check whether a controllability counterexample is a correct
  * counterexample to show that a given product DES is not controllable.</P>
  *
  * <P>To use this class, an instance must be obtained from the constructor.
- * Afterwards, {@link #checkCounterExample(ProductDESProxy,TraceProxy)
+ * Afterwards, {@link #checkCounterExample(ProductDESProxy,CounterExampleProxy)
  * checkCounterExample()} can be called repeatedly. If a check fails,
  * {@link #getDiagnostics()} can be called to retrieve an explanation.</P>
  *
@@ -63,7 +64,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <CODE>ControllabilityCounterExampleChecker checker =
  *   new {@link #ControllabilityCounterExampleChecker()
  *   ControllabilityCounterExampleChecker}();</CODE><BR>
- * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,TraceProxy)
+ * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,CounterExampleProxy)
  *   checkCounterExample}(</CODE><I>des</I><CODE>, </CODE><I>trace</I><CODE>))
  *   {</CODE><BR>
  * <CODE>&nbsp;&nbsp;System.out.println(&quot;OK&quot;);</CODE><BR>
@@ -131,7 +132,7 @@ public class ControllabilityCounterExampleChecker
   /**
    * Checks a controllability error trace.
    * @param  des       The product DES that was verified.
-   * @param  trace     The counterexample to be checked.
+   * @param  counter   The counterexample to be checked.
    * @return <CODE>true</CODE> if the given counterexample demonstrates that
    *         the given product DES is not controllable, <CODE>false</CODE>
    *         otherwise.
@@ -140,49 +141,51 @@ public class ControllabilityCounterExampleChecker
    */
   @Override
   public boolean checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws AnalysisException
   {
-    if (!super.checkCounterExample(des, trace)) {
+    if (!super.checkCounterExample(des, counter)) {
       return false;
-    } else if (!(trace instanceof SafetyTraceProxy)) {
-      reportMalformedCounterExample(trace, "is not a SafetyTraceProxy");
+    } else if (!(counter instanceof SafetyCounterExampleProxy)) {
+      reportMalformedCounterExample(counter, "is not a SafetyCounterExampleProxy");
       return false;
     }
     if (mEndStateEnabled) {
       final int numAutomata = des.getAutomata().size();
       mEndStateMap = new HashMap<>(numAutomata);
     }
-    final SafetyTraceProxy safetyTrace = (SafetyTraceProxy) trace;
-    final List<EventProxy> traceEvents = safetyTrace.getEvents();
+    final SafetyCounterExampleProxy safetyCounter =
+      (SafetyCounterExampleProxy) counter;
+    final TraceProxy trace = safetyCounter.getTrace();
+    final List<EventProxy> traceEvents = trace.getEvents();
     if (traceEvents.isEmpty()) {
-      reportMalformedCounterExample(trace, "does not have any event");
-      findEndState(des, trace);
+      reportMalformedCounterExample(counter, "does not have any event");
+      findEndState(des, safetyCounter);
       return false;
     }
     final int numSteps = traceEvents.size();
     final EventProxy lastEvent = traceEvents.get(numSteps - 1);
     if (lastEvent.getKind() == EventKind.CONTROLLABLE) {
-      reportMalformedCounterExample(trace, "ends with controllable event",
+      reportMalformedCounterExample(counter, "ends with controllable event",
                                     lastEvent, -1);
-      findEndState(des, trace);
+      findEndState(des, safetyCounter);
       return false;
     }
     boolean gotRejectingSpec = false;
     for (final AutomatonProxy aut : des.getAutomata()) {
-      final int steps = checkCounterExample(aut, safetyTrace);
+      final int steps = checkCounterExample(aut, safetyCounter);
       switch (aut.getKind()) {
       case PLANT:
         if (steps < numSteps) {
           reportMalformedCounterExample
-            (safetyTrace, "is rejected by plant", aut, steps);
+            (safetyCounter, "is rejected by plant", aut, steps);
           return false;
         }
         break;
       case SPEC:
         if (steps < numSteps - 1) {
           reportMalformedCounterExample
-            (safetyTrace, "is rejected too early by spec", aut, steps);
+            (safetyCounter, "is rejected too early by spec", aut, steps);
           return false;
         } else if (steps == numSteps - 1) {
           gotRejectingSpec = true;
@@ -194,7 +197,7 @@ public class ControllabilityCounterExampleChecker
     }
     if (!gotRejectingSpec) {
       reportMalformedCounterExample
-        (safetyTrace, "is accepted by all specifications");
+        (safetyCounter, "is accepted by all specifications");
       return false;
     }
     return true;
@@ -202,7 +205,7 @@ public class ControllabilityCounterExampleChecker
 
   /**
    * Returns the state tuple reached after accepting the complete trace.
-   * If the last call to {@link #checkCounterExample(ProductDESProxy, TraceProxy)
+   * If the last call to {@link #checkCounterExample(ProductDESProxy, CounterExampleProxy)
    * checkCounterExample()} has found the counterexample to be accepted by
    * all automata in the model (in which case it is not a correct
    * controllability counterexample), this method can be used to return the
@@ -232,19 +235,20 @@ public class ControllabilityCounterExampleChecker
 
   //#########################################################################
   //# Auxiliary Methods
-  private void findEndState(final ProductDESProxy des, final TraceProxy trace)
+  private void findEndState(final ProductDESProxy des,
+                            final SafetyCounterExampleProxy counter)
   {
     if (mEndStateMap != null) {
       final Iterator<AutomatonProxy> iter = des.getAutomata().iterator();
       while (iter.hasNext() && mEndStateMap != null) {
         final AutomatonProxy aut = iter.next();
-        checkCounterExample(aut, trace);
+        checkCounterExample(aut, counter);
       }
     }
   }
 
   private int checkCounterExample(final AutomatonProxy aut,
-                                  final TraceProxy trace)
+                                  final SafetyCounterExampleProxy counter)
   {
     StateProxy current = AutomatonTools.getFirstInitialState(aut);
     if (current == null) {
@@ -253,6 +257,7 @@ public class ControllabilityCounterExampleChecker
     }
     int steps = 0;
     final Collection<EventProxy> events = aut.getEvents();
+    final TraceProxy trace = counter.getTrace();
     final List<EventProxy> traceEvents = trace.getEvents();
     for (final EventProxy event : traceEvents) {
       if (events.contains(event) && event.getKind() != EventKind.PROPOSITION) {

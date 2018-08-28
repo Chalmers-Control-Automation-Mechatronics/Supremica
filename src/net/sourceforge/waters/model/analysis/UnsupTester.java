@@ -314,10 +314,10 @@ public class UnsupTester
               if (clazz == HalfWaySynthesisTRSimplifier.class ||
                   clazz == CertainUnsupervisabilityTRSimplifier.class) {
                 final int states = simpStats.getInputStates() -
-                  simpStats.getOutputStates() - simpStats.getUnchangedStates();
+                  simpStats.getChangedOutputStates() - simpStats.getUnchangedStates();
                 System.out.println("State reduction: " + states);
                 final int trans = simpStats.getInputTransitions() -
-                  simpStats.getOutputTransitions() -
+                  simpStats.getChangedOutputTransitions() -
                   simpStats.getUnchangedTransitions();
                 System.out.println("Transition reduction: " + trans);
               }

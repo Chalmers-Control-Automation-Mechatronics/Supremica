@@ -38,7 +38,7 @@ import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
 
 /**
@@ -103,7 +103,8 @@ public class SDCFourVerifier extends AbstractSDLanguageInclusionChecker
       if (result.isSatisfied()) {
         return true;
       } else {
-        final SafetyTraceProxy counterexample = checker.getCounterExample();
+        final SafetyCounterExampleProxy counterexample =
+          checker.getCounterExample();
         return setFailedResult(counterexample);
       }
     } finally {

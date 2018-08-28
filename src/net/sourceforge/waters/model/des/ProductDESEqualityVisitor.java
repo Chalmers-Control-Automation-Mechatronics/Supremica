@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
@@ -125,23 +126,6 @@ public class ProductDESEqualityVisitor
   //#########################################################################
   //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
   @Override
-  public Boolean visitConflictTraceProxy(final ConflictTraceProxy trace)
-      throws VisitorException
-  {
-    if (visitTraceProxy(trace)) {
-      final ConflictTraceProxy expected = (ConflictTraceProxy) getSecondProxy();
-      final ConflictKind kind1 = trace.getKind();
-      final ConflictKind kind2 = expected.getKind();
-      if (kind1 != kind2) {
-        return reportAttributeMismatch("kind", kind1, kind2);
-      }
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  @Override
   public Boolean visitAutomatonProxy(final AutomatonProxy aut)
       throws VisitorException
   {
@@ -179,6 +163,62 @@ public class ProductDESEqualityVisitor
   }
 
   @Override
+  public Object visitConflictCounterExampleProxy
+    (final ConflictCounterExampleProxy counter)
+    throws VisitorException
+  {
+    if (visitCounterExampleProxy(counter)) {
+      final ConflictCounterExampleProxy expected =
+        (ConflictCounterExampleProxy) getSecondProxy();
+      final ConflictKind kind1 = counter.getKind();
+      final ConflictKind kind2 = expected.getKind();
+      if (kind1 != kind2) {
+        return reportAttributeMismatch("kind", kind1, kind2);
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public Boolean visitCounterExampleProxy(final CounterExampleProxy counter)
+    throws VisitorException
+  {
+    if (visitDocumentProxy(counter)) {
+      final CounterExampleProxy expected = (CounterExampleProxy) getSecondProxy();
+      final ProductDESProxy des1 = counter.getProductDES();
+      final ProductDESProxy des2 = expected.getProductDES();
+      if (!des1.refequals(des2)) {
+        return reportAttributeMismatch
+            ("product DES", des1.getName(), des2.getName());
+      }
+      final Set<AutomatonProxy> automata1 = counter.getAutomata();
+      final Set<AutomatonProxy> automata2 = expected.getAutomata();
+      if (!compareRefSets(automata1, automata2)) {
+        return false;
+      }
+      final List<TraceProxy> traces1 = counter.getTraces();
+      final List<TraceProxy> traces2 = expected.getTraces();
+      if (!compareLists(traces1, traces2)) {
+        return false;
+      }
+      setSecondProxy(expected);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public Boolean visitDualCounterExampleProxy
+    (final DualCounterExampleProxy proxy)
+    throws VisitorException
+  {
+    return visitCounterExampleProxy(proxy);
+  }
+
+  @Override
   public Boolean visitEventProxy(final EventProxy event)
       throws VisitorException
   {
@@ -206,20 +246,11 @@ public class ProductDESEqualityVisitor
   }
 
   @Override
-  public Boolean visitLoopTraceProxy(final LoopTraceProxy trace)
-      throws VisitorException
+  public Boolean visitLoopCounterExampleProxy
+    (final LoopCounterExampleProxy counter)
+    throws VisitorException
   {
-    if (visitTraceProxy(trace)) {
-      final LoopTraceProxy expected = (LoopTraceProxy) getSecondProxy();
-      final int loop1 = trace.getLoopIndex();
-      final int loop2 = expected.getLoopIndex();
-      if (loop1 != loop2) {
-        return reportAttributeMismatch("loop index", loop1, loop2);
-      }
-      return true;
-    } else {
-      return false;
-    }
+    return visitCounterExampleProxy(counter);
   }
 
   @Override
@@ -245,10 +276,11 @@ public class ProductDESEqualityVisitor
   }
 
   @Override
-  public Boolean visitSafetyTraceProxy(final SafetyTraceProxy trace)
-      throws VisitorException
+  public Boolean visitSafetyCounterExampleProxy
+    (final SafetyCounterExampleProxy counter)
+    throws VisitorException
   {
-    return visitTraceProxy(trace);
+    return visitCounterExampleProxy(counter);
   }
 
   @Override
@@ -277,23 +309,22 @@ public class ProductDESEqualityVisitor
   public Boolean visitTraceProxy(final TraceProxy trace)
       throws VisitorException
   {
-    if (visitDocumentProxy(trace)) {
+    if (visitProxy(trace)) {
       final TraceProxy expected = (TraceProxy) getSecondProxy();
-      final ProductDESProxy des1 = trace.getProductDES();
-      final ProductDESProxy des2 = expected.getProductDES();
-      if (!des1.refequals(des2)) {
-        return reportAttributeMismatch
-            ("product DES", des1.getName(), des2.getName());
-      }
-      final Set<AutomatonProxy> automata1 = trace.getAutomata();
-      final Set<AutomatonProxy> automata2 = expected.getAutomata();
-      if (!compareRefSets(automata1, automata2)) {
-        return false;
+      final String name1 = trace.getName();
+      final String name2 = expected.getName();
+      if (!ProxyTools.equals(name1, name2)) {
+        return reportAttributeMismatch("trace name", name1, name2);
       }
       final List<TraceStepProxy> steps1 = trace.getTraceSteps();
       final List<TraceStepProxy> steps2 = expected.getTraceSteps();
       if (!compareLists(steps1, steps2)) {
         return false;
+      }
+      final int loop1 = trace.getLoopIndex();
+      final int loop2 = expected.getLoopIndex();
+      if (loop1 != loop2 && (loop1 >= 0 || loop2 >= 0)) {
+        return reportAttributeMismatch("loop index", loop1, loop2);
       }
       setSecondProxy(expected);
       return true;

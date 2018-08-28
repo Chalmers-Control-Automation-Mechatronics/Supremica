@@ -123,6 +123,7 @@ class ComponentDataFlavor extends ModuleDataFlavor
   @Override
   List<Proxy> createImportData(final Collection<? extends Proxy> data)
   {
+    final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
     final List<Proxy> proxyList = new ArrayList<Proxy>();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final ProductDESProxyFactory factoryDES =
@@ -131,25 +132,25 @@ class ComponentDataFlavor extends ModuleDataFlavor
     ProductDESImporter importer = null;
     for (final Proxy p : data) {
       if (p instanceof AutomatonProxy) {
-        if (importer == null) {
-          importer = new ProductDESImporter(factory);
-        }
-        try {
-          // TODO Use AutomatonTools.createProductDESProxy() to make a DES
-          // TODO Import the DES to get a module
-          // TODO Include the components and events from the module
-          final ProductDESProxy product = AutomatonTools
-            .createProductDESProxy((AutomatonProxy) p, factoryDES);
-          final ModuleProxy module = importer.importModule(product);
-          proxyList.add(module);
-        } catch (final ParseException exception) {
-          final Logger logger = LogManager.getLogger();
-          final String msg = exception.getMessage();
-          logger.error(msg);
-        }
+        autList.add((AutomatonProxy) p);
       } else {
         proxyList.add(cloner.getClone(p));
       }
+    }
+    importer = new ProductDESImporter(factory);
+    final ProductDESProxy product = AutomatonTools
+      .createProductDESProxy("importFromAnalyzer", autList, factoryDES);
+    ModuleProxy module = null;
+    try {
+      module = importer.importModule(product);
+    } catch (final ParseException exception) {
+      final Logger logger = LogManager.getLogger();
+      final String msg = exception.getMessage();
+      logger.error(msg);
+    }
+    if (module != null) {
+      proxyList.addAll(module.getComponentList());
+      proxyList.addAll(module.getEventDeclList());
     }
     return proxyList;
   }

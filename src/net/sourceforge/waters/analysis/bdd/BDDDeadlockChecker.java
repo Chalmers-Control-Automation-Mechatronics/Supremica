@@ -38,6 +38,7 @@ import java.util.List;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -48,10 +49,11 @@ import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
@@ -169,9 +171,9 @@ public class BDDDeadlockChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SafetyVerifier
   @Override
-  public ConflictTraceProxy getCounterExample()
+  public ConflictCounterExampleProxy getCounterExample()
   {
-    return (ConflictTraceProxy) super.getCounterExample();
+    return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
 
@@ -254,19 +256,21 @@ public class BDDDeadlockChecker
     return true;
   }
 
-  private ConflictTraceProxy computeCounterExample()
+  private ConflictCounterExampleProxy computeCounterExample()
     throws AnalysisAbortException, OverflowException
   {
     for (final BDD part : mDeadlockBDDs) {
       part.free();
     }
     final int level = getDepth();
-    final List<TraceStepProxy> trace = computeTrace(mBadStateBDD, level);
+    final List<TraceStepProxy> steps = computeTrace(mBadStateBDD, level);
     final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy des = getModel();
     final String name = getTraceName();
     final List<AutomatonProxy> automata = getAutomata();
-    final ConflictTraceProxy counterExample = desFactory.createConflictTraceProxy
+    final TraceProxy trace = desFactory.createTraceProxy(steps);
+    final ConflictCounterExampleProxy counterExample =
+      desFactory.createConflictCounterExampleProxy
       (name, null, null, des, automata, trace, ConflictKind.DEADLOCK);
     setFailedResult(counterExample);
     return counterExample;

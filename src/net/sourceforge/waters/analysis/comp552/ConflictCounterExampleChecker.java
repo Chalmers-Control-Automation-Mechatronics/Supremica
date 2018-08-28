@@ -45,11 +45,12 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
-import net.sourceforge.waters.model.des.ConflictTraceProxy;
+import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.SafetyTraceProxy;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
@@ -59,12 +60,12 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
- * <P>A tool to check whether a conflict error trace is a correct
+ * <P>A tool to check whether a conflict counterexample is a correct
  * counterexample to show that a given product DES is blocking.</P>
  *
  * <P>To use this class, it must be initialised with a
  * {@link ProductDESProxyFactory}. Afterwards, {@link
- * #checkCounterExample(ProductDESProxy,TraceProxy)
+ * #checkCounterExample(ProductDESProxy,CounterExampleProxy)
  * checkCounterExample()} can be called repeatedly. If a check fails,
  * {@link #getDiagnostics()} can be called to retrieve an explanation.</P>
  *
@@ -76,7 +77,7 @@ import net.sourceforge.waters.xsd.base.EventKind;
  * <CODE>ConflictCounterExampleChecker checker =
  *   new {@link #ConflictCounterExampleChecker(ProductDESProxyFactory)
  *   ConflictCounterExampleChecker}(factory);</CODE><BR>
- * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,TraceProxy)
+ * <CODE>if (checker.{@link #checkCounterExample(ProductDESProxy,CounterExampleProxy)
  *   checkCounterExample}(</CODE><I>des</I><CODE>, </CODE><I>trace</I><CODE>))
  *   {</CODE><BR>
  * <CODE>&nbsp;&nbsp;System.out.println(&quot;OK&quot;);</CODE><BR>
@@ -136,7 +137,7 @@ public class ConflictCounterExampleChecker
   /**
    * Checks a conflict error trace.
    * @param  des       The product DES that was verified.
-   * @param  trace     The counterexample to be checked.
+   * @param  counter   The counterexample to be checked.
    * @return <CODE>true</CODE> if the given counterexample demonstrates that
    *         the given product DES is blocking, <CODE>false</CODE> otherwise.
    * @throws AnalysisException to indicate a problem while attempting to
@@ -144,25 +145,28 @@ public class ConflictCounterExampleChecker
    */
   @Override
   public boolean checkCounterExample(final ProductDESProxy des,
-                                     final TraceProxy trace)
+                                     final CounterExampleProxy counter)
     throws AnalysisException
   {
-    if (!super.checkCounterExample(des, trace)) {
+    if (!super.checkCounterExample(des, counter)) {
       return false;
-    } else if (!(trace instanceof ConflictTraceProxy)) {
-      reportMalformedCounterExample(trace, "is not a ConflictTraceProxy", null);
+    } else if (!(counter instanceof ConflictCounterExampleProxy)) {
+      reportMalformedCounterExample
+        (counter, "is not a ConflictCounterExampleProxy", null);
       return false;
     }
-    final ConflictTraceProxy conflictTrace = (ConflictTraceProxy) trace;
+    final ConflictCounterExampleProxy confCounter =
+      (ConflictCounterExampleProxy) counter;
+    final TraceProxy trace = confCounter.getTrace();
     final Collection<AutomatonProxy> automata = des.getAutomata();
     final int size = automata.size();
     final Map<AutomatonProxy,StateProxy> tuple =
       new HashMap<AutomatonProxy,StateProxy>(size);
     for (final AutomatonProxy aut : automata) {
-      final StateProxy state = checkCounterExample(aut, conflictTrace);
+      final StateProxy state = checkCounterExample(aut, trace);
       if (state == null) {
         reportMalformedCounterExample
-          (conflictTrace, "is not accepted by component", aut);
+          (confCounter, "is not accepted by component", aut);
         return false;
       }
       tuple.put(aut, state);
@@ -172,8 +176,8 @@ public class ConflictCounterExampleChecker
       new NativeLanguageInclusionChecker(lDES, mFactory);
     final boolean blocking = checker.run();
     if (!blocking) {
-      final SafetyTraceProxy lTrace = checker.getCounterExample();
-      reportMalformedCounterExample(conflictTrace, lTrace);
+      final SafetyCounterExampleProxy unsafe = checker.getCounterExample();
+      reportMalformedCounterExample(confCounter, unsafe);
     } else {
       reportCorrectCounterExample();
     }
@@ -324,12 +328,13 @@ public class ConflictCounterExampleChecker
   }
 
   private void reportMalformedCounterExample
-    (final ConflictTraceProxy confTrace, final SafetyTraceProxy langTrace)
+    (final ConflictCounterExampleProxy confCounter,
+     final SafetyCounterExampleProxy langCounter)
   {
     reportMalformedCounterExample
-      (confTrace, "does not lead to blocking state", null);
+      (confCounter, "does not lead to blocking state", null);
     reportCounterCounterExample
-      ("A marked state can be reached as follows:", langTrace);
+      ("A marked state can be reached as follows:", langCounter);
   }
 
 

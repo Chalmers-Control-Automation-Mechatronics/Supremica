@@ -398,6 +398,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerSynchronousProductAction.class);
   }
 
+  public IDEAction getAnalyzerSynthesizerAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerSynthesizerAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;

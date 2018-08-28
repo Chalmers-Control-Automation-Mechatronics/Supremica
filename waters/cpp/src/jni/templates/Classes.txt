@@ -159,6 +159,18 @@ glue class AutomatonProxy extends NamedProxy {
   glue Collection getTransitions();
 }
 
+glue class CounterExampleProxy {
+}
+
+glue class SafetyCounterExampleProxy extends CounterExampleProxy {
+}
+
+glue class ConflictCounterExampleProxy extends CounterExampleProxy {
+}
+
+glue class LoopCounterExampleProxy extends CounterExampleProxy {
+}
+
 glue class ProductDESProxy extends NamedProxy {
   glue Set getEvents();
   glue Set getAutomata();
@@ -170,53 +182,41 @@ glue class TraceProxy {
 glue class TraceStepProxy {
 }
 
-glue class SafetyTraceProxy extends TraceProxy {
-}
-
-glue class ConflictTraceProxy extends TraceProxy {
-}
-
-glue class LoopTraceProxy extends TraceProxy {
-}
-
 glue class ProductDESProxyFactory {
   glue AutomatonProxy createAutomatonProxy(String name,
                                            glue ComponentKind kind,
                                            glue Collection events,
                                            glue Collection states,
                                            glue Collection transitions);
-  glue ConflictTraceProxy createConflictTraceProxy(String name,
-                                                   glue ProductDESProxy des,
-                                                   glue List events,
-                                                   glue ConflictKind kind);
-  glue ConflictTraceProxy createConflictTraceProxy(String name,
-                                                   String comment,
-                                                   URI location,
-                                                   glue ProductDESProxy des,
-                                                   glue Collection automata,
-                                                   glue List steps,
-                                                   glue ConflictKind kind);
-  glue LoopTraceProxy createLoopTraceProxy(String name,
-					   String comment,
-					   URI location,
-					   glue ProductDESProxy des,
-					   glue Collection automata,
-					   glue List steps,
-					   int index);
+  glue ConflictCounterExampleProxy createConflictCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     glue ProductDESProxy des,
+     glue Collection automata,
+     glue TraceProxy trace,
+     glue ConflictKind kind);
+  glue LoopCounterExampleProxy createLoopCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     glue ProductDESProxy des,
+     glue Collection automata,
+     glue TraceProxy trace);
   glue EventProxy createEventProxy(String name, glue EventKind kind);
   glue ProductDESProxy createProductDESProxy(String name,
                                              glue Collection events,
                                              glue Collection automata);
   glue ProductDESProxy createProductDESProxy(String name);
-  glue SafetyTraceProxy createSafetyTraceProxy(String name,
-                                               glue ProductDESProxy des,
-                                               glue List events);
-  glue SafetyTraceProxy createSafetyTraceProxy(String name,
-                                               String comment,
-                                               URI location,
-                                               glue ProductDESProxy des,
-                                               glue Collection automata,
-                                               glue List steps);
+  glue SafetyCounterExampleProxy createSafetyCounterExampleProxy
+    (String name,
+     String comment,
+     URI location,
+     glue ProductDESProxy des,
+     glue Collection automata,
+     glue TraceProxy trace);
+  glue TraceProxy createTraceProxy(glue List steps, int index);
+  glue TraceProxy createTraceProxy(glue List steps);
   glue TraceStepProxy createTraceStepProxy(glue EventProxy event);
   glue TraceStepProxy createTraceStepProxy(glue EventProxy event,
                                            glue Map statemap);
@@ -238,7 +238,7 @@ glue class AnalysisResult {
 }
 
 glue class VerificationResult extends AnalysisResult {
-  void setCounterExample(glue TraceProxy trace);
+  void setCounterExample(glue CounterExampleProxy counter);
 }
 
 glue class KindTranslator {

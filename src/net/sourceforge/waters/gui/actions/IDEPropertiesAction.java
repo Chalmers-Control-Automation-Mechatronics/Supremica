@@ -40,7 +40,8 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
+import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.dialog.AutomatonPropertiesDialog;
 import net.sourceforge.waters.gui.dialog.ConstantAliasEditorDialog;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.EventAliasEditorDialog;
@@ -81,24 +82,27 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
 /**
- * <P>The action associated with the 'properties' menu buttons.</P>
+ * <P>
+ * The action associated with the 'properties' menu buttons.
+ * </P>
  *
- * <P>This action pops up a dialog box to edit the currently focused
- * item, if that item is of a supported type. To support this action,
- * components that hold editable items must implement the {@link
- * SelectionOwner} interface and return the item to be edited through
- * their {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()}
- * method.</P>
+ * <P>
+ * This action pops up a dialog box to edit the currently focused item, if
+ * that item is of a supported type. To support this action, components that
+ * hold editable items must implement the {@link SelectionOwner} interface and
+ * return the item to be edited through their
+ * {@link SelectionOwner#getSelectionAnchor() getSelectionAnchor()} method.
+ * </P>
  *
  * @author Robi Malik
  */
 
-public class IDEPropertiesAction
-  extends WatersAction
+public class IDEPropertiesAction extends WatersAction
 {
 
   //#########################################################################
@@ -117,7 +121,6 @@ public class IDEPropertiesAction
     updateEnabledStatus();
   }
 
-
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
@@ -126,7 +129,6 @@ public class IDEPropertiesAction
     final Proxy proxy = getActionArgument();
     mVisitor.editProperties(proxy);
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
@@ -138,13 +140,13 @@ public class IDEPropertiesAction
     }
   }
 
-
   //#########################################################################
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();
-    final boolean enabled = proxy != null && mVisitor.canEditProperties(proxy);
+    final boolean enabled =
+      proxy != null && mVisitor.canEditProperties(proxy);
     setEnabled(enabled);
     if (enabled) {
       final String name = ProxyNamer.getItemClassName(proxy);
@@ -172,7 +174,6 @@ public class IDEPropertiesAction
   private class PropertiesVisitor
     extends DefaultProductDESAndModuleProxyVisitor
   {
-
     //#######################################################################
     //# Invocation
     private boolean canEditProperties(final Proxy proxy)
@@ -196,7 +197,7 @@ public class IDEPropertiesAction
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ProxyVisitor
+    //# Interface net.sourceforge.waters.model.base.ProxyVisitor
     @Override
     public Boolean visitProxy(final Proxy proxy)
     {
@@ -204,7 +205,28 @@ public class IDEPropertiesAction
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.model.printer.ModuleProxyVisitor
+    //# Interface net.sourceforge.waters.model.des.ProductDESProxyVisitor
+    @Override
+    public Boolean visitAutomatonProxy(final AutomatonProxy aut)
+    {
+      if (mDoEdit) {
+        final ModuleContainer container = getActiveModuleContainer();
+        if (container == null) {
+          return false;
+        }
+        final MainPanel panel = container.getActivePanel();
+        if (panel == null || !(panel instanceof WatersAnalyzerPanel)) {
+          return false;
+        }
+        final WatersAnalyzerPanel analyzer = (WatersAnalyzerPanel) panel;
+        new AutomatonPropertiesDialog(analyzer,
+                                      aut);
+      }
+      return true;
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
     public Boolean visitConstantAliasProxy(final ConstantAliasProxy decl)
     {
@@ -278,15 +300,15 @@ public class IDEPropertiesAction
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        final ParameterBindingSubject subject = (ParameterBindingSubject) binding;
-        new ParameterBindingEditorDialog(root,subject);
+        final ParameterBindingSubject subject =
+          (ParameterBindingSubject) binding;
+        new ParameterBindingEditorDialog(root, subject);
       }
       return true;
     }
 
     @Override
-    public Boolean visitSimpleComponentProxy
-      (final SimpleComponentProxy comp)
+    public Boolean visitSimpleComponentProxy(final SimpleComponentProxy comp)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
@@ -313,8 +335,7 @@ public class IDEPropertiesAction
     }
 
     @Override
-    public Boolean visitVariableComponentProxy
-      (final VariableComponentProxy var)
+    public Boolean visitVariableComponentProxy(final VariableComponentProxy var)
     {
       if (mDoEdit) {
         final ModuleWindowInterface root = getActiveModuleWindowInterface();
@@ -325,31 +346,15 @@ public class IDEPropertiesAction
       return true;
     }
 
-    @Override
-    public Boolean visitAutomatonProxy
-      (final AutomatonProxy aut)
-    {
-      if (mDoEdit) {
-        //TODO cant use moduleWindow, what to use instead?
-
-        final ModuleWindowInterface root = getActiveModuleWindowInterface();
-        new AutomatonSynchronousProductDialog(root, aut);
-      }
-      return true;
-    }
-
     //#######################################################################
     //# Data Members
     private boolean mDoEdit;
-
   }
-
 
   //#########################################################################
   //# Data Members
   private final Proxy mActionArgument;
   private final PropertiesVisitor mVisitor;
-
 
   //#########################################################################
   //# Class Constants

@@ -37,9 +37,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.TraceProxy;
 
 
 /**
@@ -108,7 +108,7 @@ public abstract class NativeModelVerifier
   }
 
   @Override
-  public TraceProxy getCounterExample()
+  public CounterExampleProxy getCounterExample()
   {
     if (isSatisfied()) {
       throw new IllegalStateException("No trace for satisfied property!");
