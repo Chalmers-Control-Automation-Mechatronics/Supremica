@@ -489,19 +489,19 @@ public class CliqueBasedReductionLocalisedComparisons
       mPrintWriter.write(NO_ENTRY);
     } else if (cliqueBasedStats == null) {
       mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-      mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getOutputStates()
+      mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getChangedOutputStates()
                          + "," + NO_ENTRY + ",");
       mPrintWriter
         .write(NO_ENTRY + "," + suWonhamStats.getRunTime() + "," + NO_ENTRY);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
-      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + NO_ENTRY
+      mPrintWriter.write(cliqueBasedStats.getChangedOutputStates() + "," + NO_ENTRY
                          + "," + NO_ENTRY + ",");
       mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + NO_ENTRY + ","
                          + NO_ENTRY);
     } else {
-      final int swStates = suWonhamStats.getOutputStates();
-      final int cbStates = cliqueBasedStats.getOutputStates();
+      final int swStates = suWonhamStats.getChangedOutputStates();
+      final int cbStates = cliqueBasedStats.getChangedOutputStates();
       final long cbRuntime = cliqueBasedStats.getRunTime();
       final long swRuntime = suWonhamStats.getRunTime();
 
