@@ -125,7 +125,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     mNamePrefix.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mObjectLabel = new JLabel("Objective: ");
     mControllable = new JCheckBox("Controllable", true);
-    mNonBlocking = new JCheckBox("NonBlocking", true);
+    mNonBlocking = new JCheckBox("Nonblocking", true);
     final ActionListener ObjectiveHandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -133,12 +133,11 @@ public class AutomatonSynthesizerDialog extends JDialog
         final JCheckBox checkbox = (JCheckBox) event.getSource();
         objectiveChanged(checkbox);
       }
-
     };
     mControllable.addActionListener(ObjectiveHandler);
     mNonBlocking.addActionListener(ObjectiveHandler);
     mSupReductionLabel = new JLabel("Supervisor Reduction: ");
-    final String[] types = {"off", "SuWonham", "Clique-Based"};
+    final String[] types = {"off", "Su/Wonham", "Clique-Based"};
     mSupReductionType = new JComboBox<>(types);
     mSupReductionType.setSelectedIndex(0);
     final ActionListener ReductionHandler = new ActionListener() {
@@ -147,7 +146,6 @@ public class AutomatonSynthesizerDialog extends JDialog
       {
         reductionChanged();
       }
-
     };
     mSupReductionType.addActionListener(ReductionHandler);
     mLocalisedSupervisor = new JCheckBox("Localised Supervisors", false);

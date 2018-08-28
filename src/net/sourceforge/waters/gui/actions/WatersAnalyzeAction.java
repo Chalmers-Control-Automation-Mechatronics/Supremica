@@ -42,6 +42,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -109,8 +110,9 @@ public abstract class WatersAnalyzeAction
   @Override
   public void compilationSucceeded(final ProductDESProxy compiledDES)
   {
+    final IDE ide = getIDE();
     @SuppressWarnings("unused")
-    final AnalyzerDialog dialog = new AnalyzerDialog(compiledDES);
+    final AnalyzerDialog dialog = new AnalyzerDialog(ide, compiledDES);
   }
 
   @Override
@@ -197,15 +199,16 @@ public abstract class WatersAnalyzeAction
   {
     //#######################################################################
     //# Constructor
-    public AnalyzerDialog(final ProductDESProxy des)
+    public AnalyzerDialog(final JFrame owner,
+                          final ProductDESProxy des)
     {
-      super(getIDE());
+      super(owner);
       setTitle(getCheckName() + " Check");
       mRunner = new AnalyzerThread();
       mBottomPanel = new JPanel();
       mInformationLabel = new JLabel();
       mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
-      setInformationText(" Check is running...");
+      setInformationText(getCheckName() + " check is running...");
       final Border outer = BorderFactory.createRaisedBevelBorder();
       final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
       final Border border = BorderFactory.createCompoundBorder(outer, inner);
@@ -318,7 +321,7 @@ public abstract class WatersAnalyzeAction
     private void setLocationAndSize()
     {
       pack();
-      setLocationRelativeTo(getIDE());
+      setLocationRelativeTo(getOwner());
     }
 
     private void setInformationText(final String text)
