@@ -266,15 +266,15 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
       mPrintWriter.write(mNoEntryValue);
     } else if (cliqueBasedStats == null) {
      mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getChangedOutputStates() + "," + mNoEntryValue +",");
+     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getOutputStates() + "," + mNoEntryValue +",");
      mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getRunTime() + "," + mNoEntryValue);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
-      mPrintWriter.write(cliqueBasedStats.getChangedOutputStates() + "," + mNoEntryValue + "," + mNoEntryValue + ",");
+      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + mNoEntryValue + "," + mNoEntryValue + ",");
       mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + mNoEntryValue + "," + mNoEntryValue);
     } else {
-      final int swStates = suWonhamStats.getChangedOutputStates();
-      final int cbStates = cliqueBasedStats.getChangedOutputStates();
+      final int swStates = suWonhamStats.getOutputStates();
+      final int cbStates = cliqueBasedStats.getOutputStates();
       final long cbRuntime = cliqueBasedStats.getRunTime();
       final long swRuntime = suWonhamStats.getRunTime();
 

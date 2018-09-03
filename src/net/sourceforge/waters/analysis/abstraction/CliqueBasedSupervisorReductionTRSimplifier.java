@@ -141,6 +141,30 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     mMaxHeuristicCovers = maxHeuristicCovers;
   }
 
+  /**
+   * Gets the maximum number of candidate solutions to be expanded before an OverflowException
+   * is thrown (stopping the search).
+   * @return The maximum number of candidate solutions to be expanded.
+   */
+  public int getSearchLimit() {
+    return mSearchLimit;
+  }
+
+  /**
+   * Sets the maximum number of candidate solutions to be expanded before an OverflowException
+   * is thrown (stopping the search). If a negative number is specified the limit will be
+   * set to Integer.MAX_VALUE
+   * @param searchLimit The maximum number of candidate solutions to be expanded.
+   */
+  public void setSearchLimit(final int searchLimit) {
+    if (searchLimit < 0) {
+      mSearchLimit = Integer.MAX_VALUE;
+    }
+    else {
+      mSearchLimit = searchLimit;
+    }
+  }
+
   //#########################################################################
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
@@ -173,6 +197,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     super.setUp();
 
     final ListBufferTransitionRelation relation = getTransitionRelation();
+
+    mNumSolutionsSearched = 0;
 
     mSuccessorTransitionIterator =
       relation.createSuccessorsReadOnlyIterator();
@@ -248,7 +274,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                               new SimpleAddCandidateStrategy(), false);
     }
 
-    final Candidate closedSolution = searcher.reduce(searchSpace, mNumStates);
+    final int numReachableStates = getTransitionRelation().getNumberOfReachableStates();
+    final Candidate closedSolution = searcher.reduce(searchSpace, numReachableStates);
 
     if (closedSolution == null) {
       System.out.println("\nCould not reduce supervisor");
@@ -273,11 +300,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     searcher = null;
 
     if (optimisedSupervisor == null
-        && closedSolution.size() + 1 < mNumStates) {
+        && closedSolution.size() + 1 < numReachableStates) {
       buildReducedSupervisor(closedSolution);
       return true;
     } else if (optimisedSupervisor != null
-               && optimisedSupervisor.size() + 1 < mNumStates) {
+               && optimisedSupervisor.size() + 1 < numReachableStates) {
       buildReducedSupervisor(optimisedSupervisor);
       return true;
     }
@@ -289,6 +316,17 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected void tearDown()
   {
+    mDependencyIdBuffer.clear();
+    mCompatibleBuffer.clear();
+    mEnabledEventsBuffer.clear();
+
+    mListBuffer.clear();
+    mSetBuffer.clear();
+    mStackBuffer.clear();
+
+    mStatesCompatibleWithAll.clear();
+    mStateToNeighbourCountMap.clear();
+
     mDependencyIdBuffer = null;
     mCompatibleBuffer = null;
     mEnabledEventsBuffer = null;
@@ -327,18 +365,23 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     public Candidate reduce(final PriorityQueue<Candidate> searchSpace,
-                            final int maximumSize) throws AnalysisAbortException
+                            final int maximumSize) throws AnalysisException
     {
       Candidate reducedSupervisor = null;
       int reducedSupervisorSize = maximumSize;
 
       while (!searchSpace.isEmpty()) {
         checkAbort();
+
         //get the most promising partial solution
         final Candidate candidateSolution = searchSpace.poll();
 
         if (reducedSupervisor != null && candidateSolution.size() + 1 >= reducedSupervisorSize) {
           continue;
+        }
+
+        if (++mNumSolutionsSearched > mSearchLimit) {
+          throw new OverflowException("Search limit (" + mSearchLimit + ") exceeded");
         }
 
         System.out.println("Picked " + candidateSolution);
@@ -400,6 +443,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           }
         }
       }
+      System.out.println(mNumSolutionsSearched);
       return reducedSupervisor;
     }
   }
@@ -932,6 +976,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     boolean hasExplicitDumpState = false;
 
     for (int s = 0; s < newSupervisor.length; s++) {
+      checkAbort();
       final int compatibleIndex =
         (s + startStateIndexOffset) % newSupervisor.length;
       final TIntSet compatible = newSupervisor[compatibleIndex];
@@ -1016,8 +1061,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
                  + " unreachable states");
     }
 
-    getLogger().info(relation.getNumberOfStates());
-    System.out.println("Reduced to " + relation.getNumberOfStates()
+    System.out.println("Reduced to " + relation.getNumberOfReachableStates()
                        + " states from " + mNumStates);
 
     return true;
@@ -1542,6 +1586,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private HeuristicCoverStrategy mHeuristicCoverStrategy =
     HeuristicCoverStrategy.NONE;
   private int mMaxHeuristicCovers = -1;
+  private int mSearchLimit = 100000;
+
+  private int mNumSolutionsSearched;
 
   private TransitionIterator mPredecessorTransitionIterator;
   private TransitionIterator mSuccessorTransitionIterator;
