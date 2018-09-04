@@ -76,7 +76,7 @@ public class AnalyzeDiagnosabilityCheckAction extends WatersAnalyzeAction
   }
 
   @Override
-  protected DiagnosabilityChecker getModelVerifier
+  protected DiagnosabilityChecker createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException

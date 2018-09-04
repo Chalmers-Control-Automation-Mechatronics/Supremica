@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -47,7 +48,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
@@ -56,17 +56,15 @@ import javax.swing.JTextField;
 import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -75,11 +73,10 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
 import org.supremica.gui.ide.IDE;
-import org.supremica.properties.Config;
 
 
 /**
- * @author George Hewlett, Carly Hona
+ * @author George Hewlett, Robi Malik
  */
 public class AutomatonSynthesizerDialog extends JDialog
 {
@@ -104,6 +101,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     mCliqueBased = new CliqueBasedSupervisorReductionTRSimplifier();
   }
 
+
   //#########################################################################
   //# Initialisation and Layout of Components
   /**
@@ -124,7 +122,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     mNamePrefix = new JTextField();
     mNamePrefix.setText("sup");
     mNamePrefix.addActionListener(commithandler);
-    mNamePrefix.setToolTipText("Enter automaton name, e.g., x or v[i]");
+    mNamePrefix.setToolTipText("Name prefix for synthesised supervisor components");
     mObjectLabel = new JLabel("Objective: ");
     mControllable = new JCheckBox("Controllable", true);
     mNonBlocking = new JCheckBox("Nonblocking", true);
@@ -259,6 +257,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     pack();
   }
 
+
   //#########################################################################
   //# Action Listeners
   /**
@@ -270,59 +269,36 @@ public class AutomatonSynthesizerDialog extends JDialog
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
     final String prefixName = mNamePrefix.getText();
-
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
                                            mAutomatonList, factory);
-
     mSynthesizer = new MonolithicSynthesizer(des, factory);
     mSynthesizer.setOutputName(prefixName);
-    KindTranslator translator;
-    if (mControllable.isSelected())
+    final KindTranslator translator;
+    if (mControllable.isSelected()) {
       translator = IdenticalKindTranslator.getInstance();
-    else
+    } else {
       translator = ControllableSynthesisKindTranslator.getInstance();
+    }
     mSynthesizer.setKindTranslator(translator);
     mSynthesizer.setNonblockingSupported(mNonBlocking.isSelected());
-    AbstractSupervisorReductionTRSimplifier simplifier;
-    if (mSupReductionType.getSelectedIndex() == 0)
+    final AbstractSupervisorReductionTRSimplifier simplifier;
+    if (mSupReductionType.getSelectedIndex() == 0) {
       simplifier = null;
-    else if (mSupReductionType.getSelectedIndex() == 1)
+    } else if (mSupReductionType.getSelectedIndex() == 1) {
       simplifier = mSuWonHam;
-    else
+    } else {
       simplifier = mCliqueBased;
+    }
     mSynthesizer.setSupervisorReductionSimplifier(simplifier);
-    mSynthesizer
-      .setSupervisorLocalizationEnabled(mLocalisedSupervisor.isSelected());
+    mSynthesizer.setSupervisorLocalizationEnabled
+      (mLocalisedSupervisor.isSelected());
     mSynthesizer.setModel(des);
     final IDE ide = mAnalyzerPanel.mModuleContainer.getIDE();
     final SynthesisPopUpDialog dialog =
-      new SynthesisPopUpDialog(ide, des, getModelVerifier(), ide);
-    this.setVisible(false);
-    dialog.setVisible(true);
-
-    //    try {
-    //      mSynthesizer.run();
-    //    } catch (final AnalysisException exception) {
-    //      final Logger logger = LogManager.getLogger();
-    //      final String msg = exception.getMessage();
-    //      logger.error(msg);
-    //    }
-    //    final MonolithicSynthesisResult result = mSynthesizer.getAnalysisResult();
-    //    if (result.isSatisfied()) {
-    //      final Collection<AutomatonProxy> resultList =
-    //        result.getComputedAutomata();
-    //      if (resultList != null) {
-    //        final AutomataTableModel model =
-    //          mAnalyzerPanel.getAutomataTableModel();
-    //        model.insertRows(resultList);
-    //      }
-    //    } else {
-    //      //pop up window saying did not work
-    //
-    //    }
-    //    // Close the dialog
+      new SynthesisPopUpDialog(ide, des, mSynthesizer);
     dispose();
+    dialog.setVisible(true);
   }
 
   private void reductionChanged()
@@ -365,97 +341,72 @@ public class AutomatonSynthesizerDialog extends JDialog
   }
 
   //#########################################################################
-  //# Factory Access
-  ModelAnalyzerFactory getModelVerifierFactory() throws ClassNotFoundException
-  {
-    final ModelAnalyzerFactoryLoader loader =
-      Config.GUI_ANALYZER_USED_FACTORY.get();
-    return loader.getModelAnalyzerFactory();
-  }
-
-  ModelAnalyzer getModelVerifier()
-  {
-    try {
-      final ModelAnalyzerFactory vFactory = getModelVerifierFactory();
-      final ModelAnalyzer verifier = mSynthesizer;
-      vFactory.configureFromOptions(verifier);
-      return verifier;
-    } catch (final NoClassDefFoundError | ClassNotFoundException
-      | UnsupportedOperationException | UnsatisfiedLinkError exception) {
-      return null;
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class AnalyzerDialog
-  private class SynthesisPopUpDialog extends AnalyzeDialog
+  private class SynthesisPopUpDialog extends WatersAnalyzeDialog
   {
-
-    public SynthesisPopUpDialog(final JFrame owner, final ProductDESProxy des,
-                                final ModelAnalyzer Verifier, final IDE ide)
+    //#######################################################################
+    //# Constructor
+    public SynthesisPopUpDialog(final Frame owner,
+                                final ProductDESProxy des,
+                                final ModelAnalyzer Verifier)
     {
-      super(owner, des, Verifier, ide);
+      super(owner, des, Verifier);
     }
 
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
     public void succeed()
     {
-      final ProductDESProxy des = mAnalyzer.getModel();
-      final String name = des.getName();
-      setInformationText("Model " + name + " " + getSuccessDescription()
-                         + ".");
-      mExitButton.setText("OK");
-      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
-      mExitButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-          final Collection<AutomatonProxy> resultList = mSynResult.getComputedAutomata();
-          if (resultList != null) {
-            final AutomataTableModel model =
-              mAnalyzerPanel.getAutomataTableModel();
-            model.insertRows(resultList);
-          }
-          dispose();
-        }
-      });
-      setLocationAndSize();
+      super.succeed();
+      final MonolithicSynthesisResult result = mSynthesizer.getAnalysisResult();
+      final Collection<AutomatonProxy> resultList = result.getComputedAutomata();
+      final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
+      model.insertRows(resultList);
     }
 
     @Override
-    protected String getCheckName()
+    protected String getAnalysisName()
     {
-      return "Synthesizing Automaton(s)";
+      return "Supervisor synthesis";
     }
 
     @Override
-    protected String getFailureDescription()
+    protected String getFailureText()
     {
-      return "could not produce synthesized automaton(s)";
+      return "Synthesis failed. There is no solution to the control problem.";
     }
 
     @Override
-    protected String getSuccessDescription()
+    protected String getSuccessText()
     {
-      return "Successfully created syntehsized automaton(s)";
+      final MonolithicSynthesisResult result = mSynthesizer.getAnalysisResult();
+      final int size = result.getComputedAutomata().size();
+      switch (size) {
+      case 0:
+        return "The system already satisfies all control objectives. " +
+               "No supervisor is needed.";
+      case 1:
+        return "Successfully synthesised a supervisor.";
+      default:
+        return "Successfully synthesised " + size + " supervisor components.";
+      }
     }
 
     @Override
-    protected ModelAnalyzer getModelVerifier(final ModelAnalyzerFactory factory,
-                                             final ProductDESProxyFactory desFactory)
-      throws AnalysisConfigurationException
+    protected ModelAnalyzer createModelAnalyzer()
     {
-      return AutomatonSynthesizerDialog.this.mSynthesizer;
+      return mSynthesizer;
     }
+
+    //#######################################################################
+    //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
   }
 
+
   //#########################################################################
   //# Data Members
-
-  public MonolithicSynthesizer mSynthesizer;
-
   // Dialog state
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final List<AutomatonProxy> mAutomatonList;
@@ -464,8 +415,8 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JPanel mMainPanel;
   private JLabel mNamePrefixLabel;
   private JTextField mNamePrefix;
-  //  private JPanel mErrorPanel;
-  //  private ErrorLabel mErrorLabel;
+  // private JPanel mErrorPanel;
+  // private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
 
   private JLabel mObjectLabel;
@@ -475,8 +426,11 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JComboBox<String> mSupReductionType;
   private JCheckBox mLocalisedSupervisor;
 
+  // Analysis workers
+  private MonolithicSynthesizer mSynthesizer;
   private final SuWonhamSupervisorReductionTRSimplifier mSuWonHam;
   private final CliqueBasedSupervisorReductionTRSimplifier mCliqueBased;
+
 
   //#########################################################################
   //# Class Constants

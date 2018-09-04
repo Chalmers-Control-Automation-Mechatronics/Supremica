@@ -59,7 +59,7 @@ public class AnalyzeSDControllabilityAction extends WatersAnalyzeAction
     return "is not controllable";
   }
 
-  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
+  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
                                            final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final ControllabilityChecker checker=

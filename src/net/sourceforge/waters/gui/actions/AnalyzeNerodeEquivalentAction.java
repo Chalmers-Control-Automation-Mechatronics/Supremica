@@ -60,7 +60,7 @@ public class AnalyzeNerodeEquivalentAction extends WatersAnalyzeAction
     return "does not satisfy SD Controllability Point iii.2";
   }
 
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {

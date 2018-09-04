@@ -35,61 +35,46 @@ package net.sourceforge.waters.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import org.supremica.gui.ide.IDE;
-import org.supremica.gui.ide.ModuleContainer;
-import org.supremica.properties.Config;
 
 
 /**
- * @author Andrew Holland, Robi Malik
+ * @author George Hewlett, Andrew Holland, Robi Malik
  */
 
-//#########################################################################
-//# Inner Class AnalyzerDialog
-public abstract class AnalyzeDialog extends JDialog
+public abstract class WatersAnalyzeDialog extends JDialog
 {
-  //#######################################################################
+  //#########################################################################
   //# Constructor
-  public AnalyzeDialog(final JFrame owner, final ProductDESProxy des,
-                       final ModelAnalyzer Verifier, final IDE ide)
+  public WatersAnalyzeDialog(final Frame owner,
+                             final ProductDESProxy des,
+                             final ModelAnalyzer Verifier)
   {
     super(owner);
-    setTitle(getCheckName() + " Check");
+    final String title = getAnalysisName();
+    setTitle(title);
     mRunner = new AnalyzerThread();
     mBottomPanel = new JPanel();
     mInformationLabel = new JLabel();
     mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
-    setInformationText(getCheckName() + " check is running...");
+    setInformationText(title + " is running...");
     final Border outer = BorderFactory.createRaisedBevelBorder();
     final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     final Border border = BorderFactory.createCompoundBorder(outer, inner);
@@ -109,64 +94,44 @@ public abstract class AnalyzeDialog extends JDialog
     pane.add(mBottomPanel, BorderLayout.SOUTH);
     setLocationAndSize();
     setVisible(true);
-    mIDE = ide;
-    mAnalyzer = getModelVerifier();
+    mAnalyzer = createModelAnalyzer();
     mAnalyzer.setModel(des);
     mRunner.setPriority(Thread.MIN_PRIORITY);
     mRunner.start();
   }
 
-  //#########################################################################
-  // # Abstract Methods
-  protected abstract String getCheckName();
-
-  protected abstract String getFailureDescription();
-
-  protected abstract String getSuccessDescription();
-
-  protected abstract ModelAnalyzer getModelVerifier(ModelAnalyzerFactory factory,
-                                                    ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException;
 
   //#########################################################################
-  //# Factory Access
-  ModelAnalyzerFactory getModelVerifierFactory() throws ClassNotFoundException
+  //# Simple Access
+  protected ModelAnalyzer getModelAnalyzer()
   {
-    final ModelAnalyzerFactoryLoader loader =
-      Config.GUI_ANALYZER_USED_FACTORY.get();
-    return loader.getModelAnalyzerFactory();
+    return mAnalyzer;
   }
 
-  ModelAnalyzer getModelVerifier()
-  {
-    try {
-      final ProductDESProxyFactory desFactory =
-        ProductDESElementFactory.getInstance();
-      final ModelAnalyzerFactory vFactory = getModelVerifierFactory();
-      final ModelAnalyzer verifier = getModelVerifier(vFactory, desFactory);
-      vFactory.configureFromOptions(verifier);
-      return verifier;
-    } catch (final NoClassDefFoundError | ClassNotFoundException
-      | UnsupportedOperationException | UnsatisfiedLinkError
-      | AnalysisConfigurationException exception) {
-      return null;
-    }
-  }
 
-  //#######################################################################
+  //#########################################################################
+  //# Abstract Methods
+  protected abstract String getAnalysisName();
+
+  protected abstract String getFailureText();
+
+  protected abstract String getSuccessText();
+
+  protected abstract ModelAnalyzer createModelAnalyzer();
+
+
+  //#########################################################################
   //# Buttons
   public void succeed()
   {
-    final ProductDESProxy des = mAnalyzer.getModel();
-    final String name = des.getName();
-    setInformationText("Model " + name + " " + getSuccessDescription() + ".");
+    setInformationText(getSuccessText());
     mExitButton.setText("OK");
     mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
     mExitButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        AnalyzeDialog.this.dispose();
+        WatersAnalyzeDialog.this.dispose();
       }
     });
     setLocationAndSize();
@@ -180,42 +145,10 @@ public abstract class AnalyzeDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        AnalyzeDialog.this.dispose();
+        WatersAnalyzeDialog.this.dispose();
       }
     });
-    String comment = null;
-    if (mAnalyzer instanceof ModelVerifier) {
-      final ModelVerifier modelVerifier = (ModelVerifier) mAnalyzer;
-      final CounterExampleProxy counterexample =
-        modelVerifier.getCounterExample();
-      if (counterexample != null) {
-        traceButton = new JButton("Show Trace");
-        traceButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e)
-          {
-            AnalyzeDialog.this.dispose();
-            final ModuleContainer container =
-              (ModuleContainer) mIDE.getActiveDocumentContainer();
-            container.switchToTraceMode(counterexample);
-            final String comment = counterexample.getComment();
-            if (comment != null && comment.length() > 0) {
-              final Logger logger =
-                LogManager.getLogger(AnalyzeDialog.this.getClass());
-              logger.info(comment);
-            }
-          }
-        });
-        mBottomPanel.add(traceButton, BorderLayout.EAST);
-        comment = counterexample.getComment();
-      }
-    }
-    if (comment == null || comment.length() == 0) {
-      final ProductDESProxy des = mAnalyzer.getModel();
-      final String name = des.getName();
-      comment = "Model " + name + " " + getFailureDescription() + ".";
-    }
-    setInformationText(comment);
+    setInformationText(getFailureText());
     setLocationAndSize();
   }
 
@@ -232,13 +165,14 @@ public abstract class AnalyzeDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent e)
       {
-        AnalyzeDialog.this.dispose();
+        WatersAnalyzeDialog.this.dispose();
       }
     });
     setLocationAndSize();
   }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Auxiliary Methods
   protected void setLocationAndSize()
   {
@@ -251,12 +185,16 @@ public abstract class AnalyzeDialog extends JDialog
     HTMLPrinter.setLabelText(mInformationLabel, text, DEFAULT_WIDTH);
   }
 
+  protected void addButton(final JButton button)
+  {
+    mBottomPanel.add(button, BorderLayout.EAST);
+  }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Inner Class AnalyzerThread
   private class AnalyzerThread extends Thread
   {
-
     @Override
     public void run()
     {
@@ -266,8 +204,8 @@ public abstract class AnalyzeDialog extends JDialog
       } catch (final AnalysisAbortException exception) {
         // Do nothing: Aborted
         return;
-      } catch (final AnalysisException | NoClassDefFoundError
-        | UnsatisfiedLinkError exception) {
+      } catch (final AnalysisException | NoClassDefFoundError |
+               UnsatisfiedLinkError exception) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run()
@@ -288,18 +226,8 @@ public abstract class AnalyzeDialog extends JDialog
         });
         return;
       }
-      final boolean result;
-      if (mAnalyzer instanceof ModelVerifier) {
-        final ModelVerifier verifier = (ModelVerifier) mAnalyzer;
-        result = verifier.isSatisfied();
-      } else if (mAnalyzer instanceof MonolithicSynthesizer) {
-        mSynResult =
-          (MonolithicSynthesisResult) mAnalyzer.getAnalysisResult();
-        result = mSynResult.isSatisfied();
-      } else {
-        result = false;
-      }
-      if (result) {
+      final AnalysisResult result = mAnalyzer.getAnalysisResult();
+      if (result.isSatisfied()) {
         SwingUtilities.invokeLater(new Runnable() {
           @Override
           public void run()
@@ -329,18 +257,17 @@ public abstract class AnalyzeDialog extends JDialog
     }
   }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Data Members
-  protected MonolithicSynthesisResult mSynResult;
-  private final IDE mIDE;
   private final AnalyzerThread mRunner;
-  protected ModelAnalyzer mAnalyzer;
+  private ModelAnalyzer mAnalyzer;
   private final JPanel mBottomPanel;
-  protected final JButton mExitButton;
-  private JButton traceButton;
+  private final JButton mExitButton;
   private final JLabel mInformationLabel;
 
-  //#######################################################################
+
+  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -2478548485525996982L;
   private static final int DEFAULT_WIDTH = 290;
