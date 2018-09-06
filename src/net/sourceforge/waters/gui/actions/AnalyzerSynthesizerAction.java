@@ -91,10 +91,11 @@ public class AnalyzerSynthesizerAction extends WatersAnalyzerAction
     boolean enabled = false;
     final AutomataTable table = getAnalyzerTable();
     if (table != null) {
-      enabled = (table.getSelectedRowCount() == 1);
+      enabled = (table.getSelectedRowCount() >= 1);
     }
     setEnabled(enabled);
   }
+
 
   //#########################################################################
   //# Class Constants

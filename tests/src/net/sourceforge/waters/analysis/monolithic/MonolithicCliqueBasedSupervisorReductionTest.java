@@ -69,7 +69,6 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
     final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setIsFindFirst(false);
     simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.NONE);
     synthesizer.setSupervisorReductionSimplifier(simplifier);
     synthesizer.setSupervisorLocalizationEnabled(true);
@@ -96,9 +95,9 @@ public class MonolithicCliqueBasedSupervisorReductionTest
     }
 
     if (reductionStatistics != null) {
-      System.out.println("Overall stats for " + des.getName());
+      //System.out.println("Overall stats for " + des.getName());
       //a System.out.println(reductionStatistics.toString()) just gives me the default .toString() implementation
-      System.out.println(reductionStatistics.toString());
+      //System.out.println(reductionStatistics.toString());
     }
     return result;
   }

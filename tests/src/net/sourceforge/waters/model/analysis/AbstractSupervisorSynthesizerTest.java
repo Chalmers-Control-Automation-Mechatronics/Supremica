@@ -908,11 +908,11 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   //#########################################################################
   //# Data Members
-  private SupervisorSynthesizer mSynthesizer;
+  protected SupervisorSynthesizer mSynthesizer;
   private ControllabilityChecker mControllabilityChecker;
   private LanguageInclusionChecker mLanguageInclusionChecker;
   private ConflictChecker mConflictChecker;
   private JAXBCounterExampleMarshaller mTraceMarshaller;
-  private List<ParameterBindingProxy> mBindings;
+  protected List<ParameterBindingProxy> mBindings;
 
 }

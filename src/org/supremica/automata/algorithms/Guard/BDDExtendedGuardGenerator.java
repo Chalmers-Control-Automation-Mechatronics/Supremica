@@ -166,7 +166,7 @@ public final class BDDExtendedGuardGenerator {
 
       // update edge2BDDMap by removing entries where the edge is disabled
       // in the synchronized transition relation. This prevents generating "0"
-      // the edges that are already forbidden through synchronization.
+      // to the edges that are already forbidden through synchronization.
       final HashSet<EdgeProxy> edgesForbidden = new HashSet<>();
       for (final EdgeProxy edge: edge2BDDMap.keySet()) {
         if (edge2BDDMap.get(edge).and(statesEnablingSigmaBDD).isZero()) {
@@ -281,6 +281,16 @@ public final class BDDExtendedGuardGenerator {
 
   private void pruneEdge2GuardMap()
   {
+    // remove the edges for which the guard is true
+    final Set<EdgeProxy> trueEdges = new HashSet<>();
+    for (final EdgeProxy e: edge2GuardMap.keySet()) {
+      if (edge2GuardMap.get(e).equals(TRUE))
+        trueEdges.add(e);
+    }
+    for (final EdgeProxy e: trueEdges) {
+      edge2GuardMap.remove(e);
+    }
+
     final Map<String, Set<EdgeProxy>> guard2EdgesMap =
       new HashMap<>();
     for (final Map.Entry<EdgeProxy, String> e: edge2GuardMap.entrySet()) {
@@ -338,7 +348,7 @@ public final class BDDExtendedGuardGenerator {
       });
       final String autName =
         automataBDD.getEdge2ExAutomatonMap().get(edgeList.get(0)).getName();
-      //Remove redundant edges from edge2GuardMap...
+      // Remove redundant edges from edge2GuardMap...
       for (int i=1; i < edgeList.size(); i++) {
         final EdgeProxy edge = edgeList.get(i);
         final String otherAutName =

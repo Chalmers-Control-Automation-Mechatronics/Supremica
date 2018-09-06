@@ -33,26 +33,18 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
+import javax.swing.JFrame;
 
-import net.sourceforge.waters.gui.HTMLPrinter;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
+import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -109,8 +101,10 @@ public abstract class WatersAnalyzeAction
   @Override
   public void compilationSucceeded(final ProductDESProxy compiledDES)
   {
+    final IDE ide = getIDE();
     @SuppressWarnings("unused")
-    final AnalyzerDialog dialog = new AnalyzerDialog(compiledDES);
+    final AnalyzeDialog dialog =
+      new AnalyzeDialog(ide, compiledDES, createModelVerifier());
   }
 
   @Override
@@ -147,14 +141,14 @@ public abstract class WatersAnalyzeAction
       setEnabled(false);
       return;
     }
-    final ModelVerifier verifier = getModelVerifier();
-    setEnabled(verifier != null);
+    final ModelAnalyzer analyzer = createModelVerifier();
+    setEnabled(analyzer != null);
   }
 
 
   //#########################################################################
   //# Factory Access
-  ModelAnalyzerFactory getModelVerifierFactory()
+  ModelAnalyzerFactory getModelAnalyzerFactory()
     throws ClassNotFoundException
   {
     final ModelAnalyzerFactoryLoader loader =
@@ -162,13 +156,13 @@ public abstract class WatersAnalyzeAction
     return loader.getModelAnalyzerFactory();
   }
 
-  ModelVerifier getModelVerifier()
+  ModelVerifier createModelVerifier()
   {
     try {
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
-      final ModelAnalyzerFactory vFactory = getModelVerifierFactory();
-      final ModelVerifier verifier = getModelVerifier(vFactory, desFactory);
+      final ModelAnalyzerFactory vFactory = getModelAnalyzerFactory();
+      final ModelVerifier verifier = createModelVerifier(vFactory, desFactory);
       vFactory.configureFromOptions(verifier);
       return verifier;
     } catch (final NoClassDefFoundError |
@@ -186,90 +180,78 @@ public abstract class WatersAnalyzeAction
   protected abstract String getCheckName();
   protected abstract String getFailureDescription();
   protected abstract String getSuccessDescription();
-  protected abstract ModelVerifier getModelVerifier
+  protected abstract ModelVerifier createModelVerifier
     (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException;
 
 
   //#########################################################################
-  //# Inner Class AnalyzerDialog
-  private class AnalyzerDialog extends JDialog
+  //# Inner Class AnalyzeDialog
+  private class AnalyzeDialog extends WatersAnalyzeDialog
   {
     //#######################################################################
     //# Constructor
-    public AnalyzerDialog(final ProductDESProxy des)
+    public AnalyzeDialog(final JFrame owner,
+                         final ProductDESProxy des,
+                         final ModelAnalyzer Verifier)
     {
-      super(getIDE());
-      setTitle(getCheckName() + " Check");
-      mRunner = new AnalyzerThread();
-      mBottomPanel = new JPanel();
-      mInformationLabel = new JLabel();
-      mInformationLabel.setHorizontalAlignment(JLabel.CENTER);
-      setInformationText(" Check is running...");
-      final Border outer = BorderFactory.createRaisedBevelBorder();
-      final Border inner = BorderFactory.createEmptyBorder(4, 4, 4, 4);
-      final Border border = BorderFactory.createCompoundBorder(outer, inner);
-      mInformationLabel.setBorder(border);
-      mExitButton = new JButton("Abort");
-      mExitButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-          mRunner.abort();
-          dispose();
-        }
-      });
-      mBottomPanel.add(mExitButton, BorderLayout.WEST);
-      final Container pane = getContentPane();
-      pane.add(mInformationLabel, BorderLayout.CENTER);
-      pane.add(mBottomPanel, BorderLayout.SOUTH);
-      setLocationAndSize();
-      setVisible(true);
-      mVerifier = getModelVerifier();
-      mVerifier.setModel(des);
-      mRunner.setPriority(Thread.MIN_PRIORITY);
-      mRunner.start();
+      super(owner, des, Verifier);
     }
 
     //#######################################################################
-    //# Buttons
-    public void succeed()
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
+    @Override
+    protected String getAnalysisName()
     {
-      final ProductDESProxy des = mVerifier.getModel();
-      final String name = des.getName();
-      setInformationText("Model " + name + " " + getSuccessDescription() + ".");
-      mExitButton.setText("OK");
-      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
-      mExitButton.addActionListener(new ActionListener(){
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-          AnalyzerDialog.this.dispose();
-        }
-      });
-      setLocationAndSize();
+      return WatersAnalyzeAction.this.getCheckName() + " check";
     }
 
+    @Override
+    protected String getFailureText()
+    {
+      final ModelVerifier verifier = getModelVerifier();
+      final CounterExampleProxy counterExample = verifier.getCounterExample();
+      String text = null;
+      if (counterExample != null) {
+        text = counterExample.getComment();
+      }
+      if (text == null || text.length() == 0) {
+        final ProductDESProxy des = verifier.getModel();
+        final String name = des.getName();
+        text = "Model " + name + " " + getFailureDescription() + ".";
+      }
+      return text;
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final ModelAnalyzer analyzer = getModelAnalyzer();
+      final ProductDESProxy des = analyzer.getModel();
+      final String name = des.getName();
+      return "Model " + name + " " + getSuccessDescription() + ".";
+    }
+
+    @Override
+    protected ModelAnalyzer createModelAnalyzer()
+    {
+      return WatersAnalyzeAction.this.createModelVerifier();
+    }
+
+    @Override
     public void fail()
     {
-      mExitButton.setText("OK");
-      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
-      mExitButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-          AnalyzerDialog.this.dispose();
-        }
-      });
-      final CounterExampleProxy counterexample = mVerifier.getCounterExample();
-      String comment = null;
+      super.fail();
+      final ModelVerifier modelVerifier = getModelVerifier();
+      final CounterExampleProxy counterexample =
+        modelVerifier.getCounterExample();
       if (counterexample != null) {
-        traceButton = new JButton("Show Trace");
+        final JButton traceButton = new JButton("Show Trace");
         traceButton.addActionListener(new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent e)
           {
-            AnalyzerDialog.this.dispose();
+            AnalyzeDialog.this.dispose();
             final IDE ide = getIDE();
             final ModuleContainer container =
               (ModuleContainer) ide.getActiveDocumentContainer();
@@ -282,122 +264,25 @@ public abstract class WatersAnalyzeAction
             }
           }
         });
-        mBottomPanel.add(traceButton, BorderLayout.EAST);
-        comment = counterexample.getComment();
-      }
-      if (comment == null || comment.length() == 0) {
-        final ProductDESProxy des = mVerifier.getModel();
-        final String name = des.getName();
-        comment = "Model " + name + " " + getFailureDescription() + ".";
-      }
-      setInformationText(comment);
-      setLocationAndSize();
-    }
-
-    public void error(final Throwable exception)
-    {
-      if (exception instanceof OutOfMemoryError) {
-        setInformationText("ERROR: Out of Memory");
-      } else {
-        setInformationText("ERROR: " + exception.getMessage());
-      }
-      mExitButton.setText("OK");
-      mExitButton.removeActionListener(mExitButton.getActionListeners()[0]);
-      mExitButton.addActionListener(new ActionListener(){
-        @Override
-        public void actionPerformed(final ActionEvent e)
-        {
-          AnalyzerDialog.this.dispose();
-        }
-      });
-      setLocationAndSize();
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private void setLocationAndSize()
-    {
-      pack();
-      setLocationRelativeTo(getIDE());
-    }
-
-    private void setInformationText(final String text)
-    {
-      HTMLPrinter.setLabelText(mInformationLabel, text, DEFAULT_WIDTH);
-    }
-
-
-    //#######################################################################
-    //# Inner Class AnalyzerThread
-    private class AnalyzerThread extends Thread
-    {
-
-      @Override
-      public void run()
-      {
-        super.run();
-        try {
-          mVerifier.run();
-        } catch (final AnalysisAbortException exception) {
-          // Do nothing: Aborted
-          return;
-        } catch (final AnalysisException |
-                       NoClassDefFoundError |
-                       UnsatisfiedLinkError exception) {
-          SwingUtilities.invokeLater
-            (new Runnable() {@Override
-            public void run() {error(exception);}});
-          return;
-        } catch (final OutOfMemoryError error) {
-          mVerifier = null;
-          System.gc();
-          SwingUtilities.invokeLater
-            (new Runnable() {@Override
-            public void run() {error(error);}});
-          return;
-        }
-        final boolean result = mVerifier.isSatisfied();
-        if (result) {
-          SwingUtilities.invokeLater
-            (new Runnable() {@Override
-            public void run() {succeed();}});
-        } else {
-          SwingUtilities.invokeLater
-            (new Runnable() {@Override
-            public void run() {fail();}});
-        }
-      }
-
-      public boolean abort()
-      {
-        if (mVerifier != null) {
-          mVerifier.requestAbort();
-          return true;
-        } else {
-          return false;
-        }
+        addButton(traceButton);
       }
     }
 
     //#######################################################################
-    //# Data Members
-    private final AnalyzerThread mRunner;
-    private ModelVerifier mVerifier;
-    private final JPanel mBottomPanel;
-    private final JButton mExitButton;
-    private JButton traceButton;
-    private final JLabel mInformationLabel;
+    //# Simple Access
+    private ModelVerifier getModelVerifier()
+    {
+      return (ModelVerifier) getModelAnalyzer();
+    }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = -2478548485525996982L;
+    private static final long serialVersionUID = -3327360941008729348L;
   }
 
 
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -3797986885054648213L;
-
-  private static final int DEFAULT_WIDTH = 290;
 
 }

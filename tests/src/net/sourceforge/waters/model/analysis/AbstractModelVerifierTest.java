@@ -315,9 +315,9 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
     final String traceName = trace.getName();
     final boolean named = traceName != null && !traceName.equals("");
     final String traceLabelL =
-      named ? "trace " + traceName : "counterexample trace";
+      named ? "trace '" + traceName + "'" : "counterexample trace";
     final String traceLabelU =
-      named ? "Trace " + traceName : "Counterexample trace";
+      named ? "Trace '" + traceName + "'" : "Counterexample trace";
     final List<TraceStepProxy> traceSteps = trace.getTraceSteps();
     final Iterator<TraceStepProxy> iter = traceSteps.iterator();
     // check initial state
@@ -330,17 +330,17 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
           if (current == null) {
             current = state;
           } else {
-            fail(traceLabelU + " specifies no initial state for automaton " +
-                 aut.getName() + ", which has more than one initial state!");
+            fail(traceLabelU + " specifies no initial state for automaton '" +
+                 aut.getName() + "', which has more than one initial state!");
           }
         }
       }
-      assertNotNull("The automaton " + aut.getName() +
-                    " has no initial state!", current);
+      assertNotNull("The automaton '" + aut.getName() +
+                    "' has no initial state!", current);
     } else {
-      assertTrue(traceLabelU + "specifies initial state " + current.getName() +
-                 " for automaton " + aut.getName() +
-                 ", which is not an initial state of this automaton!",
+      assertTrue(traceLabelU + "specifies initial state '" + current.getName() +
+                 "' for automaton '" + aut.getName() +
+                 "', which is not an initial state of this automaton!",
                  current.isInitial());
     }
     // check trace steps
@@ -363,18 +363,18 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
           for (final TransitionProxy trans : transitions) {
             if (trans.getSource() == current && trans.getEvent() == event) {
               assertNull(traceLabelU + " does not contain a successor state " +
-                         "for the nondeterministic transition in automaton " +
-                         aut.getName() + " from source state " +
-                         current.getName() + " with event " + event.getName() +
-                         "!", next);
+                         "for the nondeterministic transition in automaton '" +
+                         aut.getName() + "' from source state '" +
+                         current.getName() + "' with event '" +
+                         event.getName() + "'!", next);
               next = trans.getTarget();
             }
           }
           if (!spec || iter.hasNext()) {
-            assertNotNull("The automaton " + aut.getName() +
-                          " has no successor state for event " +
-                          event.getName() + " from state " +
-                          current.getName() + "!", next);
+            assertNotNull("The automaton '" + aut.getName() +
+                          "' has no successor state for event '" +
+                          event.getName() + "' from state '" +
+                          current.getName() + "'!", next);
           }
           current = next;
         }
@@ -387,26 +387,26 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
               found = true;
             }
           }
-          assertTrue("There is no transition from state " + current.getName() +
-                     " to state " + target.getName() + " with event " +
-                     event.getName() + " in automaton " + aut.getName() +
-                     " as specified in the " + traceLabelL + "!", found);
+          assertTrue("There is no transition from state '" + current.getName() +
+                     "' to state '" + target.getName() + "' with event '" +
+                     event.getName() + "' in automaton '" + aut.getName() +
+                     "' as specified in the " + traceLabelL + "!", found);
           current = target;
         } else {
           assertSame("The target state specified in the " + traceLabelL +
-                     " for the selflooped event " + event.getName() +
-                     " is different from the current state of automaton " +
-                     aut.getName() + "!", current, target);
+                     " for the selflooped event '" + event.getName() +
+                     "' is different from the current state of automaton '" +
+                     aut.getName() + "'!", current, target);
         }
       }
     }
     // check loop entry state
     if (loopIndex >= 0) {
       assertNotNull(traceLabelU + " includes empty loop!", loopEntryState);
-      assertSame("The end state " + current.getName() +
-                 " reached by automaton " + aut.getName() + " in the " +
-                 traceLabelL + " is not the same as the loop entry state " +
-                 loopEntryState.getName() + "!", current, loopEntryState);
+      assertSame("The end state '" + current.getName() +
+                 "' reached by automaton '" + aut.getName() + "' in the " +
+                 traceLabelL + " is not the same as the loop entry state '" +
+                 loopEntryState.getName() + "'!", current, loopEntryState);
     }
     // return the end state of the counterexample trace
     return current;

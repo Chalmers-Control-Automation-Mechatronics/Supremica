@@ -96,7 +96,7 @@ public class AbortableCompiler implements Abortable
     throws VisitorException
   {
     if (mIsAborting) {
-      final AnalysisAbortException exception = new AnalysisAbortException();
+      final EvalAbortException exception = new EvalAbortException();
       throw new VisitorException(exception);
     }
   }

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="coffee_machine" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <EventDeclList>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="e4"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e5"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e6"/>
+        <EventDecl Kind="CONTROLLABLE" Name="e7"/>
+        <EventDecl Kind="PROPOSITION" Name=":accepting"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SUPERVISOR" Name="sup:coffee">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="S:0">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                    </SimpleNode>
+                    <SimpleNode Name="S:1"/>
+                    <SimpleNode Name="S:2"/>
+                    <SimpleNode Name="S:3"/>
+                    <SimpleNode Name="S:4"/>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="S:0" Target="S:1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e6"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e2"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:1" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                            <SimpleIdentifier Name="e7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:3">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e7"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:2" Target="S:4">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e5"/>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S:3" Target="S:0">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="e4"/>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>

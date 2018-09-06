@@ -34,53 +34,49 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.JTextField;
 
+import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
-import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
+import org.supremica.gui.ide.IDE;
 
 
 /**
- * @author George Hewlett, Carly Hona
+ * @author George Hewlett, Robi Malik
  */
 public class AutomatonSynthesizerDialog extends JDialog
 {
@@ -92,41 +88,27 @@ public class AutomatonSynthesizerDialog extends JDialog
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 
-    setTitle("Synchronizing automatons'");
+    setTitle("Supervisor synthesis");
     createComponents();
     layoutComponents();
 
     setLocationRelativeTo(panel.getTopLevelAncestor());
-    mNameInput.requestFocusInWindow();
+    mNamePrefix.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
+
+    mSuWonHam = new SuWonhamSupervisorReductionTRSimplifier();
+    mCliqueBased = new CliqueBasedSupervisorReductionTRSimplifier();
   }
 
-  //#########################################################################
-  //# Access to Edited Item
-  /**
-   * Gets the automaton edited by this dialog.
-   *
-   * @return A reference to the automaton being edited by this dialog.
-   */
-  public List<AutomatonProxy> getEditedItem()
-  {
-    final List<AutomatonProxy> autList =
-      mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-    return autList;
-  }
 
   //#########################################################################
   //# Initialisation and Layout of Components
   /**
    * Initialise buttons and components.
    */
-  @SuppressWarnings("null")
   private void createComponents()
   {
-    final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
-    final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final ExpressionParser parser = new ExpressionParser(factory, optable);
     final ActionListener commithandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -136,53 +118,38 @@ public class AutomatonSynthesizerDialog extends JDialog
     };
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
-    mNameLabel = new JLabel("Name:");
-    IdentifierProxy oldname = null;
-    try {
-      oldname = parser.parseIdentifier(getNewName());
-    } catch (final ParseException exception) {
-      exception.printStackTrace();
-    }
-    mNameInput =
-      new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
-    //mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
-    mKindLabel = new JLabel("Kind:");
-    mKindGroup = new ButtonGroup();
-    mPlantButton = new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
-                                       mKindGroup, 'p');
-    mPropertyButton =
-      new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
-                          mKindGroup, 'o');
-    mSpecButton =
-      new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC,
-                          mKindGroup, 's');
-    mSupervisorButton =
-      new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
-                          mKindGroup, 'u');
-
-    final ComponentKind kind = getKind();
-    switch (kind) {
-    case PLANT:
-      mPlantButton.setSelected(true);
-      break;
-    case PROPERTY:
-      mPropertyButton.setSelected(true);
-      break;
-    case SPEC:
-      mSpecButton.setSelected(true);
-      break;
-    case SUPERVISOR:
-      mSupervisorButton.setSelected(true);
-      break;
-    }
-
-    // Error panel ...
-    mErrorPanel = new RaisedDialogPanel();
-    mErrorLabel = new ErrorLabel();
-    mErrorPanel.add(mErrorLabel);
-    mNameInput.setErrorDisplay(mErrorLabel);
+    mNamePrefixLabel = new JLabel("Name Prefix:");
+    mNamePrefix = new JTextField();
+    mNamePrefix.setText("sup");
+    mNamePrefix.addActionListener(commithandler);
+    mNamePrefix.setToolTipText("Name prefix for synthesised supervisor components");
+    mObjectLabel = new JLabel("Objective: ");
+    mControllable = new JCheckBox("Controllable", true);
+    mNonBlocking = new JCheckBox("Nonblocking", true);
+    final ActionListener ObjectiveHandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        final JCheckBox checkbox = (JCheckBox) event.getSource();
+        objectiveChanged(checkbox);
+      }
+    };
+    mControllable.addActionListener(ObjectiveHandler);
+    mNonBlocking.addActionListener(ObjectiveHandler);
+    mSupReductionLabel = new JLabel("Supervisor Reduction: ");
+    final String[] types = {"off", "Su/Wonham", "Clique-Based"};
+    mSupReductionType = new JComboBox<>(types);
+    mSupReductionType.setSelectedIndex(0);
+    final ActionListener ReductionHandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        reductionChanged();
+      }
+    };
+    mSupReductionType.addActionListener(ReductionHandler);
+    mLocalisedSupervisor = new JCheckBox("Localised Supervisors", false);
+    mLocalisedSupervisor.setEnabled(false);
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
@@ -220,43 +187,56 @@ public class AutomatonSynthesizerDialog extends JDialog
     constraints.gridy = 0;
     constraints.weightx = 0.0;
     constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mNameLabel, constraints);
-    mMainPanel.add(mNameLabel);
+    mainlayout.setConstraints(mNamePrefixLabel, constraints);
+    mMainPanel.add(mNamePrefixLabel);
     // mNameInput
-    mNameInput.setColumns(20);
-    constraints.gridx++;
+    mNamePrefix.setColumns(20);
+    constraints.gridx = constraints.gridx + 2;
     constraints.gridwidth = 2;
     constraints.weightx = 3.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mNameInput, constraints);
-    mMainPanel.add(mNameInput);
-    // TODO No selection of kind in synthesis
-    // mKindLabel
+    mainlayout.setConstraints(mNamePrefix, constraints);
+    mMainPanel.add(mNamePrefix);
+    // mObjectLabel
     constraints.gridx = 0;
     constraints.gridy++;
-    constraints.gridwidth = 1;
     constraints.weightx = 0.0;
+    constraints.anchor = GridBagConstraints.WEST;
+    mainlayout.setConstraints(mObjectLabel, constraints);
+    mMainPanel.add(mObjectLabel);
+    // mControllable
+    constraints.gridx = constraints.gridx + 2;
     constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mKindLabel, constraints);
-    mMainPanel.add(mKindLabel);
-    // mPlantButton
-    constraints.gridx++;
-    constraints.weightx = 1.0;
-    mainlayout.setConstraints(mPlantButton, constraints);
-    mMainPanel.add(mPlantButton);
-    // mSpecButton
-    constraints.gridx++;
-    mainlayout.setConstraints(mSpecButton, constraints);
-    mMainPanel.add(mSpecButton);
-    // mPropertyButton
-    constraints.gridx--;
+    mainlayout.setConstraints(mControllable, constraints);
+    mMainPanel.add(mControllable);
+    // mNonBlocking
     constraints.gridy++;
-    mainlayout.setConstraints(mPropertyButton, constraints);
-    mMainPanel.add(mPropertyButton);
-    // mSupervisorButton
-    constraints.gridx++;
-    mainlayout.setConstraints(mSupervisorButton, constraints);
-    mMainPanel.add(mSupervisorButton);
+    constraints.gridx = 2;
+    constraints.fill = GridBagConstraints.NONE;
+    mainlayout.setConstraints(mNonBlocking, constraints);
+    mMainPanel.add(mNonBlocking);
+    // mSupReductionLabel
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.weightx = 0.0;
+    constraints.anchor = GridBagConstraints.WEST;
+    mainlayout.setConstraints(mSupReductionLabel, constraints);
+    mMainPanel.add(mSupReductionLabel);
+    // mSupReductionType
+    constraints.gridx = constraints.gridx + 2;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    mainlayout.setConstraints(mSupReductionType, constraints);
+    mMainPanel.add(mSupReductionType);
+    // mLocalisedSupervisor
+    constraints.gridx = 2;
+    constraints.gridy++;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.anchor = GridBagConstraints.WEST;
+    mainlayout.setConstraints(mLocalisedSupervisor, constraints);
+    mMainPanel.add(mLocalisedSupervisor);
 
     // Finally, build the full dialog ...
     final Container contents = getContentPane();
@@ -272,14 +252,11 @@ public class AutomatonSynthesizerDialog extends JDialog
     layout.setConstraints(mMainPanel, constraints);
     contents.add(mMainPanel);
 
-    constraints.weighty = 0.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    layout.setConstraints(mErrorPanel, constraints);
-    contents.add(mErrorPanel);
     layout.setConstraints(mButtonsPanel, constraints);
     contents.add(mButtonsPanel);
     pack();
   }
+
 
   //#########################################################################
   //# Action Listeners
@@ -291,122 +268,142 @@ public class AutomatonSynthesizerDialog extends JDialog
   {
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
-    if (isInputLocked()) {
-      // There is invalid input and an error message has been displayed.
-      // Do not try to commit.
+    final String prefixName = mNamePrefix.getText();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
+                                           mAutomatonList, factory);
+    mSynthesizer = new MonolithicSynthesizer(des, factory);
+    mSynthesizer.setOutputName(prefixName);
+    final KindTranslator translator;
+    if (mControllable.isSelected()) {
+      translator = IdenticalKindTranslator.getInstance();
     } else {
-      // Read the data from the dialog ...
-      //      final IdentifierSubject ident0 =
-      //        (IdentifierSubject) mNameInput.getValue();
-      //      final IdentifierSubject ident =
-      //        ident0.getParent() == null ? ident0 : ident0.clone();
-      final String name = mNameInput.getText();
-      //      final ComponentKind kind;
-      //      if (mPlantButton.isSelected()) {
-      //        kind = ComponentKind.PLANT;
-      //      } else if (mPropertyButton.isSelected()) {
-      //        kind = ComponentKind.PROPERTY;
-      //      } else if (mSpecButton.isSelected()) {
-      //        kind = ComponentKind.SPEC;
-      //      } else if (mSupervisorButton.isSelected()) {
-      //        kind = ComponentKind.SUPERVISOR;
-      //      } else {
-      //        throw new IllegalStateException("Component kind not selected!");
-      //      }
+      translator = ControllableSynthesisKindTranslator.getInstance();
+    }
+    mSynthesizer.setKindTranslator(translator);
+    mSynthesizer.setNonblockingSupported(mNonBlocking.isSelected());
+    final AbstractSupervisorReductionTRSimplifier simplifier;
+    if (mSupReductionType.getSelectedIndex() == 0) {
+      simplifier = null;
+    } else if (mSupReductionType.getSelectedIndex() == 1) {
+      simplifier = mSuWonHam;
+    } else {
+      simplifier = mCliqueBased;
+    }
+    mSynthesizer.setSupervisorReductionSimplifier(simplifier);
+    mSynthesizer.setSupervisorLocalizationEnabled
+      (mLocalisedSupervisor.isSelected());
+    mSynthesizer.setModel(des);
+    final IDE ide = mAnalyzerPanel.mModuleContainer.getIDE();
+    final SynthesisPopUpDialog dialog =
+      new SynthesisPopUpDialog(ide, des, mSynthesizer);
+    dispose();
+    dialog.setVisible(true);
+  }
 
-      final ProductDESProxy des =
-        AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                             mAutomatonList, factory);
-      final MonolithicSynthesizer syn =
-        new MonolithicSynthesizer(des, factory);
-      syn.setOutputName(name);
-      try {
-        syn.run();
-      } catch (final AnalysisException exception) {
-        final Logger logger = LogManager.getLogger();
-        final String msg = exception.getMessage();
-        logger.error(msg);
+  private void reductionChanged()
+  {
+    if (mSupReductionType.getSelectedIndex() == 1) {
+      if (mSuWonHam.isSupervisedEventRequired()) {
+        mLocalisedSupervisor.setSelected(true);
+        mLocalisedSupervisor.setEnabled(false);
+      } else {
+        mLocalisedSupervisor.setSelected(false);
+        mLocalisedSupervisor.setEnabled(true);
+
       }
-      final MonolithicSynthesisResult result = syn.getAnalysisResult();
-      final Collection<AutomatonProxy> resultList =
-        result.getComputedAutomata();
-      final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
-      if (resultList != null) {
-        final List<AutomatonProxy> autList =
-          new ArrayList<AutomatonProxy>(resultList);
-        model.insertRows(autList);
+    } else if (mSupReductionType.getSelectedIndex() == 2) {
+      if (mCliqueBased.isSupervisedEventRequired()) {
+        mLocalisedSupervisor.setSelected(true);
+        mLocalisedSupervisor.setEnabled(false);
+      } else {
+        mLocalisedSupervisor.setSelected(false);
+        mLocalisedSupervisor.setEnabled(true);
+
       }
-      // Close the dialog
-      dispose();
+    } else {
+      mLocalisedSupervisor.setSelected(false);
+      mLocalisedSupervisor.setEnabled(false);
+    }
+  }
+
+  private void objectiveChanged(final JCheckBox checkbox)
+  {
+    if (checkbox.equals(mControllable)) {
+      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
+        mNonBlocking.setSelected(true);
+      }
+    } else {
+      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
+        mControllable.setSelected(true);
+      }
     }
   }
 
   //#########################################################################
-  //# Auxiliary Methods
-  /**
-   * Checks whether it is unsafe to commit the currently edited text field. If
-   * this method returns <CODE>true</CODE>, it is unsafe to commit the current
-   * dialog contents, and shifting the focus is to be avoided.
-   *
-   * @return <CODE>true</CODE> if the component currently owning the focus has
-   *         been found to contain invalid information, <CODE>false</CODE>
-   *         otherwise.
-   */
-  private boolean isInputLocked()
+  //# Inner Class AnalyzerDialog
+  private class SynthesisPopUpDialog extends WatersAnalyzeDialog
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
-  }
-
-  private String getNewName()
-  {
-    String name = "";
-    if (mAutomatonList.size() <= 4)
-      for (final AutomatonProxy aut : mAutomatonList) {
-        if (aut.equals(mAutomatonList.get((mAutomatonList.size() - 1))))
-          name += aut.getName();
-        else
-          name += aut.getName() + "_";
-      }
-    else
-      name = "New Automaton";
-    return name;
-  }
-
-  private ComponentKind getKind()
-  {
-    int plantCount = 0;
-    int propCount = 0;
-    int specCount = 0;
-    int superCount = 0;
-    for (final AutomatonProxy aut : mAutomatonList) {
-      switch (aut.getKind()) {
-      case PLANT:
-        plantCount++;
-        break;
-      case PROPERTY:
-        propCount++;
-        break;
-      case SPEC:
-        specCount++;
-        break;
-      case SUPERVISOR:
-        superCount++;
-        break;
-      }
-
+    //#######################################################################
+    //# Constructor
+    public SynthesisPopUpDialog(final Frame owner,
+                                final ProductDESProxy des,
+                                final ModelAnalyzer Verifier)
+    {
+      super(owner, des, Verifier);
     }
-    if (plantCount > specCount || plantCount > propCount
-        || plantCount > superCount)
-      return ComponentKind.PLANT;
-    else if (propCount > specCount || propCount > plantCount
-             || propCount > superCount)
-      return ComponentKind.PROPERTY;
-    else if (specCount > plantCount || specCount > propCount
-             || specCount > superCount)
-      return ComponentKind.SPEC;
-    else
-      return ComponentKind.SUPERVISOR;
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
+    @Override
+    public void succeed()
+    {
+      super.succeed();
+      final MonolithicSynthesisResult result = mSynthesizer.getAnalysisResult();
+      final Collection<AutomatonProxy> resultList = result.getComputedAutomata();
+      final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
+      model.insertRows(resultList);
+    }
+
+    @Override
+    protected String getAnalysisName()
+    {
+      return "Supervisor synthesis";
+    }
+
+    @Override
+    protected String getFailureText()
+    {
+      return "Synthesis failed. There is no solution to the control problem.";
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final MonolithicSynthesisResult result = mSynthesizer.getAnalysisResult();
+      final int size = result.getComputedAutomata().size();
+      switch (size) {
+      case 0:
+        return "The system already satisfies all control objectives. " +
+               "No supervisor is needed.";
+      case 1:
+        return "Successfully synthesised a supervisor.";
+      default:
+        return "Successfully synthesised " + size + " supervisor components.";
+      }
+    }
+
+    @Override
+    protected ModelAnalyzer createModelAnalyzer()
+    {
+      return mSynthesizer;
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 6159733639861131531L;
   }
+
 
   //#########################################################################
   //# Data Members
@@ -416,17 +413,23 @@ public class AutomatonSynthesizerDialog extends JDialog
 
   // Swing components
   private JPanel mMainPanel;
-  private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
-  private JLabel mKindLabel;
-  private ButtonGroup mKindGroup;
-  private IconRadioButton mPlantButton;
-  private IconRadioButton mPropertyButton;
-  private IconRadioButton mSpecButton;
-  private IconRadioButton mSupervisorButton;
-  private JPanel mErrorPanel;
-  private ErrorLabel mErrorLabel;
+  private JLabel mNamePrefixLabel;
+  private JTextField mNamePrefix;
+  // private JPanel mErrorPanel;
+  // private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+
+  private JLabel mObjectLabel;
+  private JCheckBox mControllable;
+  private JCheckBox mNonBlocking;
+  private JLabel mSupReductionLabel;
+  private JComboBox<String> mSupReductionType;
+  private JCheckBox mLocalisedSupervisor;
+
+  // Analysis workers
+  private MonolithicSynthesizer mSynthesizer;
+  private final SuWonhamSupervisorReductionTRSimplifier mSuWonHam;
+  private final CliqueBasedSupervisorReductionTRSimplifier mCliqueBased;
 
 
   //#########################################################################

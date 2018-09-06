@@ -64,7 +64,6 @@ import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -100,19 +99,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
     setMinimumSize(getSize());
   }
 
-  //#########################################################################
-  //# Access to Edited Item
-  /**
-   * Gets the automaton edited by this dialog.
-   *
-   * @return A reference to the automaton being edited by this dialog.
-   */
-  public List<AutomatonProxy> getEditedItem()
-  {
-    final List<AutomatonProxy> autList =
-      mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-    return autList;
-  }
 
   //#########################################################################
   //# Initialisation and Layout of Components
@@ -140,9 +126,9 @@ public class AutomatonSynchronousProductDialog extends JDialog
     } catch (final ParseException exception) {
       exception.printStackTrace();
     }
+    final FormattedInputParser nameparser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, false);
     mNameInput =
-      new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
-    //mNameInput = new SimpleExpressionCell(Operator.TYPE_NAME, parser);
+      new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -366,7 +352,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
     int plantCount = 0;
     int propCount = 0;
     int specCount = 0;
-    int superCount = 0;
     for (final AutomatonProxy aut : mAutomatonList) {
       switch (aut.getKind()) {
       case PLANT:
@@ -379,17 +364,15 @@ public class AutomatonSynchronousProductDialog extends JDialog
         specCount++;
         break;
       case SUPERVISOR:
-        superCount++;
         break;
       }
 
     }
-    // TODO if (plantCount > 0) then PLANT; else if (specCount > 0) ...
-    if(plantCount > specCount || plantCount > propCount ||plantCount > superCount)
+    if(plantCount > 0)
       return ComponentKind.PLANT;
-    else if(propCount > specCount || propCount > plantCount ||propCount > superCount)
+    else if(propCount > 0)
       return ComponentKind.PROPERTY;
-    else if(specCount > plantCount || specCount > propCount ||specCount > superCount)
+    else if(specCount > 0)
       return ComponentKind.SPEC;
     else
       return ComponentKind.SUPERVISOR;

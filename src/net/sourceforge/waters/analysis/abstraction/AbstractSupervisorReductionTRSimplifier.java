@@ -77,7 +77,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  */
 
 public abstract class AbstractSupervisorReductionTRSimplifier
-  extends AbstractMarkingTRSimplifier
+  extends AbstractTRSimplifier
 {
 
   //#########################################################################
@@ -98,6 +98,14 @@ public abstract class AbstractSupervisorReductionTRSimplifier
   public boolean isObservationEquivalentAbstraction()
   {
     return false;
+  }
+
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, true, false);
+    return setStatistics(stats);
   }
 
 

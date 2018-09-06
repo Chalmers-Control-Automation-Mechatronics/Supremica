@@ -59,7 +59,6 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -128,10 +127,12 @@ public class AutomatonPropertiesDialog extends JDialog
     try {
       oldname = parser.parseIdentifier(mAutomaton.getName());
     } catch (final ParseException exception) {
-      exception.printStackTrace();
+      oldname = factory.createSimpleIdentifierProxy(mAutomaton.getName());
+      //exception.printStackTrace();
     }
+    final FormattedInputParser nameparser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, true);
     mNameInput =
-      new SimpleExpressionCell(oldname, Operator.TYPE_NAME, parser);
+      new SimpleExpressionCell(oldname, nameparser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -315,7 +316,6 @@ public class AutomatonPropertiesDialog extends JDialog
       } else {
         throw new IllegalStateException("Component kind not selected!");
       }
-      // TODO Use attributes from dialog
       final Map<String,String> attribs = mAttributesPanel.getTableData();
       final Map<String,String> autAttribs = mAutomaton.getAttributes();
       if (!attribs.equals(autAttribs) || !kind.equals(mAutomaton.getKind())
@@ -325,7 +325,7 @@ public class AutomatonPropertiesDialog extends JDialog
                                        mAutomaton.getEvents(),
                                        mAutomaton.getStates(),
                                        mAutomaton.getTransitions(),
-                                       mAutomaton.getAttributes());
+                                       attribs);
 
         final AutomataTableModel model =
           mAnalyzerPanel.getAutomataTableModel();

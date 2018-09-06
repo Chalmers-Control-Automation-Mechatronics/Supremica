@@ -184,7 +184,8 @@ public abstract class BDDAbstractManager {
     public BDD guard2BDD(final SimpleExpressionProxy expr,
                          final HashSet<String> updatedVars) {
       final ResultOverflows guardBDD = expr2BDDBitVec(expr, true, updatedVars);
-      return guardBDD.getResult().getBit(0).and(guardBDD.getOverflows().not());
+      final BDD result = guardBDD.getResult().getBit(0);
+      return result;
     }
 
     public BDD action2BDD(final BinaryExpressionProxy expr)
@@ -551,7 +552,7 @@ public abstract class BDDAbstractManager {
             bddExAutomata.getIndexMap().getEventAt(eventIndex).getName();
           final Map<EdgeProxy, BDD> eventEdge2BDDMap =
             bddExAutomata.getEventName2EdgeBDDMap().get(eventName);
-          final BDD edgeSourceBDD = guardBDD
+          final BDD edgeSourceBDD = sourceBDD
             .exist(bddExAutomata.getDestStatesVarSet())
             .exist(bddExAutomata.getEventVarSet());
           if (!edgeSourceBDD.isZero())

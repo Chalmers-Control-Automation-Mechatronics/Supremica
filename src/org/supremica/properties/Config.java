@@ -216,9 +216,12 @@ public final class Config
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
+    public static final BooleanProperty BACKGROUND_COMPILER =
+      new BooleanProperty(PropertyType.GUI, "backgroundCompiler", true,
+              "Compile automatically while editing");
     public static final BooleanProperty OPTIMIZING_COMPILER =
       new BooleanProperty(PropertyType.GUI, "optimizingCompiler", false,
-			  "Remove redundant events, transitions, and components " +
+              "Remove redundant events, transitions, and components " +
               "when compiling");
     public static final BooleanProperty NORMALIZING_COMPILER =
       new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,

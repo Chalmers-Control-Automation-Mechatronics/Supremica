@@ -61,7 +61,7 @@ public class AnalyzeSDSingularPropertyAction extends WatersAnalyzeAction
     return "does not satisfy S-Singular Prohibitable Behaviour Property ";
   }
 
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {

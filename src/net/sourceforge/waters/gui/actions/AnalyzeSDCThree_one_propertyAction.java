@@ -61,7 +61,7 @@ public class AnalyzeSDCThree_one_propertyAction extends WatersAnalyzeAction
     return "does not satisfy SD Controllability Point iii.1  ";
   }
 
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {

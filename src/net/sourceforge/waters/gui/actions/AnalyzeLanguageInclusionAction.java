@@ -121,7 +121,7 @@ public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
   }
 
   @Override
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory vfactory,
      final ProductDESProxyFactory desfactory) throws AnalysisConfigurationException
   {

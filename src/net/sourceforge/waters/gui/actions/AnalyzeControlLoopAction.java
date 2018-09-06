@@ -59,7 +59,7 @@ public class AnalyzeControlLoopAction extends WatersAnalyzeAction
     return "has a control loop";
   }
 
-  protected ModelVerifier getModelVerifier(final ModelAnalyzerFactory factory,
+  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
                                            final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     return factory.createControlLoopChecker(desFactory);

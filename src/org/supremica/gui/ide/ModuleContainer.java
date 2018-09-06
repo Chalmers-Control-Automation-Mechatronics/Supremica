@@ -682,7 +682,7 @@ public class ModuleContainer
       try {
         if (mSelected instanceof SupremicaAnalyzerPanel) {
           final SupremicaAnalyzerPanel panel = (SupremicaAnalyzerPanel) mSelected;
-          panel.updateAutomata(compiledDES);
+          panel.updateAutomata(compiledDES);  // may throw ...
         }
         final int index = indexOfComponent(mSelected);
         setSelectedIndexImpl(index);
