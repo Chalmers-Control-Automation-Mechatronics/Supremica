@@ -105,10 +105,10 @@ Nicholas Mcgrath
                     <Edge Source="S3" Target="S3">
                         <LabelBlock>
                             <SimpleIdentifier Name="f"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="9" Y="-4"/>
+                            </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="165" Y="3"/>
-                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
