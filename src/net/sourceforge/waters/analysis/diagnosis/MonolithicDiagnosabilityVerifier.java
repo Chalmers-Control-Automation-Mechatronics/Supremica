@@ -463,8 +463,12 @@ public class MonolithicDiagnosabilityVerifier
     }
     addStep((succA&MsbMask),-1,traceA);
     addStep((succB&MsbMask),-1,traceB);
-
-
+    if(loopIndexA==(traceA.size()-1)) {
+      loopIndexA = -1;
+    }
+    if(loopIndexB==(traceB.size()-1)) {
+      loopIndexB = -1;
+    }
     final String nameA = "faulty";
     final String nameB = "non-faulty";
     final String ceName = getModel().getName()+"-undiagnosable";
