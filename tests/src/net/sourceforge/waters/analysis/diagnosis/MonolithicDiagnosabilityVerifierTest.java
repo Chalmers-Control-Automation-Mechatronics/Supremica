@@ -51,7 +51,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class MonolithicDiagnosabilityVerifierTest
@@ -369,16 +368,11 @@ public class MonolithicDiagnosabilityVerifierTest
     for(final AutomatonProxy aut : automata) {
       final StateProxy lastA = lastMapA.get(aut);
       final StateProxy lastB = lastMapB.get(aut);
-      final ComponentKind kind = aut.getKind();
-        assertTrue("TraceA is not possible in automaton  "+aut.getName(),
-          lastA == super.checkTrace(aut, traceA));
-        assertTrue("TraceB is not possible in automaton  "+aut.getName(),
-          lastB == super.checkTrace(aut, traceB));
-
-
+      assertTrue("TraceA is not possible in automaton " + aut.getName(),
+                 lastA == super.checkTrace(aut, traceA));
+      assertTrue("TraceB is not possible in automaton " + aut.getName(),
+                 lastB == super.checkTrace(aut, traceB));
     }
   }
-
-
 
 }
