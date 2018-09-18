@@ -139,7 +139,7 @@ public class BackgroundCompiler
         abortNonBackgroundCompiler();
       }
     };
-    setModuleChanged();
+    mModuleChanged = true;
     if (Config.BACKGROUND_COMPILER.isTrue()) {
       compile(null);
     }
@@ -179,8 +179,9 @@ public class BackgroundCompiler
    * changed.
    * If the module has changed and the compiler is not already running,
    * compilation is started.
-   * If the module has changed and the compiler is already running,
-   * a flag is set to restart the compiler as soon as it finishes.
+   * If the module has changed and the compiler is already running, it is
+   * requested to abort and a flag is set to restart the compiler as soon as
+   * it is ready.
    * @param  observer  An observer object to be notified as soon as the
    *                   compilation has finished and the results are available,
    *                   or <CODE>null</CODE>.
@@ -204,8 +205,8 @@ public class BackgroundCompiler
   }
 
   /**
-   * Ensures that the module is recompiled as soon as possible event if it has
-   * not changed. This method calls {@link #setModuleChanged()} followed by
+   * Ensures that the module is recompiled as soon as possible even if it has
+   * not changed. This method marks the module as changed and then calls
    * {@link #compile(CompilationObserver) compile()}.
    * @param  observer  An observer object to be notified as soon as the
    *                   compilation has finished and the results are available,
@@ -213,7 +214,7 @@ public class BackgroundCompiler
    */
   public void forceCompile(final CompilationObserver observer)
   {
-    setModuleChanged();
+    mModuleChanged = true;
     compile(observer);
   }
 
