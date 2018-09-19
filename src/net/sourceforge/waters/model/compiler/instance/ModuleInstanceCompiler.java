@@ -1168,7 +1168,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           mFactory.createVariableComponentProxy(fullName, value,
                                                 newInit, newMarkings);
         mNameSpace.addComponent(suffix, newVar);
-        mCompilationInfo.add(newVar, var);
+        mCompilationInfo.add(newVar, var, mContext);
         return newVar;
       } else {
         // Although variables are compiled in a first pass, they are
