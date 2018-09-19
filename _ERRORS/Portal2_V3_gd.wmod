@@ -78,7 +78,7 @@
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
     </EventDeclList>
     <ComponentList>
-        <VariableComponent Name="Pcb1State_curr">
+        <VariableComponent Name="Pcb1State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -87,13 +87,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb1State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb1State == Unknown">
+                    <SimpleIdentifier Name="Pcb1State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb2State_curr">
+        <VariableComponent Name="Pcb2State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -102,13 +102,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb2State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb2State == Unknown">
+                    <SimpleIdentifier Name="Pcb2State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb3State_curr">
+        <VariableComponent Name="Pcb3State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -117,13 +117,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb3State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb3State == Unknown">
+                    <SimpleIdentifier Name="Pcb3State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb4State_curr">
+        <VariableComponent Name="Pcb4State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -132,13 +132,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb4State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb4State == Unknown">
+                    <SimpleIdentifier Name="Pcb4State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb5State_curr">
+        <VariableComponent Name="Pcb5State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -147,13 +147,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb5State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb5State == Unknown">
+                    <SimpleIdentifier Name="Pcb5State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb6State_curr">
+        <VariableComponent Name="Pcb6State">
             <VariableRange>
                 <EnumSetExpression Text="[Unknown,Good,Bad]">
                     <SimpleIdentifier Name="Unknown"/>
@@ -162,13 +162,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb6State_curr == Unknown">
-                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb6State == Unknown">
+                    <SimpleIdentifier Name="Pcb6State"/>
                     <SimpleIdentifier Name="Unknown"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb1Spot_curr">
+        <VariableComponent Name="Pcb1Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -176,13 +176,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb1Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb1Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb1Spot == empty">
+                    <SimpleIdentifier Name="Pcb1Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb2Spot_curr">
+        <VariableComponent Name="Pcb2Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -190,13 +190,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb2Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb2Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb2Spot == empty">
+                    <SimpleIdentifier Name="Pcb2Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb3Spot_curr">
+        <VariableComponent Name="Pcb3Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -204,13 +204,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb3Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb3Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb3Spot == empty">
+                    <SimpleIdentifier Name="Pcb3Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb4Spot_curr">
+        <VariableComponent Name="Pcb4Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -218,13 +218,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb4Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb4Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb4Spot == empty">
+                    <SimpleIdentifier Name="Pcb4Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb5Spot_curr">
+        <VariableComponent Name="Pcb5Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -232,13 +232,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb5Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb5Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb5Spot == empty">
+                    <SimpleIdentifier Name="Pcb5Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="Pcb6Spot_curr">
+        <VariableComponent Name="Pcb6Spot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -246,13 +246,13 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="Pcb6Spot_curr == empty">
-                    <SimpleIdentifier Name="Pcb6Spot_curr"/>
+                <BinaryExpression Operator="==" Text="Pcb6Spot == empty">
+                    <SimpleIdentifier Name="Pcb6Spot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
         </VariableComponent>
-        <VariableComponent Name="PanelSpot_curr">
+        <VariableComponent Name="PanelSpot">
             <VariableRange>
                 <EnumSetExpression Text="[empty,full]">
                     <SimpleIdentifier Name="empty"/>
@@ -260,8 +260,8 @@
                 </EnumSetExpression>
             </VariableRange>
             <VariableInitial>
-                <BinaryExpression Operator="==" Text="PanelSpot_curr == empty">
-                    <SimpleIdentifier Name="PanelSpot_curr"/>
+                <BinaryExpression Operator="==" Text="PanelSpot == empty">
+                    <SimpleIdentifier Name="PanelSpot"/>
                     <SimpleIdentifier Name="empty"/>
                 </BinaryExpression>
             </VariableInitial>
@@ -468,8 +468,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb1Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb1Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb1Spot == full">
+                                    <SimpleIdentifier Name="Pcb1Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -493,8 +493,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb1Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1Spot = empty">
+                                    <SimpleIdentifier Name="Pcb1Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -515,8 +515,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb2Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb2Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb2Spot == full">
+                                    <SimpleIdentifier Name="Pcb2Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -540,8 +540,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb2Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb2Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2Spot = empty">
+                                    <SimpleIdentifier Name="Pcb2Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -565,8 +565,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb3Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb3Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb3Spot == full">
+                                    <SimpleIdentifier Name="Pcb3Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -590,8 +590,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb3Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb3Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3Spot = empty">
+                                    <SimpleIdentifier Name="Pcb3Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -615,8 +615,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb4Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb4Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb4Spot == full">
+                                    <SimpleIdentifier Name="Pcb4Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -640,8 +640,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb4Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb4Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4Spot = empty">
+                                    <SimpleIdentifier Name="Pcb4Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -665,8 +665,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb5Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb5Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb5Spot == full">
+                                    <SimpleIdentifier Name="Pcb5Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -690,8 +690,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb5Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb5Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5Spot = empty">
+                                    <SimpleIdentifier Name="Pcb5Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -715,8 +715,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb6Spot_curr == full">
-                                    <SimpleIdentifier Name="Pcb6Spot_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb6Spot == full">
+                                    <SimpleIdentifier Name="Pcb6Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -740,8 +740,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb6Spot_curr = empty">
-                                    <SimpleIdentifier Name="Pcb6Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6Spot = empty">
+                                    <SimpleIdentifier Name="Pcb6Spot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -765,8 +765,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="PanelSpot_curr == full">
-                                    <SimpleIdentifier Name="PanelSpot_curr"/>
+                                <BinaryExpression Operator="==" Text="PanelSpot == full">
+                                    <SimpleIdentifier Name="PanelSpot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Guards>
@@ -790,8 +790,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="PanelSpot_curr = empty">
-                                    <SimpleIdentifier Name="PanelSpot_curr"/>
+                                <BinaryExpression Operator="=" Text="PanelSpot = empty">
+                                    <SimpleIdentifier Name="PanelSpot"/>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1147,32 +1147,32 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb1Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1Spot = full">
+                                    <SimpleIdentifier Name="Pcb1Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="Pcb2Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb2Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2Spot = full">
+                                    <SimpleIdentifier Name="Pcb2Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="Pcb3Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb3Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3Spot = full">
+                                    <SimpleIdentifier Name="Pcb3Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="Pcb4Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb4Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4Spot = full">
+                                    <SimpleIdentifier Name="Pcb4Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="Pcb5Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb5Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5Spot = full">
+                                    <SimpleIdentifier Name="Pcb5Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="Pcb6Spot_curr = full">
-                                    <SimpleIdentifier Name="Pcb6Spot_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6Spot = full">
+                                    <SimpleIdentifier Name="Pcb6Spot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
-                                <BinaryExpression Operator="=" Text="PanelSpot_curr = full">
-                                    <SimpleIdentifier Name="PanelSpot_curr"/>
+                                <BinaryExpression Operator="=" Text="PanelSpot = full">
+                                    <SimpleIdentifier Name="PanelSpot"/>
                                     <SimpleIdentifier Name="full"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1190,43 +1190,43 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="&amp;" Text="Pcb1Spot_curr == empty &amp; Pcb2Spot_curr == empty &amp; Pcb3Spot_curr == empty &amp; Pcb4Spot_curr == empty &amp; Pcb5Spot_curr == empty &amp; Pcb6Spot_curr == empty &amp; PanelSpot_curr == empty">
+                                <BinaryExpression Operator="&amp;" Text="Pcb1Spot == empty &amp; Pcb2Spot == empty &amp; Pcb3Spot == empty &amp; Pcb4Spot == empty &amp; Pcb5Spot == empty &amp; Pcb6Spot == empty &amp; PanelSpot == empty">
                                     <BinaryExpression Operator="&amp;">
                                         <BinaryExpression Operator="&amp;">
                                             <BinaryExpression Operator="&amp;">
                                                 <BinaryExpression Operator="&amp;">
                                                     <BinaryExpression Operator="&amp;">
                                                         <BinaryExpression Operator="==">
-                                                            <SimpleIdentifier Name="Pcb1Spot_curr"/>
+                                                            <SimpleIdentifier Name="Pcb1Spot"/>
                                                             <SimpleIdentifier Name="empty"/>
                                                         </BinaryExpression>
                                                         <BinaryExpression Operator="==">
-                                                            <SimpleIdentifier Name="Pcb2Spot_curr"/>
+                                                            <SimpleIdentifier Name="Pcb2Spot"/>
                                                             <SimpleIdentifier Name="empty"/>
                                                         </BinaryExpression>
                                                     </BinaryExpression>
                                                     <BinaryExpression Operator="==">
-                                                        <SimpleIdentifier Name="Pcb3Spot_curr"/>
+                                                        <SimpleIdentifier Name="Pcb3Spot"/>
                                                         <SimpleIdentifier Name="empty"/>
                                                     </BinaryExpression>
                                                 </BinaryExpression>
                                                 <BinaryExpression Operator="==">
-                                                    <SimpleIdentifier Name="Pcb4Spot_curr"/>
+                                                    <SimpleIdentifier Name="Pcb4Spot"/>
                                                     <SimpleIdentifier Name="empty"/>
                                                 </BinaryExpression>
                                             </BinaryExpression>
                                             <BinaryExpression Operator="==">
-                                                <SimpleIdentifier Name="Pcb5Spot_curr"/>
+                                                <SimpleIdentifier Name="Pcb5Spot"/>
                                                 <SimpleIdentifier Name="empty"/>
                                             </BinaryExpression>
                                         </BinaryExpression>
                                         <BinaryExpression Operator="==">
-                                            <SimpleIdentifier Name="Pcb6Spot_curr"/>
+                                            <SimpleIdentifier Name="Pcb6Spot"/>
                                             <SimpleIdentifier Name="empty"/>
                                         </BinaryExpression>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="PanelSpot_curr"/>
+                                        <SimpleIdentifier Name="PanelSpot"/>
                                         <SimpleIdentifier Name="empty"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -1280,8 +1280,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1State = Bad">
+                                    <SimpleIdentifier Name="Pcb1State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1299,8 +1299,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1State = Unknown">
+                                    <SimpleIdentifier Name="Pcb1State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1324,8 +1324,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1State = Unknown">
+                                    <SimpleIdentifier Name="Pcb1State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1349,8 +1349,8 @@
                         </EndPointGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb1State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb1State = Good">
+                                    <SimpleIdentifier Name="Pcb1State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1403,8 +1403,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb2State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2State = Bad">
+                                    <SimpleIdentifier Name="Pcb2State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1422,8 +1422,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb2State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2State = Unknown">
+                                    <SimpleIdentifier Name="Pcb2State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1441,8 +1441,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb2State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2State = Good">
+                                    <SimpleIdentifier Name="Pcb2State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1460,8 +1460,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb2State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb2State = Unknown">
+                                    <SimpleIdentifier Name="Pcb2State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1514,8 +1514,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb3State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3State = Bad">
+                                    <SimpleIdentifier Name="Pcb3State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1533,8 +1533,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb3State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3State = Unknown">
+                                    <SimpleIdentifier Name="Pcb3State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1552,8 +1552,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb3State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3State = Good">
+                                    <SimpleIdentifier Name="Pcb3State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1571,8 +1571,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb3State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb3State = Unknown">
+                                    <SimpleIdentifier Name="Pcb3State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1625,8 +1625,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb4State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4State = Bad">
+                                    <SimpleIdentifier Name="Pcb4State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1644,8 +1644,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb4State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4State = Unknown">
+                                    <SimpleIdentifier Name="Pcb4State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1663,8 +1663,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb4State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4State = Good">
+                                    <SimpleIdentifier Name="Pcb4State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1682,8 +1682,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb4State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb4State = Unknown">
+                                    <SimpleIdentifier Name="Pcb4State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1736,8 +1736,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb5State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5State = Bad">
+                                    <SimpleIdentifier Name="Pcb5State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1755,8 +1755,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb5State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5State = Unknown">
+                                    <SimpleIdentifier Name="Pcb5State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1774,8 +1774,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb5State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5State = Good">
+                                    <SimpleIdentifier Name="Pcb5State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1793,8 +1793,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb5State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb5State = Unknown">
+                                    <SimpleIdentifier Name="Pcb5State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1847,8 +1847,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb6State_curr = Bad">
-                                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6State = Bad">
+                                    <SimpleIdentifier Name="Pcb6State"/>
                                     <SimpleIdentifier Name="Bad"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1869,8 +1869,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb6State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6State = Unknown">
+                                    <SimpleIdentifier Name="Pcb6State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1888,8 +1888,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb6State_curr = Good">
-                                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6State = Good">
+                                    <SimpleIdentifier Name="Pcb6State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Actions>
@@ -1907,8 +1907,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Actions>
-                                <BinaryExpression Operator="=" Text="Pcb6State_curr = Unknown">
-                                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                                <BinaryExpression Operator="=" Text="Pcb6State = Unknown">
+                                    <SimpleIdentifier Name="Pcb6State"/>
                                     <SimpleIdentifier Name="Unknown"/>
                                 </BinaryExpression>
                             </Actions>
@@ -5150,8 +5150,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb1State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb1State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb1State == Good">
+                                    <SimpleIdentifier Name="Pcb1State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5169,13 +5169,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb1State_curr == Bad | Pcb1State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb1State == Bad | Pcb1State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb1State_curr"/>
+                                        <SimpleIdentifier Name="Pcb1State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb1State_curr"/>
+                                        <SimpleIdentifier Name="Pcb1State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -5266,8 +5266,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb2State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb2State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb2State == Good">
+                                    <SimpleIdentifier Name="Pcb2State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5285,13 +5285,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb2State_curr == Bad | Pcb2State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb2State == Bad | Pcb2State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb2State_curr"/>
+                                        <SimpleIdentifier Name="Pcb2State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb2State_curr"/>
+                                        <SimpleIdentifier Name="Pcb2State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -5382,8 +5382,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb3State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb3State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb3State == Good">
+                                    <SimpleIdentifier Name="Pcb3State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5401,13 +5401,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb3State_curr == Bad | Pcb3State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb3State == Bad | Pcb3State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb3State_curr"/>
+                                        <SimpleIdentifier Name="Pcb3State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb3State_curr"/>
+                                        <SimpleIdentifier Name="Pcb3State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -5498,8 +5498,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb4State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb4State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb4State == Good">
+                                    <SimpleIdentifier Name="Pcb4State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5517,13 +5517,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb4State_curr == Bad | Pcb4State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb4State == Bad | Pcb4State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb4State_curr"/>
+                                        <SimpleIdentifier Name="Pcb4State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb4State_curr"/>
+                                        <SimpleIdentifier Name="Pcb4State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -5614,8 +5614,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb5State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb5State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb5State == Good">
+                                    <SimpleIdentifier Name="Pcb5State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5633,13 +5633,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb5State_curr == Bad | Pcb5State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb5State == Bad | Pcb5State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb5State_curr"/>
+                                        <SimpleIdentifier Name="Pcb5State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb5State_curr"/>
+                                        <SimpleIdentifier Name="Pcb5State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
@@ -5730,8 +5730,8 @@
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="Pcb6State_curr == Good">
-                                    <SimpleIdentifier Name="Pcb6State_curr"/>
+                                <BinaryExpression Operator="==" Text="Pcb6State == Good">
+                                    <SimpleIdentifier Name="Pcb6State"/>
                                     <SimpleIdentifier Name="Good"/>
                                 </BinaryExpression>
                             </Guards>
@@ -5749,13 +5749,13 @@
                         </LabelBlock>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="|" Text="Pcb6State_curr == Bad | Pcb6State_curr == Unknown">
+                                <BinaryExpression Operator="|" Text="Pcb6State == Bad | Pcb6State == Unknown">
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb6State_curr"/>
+                                        <SimpleIdentifier Name="Pcb6State"/>
                                         <SimpleIdentifier Name="Bad"/>
                                     </BinaryExpression>
                                     <BinaryExpression Operator="==">
-                                        <SimpleIdentifier Name="Pcb6State_curr"/>
+                                        <SimpleIdentifier Name="Pcb6State"/>
                                         <SimpleIdentifier Name="Unknown"/>
                                     </BinaryExpression>
                                 </BinaryExpression>
