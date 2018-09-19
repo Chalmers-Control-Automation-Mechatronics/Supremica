@@ -102,9 +102,11 @@ public abstract class PopupFactory
                              final Proxy proxy)
   {
     if (event.isPopupTrigger()) {
-      if(invoker instanceof SelectionOwner && proxy != null && !(proxy instanceof ModuleProxy)){
+      if (invoker instanceof SelectionOwner &&
+          proxy != null &&
+          !(proxy instanceof ModuleProxy)){
         final SelectionOwner selection = (SelectionOwner)invoker;
-        if(!selection.isSelected(proxy)){
+        if (!selection.isSelected(proxy)) {
           final List<Proxy> items = Collections.singletonList(proxy);
           selection.replaceSelection(items);
         }

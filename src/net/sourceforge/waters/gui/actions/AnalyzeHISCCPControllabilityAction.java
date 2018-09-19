@@ -79,7 +79,7 @@ public class AnalyzeHISCCPControllabilityAction
   }
 
   @Override
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {

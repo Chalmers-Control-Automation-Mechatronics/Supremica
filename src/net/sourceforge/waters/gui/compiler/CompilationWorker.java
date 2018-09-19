@@ -77,19 +77,19 @@ public class CompilationWorker implements Runnable
   public synchronized void compile()
   {
     mHasWork = true;
-    this.notify();
+    notify();
   }
 
   public synchronized void abort()
   {
     mCompiler.requestAbort();
-    this.notify();
   }
 
   public synchronized void terminate()
   {
     mTerminate = true;
     abort();
+    notify();
   }
 
 
@@ -105,7 +105,12 @@ public class CompilationWorker implements Runnable
       }
     }
     mHasWork = false;
-    return !mTerminate;
+    if (mTerminate) {
+      return false;
+    } else {
+      mCompiler.resetAbort();
+      return true;
+    }
   }
 
   private void notifyOwner(final ProductDESProxy compiledDES,

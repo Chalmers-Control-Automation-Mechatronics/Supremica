@@ -77,7 +77,6 @@ import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.TransferHandler.TransferSupport;
@@ -124,6 +123,7 @@ import net.sourceforge.waters.model.base.GeometryProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -174,6 +174,8 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
 import net.sourceforge.waters.xsd.module.SplineKind;
+
+import org.apache.logging.log4j.LogManager;
 
 import org.supremica.gui.ide.ComponentEditorPanel;
 import org.supremica.gui.ide.IDE;
@@ -2076,8 +2078,78 @@ public class GraphEditorPanel
       }
     }
 
-    private void mousePressedWhenInFocus(final MouseEvent event)
+    //#######################################################################
+    //# Additional Callbacks
+    /**
+     * Called after the listener is installed due to tool selection.
+     */
+    void installed()
     {
+      requestFocusInWindow();
+      updateHighlighting();
+    }
+
+    //#######################################################################
+    //# Interface java.awt.MouseListener
+    @Override
+    public void mouseClicked(final MouseEvent event)
+    {
+      // LogManager.getLogger().info("ToolController.mouseClicked");
+      final ProxySubject item = mItem;
+      if (canBeSelected(item)) {
+        final List<ProxySubject> list = getListOfSelectedLabels();
+        if (event.isShiftDown() || event.isControlDown()) {
+          if (isSelected(item)) {
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject) {
+              removeFromSelection(item);
+            } else {
+              if (list.isEmpty()) {
+                removeFromSelection(item);
+              }
+            }
+          } else {
+            if (item instanceof IdentifierSubject ||
+                item instanceof ForeachSubject){
+              if (list.isEmpty()) {
+                if (mSelection.size() > 1) {
+                  // If there are more things selected, toggle the label block.
+                  final LabelBlockSubject block =
+                    SubjectTools.getAncestor(item, LabelBlockSubject.class);
+                  toggleSelection(block);
+                } else {
+                  // If the only thing selected is the label block, add the label.
+                  replaceSelection(item);
+                }
+              }
+            }
+          }
+        } else {
+          if (isSelected(item)) {
+            if (item instanceof LabelBlockSubject) {
+              if (list.isEmpty()) {
+                if (mSelection.size() > 1) {
+                  replaceSelection(item);
+                }
+              } else {
+                removeFromSelection(list);
+              }
+            } else {
+              replaceSelection(item);
+            }
+          } else if (item instanceof IdentifierSubject ||
+                     item instanceof ForeachSubject) {
+            replaceSelection(item);
+          }
+        }
+      }
+      mItem = null;
+    }
+
+    @Override
+    public void mousePressed(final MouseEvent event)
+    {
+      // LogManager.getLogger().info("ToolController.mousePressed");
       final ProxySubject item = getDraggableItem(event, true);
       final List<ProxySubject> list = getListOfSelectedLabels();
       mItem = item;
@@ -2133,95 +2205,10 @@ public class GraphEditorPanel
                                    mFocusedObject);
     }
 
-    //#######################################################################
-    //# Additional Callbacks
-    /**
-     * Called after the listener is installed due to tool selection.
-     */
-    void installed()
-    {
-      requestFocusInWindow();
-      updateHighlighting();
-    }
-
-    //#######################################################################
-    //# Interface java.awt.MouseListener
-    @Override
-    public void mouseClicked(final MouseEvent event)
-    {
-      final ProxySubject item = mItem;
-      if (canBeSelected(item)) {
-        final List<ProxySubject> list = getListOfSelectedLabels();
-        if (event.isShiftDown() || event.isControlDown()) {
-          if (isSelected(item)) {
-            if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject) {
-              removeFromSelection(item);
-            } else {
-              if (list.isEmpty()) {
-                removeFromSelection(item);
-              }
-            }
-          } else {
-            if (item instanceof IdentifierSubject ||
-                item instanceof ForeachSubject){
-              if (list.isEmpty()) {
-                if (mSelection.size() > 1) {
-                  // If there are more things selected, toggle the label block.
-                  final LabelBlockSubject block =
-                    SubjectTools.getAncestor(item, LabelBlockSubject.class);
-                  toggleSelection(block);
-                } else {
-                  // If the only thing selected is the label block, add the label.
-                  replaceSelection(item);
-                }
-              }
-            }
-          }
-        } else {
-          if (isSelected(item)) {
-            if (item instanceof LabelBlockSubject) {
-              if (list.isEmpty()) {
-                if (mSelection.size() > 1) {
-                  replaceSelection(item);
-                }
-              } else {
-                removeFromSelection(list);
-              }
-            } else {
-              replaceSelection(item);
-            }
-          } else if (item instanceof IdentifierSubject ||
-                     item instanceof ForeachSubject) {
-            replaceSelection(item);
-          }
-        }
-      }
-      mItem = null;
-    }
-
-    @Override
-    public void mousePressed(final MouseEvent event)
-    {
-      if (isFocusOwner()) {
-        mousePressedWhenInFocus(event);
-      } else {
-        requestFocusInWindow();
-        SwingUtilities.invokeLater(new Runnable() {
-          @Override
-          public void run()
-          {
-            if (isFocusOwner()) {
-              mousePressedWhenInFocus(event);
-            }
-          }
-        });
-      }
-    }
-
     @Override
     public void mouseReleased(final MouseEvent event)
     {
+      // LogManager.getLogger().info("ToolController.mouseReleased");
       mStartPoint = null;
       mPopupFactory.maybeShowPopup
         (GraphEditorPanel.this, event, mFocusedObject);
@@ -2243,6 +2230,7 @@ public class GraphEditorPanel
     @Override
     public void mouseDragged(final MouseEvent event)
     {
+      // LogManager.getLogger().info("ToolController.mouseDragged");
       final Point mousePosition = event.getPoint();
       final Point point = applyInverseTransform(mousePosition);
       updateHighlighting(point);
@@ -2254,6 +2242,7 @@ public class GraphEditorPanel
     @Override
     public void mouseEntered(final MouseEvent event)
     {
+      // LogManager.getLogger().info("ToolController.mouseEntered");
       abortExternalDrag(event);
       final Point mousePosition = event.getPoint();
       final Point point = applyInverseTransform(mousePosition);
@@ -2263,6 +2252,7 @@ public class GraphEditorPanel
     @Override
     public void mouseExited(final MouseEvent event)
     {
+      // LogManager.getLogger().info("ToolController.mouseExited");
       if (mInternalDragAction != null) {
         abortExternalDrag(event);
         final Point mousePosition = event.getPoint();
@@ -2272,7 +2262,6 @@ public class GraphEditorPanel
         updateHighlighting(null);
       }
     }
-
 
     //#######################################################################
     //# Interface java.awt.MouseMotionListener
@@ -2285,9 +2274,10 @@ public class GraphEditorPanel
       updateHighlighting(point);
     }
 
+    //#######################################################################
+    //# Data Members
     private Point mStartPoint;
     private ProxySubject mItem;
-
   }
 
 
@@ -2356,6 +2346,7 @@ public class GraphEditorPanel
     @Override
     public void mouseClicked(final MouseEvent event)
     {
+      // LogManager.getLogger().info("SelectController.mouseClicked");
       super.mouseClicked(event);
       //double clicks
       if (event.getButton() == MouseEvent.BUTTON1 &&
@@ -2380,6 +2371,8 @@ public class GraphEditorPanel
     @Override
     public void mouseDragged(final MouseEvent event)
     {
+      // LogManager.getLogger().info
+      // ("SelectController.mouseDragged [" + (mInternalDragAction != null) + "]");
       if (mInternalDragAction == null) {
         final Point start = getStartPoint();
         if (mFocusedObject == null) {
@@ -2737,11 +2730,14 @@ public class GraphEditorPanel
    */
   private abstract class InternalDragAction
   {
-
     //#######################################################################
     //# Constructors
     private InternalDragAction(final Point point)
     {
+      if (point == null) {
+        LogManager.getLogger().error
+          ("Creating {} with null point!", ProxyTools.getShortClassName(this));
+      }
       mPreviousSelection = null;
       mDragStart = point;
       mDragCurrent = point;
@@ -2750,7 +2746,6 @@ public class GraphEditorPanel
 
     //#######################################################################
     //# Simple Access
-
     Point getDragStart()
     {
       return mDragStart;
@@ -2814,10 +2809,9 @@ public class GraphEditorPanel
       return false;
     }
 
-    void modifiersChanged(final int key, final boolean pressed){
-
+    void modifiersChanged(final int key, final boolean pressed)
+    {
     }
-
 
     //#######################################################################
     //# Temporary Selection
@@ -2845,7 +2839,7 @@ public class GraphEditorPanel
      */
     boolean continueDrag(final Point point)
     {
-      if (mDragCurrent.equals(point)) {
+      if (ProxyTools.equals(mDragCurrent, point)) {
         return false;
       }
       mDragCurrent = point;

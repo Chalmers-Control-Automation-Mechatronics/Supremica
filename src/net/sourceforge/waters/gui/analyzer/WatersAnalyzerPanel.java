@@ -176,7 +176,7 @@ public class WatersAnalyzerPanel extends MainPanel
 
   //#########################################################################
   //# Data Members
-  private final ModuleContainer mModuleContainer;
+  public final ModuleContainer mModuleContainer;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
 
 

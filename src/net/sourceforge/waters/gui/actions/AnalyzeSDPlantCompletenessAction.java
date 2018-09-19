@@ -61,7 +61,7 @@ public class AnalyzeSDPlantCompletenessAction extends WatersAnalyzeAction
     return "does not satisfy Plant Completeness";
   }
 
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {  final ControllabilityChecker checker=

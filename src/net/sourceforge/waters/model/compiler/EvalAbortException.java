@@ -48,15 +48,15 @@ public class EvalAbortException extends EvalException {
   //#########################################################################
   //# Constructors
   /**
-   * Constructs a new overflow exception with a default message.
+   * Constructs a new abort exception with a default message.
    */
   public EvalAbortException()
   {
-    this("Compilation aborted!");
+    this("Compilation aborted.");
   }
 
   /**
-   * Constructs a new overflow exception with a given message.
+   * Constructs a new abort exception with a given message.
    */
   public EvalAbortException(final String msg)
   {
@@ -66,6 +66,6 @@ public class EvalAbortException extends EvalException {
 
   //#########################################################################
   //# Static Class Variables
-  public static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 8143133897793009203L;
 
 }

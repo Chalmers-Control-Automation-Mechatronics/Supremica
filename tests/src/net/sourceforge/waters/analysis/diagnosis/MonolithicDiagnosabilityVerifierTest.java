@@ -51,7 +51,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 public class MonolithicDiagnosabilityVerifierTest
@@ -238,7 +237,12 @@ public class MonolithicDiagnosabilityVerifierTest
     runModelVerifier(des, false);
   }
 
-
+  public void testNotDiag13() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "notDiag_13.wmod");
+    runModelVerifier(des, false);
+  }
   public void testSmallFactory2nd() throws Exception
   {
     final ProductDESProxy des =
@@ -291,18 +295,21 @@ public class MonolithicDiagnosabilityVerifierTest
     = stepsA.get(lenA-1).getStateMap();
     final Map<AutomatonProxy,StateProxy> lastMapB
     = stepsB.get(lenB-1).getStateMap();
-    final Map<AutomatonProxy,StateProxy> loopMapA
-    = stepsA.get(loopIndexA).getStateMap();
-    final Map<AutomatonProxy,StateProxy> loopMapB
-    = stepsB.get(loopIndexB).getStateMap();
-    for(final AutomatonProxy aut : automata) {
-      System.out.println(loopMapA.get(aut).getName()+" "+lastMapA.get(aut).getName());
-      System.out.println(loopMapB.get(aut).getName()+" "+lastMapB.get(aut).getName());
-      System.out.println();
-      assertTrue("TraceA does not have a valid loop",
-                 lastMapA.get(aut)==loopMapA.get(aut));
-      assertTrue("TraceB does not have a valid loop",
-                 lastMapB.get(aut)==loopMapB.get(aut));
+    if(loopIndexA>=0) {
+      final Map<AutomatonProxy,StateProxy> loopMapA
+      = stepsA.get(loopIndexA).getStateMap();
+      for(final AutomatonProxy aut : automata) {
+        assertTrue("TraceA does not have a valid loop",
+                   lastMapA.get(aut)==loopMapA.get(aut));
+      }
+    }
+    if(loopIndexB>=0) {
+      final Map<AutomatonProxy,StateProxy> loopMapB
+      = stepsB.get(loopIndexB).getStateMap();
+      for(final AutomatonProxy aut : automata) {
+        assertTrue("TraceB does not have a valid loop",
+                   lastMapB.get(aut)==loopMapB.get(aut));
+      }
     }
 
     // traceA has fault event
@@ -361,23 +368,11 @@ public class MonolithicDiagnosabilityVerifierTest
     for(final AutomatonProxy aut : automata) {
       final StateProxy lastA = lastMapA.get(aut);
       final StateProxy lastB = lastMapB.get(aut);
-      final ComponentKind kind = aut.getKind();
-      switch (kind) {
-      case PLANT:
-        assertTrue("TraceA is not possible in automaton  "+aut.getName(),
-          lastA == super.checkTrace(aut, traceA));
-        assertTrue("TraceB is not possible in automaton  "+aut.getName(),
-          lastB == super.checkTrace(aut, traceB));
-      case SPEC:
-        assertTrue("TraceA is not possible in automaton  "+aut.getName(),
-          lastA == super.checkTrace(aut, traceA));
-        assertTrue("TraceB is not possible in automaton  "+aut.getName(),
-          lastB == super.checkTrace(aut, traceB));
-      default:
-      }
+      assertTrue("TraceA is not possible in automaton " + aut.getName(),
+                 lastA == super.checkTrace(aut, traceA));
+      assertTrue("TraceB is not possible in automaton " + aut.getName(),
+                 lastB == super.checkTrace(aut, traceB));
     }
   }
-
-
 
 }

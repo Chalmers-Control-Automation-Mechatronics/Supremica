@@ -61,7 +61,7 @@ public class AnalyzeProperTimeBehaviorPropertyAction extends WatersAnalyzeAction
     return "does not satisfy Proper Time Behavior";
   }
 
-  protected ModelVerifier getModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {

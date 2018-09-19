@@ -39,12 +39,14 @@ import java.util.Map;
 
 import javax.swing.Timer;
 
+import net.sourceforge.waters.model.compiler.EvalAbortException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ModelObserver;
@@ -58,6 +60,38 @@ import org.supremica.gui.ide.ModuleContainer;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
+
+/**
+ * <P>The unit that controls background compilation in the IDE.</P>
+ *
+ * <P>Each module is associated with a background compiler, which is
+ * stored in the {@link ModuleContainer} after the module is loaded.
+ * The background compiler listens for changes to the module, and when
+ * a change is detected, recompilation is initiated after expiry of a
+ * timeout. After the timeout, the {@link ModuleCompiler} is started in
+ * a separate thread of type {@link CompilationWorker}. When compilation
+ * finishes, the {@link CompilationWorker} notifies the background compiler,
+ * which records the compiled DES or the errors so that they are available
+ * to the {@link ModuleContainer}.</P>
+ *
+ * <P>The background compiler includes support for large modules that take
+ * a long time to compile. If the user switches tabs or requests verification
+ * while the background compiler is running, a dialog ({@link
+ * CompilationDialog}) is displayed to inform the user that the operation is
+ * suspended until compilation completes. The user can dismiss the dialog
+ * by clicking an Abort button, in which case they can use the editor again
+ * while compilation continues.</P>
+ *
+ * <P>The automatic compilation can be disabled through the configuration
+ * option {@link Config#BACKGROUND_COMPILER}. In that case, module changes
+ * no longer a trigger a timer and the module does not get compiled
+ * automatically. The compiler is still started when the user switches tabs or
+ * requests verification, in which case the {@link CompilationDialog} is
+ * displayed, and aborting it does not only dismiss the dialog but also
+ * abort the compilation.</P>
+ *
+ * @author Tom Levy, Robi Malik
+ */
 
 public class BackgroundCompiler
   implements ModelObserver, ActionListener
@@ -75,10 +109,15 @@ public class BackgroundCompiler
     mCompiler.setSourceInfoEnabled(true);
     mCompiler.setMultiExceptionsEnabled(true);
     mWorker = new CompilationWorker(this, mCompiler, container.getName());
-    mTimer = new Timer(DELAY_AFTER_EDIT, this);
-    mTimer.setRepeats(false);
     container.getModule().addModelObserver(this);
-
+    mEnablementPropertyChangeListener = new SupremicaPropertyChangeListener() {
+      @Override
+      public void propertyChanged(final SupremicaPropertyChangeEvent event)
+      {
+        setTimerEnabled(Config.BACKGROUND_COMPILER.isTrue());
+      }
+    };
+    mEnablementPropertyChangeListener.propertyChanged(null);
     mCompilerPropertyChangeListener = new SupremicaPropertyChangeListener() {
       @Override
       public void propertyChanged(final SupremicaPropertyChangeEvent event)
@@ -86,20 +125,146 @@ public class BackgroundCompiler
         setModuleChanged();
       }
     };
+    Config.BACKGROUND_COMPILER.addPropertyChangeListener
+      (mEnablementPropertyChangeListener);
     Config.OPTIMIZING_COMPILER.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
-
-    mRemoveObserverAction = new ActionListener() {
+    mAbortButtonAction = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e)
       {
         removeObserver();
+        abortNonBackgroundCompiler();
       }
     };
+    mModuleChanged = true;
+    if (Config.BACKGROUND_COMPILER.isTrue()) {
+      compile(null);
+    }
+  }
 
-    forceCompile(null);
+
+  //#########################################################################
+  //# Simple Access
+  /**
+   * Retrieves the {@link ProductDESProxy} from the compiler.
+   * This method returns the latest available result of compilation.
+   * @return The product DES from the last successful run of the
+   *         {@link ModuleCompiler}, or <CODE>null</CODE>.
+   */
+  public ProductDESProxy getCompiledDES()
+  {
+    return mCompiledDES;
+  }
+
+  /**
+   * Retrieves the source information map that associated objects in the
+   * produced {@link ProductDESProxy} with locations in the compiled
+   * {@link ModuleProxy}.
+   * @return The source information map from the last successful run of the
+   *         {@link ModuleCompiler}, or <CODE>null</CODE>.
+   */
+  public Map<Object, SourceInfo> getSourceInfoMap()
+  {
+    return mSourceInfoMap;
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  /**
+   * Ensures that the module is recompiled as soon as possible if it has
+   * changed.
+   * If the module has changed and the compiler is not already running,
+   * compilation is started.
+   * If the module has changed and the compiler is already running, it is
+   * requested to abort and a flag is set to restart the compiler as soon as
+   * it is ready.
+   * @param  observer  An observer object to be notified as soon as the
+   *                   compilation has finished and the results are available,
+   *                   or <CODE>null</CODE>.
+   */
+  public void compile(final CompilationObserver observer)
+  {
+    setObserver(observer);
+    if (mModuleChanged && !mRunning) {
+      mModuleChanged = false;
+      mRunning = true;
+      mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
+      mCompiler.setNormalizationEnabled(Config.NORMALIZING_COMPILER.isTrue());
+      mCompiler.setInputModule(mModuleContainer.getModule(), true);
+      mWorker.compile();
+    } else if (mModuleChanged && mRunning) {
+      mRestart = true;
+      mWorker.abort();
+    } else if (!mModuleChanged && !mRunning) {
+      notifyObserver();
+    }
+  }
+
+  /**
+   * Ensures that the module is recompiled as soon as possible even if it has
+   * not changed. This method marks the module as changed and then calls
+   * {@link #compile(CompilationObserver) compile()}.
+   * @param  observer  An observer object to be notified as soon as the
+   *                   compilation has finished and the results are available,
+   *                   or <CODE>null</CODE>.
+   */
+  public void forceCompile(final CompilationObserver observer)
+  {
+    mModuleChanged = true;
+    compile(observer);
+  }
+
+  /**
+   * Terminates the background compiler. This method is called for cleanup
+   * when the {@link ModuleContainer} is closed in the IDE. It cancels any
+   * running compilation and stops all threads.
+   */
+  public void terminate()
+  {
+    Config.OPTIMIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.NORMALIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.BACKGROUND_COMPILER.removePropertyChangeListener
+      (mEnablementPropertyChangeListener);
+    setTimerEnabled(false);
+    mWorker.terminate();
+  }
+
+  /**
+   * Callback to notify the background compiler when the {@link ModuleCompiler}
+   * has finished. This method records the results of compilation and notifies
+   * the observer, or restarts the compilation if the recompilation was
+   * initiated after the compiler has started.
+   * @param  compiledDES    The compiled DES returned by the
+   *                        {@link ModuleCompiler}, or <CODE>null</CODE>
+   *                        in case of error.
+   * @param  evalException  An exception produced by the {@link ModuleCompiler},
+   *                        or <CODE>null</CODE> if compilation was
+   *                        successful.
+   */
+  public void compilationFinished(final ProductDESProxy compiledDES,
+                                  final EvalException evalException)
+  {
+    assert compiledDES != null || evalException != null;
+    mRunning = false;
+    if (mRestart) {
+      mRestart = false;
+      compile(mObserver);
+    } else {
+      mCompiledDES = compiledDES;
+      mEvalException = evalException;
+      mSourceInfoMap = mCompiler.getSourceInfoMap();
+      mModuleContainer.setCompilationException(evalException);
+      notifyObserver();
+      if (mModuleChanged) {
+        startTimer();
+      }
+    }
   }
 
 
@@ -130,83 +295,16 @@ public class BackgroundCompiler
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
+  /**
+   * Callback for when the timer expires.
+   * Triggers compilation if not already compiling and the module has changed.
+   */
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    if (mModuleChanged && !mRunning) {
+    if (mTimer != null && mModuleChanged && !mRunning) {
       compile(null);
     }
-  }
-
-
-  //#########################################################################
-  //# Invocation
-  public void compile(final CompilationObserver observer)
-  {
-    setObserver(observer);
-    if (mModuleChanged && !mRunning) {
-      mModuleChanged = false;
-      mRunning = true;
-      mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-      mCompiler.setNormalizationEnabled(Config.NORMALIZING_COMPILER.isTrue());
-      mCompiler.setInputModule(mModuleContainer.getModule(), true);
-      mWorker.compile();
-    } else if (mModuleChanged && mRunning) {
-      mRestart = true;
-      mWorker.abort();
-    } else if (!mModuleChanged && !mRunning) {
-      notifyObserver();
-    }
-  }
-
-  public void forceCompile(final CompilationObserver observer)
-  {
-    setModuleChanged();
-    compile(observer);
-  }
-
-  public void terminate()
-  {
-    Config.OPTIMIZING_COMPILER.removePropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    Config.NORMALIZING_COMPILER.removePropertyChangeListener
-      (mCompilerPropertyChangeListener);
-    mTimer.stop();
-    mWorker.terminate();
-  }
-
-  public void compilationFinished(final ProductDESProxy compiledDES,
-                                  final EvalException evalException)
-  {
-    assert compiledDES != null || evalException != null;
-    mRunning = false;
-    if (mRestart) {
-      mRestart = false;
-      mCompiler.resetAbort();
-      compile(mObserver);
-    } else {
-      mCompiledDES = compiledDES;
-      mEvalException = evalException;
-      mSourceInfoMap = mCompiler.getSourceInfoMap();
-      mModuleContainer.setCompilationException(evalException);
-      notifyObserver();
-      if (mModuleChanged) {
-        mTimer.restart();
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Simple Access
-  public ProductDESProxy getCompiledDES()
-  {
-    return mCompiledDES;
-  }
-
-  public Map<Object, SourceInfo> getSourceInfoMap()
-  {
-    return mSourceInfoMap;
   }
 
 
@@ -215,28 +313,26 @@ public class BackgroundCompiler
   private void setModuleChanged()
   {
     mModuleChanged = true;
-    if (mObserver != null) {
-      removeObserver();
-    }
-    mTimer.restart();
+    removeObserver();
+    startTimer();
   }
 
   private void removeObserver()
   {
-    mObserver = null;
-    mDialog.dispose();
-    mDialog = null;
+    if (mObserver != null) {
+      mObserver = null;
+      mDialog.dispose();
+      mDialog = null;
+    }
   }
 
   private void setObserver(final CompilationObserver observer)
   {
-    if (mObserver != null) {
-      removeObserver();
-    }
+    removeObserver();
     mObserver = observer;
     if (mObserver != null) {
       final IDE ide = mModuleContainer.getIDE();
-      mDialog = new CompilationDialog(ide, mRemoveObserverAction);
+      mDialog = new CompilationDialog(ide, mAbortButtonAction);
     }
   }
 
@@ -251,12 +347,47 @@ public class BackgroundCompiler
     } else if (hasObserver && !succeeded) {
       mDialog.setEvalException(mEvalException, mObserver.getVerb());
     } else if (!hasObserver && !succeeded) {
-      for (final EvalException ex : mEvalException.getAll()) {
-        if (!(ex.getLocation() instanceof ProxySubject)) {
+      for (final EvalException exception : mEvalException.getAll()) {
+        if (exception instanceof EvalAbortException) {
           final Logger logger = LogManager.getLogger();
-          logger.error(ex.getMessage());
+          logger.info(exception.getMessage());
+        } else if (!(exception.getLocation() instanceof ProxySubject)) {
+          final Logger logger = LogManager.getLogger();
+          logger.error(exception.getMessage());
         }
       }
+    }
+  }
+
+  private void setTimerEnabled(final boolean enable)
+  {
+    if (enable) {
+      mTimer = new Timer(DELAY_AFTER_EDIT, this);
+      mTimer.setRepeats(false);
+      if (mModuleChanged) {
+        startTimer();
+      }
+    } else if (mTimer != null) {
+      mTimer.stop();
+      mTimer = null;
+      if (mObserver == null) {
+        abortNonBackgroundCompiler();
+      }
+    }
+  }
+
+  private void startTimer()
+  {
+    if (mTimer != null) {
+      mTimer.restart();
+    }
+  }
+
+  private void abortNonBackgroundCompiler()
+  {
+    if (mRunning && mTimer == null) {
+      mWorker.abort();
+      mModuleChanged = true;
     }
   }
 
@@ -266,11 +397,11 @@ public class BackgroundCompiler
   private final ModuleContainer mModuleContainer;
   private final ModuleCompiler mCompiler;
   private final CompilationWorker mWorker;
-  private final Timer mTimer;
-  private final SupremicaPropertyChangeListener
-    mCompilerPropertyChangeListener;
-  private final ActionListener mRemoveObserverAction;
+  private final SupremicaPropertyChangeListener mEnablementPropertyChangeListener;
+  private final SupremicaPropertyChangeListener mCompilerPropertyChangeListener;
+  private final ActionListener mAbortButtonAction;
 
+  private Timer mTimer;
   private boolean mModuleChanged;
   private boolean mRunning;
   private boolean mRestart;

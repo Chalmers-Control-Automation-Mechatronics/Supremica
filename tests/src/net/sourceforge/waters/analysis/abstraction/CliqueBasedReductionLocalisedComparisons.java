@@ -69,10 +69,14 @@ public class CliqueBasedReductionLocalisedComparisons
   private static void run(final CliqueBasedReductionLocalisedComparisons comparisons)
     throws Exception
   {
-    comparisons.setUp();
-    comparisons.writeHeader();
-    doTests(comparisons);
-    comparisons.tearDown();
+    try {
+      comparisons.setUp();
+      comparisons.writeHeader();
+      doTests(comparisons);
+    }
+    finally {
+      comparisons.tearDown();
+    }
   }
 
   private static void doTests(final CliqueBasedReductionLocalisedComparisons comparisons)
@@ -83,7 +87,6 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testBigFactory1();
     comparisons.testBigFactory2();
     comparisons.testBigFactory3();
-    System.gc();
     comparisons.testCatMouse();
     comparisons.testCatMouseUnsup2();
     comparisons.testCatMouseUnsup1();
@@ -93,15 +96,12 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testCT3();
     comparisons.testCoffeeMachine();
     comparisons.testDosingUnit();
-    System.gc();
     comparisons.testIMS();
-    System.gc();
     comparisons.testIPC();
     comparisons.testIPCcswitch();
     comparisons.testIPClswitch();
     comparisons.testIPCuswitch();
     comparisons.testManufacturingSystem();
-    System.gc();
     comparisons.testManWolf();
     comparisons.testNoPlant1();
     comparisons.testNoPlant2();
@@ -122,14 +122,12 @@ public class CliqueBasedReductionLocalisedComparisons
     comparisons.testSupRed3();
     comparisons.testTankProcess();
     comparisons.testTbedMinsync();
-    System.gc();
     comparisons.testTicTacToe();
     comparisons.testTeleNetwork();
     comparisons.testTrafficlights();
     comparisons.testTransferLine1();
     comparisons.testTransferLine2();
     comparisons.testTransferLine3();
-    System.gc();
   }
 
   public CliqueBasedReductionLocalisedComparisons()
@@ -162,8 +160,10 @@ public class CliqueBasedReductionLocalisedComparisons
   @Override
   protected void tearDown() throws Exception
   {
-    mPrintWriter.close();
-    mPrintWriter = null;
+    if (mPrintWriter != null) {
+      mPrintWriter.close();
+      mPrintWriter = null;
+    }
     super.tearDown();
   }
 
@@ -409,7 +409,7 @@ public class CliqueBasedReductionLocalisedComparisons
     throws Exception
   {
     System.out.println("Running on " + des.getName());
-    final ListBufferTransitionRelation relation =
+    ListBufferTransitionRelation relation =
       getRelationFromAutomaton(des);
     for (int e = EventEncoding.NONTAU; e < relation
       .getNumberOfProperEvents(); e++) {
@@ -444,10 +444,12 @@ public class CliqueBasedReductionLocalisedComparisons
                      suWonhamStats);
       }
     }
+    relation = null;
   }
 
   private TRSimplifierStatistics applySimplifier(final TransitionRelationSimplifier simplifier)
   {
+    System.gc();
     simplifier.createStatistics();
     final ExecutorService singlePool = Executors.newSingleThreadExecutor();
     Optional<Boolean> isReduced = Optional.empty();
@@ -489,19 +491,19 @@ public class CliqueBasedReductionLocalisedComparisons
       mPrintWriter.write(NO_ENTRY);
     } else if (cliqueBasedStats == null) {
       mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-      mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getChangedOutputStates()
+      mPrintWriter.write(NO_ENTRY + "," + suWonhamStats.getOutputStates()
                          + "," + NO_ENTRY + ",");
       mPrintWriter
         .write(NO_ENTRY + "," + suWonhamStats.getRunTime() + "," + NO_ENTRY);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
-      mPrintWriter.write(cliqueBasedStats.getChangedOutputStates() + "," + NO_ENTRY
+      mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + NO_ENTRY
                          + "," + NO_ENTRY + ",");
       mPrintWriter.write(cliqueBasedStats.getRunTime() + "," + NO_ENTRY + ","
                          + NO_ENTRY);
     } else {
-      final int swStates = suWonhamStats.getChangedOutputStates();
-      final int cbStates = cliqueBasedStats.getChangedOutputStates();
+      final int swStates = suWonhamStats.getOutputStates();
+      final int cbStates = cliqueBasedStats.getOutputStates();
       final long cbRuntime = cliqueBasedStats.getRunTime();
       final long swRuntime = suWonhamStats.getRunTime();
 
