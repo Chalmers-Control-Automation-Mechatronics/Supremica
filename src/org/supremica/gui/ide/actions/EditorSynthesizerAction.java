@@ -244,6 +244,8 @@ public class EditorSynthesizerAction extends IDEAction
       eventGeoInfo = new HashMap<>();
       // Make things deterministic...
       for(final String event: eventNames) {
+        if (!event2GuardGen.containsKey(event))
+           continue;
         final BDDExtendedGuardGenerator guardGen = event2GuardGen.get(event);
         final Map<EdgeProxy, String> evensEdge2GuardMap =
           guardGen.getEdge2GuardMap();

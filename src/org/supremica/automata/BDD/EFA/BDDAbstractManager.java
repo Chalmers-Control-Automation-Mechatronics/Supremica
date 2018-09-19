@@ -340,8 +340,12 @@ public abstract class BDDAbstractManager {
                         !nonIntegerVarNameSet.contains(right.toString())) {
                       final Map<String, String> var2InstIntMap =
                         bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(leftVarName);
-                      final IntConstantProxy mappedIntProxy =
-                        new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      IntConstantProxy mappedIntProxy = null;
+                      if (var2InstIntMap.containsKey(right.toString())) {
+                        mappedIntProxy = new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      } else {
+                        mappedIntProxy = new IntConstantSubject(Integer.parseInt(right.toString()));
+                      }
                       roRight = expr2BDDBitVec(mappedIntProxy, false, updatedVariables);
                     } else {
                       roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
@@ -376,8 +380,12 @@ public abstract class BDDAbstractManager {
                         !nonIntegerVarNameSet.contains(right.toString())) {
                       final Map<String, String> var2InstIntMap =
                         bddExAutomata.orgExAutomata.getNonIntVar2InstanceIntMap().get(left.toString());
-                      final IntConstantProxy mappedIntProxy =
-                        new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      IntConstantProxy mappedIntProxy = null;
+                      if (var2InstIntMap.containsKey(right.toString())) {
+                        mappedIntProxy = new IntConstantSubject(Integer.parseInt(var2InstIntMap.get(right.toString())));
+                      } else {
+                        mappedIntProxy = new IntConstantSubject(Integer.parseInt(right.toString()));
+                      }
                       roRight = expr2BDDBitVec(mappedIntProxy, false, updatedVariables);
                     } else {
                       roRight = expr2BDDBitVec(bexpr.getRight(), false, updatedVariables);
