@@ -3293,6 +3293,7 @@ public class GraphEditorPanel
       if (mShouldCommit) {
         super.commitSecondaryGraph();
         adjustSize();
+        assert mMoveVisitor != null;
         final List<ProxySubject> movedObjects =
           new ArrayList<>(mMoveVisitor.mMovedObjects);
         scrollToVisible(movedObjects);
