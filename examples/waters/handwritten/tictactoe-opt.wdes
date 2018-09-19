@@ -2,7 +2,9 @@
 <ns2:ProductDES Name="tictactoe" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns="http://waters.sourceforge.net/xsd/base">
     <Comment>Model of Tic-Tac-Toe game.
 Two players, white and black, take turns to occupy squares in 3x3 grid. The winner is the player who first occupies a horizontal, vertical, or diagonal row of three squares.
-The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.</Comment>
+The control objective is to synthesise a strategy for the second player (black) that prevents the first player (white) from winning. Synthesis can be used to find such a strategy.
+The model is not controllable and nonblocking.
+It has 6324 reachable states and the diamater is 73.</Comment>
     <ns2:EventList>
         <ns2:Event Kind="PROPOSITION" Name=":accepting"/>
         <ns2:Event Kind="CONTROLLABLE" Name="black[0][0]"/>
