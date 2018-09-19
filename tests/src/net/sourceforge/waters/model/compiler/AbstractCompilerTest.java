@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -502,6 +503,22 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "graph", "forbidden");
+    testCompile(module);
+  }
+
+  public void testCompile_foreach_enum1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "foreach_enum1");
+    testCompile(module);
+  }
+
+  public void testCompile_foreach_enum2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "foreach_enum2");
     testCompile(module);
   }
 
@@ -1000,7 +1017,17 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                            final boolean appendToName)
     throws IOException, WatersException
   {
-    final ProductDESProxy des = compile(module, bindings);
+    final ProductDESProxy des;
+    try {
+      des = compile(module, bindings);
+    } catch (final MultiEvalException exception) {
+      final List<EvalException> all = exception.getAll();
+      if (all.size() >= 1) {
+        throw all.get(0);
+      } else {
+        throw exception;
+      }
+    }
 
     // Obtain components of the final file name.
     final String name = module.getName();
@@ -1065,7 +1092,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                   final List<ParameterBindingProxy> bindings)
     throws EvalException
   {
-    mCompiler = new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
+    mCompiler =
+      new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     configure(mCompiler);
     return mCompiler.compile(bindings);
   }
@@ -1104,7 +1132,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
    * Asserts that the culprit is mentioned by at least one exception.
    */
   private void assertMentioned(final String[] culprit,
-                               final WatersException[] exceptions)
+                               final Collection<? extends WatersException> exceptions)
   {
     for (final WatersException exception : exceptions) {
       if (mentions(exception, culprit)) {
@@ -1180,10 +1208,10 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     if (multi && EvalException.class.isAssignableFrom(exclass)) {
       assertEquals("Not a MultiEvalException!",
                    MultiEvalException.class, exception.getClass());
-      final EvalException[] exceptions = ((EvalException) exception).getAll();
+      final List<EvalException> exceptions = ((EvalException) exception).getAll();
       assertTrue("Caught MultiEvalException as expected, " +
                  "but it does not contain any exceptions!",
-                 exceptions.length > 0);
+                 exceptions.size() > 0);
       for (final EvalException ex : exceptions) {
         checkException(module, ex, exclass, culprits);
       }
