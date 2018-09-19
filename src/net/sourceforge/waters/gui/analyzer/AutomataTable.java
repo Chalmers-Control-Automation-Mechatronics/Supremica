@@ -50,10 +50,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.swing.Action;
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -87,16 +89,16 @@ public class AutomataTable extends JTable implements SelectionOwner
 
   //#########################################################################
   //# Constructor
-  AutomataTable(final ModuleContainer ModContainer,
-                final WatersAnalyzerPanel Parent)
+  AutomataTable(final ModuleContainer moduleContainer,
+                final WatersAnalyzerPanel parent)
   {
-    super(new AutomataTableModel(ModContainer));
-    mModuleContainer = ModContainer;
-    //mCompiledDES = mModuleContainer.getCompiledDES();
-    mParent = Parent;
-    final TableCellRenderer textRenderer = new TextCellRenderer();
+    super(new AutomataTableModel(moduleContainer));
+    mModuleContainer = moduleContainer;
+    mParent = parent;
+    final TextCellRenderer textRenderer = new TextCellRenderer();
     setDefaultRenderer(String.class, textRenderer);
-    setDefaultRenderer(Integer.class, textRenderer);
+    final TextCellRenderer numberRenderer = new TextCellRenderer(RIGHT_PADDING);
+    setDefaultRenderer(Integer.class, numberRenderer);
     final TableCellRenderer iconRenderer = new IconCellRenderer();
     setDefaultRenderer(ComponentKind.class, iconRenderer);
     setShowGrid(false);
@@ -507,12 +509,28 @@ public class AutomataTable extends JTable implements SelectionOwner
   //#########################################################################
   //# Inner Class TextCellRenderer
   /**
-   * A text renderer for the simulator's automata table. This renderer
-   * displays text without the focus rectangle, and changes the font to bold
-   * if the automaton is open on the simulator's desktop.
+   * A text renderer for the analyser's automata table.
+   * This renderer supports left-aligned text cells and right-aligned
+   * number cells (with additional padding). It also ensures that the
+   * cell are displayed without the focus rectangle.
    */
   private class TextCellRenderer extends DefaultTableCellRenderer
   {
+    //#######################################################################
+    //# Constructors
+    private TextCellRenderer()
+    {
+      mBorder = null;
+    }
+
+    private TextCellRenderer(final int rightBorder)
+    {
+      final int scaledBorder =
+        Math.round(rightBorder * IconAndFontLoader.GLOBAL_SCALE_FACTOR);
+      mBorder = BorderFactory.createEmptyBorder(0, 0, 0, scaledBorder);
+      setHorizontalAlignment(JLabel.RIGHT);
+    }
+
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
     @Override
@@ -523,11 +541,15 @@ public class AutomataTable extends JTable implements SelectionOwner
                                                    final int row,
                                                    final int column)
     {
-      final Component cell =
-        super.getTableCellRendererComponent(table, value, selected, false,
-                                            row, column);
+      final JLabel cell = (JLabel) super.getTableCellRendererComponent
+        (table, value, selected, false, row, column);
+      cell.setBorder(mBorder);
       return cell;
     }
+
+    //#######################################################################
+    //# Data Members
+    private final Border mBorder;
 
     //#######################################################################
     //# Class Constants
@@ -537,7 +559,11 @@ public class AutomataTable extends JTable implements SelectionOwner
 
   //#########################################################################
   //# Inner Class IconCellRenderer
-  private class IconCellRenderer extends DefaultTableCellRenderer
+  /**
+   * An icon renderer for the analyser's automata table.
+   * This renderer displays the component kind of automata as icons.
+   */
+ private class IconCellRenderer extends DefaultTableCellRenderer
   {
     //#######################################################################
     //# Interface javax.swing.table.TableCellRenderer
@@ -615,6 +641,8 @@ public class AutomataTable extends JTable implements SelectionOwner
 
   //#########################################################################
   //# Class Constants
+  private static final int RIGHT_PADDING = 8;
+
   private static final long serialVersionUID = -9036493474591272655L;
 
 }
