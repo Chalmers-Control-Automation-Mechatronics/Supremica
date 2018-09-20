@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -115,12 +116,12 @@ public class CompilationDialog extends JDialog
     sb.append("The module cannot be ");
     sb.append(taskVerb);
     sb.append(" because it has ");
-    final EvalException[] all = exception.getAll();
-    if (all.length == 1) {
+    final List<EvalException> all = exception.getAll();
+    if (all.size() == 1) {
       sb.append("an error: " );
-      sb.append(all[0].getMessage());
+      sb.append(all.get(0).getMessage());
     } else {
-      sb.append(all.length);
+      sb.append(all.size());
       sb.append(" errors.");
     }
     HTMLPrinter.setLabelText(mInformationLabel, sb.toString(), DEFAULT_WIDTH);

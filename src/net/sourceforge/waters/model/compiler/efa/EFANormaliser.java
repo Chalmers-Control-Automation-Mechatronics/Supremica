@@ -71,6 +71,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ComponentProxy;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -769,6 +770,8 @@ public class EFANormaliser extends AbortableCompiler
       try {
         final String name = module.getName();
         final String comment = module.getComment();
+        final List<ConstantAliasProxy> aliases =
+          module.getConstantAliasList();
         final List<EventDeclProxy> decls = module.getEventDeclList();
         final int numdecls = decls.size();
         mEventDeclarations = new ArrayList<>(numdecls);
@@ -782,7 +785,7 @@ public class EFANormaliser extends AbortableCompiler
           mComponents.add(aut);
         }
         return mFactory.createModuleProxy
-          (name, comment, null, null, mEventDeclarations, null, mComponents);
+          (name, comment, null, aliases, mEventDeclarations, null, mComponents);
       } finally {
         mEventDeclarations = null;
         mComponents = null;

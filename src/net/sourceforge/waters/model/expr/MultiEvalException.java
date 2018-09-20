@@ -61,9 +61,9 @@ public class MultiEvalException extends EvalException
   //#########################################################################
   //# Overrides for EvalException
   @Override
-  public EvalException[] getAll()
+  public List<EvalException> getAll()
   {
-    return mExceptions.toArray(new EvalException[mExceptions.size()]);
+    return mExceptions;
   }
 
 

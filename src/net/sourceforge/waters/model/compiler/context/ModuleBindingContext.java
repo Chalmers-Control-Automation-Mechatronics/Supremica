@@ -34,6 +34,9 @@
 package net.sourceforge.waters.model.compiler.context;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sourceforge.waters.model.base.ProxyAccessor;
 import net.sourceforge.waters.model.base.ProxyAccessorHashSet;
 import net.sourceforge.waters.model.base.ProxyAccessorSet;
@@ -47,13 +50,22 @@ import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 
 
 /**
- * A binding context constructed when compiling a module.
- * A module binding context contains a symbol map with the bindings of any
+ * <P>A binding context constructed when compiling a module.</P>
+ *
+ * <P>A module binding context contains a symbol map with the bindings of any
  * parameters and constant aliases used throughout the compilation of the
- * module. If the module was compiled as an instance {@link
+ * module.</P>
+ *
+ * <P>Special support is provided to create and retrieve bindings for
+ * enumeration atoms. These are simple identifiers ({@link
+ * SimpleIdentifierProxy}) encountered in the explicit or implicit
+ * declarations of enumeration types. The are treated as ordinary symbols
+ * bound to themselves in the binding map.</P>
+ *
+ * <P>If the module was compiled as an instance {@link
  * net.sourceforge.waters.model.module.InstanceProxy InstanceProxy} within
  * another module, information about the location of that instance is also
- * available.
+ * available.</P>
  *
  * @see BindingContext
  * @author Robi Malik
@@ -74,10 +86,11 @@ public class ModuleBindingContext implements BindingContext
                               final SourceInfo info)
   {
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    mMap = new ProxyAccessorHashSet<>(eq);
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
+    mMap = new ProxyAccessorHashSet<>(eq);
+    mEnumAtoms = new ArrayList<>();
   }
 
 
@@ -170,6 +183,7 @@ public class ModuleBindingContext implements BindingContext
     final SimpleExpressionProxy expr = mMap.get(key);
     if (expr == null) {
       mMap.put(key, ident);
+      mEnumAtoms.add(ident);
     } else {
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       if (!eq.equals(ident, expr)) {
@@ -179,12 +193,18 @@ public class ModuleBindingContext implements BindingContext
     }
   }
 
+  public List<SimpleIdentifierProxy> getEnumAtoms()
+  {
+    return mEnumAtoms;
+  }
+
 
   //#########################################################################
   //# Data Members
-  private final ProxyAccessorSet<SimpleExpressionProxy> mMap;
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
   private final SourceInfo mInstanceSource;
+  private final ProxyAccessorSet<SimpleExpressionProxy> mMap;
+  private final List<SimpleIdentifierProxy> mEnumAtoms;
 
 }

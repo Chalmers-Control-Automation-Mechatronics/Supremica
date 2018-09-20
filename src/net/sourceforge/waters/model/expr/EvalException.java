@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.model.expr;
 
+import java.util.Collections;
+import java.util.List;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 
@@ -133,14 +136,13 @@ public class EvalException extends WatersException
 
   /**
    * Returns all the exceptions associated with this instance. The default
-   * implementation returns a singleton array containing <CODE>this</CODE>,
+   * implementation returns a singleton list containing <CODE>this</CODE>,
    * but a {@link MultiEvalException} may return several exceptions.
-   *
    * @return The exceptions associated with this instance.
    */
-  public EvalException[] getAll()
+  public List<EvalException> getAll()
   {
-    return new EvalException[] { this };
+    return Collections.singletonList(this);
   }
 
 

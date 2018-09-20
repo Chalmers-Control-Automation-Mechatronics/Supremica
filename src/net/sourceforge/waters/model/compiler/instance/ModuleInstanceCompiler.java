@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -81,6 +82,7 @@ import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
@@ -135,6 +137,11 @@ import org.xml.sax.SAXException;
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
  * <LI>{@link SimpleComponentProxy};</LI>
  * <LI>{@link VariableComponentProxy}.</LI>
+ * <LI>{@link ConstantAliasProxy}, if the input module uses enumeration types.
+ *     A single named constant called &quot;:atoms&quot; including all
+ *     enumeration atoms in the input module may be declared in the output.
+ *     If there are no enumerations, then the output module contains no
+ *     aliases whatsoever.</LI>
  * </UL>
  *
  * <P>The instance compiler is used as the first stage of the {@link
@@ -289,7 +296,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   {
     try {
       mHasEFAElements = false;
-      mContext = new ModuleBindingContext(mInputModule);
+      mContext = mRootContext = new ModuleBindingContext(mInputModule);
       mNameSpace = new CompiledNameSpace(mEquality);
       mCompiledEvents = new TreeSet<>();
       mCompiledComponents = new LinkedList<>();
@@ -298,11 +305,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         visitCollection(bindings);
       }
       visitModuleProxy(mInputModule);
-      final String name = mInputModule.getName();
-      final String comment = mInputModule.getComment();
-      return mFactory.createModuleProxy(name, comment, null, null,
-                                        mCompiledEvents, null,
-                                        mCompiledComponents);
+      return createCompiledModule();
     } catch (final VisitorException exception) {
       final Throwable cause = exception.getCause();
       if (cause instanceof EvalException) {
@@ -1168,7 +1171,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
           mFactory.createVariableComponentProxy(fullName, value,
                                                 newInit, newMarkings);
         mNameSpace.addComponent(suffix, newVar);
-        mCompilationInfo.add(newVar, var);
+        mCompilationInfo.add(newVar, var, mContext);
         return newVar;
       } else {
         // Although variables are compiled in a first pass, they are
@@ -1327,6 +1330,27 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
   }
 
+  private ModuleProxy createCompiledModule()
+  {
+    final String name = mInputModule.getName();
+    final String comment = mInputModule.getComment();
+    final List<ConstantAliasProxy> aliases;
+    final List<SimpleIdentifierProxy> enumAtoms = mRootContext.getEnumAtoms();
+    if (enumAtoms.size() > 0) {
+      final SimpleIdentifierProxy ident =
+        mFactory.createSimpleIdentifierProxy(":atoms");
+      final EnumSetExpressionProxy enumSet =
+        mFactory.createEnumSetExpressionProxy(enumAtoms);
+      final ConstantAliasProxy enumDecl =
+        mFactory.createConstantAliasProxy(ident, enumSet);
+      aliases = Collections.singletonList(enumDecl);
+    } else {
+      aliases = null;
+    }
+    return mFactory.createModuleProxy(name, comment, null, aliases,
+                                      mCompiledEvents, null,
+                                      mCompiledComponents);
+  }
 
   //#########################################################################
   //# Inner Class: PrimeSearcher
@@ -1664,6 +1688,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   private boolean mHasEFAElements;
   private boolean m1stPass; // Used in the method visitModuleProxy().
 
+  private ModuleBindingContext mRootContext;
   private BindingContext mContext;
   private CompiledNameSpace mNameSpace;
   private Collection<EventDeclProxy> mCompiledEvents;

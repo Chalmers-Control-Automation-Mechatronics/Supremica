@@ -249,9 +249,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     case 1:
       return String.class;
     case 2:
-      return Integer.class;
     case 3:
-      return Integer.class;
     case 4:
       return Integer.class;
     default:
