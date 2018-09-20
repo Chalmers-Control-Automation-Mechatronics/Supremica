@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="foreach_enum1" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test that involves variables in a foreach-block that iterates over an enumeration.</Comment>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="e[A]">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+                <ns2:State Name="3"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="e[B]">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+                <ns2:State Name="3"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="e[C]">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+                <ns2:State Name="3"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

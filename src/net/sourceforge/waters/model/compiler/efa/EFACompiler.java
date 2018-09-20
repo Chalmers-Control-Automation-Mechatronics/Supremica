@@ -52,6 +52,7 @@ import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.AbortableCompiler;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintPropagator;
 import net.sourceforge.waters.model.compiler.constraint.SplitCandidate;
@@ -64,9 +65,12 @@ import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
 import net.sourceforge.waters.model.expr.EvalException;
+import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EdgeProxy;
+import net.sourceforge.waters.model.module.EnumSetExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
@@ -91,14 +95,15 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * <P>The third pass of the compiler.</P>
+ * <P>The third pass of the {@link ModuleCompiler}.</P>
  *
  * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
  * produces another module as output. It expands all guard/action blocks
  * by partitioning the events, and replaces all variables by simple
- * components. Event arrays, aliases, foreach constructs, and
- * instantiations are not allowed in the input; these should be expanded by
- * a previous call the the module instance compiler ({@link
+ * components. Event arrays, event aliases, foreach constructs, and
+ * instantiations are not allowed in the input. Constant alias declarations
+ * are only parsed to collect enumeration atoms. All these constructs should
+ * be expanded by a previous call the the module instance compiler ({@link
  * net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler
  * ModuleInstanceCompiler}).</P>
  *
@@ -107,7 +112,7 @@ import org.apache.logging.log4j.Logger;
  * <UL>
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
  *     i.e., the list of ranges is guaranteed to be empty;</LI>
- * <LI>{@link SimpleComponentProxy};</LI>
+ * <LI>{@link SimpleComponentProxy}.</LI>
  * </UL>
  *
  * <P><STRONG>Algorithm</STRONG></P>
@@ -440,13 +445,35 @@ public class EFACompiler extends AbortableCompiler
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
+    public Object visitConstantAliasProxy(final ConstantAliasProxy alias)
+      throws VisitorException
+    {
+      final ExpressionProxy expr = alias.getExpression();
+      return expr.acceptVisitor(this);
+    }
+
+    @Override
+    public Object visitEnumSetExpressionProxy(final EnumSetExpressionProxy expr)
+      throws VisitorException
+    {
+      for (final SimpleIdentifierProxy ident : expr.getItems()) {
+        try {
+          mRootContext.insertEnumAtom(ident);
+        } catch (final EvalException exception) {
+          mCompilationInfo.raiseInVisitor(exception);
+        }
+      }
+      return null;
+    }
+
+    @Override
     public List<SimpleIdentifierProxy> visitGraphProxy(final GraphProxy graph)
       throws VisitorException
     {
       try {
         final Collection<NodeProxy> nodes = graph.getNodes();
         final int size = nodes.size();
-        mCurrentRange = new ArrayList<SimpleIdentifierProxy>(size);
+        mCurrentRange = new ArrayList<>(size);
         visitCollection(nodes);
         return mCurrentRange;
       } finally {
@@ -458,6 +485,8 @@ public class EFACompiler extends AbortableCompiler
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
+      final List<ConstantAliasProxy> aliases = module.getConstantAliasList();
+      visitCollection(aliases);
       final List<Proxy> components = module.getComponentList();
       visitCollection(components);
       return null;

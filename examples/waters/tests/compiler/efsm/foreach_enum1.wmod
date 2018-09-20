@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="foreach_enum1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A compiler test that involves variables in a foreach-block that iterates over an enumeration.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="VARS">
+            <ConstantAliasExpression>
+                <EnumSetExpression Text="[A,B,C]">
+                    <SimpleIdentifier Name="A"/>
+                    <SimpleIdentifier Name="B"/>
+                    <SimpleIdentifier Name="C"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+        <ConstantAlias Name="ADR">
+            <ConstantAliasExpression>
+                <BinaryExpression Operator="..">
+                    <IntConstant Value="0"/>
+                    <IntConstant Value="3"/>
+                </BinaryExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
+    <ComponentList>
+        <ForeachComponent Name="i">
+            <SimpleIdentifier Name="VARS"/>
+            <ComponentList>
+                <VariableComponent>
+                    <IndexedIdentifier Name="e">
+                        <SimpleIdentifier Name="i"/>
+                    </IndexedIdentifier>
+                    <VariableRange>
+                        <SimpleIdentifier Name="ADR"/>
+                    </VariableRange>
+                    <VariableInitial>
+                        <BinaryExpression Operator="==">
+                            <IndexedIdentifier Name="e">
+                                <SimpleIdentifier Name="i"/>
+                            </IndexedIdentifier>
+                            <IntConstant Value="0"/>
+                        </BinaryExpression>
+                    </VariableInitial>
+                </VariableComponent>
+            </ComponentList>
+        </ForeachComponent>
+    </ComponentList>
+</Module>
