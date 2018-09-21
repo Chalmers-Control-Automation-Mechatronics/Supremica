@@ -314,7 +314,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         throw exception.getRuntimeException();
       }
     } finally {
-      mContext = null;
+      mContext = mRootContext = null;
       mNameSpace = null;
       mCompiledEvents = null;
       mCompiledComponents = null;
