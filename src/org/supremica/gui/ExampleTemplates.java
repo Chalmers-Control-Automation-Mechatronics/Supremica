@@ -83,8 +83,8 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeGames();
     initializeModuleExamples();
     initializeSchedulingExamples();
-    initializeTUMunichExamples();
 	initializeOtherExamples();
+    initializeTUMunichExamples();
     //initializeStandardComponents();
   }
 
@@ -175,8 +175,8 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
   {
     final TemplateGroup thisGroup = TUMunichExamples;
     final String prefix = basePrefix + "/TUMunichSES/";
-    thisGroup.addItem("Portal2_Test", prefix + "Portal2_Test.wmod");
-    thisGroup.addItem("Portal2_V20_init", prefix + "Portal2_V20_init.wmod");
+    thisGroup.addItem("Portal2 Test", prefix + "Portal2_Test.wmod");
+    thisGroup.addItem("Portal2 V20 init", prefix + "Portal2_V20_init.wmod");
     addGroup(thisGroup);
   }
 
