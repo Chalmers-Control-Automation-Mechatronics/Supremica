@@ -152,7 +152,7 @@ public class IDEAppender
       builder.withName("logFile");
       builder.withFileName(fileName);
       final PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
-      layoutBuilder.withPattern("%-5level %msg%ex%n");
+      layoutBuilder.withPattern("%-5level [%d] %msg%ex%n");
       final Layout<String> layout = layoutBuilder.build();
       builder.withLayout(layout);
       final boolean ignore = ignoreExceptions();
