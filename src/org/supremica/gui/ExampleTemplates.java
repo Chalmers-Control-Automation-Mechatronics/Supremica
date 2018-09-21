@@ -35,8 +35,12 @@
 
 package org.supremica.gui;
 
-import java.util.*;
-import org.supremica.automata.templates.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.supremica.automata.templates.TemplateGroup;
+import org.supremica.automata.templates.TemplateTypes;
 
 /**
  * For convenient menu-access to a large set of examples.
@@ -148,6 +152,7 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     addGroup(thisGroup);
   }
 
+  @SuppressWarnings("unused")
   private void initializeOtherExamples()
   {
     final TemplateGroup thisGroup = OtherExamples;
@@ -334,6 +339,7 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     return mAllGroups.isEmpty();
   }
 
+  @Override
   public Iterator<TemplateGroup> iterator()
   {
     return mAllGroups.iterator();
