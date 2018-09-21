@@ -42,6 +42,7 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,6 +186,9 @@ public class EditorSynthesizerAction extends IDEAction
 
     // do the work
     bddSynthesizer.synthesize(options);
+
+    logger.info("Synthesis completed on "
+                + new Date().toString() + ".");
 
     logger.info("Synthesis completed after "
                 + bddSynthesizer.getSynthesisTimer().toString() + ".");
