@@ -58,6 +58,7 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
   private final TemplateGroup ModuleExamples  = new TemplateGroup(TemplateTypes.ModuleExamples);
   private final TemplateGroup SchedulingExamples = new TemplateGroup(TemplateTypes.SchedulingExamples);
   private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
+  private final TemplateGroup TUMunichExamples = new TemplateGroup(TemplateTypes.TUMunichExamples);
 
   //private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
   private static final String basePrefix = "/includeInJarFile";
@@ -82,7 +83,8 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeGames();
     initializeModuleExamples();
     initializeSchedulingExamples();
-    initializeOtherExamples();
+    initializeTUMunichExamples();
+	initializeOtherExamples();
     //initializeStandardComponents();
   }
 
@@ -166,6 +168,15 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     thisGroup.addItem("Passenger Land-Transportation System", basePrefix + "/ModuleExamples/other/PLanTS.wmod");
     thisGroup.addItem("Professors, Pen and Paper", prefix + "ProfessorsPenPaper.xml");
     thisGroup.addItem("Telecommunications Network (incomplete)", prefix + "telecommunicationsNetwork.xml");
+    addGroup(thisGroup);
+  }
+
+  private void initializeTUMunichExamples()
+  {
+    final TemplateGroup thisGroup = TUMunichExamples;
+    final String prefix = basePrefix + "/TUMunichSES/";
+    thisGroup.addItem("Portal2_Test", prefix + "Portal2_Test.wmod");
+    thisGroup.addItem("Portal2_V20_init", prefix + "Portal2_V20_init.wmod");
     addGroup(thisGroup);
   }
 
