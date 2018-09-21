@@ -110,6 +110,7 @@ public final class EditorSynthesizerOptions
          Config.SYNTHESIS_PRINT_GUARD.get(),
          Config.SYNTHESIS_ADD_GUARDS.get(),
          Config.SYNTHESIS_SAVE_IN_FILE.get(),
+         Config.SYNTHESIS_SAVE_IDD_IN_FILE.get(),
          Config.SYNTHESIS_REACHABILITY.get(),
          Config.SYNTHESIS_PEAKBDD.get(),
          Config.SYNTHESIS_OPTIMIZATION.get());
@@ -132,6 +133,7 @@ public final class EditorSynthesizerOptions
                                    final boolean computePrintGuard,
                                    final boolean addGuards,
                                    final boolean saveInFile,
+                                   final boolean saveIDDInFile,
                                    final boolean reachability,
                                    final boolean peakBDD,
                                    final boolean optimization)
@@ -146,6 +148,7 @@ public final class EditorSynthesizerOptions
     this.printGuard = computePrintGuard;
     this.addGuards = addGuards;
     this.saveInFile = saveInFile;
+    this.saveIDDInFile = saveIDDInFile;
     this.reachability = reachability;
     this.peakBDD = peakBDD;
     this.optimization = optimization;
@@ -179,6 +182,7 @@ public final class EditorSynthesizerOptions
    */
   // In which case is this method used? The defaults are specified
   // in Config.
+  // Julien Provost, 2018-09-21: This functions seems to never be used
   public static EditorSynthesizerOptions getDefaultSynthesizerOptions()
   {
     return new EditorSynthesizerOptions(SynthesisType.CONTROLLABLE,
@@ -191,7 +195,8 @@ public final class EditorSynthesizerOptions
                                         true,
                                         false,
                                         false,
-                                        true,
+                                        false,
+                                        false,
                                         true,
                                         false);
   }
