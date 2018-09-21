@@ -419,6 +419,7 @@ public class EditorSynthesizerDialogStandardPanel
 
   //#########################################################################
   //# Overridden methods from EditorSynthesizerPanel
+  //TODO: this update function should modify the same parameters as the ones used in regain
   @Override
   public void update(final EditorSynthesizerOptions synthesizerOptions)
   {
@@ -427,8 +428,13 @@ public class EditorSynthesizerDialogStandardPanel
       synthesizerOptions.getSynthesisAlgorithm();
     algorithmSelector.setAlgorithm(synthesisAlgo);
     printGuardBox.setSelected(synthesizerOptions.getPrintGuard());
+    addGuardsBox.setSelected(synthesizerOptions.getAddGuards());
+    saveEventGuardInFileBox.setSelected(synthesizerOptions.getSaveInFile());
+    saveIDDInFileBox.setSelected(synthesizerOptions.getSaveIDDInFile());
     reachableBox.setSelected(synthesizerOptions.getReachability());
     peakBDDBox.setSelected(synthesizerOptions.getPeakBDD());
+    complementHeuristicBox.setSelected(synthesizerOptions.getCompHeuristic());
+    independentHeuristicBox.setSelected(synthesizerOptions.getIndpHeuristic());
     globalClockDomainField.setEnabled(timeOptBox.isSelected());
   }
 
