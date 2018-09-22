@@ -1,0 +1,3 @@
+ant initialize
+
+cmd /k

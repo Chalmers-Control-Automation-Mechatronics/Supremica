@@ -85,6 +85,8 @@ public class EditorSynthesizerDialogStandardPanel
   private final JCheckBox addGuardsBox;
   private final JCheckBox saveEventGuardInFileBox;
   private final JCheckBox saveIDDInFileBox;
+  
+  private final JCheckBox genPLCCodeTUMBox;
 
   private final JCheckBox timeOptBox;
 
@@ -319,6 +321,16 @@ public class EditorSynthesizerDialogStandardPanel
 
     saveIDDInFileBox.addActionListener(this);
 
+    genPLCCodeTUMBox = new JCheckBox("Generate PLC code");
+    genPLCCodeTUMBox
+      .setToolTipText("Call the TUM external toolbox "
+                      + "to generate PLC code. "
+                      + "More options in this toolbox. "
+                      + "NOTA: Guards must be added to the model first!");
+                      
+    genPLCCodeTUMBox.addActionListener(this);
+    genPLCCodeTUMBox.setSelected(false); // This option is deactivated by default
+
     final JPanel representationPanel = new JPanel();
     representationPanel
       .setBorder(BorderFactory.createTitledBorder("Guard representation"));
@@ -327,6 +339,7 @@ public class EditorSynthesizerDialogStandardPanel
     representationPanel.add(addGuardsBox);
     representationPanel.add(saveEventGuardInFileBox);
     representationPanel.add(saveIDDInFileBox);
+    representationPanel.add(genPLCCodeTUMBox);
 
     genGuardComputeSupBox.add(representationPanel);
 
@@ -415,6 +428,10 @@ public class EditorSynthesizerDialogStandardPanel
     algorithmSelector.setSelectedIndex(0);
     // Reselect previously selected item if possible
     algorithmSelector.setAlgorithm(selected);
+
+    if (!addGuardsBox.isSelected()) {
+        genPLCCodeTUMBox.setSelected(false);
+    }
   }
 
   //#########################################################################
@@ -431,6 +448,7 @@ public class EditorSynthesizerDialogStandardPanel
     addGuardsBox.setSelected(synthesizerOptions.getAddGuards());
     saveEventGuardInFileBox.setSelected(synthesizerOptions.getSaveInFile());
     saveIDDInFileBox.setSelected(synthesizerOptions.getSaveIDDInFile());
+    genPLCCodeTUMBox.setSelected(synthesizerOptions.getGenPLCCodeTUMBox());
     reachableBox.setSelected(synthesizerOptions.getReachability());
     peakBDDBox.setSelected(synthesizerOptions.getPeakBDD());
     complementHeuristicBox.setSelected(synthesizerOptions.getCompHeuristic());
@@ -448,6 +466,7 @@ public class EditorSynthesizerDialogStandardPanel
     synthesizerOptions.setAddGuards(addGuardsBox.isSelected());
     synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
     synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
+    synthesizerOptions.setGenPLCCodeTUMBox(genPLCCodeTUMBox.isSelected());
     synthesizerOptions.setReachability(reachableBox.isSelected());
     synthesizerOptions.setPeakBDD(peakBDDBox.isSelected());
     synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());

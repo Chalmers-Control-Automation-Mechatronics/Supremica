@@ -368,5 +368,26 @@ public class EditorSynthesizerAction extends IDEAction
 
     // Cleanup...
     bddSynthesizer.done();
+    
+    // Call TUM PLC Code generator
+    // TODO: * Call the actual file
+    //       * Improve the integration
+    if (options.getGenPLCCodeTUMBox()) {
+        logger.info("Generating PLC Code using TUM external toolbox...");
+        try {
+            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start", "HelloWorld.bat");
+            //File dir = new File("C:\\Users\\ga37vuy\\Documents\\Research\\Code\\Supremica");
+            File dir = new File("..\\"); // one level above \dist
+            pb.directory(dir);
+            Process p = pb.start();
+        }
+        catch (final Exception ex) {
+            logger.error("Exception while generating PLC Code using TUM external toolbox");
+            ex.printStackTrace();
+        }
+        logger.info("PLC code generated using TUM external toolbox");
+        // TODO: Get some output from the external toolbox?
+        logger.info("TODO: File saved in ???");
+    }
   }
 }
