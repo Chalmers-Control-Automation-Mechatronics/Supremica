@@ -469,6 +469,7 @@ public class DocumentContainerManager
   private void saveActiveContainerAs(final boolean maycancel)
   {
     final JFileChooser chooser = getSaveFileChooser();
+    chooser.setDialogTitle("Save as ...");
     final int returnVal = chooser.showSaveDialog(mIDE.getFrame());
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       File file = chooser.getSelectedFile();
