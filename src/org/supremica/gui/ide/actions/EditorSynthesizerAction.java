@@ -441,6 +441,8 @@ public class EditorSynthesizerAction extends IDEAction
             // END Unused for the moment
 
             // Building the command to pass to the external converter
+            // TODO: Now that the number of command is growing it would make sense to create a dedicated function
+            // If would be simpler to handle specific cases, such as -h which should directly return
             logger.info("\tBuilding the command");
             ArrayList<String> command = new ArrayList<>(Arrays.asList("cmd", "/k", "start", "STCodeConverter.exe"));
             if (options.getTypePLCCodeTUM()=="standalone") { // standalone (default) option, with filepath
@@ -451,6 +453,10 @@ public class EditorSynthesizerAction extends IDEAction
                 command.addAll(addargs);
             } else { // Help option
                 command.add("-h");
+            }
+            if (options.getPLCCodeTUMefaBox()) { // adding the EFA option
+                List<String> addargs = Arrays.asList("-e");
+                command.addAll(addargs);
             }
             logger.debug("Command built: " + command);
 

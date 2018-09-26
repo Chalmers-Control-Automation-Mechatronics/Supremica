@@ -87,6 +87,7 @@ public class EditorSynthesizerDialogStandardPanel
   private final JCheckBox saveIDDInFileBox;
 
   private final JPanel plcCodePanel;
+  private final JCheckBox plcCodeTUMefaBox;
   private final JCheckBox genPLCCodeTUMBox;
   private final JComboBox<String> typePLCCodeTUMSelector; // Later, this could be defined as a specific class.
 
@@ -226,7 +227,7 @@ public class EditorSynthesizerDialogStandardPanel
     reachableBox.setEnabled(true);
     reachableBox.setVisible(true);
     box.add(reachableBox);
-    reachableBox.addActionListener(this);
+    // reachableBox.addActionListener(this); // Not needed?
     panel.add(box);
     supervisorPanel.add(panel);
 
@@ -236,7 +237,7 @@ public class EditorSynthesizerDialogStandardPanel
     peakBDDBox.setEnabled(true);
     peakBDDBox.setVisible(true);
     box.add(peakBDDBox);
-    peakBDDBox.addActionListener(this);
+    // peakBDDBox.addActionListener(this); // Not needed?
     panel.add(box);
     supervisorPanel.add(panel);
 
@@ -299,29 +300,25 @@ public class EditorSynthesizerDialogStandardPanel
 
     printGuardBox = new JCheckBox("Print the computed guards");
     printGuardBox.setToolTipText("Compute and print the guards.");
-
-    printGuardBox.addActionListener(this);
+    // printGuardBox.addActionListener(this); // Not needed?
 
     addGuardsBox = new JCheckBox("Add guards to the model");
     addGuardsBox.setToolTipText("Add computed guards to the model; "
                                 + "variables of automata are created and "
                                 + "updates are added.");
-
-    addGuardsBox.addActionListener(this);
+    addGuardsBox.addActionListener(this); // needed to enable/disable genPLCCodeTUMBox selection
 
     saveEventGuardInFileBox = new JCheckBox("Save the result in a file");
     saveEventGuardInFileBox
       .setToolTipText("Compute and write the event-guard pairs in a file.");
-
-    saveEventGuardInFileBox.addActionListener(this);
+    // saveEventGuardInFileBox.addActionListener(this); // Not needed?
 
     saveIDDInFileBox = new JCheckBox("Save the result as an IDD in a file");
     saveIDDInFileBox
       .setToolTipText("For each event an IDD (expression "
                       + "graph) is generated representing the "
                       + "guard. The file is saved in .ps format.");
-
-    saveIDDInFileBox.addActionListener(this);
+    // saveIDDInFileBox.addActionListener(this); // Not needed?
 
     final JPanel representationPanel = new JPanel();
     representationPanel
@@ -384,28 +381,35 @@ public class EditorSynthesizerDialogStandardPanel
     plcCodePanel = new JPanel();
     plcCodePanel.setBorder(BorderFactory.createTitledBorder(
         "PLC code generation"));
-    plcCodePanel.setLayout(new GridLayout(2, 1));
+    plcCodePanel.setLayout(new GridLayout(3, 1)); // Change this number according to the number of boxes
 
     genPLCCodeTUMBox = new JCheckBox("Generate PLC code (external)");
     genPLCCodeTUMBox.setToolTipText(
         "Call the TUM external toolbox to generate PLC code. "
       + "More options in this toolbox. "
       + "NOTA: Guards must be added to the model first!");
-    genPLCCodeTUMBox.addActionListener(this);
     genPLCCodeTUMBox.setSelected(false); // This option is deactivated by default
+    genPLCCodeTUMBox.addActionListener(this); // needed to check if addGuardsBox is selected
 
     Box typePLCCodeTUMBox = Box.createHorizontalBox();
     typePLCCodeTUMBox.add(new JLabel("Output format:"));
     String[] _typeList = {"standalone", "TwinCAT"};
     typePLCCodeTUMSelector = new JComboBox<String>(_typeList);
-    typePLCCodeTUMSelector.addActionListener(this);
-    // typePLCCodeTUMSelector.setSelectedIndex(1); // Default selection
-    typePLCCodeTUMSelector.setSelectedItem("TwinCAT");//
+    typePLCCodeTUMSelector.setSelectedItem("TwinCAT"); // Default selection
     typePLCCodeTUMBox.add(typePLCCodeTUMSelector);
+
+    plcCodeTUMefaBox = new JCheckBox("EFA extension (experimental)");
+    plcCodeTUMefaBox.setToolTipText(
+        "Use the EFA extension. "
+      + "NOTA: Experimental");
+    plcCodeTUMefaBox.setSelected(false); // This option is deactivated by default
+    plcCodeTUMefaBox.addActionListener(this); // needed to check if addGuardsBox is selected
+
 
     // Add plcCodePanel's elements
     plcCodePanel.add(genPLCCodeTUMBox);
     plcCodePanel.add(typePLCCodeTUMBox);
+    plcCodePanel.add(plcCodeTUMefaBox);
     // END TUM external toolbox for ST code generation
 
 
@@ -452,8 +456,10 @@ public class EditorSynthesizerDialogStandardPanel
     // Reselect previously selected item if possible
     algorithmSelector.setAlgorithm(selected);
 
+    // TUM external toolbox for ST code generation
     if (!addGuardsBox.isSelected()) {
         genPLCCodeTUMBox.setSelected(false);
+        plcCodeTUMefaBox.setSelected(false);
     }
   }
 
@@ -472,6 +478,7 @@ public class EditorSynthesizerDialogStandardPanel
     saveIDDInFileBox.setSelected(synthesizerOptions.getSaveIDDInFile());
     // genPLCCodeTUMBox.setSelected(synthesizerOptions.getGenPLCCodeTUMBox());
     // typePLCCodeTUMSelector.setSelectedItem(synthesizerOptions.getTypePLCCodeTUM());
+    // plcCodeTUMefaBox.setSelected(synthesizerOptions.getPLCCodeTUMefaBox());
     reachableBox.setSelected(synthesizerOptions.getReachability());
     peakBDDBox.setSelected(synthesizerOptions.getPeakBDD());
     complementHeuristicBox.setSelected(synthesizerOptions.getCompHeuristic());
@@ -491,6 +498,7 @@ public class EditorSynthesizerDialogStandardPanel
     synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
     synthesizerOptions.setGenPLCCodeTUMBox(genPLCCodeTUMBox.isSelected());
     synthesizerOptions.setTypePLCCodeTUM((String) typePLCCodeTUMSelector.getSelectedItem());
+    synthesizerOptions.setPLCCodeTUMefaBox(plcCodeTUMefaBox.isSelected());
     synthesizerOptions.setReachability(reachableBox.isSelected());
     synthesizerOptions.setPeakBDD(peakBDDBox.isSelected());
     synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
