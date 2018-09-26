@@ -74,6 +74,7 @@ public final class EditorSynthesizerOptions
   private boolean saveInFile;
   private boolean saveIDDInFile;
   private boolean genPLCCodeTUMBox;
+  private String typePLCCodeTUM;
   private boolean compHeuristic;
   private boolean indpHeuristic;
   private boolean reachability;
@@ -362,6 +363,16 @@ public final class EditorSynthesizerOptions
   public boolean getGenPLCCodeTUMBox()
   {
     return genPLCCodeTUMBox;
+  }
+
+  public void setTypePLCCodeTUM(final String option)
+  {
+    typePLCCodeTUM = option;
+  }
+
+  public String getTypePLCCodeTUM()
+  {
+    return typePLCCodeTUM;
   }
 
   public void setCompHeuristic(final boolean bool)

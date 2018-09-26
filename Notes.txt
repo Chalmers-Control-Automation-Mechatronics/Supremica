@@ -1,3 +1,0 @@
-saveProperties() in SupremicaProperties.java
-vs.
-saveOptions() in EditorSynthesizerOptions.java

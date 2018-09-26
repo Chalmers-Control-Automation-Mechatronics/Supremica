@@ -39,7 +39,10 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -73,6 +76,7 @@ import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -368,26 +372,106 @@ public class EditorSynthesizerAction extends IDEAction
 
     // Cleanup...
     bddSynthesizer.done();
-    
+
     // Call TUM PLC Code generator
-    // TODO: * Call the actual file
-    //       * Improve the integration
+    // TODO: * Improve the integration: At least output Pass/Fail in the log of Supremica
     if (options.getGenPLCCodeTUMBox()) {
         logger.info("Generating PLC Code using TUM external toolbox...");
+        tryLabel:
         try {
-            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start", "HelloWorld.bat");
-            //File dir = new File("C:\\Users\\ga37vuy\\Documents\\Research\\Code\\Supremica");
-            File dir = new File("..\\"); // one level above \dist
+            logger.info("\tChecking the current model file");
+            final String modulename = module.getName(); // Module's name without extension
+
+            // Retrieve the path to access the Wmod file to be passed to the converter
+            String modulePath;
+            URI moduleUri = module.getLocation(); // already returns null if the module (included in the JAR) is not a Wmod file
+            if (moduleUri == null) {
+                modulePath = null;
+            } else {
+                modulePath = moduleUri.getPath(); // returns null if in the JAR, returns the path otherwise, TODO: test on a NAS folder
+            }
+
+            // modulePath is null if the module is included in the JAR -> Save the current module into a selected folder
+            if (modulePath == null) { // modulePath is null if the module is included in the JAR
+                // Save as ...
+                logger.warn("The current model first needs to be saved as an external WMOD file. Please select the destination folder.");
+                final DocumentContainerManager manager = ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager();
+                manager.saveActiveContainerAs();
+
+                // Retrieve the new module's path (and name)
+                moduleUri = module.getLocation();
+                modulePath = moduleUri.getPath(); // retrieve the new module's path (and name)
+            }
+
+            // Check and clean up the path
+            // Only Windows if considered here
+            // TODO: add a check for the OS
+            if (modulePath.startsWith("//")) {
+                logger.error("The external PLC code converter does not support network repositories!");
+                break tryLabel;
+            } else if (modulePath.startsWith("/")) {
+                modulePath = modulePath.substring(1); // remove the first /
+            }
+
+            // Unused for the moment. Converter.exe accepts only one path
+            // logger.info("\tSelecting the PLC code destination");
+            // final String dialogTitle;
+            // if (options.getTypePLCCodeTUM()=="standalone") {
+                // dialogTitle = "Select the destination folder";
+            // } else if (options.getTypePLCCodeTUM()=="TwinCAT") {
+                // dialogTitle = "Select the TwinCAT project folder";
+            // } else {
+                // dialogTitle = "Title undefined"; // Should never be called
+            // }
+            // logger.debug("dialogTitle: " + dialogTitle); //
+
+            // final JFileChooser chooser = new JFileChooser();
+            // chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            // chooser.setAcceptAllFileFilterUsed(false);
+            // chooser.setDialogTitle(dialogTitle);
+            // final int returnVal = chooser.showOpenDialog(ide.getFrame());
+
+            // final String destPath;
+            // if (returnVal == JFileChooser.APPROVE_OPTION) {
+                // destPath = chooser.getSelectedFile().getAbsolutePath();
+            // } else {
+                // destPath = "";
+            // }
+            // logger.debug("destPath: " + destPath);
+            // END Unused for the moment
+
+            // Building the command to pass to the external converter
+            logger.info("\tBuilding the command");
+            ArrayList<String> command = new ArrayList<>(Arrays.asList("cmd", "/k", "start", "STCodeConverter.exe"));
+            if (options.getTypePLCCodeTUM()=="standalone") { // standalone (default) option, with filepath
+                List<String> addargs = Arrays.asList("-f", modulePath);
+                command.addAll(addargs);
+            } else if (options.getTypePLCCodeTUM()=="TwinCAT") { // TwinCAT option, with filepath
+                List<String> addargs = Arrays.asList("-tc", "-f", modulePath);
+                command.addAll(addargs);
+            } else { // Help option
+                command.add("-h");
+            }
+            logger.debug("Command built: " + command);
+
+            // Building the external process and starting it
+            logger.info("\tStarting the external process");
+            final ProcessBuilder pb = new ProcessBuilder(command);
+            File dir = new File("..\\"); // TUM external toolbox is one level above /dist
+            // TODO: modify build.xml in order to copy STCodeConverter.exe to the /dist folder
             pb.directory(dir);
-            Process p = pb.start();
+            final Process p = pb.start();
+            logger.debug("External process started");
         }
         catch (final Exception ex) {
             logger.error("Exception while generating PLC Code using TUM external toolbox");
             ex.printStackTrace();
         }
-        logger.info("PLC code generated using TUM external toolbox");
-        // TODO: Get some output from the external toolbox?
-        logger.info("TODO: File saved in ???");
+        finally{
+            // TODO: finally of Generating PLC Code using TUM external toolbox
+            logger.debug("TODO: finally of Generating PLC Code using TUM external toolbox");
+        }
+        // TODO: Get some outputs from the external toolbox?
     }
   }
 }
