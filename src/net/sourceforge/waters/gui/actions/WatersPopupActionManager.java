@@ -401,7 +401,7 @@ public class WatersPopupActionManager
   public IDEAction getAnalyzerSynthesizerAction()
   {
     final WatersActionManager master = mIDE.getActions();
-    return master.getAction(AnalyzerSynthesizerAction.class);
+    return master.getAction(AnalyzerSynthesisAction.class);
   }
 
   //#########################################################################

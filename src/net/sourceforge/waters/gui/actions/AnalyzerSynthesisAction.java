@@ -40,26 +40,29 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynthesizerDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the synchronous product dialog in the Waters analyser.
+ * The action to invoke the supervisor synthesis dialog in the Waters analyser.
  *
  * @author George Hewlett
  */
 
-public class AnalyzerSynthesizerAction extends WatersAnalyzerAction
+public class AnalyzerSynthesisAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
   //# Constructor
-  AnalyzerSynthesizerAction(final IDE ide)
+  AnalyzerSynthesisAction(final IDE ide)
   {
     super(ide);
     putValue(Action.NAME, "Synthesize ...");
-    putValue(Action.SHORT_DESCRIPTION, "Synthesize the selected automata");
+    putValue(Action.SHORT_DESCRIPTION,
+             "Synthesize supervisors for the selected automata");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
     updateEnabledStatus();
   }
 

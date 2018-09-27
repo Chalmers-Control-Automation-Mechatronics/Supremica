@@ -264,6 +264,8 @@ public class IconAndFontLoader
 
   //#########################################################################
   //# Private Constants
+  private static final String NAME_ANALYZER_SYNC = "analyzer_sync";
+  private static final String NAME_ANALYZER_SYNTH = "analyzer_synth";
   private static final String NAME_APPLICATION = "application";
   private static final String NAME_BINDING = "binding";
   private static final String NAME_CONSOLE_DEBUG = "debug";
@@ -343,6 +345,11 @@ public class IconAndFontLoader
   //#########################################################################
   //# Public Icons
   // Editor
+  public static final ImageIcon ICON_ANALYZER_SYNC =
+    getWatersIcon(NAME_ANALYZER_SYNC);
+  public static final ImageIcon ICON_ANALYZER_SYNTH =
+    getWatersIcon(NAME_ANALYZER_SYNTH);
+  public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
   public static final ImageIcon ICON_CONSTANT = getWatersIcon(NAME_CONSTANT);
   public static final ImageIcon ICON_CONSOLE_DEBUG =
     getWatersIcon(NAME_CONSOLE_DEBUG);
@@ -352,7 +359,6 @@ public class IconAndFontLoader
     getWatersIcon(NAME_CONSOLE_INFO);
   public static final ImageIcon ICON_CONSOLE_WARNING =
     getWatersIcon(NAME_CONSOLE_WARNING);
-  public static final ImageIcon ICON_BINDING = getWatersIcon(NAME_BINDING);
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE =
     getWatersIcon(NAME_CONTROLLABLE_OBSERVABLE);
   public static final ImageIcon ICON_CONTROLLABLE_OBSERVABLE_ERROR =

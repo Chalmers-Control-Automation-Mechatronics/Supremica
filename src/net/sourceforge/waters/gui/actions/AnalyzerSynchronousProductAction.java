@@ -40,6 +40,7 @@ import javax.swing.Action;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.gui.ide.IDE;
 
@@ -60,6 +61,7 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
     super(ide);
     putValue(Action.NAME, "Synchronise ...");
     putValue(Action.SHORT_DESCRIPTION, "Synchronise the selected automata");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNC);
     updateEnabledStatus();
   }
 
