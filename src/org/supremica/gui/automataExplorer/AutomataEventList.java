@@ -95,7 +95,7 @@ public class AutomataEventList
             {
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2)
                 {
-					System.out.println("!mosueClicked: " + e.toString());
+					System.out.println("!mouseClicked: " + e.toString());
                     final int index = theList.locationToIndex(e.getPoint());
 
                     if (index >= 0)
