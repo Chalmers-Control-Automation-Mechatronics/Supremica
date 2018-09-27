@@ -374,14 +374,12 @@ public class EditorSynthesizerAction extends IDEAction
     bddSynthesizer.done();
 
     // Call TUM PLC Code generator
-    // TODO: * Improve the integration: At least output Pass/Fail in the log of Supremica
+    // TODO: * Improve the integration: Get some outputs (at least Pass/Fail) from the external toolbox and pass them to Supremica/Waters logger.info()
     //       * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
     //       * Only Windows if considered here
     //         -> Add a check for the OS
     //         -> Handle the file separators properly: "\\", "/", File.separator ...
     //       * Probably move this code (which is getting larger) to another file and functions
-    //       * Modify build.xml in order to copy STCodeConverter.exe to the /dist folder
-    //       * Get some outputs from the external toolbox and pass them to Supremica/Waters logger.info()
     //
     if (options.getGenPLCCodeTUMBox()) {
         logger.info("Generating PLC Code using TUM external toolbox...");
@@ -490,8 +488,6 @@ public class EditorSynthesizerAction extends IDEAction
             // Building the external process and starting it
             logger.info("\tStarting the external process");
             final ProcessBuilder pb = new ProcessBuilder(command);
-            File dir = new File("..\\"); // TUM external toolbox is one level above /dist
-            pb.directory(dir);
             final Process p = pb.start();
             logger.warn("External process started! Please check the external console for output.");
         }
