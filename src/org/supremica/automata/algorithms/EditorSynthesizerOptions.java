@@ -76,6 +76,7 @@ public final class EditorSynthesizerOptions
   private boolean genPLCCodeTUMBox;
   private String typePLCCodeTUM;
   private boolean plcCodeTUMefaBox;
+  private boolean savPLCCodeTUMBox;
   private boolean compHeuristic;
   private boolean indpHeuristic;
   private boolean reachability;
@@ -384,6 +385,16 @@ public final class EditorSynthesizerOptions
   public boolean getPLCCodeTUMefaBox()
   {
     return plcCodeTUMefaBox;
+  }
+
+  public void setSavPLCCodeTUMBox(final boolean bool)
+  {
+    savPLCCodeTUMBox = bool;
+  }
+
+  public boolean getSavPLCCodeTUMBox()
+  {
+    return savPLCCodeTUMBox;
   }
 
   public void setCompHeuristic(final boolean bool)
