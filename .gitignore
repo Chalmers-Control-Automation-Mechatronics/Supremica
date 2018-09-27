@@ -33,3 +33,6 @@ Thumbs.db
 *.iml
 
 # Don't ignore .settings - shared run configurations for Eclipse.
+
+# Specific dist folders with different (temporary) versions, used for testing
+/dist_*
