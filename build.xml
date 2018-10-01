@@ -232,6 +232,8 @@
     
     <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
     
+    <target name="compile-minimal" depends="compile_supremica-minimal"/>
+    
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
                debuglevel="lines,source,vars"
