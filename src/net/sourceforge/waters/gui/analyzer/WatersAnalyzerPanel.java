@@ -83,13 +83,10 @@ public class WatersAnalyzerPanel extends MainPanel
       new SimpleExpressionCompiler(factory, optable);
     mAutomataTable = new AutomataTable(moduleContainer, this);
     final JScrollPane scroll = new JScrollPane(mAutomataTable);
-    final JPanel mAutomataPanel = new JPanel();
-    final JPanel scrollDisplay = new JPanel();
-    scrollDisplay.setBackground(Color.WHITE);
-    scrollDisplay.add(mAutomataPanel);
-    mModuleContainer.getCompiledDES();
     setLeftComponent(scroll);
-    setRightComponent(scrollDisplay);
+    final JPanel emptyPanel = new JPanel();
+    emptyPanel.setBackground(Color.WHITE);
+    setRightComponent(emptyPanel);
   }
 
   //#########################################################################
@@ -102,11 +99,6 @@ public class WatersAnalyzerPanel extends MainPanel
   ModuleSubject getModule()
   {
     return mModuleContainer.getModule();
-  }
-
-  SimpleExpressionCompiler getSimpleExpressionCompiler()
-  {
-    return mSimpleExpressionCompiler;
   }
 
   public AutomataTableModel getAutomataTableModel()
@@ -176,10 +168,8 @@ public class WatersAnalyzerPanel extends MainPanel
 
   //#########################################################################
   //# Data Members
-  public final ModuleContainer mModuleContainer;
+  private final ModuleContainer mModuleContainer;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
-
-
   private final AutomataTable mAutomataTable;
 
   //#########################################################################

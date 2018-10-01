@@ -635,9 +635,10 @@ public class AutomataTable extends JTable implements SelectionOwner
 
   //#########################################################################
   //# Data Members
-  final WatersAnalyzerPanel mParent;
+  private final WatersAnalyzerPanel mParent;
   private List<Observer> mObservers;
-  final ModuleContainer mModuleContainer;
+  private final ModuleContainer mModuleContainer;
+
 
   //#########################################################################
   //# Class Constants

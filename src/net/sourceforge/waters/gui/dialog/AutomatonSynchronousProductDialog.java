@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.awt.Container;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -86,6 +87,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
   //# Constructor
   public AutomatonSynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
+    super((Frame) panel.getTopLevelAncestor());
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 

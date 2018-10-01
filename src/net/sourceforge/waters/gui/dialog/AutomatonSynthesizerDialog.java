@@ -72,7 +72,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
-import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -85,6 +84,7 @@ public class AutomatonSynthesizerDialog extends JDialog
   //# Constructor
   public AutomatonSynthesizerDialog(final WatersAnalyzerPanel panel)
   {
+    super((Frame) panel.getTopLevelAncestor());
     mAnalyzerPanel = panel;
     mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
 
@@ -294,9 +294,9 @@ public class AutomatonSynthesizerDialog extends JDialog
     mSynthesizer.setSupervisorLocalizationEnabled
       (mLocalisedSupervisor.isSelected());
     mSynthesizer.setModel(des);
-    final IDE ide = mAnalyzerPanel.mModuleContainer.getIDE();
+    final Frame owner = (Frame) getOwner();
     final SynthesisPopUpDialog dialog =
-      new SynthesisPopUpDialog(ide, des, mSynthesizer);
+      new SynthesisPopUpDialog(owner, des, mSynthesizer);
     dispose();
     dialog.setVisible(true);
   }
