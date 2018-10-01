@@ -139,9 +139,9 @@ public abstract class SimpleExpressionSubject
   /**
    * Sets the original text of this expression.
    */
-  public void setPlainText(final String plainText)
+  public void setPlainText(final String plainText) // This was never used, until added in the constructors of BinaryExpressionSubject and BinaryExpressionElement
   {
-    if (mPlainText.equals(plainText)) {
+    if (mPlainText != null && mPlainText.equals(plainText)) {
       return;
     }
     mPlainText = plainText;

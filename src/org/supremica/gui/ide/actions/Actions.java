@@ -144,6 +144,7 @@ public class Actions extends WatersActionManager
     public IDEAction editorAddBindingAction = new EditorAddBindingAction(mIDEActions);
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
+    public IDEAction editorGenerateTextLabelAction = new EditorGenerateTextLabelAction(mIDEActions);
     public IDEAction editorEFASynchEval = new EditorEFASynchAndEvalAction(mIDEActions);
     public IDEAction editorEFASynch = new EditorEFASynchAction(mIDEActions);
     public IDEAction editorEFAPE = new EditorEFAPEAction(mIDEActions);
@@ -175,7 +176,7 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerDeleteAllAction = new AnalyzerDeleteAllAutomataAction(mIDEActions);
     public IDEAction analyzerMinimizeAction = new AnalyzerMinimizeAction(mIDEActions);
     public IDEAction analyzerPurgeAction = new AnalyzerPurgeAction(mIDEActions);
-	public IDEAction analyzerEnumerateAction = new AnalyzerEnumerateAction(mIDEActions);
+    public IDEAction analyzerEnumerateAction = new AnalyzerEnumerateAction(mIDEActions);
     public IDEAction analyzerEventHiderAction = new AnalyzerEventHiderAction(mIDEActions);
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(mIDEActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
