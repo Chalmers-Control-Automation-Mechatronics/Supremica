@@ -190,7 +190,7 @@ public class ExpressionParser {
   public SimpleExpressionProxy parse(String input, final int mask)
     throws ParseException
   {
-    input = removeBlanks(input);
+    input = removeBlanks(input); // Wouldn't it be simpler to use input.trim()?
     try {
       final Reader reader = new StringReader(input);
       return parse(reader, mask, input);
@@ -299,7 +299,7 @@ public class ExpressionParser {
     return mScanner.isExpressionCharacter(ch);
   }
 
-  private String removeBlanks(final String text)
+  private String removeBlanks(final String text) // Wouldn't it be simpler to use text.trim()?
   {
     final int len = text.length();
     int start = 0;
