@@ -36,75 +36,34 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
+// import javax.swing.ImageIcon;
+// import javax.swing.JFileChooser;
+// import javax.swing.JOptionPane;
 
-import net.sf.javabdd.BDD;
-
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.compiler.ModuleCompiler;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.expr.TypeMismatchException;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.module.ForeachProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-import net.sourceforge.waters.model.module.ModuleProxy;
+import net.sourceforge.waters.gui.command.Command;
+import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.model.module.GraphProxy;
-import net.sourceforge.waters.model.module.EdgeProxy;
-import net.sourceforge.waters.model.module.GuardActionBlockProxy;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.module.BinaryExpressionSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
-// import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
-
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.supremica.automata.ExtendedAutomata;
-import org.supremica.automata.ExtendedAutomaton;
-import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
-import org.supremica.automata.algorithms.EditorSynthesizerOptions;
-import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
-import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.ModuleContainer;
+// import org.supremica.properties.Config;
 
 public class EditorGenerateTextLabelAction extends IDEAction
 {
@@ -116,9 +75,8 @@ public class EditorGenerateTextLabelAction extends IDEAction
         super(actionList);
         setEditorActiveRequired(true);
 
-        final String actName =
-          "Recompute Guards (and Actions) Text label";
-        final String description = "Recompute the Text label of Guards";
+        final String actName = "Recompute Guards and Actions Text labels";
+        final String description = "Recompute the XML Text labels of Guards and Actions";
 
         putValue(Action.NAME, actName);
         putValue(Action.SHORT_DESCRIPTION, description);
@@ -136,34 +94,78 @@ public class EditorGenerateTextLabelAction extends IDEAction
     public void doAction()
     {
       ///////////////////////////////////////////////////
-	  // TODO: * Do the same for actions?              //
-	  //       * Add undo operation. How?              //
-	  //       * Automatic Save as?                    //
-	  //       * Remove unused imports                 //
-	  //       * Option: Guards and/or Actions         //
-	  //       * Option: Replace all / only if missing //
-	  ///////////////////////////////////////////////////
-	  final ModuleSubject moduleSubject =
-        ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
+      // TODO: * Automatic Save as?                    //
+      //       * Option: Guards and/or Actions         //
+      //       * Option: Replace all / only if missing //
+      //       * Remove unused imports                 //
+      ///////////////////////////////////////////////////
+      logger.info("Recomputing Guards (and Actions) Text labels...");
+      logger.debug("\tRetrieving ModuleContainer and ModuleSubject...");
+      final DocumentContainer docContainer = ide.getActiveDocumentContainer();
+      final ModuleContainer moduleContainer;
+      final ModuleSubject moduleSubject;
+      if (docContainer instanceof ModuleContainer) {
+        moduleContainer = (ModuleContainer) docContainer; // needed to execute the EditCommand
+        moduleSubject = moduleContainer.getModule();
+        logger.debug("\tModuleContainer and ModuleSubject successfully retrieved.");
+      } else {
+        // We should never get there
+        logger.error("ModuleContainer and ModuleSubject could not be retrieved.");
+        return;
+      }
+
+      final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+
       for (final AbstractSubject absSubject
-				  : moduleSubject.getComponentListModifiable()) {
+                  : moduleSubject.getComponentListModifiable()) {
         if (absSubject instanceof SimpleComponentSubject) {
-		  final SimpleComponentSubject componentSubject = (SimpleComponentSubject) absSubject;
-		  final GraphSubject graphSubject = componentSubject.getGraph();
-		  for (final EdgeSubject edgeSubject
-					  : graphSubject.getEdgesModifiable()) {
-		    final GuardActionBlockSubject guardActionBlockSubject = edgeSubject.getGuardActionBlock();
-		    for (final SimpleExpressionSubject guardSubject
-						: guardActionBlockSubject.getGuardsModifiable()) {
-			  String newPlainText = guardSubject.toString();
-			  guardSubject.setPlainText(newPlainText);
-		    }
-		  }
-		}
-	  }
+          final SimpleComponentSubject componentSubject = (SimpleComponentSubject) absSubject;
+          final GraphSubject graphSubject = componentSubject.getGraph();
+          for (final EdgeSubject edgeSubject
+                      : graphSubject.getEdgesModifiable()) {
+            // Retrieve and clone the GuardActionBlock
+            final GuardActionBlockSubject guardActionBlockSubject = edgeSubject.getGuardActionBlock();
+            final GuardActionBlockSubject newGuardActionBlockSubject = (GuardActionBlockSubject) cloner.getClone(guardActionBlockSubject);
+            logger.debug("\t1 GuardActionBlockSubject successfully cloned.");
+            // Loop on the guards
+            for (final SimpleExpressionSubject guardSubject
+                        : newGuardActionBlockSubject.getGuardsModifiable()) {
+              final String oldGuardPlainText = guardSubject.getPlainText();
+              final String newGuardPlainText = guardSubject.toString();
+              guardSubject.setPlainText(newGuardPlainText);
+              Command command = null;
+              if(!newGuardPlainText.equals(oldGuardPlainText)){
+                // Prepare the EditCommand to update the GuardActionBlock
+                command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
+              }
+              if (command != null){
+                // Execute the EditCommand
+                moduleContainer.executeCommand(command);
+              }
+            }
+            // Loop on the actions
+            for (final BinaryExpressionSubject actionSubject
+                        : newGuardActionBlockSubject.getActionsModifiable()) {
+              final String oldActionPlainText = actionSubject.getPlainText();
+              final String newActionPlainText = actionSubject.toString();
+              actionSubject.setPlainText(newActionPlainText);
+              Command command = null;
+              if(!newActionPlainText.equals(oldActionPlainText)){
+                // Prepare the EditCommand to update the GuardActionBlock
+                command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
+              }
+              if (command != null){
+                // Execute the EditCommand
+                moduleContainer.executeCommand(command);
+              }
+            }
+          }
+        }
+      }
+      logger.info("Guards and Actions Text labels successfully recomputed!");
     }
-	
-	//#########################################################################
+
+    //#########################################################################
     //# Class Constants
     private final Logger logger = LogManager.getLogger(IDE.class);
     private final long serialVersionUID = 1L;
