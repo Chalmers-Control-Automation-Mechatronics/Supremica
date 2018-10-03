@@ -68,102 +68,129 @@ import org.supremica.gui.ide.ModuleContainer;
 public class EditorGenerateTextLabelAction extends IDEAction
 {
 
-    //#########################################################################
-    //# Constructor
-    public EditorGenerateTextLabelAction(final List<IDEAction> actionList)
-    {
-        super(actionList);
-        setEditorActiveRequired(true);
+  //#########################################################################
+  //# Constructor
+  public EditorGenerateTextLabelAction(final List<IDEAction> actionList)
+  {
+    super(actionList);
+    setEditorActiveRequired(true);
 
-        final String actName = "Recompute Guards and Actions Text labels";
-        final String description = "Recompute the XML Text labels of Guards and Actions";
+    final String actName = "Recompute Guards and Actions Text labels";
+    final String description = "Recompute the XML Text labels of Guards and Actions";
 
-        putValue(Action.NAME, actName);
-        putValue(Action.SHORT_DESCRIPTION, description);
+    putValue(Action.NAME, actName);
+    putValue(Action.SHORT_DESCRIPTION, description);
+  }
+
+  //#########################################################################
+  //# Overridden methods
+  @Override
+  public void actionPerformed(final ActionEvent e)
+  {
+    doAction();
+  }
+
+  @Override
+  public void doAction()
+  {
+    ////////////////////////////////////////////////////////////
+    // TODO: * Automatic Save as?                             //
+    //       * Option: Guards and/or Actions                  //
+    //       * Option: Replace all / only if missing          //
+    //       * Remove unused imports                          //
+    //       * Add some more != null checks before for-loops  //
+    //         even though they are less likely to occur      //
+    //         (Graph, Edges, ...)                   //
+    ////////////////////////////////////////////////////////////
+    logger.info("Recomputing Guards (and Actions) Text labels...");
+    logger.debug("\tRetrieving ModuleContainer and ModuleSubject...");
+    final DocumentContainer docContainer = ide.getActiveDocumentContainer();
+    final ModuleContainer moduleContainer;
+    final ModuleSubject moduleSubject;
+    if (docContainer instanceof ModuleContainer) {
+      moduleContainer = (ModuleContainer) docContainer; // needed to execute the EditCommand
+      moduleSubject = moduleContainer.getModule();
+      logger.debug("\tModuleContainer and ModuleSubject successfully retrieved.");
+    } else {
+      // We should never get there
+      logger.error("ModuleContainer and ModuleSubject could not be retrieved.");
+      return;
     }
 
-    //#########################################################################
-    //# Overridden methods
-    @Override
-    public void actionPerformed(final ActionEvent e)
-    {
-        doAction();
-    }
-
-    @Override
-    public void doAction()
-    {
-      ///////////////////////////////////////////////////
-      // TODO: * Automatic Save as?                    //
-      //       * Option: Guards and/or Actions         //
-      //       * Option: Replace all / only if missing //
-      //       * Remove unused imports                 //
-      ///////////////////////////////////////////////////
-      logger.info("Recomputing Guards (and Actions) Text labels...");
-      logger.debug("\tRetrieving ModuleContainer and ModuleSubject...");
-      final DocumentContainer docContainer = ide.getActiveDocumentContainer();
-      final ModuleContainer moduleContainer;
-      final ModuleSubject moduleSubject;
-      if (docContainer instanceof ModuleContainer) {
-        moduleContainer = (ModuleContainer) docContainer; // needed to execute the EditCommand
-        moduleSubject = moduleContainer.getModule();
-        logger.debug("\tModuleContainer and ModuleSubject successfully retrieved.");
-      } else {
-        // We should never get there
-        logger.error("ModuleContainer and ModuleSubject could not be retrieved.");
-        return;
-      }
-
-      final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-
-      for (final AbstractSubject absSubject
-                  : moduleSubject.getComponentListModifiable()) {
+    final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
+    List<AbstractSubject> absSubjects = moduleSubject.getComponentListModifiable();
+	boolean graphFound = false;
+	int guardsFound = 0;
+	int actionsFound = 0;
+    if (absSubjects != null) {
+      for (final AbstractSubject absSubject : absSubjects) {
         if (absSubject instanceof SimpleComponentSubject) {
           final SimpleComponentSubject componentSubject = (SimpleComponentSubject) absSubject;
           final GraphSubject graphSubject = componentSubject.getGraph();
-          for (final EdgeSubject edgeSubject
-                      : graphSubject.getEdgesModifiable()) {
-            // Retrieve and clone the GuardActionBlock
-            final GuardActionBlockSubject guardActionBlockSubject = edgeSubject.getGuardActionBlock();
-            final GuardActionBlockSubject newGuardActionBlockSubject = (GuardActionBlockSubject) cloner.getClone(guardActionBlockSubject);
-            logger.debug("\t1 GuardActionBlockSubject successfully cloned.");
-            // Loop on the guards
-            for (final SimpleExpressionSubject guardSubject
-                        : newGuardActionBlockSubject.getGuardsModifiable()) {
-              final String oldGuardPlainText = guardSubject.getPlainText();
-              final String newGuardPlainText = guardSubject.toString();
-              guardSubject.setPlainText(newGuardPlainText);
-              Command command = null;
-              if(!newGuardPlainText.equals(oldGuardPlainText)){
-                // Prepare the EditCommand to update the GuardActionBlock
-                command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
-              }
-              if (command != null){
-                // Execute the EditCommand
-                moduleContainer.executeCommand(command);
-              }
-            }
-            // Loop on the actions
-            for (final BinaryExpressionSubject actionSubject
-                        : newGuardActionBlockSubject.getActionsModifiable()) {
-              final String oldActionPlainText = actionSubject.getPlainText();
-              final String newActionPlainText = actionSubject.toString();
-              actionSubject.setPlainText(newActionPlainText);
-              Command command = null;
-              if(!newActionPlainText.equals(oldActionPlainText)){
-                // Prepare the EditCommand to update the GuardActionBlock
-                command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
-              }
-              if (command != null){
-                // Execute the EditCommand
-                moduleContainer.executeCommand(command);
+          if (graphSubject != null) {
+			graphFound = true;
+            List<EdgeSubject> edgeSubjects = graphSubject.getEdgesModifiable();
+            if (edgeSubjects != null) {
+              for (final EdgeSubject edgeSubject : edgeSubjects) {
+                // Retrieve and clone the GuardActionBlock
+                final GuardActionBlockSubject guardActionBlockSubject = edgeSubject.getGuardActionBlock();
+                if (guardActionBlockSubject != null){
+                  // Clone the GuardActionBlock
+                  final GuardActionBlockSubject newGuardActionBlockSubject = (GuardActionBlockSubject) cloner.getClone(guardActionBlockSubject);
+                  logger.debug("\t1 GuardActionBlockSubject successfully cloned.");
+                  // Loop on the guards
+                  List<SimpleExpressionSubject> guardSubjects = newGuardActionBlockSubject.getGuardsModifiable();
+                  if (guardSubjects != null) {
+                    for (final SimpleExpressionSubject guardSubject : guardSubjects) {
+					  guardsFound += 1;
+                      final String oldGuardPlainText = guardSubject.getPlainText();
+                      final String newGuardPlainText = guardSubject.toString();
+                      guardSubject.setPlainText(newGuardPlainText);
+                      Command command = null;
+					  // NOTA: here the space seems to be ignored: Override of equals at the String level?
+                      if(!newGuardPlainText.equals(oldGuardPlainText)){
+                        // Prepare the EditCommand to update the GuardActionBlock
+                        command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
+                      }
+                      if (command != null){
+                        // Execute the EditCommand
+                        moduleContainer.executeCommand(command);
+                      }
+                    }
+                  }
+                  // Loop on the actions
+                  List<BinaryExpressionSubject> actionSubjects = newGuardActionBlockSubject.getActionsModifiable();
+                  if (actionSubjects != null) {
+                    for (final BinaryExpressionSubject actionSubject : actionSubjects) {
+                      actionsFound += 1;
+					  final String oldActionPlainText = actionSubject.getPlainText();
+                      final String newActionPlainText = actionSubject.toString();
+                      actionSubject.setPlainText(newActionPlainText);
+                      Command command = null;
+                      if(!newActionPlainText.equals(oldActionPlainText)){
+                        // Prepare the EditCommand to update the GuardActionBlock
+                        command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
+                      }
+                      if (command != null){
+                        // Execute the EditCommand
+                        moduleContainer.executeCommand(command);
+                      }
+                    }
+                  }
+                }
               }
             }
           }
         }
       }
-      logger.info("Guards and Actions Text labels successfully recomputed!");
     }
+	if (!graphFound) {
+	  logger.error("No GraphSubject could be retrieved.");
+      return;
+	}
+    logger.info("Guards and Actions Text labels successfully recomputed!");
+	logger.info("\t" + guardsFound + " Guards and " + actionsFound + " Actions found.");
+  }
 
     //#########################################################################
     //# Class Constants
