@@ -230,11 +230,15 @@ public class EditorSynthesizerAction extends IDEAction
     if (!(options.getSaveInFile() || options.getSaveIDDInFile()
       || options.getPrintGuard() || options.getAddGuards())) {
       // no guard related option is set, quite silently
+      // Cleanup...
+      bddSynthesizer.done();
       return;
     }
 
     if (bddSynthesizer.nbrOfStates() == 0) {
       logger.info("No guard can be derived from empty supervisor.");
+      // Cleanup...
+      bddSynthesizer.done();
       return;
     }
 
