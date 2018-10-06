@@ -480,6 +480,10 @@ public final class Config
     public static final BooleanProperty INCLUDE_USERINTERFACE = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "includeUserInterface", false, "Include SwiXML analyzer tools");
     public static final BooleanProperty EXPAND_EXTENDED_AUTOMATA = new BooleanProperty(PropertyType.ALGORITHMS_HMI, "expandEFA", true, "Expand extended automata into DFA");
 
+    // MISC
+    public static final BooleanProperty TUM_EXTERNAL_ON =
+      new BooleanProperty(PropertyType.MISC, "tumExternalOn", false, "Activate TUM options");
+
     private static Config instance = null;
 
     /**
