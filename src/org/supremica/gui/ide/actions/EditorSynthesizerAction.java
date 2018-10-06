@@ -40,7 +40,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -402,15 +401,17 @@ public class EditorSynthesizerAction extends IDEAction
         }
 
         // modulePath is null if the module is included in the JAR -> Save the current module into a selected folder
+        final DocumentContainerManager manager = ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager();
         if (modulePath == null) { // modulePath is null if the module is included in the JAR
           // Save as ...
           logger.warn("The current model first needs to be saved as an external WMOD file. Please select the destination folder.");
-          final DocumentContainerManager manager = ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager();
           manager.saveActiveContainerAs();
 
           // Retrieve the new module's path (and name)
           moduleUri = module.getLocation();
           modulePath = moduleUri.getPath(); // retrieve the new module's path (and name)
+        } else {
+          manager.saveActiveContainer();
         }
         logger.debug("moduleUri   : " + moduleUri);
         logger.debug("modulePath  : " + modulePath);
@@ -494,7 +495,7 @@ public class EditorSynthesizerAction extends IDEAction
       }
       finally{
         // TODO: finally of Generating PLC Code using TUM external toolbox
-        logger.debug("TODO: finally of Generating PLC Code using TUM external toolbox");
+        logger.debug("Finally of Generating PLC Code using TUM external toolbox");
       }
       // TODO: Get some outputs from the external toolbox?
     }
