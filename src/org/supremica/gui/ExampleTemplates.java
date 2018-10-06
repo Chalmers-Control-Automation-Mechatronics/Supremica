@@ -87,13 +87,8 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeGames();
     initializeModuleExamples();
     initializeSchedulingExamples();
-<<<<<<< .mine
-
-
-=======
-	initializeOtherExamples();
+    initializeOtherExamples();
     initializeTUMunichExamples();
->>>>>>> .theirs
     //initializeStandardComponents();
   }
 
@@ -181,17 +176,6 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     addGroup(thisGroup);
   }
 
-<<<<<<< .mine
-
-
-
-
-
-
-
-
-
-=======
   private void initializeTUMunichExamples()
   {
     final TemplateGroup thisGroup = TUMunichExamples;
@@ -201,7 +185,6 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     addGroup(thisGroup);
   }
 
->>>>>>> .theirs
   private void initializeAIPExamples()
   {
     final TemplateGroup thisGroup = AIPExamples;
