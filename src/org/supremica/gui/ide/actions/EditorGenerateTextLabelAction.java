@@ -36,7 +36,6 @@
 package org.supremica.gui.ide.actions;
 
 import java.awt.event.ActionEvent;
-
 import java.util.List;
 
 import javax.swing.Action;
@@ -60,14 +59,13 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.DocumentContainer;
+import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 // import org.supremica.properties.Config;
 
 public class EditorGenerateTextLabelAction extends IDEAction
 {
-
   //#########################################################################
   //# Constructor
   public EditorGenerateTextLabelAction(final List<IDEAction> actionList)
@@ -118,18 +116,18 @@ public class EditorGenerateTextLabelAction extends IDEAction
     }
 
     final ModuleProxyCloner cloner = ModuleSubjectFactory.getCloningInstance();
-    List<AbstractSubject> absSubjects = moduleSubject.getComponentListModifiable();
-	boolean graphFound = false;
-	int guardsFound = 0;
-	int actionsFound = 0;
+    final List<AbstractSubject> absSubjects = moduleSubject.getComponentListModifiable();
+    boolean graphFound = false;
+    int guardsFound = 0;
+    int actionsFound = 0;
     if (absSubjects != null) {
       for (final AbstractSubject absSubject : absSubjects) {
         if (absSubject instanceof SimpleComponentSubject) {
           final SimpleComponentSubject componentSubject = (SimpleComponentSubject) absSubject;
           final GraphSubject graphSubject = componentSubject.getGraph();
           if (graphSubject != null) {
-			graphFound = true;
-            List<EdgeSubject> edgeSubjects = graphSubject.getEdgesModifiable();
+            graphFound = true;
+            final List<EdgeSubject> edgeSubjects = graphSubject.getEdgesModifiable();
             if (edgeSubjects != null) {
               for (final EdgeSubject edgeSubject : edgeSubjects) {
                 // Retrieve and clone the GuardActionBlock
@@ -139,15 +137,15 @@ public class EditorGenerateTextLabelAction extends IDEAction
                   final GuardActionBlockSubject newGuardActionBlockSubject = (GuardActionBlockSubject) cloner.getClone(guardActionBlockSubject);
                   logger.debug("\t1 GuardActionBlockSubject successfully cloned.");
                   // Loop on the guards
-                  List<SimpleExpressionSubject> guardSubjects = newGuardActionBlockSubject.getGuardsModifiable();
+                  final List<SimpleExpressionSubject> guardSubjects = newGuardActionBlockSubject.getGuardsModifiable();
                   if (guardSubjects != null) {
                     for (final SimpleExpressionSubject guardSubject : guardSubjects) {
-					  guardsFound += 1;
+                      guardsFound += 1;
                       final String oldGuardPlainText = guardSubject.getPlainText();
                       final String newGuardPlainText = guardSubject.toString();
                       guardSubject.setPlainText(newGuardPlainText);
                       Command command = null;
-					  // NOTA: here the space seems to be ignored: Override of equals at the String level?
+                      // NOTA: here the space seems to be ignored: Override of equals at the String level?
                       if(!newGuardPlainText.equals(oldGuardPlainText)){
                         // Prepare the EditCommand to update the GuardActionBlock
                         command = new EditCommand(guardActionBlockSubject, newGuardActionBlockSubject, null);
@@ -159,11 +157,11 @@ public class EditorGenerateTextLabelAction extends IDEAction
                     }
                   }
                   // Loop on the actions
-                  List<BinaryExpressionSubject> actionSubjects = newGuardActionBlockSubject.getActionsModifiable();
+                  final List<BinaryExpressionSubject> actionSubjects = newGuardActionBlockSubject.getActionsModifiable();
                   if (actionSubjects != null) {
                     for (final BinaryExpressionSubject actionSubject : actionSubjects) {
                       actionsFound += 1;
-					  final String oldActionPlainText = actionSubject.getPlainText();
+                      final String oldActionPlainText = actionSubject.getPlainText();
                       final String newActionPlainText = actionSubject.toString();
                       actionSubject.setPlainText(newActionPlainText);
                       Command command = null;
@@ -184,16 +182,16 @@ public class EditorGenerateTextLabelAction extends IDEAction
         }
       }
     }
-	if (!graphFound) {
-	  logger.error("No GraphSubject could be retrieved.");
+    if (!graphFound) {
+      logger.error("No GraphSubject could be retrieved.");
       return;
-	}
+    }
     logger.info("Guards and Actions Text labels successfully recomputed!");
-	logger.info("\t" + guardsFound + " Guards and " + actionsFound + " Actions found.");
+    logger.info("\t" + guardsFound + " Guards and " + actionsFound + " Actions found.");
   }
 
-    //#########################################################################
-    //# Class Constants
-    private final Logger logger = LogManager.getLogger(IDE.class);
-    private final long serialVersionUID = 1L;
+  //#########################################################################
+  //# Class Constants
+  private final Logger logger = LogManager.getLogger(IDE.class);
+  private final static long serialVersionUID = 1L;
  }
