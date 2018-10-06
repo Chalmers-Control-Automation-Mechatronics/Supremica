@@ -24,6 +24,7 @@
     <property name="help" value="help"/>
     <property name="lib" value="lib"/>
     <property name="unjared" value="unjared"/>
+    <property name="tools" value="tools"/>
      
     <property name="resources" value="resources"/>
     
@@ -97,6 +98,11 @@
         depends="clean,jar_supremica_lib,build,-jar_supremica_tests,cpp_waters"
         description="Rebuilds the project from scratch."/>
 
+    <target
+        name="initialize-minimal"
+        depends="clean,jar_supremica_lib-minimal,build-minimal,cpp_waters"
+        description="Rebuilds the project from scratch."/>
+
     <target name="initialize_jars" depends="-jar_waters_jaxb">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
 
@@ -145,6 +151,84 @@
         <unjar src="${lib}/manufacturingTables_jaxb.jar"
                dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/lpsolve55j.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/cplex.jar" dest="${lib}/${unjared}"/>
+        
+        <!-- Library for handling Sat4j. -->
+        <unjar src="${lib}/org.sat4j.core.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.csp.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.csp.xmlparser.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/org.sat4j.pb.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/js.jar" dest="${lib}/${unjared}"/>
+		
+        <!-- Library for handling Microsoft Z3 SMT Solver. -->
+        <unjar src="${lib}/com.microsoft.z3.jar" dest="${lib}/${unjared}"/>		
+        
+        <!-- Tools for Adobe PostScript. -->
+        <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
+               dest="${lib}/${unjared}"/>
+
+        <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
+
+        <!-- JAXB -->
+        <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
+        <unjar src="${jaxb-core.jar}" dest="${lib}/${unjared}"/>
+        <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
+        <!-- JUnit -->
+        <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
+    </target>
+
+    <target name="initialize_jars-minimal" depends="-jar_waters_jaxb">  
+        <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
+
+        <!-- Library for handling db in SOC -->
+        <unjar src="${lib}/sqljdbc.jar" dest="${lib}/${unjared}"/>
+        <!-- Library used by SOC -->
+        <unjar src="${lib}/jniwrap-3.1.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jexcel-1.0.jar" dest="${lib}/${unjared}"/>
+
+        <!-- Create multisplit pane without nesting -->
+        <unjar src="${lib}/multisplit.jar" dest="${lib}/${unjared}"/>
+
+        <unjar src="${lib}/JGo.jar" dest="${lib}/${unjared}"/>  
+        <unjar src="${lib}/JGoLayout.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/grappa.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jdom.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jlfgr-1_0.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/regler.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
+    	<!-- JacoZoom -->
+        <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
+        <unjar src="${lib}/CCOM.jar" dest="${lib}/${unjared}"/> 
+        <unjar src="${lib}/jacorb.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/jutils.jar" dest="${lib}/${unjared}"/>       
+        <!-- <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
+        <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
+        <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
+        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
+        <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
+        <!--   Maintained by: cengic@chalmers.se -->
+        <!-- <unjar src="${lib}/fcc_demo.jar" dest="${lib}/${unjared}"/> -->
+        <!-- <unjar src="${lib}/fuber.jar" dest="${lib}/${unjared}"/> -->
+        <!-- End IEC61499 runtime libraries -->
+        <unjar src="${lib}/swixml.jar" dest="${lib}/${unjared}"/>
+        <!-- GNU Trove -->
+        <unjar src="${lib}/trove-3.0.3.jar" dest="${lib}/${unjared}"/>
+        <!-- Library for handling BDDs. -->
+        <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
+        <!-- <unjar src="${lib}/manufacturingTables_jaxb.jar" -->
+               <!-- dest="${lib}/${unjared}"/> -->
+        <!-- <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/> -->
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
@@ -235,6 +319,22 @@
     <target name="compile-minimal" depends="compile_supremica-minimal"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
+        <javac debug="on"
+               debuglevel="lines,source,vars"
+               srcdir="${src}"
+               destdir="${build}"
+               verbose="false"
+               nowarn="true"
+               source="1.8"
+	       encoding="ISO-8859-15"
+               fork="true"
+               includeantruntime="false"
+               memoryMaximumSize="512M">
+            <classpath refid="supremica.classpath"/>    
+        </javac>
+    </target>
+    
+    <target name="compile_supremica-minimal" depends="-startfiles_minimal">
         <javac debug="on"
                debuglevel="lines,source,vars"
                srcdir="${src}"
@@ -345,12 +445,29 @@
     <target name="build" depends="compile,-jar_supremica,-startfiles_supremica" description=
             "Recompiles only the files that have changed, then packages all files into a jar file.">
     </target>
+        
+    <target name="build-minimal" depends="compile-minimal,-jar_supremica-minimal" description=
+            "Recompiles only the files that have changed, then packages all files into a jar file.">
+    </target>
     
     <target name="rebuild" depends="clean_build,build" description=
             "Deletes all existing class files, recompiles all files, and packages all files into a jar file that can be executed without any other dependencies.">
     </target>
     
+    <target name="rebuild-minimal" depends="clean_build,build-minimal" description=
+            "Deletes all existing class files, recompiles all files, and packages all files into a jar file that can be executed without any other dependencies.">
+    </target>
+    
     <target name="jar_supremica_lib" depends="initialize_jars">
+        <delete dir="${javalibs.dir}/META-INF"/>
+        <jar jarfile="${dist}/SupremicaLib.jar"> 
+            <fileset dir="${javalibs.dir}"/>
+        </jar>
+	<copy file="${lib}/${log4j2.api.jar}" todir="${dist}"/>
+	<copy file="${lib}/${log4j2.core.jar}" todir="${dist}"/>
+    </target>
+    
+    <target name="jar_supremica_lib-minimal" depends="initialize_jars-minimal">
         <delete dir="${javalibs.dir}/META-INF"/>
         <jar jarfile="${dist}/SupremicaLib.jar"> 
             <fileset dir="${javalibs.dir}"/>
@@ -392,6 +509,19 @@ Class-Path: ${manifest.pathlist}</echo>
             <fileset dir="${animations}"/>
             <fileset dir="${userinterfaces}"/>  
             <fileset dir="${runtimesoftplcbuild}"/>
+        </jar>
+    </target>
+    
+    <target name="-jar_supremica-minimal"
+            depends="compile_supremica-minimal,downloads_supremica,copy_watersxmlfiles_into_build,version">
+        <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
+            <fileset dir="${build}"
+                     excludes="net/sourceforge/waters/analysis/comp552/"/>
+            <fileset dir="${images}"/>
+            <fileset dir="${examples}" includes="includeInJarFile/"/>
+            <!-- <fileset dir="${animations}"/> -->
+            <!-- <fileset dir="${userinterfaces}"/>   -->
+            <!-- <fileset dir="${runtimesoftplcbuild}"/> -->
         </jar>
     </target>
     
@@ -606,6 +736,35 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/SupremicaAppletViewer.html" todir="${dist}"/>
         <chmod file="${dist}/SupremicaAppletViewer.html" perm="644"/>
         -->
+    </target>
+
+    <target name="-startfiles_minimal"
+            depends="-dynamic_libs">
+        <copy file="${templates}/launchSupremica.cmd" todir="${dist}"/>
+        <chmod file="${dist}/launchSupremica.cmd" perm="644"/>
+    </target>
+	
+	<!-- 
+*       Copies the launch commands, the ST Code Converterand
+*       and the config properties files to /dist
+    -->
+
+    <target name="startfiles_tum">
+		<delete file="${dist}/launchSupremica.cmd"/>
+        <copy file="${templates}/launchSupremica_local.cmd" todir="${dist}"/>
+        <chmod file="${dist}/launchSupremica_local.cmd" perm="555"/>
+        <copy file="${templates}/launchSupremica_local_MaxMem.cmd" todir="${dist}"/>
+        <chmod file="${dist}/launchSupremica_local_MaxMem.cmd" perm="555"/>
+        <copy file="${templates}/TUM_Student.properties" todir="${dist}"/>
+        <chmod file="${dist}/TUM_Student.properties" perm="666"/>
+        <copy file="${templates}/TUM_Student.properties" tofile="${dist}/waters.properties"/>
+        <chmod file="${dist}/waters.properties" perm="666"/>
+        <copy file="${templates}/TUM_Standard.properties" todir="${dist}"/>
+        <chmod file="${dist}/TUM_Standard.properties" perm="444"/>
+        <copy file="${templates}/TUM_Teacher.properties" todir="${dist}"/>
+        <chmod file="${dist}/TUM_Teacher.properties" perm="111"/>
+        <copy file="${tools}/STCodeConverter.exe" todir="${dist}"/>
+        <chmod file="${dist}/STCodeConverter.exe" perm="555"/>
     </target>
 
     <target name="-run_tests" depends="-jar_supremica,-jar_supremica_tests">

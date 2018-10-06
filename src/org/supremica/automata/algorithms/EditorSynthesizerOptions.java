@@ -1,4 +1,3 @@
-
 /*
  * Supremica Software License Agreement
  *
@@ -74,6 +73,10 @@ public final class EditorSynthesizerOptions
   private boolean addGuards;
   private boolean saveInFile;
   private boolean saveIDDInFile;
+  private boolean genPLCCodeTUMBox;
+  private String typePLCCodeTUM;
+  private boolean plcCodeTUMefaBox;
+  private boolean savPLCCodeTUMBox;
   private boolean compHeuristic;
   private boolean indpHeuristic;
   private boolean reachability;
@@ -352,6 +355,46 @@ public final class EditorSynthesizerOptions
   public boolean getSaveIDDInFile()
   {
     return saveIDDInFile;
+  }
+
+  public void setGenPLCCodeTUMBox(final boolean bool)
+  {
+    genPLCCodeTUMBox = bool;
+  }
+
+  public boolean getGenPLCCodeTUMBox()
+  {
+    return genPLCCodeTUMBox;
+  }
+
+  public void setTypePLCCodeTUM(final String option)
+  {
+    typePLCCodeTUM = option;
+  }
+
+  public String getTypePLCCodeTUM()
+  {
+    return typePLCCodeTUM;
+  }
+
+  public void setPLCCodeTUMefaBox(final boolean bool)
+  {
+    plcCodeTUMefaBox = bool;
+  }
+
+  public boolean getPLCCodeTUMefaBox()
+  {
+    return plcCodeTUMefaBox;
+  }
+
+  public void setSavPLCCodeTUMBox(final boolean bool)
+  {
+    savPLCCodeTUMBox = bool;
+  }
+
+  public boolean getSavPLCCodeTUMBox()
+  {
+    return savPLCCodeTUMBox;
   }
 
   public void setCompHeuristic(final boolean bool)

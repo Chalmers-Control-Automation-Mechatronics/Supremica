@@ -68,6 +68,7 @@ public class TemplateTypes
     public static final TemplateTypes ModuleExamples = new TemplateTypes("Module Examples");
     public static final TemplateTypes OtherExample = new TemplateTypes("Other Examples");
     public static final TemplateTypes SchedulingExamples = new TemplateTypes("Scheduling Examples");
+    public static final TemplateTypes TUMunichExamples = new TemplateTypes("TU Munich SES Examples");
     
     // public static final TemplateTypes StandardComponent = new TemplateTypes("Standard Components");
     private String name;

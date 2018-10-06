@@ -39,9 +39,12 @@ import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +75,7 @@ import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
+import org.supremica.gui.ide.DocumentContainerManager;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
@@ -185,6 +189,9 @@ public class EditorSynthesizerAction extends IDEAction
 
     // do the work
     bddSynthesizer.synthesize(options);
+
+    logger.info("Synthesis completed on "
+                + new Date().toString() + ".");
 
     logger.info("Synthesis completed after "
                 + bddSynthesizer.getSynthesisTimer().toString() + ".");
@@ -368,5 +375,131 @@ public class EditorSynthesizerAction extends IDEAction
 
     // Cleanup...
     bddSynthesizer.done();
+
+    // Call TUM PLC Code generator
+    // TODO: * Improve the integration: Get some outputs (at least Pass/Fail) from the external toolbox and pass them to Supremica/Waters logger.info()
+    //       * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
+    //       * Only Windows if considered here
+    //         -> Add a check for the OS
+    //         -> Handle the file separators properly: "\\", "/", File.separator ...
+    //       * Probably move this code (which is getting larger) to another file and functions
+    //
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      if (options.getGenPLCCodeTUMBox()) {
+        logger.info("Generating PLC Code using TUM external toolbox...");
+        tryLabel:
+        try {
+          logger.info("\tChecking the current model file");
+          final String modulename = module.getName(); // Module's name without extension
+
+          // Retrieve the path to access the Wmod file to be passed to the converter
+          String modulePath;
+          URI moduleUri = module.getLocation(); // already returns null if the module (included in the JAR) is not a Wmod file
+          if (moduleUri == null) {
+            modulePath = null;
+          } else {
+            modulePath = moduleUri.getPath(); // returns null if in the JAR, returns the path otherwise
+          }
+
+          // modulePath is null if the module is included in the JAR -> Save the current module into a selected folder
+          final DocumentContainerManager manager = ide.getActiveDocumentContainer().getIDE().getDocumentContainerManager();
+          if (modulePath == null) { // modulePath is null if the module is included in the JAR
+            // Save as ...
+            logger.warn("The current model first needs to be saved as an external WMOD file. Please select the destination folder.");
+            manager.saveActiveContainerAs();
+
+            // Retrieve the new module's path (and name)
+            moduleUri = module.getLocation();
+            modulePath = moduleUri.getPath(); // retrieve the new module's path (and name)
+          } else {
+            manager.saveActiveContainer();
+          }
+          logger.debug("moduleUri   : " + moduleUri);
+          logger.debug("modulePath  : " + modulePath);
+
+          // Select the Output path to be passed to the converter
+          String destFoldPath = modulePath;
+          if (!options.getSavPLCCodeTUMBox()) { // adding the Output option
+            logger.warn("Selection of the PLC code destination. Please select the output folder.");
+            final String dialogTitle;
+            if (options.getTypePLCCodeTUM()=="standalone") {
+              dialogTitle = "Select the destination folder";
+            } else if (options.getTypePLCCodeTUM()=="TwinCAT") {
+              dialogTitle = "Select the TwinCAT project folder";
+            } else {
+              dialogTitle = "Title undefined"; // Should never be called
+            }
+
+            final JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            chooser.setCurrentDirectory(new File("/" + modulePath));
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setDialogTitle(dialogTitle);
+            final int returnVal = chooser.showOpenDialog(ide.getFrame());
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+              destFoldPath = chooser.getSelectedFile().getAbsolutePath();
+              destFoldPath = destFoldPath.replace("\\", "/");
+            } else {
+              logger.warn("\tSelection canceled! Saving in the module's folder:" + modulePath);
+              destFoldPath = modulePath;
+            }
+          }
+          logger.debug("destFoldPath: " + destFoldPath);
+
+          // Check and clean up the paths
+          if (modulePath.startsWith("//")) {
+            logger.error("The external PLC code converter does not support network repositories!");
+            break tryLabel;
+          } else if (modulePath.startsWith("/")) {
+            modulePath = modulePath.substring(1); // remove the first /
+          }
+          if (destFoldPath.startsWith("//")) {
+            logger.error("The external PLC code converter does not support network repositories!");
+            break tryLabel;
+          } else if (destFoldPath.startsWith("/")) {
+            destFoldPath = destFoldPath.substring(1); // remove the first /
+          }
+
+          // Building the command to pass to the external converter
+          // TODO: Now that the number of command is growing it would make sense to create a dedicated function
+          // If would be simpler to handle specific cases, such as -h which should directly return
+          logger.info("\tBuilding the command");
+          final ArrayList<String> command = new ArrayList<>(Arrays.asList("cmd", "/k", "start", "STCodeConverter.exe"));
+          if (options.getTypePLCCodeTUM()=="standalone") { // Standalone (default) option, with filepath
+            final List<String> addargs = Arrays.asList("-f", modulePath);
+            command.addAll(addargs);
+          } else if (options.getTypePLCCodeTUM()=="TwinCAT") { // TwinCAT option, with filepath
+            final List<String> addargs = Arrays.asList("-tc", "-f", modulePath);
+            command.addAll(addargs);
+          } else { // Help option
+            command.add("-h");
+          }
+          if (options.getPLCCodeTUMefaBox()) { // adding the EFA option
+            final List<String> addargs = Arrays.asList("-e");
+            command.addAll(addargs);
+          }
+          if (!options.getSavPLCCodeTUMBox()) { // adding the Output option
+            final List<String> addargs = Arrays.asList("-o", destFoldPath);
+            command.addAll(addargs);
+          }
+          logger.debug("Command built: " + command);
+
+          // Building the external process and starting it
+          logger.info("\tStarting the external process");
+          final ProcessBuilder pb = new ProcessBuilder(command);
+          final Process p = pb.start();
+          logger.warn("External process started! Please check the external console for output.");
+        }
+        catch (final Exception ex) {
+          logger.error("Exception while generating PLC Code using TUM external toolbox");
+          ex.printStackTrace();
+        }
+        finally{
+          // TODO: finally of Generating PLC Code using TUM external toolbox
+          logger.debug("Finally of Generating PLC Code using TUM external toolbox");
+        }
+        // TODO: Get some outputs from the external toolbox?
+      }
+    }
   }
 }

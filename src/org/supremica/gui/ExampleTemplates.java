@@ -62,6 +62,7 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
   private final TemplateGroup ModuleExamples  = new TemplateGroup(TemplateTypes.ModuleExamples);
   private final TemplateGroup SchedulingExamples = new TemplateGroup(TemplateTypes.SchedulingExamples);
   private final TemplateGroup OtherExamples = new TemplateGroup(TemplateTypes.OtherExample);
+  private final TemplateGroup TUMunichExamples = new TemplateGroup(TemplateTypes.TUMunichExamples);
 
   //private final TemplateGroup StandardComponents = new TemplateGroup(TemplateTypes.StandardComponent);
   private static final String basePrefix = "/includeInJarFile";
@@ -86,6 +87,13 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeGames();
     initializeModuleExamples();
     initializeSchedulingExamples();
+<<<<<<< .mine
+
+
+=======
+	initializeOtherExamples();
+    initializeTUMunichExamples();
+>>>>>>> .theirs
     //initializeStandardComponents();
   }
 
@@ -173,6 +181,27 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     addGroup(thisGroup);
   }
 
+<<<<<<< .mine
+
+
+
+
+
+
+
+
+
+=======
+  private void initializeTUMunichExamples()
+  {
+    final TemplateGroup thisGroup = TUMunichExamples;
+    final String prefix = basePrefix + "/TUMunichSES/";
+    thisGroup.addItem("Portal2 Test", prefix + "Portal2_Test.wmod");
+    thisGroup.addItem("Portal2 V20 init", prefix + "Portal2_V20_init.wmod");
+    addGroup(thisGroup);
+  }
+
+>>>>>>> .theirs
   private void initializeAIPExamples()
   {
     final TemplateGroup thisGroup = AIPExamples;

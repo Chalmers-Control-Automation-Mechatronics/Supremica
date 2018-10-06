@@ -61,5 +61,6 @@ public interface SimpleExpressionProxy
    */
   // @geometry
   public String getPlainText();
-
+  
+  public void setPlainText(final String plainText);
 }
