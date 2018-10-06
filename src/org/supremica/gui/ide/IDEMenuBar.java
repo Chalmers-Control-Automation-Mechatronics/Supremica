@@ -267,6 +267,7 @@ public class IDEMenuBar extends JMenuBar
     Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
       (analyzeListener);
+    Config.TUM_EXTERNAL_ON.addPropertyChangeListener(analyzeListener);
   }
 
 
@@ -469,8 +470,10 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu = new JMenu("Analyze");
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
-        mEdAnalyzeMenu.add(actions.editorGenerateTextLabelAction.getMenuItem());
-        mEdAnalyzeMenu.add(actions.editorRemoveGABlocksAction.getMenuItem());
+        if (Config.TUM_EXTERNAL_ON.isTrue()) {
+          mEdAnalyzeMenu.add(actions.editorGenerateTextLabelAction.getMenuItem());
+          mEdAnalyzeMenu.add(actions.editorRemoveGABlocksAction.getMenuItem());
+        }
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
             //IISC Algorithms

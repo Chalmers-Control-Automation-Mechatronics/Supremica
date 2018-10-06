@@ -55,6 +55,7 @@ import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions.ExpressionType;
 import org.supremica.automata.algorithms.SynthesisAlgorithm;
 import org.supremica.automata.algorithms.SynthesisType;
+import org.supremica.properties.Config;
 
 //###########################################################################
 //# Abstract class
@@ -86,7 +87,7 @@ public class EditorSynthesizerDialogStandardPanel
   private final JCheckBox saveEventGuardInFileBox;
   private final JCheckBox saveIDDInFileBox;
 
-  private final JPanel plcCodePanel;
+  private final JPanel tumPanel;
   private final JCheckBox genPLCCodeTUMBox;
   private final Box typePLCCodeTUMBox;
   private final JComboBox<String> typePLCCodeTUMSelector; // Later, this could be defined as a specific class.
@@ -380,49 +381,58 @@ public class EditorSynthesizerDialogStandardPanel
 
 
     // TUM external toolbox for ST code generation
-    plcCodePanel = new JPanel();
-    plcCodePanel.setBorder(BorderFactory.createTitledBorder(
-        "PLC code generation"));
-    plcCodePanel.setLayout(new GridLayout(4, 1)); // Change this number according to the number of boxes
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      tumPanel = new JPanel();
+      tumPanel.setBorder(BorderFactory.createTitledBorder(
+          "PLC code generation"));
+      tumPanel.setLayout(new GridLayout(4, 1)); // Change this number according to the number of boxes
 
-    genPLCCodeTUMBox = new JCheckBox("Generate PLC code (external)");
-    genPLCCodeTUMBox.setToolTipText(
-        "Call the TUM external toolbox to generate PLC code. "
-      + "More options in this toolbox. "
-      + "NOTA: Guards must be added to the model first!");
-    genPLCCodeTUMBox.setSelected(false); // This option is deactivated by default
-    genPLCCodeTUMBox.setEnabled(false);
-    genPLCCodeTUMBox.addActionListener(this); // needed to check if addGuardsBox is selected
+      genPLCCodeTUMBox = new JCheckBox("Generate PLC code (external)");
+      genPLCCodeTUMBox.setToolTipText(
+          "Call the TUM external toolbox to generate PLC code. "
+        + "More options in this toolbox. "
+        + "NOTA: Guards must be added to the model first!");
+      genPLCCodeTUMBox.setSelected(false); // This option is deactivated by default
+      genPLCCodeTUMBox.setEnabled(false);
+      genPLCCodeTUMBox.addActionListener(this); // needed to check if addGuardsBox is selected
 
-    typePLCCodeTUMBox = Box.createHorizontalBox();
-    typePLCCodeTUMBox.add(new JLabel("Output format: "));
-    String[] _typeList = {"standalone", "TwinCAT"};
-    typePLCCodeTUMSelector = new JComboBox<String>(_typeList);
-    typePLCCodeTUMSelector.setSelectedItem("TwinCAT"); // Default selection
-    typePLCCodeTUMBox.setEnabled(false);
-    typePLCCodeTUMSelector.setEnabled(false);
-    typePLCCodeTUMBox.add(typePLCCodeTUMSelector);
+      typePLCCodeTUMBox = Box.createHorizontalBox();
+      typePLCCodeTUMBox.add(new JLabel("Output format: "));
+      final String[] _typeList = {"standalone", "TwinCAT"};
+      typePLCCodeTUMSelector = new JComboBox<String>(_typeList);
+      typePLCCodeTUMSelector.setSelectedItem("TwinCAT"); // Default selection
+      typePLCCodeTUMBox.setEnabled(false);
+      typePLCCodeTUMSelector.setEnabled(false);
+      typePLCCodeTUMBox.add(typePLCCodeTUMSelector);
 
-    plcCodeTUMefaBox = new JCheckBox("EFA extension (experimental)");
-    plcCodeTUMefaBox.setToolTipText(
-        "Use the EFA extension. "
-      + "NOTA: Experimental");
-    plcCodeTUMefaBox.setSelected(false); // This option is deactivated by default
-    plcCodeTUMefaBox.setEnabled(false);
+      plcCodeTUMefaBox = new JCheckBox("EFA extension (experimental)");
+      plcCodeTUMefaBox.setToolTipText(
+          "Use the EFA extension. "
+        + "NOTA: Experimental");
+      plcCodeTUMefaBox.setSelected(false); // This option is deactivated by default
+      plcCodeTUMefaBox.setEnabled(false);
 
-    savPLCCodeTUMBox = new JCheckBox("Save in the same folder");
-    savPLCCodeTUMBox.setToolTipText(
-        "Save the output file in the same folder as the current module. / "
-      + "Search for TwinCAT projects in the same folder as the current module.");
-    savPLCCodeTUMBox.setSelected(true); // This option is activated by default
-    savPLCCodeTUMBox.setEnabled(false);
+      savPLCCodeTUMBox = new JCheckBox("Save in the same folder");
+      savPLCCodeTUMBox.setToolTipText(
+          "Save the output file in the same folder as the current module. / "
+        + "Search for TwinCAT projects in the same folder as the current module.");
+      savPLCCodeTUMBox.setSelected(true); // This option is activated by default
+      savPLCCodeTUMBox.setEnabled(false);
 
 
-    // Add plcCodePanel's elements
-    plcCodePanel.add(genPLCCodeTUMBox);
-    plcCodePanel.add(typePLCCodeTUMBox);
-    plcCodePanel.add(plcCodeTUMefaBox);
-    plcCodePanel.add(savPLCCodeTUMBox);
+      // Add tumPanel's elements
+      tumPanel.add(genPLCCodeTUMBox);
+      tumPanel.add(typePLCCodeTUMBox);
+      tumPanel.add(plcCodeTUMefaBox);
+      tumPanel.add(savPLCCodeTUMBox);
+    } else {
+      tumPanel = null;
+      genPLCCodeTUMBox = null;
+      typePLCCodeTUMBox = null;
+      typePLCCodeTUMSelector = null; // Later, this could be defined as a specific class.
+      plcCodeTUMefaBox = null;
+      savPLCCodeTUMBox = null;
+    }
     // END TUM external toolbox for ST code generation
 
 
@@ -435,9 +445,10 @@ public class EditorSynthesizerDialogStandardPanel
     constraints.gridy++;
     add(genGuardComputeSupBox, constraints);
     add(optimizationPanel, constraints);
-    constraints.gridy++;
-    add(plcCodePanel, constraints);
-
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      constraints.gridy++;
+      add(tumPanel, constraints);
+    }
     updatePanel();
   }
 
@@ -470,26 +481,28 @@ public class EditorSynthesizerDialogStandardPanel
     algorithmSelector.setAlgorithm(selected);
 
     // TUM external toolbox for ST code generation
-    if (!addGuardsBox.isSelected()) {
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      if (!addGuardsBox.isSelected()) {
         genPLCCodeTUMBox.setSelected(false);
         genPLCCodeTUMBox.setEnabled(false);
         typePLCCodeTUMBox.setEnabled(false);
         typePLCCodeTUMSelector.setEnabled(false);
         plcCodeTUMefaBox.setEnabled(false);
         savPLCCodeTUMBox.setEnabled(false);
-    } else {
+      } else {
         genPLCCodeTUMBox.setEnabled(true);
-    }
-    if (genPLCCodeTUMBox.isSelected()) {
+      }
+      if (genPLCCodeTUMBox.isSelected()) {
         typePLCCodeTUMBox.setEnabled(true);
         typePLCCodeTUMSelector.setEnabled(true);
         plcCodeTUMefaBox.setEnabled(true);
         savPLCCodeTUMBox.setEnabled(true);
-    } else {
+      } else {
         typePLCCodeTUMBox.setEnabled(false);
         typePLCCodeTUMSelector.setEnabled(false);
         plcCodeTUMefaBox.setEnabled(false);
         savPLCCodeTUMBox.setEnabled(false);
+      }
     }
   }
 
@@ -512,7 +525,9 @@ public class EditorSynthesizerDialogStandardPanel
     independentHeuristicBox.setSelected(synthesizerOptions.getIndpHeuristic());
     globalClockDomainField.setEnabled(timeOptBox.isSelected());
 
-    genPLCCodeTUMBox.setEnabled(synthesizerOptions.getAddGuards()); //
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      genPLCCodeTUMBox.setEnabled(synthesizerOptions.getAddGuards());
+    }
   }
 
   @Override
@@ -525,10 +540,6 @@ public class EditorSynthesizerDialogStandardPanel
     synthesizerOptions.setAddGuards(addGuardsBox.isSelected());
     synthesizerOptions.setSaveInFile(saveEventGuardInFileBox.isSelected());
     synthesizerOptions.setSaveIDDInFile(saveIDDInFileBox.isSelected());
-    synthesizerOptions.setGenPLCCodeTUMBox(genPLCCodeTUMBox.isSelected());
-    synthesizerOptions.setTypePLCCodeTUM((String) typePLCCodeTUMSelector.getSelectedItem());
-    synthesizerOptions.setPLCCodeTUMefaBox(plcCodeTUMefaBox.isSelected());
-    synthesizerOptions.setSavPLCCodeTUMBox(savPLCCodeTUMBox.isSelected());
     synthesizerOptions.setReachability(reachableBox.isSelected());
     synthesizerOptions.setPeakBDD(peakBDDBox.isSelected());
     synthesizerOptions.setCompHeuristic(complementHeuristicBox.isSelected());
@@ -536,6 +547,12 @@ public class EditorSynthesizerDialogStandardPanel
     synthesizerOptions.setOptimization(timeOptBox.isSelected());
     synthesizerOptions
       .setGlobalClockDomain(Long.parseLong(globalClockDomainField.getText()));
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      synthesizerOptions.setGenPLCCodeTUMBox(genPLCCodeTUMBox.isSelected());
+      synthesizerOptions.setTypePLCCodeTUM((String) typePLCCodeTUMSelector.getSelectedItem());
+      synthesizerOptions.setPLCCodeTUMefaBox(plcCodeTUMefaBox.isSelected());
+      synthesizerOptions.setSavPLCCodeTUMBox(savPLCCodeTUMBox.isSelected());
+    }
 
     if (fromForbiddenStatesButton.isSelected()) {
       synthesizerOptions.setExpressionType(ExpressionType.FORBIDDEN);
