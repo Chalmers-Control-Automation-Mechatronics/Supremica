@@ -267,6 +267,7 @@ public class IDEMenuBar extends JMenuBar
     Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
     Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
       (analyzeListener);
+    Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.addPropertyChangeListener(analyzeListener);
     Config.TUM_EXTERNAL_ON.addPropertyChangeListener(analyzeListener);
   }
 
