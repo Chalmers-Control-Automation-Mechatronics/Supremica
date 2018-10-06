@@ -145,6 +145,7 @@ public class Actions extends WatersActionManager
     public IDEAction editorStopEmbedderAction = new EditorStopEmbedderAction(mIDEActions);
     public IDEAction editorSynthesizerAction = new EditorSynthesizerAction(mIDEActions);
     public IDEAction editorGenerateTextLabelAction = new EditorGenerateTextLabelAction(mIDEActions);
+    public IDEAction editorRemoveGABlocksAction = new EditorRemoveGABlocksAction(mIDEActions);
     public IDEAction editorEFASynchEval = new EditorEFASynchAndEvalAction(mIDEActions);
     public IDEAction editorEFASynch = new EditorEFASynchAction(mIDEActions);
     public IDEAction editorEFAPE = new EditorEFAPEAction(mIDEActions);

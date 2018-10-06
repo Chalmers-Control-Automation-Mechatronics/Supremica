@@ -470,6 +470,7 @@ public class IDEMenuBar extends JMenuBar
         mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
         mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
         mEdAnalyzeMenu.add(actions.editorGenerateTextLabelAction.getMenuItem());
+        mEdAnalyzeMenu.add(actions.editorRemoveGABlocksAction.getMenuItem());
         if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
         {
             //IISC Algorithms
