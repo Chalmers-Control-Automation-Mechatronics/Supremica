@@ -140,11 +140,18 @@ public class GenerateSTCodeAction
       logger.warn("External process started! Please check the external console for output.");
 
       final byte[] buffer = new byte[4000];
+      String returnStr = "";
+      boolean returnSuccess = false;
       while (isAlive(proc)) {
         final int no = out.available();
         if (no > 0) {
           final int n = out.read(buffer, 0, Math.min(no, buffer.length));
-          System.out.println(new String(buffer, 0, n));
+          final String str = new String(buffer, 0, n);
+          System.out.println(str);
+          returnStr += str; // TODO: Should we retrieve all strings?
+          if (str.contains("successfully")) {
+            returnSuccess = true;
+          }
         }
 
         final int ni = System.in.available();
@@ -161,22 +168,31 @@ public class GenerateSTCodeAction
         }
       }
 
-//      System.out.println(proc.exitValue());
+//      final int result = proc.exitValue(); // TODO: What is the difference between exitValue and waitFor?
 
       final int result = proc.waitFor();
+
       if (result == 0) {
         // TODO: Parse the outputstream to check if that was really successful, or if that was a successfully caught error!
         //       -> Need to agree on the message to be written by the STCodeConverter.exe
-//        final String pressEnter = "\\r\\n";
-//        final byte[] bytes = pressEnter.getBytes(StandardCharsets.UTF_8);
-//        in.write(bytes);
-
-        final String msg = "External process completed! Successfully? Please check the external console for output.";
-        logger.warn(msg);
-        JOptionPane.showMessageDialog(ide.getFrame(), msg);
+        //       -> See above, e.g. if (str.contains("successfully")) ...
+        if (returnSuccess) {
+          final String msg = "ST code generation process successfully completed!\r\n"
+                           + "Check the console for more details.";
+          logger.warn(msg);
+          logger.info("Console output: \r\n" + returnStr);
+          JOptionPane.showMessageDialog(ide.getFrame(), msg);
+        } else {
+          final String msg = "ST code generation process gracefully exited after an error!\r\n"
+                           + "Check the console for more details.";
+          logger.warn(msg);
+          logger.warn("Console output: \r\n" + returnStr);
+          JOptionPane.showMessageDialog(ide.getFrame(), msg);
+        }
       } else {
-        final String msg = "External process did not completed properly! Error code: " + Integer.toString(result);
+        final String msg = "ST code generation process did not completed properly! Error code: " + Integer.toString(result);
         logger.error(msg);
+        logger.error("Console output: \r\n" + returnStr);
         JOptionPane.showMessageDialog(ide.getFrame(), msg);
       }
     }
@@ -186,7 +202,6 @@ public class GenerateSTCodeAction
     }
     finally{
       // TODO: finally of Generating PLC Code using TUM external toolbox
-      logger.debug("Finally of Generating PLC Code using TUM external toolbox");
     }
   }
 
