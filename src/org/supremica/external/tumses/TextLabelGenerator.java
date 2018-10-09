@@ -38,6 +38,7 @@ public class TextLabelGenerator
   ////////////////////////////////////////////////////////////
 
   public static void GenerateTextLabel(final IDEActionInterface ide) {
+    logger.info("Recomputing Guards (and Actions) Text labels...");
     logger.debug("\tRetrieving ModuleContainer and ModuleSubject...");
     final DocumentContainer docContainer = ide.getActiveDocumentContainer();
     final ModuleContainer moduleContainer;

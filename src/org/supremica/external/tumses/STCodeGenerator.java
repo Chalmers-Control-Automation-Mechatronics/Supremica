@@ -109,7 +109,6 @@ public class STCodeGenerator
       // Building the command to pass to the external converter
       // examples:
       // STCodeConverter.exe -tc -f modulePath -o destFoldPath outputfilename(without extension)
-      logger.debug("\tBuilding the command");
       final ArrayList<String> command = new ArrayList<>(Arrays.asList("STCodeConverter.exe"));
       if (options.getTypePLCCodeTUM()=="standalone") { // Standalone (default) option, with filepath
         final List<String> addargs = Arrays.asList("-f", modulePath);
@@ -127,7 +126,8 @@ public class STCodeGenerator
       // NOTA: by default for our Praktikum we write the supervisor code into the file "main_control.TcPOU"
       // TODO: Add this information to the documentation
       if (options.getTypePLCCodeTUM()=="TwinCAT") { // TwinCAT option -> Specify the output file's path and name
-        final List<String> addargs = Arrays.asList("-o", destFoldPath, "main_control");
+        final String pouFilename = options.getPouNameField();
+        final List<String> addargs = Arrays.asList("-o", destFoldPath, pouFilename);
         command.addAll(addargs);
       }
       logger.trace("\tCommand built: " + command);
@@ -140,7 +140,7 @@ public class STCodeGenerator
       final Process proc = procbuilder.start();
       final InputStream out = proc.getInputStream();
       final OutputStream in = proc.getOutputStream();
-      logger.warn("External process started! Please check the external console for output.");
+      logger.warn("External process started!");
 
       final byte[] buffer = new byte[4000];
       String returnStr = "";
@@ -172,7 +172,7 @@ public class STCodeGenerator
         // TODO: Parse the outputstream to check if that was really successful, or if that was a successfully caught error!
         //       -> Need to agree on the message to be written by the STCodeConverter.exe
         //       -> See in a previous version (commit ac0f7708551b59d0c37a01bb77d0acc8c473ff69), e.g. if (str.contains("successfully")) ...
-        final String msg = "ST code generation process (successfully) completed!\r\n"
+        final String msg = "ST code generation process completed!\r\n"
                          + "Check the console for more details.";
         logger.warn(msg);
         logger.info("STCodeGenerator's console output: \r\n" + returnStr);
@@ -180,8 +180,8 @@ public class STCodeGenerator
                                       "ST code generation completed",
                                       JOptionPane.WARNING_MESSAGE);
       } else {
-        final String msg = "ST code generation process did not completed properly! Error code: " + Integer.toString(result);
-        logger.error(msg);
+        final String msg = "ST code generation process did not completed properly!";
+        logger.debug(msg + "\r\n\tjava.lang.Process error code: " + Integer.toString(result));
         logger.error("STCodeGenerator's console output: \r\n" + returnStr);
         JOptionPane.showMessageDialog(ide.getFrame(), msg,
                                       "Error during the ST code generation",

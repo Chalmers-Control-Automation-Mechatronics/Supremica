@@ -28,6 +28,8 @@ public class GABlocksRemover
   //       * Undo support?                                  //
   ////////////////////////////////////////////////////////////
   public static void RemoveGABlocksAction(final IDEActionInterface ide) {
+    // TODO: add a confirmation dialog, add a second argument (true by default)
+    logger.info("Removing all Guards and Actions of the current module...");
     logger.debug("\tRetrieving ModuleContainer and ModuleSubject...");
     final DocumentContainer docContainer = ide.getActiveDocumentContainer();
     final ModuleContainer moduleContainer;

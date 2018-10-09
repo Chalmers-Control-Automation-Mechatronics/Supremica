@@ -77,6 +77,8 @@ public final class EditorSynthesizerOptions
   private String typePLCCodeTUM;
   private boolean plcCodeTUMefaBox;
   private boolean savPLCCodeTUMBox;
+  private boolean pouDefaultNameBox;
+  private String pouNameField;
   private boolean compHeuristic;
   private boolean indpHeuristic;
   private boolean reachability;
@@ -395,6 +397,26 @@ public final class EditorSynthesizerOptions
   public boolean getSavPLCCodeTUMBox()
   {
     return savPLCCodeTUMBox;
+  }
+
+  public void setPouDefaultNameBox(final boolean bool)
+  {
+    pouDefaultNameBox = bool;
+  }
+
+  public boolean getPouDefaultNameBox()
+  {
+    return pouDefaultNameBox;
+  }
+
+  public void setPouNameField(final String text)
+  {
+    pouNameField = text;
+  }
+
+  public String getPouNameField()
+  {
+    return pouNameField;
   }
 
   public void setCompHeuristic(final boolean bool)

@@ -44,7 +44,6 @@ public class EditorGenerateTextLabelAction extends IDEAction
   @Override
   public void doAction()
   {
-    logger.info("Recomputing Guards (and Actions) Text labels...");
     TextLabelGenerator.GenerateTextLabel(ide);
   }
 

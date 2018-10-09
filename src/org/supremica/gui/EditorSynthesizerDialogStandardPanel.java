@@ -93,6 +93,11 @@ public class EditorSynthesizerDialogStandardPanel
   private final JComboBox<String> typePLCCodeTUMSelector; // Later, this could be defined as a specific class.
   private final JCheckBox plcCodeTUMefaBox;
   private final JCheckBox savPLCCodeTUMBox;
+  private final JCheckBox pouDefaultNameBox;
+  private final JTextField pouNameField;
+  private final Box pouNameFieldBox;
+
+  private final static String defaultTcPOUNameField = "main_control"; // TUM TwinCAT parameter
 
   private final JCheckBox timeOptBox;
 
@@ -385,7 +390,7 @@ public class EditorSynthesizerDialogStandardPanel
       tumPanel = new JPanel();
       tumPanel.setBorder(BorderFactory.createTitledBorder(
           "PLC code generation"));
-      tumPanel.setLayout(new GridLayout(4, 1)); // Change this number according to the number of boxes
+      tumPanel.setLayout(new GridLayout(6, 1)); // Change this number according to the number of boxes
 
       genPLCCodeTUMBox = new JCheckBox("Generate PLC code (external)");
       genPLCCodeTUMBox.setToolTipText(
@@ -401,6 +406,7 @@ public class EditorSynthesizerDialogStandardPanel
       final String[] _typeList = {"standalone", "TwinCAT"};
       typePLCCodeTUMSelector = new JComboBox<String>(_typeList);
       typePLCCodeTUMSelector.setSelectedItem("TwinCAT"); // Default selection
+      typePLCCodeTUMSelector.addActionListener(this); // needed to (de)activate the pouDefaultNameBox
       typePLCCodeTUMBox.setEnabled(false);
       typePLCCodeTUMSelector.setEnabled(false);
       typePLCCodeTUMBox.add(typePLCCodeTUMSelector);
@@ -419,12 +425,27 @@ public class EditorSynthesizerDialogStandardPanel
       savPLCCodeTUMBox.setSelected(true); // This option is activated by default
       savPLCCodeTUMBox.setEnabled(false);
 
+      pouDefaultNameBox = new JCheckBox("Use default TwinCAT POU's name");
+      pouDefaultNameBox.setToolTipText("Use the default TwinCAT POU's name (main_control).");
+      pouDefaultNameBox.setSelected(true); // This option is deactivated by default
+      pouDefaultNameBox.setEnabled(true);
+      pouDefaultNameBox.addActionListener(this); // needed to (de)activate the pouNameField
+
+      pouNameField = new JTextField(defaultTcPOUNameField);
+      pouNameField.setToolTipText("Enter the desired POU's name (without extension)");
+      pouNameField.setColumns(10);
+      pouNameField.setEnabled(false);
+      pouNameFieldBox = Box.createHorizontalBox();
+      pouNameFieldBox.add(new JLabel("POU's name: "));
+      pouNameFieldBox.add(pouNameField);
 
       // Add tumPanel's elements
       tumPanel.add(genPLCCodeTUMBox);
       tumPanel.add(typePLCCodeTUMBox);
       tumPanel.add(plcCodeTUMefaBox);
       tumPanel.add(savPLCCodeTUMBox);
+      tumPanel.add(pouDefaultNameBox);
+      tumPanel.add(pouNameFieldBox);
     } else {
       tumPanel = null;
       genPLCCodeTUMBox = null;
@@ -432,6 +453,9 @@ public class EditorSynthesizerDialogStandardPanel
       typePLCCodeTUMSelector = null; // Later, this could be defined as a specific class.
       plcCodeTUMefaBox = null;
       savPLCCodeTUMBox = null;
+      pouDefaultNameBox = null;
+      pouNameField = null;
+      pouNameFieldBox = null;
     }
     // END TUM external toolbox for ST code generation
 
@@ -485,10 +509,6 @@ public class EditorSynthesizerDialogStandardPanel
       if (!addGuardsBox.isSelected()) {
         genPLCCodeTUMBox.setSelected(false);
         genPLCCodeTUMBox.setEnabled(false);
-        typePLCCodeTUMBox.setEnabled(false);
-        typePLCCodeTUMSelector.setEnabled(false);
-        plcCodeTUMefaBox.setEnabled(false);
-        savPLCCodeTUMBox.setEnabled(false);
       } else {
         genPLCCodeTUMBox.setEnabled(true);
       }
@@ -502,6 +522,21 @@ public class EditorSynthesizerDialogStandardPanel
         typePLCCodeTUMSelector.setEnabled(false);
         plcCodeTUMefaBox.setEnabled(false);
         savPLCCodeTUMBox.setEnabled(false);
+      }
+      if (typePLCCodeTUMSelector.isEnabled() &&
+        typePLCCodeTUMSelector.getSelectedItem().equals("TwinCAT")) {
+        pouDefaultNameBox.setEnabled(true);
+      } else {
+        pouDefaultNameBox.setEnabled(false);
+      }
+      if (pouDefaultNameBox.isEnabled() &&
+          !pouDefaultNameBox.isSelected()) {
+        pouNameFieldBox.setEnabled(true);
+        pouNameField.setEnabled(true);
+      } else {
+        pouNameFieldBox.setEnabled(false);
+        pouNameField.setEnabled(false);
+        pouNameField.setText(defaultTcPOUNameField);
       }
     }
   }
@@ -528,6 +563,10 @@ public class EditorSynthesizerDialogStandardPanel
 
     if (Config.TUM_EXTERNAL_ON.isTrue()) {
       genPLCCodeTUMBox.setEnabled(synthesizerOptions.getAddGuards());
+//      typePLCCodeTUMSelector.setSelectedItem(synthesizerOptions.getTypePLCCodeTUM());
+//      plcCodeTUMefaBox.setSelected(synthesizerOptions.getPLCCodeTUMefaBox());
+//      savPLCCodeTUMBox.setSelected(synthesizerOptions.getSavPLCCodeTUMBox());
+//      pouNameField.setText(synthesizerOptions.getPouNameField());
     }
   }
 
@@ -553,6 +592,8 @@ public class EditorSynthesizerDialogStandardPanel
       synthesizerOptions.setTypePLCCodeTUM((String) typePLCCodeTUMSelector.getSelectedItem());
       synthesizerOptions.setPLCCodeTUMefaBox(plcCodeTUMefaBox.isSelected());
       synthesizerOptions.setSavPLCCodeTUMBox(savPLCCodeTUMBox.isSelected());
+      synthesizerOptions.setPouDefaultNameBox(pouDefaultNameBox.isSelected());
+      synthesizerOptions.setPouNameField(pouNameField.getText());
     }
 
     if (fromForbiddenStatesButton.isSelected()) {

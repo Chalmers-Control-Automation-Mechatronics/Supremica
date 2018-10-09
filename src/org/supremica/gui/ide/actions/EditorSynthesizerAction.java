@@ -72,6 +72,7 @@ import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
+import org.supremica.external.tumses.GABlocksRemover;
 import org.supremica.external.tumses.STCodeGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
@@ -112,6 +113,7 @@ public class EditorSynthesizerAction extends IDEAction
   @Override
   public void doAction()
   {
+    // TODO: If TUM option, clear the GUI console
     final ModuleSubject module =
       ide.getActiveDocumentContainer().getEditorPanel().getModuleSubject();
 
@@ -385,33 +387,54 @@ public class EditorSynthesizerAction extends IDEAction
     // NOTA: If the supervisor is empty, the code would have already returned before
     //       see if (bddSynthesizer.nbrOfStates() == 0)
     if (Config.TUM_EXTERNAL_ON.isTrue()) {
-      final int choice = JOptionPane.showOptionDialog(ide.getFrame(),
-                             "Symbolic synthesis completed.\r\n"
-                           + "If needed, guards and variables have been added to the models.\r\n"
-                           + "Check the console for more details.",
-                             "Symbolic synthesis completed",
-                             JOptionPane.OK_CANCEL_OPTION,
-                             JOptionPane.WARNING_MESSAGE,
-                             null,
-                             new String[]{"Continue","Quit"},
-                             "Continue");
+      final String message;
+      if (options.getAddGuards()) {
+        message = "Symbolic synthesis completed.\r\n"
+                + "If needed, guards and variables have been added to the models.\r\n"
+                + "Check the console for more details.";
+      } else  {
+        message = "Symbolic synthesis completed.\r\n"
+                + "Check the console for more details.";
+      }
+      final String title = "Symbolic synthesis completed";
+      final int choice;
+      if (options.getGenPLCCodeTUMBox()) {
+        choice = JOptionPane.showOptionDialog(ide.getFrame(),
+                               message,
+                               title,
+                               JOptionPane.OK_CANCEL_OPTION,
+                               JOptionPane.WARNING_MESSAGE,
+                               null,
+                               new String[]{"Continue","Quit"},
+                               "Continue");
+      } else {
+        JOptionPane.showMessageDialog(ide.getFrame(),
+                               message,
+                               title,
+                               JOptionPane.WARNING_MESSAGE);
+        choice = JOptionPane.CANCEL_OPTION;
+      }
 
       // 2) Call the code generator
-      // TODO: * Improve the integration: Get some outputs (at least Pass/Fail) from the external toolbox and pass them to Supremica/Waters logger.info()
-      //       * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
+      // TODO: * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
       //       * Only Windows if considered here
       //         -> Add a check for the OS
       //         -> Handle the file separators properly: "\\", "/", File.separator ...
-      //       * Probably move this code (which is getting larger) to another file and functions
       //
-      if (choice == JOptionPane.OK_OPTION) {
-        if (options.getGenPLCCodeTUMBox()) {
+      if (options.getGenPLCCodeTUMBox()) {
+        if (choice == JOptionPane.OK_OPTION) {
           logger.info("Continuing ..."); // TODO: this is unfortunately not printed in the GUI before calling the next process
-          // TODO: Call EditorRemoveGABlocksAction or similar after refactoring
+          // If the EFA option is not activated, remove existing guards
+          if (!options.getPLCCodeTUMefaBox()) {
+            GABlocksRemover.RemoveGABlocksAction(ide);
+          } else {
+            logger.debug("\tEFA option is selected. Guard/action blocks and variables have NOT been removed");
+          }
+          // Then, generate the ST Code
           STCodeGenerator.GenerateSTCode(ide, module, options); //TODO: Could we only pass the module and options args (not the ide)
+        } else {
+          logger.warn("PLC Code Generation aborted by the user.");
         }
-      } else {
-        logger.warn("PLC Code Generation aborted by the user.");
       }
     }
   }

@@ -45,7 +45,6 @@ public class EditorRemoveGABlocksAction extends IDEAction
   public void doAction()
   {
     GABlocksRemover.RemoveGABlocksAction(ide);
-    logger.info("Removing all Guards and Actions of the current module...");
   }
 
   //#########################################################################
