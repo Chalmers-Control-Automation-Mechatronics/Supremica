@@ -72,7 +72,7 @@ import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.BDD.EFA.BDDExtendedSynthesizer;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
-import org.supremica.external.tumses.GenerateSTCodeAction;
+import org.supremica.external.tumses.STCodeGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
@@ -234,6 +234,12 @@ public class EditorSynthesizerAction extends IDEAction
 
     if (bddSynthesizer.nbrOfStates() == 0) {
       logger.info("No guard can be derived from empty supervisor.");
+      if (Config.TUM_EXTERNAL_ON.isTrue()) {
+        JOptionPane.showMessageDialog(ide.getFrame(),
+            "No guard can be derived from empty supervisor.",
+            "Error during the symbolic synthesis",
+            JOptionPane.ERROR_MESSAGE);
+      }
       // Cleanup...
       bddSynthesizer.done();
       return;
@@ -375,16 +381,37 @@ public class EditorSynthesizerAction extends IDEAction
     bddSynthesizer.done();
 
     // Call TUM PLC Code generator
-    // TODO: * Improve the integration: Get some outputs (at least Pass/Fail) from the external toolbox and pass them to Supremica/Waters logger.info()
-    //       * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
-    //       * Only Windows if considered here
-    //         -> Add a check for the OS
-    //         -> Handle the file separators properly: "\\", "/", File.separator ...
-    //       * Probably move this code (which is getting larger) to another file and functions
-    //
+    // 1) Display info.
+    // NOTA: If the supervisor is empty, the code would have already returned before
+    //       see if (bddSynthesizer.nbrOfStates() == 0)
     if (Config.TUM_EXTERNAL_ON.isTrue()) {
-      if (options.getGenPLCCodeTUMBox()) {
-        GenerateSTCodeAction.GenerateSTCode(ide, module, options);
+      final int choice = JOptionPane.showOptionDialog(ide.getFrame(),
+                             "Symbolic synthesis completed.\r\n"
+                           + "If needed, guards and variables have been added to the models.\r\n"
+                           + "Check the console for more details.",
+                             "Symbolic synthesis completed",
+                             JOptionPane.OK_CANCEL_OPTION,
+                             JOptionPane.WARNING_MESSAGE,
+                             null,
+                             new String[]{"Continue","Quit"},
+                             "Continue");
+
+      // 2) Call the code generator
+      // TODO: * Improve the integration: Get some outputs (at least Pass/Fail) from the external toolbox and pass them to Supremica/Waters logger.info()
+      //       * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
+      //       * Only Windows if considered here
+      //         -> Add a check for the OS
+      //         -> Handle the file separators properly: "\\", "/", File.separator ...
+      //       * Probably move this code (which is getting larger) to another file and functions
+      //
+      if (choice == JOptionPane.OK_OPTION) {
+        if (options.getGenPLCCodeTUMBox()) {
+          logger.info("Continuing ..."); // TODO: this is unfortunately not printed in the GUI before calling the next process
+          // TODO: Call EditorRemoveGABlocksAction or similar after refactoring
+          STCodeGenerator.GenerateSTCode(ide, module, options); //TODO: Could we only pass the module and options args (not the ide)
+        }
+      } else {
+        logger.warn("PLC Code Generation aborted by the user.");
       }
     }
   }
