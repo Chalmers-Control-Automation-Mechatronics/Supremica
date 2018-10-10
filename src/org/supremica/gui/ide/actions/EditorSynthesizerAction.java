@@ -187,6 +187,19 @@ public class EditorSynthesizerAction extends IDEAction
       logger.info("Number of used BDD variables: " + nbrBDDVars);
     }
 
+
+    // Remove previous guards/actions if the model is not a "user-defined" EFA
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      if (options.getGenPLCCodeTUMBox()) {
+        // If the EFA option is not activated, remove existing guards
+        if (!options.getPLCCodeTUMefaBox()) {
+          GABlocksRemover.RemoveGABlocksAction(ide);
+        } else {
+          logger.debug("\tEFA option is selected. Guard/action blocks and variables have NOT been removed");
+        }
+      }
+    }
+
     // do the work
     bddSynthesizer.synthesize(options);
 
@@ -424,13 +437,7 @@ public class EditorSynthesizerAction extends IDEAction
       if (options.getGenPLCCodeTUMBox()) {
         if (choice == JOptionPane.OK_OPTION) {
           logger.info("Continuing ..."); // TODO: this is unfortunately not printed in the GUI before calling the next process
-          // If the EFA option is not activated, remove existing guards
-          if (!options.getPLCCodeTUMefaBox()) {
-            GABlocksRemover.RemoveGABlocksAction(ide);
-          } else {
-            logger.debug("\tEFA option is selected. Guard/action blocks and variables have NOT been removed");
-          }
-          // Then, generate the ST Code
+          // Generate the ST Code
           STCodeGenerator.GenerateSTCode(ide, module, options); //TODO: Could we only pass the module and options args (not the ide)
         } else {
           logger.warn("PLC Code Generation aborted by the user.");
