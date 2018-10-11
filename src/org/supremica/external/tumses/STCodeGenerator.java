@@ -158,7 +158,8 @@ public class STCodeGenerator
         }
       }
 
-      final int result = proc.waitFor();
+      final int result = proc.exitValue();
+      logger.debug("\tproc.exitValue(): " + Integer.toString(result));
 
       if (result == 0) {
         final String msg = "ST code generation process completed!\r\n"

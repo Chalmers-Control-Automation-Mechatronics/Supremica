@@ -74,6 +74,7 @@ import org.supremica.automata.algorithms.EditorSynthesizerOptions;
 import org.supremica.automata.algorithms.Guard.BDDExtendedGuardGenerator;
 import org.supremica.external.tumses.GABlocksRemover;
 import org.supremica.external.tumses.STCodeGenerator;
+import org.supremica.external.tumses.TextLabelGenerator;
 import org.supremica.gui.EditorSynthesizerDialog;
 import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
@@ -186,7 +187,6 @@ public class EditorSynthesizerAction extends IDEAction
         bddSynthesizer.getBDDAutomata().getNumberOfUsedBDDVariables();
       logger.info("Number of used BDD variables: " + nbrBDDVars);
     }
-
 
     // Remove previous guards/actions if the model is not a "user-defined" EFA
     if (Config.TUM_EXTERNAL_ON.isTrue()) {
@@ -428,7 +428,10 @@ public class EditorSynthesizerAction extends IDEAction
         choice = JOptionPane.CANCEL_OPTION;
       }
 
-      // 2) Call the code generator
+      // 2) Recompute the potentially missing Text labels
+      TextLabelGenerator.GenerateTextLabel(ide);
+
+      // 3) Call the code generator
       // TODO: * Handling of network (NAS) repositories (e.g. //nas.ads. ...) -> Pass the relative paths
       //       * Only Windows if considered here
       //         -> Add a check for the OS
