@@ -257,7 +257,9 @@ public class IDEMenuBar extends JMenuBar
     final SupremicaPropertyChangeListener toolsListener =
         new ToolsPropertyListener();
     final SupremicaPropertyChangeListener analyzeListener =
-        new AnalyzePropertyListener();
+      new AnalyzePropertyListener();
+    final SupremicaPropertyChangeListener tumListener =
+      new TumPropertyListener();
     Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
     Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
@@ -268,7 +270,7 @@ public class IDEMenuBar extends JMenuBar
     Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
       (analyzeListener);
     Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.addPropertyChangeListener(analyzeListener);
-    Config.TUM_EXTERNAL_ON.addPropertyChangeListener(analyzeListener);
+    Config.TUM_EXTERNAL_ON.addPropertyChangeListener(tumListener);
   }
 
 
@@ -576,7 +578,7 @@ public class IDEMenuBar extends JMenuBar
 
     // Examples
     if (mExamplesMenu == null) {
-      final ExampleTemplates exTempl = ExampleTemplates.getInstance();
+      final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
       if (!exTempl.isEmpty()) {
         mExamplesMenu = new JMenu("Examples");
         mExamplesMenu.setMnemonic(KeyEvent.VK_P);
@@ -814,6 +816,23 @@ public class IDEMenuBar extends JMenuBar
     {
       mVerifyMenu = null;
       mEdAnalyzeMenu = null;
+      rebuildMenus();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class TumPropertyListener
+  private class TumPropertyListener implements
+      SupremicaPropertyChangeListener
+  {
+    //#######################################################################
+    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+    @Override
+    public void propertyChanged(final SupremicaPropertyChangeEvent event)
+    {
+      mEdAnalyzeMenu = null; // for TUM ST code generator
+      mExamplesMenu = null;  // for TUM examples
       rebuildMenus();
     }
   }

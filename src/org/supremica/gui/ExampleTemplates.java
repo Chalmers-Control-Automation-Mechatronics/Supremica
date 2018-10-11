@@ -41,6 +41,7 @@ import java.util.List;
 
 import org.supremica.automata.templates.TemplateGroup;
 import org.supremica.automata.templates.TemplateTypes;
+import org.supremica.properties.Config;
 
 /**
  * For convenient menu-access to a large set of examples.
@@ -88,7 +89,9 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     initializeModuleExamples();
     initializeSchedulingExamples();
     initializeOtherExamples();
-    initializeTUMunichExamples();
+    if (Config.TUM_EXTERNAL_ON.isTrue()) {
+      initializeTUMunichExamples();
+    }
     //initializeStandardComponents();
   }
 
@@ -342,6 +345,13 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     {
       templates = new ExampleTemplates();
     }
+
+    return templates;
+  }
+
+  public synchronized static ExampleTemplates getRefreshedInstance()
+  {
+    templates = new ExampleTemplates();
 
     return templates;
   }
