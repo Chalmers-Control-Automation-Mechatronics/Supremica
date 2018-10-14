@@ -10,12 +10,7 @@ import javax.swing.Action;
 // import javax.swing.JFileChooser;
 // import javax.swing.JOptionPane;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import org.supremica.external.tumses.TextLabelGenerator;
-import org.supremica.gui.ide.IDE;
-// import org.supremica.properties.Config;
 
 public class EditorGenerateTextLabelAction extends IDEAction
 {
@@ -49,6 +44,5 @@ public class EditorGenerateTextLabelAction extends IDEAction
 
   //#########################################################################
   //# Class Constants
-  private final Logger logger = LogManager.getLogger(IDE.class);
   private final static long serialVersionUID = 1L;
- }
+}

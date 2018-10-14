@@ -24,6 +24,7 @@ import org.supremica.gui.ide.actions.IDEActionInterface;
 
 public class TextLabelGenerator
 {
+  @SuppressWarnings("unused")
   private static final long serialVersionUID = 1L;
   private final static Logger logger = LogManager.getLogger();
 
