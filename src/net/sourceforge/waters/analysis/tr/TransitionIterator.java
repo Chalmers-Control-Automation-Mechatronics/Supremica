@@ -124,6 +124,17 @@ public interface TransitionIterator
   public boolean advance();
 
   /**
+   * Returns whether the iterator has been advanced and can provide a
+   * transition. This method returns the same result as a previous call to
+   * {@link #advance()}.
+   * @return <CODE>true</CODE> if there is another transition in the iteration,
+   *         so the next call to {@link #getCurrentFromState()},
+   *         {@link #getCurrentEvent()}, or {@link #getCurrentToState()}
+   *         will succeed.
+   */
+  public boolean isValid();
+
+  /**
    * Gets the ID of the source state of the current transition in the iteration.
    * A transition's <I>source</I> state differs from its <I>from-state</I> in
    * that it always represents the actual source state of the transition, no

@@ -716,6 +716,12 @@ public class TauClosure
     }
 
     @Override
+    public boolean isValid()
+    {
+      return mCurrentState >= 0;
+    }
+
+    @Override
     public int getCurrentSourceState()
     {
       return mTransitionBuffer.getIteratorSourceState(this);
@@ -795,6 +801,12 @@ public class TauClosure
     public boolean advance()
     {
       return ++mIndex < mCurrentArray.length;
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mIndex >= -1 && mIndex < mCurrentArray.length;
     }
 
     @Override
@@ -938,6 +950,12 @@ public class TauClosure
         }
         return false;
       }
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mEventIterator.isValid();
     }
 
     @Override
@@ -1096,6 +1114,12 @@ public class TauClosure
       } else {
         return false;
       }
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mTauIterator.isValid();
     }
 
     @Override
@@ -1262,6 +1286,12 @@ public class TauClosure
         }
       }
       return false;
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return !mStart && mTauIterator2.isValid();
     }
 
     @Override

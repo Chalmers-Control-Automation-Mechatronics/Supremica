@@ -1765,6 +1765,7 @@ public abstract class TransitionListBuffer
     public boolean advance()
     {
       if (mCurrent == NULL || mNext == NULL) {
+        mCurrent = NULL;
         return false;
       }
       setCurrent(mNext);
@@ -1775,6 +1776,12 @@ public abstract class TransitionListBuffer
       } else {
         return true;
       }
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mCurrent != NULL;
     }
 
     @Override
@@ -2057,6 +2064,12 @@ public abstract class TransitionListBuffer
         mInnerIterator.resetState(mCurrentFromState);
       }
       return true;
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mInnerIterator.isValid();
     }
 
     @Override

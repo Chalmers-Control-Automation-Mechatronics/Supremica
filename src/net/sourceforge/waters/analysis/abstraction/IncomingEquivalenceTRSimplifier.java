@@ -33,6 +33,15 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.iterator.TIntIntIterator;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.stack.TIntStack;
+import gnu.trove.stack.array.TIntArrayStack;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -50,15 +59,6 @@ import net.sourceforge.waters.analysis.tr.TransitionListBuffer;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.procedure.TIntProcedure;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.stack.TIntStack;
-import gnu.trove.stack.array.TIntArrayStack;
 
 
 /**
@@ -1269,6 +1269,12 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
+    public boolean isValid()
+    {
+      return mCurrentTargetState != null;
+    }
+
+    @Override
     public int getCurrentEvent()
     {
       return mTransitionIterator.getCurrentEvent();
@@ -1501,6 +1507,12 @@ public class IncomingEquivalenceTRSimplifier
         mLevel--;
       } while (mLevel > 0);
       return false;
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mTransitionIterator.isValid();
     }
 
     @Override
@@ -1761,6 +1773,12 @@ public class IncomingEquivalenceTRSimplifier
     }
 
     @Override
+    public boolean isValid()
+    {
+      return mTauIterator.isValid();
+    }
+
+    @Override
     public int getCurrentEvent()
     {
       return mEventIterator.getCurrentEvent();
@@ -1975,6 +1993,12 @@ public class IncomingEquivalenceTRSimplifier
         mLevel--;
       } while (mLevel > 0);
       return false;
+    }
+
+    @Override
+    public boolean isValid()
+    {
+      return mTauIterator2.isValid();
     }
 
     @Override

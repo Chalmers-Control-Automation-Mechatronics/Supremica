@@ -198,6 +198,12 @@ public class StatusGroupTransitionIterator implements TransitionIterator
   }
 
   @Override
+  public boolean isValid()
+  {
+    return mInnerIterator.isValid();
+  }
+
+  @Override
   public int getCurrentEvent()
   {
     return mInnerIterator.getCurrentEvent();

@@ -38,13 +38,13 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
- * <P>A transition relation simplifier that checks for a given automaton
- * whether its natural projection removing tau events satisfies the
+ * <P>A transition relation simplifier that checks for a given transition
+ * relation whether its natural projection removing tau events satisfies the
  * observer property, using the OP-Verifier II algorithm.</P>
  *
  * <P>This is a wrapper that calls a {@link TauLoopRemovalTRSimplifier}
  * followed by a {@link OPVerifierTRSimplifier}. This emulates the
- * OP-Verifier II algorithm, which checks the observer for transition
+ * OP-Verifier II algorithm, which checks the observer property for transition
  * relations with or without silent loops. If silent loops are present,
  * strongly connected components are merged as a side-effect of the first
  * step.</P>

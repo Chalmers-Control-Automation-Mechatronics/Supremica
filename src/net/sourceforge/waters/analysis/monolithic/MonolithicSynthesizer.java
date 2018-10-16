@@ -836,6 +836,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
         final EventProxy event = mEventEncoding.getProperEvent(e);
         supervisor.setName("sup:" + event.getName());
+        /*
+        final ProjectingSupervisorReductionTRSimplifier projector =
+          new ProjectingSupervisorReductionTRSimplifier();
+        projector.setTransitionRelation(supervisor);
+        projector.setSupervisedEvent(e);
+        projector.run();
+        */
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
         supervisor.removeDumpStateTransitions();
