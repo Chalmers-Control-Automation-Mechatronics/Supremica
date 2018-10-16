@@ -127,11 +127,6 @@ public abstract class Property
     return mEditable;
   }
 
-  public String valueToEscapedString()
-  {
-    return getAsString();
-  }
-
 
   //#########################################################################
   //# General Object Handling

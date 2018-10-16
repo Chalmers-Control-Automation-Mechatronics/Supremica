@@ -186,14 +186,14 @@ public class GraphPanel
   {
     Config.GUI_EDITOR_BACKGROUND_COLOR.addPropertyChangeListener(this);
     Config.GUI_EDITOR_NODE_RADIUS.addPropertyChangeListener(this);
-    Config.GUI_EDITOR_EDGEARROW_AT_END.addPropertyChangeListener(this);
+    Config.GUI_EDITOR_EDGEARROW_POSITION.addPropertyChangeListener(this);
   }
 
   public void unregisterSupremicaPropertyChangeListeners()
   {
     Config.GUI_EDITOR_BACKGROUND_COLOR.removePropertyChangeListener(this);
     Config.GUI_EDITOR_NODE_RADIUS.removePropertyChangeListener(this);
-    Config.GUI_EDITOR_EDGEARROW_AT_END.removePropertyChangeListener(this);
+    Config.GUI_EDITOR_EDGEARROW_POSITION.removePropertyChangeListener(this);
   }
 
 

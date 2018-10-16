@@ -81,6 +81,7 @@ import javax.swing.text.NumberFormatter;
 import org.supremica.properties.BooleanProperty;
 import org.supremica.properties.ColorProperty;
 import org.supremica.properties.DoubleProperty;
+import org.supremica.properties.EnumProperty;
 import org.supremica.properties.IntegerProperty;
 import org.supremica.properties.ObjectProperty;
 import org.supremica.properties.Property;
@@ -213,6 +214,8 @@ extends JDialog
           chooser = new IntegerChooser((IntegerProperty) property);
         } else if (property instanceof DoubleProperty) {
           chooser = new DoubleChooser((DoubleProperty) property);
+        } else if (property instanceof EnumProperty) {
+          chooser = new EnumPropertyChooser((EnumProperty) property);
         } else if (property instanceof ObjectProperty) {
           chooser = new ObjectPropertyChooser((ObjectProperty) property);
         } else if (property instanceof ColorProperty) {
@@ -538,6 +541,63 @@ extends JDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 1L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EnumPropertyChooser
+  /**
+   * Chooser for {@link EnumProperty} items, using a {@link JComboBox}.
+   */
+  private class EnumPropertyChooser<E extends Enum<E>>
+    extends JPanel implements Chooser
+  {
+    //#######################################################################
+    //# Constructor
+    private EnumPropertyChooser(final EnumProperty<E> property)
+    {
+      mProperty = property;
+      mLabel = new JLabel(property.getComment());
+      add(mLabel);
+      mComboBox = new JComboBox<E>(property.getLegalValues());
+      if (property.get() != null) {
+        mComboBox.setSelectedItem(property.get());
+      }
+      add(mComboBox);
+    }
+
+    //#######################################################################
+    //# Interface org.supremica.gui.PropertiesDialog.Chooser
+    @Override
+    public void setInConfig()
+    {
+      final Object selected = mComboBox.getSelectedItem();
+      @SuppressWarnings("unchecked")
+      final E value = (E) selected;
+      mProperty.setValue(value);
+    }
+
+    @Override
+    public void getFromConfig()
+    {
+      mComboBox.setSelectedItem(mProperty.get());
+    }
+
+    @Override
+    public String getLabel()
+    {
+      return mLabel.getText();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final EnumProperty<E> mProperty;
+    private final JComboBox<E> mComboBox;
+    private final JLabel mLabel;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 440339593909208126L;
   }
 
 

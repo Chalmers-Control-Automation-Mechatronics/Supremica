@@ -64,6 +64,7 @@ import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.renderer.EPSGraphPrinter;
+import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
 import net.sourceforge.waters.gui.renderer.ModuleRenderingContext;
 import net.sourceforge.waters.gui.renderer.ProxyShapeProducer;
 import net.sourceforge.waters.gui.renderer.RenderingContext;
@@ -119,7 +120,7 @@ public class ModelAssessor
   //# Main Program Entry Point
   public static void main(final String[] args)
   {
-    Config.GUI_EDITOR_EDGEARROW_AT_END.set(false);
+    Config.GUI_EDITOR_EDGEARROW_POSITION.setValue(EdgeArrowPosition.Middle);
 
     if (args.length != 4) {
       usage();

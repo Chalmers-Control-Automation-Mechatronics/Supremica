@@ -61,6 +61,7 @@ import java.awt.Color;
 
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.gui.logging.IDELogLevel;
+import net.sourceforge.waters.gui.renderer.EdgeArrowPosition;
 import net.sourceforge.waters.gui.renderer.LayoutMode;
 import net.sourceforge.waters.gui.util.IconSet;
 import net.sourceforge.waters.gui.util.LookAndFeelOption;
@@ -263,9 +264,13 @@ public final class Config
     public static final BooleanProperty GUI_EDITOR_CONTROL_POINTS_MOVE_WITH_NODE =
       new BooleanProperty(PropertyType.GUI_EDITOR, "controlPointsMoveWithNode",
                           true, "Control points move with node");
-    public static final BooleanProperty GUI_EDITOR_EDGEARROW_AT_END =
-      new BooleanProperty(PropertyType.GUI_EDITOR, "edgeArrowAtEnd",
-                          true, "Draw edge arrows at the end");
+    public static final EnumProperty<EdgeArrowPosition> GUI_EDITOR_EDGEARROW_POSITION =
+      new EnumProperty<>(PropertyType.GUI_EDITOR, "edgeArrowAtEnd",
+                         EdgeArrowPosition.End,
+                         EdgeArrowPosition.End,
+                         EdgeArrowPosition.Middle,
+                         EdgeArrowPosition.class,
+                         "Edge arrow position");
     public static final IntegerProperty GUI_EDITOR_SPRING_EMBEDDER_TIMEOUT =
       new IntegerProperty(PropertyType.GUI_EDITOR, "springEmbedderTimeout",
                           10000, "Maximum layout time", true, 0);

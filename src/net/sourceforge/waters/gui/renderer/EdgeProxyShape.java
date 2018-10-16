@@ -99,11 +99,13 @@ abstract class EdgeProxyShape
   public Shape getShape()
   {
     if (mShape == null) {
-      final Shape curve = getCurve();
-      final Shape arrow = getArrowHead();
       mShape = new GeneralPath(GeneralPath.WIND_NON_ZERO, 2);
+      final Shape curve = getCurve();
       mShape.append(curve, false);
-      mShape.append(arrow, false);
+      final Shape arrow = getArrowHead();
+      if (arrow != null) {
+        mShape.append(arrow, false);
+      }
     }
     return mShape;
   }
@@ -125,22 +127,31 @@ abstract class EdgeProxyShape
   {
     super.draw(g2d, status);
     final Shape arrow = getArrowHead();
-    g2d.setStroke(BASICSTROKE);
-    g2d.setColor(status.getColor());
-    g2d.fill(arrow);
+    if (arrow != null) {
+      g2d.setStroke(BASICSTROKE);
+      g2d.setColor(status.getColor());
+      g2d.fill(arrow);
+    }
   }
 
   Shape getArrowHead()
   {
     if (mArrowHead == null) {
-      if (Config.GUI_EDITOR_EDGEARROW_AT_END.get()) {
+      switch (Config.GUI_EDITOR_EDGEARROW_POSITION.get()) {
+      case End:
+      {
         final Point2D tip = getEndPoint();
         final Point2D dir = getEndDirection();
         mArrowHead = createArrowHead(tip, dir);
-      } else {
+        break;
+      }
+      case Middle:
+      {
         final Point2D tip = getInnerArrowTipPoint();
         final Point2D dir = getMidDirection();
         mArrowHead = createArrowHead(tip, dir);
+        break;
+      }
       }
     }
     return mArrowHead;
@@ -189,7 +200,7 @@ abstract class EdgeProxyShape
   }
 
   /**
-   * Gets the normalized direction vector of the edge at its turning
+   * Gets the normalised direction vector of the edge at its turning
    * point. This is used to render the arrow if it is rendered on the
    * centre of the curve as opposed to its end.
    */
@@ -201,7 +212,7 @@ abstract class EdgeProxyShape
   }
 
   /**
-   * Gets the normalized direction vector of the edge at its end
+   * Gets the normalised direction vector of the edge at its end
    * point. This is used to render the arrow if it is rendered at the end
    * of the curve.
    */
