@@ -158,7 +158,6 @@ public class ExampleTemplates implements Iterable<TemplateGroup>
     addGroup(thisGroup);
   }
 
-  @SuppressWarnings("unused")
   private void initializeOtherExamples()
   {
     final TemplateGroup thisGroup = OtherExamples;
