@@ -14,7 +14,9 @@ import java.util.concurrent.TimeoutException;
 import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
@@ -224,9 +226,12 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
                                       final AbstractSupervisorReductionTRSimplifier simplifier)
     throws EventNotFoundException
   {
-    ((MonolithicSynthesizer)mSynthesizer).setSupervisorReductionSimplifier(simplifier);
+    final SupervisorReductionFactory factory =
+      new SimpleSupervisorReductionFactory(true, false, simplifier);
+    mSynthesizer.setSupervisorReductionFactory(factory);
     super.configureSynthesizer(des);
   }
+
 
   //#########################################################################
   //# Testing Procedure

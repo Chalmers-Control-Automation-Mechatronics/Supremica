@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.compositional;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -75,7 +76,8 @@ public class CompositionalSupervisorReductionMustLMinSTest
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectionHeuristic
       (CompositionalSelectionHeuristicFactory.MinS);
-    synthesizer.setSupervisorReductionEnabled(true);
+    synthesizer.setSupervisorReductionFactory
+      (DefaultSupervisorReductionFactory.SU_WONHAM);
     return synthesizer;
   }
 

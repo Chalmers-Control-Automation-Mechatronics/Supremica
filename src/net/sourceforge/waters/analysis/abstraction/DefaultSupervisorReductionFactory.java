@@ -33,111 +33,104 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-
-
 /**
- * <P>An abstract base for transition relation simplifiers that implement
- * supervisor reduction.</P>
- *
- * @see SupervisorReductionSimplifier
- *
  * @author Robi Malik
  */
 
-public abstract class AbstractSupervisorReductionTRSimplifier
-  extends AbstractTRSimplifier
-  implements SupervisorReductionSimplifier
+public enum DefaultSupervisorReductionFactory
+  implements SupervisorReductionFactory
 {
 
   //#########################################################################
+  //# Enumeration
+  OFF("Off") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      return null;
+    }
+  },
+  SU_WONHAM("Su/Wonham") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SuWonhamSupervisorReductionTRSimplifier main =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      main.setExperimentalMode(true);
+      return new SupervisorReductionChain(false, main);
+    }
+  },
+  PROJECTION_SU_WONHAM("Projection + Su/Wonham") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SuWonhamSupervisorReductionTRSimplifier main =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      main.setExperimentalMode(true);
+      return new SupervisorReductionChain(true, main);
+    }
+  },
+  CLIQUE_BASED("Clique-based") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SupervisorReductionSimplifier main =
+        new CliqueBasedSupervisorReductionTRSimplifier();
+      return new SupervisorReductionChain(false, main);
+    }
+
+    @Override
+    public boolean isSupervisedEventRequired()
+    {
+      return true;
+    }
+  },
+  PROJECTION_CLIQUE_BASED("Projection + Clique-based") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SupervisorReductionSimplifier main =
+        new CliqueBasedSupervisorReductionTRSimplifier();
+      return new SupervisorReductionChain(true, main);
+    }
+
+    @Override
+    public boolean isSupervisedEventRequired()
+    {
+      return true;
+    }
+  };
+
+
+  //#########################################################################
   //# Constructors
-  public AbstractSupervisorReductionTRSimplifier()
+  private DefaultSupervisorReductionFactory(final String name)
   {
+    mName = name;
   }
 
-  public AbstractSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  @Override
+  public String toString()
   {
-    super(rel);
+    return mName;
   }
 
 
   //#########################################################################
   //# Interface
-  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
   @Override
-  public boolean isObservationEquivalentAbstraction()
+  public boolean isSupervisedEventRequired()
   {
     return false;
-  }
-
-  @Override
-  public TRSimplifierStatistics createStatistics()
-  {
-    final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, true, false);
-    return setStatistics(stats);
-  }
-
-
-  //#########################################################################
-  //# Interface
-  //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
-  @Override
-  public void setSupervisedEvent(final int event)
-  {
-    mSupervisedEvent = event;
-  }
-
-  @Override
-  public int getSupervisedEvent()
-  {
-    return mSupervisedEvent;
-  }
-
-  /**
-   * Sets the state limit. The states limit specifies the maximum
-   * number of states that will be created. The default for supervisor
-   * reduction is <STRONG>not</STRONG> to support state limits, but
-   * this behaviour may be overridden by subclasses.
-   * @param limit
-   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of states.
-   */
-  @Override
-  public void setStateLimit(final int limit)
-  {
-  }
-
-  @Override
-  public int getStateLimit()
-  {
-    return Integer.MAX_VALUE;
-  }
-
-  /**
-   * Sets the transition limit. The transition limit specifies the maximum
-   * number of transitions that will be created. The default for supervisor
-   * reduction is <STRONG>not</STRONG> to support transition limits, but
-   * this behaviour may be overridden by subclasses.
-   * @param limit
-   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of transitions.
-   */
-  @Override
-  public void setTransitionLimit(final int limit)
-  {
-  }
-
-  @Override
-  public int getTransitionLimit()
-  {
-    return Integer.MAX_VALUE;
   }
 
 
   //#########################################################################
   //# Data Members
-  private int mSupervisedEvent = -1;
+  private String mName;
 
 }

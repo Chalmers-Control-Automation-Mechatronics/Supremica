@@ -54,6 +54,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
@@ -294,9 +296,13 @@ public class AutomataSynthesizer
            }
            mThreadToAbort = synthesizer;
            synthesizer.setConfiguredDefaultMarking(marking);
-           final boolean supervisorReduction =
-             synthesizerOptions.getReduceSupervisors();
-           synthesizer.setSupervisorReductionEnabled(supervisorReduction);
+           final SupervisorReductionFactory supervisorReduction;
+           if (synthesizerOptions.getReduceSupervisors()) {
+             supervisorReduction = DefaultSupervisorReductionFactory.SU_WONHAM;
+           } else {
+             supervisorReduction = DefaultSupervisorReductionFactory.OFF;
+           }
+           synthesizer.setSupervisorReductionFactory(supervisorReduction);
            final boolean supervisorLocalization =
              synthesizerOptions.getLocalizeSupervisors();
            synthesizer.setSupervisorLocalizationEnabled(supervisorLocalization);
@@ -360,12 +366,15 @@ public class AutomataSynthesizer
               (des, factory, translator,
                AutomataSynthesisAbstractionProcedureFactory.WSOE);
           synthesizer.setConfiguredDefaultMarking(marking);
-          final boolean supervisorReduction =
-            synthesizerOptions.getReduceSupervisors();
-          final MinimizationOptions mOptions = new MinimizationOptions();
-
-          synthesizer.setSupervisorReductionEnabled(supervisorReduction);
+          final SupervisorReductionFactory supervisorReduction;
+          if (synthesizerOptions.getReduceSupervisors()) {
+            supervisorReduction = DefaultSupervisorReductionFactory.SU_WONHAM;
+          } else {
+            supervisorReduction = DefaultSupervisorReductionFactory.OFF;
+          }
+          synthesizer.setSupervisorReductionFactory(supervisorReduction);
           synthesizer.setInternalStateLimit(5000);
+          final MinimizationOptions mOptions = new MinimizationOptions();
           final String preselectingHeuristic = mOptions.getMinimizationPreselctingHeuristic().toStringAbbreviated();
           final String selectingHeuristic =  mOptions.getMinimizationSelctingHeuristic().toStringAbbreviated();
           if (preselectingHeuristic.equals("Pairs")) {

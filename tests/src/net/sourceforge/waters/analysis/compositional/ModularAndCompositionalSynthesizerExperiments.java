@@ -40,6 +40,7 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.Watchdog;
@@ -120,7 +121,8 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
                          ",SelecHeuristic," + mSelecting );
     // mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
-    mSynthesizer.setSupervisorReductionEnabled(true);
+    mSynthesizer.setSupervisorReductionFactory
+      (DefaultSupervisorReductionFactory.SU_WONHAM);
     mSynthesizer.setRemovesUnnecessarySupervisors(true);
   }
 
@@ -183,7 +185,8 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
     throws Exception
   {
     final String with =
-      mSynthesizer.getSupervisorReductionEnabled() ? " with" : " without";
+      mSynthesizer.getSupervisorReductionFactory() ==
+      DefaultSupervisorReductionFactory.OFF ? " without" : " with";
     printAndLog("Running " + name + " with " + mPreselecting + "/" +
                 mSelecting + with + " supervisor reduction ... ", false);
     final String inputprop = System.getProperty("waters.test.inputdir");

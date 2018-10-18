@@ -63,6 +63,9 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * @author Jordan Schroder
@@ -117,7 +120,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
    * variants of the clique cover algorithm. This value is ignored if the
    * HeuristicCoverStrategy is set to NONE because a full maximal clique
    * search is performed.
-   *
    * @return the maximum number of covers to be collected by heuristic
    *         variants of the clique cover algorithm.
    */
@@ -131,7 +133,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
    * of the clique cover algorithm. This value is ignored if the
    * HeuristicCoverStrategy is set to NONE because a full maximal clique
    * search is performed.
-   *
    * @param maxHeuristicCovers
    *          the maximum number of covers to be collected by heuristic
    *          variants of the clique cover algorithm.
@@ -142,28 +143,30 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   }
 
   /**
-   * Gets the maximum number of candidate solutions to be expanded before an OverflowException
-   * is thrown (stopping the search).
+   * Gets the maximum number of candidate solutions to be expanded before an
+   * {@link OverflowException} is thrown (stopping the search).
    * @return The maximum number of candidate solutions to be expanded.
    */
-  public int getSearchLimit() {
+  public int getSearchLimit()
+  {
     return mSearchLimit;
   }
 
   /**
-   * Sets the maximum number of candidate solutions to be expanded before an OverflowException
-   * is thrown (stopping the search). If a negative number is specified the limit will be
-   * set to Integer.MAX_VALUE
+   * Sets the maximum number of candidate solutions to be expanded before an
+   * {@link OverflowException} is thrown (stopping the search). If a negative
+   * number is specified the limit will be set to {@link Integer#MAX_VALUE}.
    * @param searchLimit The maximum number of candidate solutions to be expanded.
    */
-  public void setSearchLimit(final int searchLimit) {
+  public void setSearchLimit(final int searchLimit)
+  {
     if (searchLimit < 0) {
       mSearchLimit = Integer.MAX_VALUE;
-    }
-    else {
+    } else {
       mSearchLimit = searchLimit;
     }
   }
+
 
   //#########################################################################
   //# Interface
@@ -180,17 +183,10 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     return ListBufferTransitionRelation.CONFIG_ALL;
   }
 
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.analysis.abstraction.AbstractSupervisorSimplifier
-  @Override
-  public boolean isSupervisedEventRequired()
-  {
-    return true;
-  }
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp() throws AnalysisException
   {
@@ -247,8 +243,20 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   @Override
   protected boolean runSimplifier() throws AnalysisException
   {
-    System.out.println("*** Starting reduction on supervised event "
-                       + getSupervisedEvent() + " ***");
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int dump = rel.getDumpStateIndex();
+    int numReachable = rel.getNumberOfReachableStates();
+    if (rel.isReachable(dump)) {
+      numReachable--;
+    }
+    if (numReachable <= 1) {
+      return false;
+    }
+    assert getSupervisedEvent() >= 0;
+
+    final Logger logger = LogManager.getLogger();
+    logger.debug("*** Starting reduction on supervised event {} ***",
+                 getSupervisedEvent());
     //get the set of compatibles that cover the initial state, and we will try to reduce the supervisor using each
     final PriorityQueue<Candidate> searchSpace =
       new PriorityQueue<>(new Comparator<Candidate>() {
@@ -268,22 +276,28 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     if (mHeuristicCoverStrategy == HeuristicCoverStrategy.NONE) {
       searcher = new Searcher(new BronKerboschCoverStrategy(), new RecursiveDependencyStrategy(),
                      new SimpleAddCandidateStrategy(), true);
-    }
-    else {
+    } else {
       searcher = new Searcher(new HeuristicBronKerboschCoverStrategy(), new RecursiveDependencyStrategy(),
                               new SimpleAddCandidateStrategy(), false);
     }
 
-    final int numReachableStates = getTransitionRelation().getNumberOfReachableStates();
-    final Candidate closedSolution = searcher.reduce(searchSpace, numReachableStates);
-
+    final Candidate closedSolution =
+      searcher.reduce(searchSpace, numReachable + 1);
+    searcher = null;
     if (closedSolution == null) {
-      System.out.println("\nCould not reduce supervisor");
+      logger.debug("Could not reduce supervisor.");
       return false;
     }
-
-    System.out.println("");
-    System.out.println("Completed initial search with " + closedSolution);
+    final int closedSolutionSize = closedSolution.size();
+    logger.debug("Completed initial search with {} cliques.", closedSolutionSize);
+    if (closedSolutionSize <= 2) {
+      if (closedSolutionSize < numReachable) {
+        buildReducedSupervisor(closedSolution);
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     searchSpace.clear();
     final Candidate optimiserCandidate = new Candidate(closedSolution.size());
@@ -293,40 +307,25 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     searcher =
       new Searcher(new PrecomputedCoverStrategy(closedSolution.toArray()),
                    new SimpleDependencyStrategy(), new SimpleAddCandidateStrategy(), true);
-
     final Candidate optimisedSupervisor =
       searcher.reduce(searchSpace, closedSolution.size());
-
     searcher = null;
-
-    if (optimisedSupervisor == null
-        && closedSolution.size() + 1 < numReachableStates) {
+    if (optimisedSupervisor == null && closedSolutionSize < numReachable) {
       buildReducedSupervisor(closedSolution);
       return true;
-    } else if (optimisedSupervisor != null
-               && optimisedSupervisor.size() + 1 < numReachableStates) {
+    } else if (optimisedSupervisor != null &&
+               optimisedSupervisor.size() < numReachable) {
       buildReducedSupervisor(optimisedSupervisor);
       return true;
+    } else {
+      logger.debug("Could not reduce supervisor.");
+      return false;
     }
-
-    System.out.println("\nCould not reduce supervisor");
-    return false;
   }
 
   @Override
   protected void tearDown()
   {
-    mDependencyIdBuffer.clear();
-    mCompatibleBuffer.clear();
-    mEnabledEventsBuffer.clear();
-
-    mListBuffer.clear();
-    mSetBuffer.clear();
-    mStackBuffer.clear();
-
-    mStatesCompatibleWithAll.clear();
-    mStateToNeighbourCountMap.clear();
-
     mDependencyIdBuffer = null;
     mCompatibleBuffer = null;
     mEnabledEventsBuffer = null;
@@ -367,6 +366,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     public Candidate reduce(final PriorityQueue<Candidate> searchSpace,
                             final int maximumSize) throws AnalysisException
     {
+      final Logger logger = LogManager.getLogger();
       Candidate reducedSupervisor = null;
       int reducedSupervisorSize = maximumSize;
 
@@ -384,7 +384,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           throw new OverflowException("Search limit (" + mSearchLimit + ") exceeded");
         }
 
-        System.out.println("Picked " + candidateSolution);
+        logger.debug("Picked {}", candidateSolution);
 
         //our container for the actual compatible being processed at any given time
         mCompatibleBuffer.clear();
@@ -429,7 +429,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
             //if we got here we know our solution is better than the current best
             reducedSupervisor = newSolution;
             reducedSupervisorSize = reducedSupervisor.size();
-            System.out.println(newSolution + " -- New Best");
+            logger.debug("{} -- new best", newSolution);
             if (isFullSearch) {
               continue;
             } else {
@@ -443,7 +443,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
           }
         }
       }
-      System.out.println(mNumSolutionsSearched);
+      logger.debug("Number of solutions searched: {}", mNumSolutionsSearched);
       return reducedSupervisor;
     }
   }
@@ -1054,16 +1054,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     }
 
     relation.checkReachability();
+    final Logger logger = LogManager.getLogger();
     if (relation.removeUnreachableTransitions()) {
-      System.out
-        .println("Removed "
-                 + (newSupervisor.length - relation.getNumberOfStates())
-                 + " unreachable states");
+      logger.debug("Removed {} unreachable states.",
+                   newSupervisor.length - relation.getNumberOfStates());
     }
-
-    System.out.println("Reduced to " + relation.getNumberOfReachableStates()
-                       + " states from " + mNumStates);
-
+    logger.debug("Reduced to {} states from {}.",
+                 relation.getNumberOfReachableStates(), mNumStates);
     return true;
   }
 
@@ -1552,7 +1549,6 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     @Override
     public int hashCode()
     {
-      // TODO Auto-generated method stub
       return super.hashCode() + dependencies.hashCode();
     }
 
@@ -1580,6 +1576,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       return out.toString();
     }
   }
+
 
   //#########################################################################
   //# Data Members
@@ -1610,4 +1607,5 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private TIntIntMap mStateToNeighbourCountMap;
   private TIntSet mStatesCompatibleWithAll;
+
 }

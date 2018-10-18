@@ -46,8 +46,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -250,15 +252,15 @@ public class CompositionalAutomataSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
-  public void setSupervisorReductionEnabled(final boolean enable)
+  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
   {
-    mSupervisorReductionEnabled = enable;
+    mSupervisorReductionFactory = factory;
   }
 
   @Override
-  public boolean getSupervisorReductionEnabled()
+  public SupervisorReductionFactory getSupervisorReductionFactory()
   {
-    return mSupervisorReductionEnabled;
+    return mSupervisorReductionFactory;
   }
 
   @Override
@@ -326,7 +328,7 @@ public class CompositionalAutomataSynthesizer
   {
     mDistinguisherInfoList = new LinkedList<DistinguisherInfo>();
     mBackRenaming = new HashMap<EventProxy,EventProxy>();
-    mSupervisorSimplifier = new SuWonhamSupervisorReductionTRSimplifier();
+    mSupervisorSimplifier = mSupervisorReductionFactory.createSimplifier();
     mHalfwaySimplifier = new HalfWaySynthesisTRSimplifier();
     mHalfwaySimplifier.setOutputMode
       (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
@@ -644,7 +646,7 @@ public class CompositionalAutomataSynthesizer
   private ListBufferTransitionRelation reduceSupervisor(final ListBufferTransitionRelation rel)
     throws AnalysisException
   {
-    if (mSupervisorReductionEnabled) {
+    if (mSupervisorSimplifier != null) {
       try {
         // TODO Creating dump state---could this have been done before?
         final EventProxy marking = getUsedDefaultMarking();
@@ -1201,11 +1203,12 @@ public class CompositionalAutomataSynthesizer
 
   //#########################################################################
   //# Data Members
-  private boolean mSupervisorReductionEnabled = false;
+  private SupervisorReductionFactory mSupervisorReductionFactory =
+    DefaultSupervisorReductionFactory.OFF;
   private final boolean mReduceIncrementally = false;
   private String mSupervisorNamePrefix = "sup:";
 
-  private SuWonhamSupervisorReductionTRSimplifier mSupervisorSimplifier;
+  private SupervisorReductionSimplifier mSupervisorSimplifier;
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   /**

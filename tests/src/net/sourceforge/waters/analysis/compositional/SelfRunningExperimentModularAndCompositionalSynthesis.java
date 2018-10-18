@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -61,7 +62,8 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
       final ModularAndCompositionalSynthesizer automataSynthesizer =
         new ModularAndCompositionalSynthesizer(factory);
       automataSynthesizer.setDetailedOutputEnabled(false);
-      automataSynthesizer.setSupervisorReductionEnabled(true);
+      automataSynthesizer.setSupervisorReductionFactory
+        (DefaultSupervisorReductionFactory.SU_WONHAM);
       automataSynthesizer.setInternalStateLimit(20000);
       automataSynthesizer.setInternalTransitionLimit(1000000);
       final List<Configuration> configurations = new LinkedList<>();
@@ -92,7 +94,8 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
             final String with =
-              automataSynthesizer.getSupervisorReductionEnabled() ? " with" : " without";
+              automataSynthesizer.getSupervisorReductionFactory() ==
+              DefaultSupervisorReductionFactory.OFF ? " without" : " with";
             System.out.println
               ("Method " + methodCount + " *** " + config + "/" + preName +
                "/" + selName + with + " reduction" + " ***");

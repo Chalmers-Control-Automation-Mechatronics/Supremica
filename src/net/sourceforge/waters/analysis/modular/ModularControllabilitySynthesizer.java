@@ -43,6 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -202,15 +204,15 @@ public class ModularControllabilitySynthesizer
   }
 
   @Override
-  public void setSupervisorReductionEnabled(final boolean enable)
+  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
   {
-    mMonolithicSynthesizer.setSupervisorReductionEnabled(enable);
+    mMonolithicSynthesizer.setSupervisorReductionFactory(factory);
   }
 
   @Override
-  public boolean getSupervisorReductionEnabled()
+  public SupervisorReductionFactory getSupervisorReductionFactory()
   {
-    return mMonolithicSynthesizer.getSupervisorReductionEnabled();
+    return mMonolithicSynthesizer.getSupervisorReductionFactory();
   }
 
   @Override
@@ -406,7 +408,9 @@ public class ModularControllabilitySynthesizer
           mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
         supervisors.addAll(localSups);
         mDisabledEvents.addAll(disabledEvents);
-        if (mIncludesAllAutomata && !getSupervisorReductionEnabled()) {
+        if (mIncludesAllAutomata &&
+            getSupervisorReductionFactory() ==
+            DefaultSupervisorReductionFactory.OFF) {
           final Collection<AutomatonProxy> usedAutomata =
             mMonolithicSynthesizer.getModel().getAutomata();
           for (final AutomatonProxy sup : localSups) {
@@ -443,7 +447,8 @@ public class ModularControllabilitySynthesizer
       // 5. Create product DES containing supervisors
       if (mIncludesAllAutomata) {
         final Collection<AutomatonProxy> usedAutomata = new THashSet<>();
-        if (!getSupervisorReductionEnabled()) {
+        if (getSupervisorReductionFactory() ==
+            DefaultSupervisorReductionFactory.OFF) {
           for (final AutomatonProxy sup : supervisors) {
             usedAutomata.addAll(mSupervisorUsedAutomataMap.get(sup));
           }

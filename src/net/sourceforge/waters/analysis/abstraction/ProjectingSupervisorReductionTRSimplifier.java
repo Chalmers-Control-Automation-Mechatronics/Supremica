@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TLongHashSet;
-
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -123,9 +120,6 @@ public class ProjectingSupervisorReductionTRSimplifier
   protected void setUp() throws AnalysisException
   {
     super.setUp();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    mIncompatibles = new TLongHashSet(numStates);
     mEventInfo = new LinkedList<>();
   }
 
@@ -133,26 +127,23 @@ public class ProjectingSupervisorReductionTRSimplifier
   public boolean runSimplifier() throws AnalysisException
   {
     final Logger logger = LogManager.getLogger();
-    logger.info("ENTER ProjectingSupervisorReductionTRSimplifier");
     setUpEventInfo();
-    addIncompatibles();
-
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final Iterator<EventInfo> iter = mEventInfo.iterator();
+    int numRemoved = 0;
     while (iter.hasNext()) {
       final EventInfo info = iter.next();
       final int event = info.getEvent();
       final byte status = rel.getProperEventStatus(event);
       rel.setProperEventStatus(event, status | EventStatus.STATUS_LOCAL);
       if (mVerifierBuilder.buildVerifier(rel)) {
-        logger.info("Removing event #{}", event);
+        numRemoved++;
       } else {
-        logger.info("Not removing event #{}", event);
         rel.setProperEventStatus(event, status);
         iter.remove();
       }
     }
-    logger.info("EXIT ProjectingSupervisorReductionTRSimplifier");
+    logger.debug("Proposing to remove {} events.", numRemoved);
     return false;
   }
 
@@ -160,7 +151,6 @@ public class ProjectingSupervisorReductionTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
-    mIncompatibles = null;
     mEventInfo = null;
   }
 
@@ -182,7 +172,9 @@ public class ProjectingSupervisorReductionTRSimplifier
     while (iter.advance()) {
       final int event = iter.getCurrentEvent();
       if (info[event] != null) {
-        info[event].addTransition();
+        final boolean selfloop =
+          iter.getCurrentFromState() == iter.getCurrentToState();
+        info[event].addTransition(selfloop);
       }
     }
     Collections.sort(mEventInfo);
@@ -197,61 +189,6 @@ public class ProjectingSupervisorReductionTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final byte status = rel.getProperEventStatus(event);
       return EventStatus.isControllableEvent(status);
-    }
-  }
-
-  private void addIncompatibles()
-  {
-    int event = getSupervisedEvent();
-    if (event >= 0) {
-      addIncompatibles(event);
-    } else {
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int numEvents = rel.getNumberOfProperEvents();
-      for (event = EventEncoding.NONTAU; event < numEvents; event++) {
-        final byte status = rel.getProperEventStatus(event);
-        if (EventStatus.isControllableEvent(status)) {
-          addIncompatibles(event);
-        }
-      }
-    }
-  }
-
-  private void addIncompatibles(final int event)
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final int dump = rel.getDumpStateIndex();
-    final TIntArrayList enablingStates = new TIntArrayList(numStates);
-    final TIntArrayList disablingStates = new TIntArrayList(numStates);
-    final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIterator(event);
-    while (iter.advance()) {
-      final int source = iter.getCurrentSourceState();
-      if (iter.getCurrentTargetState() == dump) {
-        disablingStates.add(source);
-      } else {
-        enablingStates.add(source);
-      }
-    }
-    if (disablingStates.size() > 0) {
-      for (int i = 0; i < enablingStates.size(); i++) {
-        final int enablingState = enablingStates.get(i);
-        for (int j = 0; j < disablingStates.size(); j++) {
-          final int disablingState = disablingStates.get(j);
-          final long pair = makeIncompatiblePair(enablingState, disablingState);
-          mIncompatibles.add(pair);
-        }
-      }
-    }
-  }
-
-  private long makeIncompatiblePair(final int code1, final int code2)
-  {
-    if (code1 < code2) {
-      return code1 | ((long) code2 << 32);
-    } else {
-      return code2 | ((long) code1 << 32);
     }
   }
 
@@ -274,23 +211,34 @@ public class ProjectingSupervisorReductionTRSimplifier
       return mEvent;
     }
 
-    private void addTransition()
+    private void addTransition(final boolean selfloop)
     {
-      mNumTransitions++;
+      if (selfloop) {
+        mNumSelfloopTransitions++;
+      } else {
+        mNumNonSelfloopTransitions++;
+      }
     }
 
     //#######################################################################
     //# Interface java.util.Comparable<EventInfo>
-   @Override
+    @Override
     public int compareTo(final EventInfo info)
     {
-      return info.mNumTransitions - mNumTransitions;
+      final int result =
+        info.mNumNonSelfloopTransitions - mNumNonSelfloopTransitions;
+      if (result != 0) {
+        return result;
+      } else {
+        return info.mNumSelfloopTransitions - mNumSelfloopTransitions;
+      }
     }
 
     //#######################################################################
     //# Data Members
     private final int mEvent;
-    private int mNumTransitions;
+    private int mNumNonSelfloopTransitions;
+    private int mNumSelfloopTransitions;
   }
 
 
@@ -302,15 +250,26 @@ public class ProjectingSupervisorReductionTRSimplifier
     //# Overrides for
     //# net.sourceforge.waters.analysis.abstraction.VerifierBuilder
     @Override
+    public boolean buildVerifier(final ListBufferTransitionRelation rel)
+      throws AnalysisException
+    {
+      mDumpIndex = rel.getDumpStateIndex();
+      return super.buildVerifier(rel);
+    }
+
+    @Override
     protected boolean newStatePair(final int code1, final int code2)
     {
-      final long pair = makeIncompatiblePair(code1, code2);
-      if (mIncompatibles.contains(pair)) {
+      if (code1 == mDumpIndex || code2 == mDumpIndex) {
         return setFailedResult();
       } else {
         return true;
       }
     }
+
+    //#########################################################################
+    //# Data Members
+    private int mDumpIndex;
   }
 
 
@@ -318,7 +277,6 @@ public class ProjectingSupervisorReductionTRSimplifier
   //# Data Members
   private final VerifierBuilder mVerifierBuilder =
     new SupervisorReductionVerifierBuilder();
-  private TLongHashSet mIncompatibles;
   private List<EventInfo> mEventInfo;
 
 }

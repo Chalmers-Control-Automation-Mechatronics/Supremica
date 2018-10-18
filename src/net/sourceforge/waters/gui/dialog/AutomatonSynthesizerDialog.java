@@ -53,9 +53,8 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
@@ -96,9 +95,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     mNamePrefix.requestFocusInWindow();
     setVisible(true);
     setMinimumSize(getSize());
-
-    mSuWonHam = new SuWonhamSupervisorReductionTRSimplifier();
-    mCliqueBased = new CliqueBasedSupervisorReductionTRSimplifier();
   }
 
 
@@ -136,9 +132,9 @@ public class AutomatonSynthesizerDialog extends JDialog
     };
     mControllable.addActionListener(ObjectiveHandler);
     mNonBlocking.addActionListener(ObjectiveHandler);
-    mSupReductionLabel = new JLabel("Supervisor Reduction: ");
-    final String[] types = {"off", "Su/Wonham", "Clique-Based"};
-    mSupReductionType = new JComboBox<>(types);
+    mSupReductionLabel = new JLabel("Supervisor reduction: ");
+    mSupReductionType = new JComboBox<>
+      (DefaultSupervisorReductionFactory.class.getEnumConstants());
     mSupReductionType.setSelectedIndex(0);
     final ActionListener ReductionHandler = new ActionListener() {
       @Override
@@ -148,7 +144,7 @@ public class AutomatonSynthesizerDialog extends JDialog
       }
     };
     mSupReductionType.addActionListener(ReductionHandler);
-    mLocalisedSupervisor = new JCheckBox("Localised Supervisors", false);
+    mLocalisedSupervisor = new JCheckBox("Supervisor localization", false);
     mLocalisedSupervisor.setEnabled(false);
 
     // Buttons panel ...
@@ -282,15 +278,9 @@ public class AutomatonSynthesizerDialog extends JDialog
     }
     mSynthesizer.setKindTranslator(translator);
     mSynthesizer.setNonblockingSupported(mNonBlocking.isSelected());
-    final AbstractSupervisorReductionTRSimplifier simplifier;
-    if (mSupReductionType.getSelectedIndex() == 0) {
-      simplifier = null;
-    } else if (mSupReductionType.getSelectedIndex() == 1) {
-      simplifier = mSuWonHam;
-    } else {
-      simplifier = mCliqueBased;
-    }
-    mSynthesizer.setSupervisorReductionSimplifier(simplifier);
+    final SupervisorReductionFactory reduction =
+      (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
+    mSynthesizer.setSupervisorReductionFactory(reduction);
     mSynthesizer.setSupervisorLocalizationEnabled
       (mLocalisedSupervisor.isSelected());
     mSynthesizer.setModel(des);
@@ -303,27 +293,16 @@ public class AutomatonSynthesizerDialog extends JDialog
 
   private void reductionChanged()
   {
-    if (mSupReductionType.getSelectedIndex() == 1) {
-      if (mSuWonHam.isSupervisedEventRequired()) {
-        mLocalisedSupervisor.setSelected(true);
-        mLocalisedSupervisor.setEnabled(false);
-      } else {
-        mLocalisedSupervisor.setSelected(false);
-        mLocalisedSupervisor.setEnabled(true);
-
-      }
-    } else if (mSupReductionType.getSelectedIndex() == 2) {
-      if (mCliqueBased.isSupervisedEventRequired()) {
-        mLocalisedSupervisor.setSelected(true);
-        mLocalisedSupervisor.setEnabled(false);
-      } else {
-        mLocalisedSupervisor.setSelected(false);
-        mLocalisedSupervisor.setEnabled(true);
-
-      }
-    } else {
+    final SupervisorReductionFactory reduction =
+      (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
+    if (reduction == DefaultSupervisorReductionFactory.OFF) {
       mLocalisedSupervisor.setSelected(false);
       mLocalisedSupervisor.setEnabled(false);
+    } else if (reduction.isSupervisedEventRequired()) {
+      mLocalisedSupervisor.setSelected(true);
+      mLocalisedSupervisor.setEnabled(false);
+    } else {
+      mLocalisedSupervisor.setEnabled(true);
     }
   }
 
@@ -423,13 +402,11 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JCheckBox mControllable;
   private JCheckBox mNonBlocking;
   private JLabel mSupReductionLabel;
-  private JComboBox<String> mSupReductionType;
+  private JComboBox<SupervisorReductionFactory> mSupReductionType;
   private JCheckBox mLocalisedSupervisor;
 
   // Analysis workers
   private MonolithicSynthesizer mSynthesizer;
-  private final SuWonhamSupervisorReductionTRSimplifier mSuWonHam;
-  private final CliqueBasedSupervisorReductionTRSimplifier mCliqueBased;
 
 
   //#########################################################################

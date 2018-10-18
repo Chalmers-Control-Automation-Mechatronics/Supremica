@@ -31,56 +31,54 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.abstraction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * @author Robi Malik
+ */
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-
-public class MonolithicSupervisorLocalizationTest extends
-  AbstractSupervisorSynthesizerTest
+public class SimpleSupervisorReductionFactory
+  implements SupervisorReductionFactory
 {
 
   //#########################################################################
-  //# To be Provided by Subclasses
-  /**
-   * Creates an instance of the synthesiser under test. This method
-   * instantiates the class of the synthesiser tested by the particular
-   * subclass of this test, and configures it as needed.
-   * @param factory
-   *          The factory used by the synthesiser to create its output.
-   * @return An instance of the synthesiser.
-   */
-  @Override
-  protected SupervisorSynthesizer createSynthesizer
-    (final ProductDESProxyFactory factory)
+  //# Constructor
+  public SimpleSupervisorReductionFactory
+    (final boolean projecting,
+     final SupervisorReductionSimplifier simplifier)
   {
-    final MonolithicSynthesizer synthesizer =
-      new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.PROJECTION_SU_WONHAM);
-    synthesizer.setSupervisorLocalizationEnabled(true);
-    return synthesizer;
+    this(false, projecting, simplifier);
+  }
+
+  public SimpleSupervisorReductionFactory
+    (final boolean localizedOnly,
+     final boolean projecting,
+     final SupervisorReductionSimplifier simplifier)
+  {
+    mProjecting = projecting;
+    mLocalizedOnly = localizedOnly;
+    mSimplifier = simplifier;
+  }
+
+  //#########################################################################
+  //# Factory Methods
+  @Override
+  public SupervisorReductionSimplifier createSimplifier()
+  {
+    return new SupervisorReductionChain(mProjecting, mSimplifier);
+  }
+
+  @Override
+  public boolean isSupervisedEventRequired()
+  {
+    return mLocalizedOnly;
   }
 
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
-  {
-    final TestSuite testSuite =
-      new TestSuite(MonolithicSupervisorLocalizationTest.class);
-    return testSuite;
-  }
-
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
-  }
+  //# Data Members
+  private final boolean mProjecting;
+  private final boolean mLocalizedOnly;
+  private final SupervisorReductionSimplifier mSimplifier;
 
 }

@@ -130,6 +130,68 @@ public class ChainTRSimplifier
     }
   }
 
+  /**
+   * Sets the state limit. The states limit specifies the maximum
+   * number of states that will be created.
+   * @param limit
+   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of states.
+   */
+  @Override
+  public void setStateLimit(final int limit)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.setStateLimit(limit);
+    }
+  }
+
+  /**
+   * Gets the state limit.
+   * @see #setStateLimit(int) setStateLimit()
+   */
+  @Override
+  public int getStateLimit()
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      final int limit = step.getStateLimit();
+      if (limit != Integer.MAX_VALUE) {
+        return limit;
+      }
+    }
+    return Integer.MAX_VALUE;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions that will be created.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  @Override
+  public void setTransitionLimit(final int limit)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.setTransitionLimit(limit);
+    }
+  }
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  @Override
+  public int getTransitionLimit()
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      final int limit = step.getTransitionLimit();
+      if (limit != Integer.MAX_VALUE) {
+        return limit;
+      }
+    }
+    return Integer.MAX_VALUE;
+  }
+
   @Override
   public boolean isPartitioning()
   {

@@ -36,6 +36,10 @@ package net.sourceforge.waters.analysis.monolithic;
 import java.util.Collection;
 import java.util.Set;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
@@ -43,9 +47,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 public class MonolithicSynthesizerNormalityTest
@@ -60,7 +61,8 @@ public class MonolithicSynthesizerNormalityTest
   {
     final MonolithicSynthesizerNormality synthesizer =
       new MonolithicSynthesizerNormality(factory);
-    synthesizer.setSupervisorReductionEnabled(false);
+    synthesizer.setSupervisorReductionFactory
+      (DefaultSupervisorReductionFactory.OFF);
     synthesizer.setSupervisorLocalizationEnabled(false);
     return synthesizer;
   }

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 
@@ -96,25 +98,27 @@ public interface SupervisorSynthesizer
    * may synthesise, although it may depend on the algorithm how to interpret
    * the result.</P>
    * <P>The method {@link #supportsNondeterminism()} should return whether
-   * nondeterminism is enabled is disabled by this method.</P>
+   * nondeterminism is enabled by this method.</P>
    */
   public void setNondeterminismEnabled(boolean enable);
 
   /**
-   * <P>Sets whether synthesis should use supervisor reduction.</P>
-   * <P>If enabled, every synthesised supervisor component may be replaced by
-   * a single smaller automaton.</P>
-   * <P><STRONG>Reference:</STRONG> Rong Su and W. Murray Wonham. Supervisor
-   * Reduction for Discrete-Event Systems. Discrete Event Dynamic Systems
-   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   * Sets the method of supervisor reduction to be used after synthesis.
+   * @param  factory  A factory object that can produce a supervisor reduction
+   *                  chain. This can be one of the values of the enumeration
+   *                  {@link DefaultSupervisorReductionFactory}, which includes
+   *                  the option {@link DefaultSupervisorReductionFactory#OFF}
+   *                  to disable supervisor reduction.
    */
-  public void setSupervisorReductionEnabled(final boolean enable);
+  public void setSupervisorReductionFactory
+    (final SupervisorReductionFactory factory);
 
   /**
-   * Returns whether the synthesiser uses supervisor reduction.
-   * @see #setSupervisorReductionEnabled(boolean) setSupervisorReductionEnabled()
+   * Gets the configured method of supervisor reduction.
+   * @see #setSupervisorReductionFactory(SupervisorReductionFactory)
+   *      setSupervisorReductionFactory()
    */
-  public boolean getSupervisorReductionEnabled();
+  public SupervisorReductionFactory getSupervisorReductionFactory();
 
   /**
    * <P>Sets whether synthesis should use supervisor localisation.</P>

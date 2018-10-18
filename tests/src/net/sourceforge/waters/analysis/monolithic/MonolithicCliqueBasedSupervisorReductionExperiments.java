@@ -38,14 +38,16 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
- * @author Pwnbot
+ * @author Jordan Schroder
  */
-public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
+public class MonolithicCliqueBasedSupervisorReductionExperiments
   extends AbstractSupervisorSynthesizerTest
 {
 
@@ -69,18 +71,20 @@ public class MonolithicCliqueBasedSupervisorReductionExperimentsTest
 
     simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.CONNECTIVITY);
     simplifier.setMaxHeuristicCovers(2);
-
-    synthesizer.setSupervisorReductionSimplifier(simplifier);
+    final SupervisorReductionFactory reduction =
+      new SimpleSupervisorReductionFactory(true, true, simplifier);
+    synthesizer.setSupervisorReductionFactory(reduction);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
+
 
 //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicCliqueBasedSupervisorReductionExperimentsTest.class);
+      new TestSuite(MonolithicCliqueBasedSupervisorReductionExperiments.class);
     return testSuite;
   }
 

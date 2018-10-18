@@ -40,6 +40,8 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.Watchdog;
@@ -246,9 +248,13 @@ public class CompositionalSynthesizerExperiments extends AbstractAnalysisTest
         } else {
           final CompositionalAutomataSynthesizer automataSynthesizer =
             new CompositionalAutomataSynthesizer(factory);
-          final boolean supervisorReductionEnabled =
-            args.length == 5 && Integer.parseInt(args[4]) != 0;
-          automataSynthesizer.setSupervisorReductionEnabled(supervisorReductionEnabled);
+          final SupervisorReductionFactory supervisorReduction;
+          if (args.length == 5 && Integer.parseInt(args[4]) != 0) {
+            supervisorReduction = DefaultSupervisorReductionFactory.SU_WONHAM;
+          } else {
+            supervisorReduction = DefaultSupervisorReductionFactory.OFF;
+          }
+          automataSynthesizer.setSupervisorReductionFactory(supervisorReduction);
           synthesizer = automataSynthesizer;
           method = StateRepresentationSynthesisAbstractionProcedureFactory.WSOE_UNSUP;
         }

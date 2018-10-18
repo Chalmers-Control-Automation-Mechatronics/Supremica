@@ -31,56 +31,71 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.abstraction;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+/**
+ * @author Robi Malik
+ */
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-
-public class MonolithicSupervisorLocalizationTest extends
-  AbstractSupervisorSynthesizerTest
+public interface SupervisorReductionFactory
 {
 
   //#########################################################################
-  //# To be Provided by Subclasses
-  /**
-   * Creates an instance of the synthesiser under test. This method
-   * instantiates the class of the synthesiser tested by the particular
-   * subclass of this test, and configures it as needed.
-   * @param factory
-   *          The factory used by the synthesiser to create its output.
-   * @return An instance of the synthesiser.
-   */
-  @Override
-  protected SupervisorSynthesizer createSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    final MonolithicSynthesizer synthesizer =
-      new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.PROJECTION_SU_WONHAM);
-    synthesizer.setSupervisorLocalizationEnabled(true);
-    return synthesizer;
-  }
+  //# Factory Methods
+  public abstract SupervisorReductionSimplifier createSimplifier();
+
+  public boolean isSupervisedEventRequired();
 
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Inner Class SupervisorReductionChain
+  public static class SupervisorReductionChain
+    extends ChainTRSimplifier
+    implements SupervisorReductionSimplifier
   {
-    final TestSuite testSuite =
-      new TestSuite(MonolithicSupervisorLocalizationTest.class);
-    return testSuite;
-  }
+    //#######################################################################
+    //# Constructor
+    protected SupervisorReductionChain(final boolean projecting,
+                                       final SupervisorReductionSimplifier main)
+    {
+      mMainSimplifier = main;
+      if (projecting) {
+        add(new ProjectingSupervisorReductionTRSimplifier());
+        add(new SpecialEventsTRSimplifier());
+        final SubsetConstructionTRSimplifier subset =
+          new SubsetConstructionTRSimplifier();
+        subset.setDumpStateAware(true);
+        add(subset);
+        add(new SelfloopSupervisorReductionTRSimplifier());
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setEquivalence
+          (ObservationEquivalenceTRSimplifier.Equivalence.
+           DETERMINISTIC_MINSTATE);
+        add(bisimulator);
+      }
+      add(main);
+      add(new SelfloopSupervisorReductionTRSimplifier());
+    }
 
-  public static void main(final String[] args)
-  {
-    junit.textui.TestRunner.run(suite());
+    //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
+    @Override
+    public void setSupervisedEvent(final int event)
+    {
+      mMainSimplifier.setSupervisedEvent(event);
+    }
+
+    @Override
+    public int getSupervisedEvent()
+    {
+      return mMainSimplifier.getSupervisedEvent();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final SupervisorReductionSimplifier mMainSimplifier;
   }
 
 }

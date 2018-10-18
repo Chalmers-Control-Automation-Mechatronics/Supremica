@@ -128,6 +128,45 @@ public abstract class AbstractTRSimplifier
   {
   }
 
+  /**
+   * Sets the state limit. The states limit specifies the maximum
+   * number of states that will be created. The default for is not to
+   * support state limits, but this behaviour may be overridden by subclasses.
+   * @param limit
+   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of states.
+   */
+  @Override
+  public void setStateLimit(final int limit)
+  {
+  }
+
+  @Override
+  public int getStateLimit()
+  {
+    return Integer.MAX_VALUE;
+  }
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions that will be created. The default is not to
+   * support transition limits, but
+   * this behaviour may be overridden by subclasses.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  @Override
+  public void setTransitionLimit(final int limit)
+  {
+  }
+
+  @Override
+  public int getTransitionLimit()
+  {
+    return Integer.MAX_VALUE;
+  }
+
   @Override
   public void setAppliesPartitionAutomatically(final boolean apply)
   {

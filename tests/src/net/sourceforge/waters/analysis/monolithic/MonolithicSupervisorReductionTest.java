@@ -36,6 +36,7 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -61,7 +62,8 @@ public class MonolithicSupervisorReductionTest extends
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionEnabled(true);
+    synthesizer.setSupervisorReductionFactory
+      (DefaultSupervisorReductionFactory.SU_WONHAM);
     synthesizer.setSupervisorLocalizationEnabled(false);
     return synthesizer;
   }

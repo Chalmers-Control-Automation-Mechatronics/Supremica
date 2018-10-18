@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethod;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer.PreselectingMethodFactory;
 import net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer;
@@ -214,16 +215,16 @@ public class ModularAndCompositionalSynthesizer
   }
 
   @Override
-  public void setSupervisorReductionEnabled(final boolean enable)
+  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
   {
-    mModularSynthesizer.setSupervisorReductionEnabled(enable);
-    mCompositionalSynthesizer.setSupervisorReductionEnabled(enable);
+    mModularSynthesizer.setSupervisorReductionFactory(factory);
+    mCompositionalSynthesizer.setSupervisorReductionFactory(factory);
   }
 
   @Override
-  public boolean getSupervisorReductionEnabled()
+  public SupervisorReductionFactory getSupervisorReductionFactory()
   {
-    return mModularSynthesizer.getSupervisorReductionEnabled();
+    return mModularSynthesizer.getSupervisorReductionFactory();
   }
 
   @Override

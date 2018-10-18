@@ -109,6 +109,36 @@ public interface TransitionRelationSimplifier
   public void setPropositions(final int preconditionID, final int defaultID);
 
   /**
+   * Sets the state limit. The states limit specifies the maximum
+   * number of states that will be created.
+   * @param limit
+   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of states.
+   */
+  public void setStateLimit(final int limit);
+
+  /**
+   * Gets the state limit.
+   * @see #setStateLimit(int) setStateLimit()
+   */
+  public int getStateLimit();
+
+  /**
+   * Sets the transition limit. The transition limit specifies the maximum
+   * number of transitions that will be created.
+   * @param limit
+   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
+   *          an unlimited number of transitions.
+   */
+  public void setTransitionLimit(final int limit);
+
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
+  public int getTransitionLimit();
+
+  /**
    * Sets whether this simplifier applies the computed partition automatically.
    * If set to <CODE>true</CODE> (the default), then any partition computed
    * by a call to {@link #run()} will immediately be applied to the
