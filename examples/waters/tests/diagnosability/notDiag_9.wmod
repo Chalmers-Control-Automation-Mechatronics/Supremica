@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
 <Module Name="notDiag_9" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>Test for diagnosability check.
 
 Not diagnosable. 
 
 Taken from:
-Marcos V. Moreira, Thiago C. Jesus, and Jo√£o C. Basilio.
+Marcos V. Moreira, Thiago C. Jesus, and Jo„o C. Basilio.
 Polynomial Time Verification of Decentralized Diagnosability of Discrete Event Systems.
 </ns2:Comment>
     <EventDeclList>
@@ -132,7 +132,7 @@ Polynomial Time Verification of Decentralized Diagnosability of Discrete Event S
                     </Edge>
                     <Edge Source="S6" Target="S6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="uo"/>
+                            <SimpleIdentifier Name="c"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="0" Y="-17"/>
                             </LabelGeometry>

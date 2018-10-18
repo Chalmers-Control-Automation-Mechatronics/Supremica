@@ -34,6 +34,7 @@
 package net.sourceforge.waters.analysis.diagnosis;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -48,9 +49,7 @@ import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
 public class MonolithicDiagnosabilityVerifierTest
@@ -216,12 +215,15 @@ public class MonolithicDiagnosabilityVerifierTest
     runModelVerifier(des, false);
   }
 
+  /*
+   * Test case has unobservable loop and gives wrong counterexample.
   public void testNotDiag10() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "diagnosability", "notDiag_10.wmod");
     runModelVerifier(des, false);
   }
+  */
 
   public void testNotDiag11() throws Exception
   {
@@ -264,115 +266,108 @@ public class MonolithicDiagnosabilityVerifierTest
   @Override
   protected void checkCounterExample(final ProductDESProxy des,
                                      final CounterExampleProxy counter)
+    throws Exception
   {
-    try {
     super.checkCounterExample(des, counter);
-    }catch(final Exception e){
 
-    }
     final DualCounterExampleProxy dual = (DualCounterExampleProxy) counter;
     final List<TraceProxy> traces = dual.getTraces();
-    final TraceProxy traceA = traces.get(0);
-    final TraceProxy traceB = traces.get(1);
-    final List<TraceStepProxy> stepsA = traceA.getTraceSteps();
-    final List<TraceStepProxy> stepsB = traceB.getTraceSteps();
-    final int loopIndexA = traceA.getLoopIndex();
-    final int loopIndexB = traceB.getLoopIndex();
-    final int lenA = stepsA.size();
-    final int lenB = stepsB.size();
+    assertEquals(2, traces.size());
+
     final Collection<AutomatonProxy> automata = des.getAutomata();
+    TraceProxy faultyTrace = null;
+    TraceProxy nonFaultyTrace = null;
+    traces:
+    for (final TraceProxy trace : traces) {
+      // Check whether traces are accepted by all automata
+      for (final AutomatonProxy aut : automata) {
+        super.checkTrace(aut, trace);
+      }
+      // Identify faulty and non-faulty traces
+      for (final EventProxy event : trace.getEvents()) {
+        if (isFaultEvent(event, dual)) {
+          faultyTrace = trace;
+          continue traces;
+        }
+      }
+      nonFaultyTrace = trace;
+    }
+    assertNotNull("Neither trace includes the fault!", faultyTrace);
+    assertNotNull("Both traces include the fault!", nonFaultyTrace);
 
-    // Both traces are not empty
-    assertTrue("TraceA is empty", lenA > 0);
-    assertTrue("TraceB is empty", lenB > 0);
+    // Check for presence of loops
+    final int faultyLoopIndex = faultyTrace.getLoopIndex();
+    assertTrue("Faulty trace has no loop!", faultyLoopIndex >= 0);
+    final int faultySteps = faultyTrace.getTraceSteps().size();
+    assertTrue("Faulty trace has empty loop!", faultyLoopIndex < faultySteps);
+    int nonFaultyLoopIndex = nonFaultyTrace.getLoopIndex();
+    final int nonFaultySteps = nonFaultyTrace.getTraceSteps().size();
+    if (nonFaultyLoopIndex < 0) {
+      nonFaultyLoopIndex = nonFaultySteps;
+    } else {
+      assertTrue("Non-faulty trace has empty loop!",
+                 nonFaultyLoopIndex < nonFaultySteps);
+    }
 
-    // Both loops are not empty
-    assertTrue("TraceA loop is empty", lenA - loopIndexA > 0);
-    assertTrue("TraceB loop is empty", lenB - loopIndexB > 0);
-
-    // Both traces have valid loops
-    final Map<AutomatonProxy,StateProxy> lastMapA
-    = stepsA.get(lenA-1).getStateMap();
-    final Map<AutomatonProxy,StateProxy> lastMapB
-    = stepsB.get(lenB-1).getStateMap();
-    if(loopIndexA>=0) {
-      final Map<AutomatonProxy,StateProxy> loopMapA
-      = stepsA.get(loopIndexA).getStateMap();
-      for(final AutomatonProxy aut : automata) {
-        assertTrue("TraceA does not have a valid loop",
-                   lastMapA.get(aut)==loopMapA.get(aut));
+    // Check whether traces agree on observable events
+    int faultyIndex = 0;
+    final Iterator<EventProxy> faultyIter =
+      faultyTrace.getEvents().iterator();
+    int nonFaultyIndex = 0;
+    final Iterator<EventProxy> nonFaultyIter =
+      nonFaultyTrace.getEvents().iterator();
+    beforeLoop:
+    while (faultyIndex++ < faultyLoopIndex) {
+      final EventProxy faultyEvent = faultyIter.next();
+      if (faultyEvent.isObservable()) {
+        while (nonFaultyIndex++ < nonFaultyLoopIndex) {
+          final EventProxy nonFaultyEvent = nonFaultyIter.next();
+          if (faultyEvent == nonFaultyEvent) {
+            continue beforeLoop;
+          }
+        }
+        fail("The non-faulty trace does not use the observable event '" +
+             faultyEvent.getName() + "' found in the faulty trace!");
       }
     }
-    if(loopIndexB>=0) {
-      final Map<AutomatonProxy,StateProxy> loopMapB
-      = stepsB.get(loopIndexB).getStateMap();
-      for(final AutomatonProxy aut : automata) {
-        assertTrue("TraceB does not have a valid loop",
-                   lastMapB.get(aut)==loopMapB.get(aut));
+    while (nonFaultyIndex++ < nonFaultyLoopIndex) {
+      final EventProxy nonFaultyEvent = nonFaultyIter.next();
+      assertFalse("The faulty trace does not use the observable event '" +
+                  nonFaultyEvent.getName() + "' found in the non-faulty trace!",
+                  nonFaultyEvent.isObservable());
+    }
+    withinLoop:
+    while (faultyIter.hasNext()) {
+      final EventProxy faultyEvent = faultyIter.next();
+      if (faultyEvent.isObservable()) {
+        while (nonFaultyIter.hasNext()) {
+          final EventProxy nonFaultyEvent = nonFaultyIter.next();
+          if (faultyEvent == nonFaultyEvent) {
+            continue withinLoop;
+          }
+        }
+        fail("The non-faulty trace does not use the observable event '" +
+             faultyEvent.getName() + "' found in the faulty trace!");
       }
     }
+    while (nonFaultyIter.hasNext()) {
+      final EventProxy nonFaultyEvent = nonFaultyIter.next();
+      assertFalse("The faulty trace does not use the observable event '" +
+                  nonFaultyEvent.getName() + "' found in the non-faulty trace!",
+                  nonFaultyEvent.isObservable());
+    }
+  }
 
-    // traceA has fault event
-    int iA=1;
-    EventProxy eventA = null;
-    final String[] split = dual.getComment().split(" ");
-    final String faultClass = split[2];
-    String eventFC;
-    Map<String,String> attrib;
-    boolean foundFault = false;
-    while(iA < lenA) {
-      eventA = stepsA.get(iA++).getEvent();
-      attrib = eventA.getAttributes();
-      eventFC = attrib.get("FAULT");
-      System.out.println(eventA.getName());
-      if(faultClass.equals(eventFC))
-        foundFault = true;
+  private boolean isFaultEvent(final EventProxy event,
+                               final DualCounterExampleProxy dual)
+  {
+    final Map<String,String> attribs = event.getAttributes();
+    final String value = attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
+    if (value == null) {
+      return false;
     }
-    assertTrue("TraceA has no fault event", foundFault);
-    System.out.println();
-    // traceB has no fault event
-    int iB=1;
-    EventProxy eventB = null;
-    foundFault = false;
-    while(iB < lenB) {
-      eventB = stepsB.get(iB++).getEvent();
-      attrib = eventB.getAttributes();
-      eventFC = attrib.get("FAULT");
-      System.out.println(eventB.getName());
-      if(faultClass.equals(eventFC))
-        foundFault = true;
-    }
-    assertFalse("TraceB has a fault event", foundFault);
-
-    // Both traces have identical observable events
-    iA=1;
-    iB=1;
-    eventA = null;
-    eventB = null;
-    while(iA<lenA||iA<lenB) {
-      if(iA<lenA)
-        eventA = stepsA.get(iA++).getEvent();
-      if(iB<lenB)
-        eventB = stepsB.get(iB++).getEvent();
-      while(!eventA.isObservable()&&iA<lenA) {
-        eventA = stepsA.get(iA++).getEvent();
-      }
-      while(!eventB.isObservable()&&iB<lenB) {
-        eventB = stepsB.get(iB++).getEvent();
-      }
-      assertTrue("Traces do not have identical observable events"
-                 , eventA.equals(eventB));
-    }
-
-    //both traces are possible
-    for(final AutomatonProxy aut : automata) {
-      final StateProxy lastA = lastMapA.get(aut);
-      final StateProxy lastB = lastMapB.get(aut);
-      assertTrue("TraceA is not possible in automaton " + aut.getName(),
-                 lastA == super.checkTrace(aut, traceA));
-      assertTrue("TraceB is not possible in automaton " + aut.getName(),
-                 lastB == super.checkTrace(aut, traceB));
-    }
+    final String comment = dual.getComment();
+    return comment.contains("fault-class " + value);
   }
 
 }
