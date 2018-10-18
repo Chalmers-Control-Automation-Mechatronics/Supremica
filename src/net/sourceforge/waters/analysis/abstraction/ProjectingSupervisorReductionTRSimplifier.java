@@ -49,7 +49,18 @@ import org.apache.logging.log4j.Logger;
 
 
 /**
- * <P>A transition relation simplifier that ...</P>
+ * <P>A transition relation simplifier that identifies events to be removed
+ * for the purpose of supervisor reduction.</P>
+ *
+ * <P>This transition relation simplifier checks for each event, using a
+ * verifier-type algorithm, whether removing the event results in an
+ * equivalent supervisor with respect to the supervised events. Any events
+ * that are found safe for removal are marked as local ({@link
+ * EventStatus#STATUS_LOCAL}), so that they can be removed by subsequent
+ * hiding ({@link SpecialEventsTRSimplifier}) and subset construction
+ * ({@link SubsetConstructionTRSimplifier}).</P>
+ *
+ * @see VerifierBuilder
  *
  * @author Robi Malik
  */
@@ -163,7 +174,7 @@ public class ProjectingSupervisorReductionTRSimplifier
     final int numEvents = rel.getNumberOfProperEvents();
     final EventInfo[] info = new EventInfo[numEvents];
     for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if (!isControllable(event)) {
+      if (!isSupervisedEvent(event)) {
         info[event] = new EventInfo(event);
         mEventInfo.add(info[event]);
       }
@@ -180,7 +191,7 @@ public class ProjectingSupervisorReductionTRSimplifier
     Collections.sort(mEventInfo);
   }
 
-  private boolean isControllable(final int event)
+  private boolean isSupervisedEvent(final int event)
   {
     final int supervised = getSupervisedEvent();
     if (supervised >= 0) {

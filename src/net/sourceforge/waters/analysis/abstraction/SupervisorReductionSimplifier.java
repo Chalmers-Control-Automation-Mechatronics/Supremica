@@ -49,14 +49,14 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * enables the event because it is not possible in the plant.</P>
  *
  * <P>To distinguish these three possibilities, the supervisor reduction
- * simplifier checks for each controllable event the states that
- * have an outgoing transition with that event. If the transition's target
- * state is the dump state, then the event must be disabled in the transition's
- * source state; if the transition's target state is not the dump state,
- * then the event must be enabled in the transition's source state. States
- * without any transitions for a controllable event are assumed to be
- * &quot;don't care&quot; and may be merged into enabling or disabling states
- * during supervisor reduction.</P>
+ * simplifier checks for each controllable event the states that have an
+ * outgoing transition with that event. If the transition's target state is
+ * the dump state, then the supervisor must disable the event in the
+ * transition's source state; if the transition's target state is not the dump
+ * state, then the supervisor must enable the event in the transition's source
+ * state. States without any transitions for a controllable event are assumed
+ * to be &quot;don't care&quot; and may be merged into enabling or disabling
+ * states during supervisor reduction.</P>
  *
  * <P>Supervisor reduction may be performed for all controllable events
  * simultaneously, or for one controllable event only. The latter case
@@ -71,6 +71,7 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
  * supervisor automaton is obtained by deleting the dump state and
  * associated transitions.</P>
  *
+ * @see SupervisorReductionFactory
  * @see ListBufferTransitionRelation#getDumpStateIndex()
  *
  * @author Robi Malik

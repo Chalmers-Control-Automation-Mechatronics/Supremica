@@ -33,7 +33,15 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+
+
 /**
+ * An interface to define a supervisor reduction method that can be used
+ * by synthesisers ({@link SupervisorSynthesizer}). A supervisor reduction
+ * factory is called by the synthesiser to produce a
+ * {@link TransitionRelationSimplifier} that performs supervisor reduction.
+ *
  * @author Robi Malik
  */
 
@@ -42,8 +50,23 @@ public interface SupervisorReductionFactory
 
   //#########################################################################
   //# Factory Methods
+  /**
+   * Creates a transition relation simplifier that can perform supervisor
+   * reduction.
+   * @return  The fully configured transition relation simplifier,
+   *          or <CODE>null</CODE> to disable supervisor reduction.
+   */
   public abstract SupervisorReductionSimplifier createSimplifier();
 
+  /**
+   * Whether the supervisor reduction algorithm provided by this algorithm
+   * requires a supervised event. If a supervised event is required,
+   * supervisor reduction must be performed for one controllable event
+   * at a time, i.e., supervisor localisation. Then the {@link
+   * SupervisorReductionSimplifier#setSupervisedEvent(int)} must be called
+   * to specify a controllable event before running the simplifier.
+   * @return <CODE>true</CODE> if a supervised event is required.
+   */
   public boolean isSupervisedEventRequired();
 
 

@@ -34,6 +34,9 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 /**
+ * A supervisor reduction factory that provides a collection of simple
+ * pre-configured methods for supervisor reduction.
+ *
  * @author Robi Malik
  */
 
@@ -43,6 +46,11 @@ public enum DefaultSupervisorReductionFactory
 
   //#########################################################################
   //# Enumeration
+  /**
+   * An option to disable supervisor reduction.
+   * With this option, synthesised supervisors are returned unchanged
+   * without any attempts of minimisation.
+   */
   OFF("Off") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
@@ -50,6 +58,20 @@ public enum DefaultSupervisorReductionFactory
       return null;
     }
   },
+  /**
+   * <P>An option to specify the Su/Wonham supervisor reduction algorithm.
+   * This option applies the Su/Wonham algorithm and afterwards removes
+   * events that appear only on selfloops and are not under supervision.</P>
+   *
+   * <P><I>Reference.</I><BR>
+   * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+   * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see SuWonhamSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
   SU_WONHAM("Su/Wonham") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
@@ -60,6 +82,23 @@ public enum DefaultSupervisorReductionFactory
       return new SupervisorReductionChain(false, main);
     }
   },
+  /**
+   * <P>An option to specify a combination of event removal and the Su/Wonham
+   * supervisor reduction algorithm. This options simplifies supervisors by
+   * first removing events that are not needed to make control decisions,
+   * then invoking the Su/Wonham algorithm, and afterwards removing events
+   * that appear only on selfloops and are not under supervision.</P>
+   *
+   * <P><I>Reference.</I><BR>
+   * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+   * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see ProjectingSupervisorReductionTRSimplifier
+   * @see SuWonhamSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
   PROJECTION_SU_WONHAM("Projection + Su/Wonham") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
@@ -70,6 +109,17 @@ public enum DefaultSupervisorReductionFactory
       return new SupervisorReductionChain(true, main);
     }
   },
+  /**
+   * <P>An option to specify clique-based supervisor reduction.
+   * This options simplifies supervisors by invoking the clique-based
+   * algorithm that attempts to find a supervisor that uses the smallest
+   * possible number of cliques of compatible states, and afterwards removing
+   * events that appear only on selfloops and are not under supervision.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see CliqueBasedSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
   CLIQUE_BASED("Clique-based") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
@@ -85,6 +135,20 @@ public enum DefaultSupervisorReductionFactory
       return true;
     }
   },
+  /**
+   * <P>An option to specify a combination of event removal and clique-based
+   * supervisor reduction. This options simplifies supervisors by removing
+   * events that are not needed to make control decisions, then invoking the
+   * clique-based algorithm that attempts to find a supervisor that uses the
+   * smallest possible number of cliques of compatible states, and afterwards
+   * removing events that appear only on selfloops and are not under
+   * supervision.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see ProjectingSupervisorReductionTRSimplifier
+   * @see CliqueBasedSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
   PROJECTION_CLIQUE_BASED("Projection + Clique-based") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()

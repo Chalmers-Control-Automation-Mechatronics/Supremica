@@ -34,6 +34,29 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 /**
+ * <P>A supervisor reduction factory that provides a fixed manually configured
+ * transition relation simplifier to perform supervisor reduction.</P>
+ *
+ * <P>A supervisor reduction method is defined by a core algorithm
+ * such as {@link SuWonhamSupervisorReductionTRSimplifier} or {@link
+ * CliqueBasedSupervisorReductionTRSimplifier} that defines how supervisor
+ * reduction is performed. Based on this, the simple supervisor reduction
+ * factory returns a simplifier chain {@link ChainTRSimplifier} that includes
+ * the core algorithm between some pre- and post-processing steps.</P>
+ *
+ * <P>The chain consists of:</P>
+ * <OL>
+ * <LI>Optionally a {@link ProjectingSupervisorReductionTRSimplifier}
+ *     to identify events that are not needed to make control decisions,
+ *     followed by a {@link SpecialEventsTRSimplifier} to hide such events,
+ *     a {@link SubsetConstructionTRSimplifier} to compute the natural
+ *     projection, and a {@link ObservationEquivalenceTRSimplifier} to compute
+ *     the minimal language-equivalent state machine.</LI>
+ * <LI>The core algorithm</LI>
+ * <LI>A {@link SelfloopSupervisorReductionTRSimplifier} to remove events that
+ *     appear only on selfloops and are not under supervision.</LI>
+ * </OL>
+ *
  * @author Robi Malik
  */
 
@@ -43,6 +66,16 @@ public class SimpleSupervisorReductionFactory
 
   //#########################################################################
   //# Constructor
+  /**
+   * Creates a supervisor reduction factory for localised and non-localised
+   * supervisor reduction.
+   * @param  projecting  Whether the supervisor reduction chain should include
+   *                     a {@link ProjectingSupervisorReductionTRSimplifier}
+   *                     to remove events that are not needed to make control
+   *                     decisions.
+   * @param  simplifier  The transition relation simplifier that implements
+   *                     the core supervisor reduction algorithm.
+   */
   public SimpleSupervisorReductionFactory
     (final boolean projecting,
      final SupervisorReductionSimplifier simplifier)
@@ -50,6 +83,24 @@ public class SimpleSupervisorReductionFactory
     this(false, projecting, simplifier);
   }
 
+  /**
+   * Creates a supervisor reduction factory that may or may not support
+   * for non-localised supervisor reduction.
+   * @param  localizedOnly Whether the core supervisor reduction simplifier
+   *                       requires a localised event. If <CODE>true</CODE>,
+   *                       the supervisor reduction factory indicates through
+   *                       the {@link #isSupervisedEventRequired()} method
+   *                       that this is required, and the simplifier may fail
+   *                       if started without first calling the {@link
+   *                       SupervisorReductionSimplifier#setSupervisedEvent(int)}
+   *                       method.
+   * @param  projecting    Whether the supervisor reduction chain should include
+   *                       a {@link ProjectingSupervisorReductionTRSimplifier}
+   *                       to remove events that are not needed to make control
+   *                       decisions.
+   * @param  simplifier    The transition relation simplifier that implements
+   *                       the core supervisor reduction algorithm.
+   */
   public SimpleSupervisorReductionFactory
     (final boolean localizedOnly,
      final boolean projecting,
@@ -59,6 +110,7 @@ public class SimpleSupervisorReductionFactory
     mLocalizedOnly = localizedOnly;
     mSimplifier = simplifier;
   }
+
 
   //#########################################################################
   //# Factory Methods
