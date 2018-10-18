@@ -39,6 +39,7 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.procedure.TIntProcedure;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.stack.TIntStack;
@@ -47,7 +48,6 @@ import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.Random;
 
@@ -1298,13 +1298,11 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
 
   /**
-   * Contains a set of ints that each represent a Compatible (a set of
-   * states). Each value is an index into the IntBufferSet, mCompatibleCache
-   * and can used to retrieve the corresponding compatible.
-   *
+   * Contains a set of integers that each represent a compatible (a set of
+   * states). Each value is an index into the the {@link #mCompatibleCache}
+   * and can used to retrieve the corresponding compatible.   *
    * Ensures that none of the underlying compatibles are strict subsets of any
-   * of the other compatibles in this set.
-   *
+   * of the other compatibles in this set.   *
    * Maintains the order of insertions so that the search space can be
    * explored systematically.
    *
@@ -1313,34 +1311,34 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private class Dependencies
   {
 
-    private final PriorityQueue<Integer> dependenciesQueue;
-    private final TIntSet dependenciesSet;
+    private final WatersIntHeap mDependenciesQueue;
+    private final TIntSet mDependenciesSet;
 
     public Dependencies()
     {
-      dependenciesQueue = new PriorityQueue<>(new Comparator<Integer>() {
-
+      mDependenciesQueue = new WatersIntHeap() {
         @Override
-        public int compare(final Integer o1, final Integer o2)
+        public int compare(final int o1, final int o2)
         {
-          return Integer.compare(mCompatibleCache.size(o1),
-                                 mCompatibleCache.size(o2));
+          return mCompatibleCache.size(o1) - mCompatibleCache.size(o2);
         }
-      });
-      dependenciesSet = new TIntHashSet();
+      };
+      mDependenciesSet = new TIntHashSet();
     }
 
     public Dependencies(final Dependencies compatibleIdSet)
     {
       this();
-      for (final int compatibleId : compatibleIdSet.getQueue()) {
+      final TIntIterator iter = compatibleIdSet.getQueue().unorderedIterator();
+      while (iter.hasNext()) {
+        final int compatibleId = iter.next();
         add(compatibleId);
       }
     }
 
-    public PriorityQueue<Integer> getQueue()
+    public WatersIntHeap getQueue()
     {
-      return dependenciesQueue;
+      return mDependenciesQueue;
     }
 
     /**
@@ -1351,14 +1349,14 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      */
     public int pop()
     {
-      final int poppedId = dependenciesQueue.poll();
-      dependenciesSet.remove(poppedId);
+      final int poppedId = mDependenciesQueue.removeFirst();
+      mDependenciesSet.remove(poppedId);
       return poppedId;
     }
 
     public int size()
     {
-      return dependenciesQueue.size();
+      return mDependenciesQueue.size();
     }
 
     /**
@@ -1377,8 +1375,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     public boolean add(final int applicantId)
     {
       if (size() == 0) {
-        dependenciesQueue.add(applicantId);
-        dependenciesSet.add(applicantId);
+        mDependenciesQueue.add(applicantId);
+        mDependenciesSet.add(applicantId);
       }
 
       //check if the applicant is a strict subset of any existing members
@@ -1390,8 +1388,8 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       //now kick out any members the applicant covers
       removeAllCoveredBy(applicantId);
 
-      if (dependenciesSet.add(applicantId)) {
-        dependenciesQueue.add(applicantId);
+      if (mDependenciesSet.add(applicantId)) {
+        mDependenciesQueue.add(applicantId);
         return true;
       }
 
@@ -1409,7 +1407,9 @@ public class CliqueBasedSupervisorReductionTRSimplifier
      */
     public boolean isUncoveredByAll(final int xId)
     {
-      for (final int compatibleId : dependenciesQueue) {
+      final TIntIterator iter = mDependenciesQueue.unorderedIterator();
+      while (iter.hasNext()) {
+        final int compatibleId = iter.next();
         if (mCompatibleCache.containsAll(compatibleId, xId)) {
           return false;
         }
@@ -1420,50 +1420,47 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     /**
      * Removes any compatibles in this set that are subsets of the compatible
      * referenced by xId.
-     *
-     * @param xId
-     *          The id of a compatible
+     * @param  xId  The id of a compatible
      */
     public void removeAllCoveredBy(final int xId)
     {
-      for (final Iterator<Integer> compatibleIdsIterator =
-        dependenciesQueue.iterator(); compatibleIdsIterator.hasNext();) {
-        final int compatibleId = compatibleIdsIterator.next();
-        if (mCompatibleCache.containsAll(xId, compatibleId)) {
-          compatibleIdsIterator.remove();
-          dependenciesSet.remove(compatibleId);
+      final TIntProcedure condition = new TIntProcedure() {
+        @Override
+        public boolean execute(final int compatibleId)
+        {
+          return mCompatibleCache.containsAll(xId, compatibleId);
         }
-      }
+      };
+      mDependenciesQueue.removeAll(condition);
     }
 
 
     @Override
     public String toString()
     {
-      final Integer[] compatibleIdBuffer = new Integer[size()];
-      dependenciesQueue.toArray(compatibleIdBuffer);
-      return Arrays.toString(compatibleIdBuffer);
+      return mDependenciesQueue.toString();
     }
 
     public String prettyPrint()
     {
-      final Integer[] set = new Integer[dependenciesQueue.size()];
-      dependenciesQueue.toArray(set);
-      final StringBuilder out = new StringBuilder();
+      final StringBuilder builder = new StringBuilder();
       final TIntList compatible = new TIntArrayList();
-      out.append("Dependencies\n");
-      for (int i = 0; i < set.length; i++) {
+      builder.append("Dependencies\n");
+      final TIntIterator iter = mDependenciesQueue.unorderedIterator();
+      while (iter.hasNext()) {
+        final int compatibleId = iter.next();
         compatible.clear();
-        getCompatibleFromCache(set[i], compatible);
-        out.append(compatible).append("\n");
+        getCompatibleFromCache(compatibleId, compatible);
+        builder.append(compatible);
+        builder.append("\n");
       }
-      return out.toString();
+      return builder.toString();
     }
 
     @Override
     public int hashCode()
     {
-      return dependenciesSet.hashCode();
+      return mDependenciesSet.hashCode();
     }
 
     @Override
@@ -1474,25 +1471,25 @@ public class CliqueBasedSupervisorReductionTRSimplifier
       }
 
       final Dependencies otherSet = (Dependencies) o;
-      return dependenciesSet.equals(otherSet.dependenciesSet);
+      return mDependenciesSet.equals(otherSet.mDependenciesSet);
     }
   }
 
 
   private class Candidate extends TIntHashSet
   {
-    private final Dependencies dependencies;
+    private final Dependencies mDependencies;
 
     public Candidate(final int capacity)
     {
       super(capacity);
-      dependencies = new Dependencies();
+      mDependencies = new Dependencies();
     }
 
     public Candidate(final Candidate existingCandidate)
     {
-      super(existingCandidate.capacity());
-      dependencies = new Dependencies(existingCandidate.dependencies);
+      super(existingCandidate.size());
+      mDependencies = new Dependencies(existingCandidate.mDependencies);
       for (final TIntIterator iterator =
         existingCandidate.iterator(); iterator.hasNext();) {
         super.add(iterator.next());
@@ -1504,7 +1501,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     public boolean add(final int val)
     {
       if (super.add(val)) {
-        dependencies.removeAllCoveredBy(val);
+        mDependencies.removeAllCoveredBy(val);
         return true;
       }
       return false;
@@ -1512,13 +1509,13 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     public int popDependency()
     {
-      return dependencies.pop();
+      return mDependencies.pop();
     }
 
     public boolean addDependency(final int val)
     {
       if (isUncoveredByAll(val)) {
-        return dependencies.add(val);
+        return mDependencies.add(val);
       }
       return false;
     }
@@ -1532,7 +1529,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
     public int dependenciesSize()
     {
-      return dependencies.size();
+      return mDependencies.size();
     }
 
     private boolean isUncoveredByAll(final int xId)
@@ -1549,7 +1546,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     @Override
     public int hashCode()
     {
-      return super.hashCode() + dependencies.hashCode();
+      return super.hashCode() + mDependencies.hashCode();
     }
 
     @Override
@@ -1557,7 +1554,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
     {
       final int[] set = toArray();
       Arrays.sort(set);
-      return "C: " + Arrays.toString(set) + " D: " + dependencies.toString();
+      return "C: " + Arrays.toString(set) + " D: " + mDependencies.toString();
     }
 
     @SuppressWarnings("unused")
@@ -1572,7 +1569,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
         getCompatibleFromCache(set[i], compatible);
         out.append(compatible).append("\n");
       }
-      out.append(dependencies.prettyPrint());
+      out.append(mDependencies.prettyPrint());
       return out.toString();
     }
   }
@@ -1583,7 +1580,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   private HeuristicCoverStrategy mHeuristicCoverStrategy =
     HeuristicCoverStrategy.NONE;
   private int mMaxHeuristicCovers = -1;
-  private int mSearchLimit = 100000;
+  private int mSearchLimit = 200000;
 
   private int mNumSolutionsSearched;
 

@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.procedure.TIntProcedure;
+
+import net.sourceforge.waters.model.base.ProxyTools;
 
 /**
  * A binary heap of <CODE>int</CODE> primitives.
@@ -140,8 +144,7 @@ public class WatersIntHeap
   }
 
   /**
-   * Returns size.
-   * @return current size.
+   * Returns the current number of elements in the priority queue.
    */
   public int size()
   {
@@ -174,7 +177,7 @@ public class WatersIntHeap
 
   /**
    * Finds the smallest item in the priority queue.
-   * @return the smallest item.
+   * @return The smallest item.
    */
   public int peekFirst()
   {
@@ -185,8 +188,39 @@ public class WatersIntHeap
   }
 
   /**
+   * Removes multiple elements from the priority queue based on a condition.
+   * This method iterates over the heap and checks each element for the
+   * condition. Elements that satisfy the condition are marked for removal,
+   * and afterwards the removal is performed while restoring the heap order.
+   * This requires up to two traversals of the heap and takes linear time.
+   * @param  condition  The {@link TIntProcedure#execute(int)} method is
+   *                    applied to all heap elements. Elements for which the
+   *                    call returns <CODE>true</CODE> are removed from the
+   *                    heap, others are retained.
+   * @return <CODE>true</CODE> if at least one element was removed,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean removeAll(final TIntProcedure condition)
+  {
+    boolean changed = false;
+    int i = 1;
+    while (i <= mCurrentSize) {
+      if (condition.execute(mData[i])) {
+        mData[i] = mData[mCurrentSize--];
+        changed = true;
+      } else {
+        i++;
+      }
+    }
+    if (changed) {
+      buildHeap();
+    }
+    return changed;
+  }
+
+  /**
    * Removes the smallest item from the priority queue.
-   * @return the smallest item.
+   * @return The smallest item.
    */
   public int removeFirst()
   {
@@ -196,12 +230,28 @@ public class WatersIntHeap
     return minItem;
   }
 
-  public int[] toArray(){
+  /**
+   * Returns an array containing all elements in this priority queue.
+   * @return A newly allocated array containing the elements in no
+   *         specified order.
+   */
+  public int[] toArray()
+  {
     final int[] temp = new int[mCurrentSize];
-    for(int i = 0; i < mCurrentSize; i++){
+    for (int i = 0; i < mCurrentSize; i++) {
       temp[i] = mData[i+1];
     }
     return temp;
+  }
+
+  /**
+   * Returns an iterator over the elements in this priority queue.
+   * @return A newly allocated iterator that produces the heap elements in no
+   *         specified order.
+   */
+  public TIntIterator unorderedIterator()
+  {
+    return new WatersIntHeapIterator();
   }
 
 
@@ -261,6 +311,60 @@ public class WatersIntHeap
   public int compare(final int val1, final int val2)
   {
     return val1 - val2;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    final StringBuilder builder = new StringBuilder("[");
+    for (int i = 0; i < mCurrentSize; i++) {
+      if (i > 0) {
+        builder.append(',');
+      }
+      builder.append(mData[i]);
+    }
+    return builder.toString();
+  }
+
+
+  //#########################################################################
+  //# Inner Class WatersIntHeapIterator
+  private class WatersIntHeapIterator implements TIntIterator
+  {
+    //#########################################################################
+    //# Constructor
+    private WatersIntHeapIterator()
+    {
+      mIndex = 0;
+    }
+
+    //#########################################################################
+    //# Interface gnu.trove.iterator.TIntIterator
+    @Override
+    public boolean hasNext()
+    {
+      return mIndex < mCurrentSize;
+    }
+
+    @Override
+    public void remove()
+    {
+      throw new UnsupportedOperationException
+        (ProxyTools.getShortClassName(this) + " does not support removal!");
+    }
+
+    @Override
+    public int next()
+    {
+      return mData[++mIndex];
+    }
+
+    //#########################################################################
+    //# Data Members
+    private int mIndex;
   }
 
 
