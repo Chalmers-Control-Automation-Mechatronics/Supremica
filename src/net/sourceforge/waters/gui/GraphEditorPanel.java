@@ -2150,6 +2150,8 @@ public class GraphEditorPanel
     public void mousePressed(final MouseEvent event)
     {
       // LogManager.getLogger().info("ToolController.mousePressed");
+      // Issue #122: Ensure focus is transferred when clicked
+      requestFocusInWindow();
       final ProxySubject item = getDraggableItem(event, true);
       final List<ProxySubject> list = getListOfSelectedLabels();
       mItem = item;
