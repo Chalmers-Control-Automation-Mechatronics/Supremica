@@ -1283,7 +1283,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private long createStatePair(final int x, final int y)
   {
-    return (((long) x << 32) | y) & 0xFFFFFFFF;
+    return ((long) x << 32) | y;
   }
 
   private int getXFromStatePair(final long statePair)
@@ -1293,16 +1293,16 @@ public class CliqueBasedSupervisorReductionTRSimplifier
 
   private int getYFromStatePair(final long statePair)
   {
-    return (int) (statePair & 0xFFFFFFFF);
+    return (int) (statePair & 0xFFFFFFFFL);
   }
 
 
   /**
    * Contains a set of integers that each represent a compatible (a set of
    * states). Each value is an index into the the {@link #mCompatibleCache}
-   * and can used to retrieve the corresponding compatible.   *
+   * and can used to retrieve the corresponding compatible.
    * Ensures that none of the underlying compatibles are strict subsets of any
-   * of the other compatibles in this set.   *
+   * of the other compatibles in this set.
    * Maintains the order of insertions so that the search space can be
    * explored systematically.
    *

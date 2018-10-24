@@ -326,6 +326,7 @@ public class WatersIntHeap
       }
       builder.append(mData[i]);
     }
+    builder.append(']');
     return builder.toString();
   }
 
