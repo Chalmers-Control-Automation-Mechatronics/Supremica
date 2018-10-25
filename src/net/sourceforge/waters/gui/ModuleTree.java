@@ -95,12 +95,15 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
@@ -710,28 +713,37 @@ public abstract class ModuleTree
     final Set<String> names = new THashSet<>(transferData.size());
     final List<InsertInfo> result = new ArrayList<>(transferData.size());
     for (final Proxy proxy : transferData) {
+      final Proxy cloned;
+      final ListInsertPosition inspos;
       if (proxy instanceof EventDeclProxy) {
         // Special treatment for event declarations pasted with an automaton
         final EventDeclProxy decl = (EventDeclProxy) proxy;
-        if (mModuleContext.getEventDecl(decl.getName()) == null) {
-          final Proxy cloned = cloner.getClone(decl);
-          final ListInsertPosition inspos =
-            new ListInsertPosition(edeclList, edeclPos++);
-          final InsertInfo info = new InsertInfo(cloned, inspos);
-          result.add(info);
+        if (mModuleContext.getEventDecl(decl.getName()) != null) {
+          continue;
         }
+        final IdentifierProxy ident = decl.getIdentifier();
+        if (ident instanceof IndexedIdentifierProxy) {
+          final IndexedIdentifierProxy indexed = (IndexedIdentifierProxy) ident;
+          if (mModuleContext.getEventDecl(indexed.getName()) != null) {
+            continue;
+          }
+        } else if (!(ident instanceof SimpleIdentifierProxy)) {
+          continue;
+        }
+        cloned = cloner.getClone(decl);
+        inspos = new ListInsertPosition(edeclList, edeclPos++);
       } else {
-        final Proxy cloned = cloner.getClone(proxy);
+        cloned = cloner.getClone(proxy);
         if (cloned instanceof IdentifiedSubject && list == getRootList()) {
           final IdentifiedSubject sub = (IdentifiedSubject) cloned;
           final IdentifierSubject newId =
             mModuleContext.getPastedName(sub, names);
           sub.setIdentifier(newId);
         }
-        final ListInsertPosition inspos = new ListInsertPosition(list, index++);
-        final InsertInfo info = new InsertInfo(cloned, inspos);
-        result.add(info);
+        inspos = new ListInsertPosition(list, index++);
       }
+      final InsertInfo info = new InsertInfo(cloned, inspos);
+      result.add(info);
     }
     return result;
   }
