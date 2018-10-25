@@ -282,7 +282,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   public List<AutomatonProxy> getAllSelectableItems()
   {
     final AutomataTableModel model = getModel();
-    return model.getAutomatonList();
+    return model.getAutomataList();
   }
 
   @Override
@@ -502,7 +502,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   public void close()
   {
     final AutomataTableModel model = getModel();
-    model.Close();
+    model.close();
   }
 
 

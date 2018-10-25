@@ -53,6 +53,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -62,28 +63,19 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
 
   //#########################################################################
   //# Constructor
-  AutomataTableModel(final ModuleContainer ModContainer)
+  AutomataTableModel(final ModuleContainer container)
   {
-    super();
-    mModuleContainer = ModContainer;
+    mModuleContainer = container;
     mModuleContainer.attach(this);
-    mCompiledDES = ModContainer.getCompiledDES();
     updateCompiledDES();
-    mDisplayMap = new HashMap<AutomatonProxy,SimpleComponentProxy>();
-    if (mCompiledDES != null) {
-      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
-    } else {
-      mAutomataList = new ArrayList<>();
-    }
   }
+
 
   //#########################################################################
   //# Simple Access
   /**
    * Gets the automaton represented by the index-th row of the sorted table.
-   *
-   * @param index
-   *          The index of the row of the table.
+   * @param  index   The index of the row of the table.
    * @return The automaton represented at that index.
    */
   AutomatonProxy getAutomaton(final int index)
@@ -91,7 +83,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     return mAutomataList.get(index);
   }
 
-  List<AutomatonProxy> getAutomatonList()
+  List<AutomatonProxy> getAutomataList()
   {
     return mAutomataList;
   }
@@ -99,27 +91,14 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   int getIndex(final AutomatonProxy aut)
   {
     return mAutomataList.indexOf(aut);
-    /*
-     * for (int looper = 0; looper < this.getRowCount(); looper++) { if
-     * ((mAutomataList.get(looper).getName()) .compareTo(aut.getName()) == 0)
-     * { return looper; } } return -1;
-     */
   }
 
   Map<String,EventProxy> getEventMap()
   {
-    mEventMap = new HashMap<String,EventProxy>();
-    for (final AutomatonProxy aut : mAutomataList) {
-      final Set<EventProxy> eventList = aut.getEvents();
-      for (final EventProxy ep : eventList) {
-        if (!mEventMap.containsKey(ep.getName()))
-          mEventMap.put(ep.getName(), ep);
-      }
-    }
     return mEventMap;
   }
 
-  public void deleteRows(final List<Integer> deleteList)
+  void deleteRows(final List<Integer> deleteList)
   {
     final Comparator<Integer> c = Collections.reverseOrder();
     Collections.sort(deleteList, c);
@@ -162,7 +141,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     insertRows(autList);
   }
 
-  public boolean containsAutomatonName(final String name)
+  boolean containsAutomatonName(final String name)
   {
     for (final AutomatonProxy aut : mAutomataList)
       if (aut.getName().equals(name) == true)
@@ -177,10 +156,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     if (containsAutomatonName(name)) {
       final StringBuilder buffer = new StringBuilder("Name '");
       buffer.append(name);
-      buffer.append("' is already taken by ");
-      final String typename = "an Automaton";
-      buffer.append(typename);
-      buffer.append('!');
+      buffer.append("' is already taken by an automaton!");
       final String msg = buffer.toString();
       throw new ParseException(msg, 0);
     }
@@ -191,40 +167,46 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   {
     int i = 0;
     for (final AutomatonProxy aut : mAutomataList) {
-      if (aut.equals(oldAut) == true) {
+      if (aut == oldAut) {
         mAutomataList.set(i, newAut);
         break;
       }
       i++;
     }
     fireTableRowsUpdated(i, i);
+    final SimpleComponentProxy comp = mDisplayMap.get(oldAut);
+    if (comp != null) {
+      mDisplayMap.remove(oldAut);
+      mDisplayMap.put(newAut, comp);
+    }
   }
 
-  public boolean containsDisplayMap(final AutomatonProxy aut)
+  boolean containsDisplayMap(final AutomatonProxy aut)
   {
     return mDisplayMap.containsKey(aut);
   }
 
-  public SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut)
+  SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut)
   {
     return mDisplayMap.get(aut);
   }
 
-  public void addToDisplayMap(final AutomatonProxy aut,
-                              final SimpleComponentProxy comp)
+  void addToDisplayMap(final AutomatonProxy aut,
+                       final SimpleComponentProxy comp)
   {
     mDisplayMap.put(aut, comp);
   }
 
-  public void removeFromDisplayMap(final AutomatonProxy aut)
+  void removeFromDisplayMap(final AutomatonProxy aut)
   {
     mDisplayMap.remove(aut);
   }
 
-  public void Close()
+  void close()
   {
     mModuleContainer.detach(this);
   }
+
 
   //#########################################################################
   //# Interface javax.swing.table.TableModel
@@ -253,27 +235,35 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     case 4:
       return Integer.class;
     default:
-      throw new ArrayIndexOutOfBoundsException("Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for automata table model!");
     }
   }
 
   @Override
   public Object getValueAt(final int row, final int col)
   {
-    final AutomatonProxy currentAutomaton = mAutomataList.get(row);
+    final AutomatonProxy aut = mAutomataList.get(row);
     switch (col) {
     case 0:
-      return currentAutomaton.getKind();
+      return aut.getKind();
     case 1:
-      return currentAutomaton.getName();
+      return aut.getName();
     case 2:
-      return currentAutomaton.getStates().size();
+      return aut.getStates().size();
     case 3:
-      return currentAutomaton.getEvents().size();
+      int count = 0;
+      for (final EventProxy event : aut.getEvents()) {
+        if (event.getKind() != EventKind.PROPOSITION) {
+          count++;
+        }
+      }
+      return count;
     case 4:
-      return currentAutomaton.getTransitions().size();
+      return aut.getTransitions().size();
     default:
-      throw new ArrayIndexOutOfBoundsException("Bad column number for markings table model!");
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for automata table model!");
     }
   }
 
@@ -292,32 +282,48 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     case 4:
       return "|\u2192|";
     default:
-      throw new ArrayIndexOutOfBoundsException("Bad column number for automata table model!");
+      throw new ArrayIndexOutOfBoundsException
+        ("Bad column number for automata table model!");
     }
   }
+
 
   //#########################################################################
   //# Updating
   @Override
   public void update(final EditorChangedEvent event)
   {
-    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH
-        && mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
+    if (event.getKind() == EditorChangedEvent.Kind.MAINPANEL_SWITCH &&
+        mModuleContainer.getActivePanel() instanceof WatersAnalyzerPanel) {
       updateCompiledDES();
-      mDisplayMap = new HashMap<AutomatonProxy,SimpleComponentProxy>();
     }
   }
 
   private void updateCompiledDES()
   {
     final ProductDESProxy newDES = mModuleContainer.getCompiledDES();
-    if (newDES != mCompiledDES) {
+    if (newDES != mCompiledDES || mAutomataList == null) {
       mCompiledDES = newDES;
-      mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
-      Collections.sort(mAutomataList);
+      if (newDES != null) {
+        mAutomataList = new ArrayList<>(mCompiledDES.getAutomata());
+        Collections.sort(mAutomataList);
+        mEventMap = new HashMap<>(mCompiledDES.getEvents().size());
+        for (final AutomatonProxy aut : mAutomataList) {
+          final Set<EventProxy> eventList = aut.getEvents();
+          for (final EventProxy event : eventList) {
+            final String name = event.getName();
+            mEventMap.put(name, event);
+          }
+        }
+      } else {
+        mAutomataList = new ArrayList<>();
+        mEventMap = Collections.emptyMap();
+      }
+      mDisplayMap = new HashMap<>();
       fireTableDataChanged();
     }
   }
+
 
   //#########################################################################
   //# Data Members
@@ -326,6 +332,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   private final ModuleContainer mModuleContainer;
   private Map<String,EventProxy> mEventMap;
   private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
+
 
   //#########################################################################
   //# Class Constants
