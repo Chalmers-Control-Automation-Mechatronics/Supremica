@@ -224,7 +224,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# CTRL-i:
 //# CTRL-j:
 //# CTRL-k:
-//# CTRL-l: Edit/Layout graph
+//# CTRL-l: Tools/Layout graph
 //# CTRL-m: Edit/Show module comments
 //# CTRL-n: File/New
 //# CTRL-o: File/Open
@@ -410,9 +410,6 @@ public class IDEMenuBar
         actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
       menu.add(properTimeBehavior);
     }
-    menu.addSeparator();
-    final Action recompile = actions.getAction(RecompileAction.class);
-    menu.add(recompile);
     add(menu);
   }
 
@@ -453,8 +450,7 @@ public class IDEMenuBar
       viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
       viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
       viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
-      viewMenu
-          .add(actions.analyzerViewModularStructureAction.getMenuItem());
+      viewMenu.add(actions.analyzerViewModularStructureAction.getMenuItem());
     }
     menu.add(viewMenu);
     menu.add(actions.analyzerSynchronizerAction.getMenuItem());
@@ -580,40 +576,46 @@ public class IDEMenuBar
     final Action showcomment =
         actions.getAction(ShowModuleCommentAction.class);
     menu.add(showcomment);
-    // Embedder & Instantiate should probably go to 'Tools' menu?
-    menu.addSeparator();
-    final Action layout = actions.getAction(GraphLayoutAction.class);
-    menu.add(layout);
-    final Action instantiation =
-      actions.getAction(InstantiateModuleAction.class);
-    menu.add(instantiation);
     add(menu);
   }
 
   private void createToolsMenu()
   {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Tools");
+    final MainPanel panel = getActivePanel();
+    if (panel != null && panel instanceof EditorPanel) {
+      final Action layout = actions.getAction(GraphLayoutAction.class);
+      menu.add(layout);
+      final Action instantiation =
+        actions.getAction(InstantiateModuleAction.class);
+      menu.add(instantiation);
+      final Action recompile = actions.getAction(RecompileAction.class);
+      menu.add(recompile);
+    }
     addProperty(Config.INCLUDE_EXTERNALTOOLS);
     if (Config.INCLUDE_EXTERNALTOOLS.isTrue()) {
       addProperty(Config.INCLUDE_SOCEDITOR);
-      addProperty(Config.INCLUDE_ANIMATOR);
-      if (Config.INCLUDE_SOCEDITOR.isTrue() ||
-          Config.INCLUDE_ANIMATOR.isTrue()) {
-        final Actions actions = getActions();
-        final JMenu menu = new JMenu("Tools");
-        menu.setMnemonic(KeyEvent.VK_T);
-        if (Config.INCLUDE_SOCEDITOR.isTrue()) {
-          menu.add(actions.toolsSOCEditorAction.getMenuItem());
+      if (Config.INCLUDE_SOCEDITOR.isTrue()) {
+        if (menu.getMenuComponentCount() > 0) {
+          menu.addSeparator();
         }
-        if (Config.INCLUDE_ANIMATOR.isTrue()) {
-          if (Config.INCLUDE_SOCEDITOR.isTrue()) {
-            menu.addSeparator();
-          }
-          menu.add(actions.simulatorLaunchAnimatorAction);
-          menu.add(actions.simulatorLaunchSimulatorAction);
-          menu.add(actions.simulatorClearSimulationData);
-        }
-        add(menu);
+        menu.add(actions.toolsSOCEditorAction.getMenuItem());
       }
+      addProperty(Config.INCLUDE_ANIMATOR);
+      if (Config.INCLUDE_ANIMATOR.isTrue()) {
+        if (menu.getMenuComponentCount() > 0) {
+          menu.addSeparator();
+        }
+        menu.addSeparator();
+        menu.add(actions.simulatorLaunchAnimatorAction);
+        menu.add(actions.simulatorLaunchSimulatorAction);
+        menu.add(actions.simulatorClearSimulationData);
+      }
+    }
+    if (menu.getMenuComponentCount() > 0) {
+      menu.setMnemonic(KeyEvent.VK_T);
+      add(menu);
     }
   }
 
