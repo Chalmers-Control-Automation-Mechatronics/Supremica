@@ -40,13 +40,13 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.supremica.automata.Automata;
 import org.supremica.automata.algorithms.SynthesizerOptions;
 import org.supremica.gui.AutomataSynthesisWorker;
 import org.supremica.gui.SynthesizerDialog;
-import org.supremica.gui.ide.IDE;
 
 
 public class AnalyzerSynthesizerAction
@@ -64,7 +64,7 @@ public class AnalyzerSynthesizerAction
         putValue(Action.MNEMONIC_KEY, new Integer(KeyEvent.VK_Y));
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
         putValue(Action.SHORT_DESCRIPTION, "Synthesize a supervisor for the selected automata");
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif")));
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
     }
 
     @Override

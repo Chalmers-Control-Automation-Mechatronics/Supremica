@@ -50,12 +50,12 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import net.sf.javabdd.BDD;
 
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
@@ -95,12 +95,9 @@ public class EditorSynthesizerAction extends IDEAction
       "Symbolic (BDD) Synthesis/Optimization on TEFAs...";
     final String description = "Synthesize a modular supervisor by adding "
                                + "guards to the original automata";
-    final ImageIcon icon =
-      new ImageIcon(IDE.class.getResource("/icons/synthesize16.gif"));
-
     putValue(Action.NAME, actName);
     putValue(Action.SHORT_DESCRIPTION, description);
-    putValue(Action.SMALL_ICON, icon);
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
   }
 
   //#########################################################################

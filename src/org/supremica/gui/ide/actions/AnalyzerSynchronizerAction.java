@@ -40,8 +40,9 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -70,7 +71,7 @@ public class AnalyzerSynchronizerAction
         putValue(Action.SHORT_DESCRIPTION, "Synchronize the selected automata");
         putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
         //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_A, ActionEvent.CTRL_MASK));
-        putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/icons/synchronize16.gif")));
+        putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNC);
     }
 
 	@Override
