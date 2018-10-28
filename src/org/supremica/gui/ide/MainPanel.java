@@ -137,6 +137,13 @@ public abstract class MainPanel extends JPanel
 
 
   //#########################################################################
+  //# Menu Setup
+  public void createPanelSpecificMenus(final IDEMenuBar menuBar)
+  {
+  }
+
+
+  //#########################################################################
   //# Focus Switching
   /**
    * Activates this panel. This method is called after the panel

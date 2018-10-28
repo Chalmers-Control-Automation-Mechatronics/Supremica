@@ -134,6 +134,17 @@ public class EditorPanel
 
 
   //#########################################################################
+  //# Menu Setup
+  @Override
+  public void createPanelSpecificMenus(final IDEMenuBar menuBar)
+  {
+    menuBar.createCreateMenu();
+    menuBar.createVerifyMenu();
+    menuBar.createEditorAnalyzeMenu();
+  }
+
+
+  //#########################################################################
   //# Focus Switching
   @Override
   protected void activate()

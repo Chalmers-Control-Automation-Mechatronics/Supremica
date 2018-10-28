@@ -106,6 +106,12 @@ public class SupremicaAnalyzerPanel
       return false;
     }
 
+    @Override
+    public void createPanelSpecificMenus(final IDEMenuBar menuBar)
+    {
+      menuBar.createSupremicaAnalyzeMenu();
+    }
+
 
     //#######################################################################
     //# Simple Access

@@ -47,6 +47,7 @@ import javax.swing.table.JTableHeader;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 
 import org.supremica.gui.WhiteScrollPane;
+import org.supremica.gui.ide.IDEMenuBar;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -70,6 +71,17 @@ public class SimulatorPanel
     setupTrace();
     setLeftComponent(mTabbedPane);
   }
+
+
+  //#########################################################################
+  //# Menu Setup
+  @Override
+  public void createPanelSpecificMenus(final IDEMenuBar menuBar)
+  {
+    menuBar.createSimulateMenu();
+    menuBar.createVerifyMenu();
+  }
+
 
   //#########################################################################
   //# Simple Access

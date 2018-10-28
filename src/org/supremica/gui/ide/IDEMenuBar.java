@@ -35,7 +35,8 @@
 
 package org.supremica.gui.ide;
 
-import java.awt.Component;
+import gnu.trove.set.hash.THashSet;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -43,6 +44,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
@@ -107,7 +109,6 @@ import net.sourceforge.waters.gui.actions.WatersRedoAction;
 import net.sourceforge.waters.gui.actions.WatersUndoAction;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
-import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
@@ -124,6 +125,7 @@ import org.supremica.gui.ide.actions.OpenRASAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
 import org.supremica.properties.Config;
+import org.supremica.properties.Property;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
 
@@ -147,9 +149,12 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * the comments below.</P>
  *
  * <P>
- * To add a new menu, add a new data member for it at the end of the class,
- * initialise it in method {@link #createMenus()}, and add it to the menu bar in
- * method {@link #addMenus()}.
+ * To add a new menu, create a new method like {@link #createFileMenu()}
+ * and call it from {@link #createMenus()}. It is also possible to create
+ * menus that are specific to certain panel times (e.g., Simulate), which
+ * is achieved by calling the menu creation method from the {@link
+ * MainPanel#createPanelSpecificMenus(IDEMenuBar) createPanelSpecificMenus()}
+ * method of the relevant panel.
  * </P>
  *
  * @see WatersActionManager
@@ -196,7 +201,7 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# ALT-p: Examples menu
 //# ALT-q:
 //# ALT-r: Verify menu
-//# ALT-s: Simulator menu
+//# ALT-s: Simulate menu
 //# ALT-t: Tools menu
 //# ALT-u:
 //# ALT-v: Create/New variable
@@ -236,7 +241,9 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# CTRL-z: Edit/Undo
 
 
-public class IDEMenuBar extends JMenuBar
+public class IDEMenuBar
+  extends JMenuBar
+  implements Observer, SupremicaPropertyChangeListener
 {
 
   //#########################################################################
@@ -244,445 +251,403 @@ public class IDEMenuBar extends JMenuBar
   public IDEMenuBar(final IDE ide)
   {
     mIDE = ide;
+    mProperties = new THashSet<>();
     createMenus();
-    addMenus();
-    updateModulesMenu();
-    final IDEListener ideListener = new IDEListener();
-    ide.attach(ideListener);
-    final SupremicaPropertyChangeListener fileListener =
-      new FilePropertyListener();
-    final SupremicaPropertyChangeListener createListener =
-        new CreatePropertyListener();
-    Config.INCLUDE_INSTANTION.addPropertyChangeListener(createListener);
-    final SupremicaPropertyChangeListener toolsListener =
-        new ToolsPropertyListener();
-    final SupremicaPropertyChangeListener analyzeListener =
-      new AnalyzePropertyListener();
-    final SupremicaPropertyChangeListener tumListener =
-      new TumPropertyListener();
-    Config.INCLUDE_EXTERNALTOOLS.addPropertyChangeListener(toolsListener);
-    Config.INCLUDE_SOCEDITOR.addPropertyChangeListener(toolsListener);
-    Config.INCLUDE_ANIMATOR.addPropertyChangeListener(toolsListener);
-    Config.INCLUDE_RAS_SUPPORT.addPropertyChangeListener(fileListener);
-    Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener(analyzeListener);
-    Config.GUI_ANALYZER_INCLUDE_HISC.addPropertyChangeListener(analyzeListener);
-    Config.GUI_ANALYZER_INCLUDE_SD.addPropertyChangeListener(analyzeListener);
-    Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.addPropertyChangeListener
-      (analyzeListener);
-    Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.addPropertyChangeListener(analyzeListener);
-    Config.TUM_EXTERNAL_ON.addPropertyChangeListener(tumListener);
+    ide.attach(this);
   }
 
 
   //#########################################################################
   //# Initialisation
-  private void createMenus()
+  public Actions getActions()
   {
-    final Actions actions = mIDE.getActions();
+    return mIDE.getActions();
+  }
 
-    // File
-    if (mFileMenu == null) {
-      mFileMenu = new JMenu("File");
-      mFileMenu.setMnemonic(KeyEvent.VK_F); // ALT-F - Create module event?
-      final Action newmod = actions.getAction(NewAction.class);
-      mFileMenu.add(newmod);
-      final Action open = actions.getAction(OpenAction.class);
-      mFileMenu.add(open);
-      if(Config.INCLUDE_RAS_SUPPORT.isTrue()){
-        final Action openRas = actions.getAction(OpenRASAction.class);
-        mFileMenu.add(openRas);
-      }
-
-      final Action save = actions.getAction(SaveAction.class);
-      mFileMenu.add(save);
-      final Action saveas = actions.getAction(SaveAsAction.class);
-      mFileMenu.add(saveas);
-      final Action close = actions.getAction(CloseAction.class);
-      mFileMenu.add(close);
-      mFileMenu.addSeparator();
-      final Action importAction = actions.getAction(ImportAction.class);
-      mFileMenu.add(importAction);
-      //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
-      final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
-      mFileMenu.add(epsprint);
-      final Action pdfprint = actions.getAction(GraphSavePDFAction.class);
-      mFileMenu.add(pdfprint);
-      mFileMenu.addSeparator();
-      final Action exit = actions.getAction(ExitAction.class);
-      mFileMenu.add(exit);
-    }
-
-    // Edit
-    if (mEditMenu == null) {
-      mEditMenu = new JMenu("Edit");
-      mEditMenu.setMnemonic(KeyEvent.VK_D); // ALT-E - Create component event?
-      final Action undo = actions.getAction(WatersUndoAction.class);
-      mEditMenu.add(undo);
-      final Action redo = actions.getAction(WatersRedoAction.class);
-      mEditMenu.add(redo);
-      mEditMenu.addSeparator();
-      final Action delete = actions.getAction(IDEDeleteAction.class);
-      mEditMenu.add(delete);
-      final Action cut = actions.getAction(IDECutAction.class);
-      mEditMenu.add(cut);
-      final Action copy = actions.getAction(IDECopyAction.class);
-      mEditMenu.add(copy);
-      final Action paste = actions.getAction(IDEPasteAction.class);
-      mEditMenu.add(paste);
-      mEditMenu.addSeparator();
-      final Action select = actions.getAction(IDESelectAllAction.class);
-      mEditMenu.add(select);
-      final Action deselect = actions.getAction(IDEDeselectAllAction.class);
-      mEditMenu.add(deselect);
-      mEditMenu.addSeparator();
-      final Action properties = actions.getAction(IDEPropertiesAction.class);
-      mEditMenu.add(properties);
-      final Action showgraph = actions.getAction(ShowGraphAction.class);
-      mEditMenu.add(showgraph);
-      final Action showcomment =
-          actions.getAction(ShowModuleCommentAction.class);
-      mEditMenu.add(showcomment);
-      // Embedder & Instantiate should probably go to 'Tools' menu?
-      mEditMenu.addSeparator();
-      final Action layout = actions.getAction(GraphLayoutAction.class);
-      mEditMenu.add(layout);
-      final Action instantiation =
-        actions.getAction(InstantiateModuleAction.class);
-      mEditMenu.add(instantiation);
-    }
-
-    final Component panel = getActivePanel();
-    if (panel != null) {
-      // Create
-      if (mCreateMenu == null && panel instanceof EditorPanel) {
-        mCreateMenu = new JMenu("Create");
-        mCreateMenu.setMnemonic(KeyEvent.VK_C);
-        final Action inscomp =
-            actions.getAction(InsertSimpleComponentAction.class);
-        mCreateMenu.add(inscomp);
-        final Action insvar = actions.getAction(InsertVariableAction.class);
-        mCreateMenu.add(insvar);
-        if (Config.INCLUDE_INSTANTION.isTrue()) {
-          final Action insforeach =
-              actions.getAction(InsertForeachAction.class);
-          mCreateMenu.add(insforeach);
-          final Action insalias =
-            actions.getAction(InsertConstantAliasAction.class);
-          mCreateMenu.add(insalias);
-          final Action inseventalias =
-            actions.getAction(InsertEventAliasAction.class);
-          mCreateMenu.add(inseventalias);
-          final Action insinstance =
-            actions.getAction(InsertInstanceAction.class);
-          mCreateMenu.add(insinstance);
-          final Action inparam =
-            actions.getAction(InsertParameterBindingAction.class);
-          mCreateMenu.add(inparam);
-        }
-        final Action insevent = actions.getAction(InsertEventDeclAction.class);
-        mCreateMenu.add(insevent);
-      }
-
-      // Verify
-      if (mVerifyMenu == null &&
-          Config.INCLUDE_WATERS_SIMULATOR.isTrue() &&
-          (panel instanceof EditorPanel || panel instanceof SimulatorPanel)) {
-        mVerifyMenu = new JMenu("Verify");
-        mVerifyMenu.setMnemonic(KeyEvent.VK_R);
-        final Action controllability =
-            actions.getAction(AnalyzeControllabilityCheckAction.class);
-        mVerifyMenu.add(controllability);
-        final Action conflict =
-          actions.getAction(AnalyzeConflictCheckAction.class);
-        mVerifyMenu.add(conflict);
-        final Action deadlock =
-          actions.getAction(AnalyzeDeadlockCheckAction.class);
-        mVerifyMenu.add(deadlock);
-        final Action controlLoop =
-            actions.getAction(AnalyzeControlLoopAction.class);
-        mVerifyMenu.add(controlLoop);
-        final Action languageInclusion =
-            actions.getAction(AnalyzeLanguageInclusionAction.class);
-        mVerifyMenu.add(languageInclusion);
-        if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
-          final Action diagnosability =
-            actions.getAction(AnalyzeDiagnosabilityCheckAction.class);
-          mVerifyMenu.add(diagnosability);
-        }
-        if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
-          mVerifyMenu.addSeparator();
-          final Action sic5 =
-            actions.getAction(AnalyzeSICProperty5Action.class);
-          mVerifyMenu.add(sic5);
-          final Action sic6 =
-            actions.getAction(AnalyzeSICProperty6Action.class);
-          mVerifyMenu.add(sic6);
-          try {
-            final Action hisccp =
-              actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
-            mVerifyMenu.add(hisccp);
-          } catch (final NoClassDefFoundError error) {
-            // skip this if it can't be loaded
-          }
-          final Action hiscco =
-            actions.getAction(AnalyzeHISCCPControllabilityAction.class);
-          mVerifyMenu.add(hiscco);
-        }
-        if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
-          mVerifyMenu.addSeparator();
-          final Action plantComplete =
-            actions.getAction(AnalyzeSDPlantCompletenessAction.class);
-          mVerifyMenu.add(plantComplete);
-          final Action activityLoop =
-            actions.getAction(AnalyzeSDActivityLoopAction.class);
-          mVerifyMenu.add(activityLoop);
-          final Action SSingular =
-            actions.getAction(AnalyzeSDSingularPropertyAction.class);
-          mVerifyMenu.add(SSingular);
-          final Action Sdone =
-            actions.getAction(AnalyzeSDControllabilityAction.class);
-          mVerifyMenu.add(Sdone);
-          final Action Sdtwoa =
-            actions.getAction(AnalyzeSDCTwoApropertyAction.class);
-          mVerifyMenu.add(Sdtwoa);
-          final Action Sdtwob =
-            actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
-          mVerifyMenu.add(Sdtwob);
-          final Action Sdthree1 =
-            actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
-          mVerifyMenu.add(Sdthree1);
-          final Action SDthree2 =
-            actions.getAction(AnalyzeNerodeEquivalentAction.class);
-          mVerifyMenu.add(SDthree2);
-          final Action Sdfour =
-            actions.getAction(AnalyzeSDCFourPropertyAction.class);
-          mVerifyMenu.add(Sdfour);
-          final Action PTimeBeh =
-            actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
-          mVerifyMenu.add(PTimeBeh);
-        }
-        mVerifyMenu.addSeparator();
-        final Action recompile = actions.getAction(RecompileAction.class);
-        mVerifyMenu.add(recompile);
-      }
-
-      // Analyze
-      if (mEdAnalyzeMenu == null &&
-          Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue() &&
-          panel instanceof EditorPanel) {
-        mEdAnalyzeMenu = new JMenu("Analyze");
-        mEdAnalyzeMenu.setMnemonic(KeyEvent.VK_Z);
-        mEdAnalyzeMenu.add(actions.editorSynthesizerAction.getMenuItem());
-        if (Config.TUM_EXTERNAL_ON.isTrue()) {
-          mEdAnalyzeMenu.add(actions.editorGenerateTextLabelAction.getMenuItem());
-          mEdAnalyzeMenu.add(actions.editorRemoveGABlocksAction.getMenuItem());
-        }
-        if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get())
-        {
-            //IISC Algorithms
-            mEdAnalyzeMenu.addSeparator();
-            mEdAnalyzeMenu.add(actions.editorEFASynch.getMenuItem());
-            mEdAnalyzeMenu.add(actions.editorEFASynchEval.getMenuItem());
-            mEdAnalyzeMenu.add(actions.editorEFAPE.getMenuItem());
-            mEdAnalyzeMenu.add(actions.editorIISC.getMenuItem());
-        }
-      }
-
-      // Simulate
-      if (mSimulateMenu == null && panel instanceof SimulatorPanel) {
-        mSimulateMenu = new JMenu("Simulate");
-        mSimulateMenu.setMnemonic(KeyEvent.VK_S);
-        final Action reset = actions.getAction(SimulationResetAction.class);
-        mSimulateMenu.add(reset);
-        final Action stepBeginning =
-          actions.getAction(SimulationBackToStartAction.class);
-        mSimulateMenu.add(stepBeginning);
-        final Action stepBack =
-          actions.getAction(SimulationStepBackAction.class);
-        mSimulateMenu.add(stepBack);
-        final Action step = actions.getAction(SimulationStepAction.class);
-        mSimulateMenu.add(step);
-        final Action replayStep =
-          actions.getAction(SimulationReplayStepAction.class);
-        mSimulateMenu.add(replayStep);
-        final Action endTrace =
-          actions.getAction(SimulationJumpToEndAction.class);
-        mSimulateMenu.add(endTrace);
-        mSimulateMenu.addSeparator();
-        final Action showAll =
-          actions.getAction(SimulationShowAllAction.class);
-        mSimulateMenu.add(showAll);
-        final Action closeAll =
-          actions.getAction(SimulationCloseAllAction.class);
-        mSimulateMenu.add(closeAll);
-        final Action cascade =
-          actions.getAction(SimulationCascadeAction.class);
-        mSimulateMenu.add(cascade);
-      }
-
-      // Analyze
-      if (mAnalyzeMenu == null && panel instanceof SupremicaAnalyzerPanel) {
-        mAnalyzeMenu = new JMenu("Analyze");
-        mAnalyzeMenu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
-        // View (submenu)
-        final JMenu viewMenu = new JMenu("View");
-        {
-          viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
-          viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
-          viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
-          viewMenu
-              .add(actions.analyzerViewModularStructureAction.getMenuItem());
-        }
-        mAnalyzeMenu.add(viewMenu);
-        mAnalyzeMenu.add(actions.analyzerSynchronizerAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerSynthesizerAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerVerifierAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerMinimizeAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerEventHiderAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerPurgeAction.getMenuItem());
-        mAnalyzeMenu.addSeparator();
-        mAnalyzeMenu.add(actions.analyzerExploreStatesAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerFindStatesAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerWorkbenchAction.getMenuItem());
-        mAnalyzeMenu.addSeparator();
-        mAnalyzeMenu.add(actions.analyzerStatisticsAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerExportAction.getMenuItem());
-        mAnalyzeMenu.addSeparator();
-        mAnalyzeMenu.add(actions.analyzerDeleteSelectedAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerDeleteAllAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerRenameAction.getMenuItem());
-        mAnalyzeMenu.add(actions.analyzerSendToEditorAction.getMenuItem());
-      }
-    }
-
-    // Tools
-    if (mToolsMenu == null && Config.INCLUDE_EXTERNALTOOLS.isTrue()) {
-      if (Config.INCLUDE_SOCEDITOR.isTrue()) {
-        mToolsMenu = new JMenu("Tools");
-        mToolsMenu.add(actions.toolsSOCEditorAction.getMenuItem());
-      }
-      if (Config.INCLUDE_ANIMATOR.isTrue()) {
-        if (mToolsMenu == null) {
-          mToolsMenu = new JMenu("Tools");
-        } else {
-          mToolsMenu.addSeparator();
-        }
-        mToolsMenu.add(actions.simulatorLaunchAnimatorAction);
-        mToolsMenu.add(actions.simulatorLaunchSimulatorAction);
-        mToolsMenu.add(actions.simulatorClearSimulationData);
-      }
-      if (mToolsMenu != null) {
-        mToolsMenu.setMnemonic(KeyEvent.VK_T);
-      }
-    }
-
-    // Examples
-    if (mExamplesMenu == null) {
-      final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
-      if (!exTempl.isEmpty()) {
-        mExamplesMenu = new JMenu("Examples");
-        mExamplesMenu.setMnemonic(KeyEvent.VK_P);
-        mExamplesMenu.add(actions.toolsTestCasesAction.getMenuItem());
-        for (final TemplateGroup currGroup : exTempl) {
-          final JMenu menuFileNewFromTemplateGroup = new JMenu();
-          menuFileNewFromTemplateGroup.setText(currGroup.getName());
-          menuFileNewFromTemplateGroup.setToolTipText(currGroup
-                                                      .getShortDescription());
-          mExamplesMenu.add(menuFileNewFromTemplateGroup);
-          for (final TemplateItem currItem : currGroup) {
-            final JMenuItem menuItem = new JMenuItem();
-            menuItem.setText(currItem.getName());
-            menuItem.setToolTipText(currItem.getShortDescription());
-            menuFileNewFromTemplateGroup.add(menuItem);
-            menuItem.addActionListener(new NewFromTemplateHandler(currItem));
-          }
-        }
-      }
-    }
-
-    // Modules
-    if (mModulesMenu == null) {
-      mModulesMenu = new JMenu("Modules");
-      mModulesMenu.setMnemonic(KeyEvent.VK_M);
-      mModulesMenu.setEnabled(false);
-    }
-
-    // Configure
-    if (mConfigureMenu == null) {
-      mConfigureMenu = new JMenu("Configure");
-      mConfigureMenu.setMnemonic(KeyEvent.VK_O);
-      mConfigureMenu.add(actions.analyzerOptionsAction.getMenuItem());
-    }
-
-    // Help
-    if (mHelpMenu == null) {
-      mHelpMenu = new JMenu("Help");
-      mHelpMenu.setMnemonic(KeyEvent.VK_H);
-      final Action about = actions.getAction(IDEAboutAction.class);
-      mHelpMenu.add(about);
-      mHelpMenu.add(actions.helpWebAction.getMenuItem());
+  public void addProperty(final Property property)
+  {
+    if (mProperties.add(property)) {
+      property.addPropertyChangeListener(this);
     }
   }
 
-  private void addMenus()
+
+  //#######################################################################
+  //# Interface org.supremica.properties.SupremicaPropertyChangeListener
+  @Override
+  public void propertyChanged(final SupremicaPropertyChangeEvent event)
   {
-    add(mFileMenu);
-    add(mEditMenu);
-    final Component panel = getActivePanel();
-    if (panel != null) {
-      if (panel instanceof EditorPanel) {
-        add(mCreateMenu);
-        if (mVerifyMenu != null) {
-          add(mVerifyMenu);
-        }
-        if (mEdAnalyzeMenu != null) {
-          add(mEdAnalyzeMenu);
-        }
-      } else if (panel instanceof SimulatorPanel) {
-        add(mSimulateMenu);
-        if (mVerifyMenu != null) {
-          add(mVerifyMenu);
-        }
-      } else if (panel instanceof SupremicaAnalyzerPanel) {
-        add(mAnalyzeMenu);
-      }
-    }
-    if (mToolsMenu != null) {
-      add(mToolsMenu);
-    }
-    if (mExamplesMenu != null) {
-      add(mExamplesMenu);
-    }
-    add(mModulesMenu);
-    add(mConfigureMenu);
-    add(mHelpMenu);
+    rebuildMenus();
   }
 
-  private void rebuildMenus()
-  {
-    removeAll();
-    createMenus();
-    addMenus();
-    revalidate();
-    repaint();
-  }
 
-  private Component getActivePanel()
+  //#######################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
   {
-    final DocumentContainer container = mIDE.getActiveDocumentContainer();
-    if (container == null) {
-      return null;
-    } else {
-      return container.getActivePanel();
+    switch (event.getKind()) {
+    case CONTAINER_SWITCH:
+    case MAINPANEL_SWITCH:
+      rebuildMenus();
+      break;
+    default:
+      break;
     }
   }
 
 
   //#########################################################################
-  //# Auxiliary Methods
-  private void updateModulesMenu()
+  //# Shared Menus
+  public void createCreateMenu()
   {
-    mModulesMenu.removeAll();
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Create");
+    menu.setMnemonic(KeyEvent.VK_C);
+    final Action insComp =
+      actions.getAction(InsertSimpleComponentAction.class);
+    menu.add(insComp);
+    final Action insVar = actions.getAction(InsertVariableAction.class);
+    menu.add(insVar);
+    addProperty(Config.INCLUDE_INSTANTION);
+    if (Config.INCLUDE_INSTANTION.isTrue()) {
+      final Action insForeach = actions.getAction(InsertForeachAction.class);
+      menu.add(insForeach);
+      final Action insAlias =
+        actions.getAction(InsertConstantAliasAction.class);
+      menu.add(insAlias);
+      final Action insEventAlias =
+        actions.getAction(InsertEventAliasAction.class);
+      menu.add(insEventAlias);
+      final Action insInstance = actions.getAction(InsertInstanceAction.class);
+      menu.add(insInstance);
+      final Action inParam =
+        actions.getAction(InsertParameterBindingAction.class);
+      menu.add(inParam);
+    }
+    final Action insEvent = actions.getAction(InsertEventDeclAction.class);
+    menu.add(insEvent);
+    add(menu);
+  }
+
+  public void createVerifyMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Verify");
+    menu.setMnemonic(KeyEvent.VK_R);
+    final Action controllability =
+      actions.getAction(AnalyzeControllabilityCheckAction.class);
+    menu.add(controllability);
+    final Action conflict =
+      actions.getAction(AnalyzeConflictCheckAction.class);
+    menu.add(conflict);
+    final Action deadlock =
+      actions.getAction(AnalyzeDeadlockCheckAction.class);
+    menu.add(deadlock);
+    final Action controlLoop =
+        actions.getAction(AnalyzeControlLoopAction.class);
+    menu.add(controlLoop);
+    final Action languageInclusion =
+        actions.getAction(AnalyzeLanguageInclusionAction.class);
+    menu.add(languageInclusion);
+    addProperty(Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY);
+    if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
+      final Action diagnosability =
+        actions.getAction(AnalyzeDiagnosabilityCheckAction.class);
+      menu.add(diagnosability);
+    }
+    addProperty(Config.GUI_ANALYZER_INCLUDE_HISC);
+    if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
+      menu.addSeparator();
+      final Action sic5 =
+        actions.getAction(AnalyzeSICProperty5Action.class);
+      menu.add(sic5);
+      final Action sic6 =
+        actions.getAction(AnalyzeSICProperty6Action.class);
+      menu.add(sic6);
+      try {
+        final Action hiscCp =
+          actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
+        menu.add(hiscCp);
+      } catch (final NoClassDefFoundError error) {
+        // skip this if it can't be loaded
+      }
+      final Action hiscCpCont =
+        actions.getAction(AnalyzeHISCCPControllabilityAction.class);
+      menu.add(hiscCpCont);
+    }
+    addProperty(Config.GUI_ANALYZER_INCLUDE_SD);
+    if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
+      menu.addSeparator();
+      final Action plantComplete =
+        actions.getAction(AnalyzeSDPlantCompletenessAction.class);
+      menu.add(plantComplete);
+      final Action activityLoop =
+        actions.getAction(AnalyzeSDActivityLoopAction.class);
+      menu.add(activityLoop);
+      final Action sSingular =
+        actions.getAction(AnalyzeSDSingularPropertyAction.class);
+      menu.add(sSingular);
+      final Action ad1 =
+        actions.getAction(AnalyzeSDControllabilityAction.class);
+      menu.add(ad1);
+      final Action sd2a =
+        actions.getAction(AnalyzeSDCTwoApropertyAction.class);
+      menu.add(sd2a);
+      final Action sd2b =
+        actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
+      menu.add(sd2b);
+      final Action sd31 =
+        actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
+      menu.add(sd31);
+      final Action sd32 =
+        actions.getAction(AnalyzeNerodeEquivalentAction.class);
+      menu.add(sd32);
+      final Action sd4 =
+        actions.getAction(AnalyzeSDCFourPropertyAction.class);
+      menu.add(sd4);
+      final Action properTimeBehavior =
+        actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
+      menu.add(properTimeBehavior);
+    }
+    menu.addSeparator();
+    final Action recompile = actions.getAction(RecompileAction.class);
+    menu.add(recompile);
+    add(menu);
+  }
+
+  public void createEditorAnalyzeMenu()
+  {
+    addProperty(Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS);
+    if (Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue()) {
+      final Actions actions = getActions();
+      final JMenu menu = new JMenu("Analyze");
+      menu.setMnemonic(KeyEvent.VK_Z);
+      menu.add(actions.editorSynthesizerAction.getMenuItem());
+      addProperty(Config.TUM_EXTERNAL_ON);
+      if (Config.TUM_EXTERNAL_ON.isTrue()) {
+        menu.add(actions.editorGenerateTextLabelAction.getMenuItem());
+        menu.add(actions.editorRemoveGABlocksAction.getMenuItem());
+      }
+      addProperty(Config.INCLUDE_EXPERIMENTAL_ALGORITHMS);
+      if (Config.INCLUDE_EXPERIMENTAL_ALGORITHMS.get()) {
+        //IISC Algorithms
+        menu.addSeparator();
+        menu.add(actions.editorEFASynch.getMenuItem());
+        menu.add(actions.editorEFASynchEval.getMenuItem());
+        menu.add(actions.editorEFAPE.getMenuItem());
+        menu.add(actions.editorIISC.getMenuItem());
+      }
+      add(menu);
+    }
+  }
+
+  public void createSupremicaAnalyzeMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Analyze");
+    menu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
+    // View (submenu)
+    final JMenu viewMenu = new JMenu("View");
+    {
+      viewMenu.add(actions.analyzerViewAutomatonAction.getMenuItem());
+      viewMenu.add(actions.analyzerViewAlphabetAction.getMenuItem());
+      viewMenu.add(actions.analyzerViewStatesAction.getMenuItem());
+      viewMenu
+          .add(actions.analyzerViewModularStructureAction.getMenuItem());
+    }
+    menu.add(viewMenu);
+    menu.add(actions.analyzerSynchronizerAction.getMenuItem());
+    menu.add(actions.analyzerSynthesizerAction.getMenuItem());
+    menu.add(actions.analyzerVerifierAction.getMenuItem());
+    menu.add(actions.analyzerMinimizeAction.getMenuItem());
+    menu.add(actions.analyzerEventHiderAction.getMenuItem());
+    menu.add(actions.analyzerPurgeAction.getMenuItem());
+    menu.addSeparator();
+    menu.add(actions.analyzerExploreStatesAction.getMenuItem());
+    menu.add(actions.analyzerFindStatesAction.getMenuItem());
+    menu.add(actions.analyzerWorkbenchAction.getMenuItem());
+    menu.addSeparator();
+    menu.add(actions.analyzerStatisticsAction.getMenuItem());
+    menu.add(actions.analyzerExportAction.getMenuItem());
+    menu.addSeparator();
+    menu.add(actions.analyzerDeleteSelectedAction.getMenuItem());
+    menu.add(actions.analyzerDeleteAllAction.getMenuItem());
+    menu.add(actions.analyzerRenameAction.getMenuItem());
+    menu.add(actions.analyzerSendToEditorAction.getMenuItem());
+    add(menu);
+  }
+
+  public void createSimulateMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Simulate");
+    menu.setMnemonic(KeyEvent.VK_S);
+    final Action reset = actions.getAction(SimulationResetAction.class);
+    menu.add(reset);
+    final Action stepBeginning =
+      actions.getAction(SimulationBackToStartAction.class);
+    menu.add(stepBeginning);
+    final Action stepBack =
+      actions.getAction(SimulationStepBackAction.class);
+    menu.add(stepBack);
+    final Action step = actions.getAction(SimulationStepAction.class);
+    menu.add(step);
+    final Action replayStep =
+      actions.getAction(SimulationReplayStepAction.class);
+    menu.add(replayStep);
+    final Action endTrace =
+      actions.getAction(SimulationJumpToEndAction.class);
+    menu.add(endTrace);
+    menu.addSeparator();
+    final Action showAll =
+      actions.getAction(SimulationShowAllAction.class);
+    menu.add(showAll);
+    final Action closeAll =
+      actions.getAction(SimulationCloseAllAction.class);
+    menu.add(closeAll);
+    final Action cascade =
+      actions.getAction(SimulationCascadeAction.class);
+    menu.add(cascade);
+    add(menu);
+  }
+
+
+  //#########################################################################
+  //# Fixed Menus
+  private void createFileMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("File");
+    menu.setMnemonic(KeyEvent.VK_F); // ALT-F - Create module event?
+    final Action newmod = actions.getAction(NewAction.class);
+    menu.add(newmod);
+    final Action open = actions.getAction(OpenAction.class);
+    menu.add(open);
+    addProperty(Config.INCLUDE_RAS_SUPPORT);
+    if(Config.INCLUDE_RAS_SUPPORT.isTrue()){
+      final Action openRas = actions.getAction(OpenRASAction.class);
+      menu.add(openRas);
+    }
+    final Action save = actions.getAction(SaveAction.class);
+    menu.add(save);
+    final Action saveas = actions.getAction(SaveAsAction.class);
+    menu.add(saveas);
+    final Action close = actions.getAction(CloseAction.class);
+    menu.add(close);
+    menu.addSeparator();
+    final Action importAction = actions.getAction(ImportAction.class);
+    menu.add(importAction);
+    //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
+    final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
+    menu.add(epsprint);
+    final Action pdfprint = actions.getAction(GraphSavePDFAction.class);
+    menu.add(pdfprint);
+    menu.addSeparator();
+    final Action exit = actions.getAction(ExitAction.class);
+    menu.add(exit);
+    add(menu);
+  }
+
+  private void createEditMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Edit");
+    menu.setMnemonic(KeyEvent.VK_D); // ALT-E - Create component event?
+    final Action undo = actions.getAction(WatersUndoAction.class);
+    menu.add(undo);
+    final Action redo = actions.getAction(WatersRedoAction.class);
+    menu.add(redo);
+    menu.addSeparator();
+    final Action delete = actions.getAction(IDEDeleteAction.class);
+    menu.add(delete);
+    final Action cut = actions.getAction(IDECutAction.class);
+    menu.add(cut);
+    final Action copy = actions.getAction(IDECopyAction.class);
+    menu.add(copy);
+    final Action paste = actions.getAction(IDEPasteAction.class);
+    menu.add(paste);
+    menu.addSeparator();
+    final Action select = actions.getAction(IDESelectAllAction.class);
+    menu.add(select);
+    final Action deselect = actions.getAction(IDEDeselectAllAction.class);
+    menu.add(deselect);
+    menu.addSeparator();
+    final Action properties = actions.getAction(IDEPropertiesAction.class);
+    menu.add(properties);
+    final Action showgraph = actions.getAction(ShowGraphAction.class);
+    menu.add(showgraph);
+    final Action showcomment =
+        actions.getAction(ShowModuleCommentAction.class);
+    menu.add(showcomment);
+    // Embedder & Instantiate should probably go to 'Tools' menu?
+    menu.addSeparator();
+    final Action layout = actions.getAction(GraphLayoutAction.class);
+    menu.add(layout);
+    final Action instantiation =
+      actions.getAction(InstantiateModuleAction.class);
+    menu.add(instantiation);
+    add(menu);
+  }
+
+  private void createToolsMenu()
+  {
+    addProperty(Config.INCLUDE_EXTERNALTOOLS);
+    if (Config.INCLUDE_EXTERNALTOOLS.isTrue()) {
+      addProperty(Config.INCLUDE_SOCEDITOR);
+      addProperty(Config.INCLUDE_ANIMATOR);
+      if (Config.INCLUDE_SOCEDITOR.isTrue() ||
+          Config.INCLUDE_ANIMATOR.isTrue()) {
+        final Actions actions = getActions();
+        final JMenu menu = new JMenu("Tools");
+        menu.setMnemonic(KeyEvent.VK_T);
+        if (Config.INCLUDE_SOCEDITOR.isTrue()) {
+          menu.add(actions.toolsSOCEditorAction.getMenuItem());
+        }
+        if (Config.INCLUDE_ANIMATOR.isTrue()) {
+          if (Config.INCLUDE_SOCEDITOR.isTrue()) {
+            menu.addSeparator();
+          }
+          menu.add(actions.simulatorLaunchAnimatorAction);
+          menu.add(actions.simulatorLaunchSimulatorAction);
+          menu.add(actions.simulatorClearSimulationData);
+        }
+        add(menu);
+      }
+    }
+  }
+
+  private void createExamplesMenu()
+  {
+    addProperty(Config.TUM_EXTERNAL_ON);
+    final Actions actions = getActions();
+    final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
+    if (!exTempl.isEmpty()) {
+      final JMenu menu = new JMenu("Examples");
+      menu.setMnemonic(KeyEvent.VK_P);
+      menu.add(actions.toolsTestCasesAction.getMenuItem());
+      for (final TemplateGroup currGroup : exTempl) {
+        final JMenu menuFileNewFromTemplateGroup = new JMenu();
+        menuFileNewFromTemplateGroup.setText(currGroup.getName());
+        menuFileNewFromTemplateGroup.setToolTipText
+          (currGroup.getShortDescription());
+        menu.add(menuFileNewFromTemplateGroup);
+        for (final TemplateItem currItem : currGroup) {
+          final JMenuItem menuItem = new JMenuItem();
+          menuItem.setText(currItem.getName());
+          menuItem.setToolTipText(currItem.getShortDescription());
+          menuFileNewFromTemplateGroup.add(menuItem);
+          menuItem.addActionListener(new NewFromTemplateHandler(currItem));
+        }
+      }
+      add(menu);
+    }
+  }
+
+  private void createModulesMenu()
+  {
+    final JMenu menu = new JMenu("Modules");
+    menu.setMnemonic(KeyEvent.VK_M);
     int count = 0;
     final DocumentContainerManager manager = mIDE.getDocumentContainerManager();
     if (manager != null) {
@@ -690,13 +655,14 @@ public class IDEMenuBar extends JMenuBar
       for (final DocumentContainer container : manager.getRecent()) {
         final JMenuItem item = createModuleMenuItem(container);
         item.setEnabled(container != active);
-        mModulesMenu.add(item);
+        menu.add(item);
         if (++count >= MAX_MODULES) {
           break;
         }
       }
     }
-    mModulesMenu.setEnabled(count > 0);
+    menu.setEnabled(count > 0);
+    add(menu);
   }
 
   private JMenuItem createModuleMenuItem(final DocumentContainer container)
@@ -723,7 +689,7 @@ public class IDEMenuBar extends JMenuBar
       public void actionPerformed(final ActionEvent event)
       {
         final DocumentContainerManager manager =
-            mIDE.getDocumentContainerManager();
+          mIDE.getDocumentContainerManager();
         manager.setActiveContainer(container);
       }
     };
@@ -731,109 +697,68 @@ public class IDEMenuBar extends JMenuBar
     return item;
   }
 
-
-  //#########################################################################
-  //# Inner Class IDEListener
-  private class IDEListener implements Observer
+  private void createConfigureMenu()
   {
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.observer.Observer
-    @Override
-    public void update(final EditorChangedEvent event)
-    {
-      switch (event.getKind()) {
-      case CONTAINER_SWITCH:
-        updateModulesMenu();
-        rebuildMenus();
-        break;
-      case MAINPANEL_SWITCH:
-        rebuildMenus();
-        break;
-      default:
-        break;
-      }
-    }
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Configure");
+    menu.setMnemonic(KeyEvent.VK_O);
+    menu.add(actions.analyzerOptionsAction.getMenuItem());
+    add(menu);
+  }
+
+  private void createHelpMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Help");
+    menu.setMnemonic(KeyEvent.VK_H);
+    final Action about = actions.getAction(IDEAboutAction.class);
+    menu.add(about);
+    menu.add(actions.helpWebAction.getMenuItem());
+    add(menu);
   }
 
 
   //#########################################################################
-  //# Inner Class ToolsPropertyListener
-  private class FilePropertyListener implements
-      SupremicaPropertyChangeListener
+  //# Menu Building
+  private void rebuildMenus()
   {
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mFileMenu = null;
-      rebuildMenus();
-    }
+    removeAll();
+    removeListeners();
+    createMenus();
+    revalidate();
+    repaint();
   }
 
-
-  //#########################################################################
-  //# Inner Class CreatePropertyListener
-  private class CreatePropertyListener implements
-      SupremicaPropertyChangeListener
+  private void createMenus()
   {
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mCreateMenu = null;
-      rebuildMenus();
+    createFileMenu();
+    createEditMenu();
+    final MainPanel panel = getActivePanel();
+    if (panel != null) {
+      panel.createPanelSpecificMenus(this);
     }
+    createToolsMenu();
+    createExamplesMenu();
+    createModulesMenu();
+    createConfigureMenu();
+    createHelpMenu();
   }
 
-
-  //#########################################################################
-  //# Inner Class ToolsPropertyListener
-  private class ToolsPropertyListener implements
-      SupremicaPropertyChangeListener
+  private void removeListeners()
   {
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mToolsMenu = null;
-      rebuildMenus();
+    for (final Property property : mProperties) {
+      property.removePropertyChangeListener(this);
     }
+    mProperties.clear();
   }
 
-
-  //#########################################################################
-  //# Inner Class AnalyzePropertyListener
-  private class AnalyzePropertyListener implements
-      SupremicaPropertyChangeListener
+  private MainPanel getActivePanel()
   {
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mVerifyMenu = null;
-      mEdAnalyzeMenu = null;
-      rebuildMenus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class TumPropertyListener
-  private class TumPropertyListener implements
-      SupremicaPropertyChangeListener
-  {
-    //#######################################################################
-    //# Interface org.supremica.properties.SupremicaPropertyChangeListener
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      mEdAnalyzeMenu = null; // for TUM ST code generator
-      mExamplesMenu = null;  // for TUM examples
-      rebuildMenus();
+    final DocumentContainer container = mIDE.getActiveDocumentContainer();
+    if (container == null) {
+      return null;
+    } else {
+      return container.getActivePanel();
     }
   }
 
@@ -875,24 +800,12 @@ public class IDEMenuBar extends JMenuBar
   //#########################################################################
   //# Data Members
   private final IDE mIDE;
-
-  private JMenu mFileMenu = null;
-  private JMenu mEditMenu = null;
-  private JMenu mCreateMenu = null;
-  private JMenu mVerifyMenu = null;
-  private JMenu mSimulateMenu = null;
-  private JMenu mAnalyzeMenu = null;
-  private JMenu mEdAnalyzeMenu = null;
-  private JMenu mToolsMenu = null;
-  private JMenu mExamplesMenu = null;
-  private JMenu mModulesMenu = null;
-  private JMenu mConfigureMenu = null;
-  private JMenu mHelpMenu = null;
+  private final Collection<Property> mProperties;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 2077418542695726371L;
+  private static final long serialVersionUID = -5837298363631259731L;
 
   private static final int MAX_MODULES = 24;
 
