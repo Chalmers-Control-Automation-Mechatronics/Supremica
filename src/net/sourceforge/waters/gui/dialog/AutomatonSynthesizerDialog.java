@@ -57,6 +57,7 @@ import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFac
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -84,13 +85,16 @@ public class AutomatonSynthesizerDialog extends JDialog
   public AutomatonSynthesizerDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
-    mAnalyzerPanel = panel;
-    mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-
     setTitle("Supervisor synthesis");
+    mAnalyzerPanel = panel;
+    final AutomataTable table = panel.getAutomataTable();
+    if (table.getSelectedRowCount() > 0) {
+      mAutomata = table.getCurrentSelection();
+    } else {
+      mAutomata = table.getAllSelectableItems();
+    }
     createComponents();
     layoutComponents();
-
     setLocationRelativeTo(panel.getTopLevelAncestor());
     mNamePrefix.requestFocusInWindow();
     setVisible(true);
@@ -267,7 +271,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     final String prefixName = mNamePrefix.getText();
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                           mAutomatonList, factory);
+                                           mAutomata, factory);
     mSynthesizer = new MonolithicSynthesizer(des, factory);
     mSynthesizer.setOutputName(prefixName);
     final KindTranslator translator;
@@ -388,7 +392,7 @@ public class AutomatonSynthesizerDialog extends JDialog
   //# Data Members
   // Dialog state
   private final WatersAnalyzerPanel mAnalyzerPanel;
-  private final List<AutomatonProxy> mAutomatonList;
+  private final List<AutomatonProxy> mAutomata;
 
   // Swing components
   private JPanel mMainPanel;

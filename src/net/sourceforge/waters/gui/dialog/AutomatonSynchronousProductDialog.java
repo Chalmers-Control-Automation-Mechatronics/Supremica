@@ -52,6 +52,7 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -88,13 +89,16 @@ public class AutomatonSynchronousProductDialog extends JDialog
   public AutomatonSynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
-    mAnalyzerPanel = panel;
-    mAutomatonList = mAnalyzerPanel.getAutomataTable().getCurrentSelection();
-
     setTitle("Synchronous product");
+    mAnalyzerPanel = panel;
+    final AutomataTable table = panel.getAutomataTable();
+    if (table.getSelectedRowCount() > 0) {
+      mAutomata = table.getCurrentSelection();
+    } else {
+      mAutomata = table.getAllSelectableItems();
+    }
     createComponents();
     layoutComponents();
-
     setLocationRelativeTo(panel.getTopLevelAncestor());
     mNameInput.requestFocusInWindow();
     setVisible(true);
@@ -265,6 +269,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     pack();
   }
 
+
   //#########################################################################
   //# Action Listeners
   /**
@@ -296,7 +301,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
 
       final ProductDESProxy des =
         AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                             mAutomatonList, factory);
+                                             mAutomata, factory);
       final TRSynchronousProductBuilder builder =
         new TRSynchronousProductBuilder(des);
       builder.setOutputName(name);
@@ -318,6 +323,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   /**
@@ -337,9 +343,9 @@ public class AutomatonSynchronousProductDialog extends JDialog
   private String getNewName()
   {
     String name = "";
-    if (mAutomatonList.size() <= 4)
-      for (final AutomatonProxy aut : mAutomatonList) {
-        if (aut.equals(mAutomatonList.get((mAutomatonList.size() - 1))))
+    if (mAutomata.size() <= 4)
+      for (final AutomatonProxy aut : mAutomata) {
+        if (aut.equals(mAutomata.get((mAutomata.size() - 1))))
           name += aut.getName();
         else
           name += aut.getName() + "_";
@@ -354,7 +360,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     int plantCount = 0;
     int propCount = 0;
     int specCount = 0;
-    for (final AutomatonProxy aut : mAutomatonList) {
+    for (final AutomatonProxy aut : mAutomata) {
       switch (aut.getKind()) {
       case PLANT:
         plantCount++;
@@ -380,11 +386,12 @@ public class AutomatonSynchronousProductDialog extends JDialog
       return ComponentKind.SUPERVISOR;
   }
 
+
   //#########################################################################
   //# Data Members
   // Dialog state
   private final WatersAnalyzerPanel mAnalyzerPanel;
-  private final List<AutomatonProxy> mAutomatonList;
+  private final List<AutomatonProxy> mAutomata;
 
   // Swing components
   private JPanel mMainPanel;

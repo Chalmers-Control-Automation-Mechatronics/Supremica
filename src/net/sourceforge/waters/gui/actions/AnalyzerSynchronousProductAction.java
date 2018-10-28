@@ -34,8 +34,10 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynchronousProductDialog;
@@ -60,10 +62,13 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
   {
     super(ide);
     putValue(Action.NAME, "Synchronise ...");
-    putValue(Action.SHORT_DESCRIPTION, "Synchronise the selected automata");
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNC);
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_L, ActionEvent.ALT_MASK));
     updateEnabledStatus();
   }
+
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -76,6 +81,7 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
     }
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
@@ -86,17 +92,26 @@ public class AnalyzerSynchronousProductAction extends WatersAnalyzerAction
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    boolean enabled = false;
     final AutomataTable table = getAnalyzerTable();
-    if (table != null) {
-      enabled = (table.getSelectedRowCount() >= 2);
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION, "Compute synchronous product");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(table.getSelectedRowCount() >= 2);
+      putValue(Action.SHORT_DESCRIPTION,
+        "Compute synchronous product of the selected automata");
+    } else {
+      setEnabled(table.getRowCount() >= 2);
+      putValue(Action.SHORT_DESCRIPTION,
+        "Compute synchronous product of all automata");
     }
-    setEnabled(enabled);
   }
+
 
   //#########################################################################
   //# Class Constants

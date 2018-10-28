@@ -34,8 +34,10 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
+import javax.swing.KeyStroke;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.dialog.AutomatonSynthesizerDialog;
@@ -60,11 +62,13 @@ public class AnalyzerSynthesisAction extends WatersAnalyzerAction
   {
     super(ide);
     putValue(Action.NAME, "Synthesize ...");
-    putValue(Action.SHORT_DESCRIPTION,
-             "Synthesize supervisors for the selected automata");
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
+    putValue(Action.ACCELERATOR_KEY,
+             KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
     updateEnabledStatus();
   }
+
 
   //#########################################################################
   //# Interface java.awt.event.ActionListener
@@ -77,6 +81,7 @@ public class AnalyzerSynthesisAction extends WatersAnalyzerAction
     }
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
@@ -87,16 +92,24 @@ public class AnalyzerSynthesisAction extends WatersAnalyzerAction
     }
   }
 
+
   //#########################################################################
   //# Auxiliary Methods
   private void updateEnabledStatus()
   {
-    boolean enabled = false;
     final AutomataTable table = getAnalyzerTable();
-    if (table != null) {
-      enabled = (table.getSelectedRowCount() >= 1);
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION, "Synthesize supervisors");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(true);
+      putValue(Action.SHORT_DESCRIPTION,
+        "Synthesize supervisors for the selected automata");
+    } else {
+      setEnabled(table.getRowCount() > 0);
+      putValue(Action.SHORT_DESCRIPTION,
+        "Synthesize supervisors for all automata");
     }
-    setEnabled(enabled);
   }
 
 
