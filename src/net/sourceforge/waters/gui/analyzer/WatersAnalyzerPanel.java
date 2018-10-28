@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -59,6 +60,7 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.supremica.gui.ide.IDEMenuBar;
 import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -89,6 +91,7 @@ public class WatersAnalyzerPanel extends MainPanel
     setRightComponent(emptyPanel);
   }
 
+
   //#########################################################################
   //# Simple Access
   ModuleContainer getModuleContainer()
@@ -111,13 +114,21 @@ public class WatersAnalyzerPanel extends MainPanel
     return mAutomataTable;
   }
 
+
   //#########################################################################
-  //# Focus Switching
+  //# Overrides for org.supremica.gui.ide.MainPanel
   @Override
   protected void activate()
   {
     FocusTracker.requestFocusFor(mAutomataTable);
   }
+
+  @Override
+  public void createPanelSpecificMenus(final IDEMenuBar menuBar)
+  {
+    menuBar.createWatersAnalyzeMenu();
+  }
+
 
   //#########################################################################
   //# Callbacks
@@ -126,24 +137,24 @@ public class WatersAnalyzerPanel extends MainPanel
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
-    BindingContext bindings = null;
-    GraphSubject graph = null;
-    final AutomataTableModel autModel = mAutomataTable.getModel();
+    final GraphSubject graph;
+    final BindingContext bindings;
     if (info != null) {
       final Proxy source = info.getSourceObject();
       final SimpleComponentSubject comp = (SimpleComponentSubject) source;
       graph = comp.getGraph();
       bindings = info.getBindingContext();
     } else {
-      SimpleComponentSubject comp = null;
+      final AutomataTableModel autModel = mAutomataTable.getModel();
+      final SimpleComponentProxy comp;
       if (autModel.containsDisplayMap(aut)) {
-        comp = (SimpleComponentSubject) autModel.getCompFromDisplayMap(aut);
+        comp = autModel.getCompFromDisplayMap(aut);
       } else {
         try {
           final ModuleProxyFactory factory =
             ModuleSubjectFactory.getInstance();
           final ProductDESImporter importer = new ProductDESImporter(factory);
-          comp = (SimpleComponentSubject) importer.importComponent(aut);
+          comp = importer.importComponent(aut);
           autModel.addToDisplayMap(aut, comp);
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
@@ -151,13 +162,14 @@ public class WatersAnalyzerPanel extends MainPanel
           return;
         }
       }
-      graph = comp.getGraph();
+      graph = (GraphSubject) comp.getGraph();
+      bindings = null;
     }
     try {
-      final AutomatonDisplayPane mAutomataDisplayPane =
+      final AutomatonDisplayPane displayPane =
         new AutomatonDisplayPane(graph, bindings, mModuleContainer,
                                  mSimpleExpressionCompiler, aut);
-      final JScrollPane scroll = new JScrollPane(mAutomataDisplayPane);
+      final JScrollPane scroll = new JScrollPane(displayPane);
       setRightComponent(scroll);
     } catch (final GeometryAbsentException exception) {
       final Logger logger = LogManager.getLogger();
@@ -166,11 +178,13 @@ public class WatersAnalyzerPanel extends MainPanel
     }
   }
 
+
   //#########################################################################
   //# Data Members
   private final ModuleContainer mModuleContainer;
   private final SimpleExpressionCompiler mSimpleExpressionCompiler;
   private final AutomataTable mAutomataTable;
+
 
   //#########################################################################
   //# Class Constants

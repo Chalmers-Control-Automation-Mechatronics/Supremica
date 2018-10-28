@@ -60,7 +60,7 @@ public class NewAction
         putValue(Action.SHORT_DESCRIPTION, "New Module");
         putValue(Action.MNEMONIC_KEY, KeyEvent.VK_N);
         putValue(Action.ACCELERATOR_KEY,
-                 KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+                 KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.ALT_MASK));
         putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_NEW);
     }
 

@@ -78,7 +78,7 @@ public class OpenAction extends net.sourceforge.waters.gui.actions.IDEAction
     putValue(Action.SHORT_DESCRIPTION, "Open/import a module");
     putValue(Action.MNEMONIC_KEY, KeyEvent.VK_O);
     putValue(Action.ACCELERATOR_KEY,
-             KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.CTRL_MASK));
+             KeyStroke.getKeyStroke(KeyEvent.VK_O, ActionEvent.ALT_MASK));
     putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPEN);
   }
 

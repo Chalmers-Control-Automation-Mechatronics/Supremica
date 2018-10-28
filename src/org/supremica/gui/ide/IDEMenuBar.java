@@ -71,6 +71,8 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
+import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
+import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
 import net.sourceforge.waters.gui.actions.GraphSavePDFAction;
@@ -182,32 +184,33 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 
 //###########################################################################
 //# ALT-Hotkeys:
+//# (Beware that toolbar items are also triggered through Alt+mnemonic)
 //###########################################################################
-//# ALT-a: Create/New automaton
+//# ALT-a: Create/New automaton (toolbar)
 //# ALT-b: Simulator/Step back
 //# ALT-c: Create menu
 //# ALT-d: Edit menu
-//# ALT-e: Create/New event
+//# ALT-e: Create/New event (toolbar)
 //# ALT-f: File menu
-//# ALT-g:
+//# ALT-g: Configure menu
 //# ALT-h: Help menu
-//# ALT-i:
+//# ALT-i: Simulate menu
 //# ALT-j:
 //# ALT-k:
-//# ALT-l:
+//# ALT-l: Analyze/Synchronize
 //# ALT-m: Modules menu
-//# ALT-n:
-//# ALT-o: Configure menu
+//# ALT-n: File/New (toolbar)
+//# ALT-o: File/Open (toolbar)
 //# ALT-p: Examples menu
 //# ALT-q:
 //# ALT-r: Verify menu
-//# ALT-s: Simulate menu
+//# ALT-s: File/Save (toolbar)
 //# ALT-t: Tools menu
 //# ALT-u:
-//# ALT-v: Create/New variable
+//# ALT-v: Create/New variable (toolbar)
 //# ALT-w:
 //# ALT-x: File/Exit
-//# ALT-y:
+//# ALT-y: Analyze/Synthesize
 //# ALT-z: Analyze menu
 
 //###########################################################################
@@ -226,9 +229,9 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
 //# CTRL-k:
 //# CTRL-l: Tools/Layout graph
 //# CTRL-m: Edit/Show module comments
-//# CTRL-n: File/New
-//# CTRL-o: File/Open
-//# CTRL-p: File/Print
+//# CTRL-n:
+//# CTRL-o:
+//# CTRL-p: File/Print (not used at the moment)
 //# CTRL-q:
 //# CTRL-r:
 //# CTRL-s: File/Save
@@ -474,11 +477,24 @@ public class IDEMenuBar
     add(menu);
   }
 
+  public void createWatersAnalyzeMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Analyze");
+    menu.setMnemonic(KeyEvent.VK_Z); // ALT-A - create automaton?
+    final Action sync =
+      actions.getAction(AnalyzerSynchronousProductAction.class);
+    menu.add(sync);
+    final Action synth = actions.getAction(AnalyzerSynthesisAction.class);
+    menu.add(synth);
+    add(menu);
+  }
+
   public void createSimulateMenu()
   {
     final Actions actions = getActions();
     final JMenu menu = new JMenu("Simulate");
-    menu.setMnemonic(KeyEvent.VK_S);
+    menu.setMnemonic(KeyEvent.VK_I);
     final Action reset = actions.getAction(SimulationResetAction.class);
     menu.add(reset);
     final Action stepBeginning =
@@ -573,8 +589,7 @@ public class IDEMenuBar
     menu.add(properties);
     final Action showgraph = actions.getAction(ShowGraphAction.class);
     menu.add(showgraph);
-    final Action showcomment =
-        actions.getAction(ShowModuleCommentAction.class);
+    final Action showcomment = actions.getAction(ShowModuleCommentAction.class);
     menu.add(showcomment);
     add(menu);
   }
@@ -703,7 +718,7 @@ public class IDEMenuBar
   {
     final Actions actions = getActions();
     final JMenu menu = new JMenu("Configure");
-    menu.setMnemonic(KeyEvent.VK_O);
+    menu.setMnemonic(KeyEvent.VK_G);
     menu.add(actions.analyzerOptionsAction.getMenuItem());
     add(menu);
   }
