@@ -66,11 +66,11 @@ import net.sourceforge.waters.gui.observer.Subject;
 import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.supremica.gui.ide.actions.Actions;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
 import org.supremica.properties.SupremicaPropertyChangeListener;
@@ -251,12 +251,7 @@ public class EditorPanel
   public ComponentEditorPanel showEditor(final SimpleComponentSubject comp)
     throws GeometryAbsentException
   {
-    final ComponentEditorPanel panel =
-      mModuleContainer.createComponentEditorPanel(comp);
-    setRightComponent(panel);
-    final GraphEditorPanel surface = panel.getGraphEditorPanel();
-    FocusTracker.requestFocusFor(surface);
-    return panel;
+    return setRightComponent(comp);
   }
 
   @Override
@@ -342,22 +337,28 @@ public class EditorPanel
     }
   }
 
+
   //#########################################################################
   //# Overrides for org.supremica.gui.ide.MainPanel
+  @Override
+  public ComponentEditorPanel setRightComponent(final Proxy proxy)
+    throws GeometryAbsentException
+  {
+    final SimpleComponentSubject comp = (SimpleComponentSubject) proxy;
+    final ComponentEditorPanel panel =
+      mModuleContainer.createComponentEditorPanel(comp);
+    setRightComponent(panel);
+    final GraphEditorPanel surface = panel.getGraphEditorPanel();
+    FocusTracker.requestFocusFor(surface);
+    return panel;
+  }
+
   @Override
   protected boolean setRightComponent(final JComponent newComponent)
   {
     if (super.setRightComponent(newComponent)) {
       final EditorChangedEvent event = new SubPanelSwitchEvent(this);
       fireEditorChangedEvent(event);
-
-      // Update enablement of actions dependent on the right component
-      // (component editor panel) --- to be deprecated ...
-      if (newComponent instanceof ComponentEditorPanel) {
-        getActions().editorPrintAction.setEnabled(true);
-      } else {
-        getActions().editorPrintAction.setEnabled(false);
-      }
       return true;
     } else {
       return false;
@@ -367,11 +368,6 @@ public class EditorPanel
 
   //#########################################################################
   //# Auxiliary Methods
-  private Actions getActions()
-  {
-    return mModuleContainer.getIDE().getActions();
-  }
-
   private void estimateMinimumWidth(final JTabbedPane tabbedPane,
                                       final float scale)
   {

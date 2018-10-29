@@ -129,11 +129,11 @@ public class WatersAnalyzerPanel extends MainPanel
     menuBar.createWatersAnalyzeMenu();
   }
 
-
-  //#########################################################################
-  //# Callbacks
-  void displaySelectedAutomaton(final AutomatonProxy aut)
+  @Override
+  public AutomatonDisplayPane setRightComponent(final Proxy proxy)
+    throws GeometryAbsentException
   {
+    final AutomatonProxy aut = (AutomatonProxy) proxy;
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
@@ -159,23 +159,18 @@ public class WatersAnalyzerPanel extends MainPanel
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
           logger.error(exception.getMessage());
-          return;
+          return null;
         }
       }
       graph = (GraphSubject) comp.getGraph();
       bindings = null;
     }
-    try {
-      final AutomatonDisplayPane displayPane =
-        new AutomatonDisplayPane(graph, bindings, mModuleContainer,
-                                 mSimpleExpressionCompiler, aut);
-      final JScrollPane scroll = new JScrollPane(displayPane);
-      setRightComponent(scroll);
-    } catch (final GeometryAbsentException exception) {
-      final Logger logger = LogManager.getLogger();
-      final String msg = exception.getMessage();
-      logger.error(msg);
-    }
+    final AutomatonDisplayPane displayPane =
+      new AutomatonDisplayPane(graph, bindings, mModuleContainer,
+                               mSimpleExpressionCompiler, aut);
+    final JScrollPane scroll = new JScrollPane(displayPane);
+    setRightComponent(scroll);
+    return displayPane;
   }
 
 

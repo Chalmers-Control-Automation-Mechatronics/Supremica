@@ -43,7 +43,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
+import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
+import net.sourceforge.waters.model.base.Proxy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.WhiteScrollPane;
 
@@ -95,6 +100,33 @@ public abstract class MainPanel extends JPanel
     return mName;
   }
 
+  public JComponent getRightComponent()
+  {
+    return (JComponent) mSplitPane.getRightComponent();
+  }
+
+  public JScrollPane getEmptyRightPanel()
+  {
+    return mEmptyRightPanel;
+  }
+
+  public JComponent showGraph(final Proxy proxy)
+  {
+    try {
+      return setRightComponent(proxy);
+    } catch (final GeometryAbsentException exception) {
+      final Logger logger = LogManager.getLogger();
+      logger.error(exception.getMessage());
+      return null;
+    }
+  }
+
+  public boolean isWatersPanel()
+  {
+    return true;
+  }
+
+
   protected void setLeftComponent(final JComponent newComponent)
   {
     if (newComponent != mSplitPane.getLeftComponent()) {
@@ -120,19 +152,10 @@ public abstract class MainPanel extends JPanel
     }
   }
 
-  public JComponent getRightComponent()
+  protected JComponent setRightComponent(final Proxy proxy)
+    throws GeometryAbsentException
   {
-    return (JComponent) mSplitPane.getRightComponent();
-  }
-
-  public JScrollPane getEmptyRightPanel()
-  {
-    return mEmptyRightPanel;
-  }
-
-  public boolean isWatersPanel()
-  {
-    return true;
+    return null;
   }
 
 

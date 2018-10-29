@@ -38,16 +38,13 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.Action;
 
-import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
 
 
 /**
@@ -73,8 +70,8 @@ public class ShowGraphAction
   {
     super(ide);
     mActionArgument = arg;
-    putValue(Action.NAME, "Show Graph");
-    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_G);
+    putValue(Action.NAME, "Show Automaton");
+    putValue(Action.MNEMONIC_KEY, KeyEvent.VK_W);
     updateEnabledStatus();
   }
 
@@ -84,16 +81,9 @@ public class ShowGraphAction
   @Override
   public void actionPerformed(final ActionEvent event)
   {
-    final ModuleWindowInterface root = getActiveModuleWindowInterface();
-    final SimpleComponentSubject comp =
-      (SimpleComponentSubject) getActionArgument();
-    try {
-      root.showEditor(comp);
-    } catch (final GeometryAbsentException exception) {
-      final Logger logger = LogManager.getLogger();
-      final String msg = exception.getMessage(comp);
-      logger.error(msg);
-    }
+    final MainPanel panel = getActiveMainPanel();
+    final Proxy proxy = getActionArgument();
+    panel.showGraph(proxy);
   }
 
 
@@ -113,14 +103,21 @@ public class ShowGraphAction
   private void updateEnabledStatus()
   {
     final Proxy proxy = getActionArgument();
-    final boolean enabled =
-      proxy != null && proxy instanceof SimpleComponentSubject;
+    final boolean enabled;
+    if (proxy == null) {
+      enabled = false;
+    } else if (proxy instanceof SimpleComponentSubject ||
+               proxy instanceof AutomatonProxy) {
+      enabled = true;
+    } else {
+      enabled = false;
+    }
     setEnabled(enabled);
     if (enabled) {
-      putValue(Action.SHORT_DESCRIPTION, "Edit the graph for this automaton");
+      putValue(Action.SHORT_DESCRIPTION, "Show the graph for this automaton");
     } else {
       putValue(Action.SHORT_DESCRIPTION,
-               "Edit the graph for the selected automaton");
+               "Show the graph for the selected automaton");
     }
   }
 

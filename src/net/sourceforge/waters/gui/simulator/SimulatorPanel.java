@@ -165,6 +165,7 @@ public class SimulatorPanel
     mTabbedPane.addTab("Events", mEventsPanel);
   }
 
+
   //#########################################################################
   //# Data Members
   private final ModuleContainer mModuleContainer;

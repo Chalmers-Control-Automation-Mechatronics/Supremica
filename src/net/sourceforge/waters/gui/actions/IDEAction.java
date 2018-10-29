@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 
 import javax.swing.AbstractAction;
@@ -43,6 +42,7 @@ import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
+import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.Proxy;
@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import org.supremica.gui.ide.DocumentContainer;
 import org.supremica.gui.ide.EditorPanel;
 import org.supremica.gui.ide.IDE;
+import org.supremica.gui.ide.MainPanel;
 import org.supremica.gui.ide.ModuleContainer;
 
 
@@ -171,18 +172,31 @@ public abstract class IDEAction
   }
 
   /**
-   * Retrieves a references to the active editor panel.
-   * @return  A module window interface to access the active editor panel,
-   *          or <CODE>null</CODE> if no editor panel is currently active.
+   * Retrieves a references to the currently active main panel.
+   * @return  The current panel, which is an {@link EditorPanel}, {@link
+   *          SimulatorPanel}, or similar; or <CODE>null</CODE> if no main
+   *          panel is currently active.
    */
-  ModuleWindowInterface getActiveModuleWindowInterface()
+  MainPanel getActiveMainPanel()
   {
     final IDE ide = getIDE();
     final DocumentContainer container = ide.getActiveDocumentContainer();
     if (container == null || !(container instanceof ModuleContainer)) {
       return null;
     }
-    final Component panel = container.getActivePanel();
+    return container.getActivePanel();
+  }
+
+  /**
+   * Retrieves a references to the active editor panel.
+   * This method will soon be deprecated,
+   * please use {@link #getActiveMainPanel()} instead.
+   * @return  A module window interface to access the active editor panel,
+   *          or <CODE>null</CODE> if no editor panel is currently active.
+   */
+  ModuleWindowInterface getActiveModuleWindowInterface()
+  {
+    final MainPanel panel = getActiveMainPanel();
     if (panel instanceof EditorPanel) {
       return (ModuleWindowInterface) panel;
     } else {

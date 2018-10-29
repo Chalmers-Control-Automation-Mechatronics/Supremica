@@ -154,6 +154,7 @@ public class AutomataTable extends JTable implements SelectionOwner
       });
   }
 
+
   //#########################################################################
   //# Overrides for javax.swing.JTable
   @Override
@@ -175,6 +176,7 @@ public class AutomataTable extends JTable implements SelectionOwner
       return null;
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -200,6 +202,7 @@ public class AutomataTable extends JTable implements SelectionOwner
     final AnalyzerPopupFactory pop = new AnalyzerPopupFactory(manager);
     pop.maybeShowPopup(this, event, clicked);
   }
+
 
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.observer.subject
@@ -233,6 +236,7 @@ public class AutomataTable extends JTable implements SelectionOwner
       }
     }
   }
+
 
   //#########################################################################
   //# Interface net.sourcefore.waters.gui.transfer.SelectionOwner
@@ -507,6 +511,24 @@ public class AutomataTable extends JTable implements SelectionOwner
 
 
   //#########################################################################
+  //# Specific Access
+  /**
+   * Gets the currently applicable arguments for an analysis operation.
+   * @return Either a list containing the automata currently selected in
+   *         the table, or a list containing all automata in the table
+   *         if the selection is empty.
+   */
+  public List<AutomatonProxy> getOperationArgument()
+  {
+    if (getSelectedRowCount() > 0) {
+      return getCurrentSelection();
+    } else {
+      return getAllSelectableItems();
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class TextCellRenderer
   /**
    * A text renderer for the analyser's automata table.
@@ -600,21 +622,12 @@ public class AutomataTable extends JTable implements SelectionOwner
     @Override
     public void mouseClicked(final MouseEvent event)
     {
-      if (event.getButton() == MouseEvent.BUTTON1
-          && event.getClickCount() == 2) {
-        final AutomatonProxy aut = getAutomaton(event);
-        if (aut != null) {
-          if (getSelectedRowCount() > 1) {
-            final AutomataTableModel model = getModel();
-            model.getAutomaton(getSelectedRows()[0]);
-          } else {
-            mParent.displaySelectedAutomaton(aut);
-          }
-        }
-      } else if (event.getButton() == MouseEvent.BUTTON1) {
+      if (event.getButton() == MouseEvent.BUTTON1) {
         final AutomatonProxy aut = getAutomaton(event);
         if (aut == null) {
           clearSelection();
+        } else if (event.getClickCount() == 2) {
+          mParent.showGraph(aut);
         }
       }
     }
@@ -632,6 +645,7 @@ public class AutomataTable extends JTable implements SelectionOwner
       maybeShowPopup(event);
     }
   }
+
 
   //#########################################################################
   //# Data Members

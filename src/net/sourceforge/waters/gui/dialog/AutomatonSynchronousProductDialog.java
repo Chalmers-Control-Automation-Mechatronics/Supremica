@@ -52,7 +52,6 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -91,12 +90,7 @@ public class AutomatonSynchronousProductDialog extends JDialog
     super((Frame) panel.getTopLevelAncestor());
     setTitle("Synchronous product");
     mAnalyzerPanel = panel;
-    final AutomataTable table = panel.getAutomataTable();
-    if (table.getSelectedRowCount() > 0) {
-      mAutomata = table.getCurrentSelection();
-    } else {
-      mAutomata = table.getAllSelectableItems();
-    }
+    mAutomata = panel.getAutomataTable().getOperationArgument();
     createComponents();
     layoutComponents();
     setLocationRelativeTo(panel.getTopLevelAncestor());
@@ -126,15 +120,16 @@ public class AutomatonSynchronousProductDialog extends JDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    IdentifierProxy oldname = null;
+    IdentifierProxy oldName = null;
     try {
-      oldname = parser.parseIdentifier(getNewName());
+      oldName = parser.parseIdentifier(getNewName());
     } catch (final ParseException exception) {
-      exception.printStackTrace();
+      oldName = factory.createSimpleIdentifierProxy(DEFAULT_NAME);
     }
-    final FormattedInputParser nameparser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, false);
+    final FormattedInputParser nameParser = new
+      AutomatonNameInputParser(oldName, mAnalyzerPanel, parser, false);
     mNameInput =
-      new SimpleExpressionCell(oldname, nameparser);
+      new SimpleExpressionCell(oldName, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -342,17 +337,21 @@ public class AutomatonSynchronousProductDialog extends JDialog
 
   private String getNewName()
   {
-    String name = "";
-    if (mAutomata.size() <= 4)
+    if (mAutomata.size() <= 4) {
+      final StringBuilder builder = new StringBuilder();
+      boolean first = true;
       for (final AutomatonProxy aut : mAutomata) {
-        if (aut.equals(mAutomata.get((mAutomata.size() - 1))))
-          name += aut.getName();
-        else
-          name += aut.getName() + "_";
+        if (first) {
+          first = false;
+        } else {
+          builder.append('_');
+        }
+        builder.append(aut.getName());
       }
-    else
-      name = "sync";
-    return name;
+      return builder.toString();
+    } else {
+      return DEFAULT_NAME;
+    }
   }
 
   private ComponentKind getKind()
@@ -374,16 +373,16 @@ public class AutomatonSynchronousProductDialog extends JDialog
       case SUPERVISOR:
         break;
       }
-
     }
-    if(plantCount > 0)
+    if (plantCount > 0) {
       return ComponentKind.PLANT;
-    else if(propCount > 0)
+    } else if (propCount > 0) {
       return ComponentKind.PROPERTY;
-    else if(specCount > 0)
+    } else if (specCount > 0) {
       return ComponentKind.SPEC;
-    else
+    } else {
       return ComponentKind.SUPERVISOR;
+    }
   }
 
 
@@ -412,5 +411,6 @@ public class AutomatonSynchronousProductDialog extends JDialog
   //# Class Constants
   private static final long serialVersionUID = 6159733639861131531L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  private static final String DEFAULT_NAME = "sync";
 
 }

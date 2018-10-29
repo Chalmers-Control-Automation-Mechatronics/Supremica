@@ -57,7 +57,6 @@ import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFac
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesisResult;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -87,12 +86,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     super((Frame) panel.getTopLevelAncestor());
     setTitle("Supervisor synthesis");
     mAnalyzerPanel = panel;
-    final AutomataTable table = panel.getAutomataTable();
-    if (table.getSelectedRowCount() > 0) {
-      mAutomata = table.getCurrentSelection();
-    } else {
-      mAutomata = table.getAllSelectableItems();
-    }
+    mAutomata = panel.getAutomataTable().getOperationArgument();
     createComponents();
     layoutComponents();
     setLocationRelativeTo(panel.getTopLevelAncestor());
