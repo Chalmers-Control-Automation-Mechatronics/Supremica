@@ -1,0 +1,577 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="distributing1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>Substem of faults1 model, created by Jeroen van Willigen, received 2018-11-03.
+The subsystem is not controllable and blocking.
+It also has deadlocks and is not diagnosable with a true fault confused cycle.
+It has 134 reachable states and the diameter is 33.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="da_pusher1.off"/>
+        <EventDecl Kind="CONTROLLABLE" Name="da_pusher1.on"/>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="df_pusher1_in_off">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAULT"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="df_pusher1_in_on">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAULT"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="df_pusher1_out_off">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAULT"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Observable="false" Name="df_pusher1_out_on">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="FAULT"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="ds_product1.on">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_pusher1_in.off"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_pusher1_in.on"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_pusher1_out.off"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_pusher1_out.on"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_stackfilled1.off"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="ds_stackfilled1.on"/>
+        <EventDecl Kind="CONTROLLABLE" Scope="REQUIRED_PARAMETER" Name="dv_allow_product1">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="SPEC" Name="di_1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="1">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="159" Y="157"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-22" Y="3"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="2">
+                        <PointGeometry>
+                            <Point X="347" Y="159"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="2" Target="1">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_product1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-60" Y="-3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="252" Y="218"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="1" Target="2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dv_allow_product1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-55" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="252" Y="95"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:Interface"/>
+            </ns2:AttributeMap>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="dr1_extreme_pos1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="extreme">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="184" Y="235"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-83" Y="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="inbetween">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="418" Y="236"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="13" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fault">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="420" Y="403"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="fault2">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="417" Y="71"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="extreme" Target="extreme">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.off"/>
+                            <SimpleIdentifier Name="da_pusher1.on"/>
+                            <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                            <SimpleIdentifier Name="ds_product1.on"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="184" Y="176"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="extreme" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.off"/>
+                            <SimpleIdentifier Name="ds_pusher1_out.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-42"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="305" Y="196"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="inbetween" Target="fault2">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="-33"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="inbetween" Target="extreme">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.on"/>
+                            <SimpleIdentifier Name="ds_pusher1_out.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-52" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="304" Y="283"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="inbetween" Target="fault">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_product1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="fault" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="5" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="fault2" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="dr2_get_product1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="disallow">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="402" Y="243"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="13" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="allow">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="190" Y="240"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-68" Y="-10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="busy">
+                        <PointGeometry>
+                            <Point X="285" Y="94"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="busy" Target="disallow">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_product1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="1" Y="-24"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="disallow" Target="allow">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="dv_allow_product1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-41" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="287" Y="279"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="allow" Target="busy">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-106" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="dr3_push_product1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="no_product">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="192" Y="266"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-105" Y="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="product">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="425" Y="268"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="wait">
+                        <PointGeometry>
+                            <Point X="309" Y="153"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="14" Y="-16"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="product" Target="no_product">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="304" Y="299"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="no_product" Target="wait">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-115" Y="-26"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="wait" Target="product">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_stackfilled1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="-16"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="da_pusher1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="off">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="140" Y="242"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="on">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="433" Y="244"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="off" Target="off">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.on"/>
+                            <SimpleIdentifier Name="ds_pusher1_out.off"/>
+                            <SimpleIdentifier Name="df_pusher1_out_off"/>
+                            <SimpleIdentifier Name="df_pusher1_in_on"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="140" Y="183"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="off" Target="on">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-48" Y="-25"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="212"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="on" Target="on">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.off"/>
+                            <SimpleIdentifier Name="df_pusher1_in_off"/>
+                            <SimpleIdentifier Name="ds_pusher1_out.on"/>
+                            <SimpleIdentifier Name="df_pusher1_out_on"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="433" Y="185"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="on" Target="off">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="da_pusher1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-60" Y="8"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="288" Y="274"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="PLANT" Name="ds_pusher1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="in">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="348" Y="95"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="12" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="out">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="543" Y="286"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="inbetween">
+                        <PointGeometry>
+                            <Point X="347" Y="284"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="23" Y="-14"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="inf">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="348" Y="470"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-49" Y="-12"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="outf">
+                        <EventList>
+                            <SimpleIdentifier Name=":accepting"/>
+                        </EventList>
+                        <PointGeometry>
+                            <Point X="96" Y="285"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="outf" Target="outf">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="96" Y="226"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="outf" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="df_pusher1_out_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="inbetween" Target="outf">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="df_pusher1_out_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-100" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="inbetween" Target="inf">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="df_pusher1_in_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-39" Y="32"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="inbetween" Target="in">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-117" Y="-14"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="307" Y="188"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="inbetween" Target="out">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_out.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-50" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="440" Y="250"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="out" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_out.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-56" Y="-1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="440" Y="325"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="out" Target="out">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="543" Y="227"/>
+                        </SplineGeometry>
+                    </Edge>
+                    <Edge Source="inf" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="df_pusher1_in_off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-43" Y="5"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="in" Target="inbetween">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="ds_pusher1_in.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="383" Y="188"/>
+                        </SplineGeometry>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
