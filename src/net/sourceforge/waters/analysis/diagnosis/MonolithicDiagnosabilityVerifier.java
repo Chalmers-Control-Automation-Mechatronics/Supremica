@@ -34,7 +34,6 @@
 package net.sourceforge.waters.analysis.diagnosis;
 
 import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.hash.TObjectHashIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 import gnu.trove.map.hash.TLongIntHashMap;
@@ -58,6 +57,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
@@ -130,26 +131,20 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final int numEvents = spEvents.getNumberOfProperEvents();
       final int numStates = rel.getNumberOfStates();
       eventObservable = new boolean[numEvents];
-      eventFaultClass = new String[numEvents];
-      final THashSet<String> faultClasses = new THashSet<String>();
+      final THashSet<String> faultClasses = new THashSet<>();
       final TIntArrayList initStates = new TIntArrayList();
       for (int i = 0; i < numStates; i++) {
         if (rel.isInitial(i)) {
           initStates.add(i);
         }
       }
-      String faultLabel;
-      Map<String,String> attrib;
-      EventProxy event;
       for (int i = EventEncoding.NONTAU; i < numEvents; i++) {
-        event = spEvents.getProperEvent(i);
+        final EventProxy event = spEvents.getProperEvent(i);
         if (event != null) {
-          attrib = event.getAttributes();
-          faultLabel = attrib.get(DiagnosabilityAttributeFactory.FAULT_KEY);
-          if (faultLabel != null) {
-            faultClasses.add(faultLabel);
+          final String faultClass = getEventFaultClass(event);
+          if (faultClass != null) {
+            faultClasses.add(faultClass);
           }
-          eventFaultClass[i] = faultLabel;
           if (event.isObservable()) {
             eventObservable[i] = true;
           } else {
@@ -157,29 +152,32 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           }
         }
       }
+      mNumberOfFaultClasses = faultClasses.size();
       if (!faultClasses.isEmpty()) {
+        mFaultEvent = new boolean[numEvents];
         mStateIndexMap = new TLongIntHashMap(numStates, 0.5f, -1, -1);
-        final TObjectHashIterator<String> faultClassIter =
-          faultClasses.iterator();
         final StateProcessor processor = new VerifierStateProcessor();
-        while (faultClassIter.hasNext()) {
-          faultClass = faultClassIter.next();
+        for (final String faultClass : faultClasses) {
+          mCurrentFaultClass = faultClass;
+          for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+            final EventProxy event = spEvents.getProperEvent(e);
+            final String eventFaultClass = getEventFaultClass(event);
+            mFaultEvent[e] = faultClass.equals(eventFaultClass);
+          }
           mComponentStack.clear();
           mControlStack.clear();
           mLinks.clear();
           mStateIndexMap.clear();
           mIndexStateMap.clear();
-          stateCount = 0;
           for (int x = 0; x < initStates.size(); x++) {
             for (int y = 0; y <= x; y++) {
               final int initA = initStates.get(y);
               final int initB = initStates.get(x);
               final long verifierInit = (((long) initA) << 32) | initB;
-              mStateIndexMap.put(verifierInit, stateCount);
+              lastVerInit = getNumberOfStatePairs();
+              mStateIndexMap.put(verifierInit, lastVerInit);
               mIndexStateMap.add(verifierInit);
-              mControlStack.push(stateCount, stateCount);
-              lastVerInit = stateCount;
-              stateCount++;
+              mControlStack.push(lastVerInit, lastVerInit);
             }
           }
           while (!mControlStack.isEmpty()) {
@@ -210,6 +208,22 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     return setSatisfiedResult();
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  @Override
+  protected void addStatistics()
+  {
+    super.addStatistics();
+    final VerificationResult result = getAnalysisResult();
+    final int numPairs = getNumberOfStatePairs();
+    result.setNumberOfStates(numPairs);
+    result.setPeakNumberOfStates(numPairs);
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private void expand(final int index, final StateProcessor process)
     throws OverflowException
   {
@@ -222,7 +236,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final int targetA = iterA.getCurrentTargetState();
       if (!eventObservable[event]) {
         final int newA, newB;
-        if (faultClass.equals(eventFaultClass[event])) {
+        if (mFaultEvent[event]) {
           newA = targetA | MSB1;
           newB = b;
         } else {
@@ -246,7 +260,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       final int targetB = iterA.getCurrentTargetState();
       if (!eventObservable[event]) {
         final int newA, newB;
-        if (faultClass.equals(eventFaultClass[event])) {
+        if (mFaultEvent[event]) {
           newA = a;
           newB = targetB | MSB1;
         } else {
@@ -271,7 +285,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       event = iterA.getCurrentEvent();
       sourceA = iterA.getCurrentSourceState();
       if (!eventObservable[event]) {
-        if (faultClass.equals(eventFaultClass[event])) {
+        if (mFaultEvent[event]) {
           if ((a & MSB1) != 0) {
             newA = sourceA | MSB1;
             newB = b;
@@ -299,7 +313,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       event = iterA.getCurrentEvent();
       sourceB = iterA.getCurrentSourceState();
       if (!eventObservable[event]) {
-        if (faultClass.equals(eventFaultClass[event])) {
+        if (mFaultEvent[event]) {
           if ((b & MSB1) != 0) {
             newA = a;
             newB = sourceB | MSB1;
@@ -474,8 +488,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     final String nameA = "faulty";
     final String nameB = "non-faulty";
     final String ceName = getModel().getName() + "-undiagnosable";
-    final String ceComment =
-      "The fault-class " + faultClass + " is not diagnosable.";
+    final String ceComment;
+    if (mNumberOfFaultClasses == 1) {
+      ceComment = "The system is not diagnosable.";
+    } else {
+      ceComment = "The fault-class '" + mCurrentFaultClass +
+        "' is not diagnosable.";
+    }
     final TraceProxy tpA =
       getFactory().createTraceProxy(nameA, traceA, loopIndexA);
     final TraceProxy tpB =
@@ -506,6 +525,17 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     final TraceStepProxy step =
       getFactory().createTraceStepProxy(event, autStateMap);
     trace.add(0, step);
+  }
+
+  private String getEventFaultClass(final EventProxy event)
+  {
+    final Map<String,String> attribs = event.getAttributes();
+    return attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
+  }
+
+  private int getNumberOfStatePairs()
+  {
+    return mIndexStateMap.size();
   }
 
   private void setLink(final int index, final int value)
@@ -618,12 +648,11 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       if (a >= 0 || b >= 0) {
         int index = mStateIndexMap.get(next);
         if (index < 0) {
-          mStateIndexMap.put(next, stateCount);
+          index = getNumberOfStatePairs();
+          mStateIndexMap.put(next, index);
           mIndexStateMap.add(next);
-          index = stateCount;
-          stateCount++;
-          if (stateCount >= getNodeLimit()) {
-            throw new OverflowException(getNodeLimit());
+          if (index + 1 >= getNodeLimit()) {
+            throw new OverflowException(OverflowKind.STATE, getNodeLimit());
           }
           mControlStack.push(index, parentIndex);
         } else {
@@ -1069,10 +1098,10 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //#########################################################################
   //# Instance Variables
   private boolean[] eventObservable;
-  private String[] eventFaultClass;
-  private int stateCount = 0;
+  private boolean[] mFaultEvent;
+  private int mNumberOfFaultClasses;
+  private String mCurrentFaultClass;
   private int bfsIndex = 0;
-  private String faultClass;
   private TLongIntHashMap mStateIndexMap;
   private final TLongArrayList mIndexStateMap = new TLongArrayList();
   private final ControlStack mControlStack = new ControlStack();

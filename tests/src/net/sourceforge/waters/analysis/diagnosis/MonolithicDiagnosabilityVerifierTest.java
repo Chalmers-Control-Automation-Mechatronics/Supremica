@@ -37,6 +37,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sourceforge.waters.model.analysis.AbstractModelVerifierTest;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -289,6 +291,7 @@ public class MonolithicDiagnosabilityVerifierTest
     final DualCounterExampleProxy dual = (DualCounterExampleProxy) counter;
     final List<TraceProxy> traces = dual.getTraces();
     assertEquals(2, traces.size());
+    final String faultClass = checkFaultClass(des, dual);
 
     final Collection<AutomatonProxy> automata = des.getAutomata();
     TraceProxy faultyTrace = null;
@@ -301,7 +304,7 @@ public class MonolithicDiagnosabilityVerifierTest
       }
       // Identify faulty and non-faulty traces
       for (final EventProxy event : trace.getEvents()) {
-        if (isFaultEvent(event, dual)) {
+        if (isFaultEvent(event, faultClass)) {
           faultyTrace = trace;
           continue traces;
         }
@@ -374,16 +377,54 @@ public class MonolithicDiagnosabilityVerifierTest
     }
   }
 
+  private String checkFaultClass(final ProductDESProxy des,
+                                 final DualCounterExampleProxy dual)
+  {
+    String faultClass = null;
+    final String comment = dual.getComment();
+    final Pattern pattern = Pattern.compile("fault-class '([^']*)'");
+    final Matcher matcher = pattern.matcher(comment);
+    if (matcher.find()) {
+      faultClass = matcher.group(1);
+      for (final EventProxy event : des.getEvents()) {
+        final Map<String,String> attribs = event.getAttributes();
+        final String value = attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
+        if (faultClass.equals(value)) {
+          return faultClass;
+        }
+      }
+      fail("The fault-class '" + faultClass + "' mentioned in the " +
+           "counterexample comment does not appear in the product DES '" +
+           des.getName() + "!");
+    } else {
+      for (final EventProxy event : des.getEvents()) {
+        final Map<String,String> attribs = event.getAttributes();
+        final String value =
+          attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
+        if (value != null) {
+          if (faultClass == null) {
+            faultClass = value;
+          } else if (!faultClass.equals(value)) {
+            fail("The counterexample comment does not mention any fault class, " +
+                 "but the product DES '" + des.getName() +
+                 "' includes more than one fault class!");
+          }
+        }
+      }
+    }
+    return faultClass;
+  }
+
   private boolean isFaultEvent(final EventProxy event,
-                               final DualCounterExampleProxy dual)
+                               final String faultClass)
   {
     final Map<String,String> attribs = event.getAttributes();
     final String value = attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
     if (value == null) {
       return false;
+    } else {
+      return value.equals(faultClass);
     }
-    final String comment = dual.getComment();
-    return comment.contains("fault-class " + value);
   }
 
 }

@@ -51,6 +51,9 @@ for F in "$@"; do
     -count)
         CHECK="StateCounter"
         ;;
+    -diag)
+        CHECK="DiagnosabilityChecker"
+        ;;
     -deadlock|-dl)
         CHECK="DeadlockChecker"
         ;;
