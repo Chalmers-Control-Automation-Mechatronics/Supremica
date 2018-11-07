@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Module Name="notDiag_14" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A test for diagnosability verification.
+This undiagnosable test has two cycles, where one is reachable from the other, with several transitions between them. This helps to ascertain that Tarjan's algorithm correctly works on structures of interconnected cycles.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="a"/>
         <EventDecl Kind="CONTROLLABLE" Name="b"/>
@@ -17,7 +19,7 @@
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
                         <PointGeometry>
-                            <Point X="256" Y="192"/>
+                            <Point X="336" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="2" Y="-21"/>
@@ -25,34 +27,66 @@
                     </SimpleNode>
                     <SimpleNode Name="S1">
                         <PointGeometry>
-                            <Point X="256" Y="96"/>
+                            <Point X="336" Y="160"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-10" Y="-22"/>
+                            <Point X="4" Y="-21"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S2">
                         <PointGeometry>
-                            <Point X="352" Y="192"/>
+                            <Point X="432" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="11" Y="-7"/>
+                            <Point X="6" Y="5"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S3">
                         <PointGeometry>
-                            <Point X="256" Y="288"/>
+                            <Point X="336" Y="352"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-8" Y="10"/>
+                            <Point X="5" Y="7"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="S4">
                         <PointGeometry>
-                            <Point X="160" Y="192"/>
+                            <Point X="240" Y="256"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-29" Y="-7"/>
+                            <Point X="-17" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S5">
+                        <PointGeometry>
+                            <Point X="336" Y="64"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="5" Y="-15"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S6">
+                        <PointGeometry>
+                            <Point X="544" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="4" Y="6"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S7">
+                        <PointGeometry>
+                            <Point X="336" Y="448"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="0" Y="10"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="S8">
+                        <PointGeometry>
+                            <Point X="144" Y="256"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-10" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -65,7 +99,7 @@
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="289" Y="224"/>
+                            <Point X="369" Y="288"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="S0" Target="S1">
@@ -126,6 +160,70 @@
                             <SimpleIdentifier Name="d"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-11" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S1" Target="S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-10"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S5" Target="S8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-17" Y="-21"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S4" Target="S8">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="2" Y="3"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S8" Target="S7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="c"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-16" Y="2"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S7" Target="S6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="d"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="0"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S6" Target="S5">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="3" Y="-22"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S2" Target="S6">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="a"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-15" Y="-23"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                    </Edge>
+                    <Edge Source="S3" Target="S7">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="b"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="6" Y="-11"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>

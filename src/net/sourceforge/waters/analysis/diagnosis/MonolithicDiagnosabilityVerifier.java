@@ -54,11 +54,11 @@ import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
@@ -117,20 +117,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   {
     try {
       setUp();
-      final TRSynchronousProductBuilder spBuilder =
-        new TRSynchronousProductBuilder(getModel());
-      spBuilder.run();
+      mSynchronousProductBuilder.run();
       final TRSynchronousProductResult spResult =
-        spBuilder.getAnalysisResult();
-      sp = spResult.getComputedAutomaton();
-      spEvents = sp.getEventEncoding();
-      mStateMap = spResult.getStateMap();
-      rel = sp.getTransitionRelation();
+        mSynchronousProductBuilder.getAnalysisResult();
+      mSynchronousProduct = spResult.getComputedAutomaton();
+      final EventEncoding enc = mSynchronousProduct.getEventEncoding();
+      final ListBufferTransitionRelation rel =
+        mSynchronousProduct.getTransitionRelation();
       iterA = rel.createSuccessorsReadOnlyIterator();
       iterB = rel.createSuccessorsReadOnlyIterator();
-      final int numEvents = spEvents.getNumberOfProperEvents();
+      final int numEvents = enc.getNumberOfProperEvents();
       final int numStates = rel.getNumberOfStates();
-      eventObservable = new boolean[numEvents];
+      mEventObservable = new boolean[numEvents];
       final THashSet<String> faultClasses = new THashSet<>();
       final TIntArrayList initStates = new TIntArrayList();
       for (int i = 0; i < numStates; i++) {
@@ -139,17 +137,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         }
       }
       for (int i = EventEncoding.NONTAU; i < numEvents; i++) {
-        final EventProxy event = spEvents.getProperEvent(i);
+        final EventProxy event = enc.getProperEvent(i);
         if (event != null) {
           final String faultClass = getEventFaultClass(event);
           if (faultClass != null) {
             faultClasses.add(faultClass);
           }
-          if (event.isObservable()) {
-            eventObservable[i] = true;
-          } else {
-            eventObservable[i] = false;
-          }
+          mEventObservable[i] = event.isObservable();
         }
       }
       mNumberOfFaultClasses = faultClasses.size();
@@ -160,7 +154,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         for (final String faultClass : faultClasses) {
           mCurrentFaultClass = faultClass;
           for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-            final EventProxy event = spEvents.getProperEvent(e);
+            final EventProxy event = enc.getProperEvent(e);
             final String eventFaultClass = getEventFaultClass(event);
             mFaultEvent[e] = faultClass.equals(eventFaultClass);
           }
@@ -169,18 +163,20 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           mLinks.clear();
           mStateIndexMap.clear();
           mIndexStateMap.clear();
+          mNumberOfTransitions = 0;
           for (int x = 0; x < initStates.size(); x++) {
             for (int y = 0; y <= x; y++) {
               final int initA = initStates.get(y);
               final int initB = initStates.get(x);
               final long verifierInit = (((long) initA) << 32) | initB;
-              lastVerInit = getNumberOfStatePairs();
+              lastVerInit = mIndexStateMap.size();
               mStateIndexMap.put(verifierInit, lastVerInit);
               mIndexStateMap.add(verifierInit);
               mControlStack.push(lastVerInit, lastVerInit);
             }
           }
           while (!mControlStack.isEmpty()) {
+            checkAbort();
             final int i = mControlStack.getTopIndex();
             if (!mControlStack.isTopExpanded()) {
               final int dfsIndex = mComponentStack.size() | MSB1;
@@ -194,31 +190,58 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
               if (!close(i, p)) {
                 final CounterExampleProxy counterExample =
                   computeCounterExample();
+                addVerifierStatistics();
                 return setFailedResult(counterExample);
               }
             }
           }
+          addVerifierStatistics();
         }
       }
+      return setSatisfiedResult();
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
-    return setSatisfiedResult();
+  }
+
+
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    mSynchronousProductBuilder =
+      new TRSynchronousProductBuilder(getModel());
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mSynchronousProductBuilder = null;
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelVerifier
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
-  protected void addStatistics()
+  public void requestAbort()
   {
-    super.addStatistics();
-    final VerificationResult result = getAnalysisResult();
-    final int numPairs = getNumberOfStatePairs();
-    result.setNumberOfStates(numPairs);
-    result.setPeakNumberOfStates(numPairs);
+    super.requestAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mSynchronousProductBuilder != null) {
+      mSynchronousProductBuilder.resetAbort();
+    }
   }
 
 
@@ -234,7 +257,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     while (iterA.advance()) {
       final int event = iterA.getCurrentEvent();
       final int targetA = iterA.getCurrentTargetState();
-      if (!eventObservable[event]) {
+      if (!mEventObservable[event]) {
         final int newA, newB;
         if (mFaultEvent[event]) {
           newA = targetA | MSB1;
@@ -258,7 +281,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     while (iterA.advance()) {
       final int event = iterA.getCurrentEvent();
       final int targetB = iterA.getCurrentTargetState();
-      if (!eventObservable[event]) {
+      if (!mEventObservable[event]) {
         final int newA, newB;
         if (mFaultEvent[event]) {
           newA = a;
@@ -284,7 +307,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     while (iterA.advance()) {
       event = iterA.getCurrentEvent();
       sourceA = iterA.getCurrentSourceState();
-      if (!eventObservable[event]) {
+      if (!mEventObservable[event]) {
         if (mFaultEvent[event]) {
           if ((a & MSB1) != 0) {
             newA = sourceA | MSB1;
@@ -312,7 +335,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     while (iterA.advance()) {
       event = iterA.getCurrentEvent();
       sourceB = iterA.getCurrentSourceState();
-      if (!eventObservable[event]) {
+      if (!mEventObservable[event]) {
         if (mFaultEvent[event]) {
           if ((b & MSB1) != 0) {
             newA = a;
@@ -358,7 +381,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           while (iterA.advance()) {
             if (iterA.getCurrentTargetState() == (a & ~MSB1)) {
               event = iterA.getCurrentEvent();
-              if (!eventObservable[event]) {
+              if (!mEventObservable[event]) {
                 return false;
               } else {
                 iterB.reset(b & ~MSB1, event);
@@ -374,7 +397,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
           while (iterA.advance()) {
             if (iterA.getCurrentTargetState() == (b & ~MSB1)) {
               event = iterA.getCurrentEvent();
-              if (!eventObservable[event]) {
+              if (!mEventObservable[event]) {
                 return false;
               }
             }
@@ -390,7 +413,8 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     return true;
   }
 
-  private CounterExampleProxy computeCounterExample() throws OverflowException
+  private CounterExampleProxy computeCounterExample()
+    throws AnalysisException
   {
     mControlStack.clear();
     mComponentStack.clear();
@@ -408,6 +432,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       bfsIndex++;
     }
     while (!bfsQueue.isEmpty()) {
+      checkAbort();
       final int current = bfsQueue.remove();
       if (mCurrentSCC.contains(current)) {
         sccRoot = current;
@@ -418,6 +443,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     bfsQueue.clear();
     expand(sccRoot, processor);
     while (!bfsQueue.isEmpty()) {
+      checkAbort();
       final int current = bfsQueue.remove();
       if (current == sccRoot) {
         break;
@@ -425,6 +451,8 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       expand(current, processor);
     }
     bfsQueue.clear();
+    final ListBufferTransitionRelation rel =
+      mSynchronousProduct.getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_PREDECESSORS);
     iterA = rel.createPredecessorsReadOnlyIterator();
     iterB = rel.createPredecessorsReadOnlyIterator();
@@ -435,12 +463,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     int succB = ((int) succState);
     int event, predA, predB, loopIndexA, loopIndexB;
     do {
+      checkAbort();
       expandBack(succA, succB, backProcessor);
       predA = backProcessor.predA;
       predB = backProcessor.predB;
       event = backProcessor.predEvent;
       assert event >= 0;
-      if (eventObservable[event]) {
+      if (mEventObservable[event]) {
         addStep((succA & ~MSB1), event, traceA);
         addStep((succB & ~MSB1), event, traceB);
       } else {
@@ -456,11 +485,12 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     loopIndexA = loopIndexB = 0;
     backProcessor.inSCC = false;
     while (backProcessor.predIndex > lastVerInit) {
+      checkAbort();
       expandBack(succA, succB, backProcessor);
       predA = backProcessor.predA;
       predB = backProcessor.predB;
       event = backProcessor.predEvent;
-      if (eventObservable[event]) {
+      if (mEventObservable[event]) {
         addStep((succA & ~MSB1), event, traceA);
         addStep((succB & ~MSB1), event, traceB);
         loopIndexA++;
@@ -499,27 +529,33 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
       getFactory().createTraceProxy(nameA, traceA, loopIndexA);
     final TraceProxy tpB =
       getFactory().createTraceProxy(nameB, traceB, loopIndexB);
+    final TRSynchronousProductResult spResult =
+      mSynchronousProductBuilder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = spResult.getStateMap();
     final DualCounterExampleProxy counterExample = getFactory()
       .createDualCounterExampleProxy(ceName, ceComment, null, getModel(),
-                                     mStateMap.getInputAutomata(), tpA, tpB);
+                                     stateMap.getInputAutomata(), tpA, tpB);
     return counterExample;
   }
 
   private void addStep(final int stateIndex, final int eventIndex,
                        final List<TraceStepProxy> trace)
   {
-    final Map<AutomatonProxy,StateProxy> autStateMap =
-      new HashMap<AutomatonProxy,StateProxy>();
-    final Collection<AutomatonProxy> auts = mStateMap.getInputAutomata();
-    final StateProxy state = sp.getState(stateIndex);
+    final TRSynchronousProductResult spResult =
+      mSynchronousProductBuilder.getAnalysisResult();
+    final SynchronousProductStateMap stateMap = spResult.getStateMap();
+    final Map<AutomatonProxy,StateProxy> autStateMap = new HashMap<>();
+    final Collection<AutomatonProxy> auts = stateMap.getInputAutomata();
+    final StateProxy state = mSynchronousProduct.getState(stateIndex);
     final EventProxy event;
     if (eventIndex != -1) {
-      event = spEvents.getProperEvent(eventIndex);
+      final EventEncoding enc = mSynchronousProduct.getEventEncoding();
+      event = enc.getProperEvent(eventIndex);
     } else {
       event = null;
     }
     for (final AutomatonProxy a : auts) {
-      final StateProxy s = mStateMap.getOriginalState(state, a);
+      final StateProxy s = stateMap.getOriginalState(state, a);
       autStateMap.put(a, s);
     }
     final TraceStepProxy step =
@@ -533,14 +569,17 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     return attribs.get(DiagnosabilityAttributeFactory.FAULT_KEY);
   }
 
-  private int getNumberOfStatePairs()
-  {
-    return mIndexStateMap.size();
-  }
-
   private void setLink(final int index, final int value)
   {
     mLinks.set(index, value);
+  }
+
+  private void addVerifierStatistics()
+  {
+    final DefaultVerificationResult result =
+      (DefaultVerificationResult) getAnalysisResult();
+    result.updateNumberOfStates(mIndexStateMap.size());
+    result.updateNumberOfTransitions(mNumberOfTransitions);
   }
 
   private static long makePair(final int a, final int b)
@@ -555,6 +594,23 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
   //#########################################################################
   //# Debugging
+  @SuppressWarnings("unused")
+  private String showVerifierStateSpace()
+  {
+    final StringBuilder builder = new StringBuilder();
+    final int numStates = mStateIndexMap.size();
+    boolean first = true;
+    for (int s = 0; s < numStates; s++) {
+      if (first) {
+        first = false;
+      } else {
+        builder.append(", ");
+      }
+      dumpIndexedPair(s, builder);
+    }
+    return builder.toString();
+  }
+
   @SuppressWarnings("unused")
   private String showCurrentSCC()
   {
@@ -644,14 +700,18 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     public void newState(final int a, final int b, final int parentIndex)
       throws OverflowException
     {
+      mNumberOfTransitions++;
+      if (mNumberOfTransitions++ >= getTransitionLimit()) {
+        throw new OverflowException(OverflowKind.TRANSITION, getTransitionLimit());
+      }
       final long next = makePair(a, b);
       if (a >= 0 || b >= 0) {
         int index = mStateIndexMap.get(next);
         if (index < 0) {
-          index = getNumberOfStatePairs();
+          index = mIndexStateMap.size();
           mStateIndexMap.put(next, index);
           mIndexStateMap.add(next);
-          if (index + 1 >= getNodeLimit()) {
+          if (index >= getNodeLimit()) {
             throw new OverflowException(OverflowKind.STATE, getNodeLimit());
           }
           mControlStack.push(index, parentIndex);
@@ -675,8 +735,8 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //# Inner Class BFSStateProcessor
   private class BFSStateProcessor implements StateProcessor
   {
-    private boolean inSCC = false;
-
+    //#########################################################################
+    //# Interface StateProcessor
     @Override
     public void newState(final int a, final int b, final int parentIndex)
       throws OverflowException
@@ -711,6 +771,10 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
         }
       }
     }
+
+    //#########################################################################
+    //# Data Members
+    private boolean inSCC = false;
   }
 
 
@@ -778,7 +842,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
    * <LI>The state index, which for unexpanded state pairs is the true state
    *     pair index, and for expanded state pairs its position on the component
    *     stack. Expanded state pairs are tagged by setting the {@link
-   *     MonolithicDiagnosabilityVerifier#MSB1 MSB1}.
+   *     MonolithicDiagnosabilityVerifier#MSB1 MSB1} of the state index.
    *     For unexpanded state pairs, the link entry in {@link
    *     MonolithicDiagnosabilityVerifier#mLinks mLinks} contains the stack
    *     index of the entry above their entry on the stack.</LI>
@@ -819,7 +883,9 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     }
 
     /**
-     * Adds a new entry to the top of the stack.
+     * Adds a new entry to the top of the stack. Also adds a {@link
+     * MonolithicDiagnosabilityVerifier#mLinks mLinks} entry to point to
+     * the new dummy top index.
      * @param  index  The state index to be stored in the new entry.
      * @param  parent The parent index to be stored in the new entry.
      */
@@ -840,7 +906,6 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
     private void pop()
     {
       final int newTop = getStackLink(mUsedTop);
-      assert newTop != mUsedTop;
       setStackLink(mDummyTop, mNextFree);
       mNextFree = mDummyTop;
       mDummyTop = mUsedTop;
@@ -1074,9 +1139,10 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
      */
     private final TIntArrayList mStack;
     /**
-     * A fake stack top entry. The dummy top is always defined and can be
-     * used as the reference to the entry above any new item pushed on the
-     * stack (which needs to be stored in {@link
+     * A fake stack top entry. The dummy top is always defined and identifies
+     * the entry to be created by a following {@link #push(int, int) push()}
+     * operation. It can be used as the reference to the entry above any new
+     * item pushed on the stack (which needs to be stored in {@link
      * MonolithicDiagnosabilityVerifier#mLinks mLinks}). The stack link
      * of <CODE>mDummyTop</CODE> always points to {@link #mUsedTop}.
      */
@@ -1097,11 +1163,10 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
 
   //#########################################################################
   //# Instance Variables
-  private boolean[] eventObservable;
+  private boolean[] mEventObservable;
   private boolean[] mFaultEvent;
   private int mNumberOfFaultClasses;
   private String mCurrentFaultClass;
-  private int bfsIndex = 0;
   private TLongIntHashMap mStateIndexMap;
   private final TLongArrayList mIndexStateMap = new TLongArrayList();
   private final ControlStack mControlStack = new ControlStack();
@@ -1109,13 +1174,13 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   private final TIntArrayList mLinks = new TIntArrayList();
   private final TIntHashSet mCurrentSCC = new TIntHashSet();
   private final ArrayDeque<Integer> bfsQueue = new ArrayDeque<Integer>();
-  private ListBufferTransitionRelation rel;
-  private SynchronousProductStateMap mStateMap;
-  private TRAutomatonProxy sp;
-  private EventEncoding spEvents;
+  private TRSynchronousProductBuilder mSynchronousProductBuilder;
+  private TRAutomatonProxy mSynchronousProduct;
   private TransitionIterator iterA;
   private TransitionIterator iterB;
   private int lastVerInit;
+  private int mNumberOfTransitions;
+  private int bfsIndex = 0;
 
 
   //#########################################################################

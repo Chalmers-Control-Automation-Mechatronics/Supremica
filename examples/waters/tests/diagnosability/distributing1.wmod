@@ -78,7 +78,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="252" Y="218"/>
+                            <Point X="250" Y="175"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="1" Target="2">
@@ -89,7 +89,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="252" Y="95"/>
+                            <Point X="251" Y="137"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -108,6 +108,9 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                         <PointGeometry>
                             <Point X="184" Y="235"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-16" Y="-1"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="-83" Y="-12"/>
                         </LabelGeometry>
@@ -153,6 +156,9 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name="da_pusher1.on"/>
                             <SimpleIdentifier Name="ds_stackfilled1.off"/>
                             <SimpleIdentifier Name="ds_product1.on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-58" Y="-67"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="184" Y="176"/>
@@ -167,7 +173,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="305" Y="196"/>
+                            <Point X="302" Y="215"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="fault2">
@@ -177,6 +183,9 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                                 <Point X="2" Y="-33"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="433" Y="154"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="extreme">
                         <LabelBlock>
@@ -187,7 +196,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="304" Y="283"/>
+                            <Point X="300" Y="251"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="fault">
@@ -197,22 +206,31 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                                 <Point X="4" Y="-1"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="437" Y="316"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="fault" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="da_pusher1.on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="5" Y="-23"/>
+                                <Point X="-104" Y="-7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="407" Y="317"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="fault2" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="da_pusher1.off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="6" Y="-8"/>
+                                <Point X="-101" Y="-27"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="405" Y="160"/>
+                        </SplineGeometry>
                     </Edge>
                 </EdgeList>
             </Graph>
@@ -225,8 +243,11 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="402" Y="243"/>
+                            <Point X="368" Y="240"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-13" Y="20"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="13" Y="-15"/>
                         </LabelGeometry>
@@ -236,7 +257,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="190" Y="240"/>
+                            <Point X="208" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="-68" Y="-10"/>
@@ -244,7 +265,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                     </SimpleNode>
                     <SimpleNode Name="busy">
                         <PointGeometry>
-                            <Point X="285" Y="94"/>
+                            <Point X="288" Y="112"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="10" Y="-14"/>
@@ -264,12 +285,9 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                         <LabelBlock>
                             <SimpleIdentifier Name="dv_allow_product1"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-41" Y="2"/>
+                                <Point X="-54" Y="-26"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="287" Y="279"/>
-                        </SplineGeometry>
                     </Edge>
                     <Edge Source="allow" Target="busy">
                         <LabelBlock>
@@ -290,10 +308,10 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="192" Y="266"/>
+                            <Point X="208" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-105" Y="-16"/>
+                            <Point X="-57" Y="11"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="product">
@@ -301,15 +319,15 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="425" Y="268"/>
+                            <Point X="384" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="12" Y="-15"/>
+                            <Point X="-13" Y="8"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="wait">
                         <PointGeometry>
-                            <Point X="309" Y="153"/>
+                            <Point X="288" Y="176"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="14" Y="-16"/>
@@ -324,15 +342,12 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                                 <Point X="-48" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="304" Y="299"/>
-                        </SplineGeometry>
                     </Edge>
                     <Edge Source="no_product" Target="wait">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_stackfilled1.off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-115" Y="-26"/>
+                                <Point X="-117" Y="-22"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -340,7 +355,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_stackfilled1.on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="4" Y="-16"/>
+                                <Point X="-5" Y="-31"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
@@ -355,10 +370,13 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="140" Y="242"/>
+                            <Point X="176" Y="240"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-24" Y="-1"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
+                            <Point X="-6" Y="9"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="on">
@@ -366,10 +384,10 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="433" Y="244"/>
+                            <Point X="368" Y="240"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
+                            <Point X="-5" Y="13"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -380,9 +398,12 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name="ds_pusher1_out.off"/>
                             <SimpleIdentifier Name="df_pusher1_out_off"/>
                             <SimpleIdentifier Name="df_pusher1_in_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-56" Y="-57"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="140" Y="183"/>
+                            <Point X="176" Y="181"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="off" Target="on">
@@ -393,7 +414,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="288" Y="212"/>
+                            <Point X="273" Y="220"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="on" Target="on">
@@ -402,9 +423,12 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name="df_pusher1_in_off"/>
                             <SimpleIdentifier Name="ds_pusher1_out.on"/>
                             <SimpleIdentifier Name="df_pusher1_out_on"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-53" Y="-58"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="433" Y="185"/>
+                            <Point X="368" Y="181"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="on" Target="off">
@@ -415,7 +439,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="288" Y="274"/>
+                            <Point X="273" Y="260"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -429,8 +453,11 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="348" Y="95"/>
+                            <Point X="352" Y="144"/>
                         </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="-42" Y="1"/>
+                        </InitialArrowGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="12" Y="-15"/>
                         </LabelGeometry>
@@ -440,7 +467,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="543" Y="286"/>
+                            <Point X="496" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="5" Y="5"/>
@@ -448,7 +475,7 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                     </SimpleNode>
                     <SimpleNode Name="inbetween">
                         <PointGeometry>
-                            <Point X="347" Y="284"/>
+                            <Point X="352" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
                             <Point X="23" Y="-14"/>
@@ -459,10 +486,10 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="348" Y="470"/>
+                            <Point X="352" Y="400"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="-49" Y="-12"/>
+                            <Point X="-37" Y="-6"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="outf">
@@ -470,10 +497,10 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                             <SimpleIdentifier Name=":accepting"/>
                         </EventList>
                         <PointGeometry>
-                            <Point X="96" Y="285"/>
+                            <Point X="208" Y="272"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="5" Y="5"/>
+                            <Point X="-20" Y="10"/>
                         </LabelGeometry>
                     </SimpleNode>
                 </NodeList>
@@ -481,93 +508,111 @@ It has 134 reachable states and the diameter is 33.</ns2:Comment>
                     <Edge Source="outf" Target="outf">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-68" Y="3"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="96" Y="226"/>
+                            <Point X="208" Y="213"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="outf" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="df_pusher1_out_off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-17" Y="1"/>
+                                <Point X="-60" Y="-24"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="283" Y="260"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="outf">
                         <LabelBlock>
                             <SimpleIdentifier Name="df_pusher1_out_on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-100" Y="-23"/>
+                                <Point X="-71" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="281" Y="288"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="inf">
                         <LabelBlock>
                             <SimpleIdentifier Name="df_pusher1_in_on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-39" Y="32"/>
+                                <Point X="11" Y="2"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="366" Y="335"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="in">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_pusher1_in.on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-117" Y="-14"/>
+                                <Point X="-116" Y="-37"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="307" Y="188"/>
+                            <Point X="334" Y="207"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="inbetween" Target="out">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_pusher1_out.on"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-50" Y="-23"/>
+                                <Point X="-57" Y="-20"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="440" Y="250"/>
+                            <Point X="423" Y="255"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="out" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_pusher1_out.off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-56" Y="-1"/>
+                                <Point X="-56" Y="6"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="440" Y="325"/>
+                            <Point X="421" Y="288"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="out" Target="out">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_stackfilled1.off"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-60" Y="2"/>
+                            </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="543" Y="227"/>
+                            <Point X="496" Y="213"/>
                         </SplineGeometry>
                     </Edge>
                     <Edge Source="inf" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="df_pusher1_in_off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="5"/>
+                                <Point X="-124" Y="7"/>
                             </LabelGeometry>
                         </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="335" Y="336"/>
+                        </SplineGeometry>
                     </Edge>
                     <Edge Source="in" Target="inbetween">
                         <LabelBlock>
                             <SimpleIdentifier Name="ds_pusher1_in.off"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-10"/>
+                                <Point X="3" Y="-38"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="383" Y="188"/>
+                            <Point X="365" Y="209"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>

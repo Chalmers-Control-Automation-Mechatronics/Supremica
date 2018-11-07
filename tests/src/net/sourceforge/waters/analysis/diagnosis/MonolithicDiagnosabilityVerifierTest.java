@@ -145,6 +145,13 @@ public class MonolithicDiagnosabilityVerifierTest
   }
 
 
+  public void testProcessingTest() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "diagnosability", "processing_test.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testSmallFactory2d() throws Exception
   {
     final ProductDESProxy des =
