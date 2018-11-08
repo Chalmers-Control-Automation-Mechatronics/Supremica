@@ -884,7 +884,7 @@ public class TRCompositionalConflictChecker
    * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
    * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
    *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Weak observation equivalence
+   * <LI>Observation equivalence
    *     ({@link ObservationEquivalenceTRSimplifier})</LI>
    * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
    * </UL>.
@@ -901,7 +901,7 @@ public class TRCompositionalConflictChecker
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
+         Equivalence.OBSERVATION_EQUIVALENCE,
          false, true, false, false);
     }
   };
