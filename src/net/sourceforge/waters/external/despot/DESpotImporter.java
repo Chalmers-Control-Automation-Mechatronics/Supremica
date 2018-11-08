@@ -312,7 +312,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     return list;
   }
 
-  /*
+  /**
    * This method adds the accepting proposition to the list of events.
    */
   private void addAcceptingProp()
@@ -328,25 +328,23 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   }
 
-  /*
+  /**
    * This method checks if an identifier (i.e., names of automata, events,
-   * states) is in the correct format for waters (as DESpot allows characters
-   * which waters does not). If it is not, the identifier name is translated to
-   * something accepted by waters and returned.
+   * states) is in the correct format for Waters (as DESpot allows characters
+   * which Waters does not). If it is not, the identifier name is translated to
+   * something accepted by Waters and returned.
    */
   private String formatIdentifier(final String name)
   {
+    // TODO Also replace '.'.
+    // TODO Check for clashes.
     final String newName = name.replaceAll("-", ":");
-
     return newName;
   }
 
   /**
    * This method creates an instance of a module. One call to this method
    * creates all the required instance for the current module.
-   *
-   * @throws FileNotFoundException
-   * @throws WatersUnmarshalException
    */
   private void constructModuleInstance(final Element uses)
       throws FileNotFoundException, WatersUnmarshalException
@@ -742,7 +740,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *
    * @param tr
    *          The transition to be converted.
-   * @throws WatersUnmarshalException
    */
   private EdgeProxy convertTransition(final String autfilename,
                                       final Element tr, final boolean exists)
