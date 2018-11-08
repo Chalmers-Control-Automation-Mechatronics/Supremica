@@ -73,6 +73,11 @@ import org.apache.logging.log4j.Logger;
 /**
  * The compositional EFSM-based conflict check algorithm.
  *
+ * <P><I>Reference:</I><BR>
+ * Sahar Mohajerani, Robi Malik, Martin Fabian. A framework for compositional
+ * nonblocking verification of extended finite-state machines. Discrete Event
+ * Dynamic Systems, <STRONG>26</STRONG>(1), 33&ndash;84, 2016.</P>
+ *
  * @author Robi Malik, Sahar Mohajerani
  */
 

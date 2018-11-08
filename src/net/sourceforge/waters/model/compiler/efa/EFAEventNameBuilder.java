@@ -72,13 +72,13 @@ import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
  * @author Robi Malik
  */
 
-class EFAEventNameBuilder {
+public class EFAEventNameBuilder {
 
   //#########################################################################
   //# Constructor
-  EFAEventNameBuilder(final ModuleProxyFactory factory,
-                      final CompilerOperatorTable optable,
-                      final VariableContext context)
+  public EFAEventNameBuilder(final ModuleProxyFactory factory,
+                             final CompilerOperatorTable optable,
+                             final VariableContext context)
   {
     mComparator = new ExpressionComparator(optable);
     mEquality = new ModuleEqualityVisitor(false);
@@ -93,7 +93,7 @@ class EFAEventNameBuilder {
 
   //#########################################################################
   //# Invocation
-  void restart()
+  public void restart()
   {
     mAllLiterals = new HashMap<CountedLiteral,CountedLiteral>();
     mAllGuards = new LinkedList<List<CountedLiteral>>();
@@ -101,7 +101,7 @@ class EFAEventNameBuilder {
     mRoot = null;
   }
 
-  void addGuard(final ConstraintList guard)
+  public void addGuard(final ConstraintList guard)
   {
     final int size = guard.size();
     final List<CountedLiteral> cguard = new ArrayList<CountedLiteral>(size);
@@ -113,7 +113,7 @@ class EFAEventNameBuilder {
     mAllGuards.add(cguard);
   }
 
-  String getNameSuffix(final ConstraintList guard)
+  public String getNameSuffix(final ConstraintList guard)
   {
     buildTree();
     final int size = guard.size();
@@ -134,7 +134,7 @@ class EFAEventNameBuilder {
     return buffer.toString();
   }
 
-  void clear()
+  public void clear()
   {
     mAllLiterals = null;
     mAllGuards = null;

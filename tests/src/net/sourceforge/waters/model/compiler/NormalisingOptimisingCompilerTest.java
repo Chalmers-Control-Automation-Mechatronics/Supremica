@@ -39,7 +39,7 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.base.WatersException;
-import net.sourceforge.waters.model.compiler.efa.EFSMControllabilityException;
+import net.sourceforge.waters.model.compiler.efsm.EFSMControllabilityException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 
 

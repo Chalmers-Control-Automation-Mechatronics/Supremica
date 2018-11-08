@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler.efa;
+package net.sourceforge.waters.model.compiler.efsm;
 
 import gnu.trove.set.hash.THashSet;
 
@@ -67,6 +67,11 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
+import net.sourceforge.waters.model.compiler.efa.EFAEventNameBuilder;
+import net.sourceforge.waters.model.compiler.efa.EFAGuardCompiler;
+import net.sourceforge.waters.model.compiler.efa.EFAModuleContext;
+import net.sourceforge.waters.model.compiler.efa.EFAVariable;
+import net.sourceforge.waters.model.compiler.efa.EFAVariableCollector;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -118,13 +123,19 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
  * <LI>Build the output module.</LI>
  * </OL>
  *
+ * <P><I>Reference:</I><BR>
+ * Sahar Mohajerani, Robi Malik, Martin Fabian. A framework for compositional
+ * nonblocking verification of extended finite-state machines. Discrete Event
+ * Dynamic Systems, <STRONG>26</STRONG>(1), 33&ndash;84, 2016.</P>
+ *
  * @author Sahar Mohajerani, Robi Malik, Roger Su
  */
-public class EFANormaliser extends AbortableCompiler
+
+public class EFSMNormaliser extends AbortableCompiler
 {
   //#########################################################################
   //# Constructor
-  public EFANormaliser(final ModuleProxyFactory factory,
+  public EFSMNormaliser(final ModuleProxyFactory factory,
                        final CompilationInfo compilationInfo,
                        final ModuleProxy module)
   {
@@ -137,21 +148,6 @@ public class EFANormaliser extends AbortableCompiler
     mSimpleExpressionCompiler =
       new SimpleExpressionCompiler(mFactory, mCompilationInfo, mOperatorTable);
     mInputModule = module;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.Abortable
-  @Override
-  public void requestAbort()
-  {
-    super.requestAbort();
-  }
-
-  @Override
-  public void resetAbort()
-  {
-    super.resetAbort();
   }
 
 
@@ -450,7 +446,7 @@ public class EFANormaliser extends AbortableCompiler
   /**
    * The visitor implementing the second pass of EFA unification. <p> For
    * each automaton, it collects all the information about events and their
-   * relevant updates and stores it in the map {@link EFANormaliser#mEventMap}.
+   * relevant updates and stores it in the map {@link EFSMNormaliser#mEventMap}.
    */
   private class Pass2Visitor extends DefaultModuleProxyVisitor
   {

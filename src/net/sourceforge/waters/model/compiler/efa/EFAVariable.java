@@ -53,7 +53,7 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
  * @author Robi Malik
  */
 
-class EFAVariable implements Comparable<EFAVariable> {
+public class EFAVariable implements Comparable<EFAVariable> {
 
   //#########################################################################
   //# Constructors
@@ -85,6 +85,7 @@ class EFAVariable implements Comparable<EFAVariable> {
 
   //#########################################################################
   //# Overrides for java.lang.Object
+  @Override
   public String toString()
   {
     return mVariableName.toString();
@@ -93,6 +94,7 @@ class EFAVariable implements Comparable<EFAVariable> {
 
   //#########################################################################
   //# Interface java.lang.Comparable
+  @Override
   public int compareTo(final EFAVariable var)
   {
     if (mIsNext != var.mIsNext) {
@@ -110,7 +112,7 @@ class EFAVariable implements Comparable<EFAVariable> {
     return mComponent;
   }
 
-  SimpleExpressionProxy getVariableName()
+  public SimpleExpressionProxy getVariableName()
   {
     return mVariableName;
   }

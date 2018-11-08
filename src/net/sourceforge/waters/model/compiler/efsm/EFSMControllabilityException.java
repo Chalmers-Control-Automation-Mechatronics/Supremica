@@ -31,9 +31,10 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.compiler.efa;
+package net.sourceforge.waters.model.compiler.efsm;
 
 import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.efa.EFAVariable;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;

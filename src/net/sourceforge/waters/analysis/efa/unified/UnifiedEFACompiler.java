@@ -42,7 +42,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
-import net.sourceforge.waters.model.compiler.efa.EFANormaliser;
+import net.sourceforge.waters.model.compiler.efsm.EFSMNormaliser;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -218,7 +218,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
       final ModuleProxy normalised;
       final ProxyAccessorMap<IdentifierProxy, ConstraintList> map;
       mEFANormaliser =
-        new EFANormaliser(modfactory, mCompilationInfo, instantiated);
+        new EFSMNormaliser(modfactory, mCompilationInfo, instantiated);
       normalised = mEFANormaliser.compile();
       map = mEFANormaliser.getEventUpdateMap();
       mEFANormaliser = null;
@@ -250,7 +250,7 @@ class UnifiedEFACompiler extends AbstractEFAAlgorithm
 
   private ModuleInstanceCompiler mModuleInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
-  private EFANormaliser mEFANormaliser;
+  private EFSMNormaliser mEFANormaliser;
   private UnifiedEFASystemBuilder mSystemBuilder;
   private CompilationInfo mCompilationInfo;
 }

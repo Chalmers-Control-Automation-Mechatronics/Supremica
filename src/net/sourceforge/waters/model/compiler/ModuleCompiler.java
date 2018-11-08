@@ -48,7 +48,7 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
-import net.sourceforge.waters.model.compiler.efa.EFANormaliser;
+import net.sourceforge.waters.model.compiler.efsm.EFSMNormaliser;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
 import net.sourceforge.waters.model.compiler.instance.ModuleInstanceCompiler;
@@ -133,7 +133,7 @@ import org.xml.sax.SAXException;
  * instantiates referenced modules.</DD>
  * <DT>{@link GroupNodeCompiler}</DT>
  * <DD>Expands transitions linked to group nodes into separate transitions.</DD>
- * <DT>{@link EFANormaliser}</DT>
+ * <DT>{@link EFSMNormaliser}</DT>
  * <DD>Combines and renames events from different EFSMs, ensures that each
  * event has a unique guard/action block throughout the module. (Only used
  * if variables and guard/action blocks are present, and normalisation
@@ -322,7 +322,7 @@ public class ModuleCompiler extends AbortableCompiler
       if (efa && mIsExpandingEFATransitions) {
         if (mIsNormalizationEnabled) { // Perform normalisation.
           mEFANormaliser =
-            new EFANormaliser(modfactory, mCompilationInfo, intermediate);
+            new EFSMNormaliser(modfactory, mCompilationInfo, intermediate);
           mEFANormaliser.setUsesEventNameBuilder(true);
           mEFANormaliser.setCreatesGuardAutomaton(true);
           intermediate = mEFANormaliser.compile();
@@ -641,7 +641,7 @@ public class ModuleCompiler extends AbortableCompiler
 
   private ModuleInstanceCompiler mInstanceCompiler;
   private GroupNodeCompiler mGroupNodeCompiler;
-  private EFANormaliser mEFANormaliser;
+  private EFSMNormaliser mEFANormaliser;
   private EFACompiler mEFACompiler;
   private ModuleGraphCompiler mGraphCompiler;
 

@@ -52,14 +52,14 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * @author Robi Malik
  */
 
-class EFAVariableCollector
+public class EFAVariableCollector
   extends DescendingModuleProxyVisitor
 {
 
   //#########################################################################
   //# Constructor
-  EFAVariableCollector(final CompilerOperatorTable optable,
-                       final EFAModuleContext context)
+  public EFAVariableCollector(final CompilerOperatorTable optable,
+                              final EFAModuleContext context)
   {
     mNextOperator = optable.getNextOperator();
     mContext = context;
@@ -73,8 +73,8 @@ class EFAVariableCollector
    * @param  expr        The expression to be searched.
    * @param  vars        Found variables will be added to this collection.
    */
-  void collectUnprimedVariables(final SimpleExpressionProxy expr,
-                                final Collection<EFAVariable> vars)
+  public void collectUnprimedVariables(final SimpleExpressionProxy expr,
+                                       final Collection<EFAVariable> vars)
   {
     try {
       mUnprimedVariables = vars;
@@ -90,8 +90,8 @@ class EFAVariableCollector
    * @param  vars        Found variables will be added in their non-primed
    *                     form to this collection.
    */
-  void collectPrimedVariables(final SimpleExpressionProxy expr,
-                              final Collection<EFAVariable> vars)
+  public void collectPrimedVariables(final SimpleExpressionProxy expr,
+                                     final Collection<EFAVariable> vars)
   {
     try {
       mPrimedVariables = vars;
@@ -108,9 +108,9 @@ class EFAVariableCollector
    * @param  primed      Primed variables will be added in their non-primed
    *                     form to this collection.
    */
-  void collectAllVariables(final SimpleExpressionProxy expr,
-                           final Collection<EFAVariable> unprimed,
-                           final Collection<EFAVariable> primed)
+  public void collectAllVariables(final SimpleExpressionProxy expr,
+                                  final Collection<EFAVariable> unprimed,
+                                  final Collection<EFAVariable> primed)
   {
     try {
       mUnprimedVariables = unprimed;
@@ -127,8 +127,8 @@ class EFAVariableCollector
    * @param  constraints Constraint list containing expression to be searched.
    * @param  vars        Found variables will be added to this collection.
    */
-  void collectUnprimedVariables(final ConstraintList constraints,
-                                final Collection<EFAVariable> vars)
+  public void collectUnprimedVariables(final ConstraintList constraints,
+                                       final Collection<EFAVariable> vars)
   {
     try {
       mUnprimedVariables = vars;
@@ -146,8 +146,8 @@ class EFAVariableCollector
    * @param  vars        Found variables will be added in their non-primed
    *                     form to this collection.
    */
-  void collectPrimedVariables(final ConstraintList constraints,
-                              final Collection<EFAVariable> vars)
+  public void collectPrimedVariables(final ConstraintList constraints,
+                                     final Collection<EFAVariable> vars)
   {
     try {
       mPrimedVariables = vars;
@@ -166,9 +166,9 @@ class EFAVariableCollector
    * @param  primed      Primed variables will be added in their non-primed
    *                     form to this collection.
    */
-  void collectAllVariables(final ConstraintList constraints,
-                           final Collection<EFAVariable> unprimed,
-                           final Collection<EFAVariable> primed)
+  public void collectAllVariables(final ConstraintList constraints,
+                                  final Collection<EFAVariable> unprimed,
+                                  final Collection<EFAVariable> primed)
   {
     try {
       mUnprimedVariables = unprimed;
