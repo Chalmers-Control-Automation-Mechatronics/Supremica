@@ -7,12 +7,12 @@
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2:2">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2_2">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="levnt:a"/>
+<EventDecl Kind="CONTROLLABLE" Name="levnt_a"/>
 <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
 <ns2:AttributeMap>
 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
@@ -38,7 +38,7 @@
 </Edge>
 <Edge Target="iX1" Source="iX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
 </Edge>
@@ -61,7 +61,7 @@
 <EdgeList>
 <Edge Target="lX1" Source="lX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
 </Edge>
@@ -93,7 +93,7 @@
 <EdgeList>
 <Edge Target="lX5" Source="lX4">
 <LabelBlock>
-<SimpleIdentifier Name="levnt:a"/>
+<SimpleIdentifier Name="levnt_a"/>
 </LabelBlock>
 </Edge>
 <Edge Target="lX1" Source="lX2">
@@ -103,7 +103,7 @@
 </Edge>
 <Edge Target="lX3" Source="lX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 </LabelBlock>
 </Edge>
 <Edge Target="lX2" Source="lX1">

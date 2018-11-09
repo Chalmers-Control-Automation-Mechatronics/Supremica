@@ -102,8 +102,8 @@ import org.xml.sax.SAXException;
 public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 {
 
-  // #########################################################################
-  // # Constructors
+  //#########################################################################
+  //# Constructors
   public DESpotImporter(final ModuleProxyFactory factory,
                         final DocumentManager docman)
   {
@@ -118,9 +118,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mDocumentManager = docman;
   }
 
-  // #########################################################################
-  // # Interface
-  // # net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller
   @Override
   public File getOutputDirectory()
   {
@@ -148,8 +148,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
   @Override
   public ModuleProxy unmarshal(final URI uri) throws IOException,
       WatersUnmarshalException
@@ -197,8 +198,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mDocumentManager = manager;
   }
 
-  // #########################################################################
-  // # Algorithm
+
+  //#########################################################################
+  //# Algorithm
   private ModuleProxy convertDESpotHierarchy(final URI uri)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersMarshalException, WatersUnmarshalException
@@ -328,19 +330,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   }
 
-  /**
-   * This method checks if an identifier (i.e., names of automata, events,
-   * states) is in the correct format for Waters (as DESpot allows characters
-   * which Waters does not). If it is not, the identifier name is translated to
-   * something accepted by Waters and returned.
-   */
-  private String formatIdentifier(final String name)
-  {
-    // TODO Also replace '.'.
-    // TODO Check for clashes.
-    final String newName = name.replaceAll("-", ":");
-    return newName;
-  }
 
   /**
    * This method creates an instance of a module. One call to this method
@@ -396,16 +385,16 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
                                                             identifier));
         }
       }
-      final SimpleIdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(formatIdentifier(moduleName));
+      final IdentifierProxy identifier =
+        mComponentIdentification.createIdentifier(moduleName);
       mComponents.add(mFactory.createInstanceProxy(identifier, moduleName,
                                                    bindings));
     }
-
   }
 
-  // #########################################################################
-  // # Initialisation
+
+  //#########################################################################
+  //# Initialisation
   /**
    * Initialises the data structures used to store the states, events and
    * transitions in the construction of a graph.
@@ -419,16 +408,18 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     mEdges.clear();
   }
 
-  // #########################################################################
-  // # Element Conversion
+
+  //#########################################################################
+  //# Element Conversion
   /**
-   * Checks if an event already exists. If the event hasn't been used already an
-   * EventDeclProxy is created and stored.
+   * Checks if an event already exists. If the event hasn't been used already
+   * an {@link EventDeclProxy} is created and stored.
    */
   private void constructEventDecl(final Element event,
                                   final boolean implementation)
   {
-    final String eventName = formatIdentifier(event.getAttribute("nm"));
+    final String name = event.getAttribute("nm");
+    final String eventName = mEventIdentification.getReplacementName(name);
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
@@ -481,7 +472,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < desList.getLength(); i++) {
       clearGraphStructures();
       final Element des = (Element) desList.item(i);
-      // final String autName = formatIdentifier(des.getAttribute("name"));
       final String location = des.getAttribute("location");
       final URI uri = new URI(null, null, location, null);
       final Element root = openDESFile(path.resolve(uri));
@@ -489,25 +479,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           (Element) root.getElementsByTagName("Definition").item(0);
       final NodeList allHeaders = definition.getElementsByTagName("Header");
       final Element header = (Element) allHeaders.item(0);
-      final String autName = formatIdentifier(header.getAttribute("name"));
       final GraphProxy graph = constructGraph(location, root, false);
       if (graph != null) {
+        final String name = header.getAttribute("name");
         final IdentifierProxy identifier =
-            mFactory.createSimpleIdentifierProxy(autName);
+          mComponentIdentification.createIdentifier(name);
         mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
                                                             graph));
       } else {
         continue;
       }
     }
-
   }
 
   /**
    * Constructs the SimpleComponent section for the module of a
    * <CODE>.wmod</CODE> file.
-   *
-   * @throws WatersUnmarshalException
    */
   private void constructSimpleComponent(final String desName,
                                         final String desLocation,
@@ -521,12 +508,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         (Element) root.getElementsByTagName("Definition").item(0);
     final NodeList allHeaders = definition.getElementsByTagName("Header");
     final Element header = (Element) allHeaders.item(0);
-    final String newName = formatIdentifier(header.getAttribute("name"));
     final GraphProxy graph = constructGraph(desLocation, root, true);
     if (graph != null) {
+      final String name = header.getAttribute("name");
       final IdentifierProxy identifier =
-          mFactory.createSimpleIdentifierProxy(newName);
-
+        mComponentIdentification.createIdentifier(name);
       mComponents.add(mFactory
           .createSimpleComponentProxy(identifier, kind, graph,
                                       HISCAttributeFactory.ATTRIBUTES_INTERFACE));
@@ -563,7 +549,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    *
    * @param des
    *          The root element of the .des file that contains the automaton.
-   * @throws WatersUnmarshalException
    */
   private GraphProxy constructGraph(final String autfilename,
                                     final Element des,
@@ -585,6 +570,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       storeStateId(stElmnt, i);
       mNodes.add(node);
     }
+    mStateIdentification.clear();
 
     // create a hash map of the ID numbers and the name they belong to for the
     // events
@@ -635,7 +621,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         findBlockedEvents(transLoopList, stElmntLst);
 
     return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
-
   }
 
   /**
@@ -702,7 +687,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < events.getLength(); i++) {
       final Element event = (Element) events.item(i);
       final int eventID = Integer.parseInt(event.getAttribute("id"));
-      final String eventName = formatIdentifier(event.getAttribute("nm"));
+      final String name = event.getAttribute("nm");
+      final String eventName = mEventIdentification.getReplacementName(name);
       mEventIDs.put(eventID, eventName);
       constructEventDecl(event, implementation);
     }
@@ -858,8 +844,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final double lblYPos = Double.parseDouble(yPosStr);
       final Point2D abslblPoint = new Point2D.Double(lblXPos, lblYPos);
 
-      // DESpot files give an absolute position for the label, waters require a
-      // position relative to the edge
+      // DESpot files give an absolute position for the label, Waters requires
+      // a position relative to the edge
       Point2D relLblPoint = null;
       double centreX = 0;
       double centreY = 0;
@@ -904,13 +890,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   /**
    * Converts a state from the despot file into a node for the waters file.
-   *
    * @param state
    *          The state to be converted.
    */
   private SimpleNodeProxy convertState(final Element state)
   {
-    final String stateName = formatIdentifier(state.getAttribute("nm"));
+    final String name = state.getAttribute("nm");
+    final String stateName = mStateIdentification.getReplacementName(name);
     // reads and stores the geometry (layout) data for the node
     String xPosStr = state.getAttribute("sx");
     String yPosStr = state.getAttribute("sy");
@@ -959,8 +945,74 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
 
-  // #########################################################################
-  // # Inner Class LevelComparator
+  //#########################################################################
+  //# Inner Class IdentifierReplacement
+  /**
+   * <P>Auxiliary class to ensure that identifiers (i.e., names of automata,
+   * events, states) is in the correct format for Waters.</P>
+   *
+   * <P>DESpot allows characters that Waters does not). If an identifier
+   * including illegal characters is encountered, those characters are
+   * replaced with something accepted by Waters. The identifiers obtained
+   * by this translation are stored in a map to avoid possible clashes.</P>
+   */
+  private class IdentifierReplacement
+  {
+    //#######################################################################
+    //# Simple Access
+    private void clear()
+    {
+      mBackwardsMap.clear();
+    }
+
+    private IdentifierProxy createIdentifier(final String name)
+    {
+      final String replacement = getReplacementName(name);
+      return mFactory.createSimpleIdentifierProxy(replacement);
+    }
+
+    private String getReplacementName(final String name)
+    {
+      final int len = name.length();
+      final StringBuilder builder = new StringBuilder(len);
+      for (int i = 0; i < len; i++) {
+        final char ch = name.charAt(i);
+        switch (ch) {
+        case ' ':
+        case '-':
+        case '.':
+          builder.append('_');
+          break;
+        case '%':
+          builder.append(':');
+          break;
+        default:
+          builder.append(ch);
+          break;
+        }
+      }
+      final String replacement0 = builder.toString();
+      String replacement = replacement0;
+      String reverseLookUp = mBackwardsMap.get(replacement);
+      int suffix = 1;
+      while (reverseLookUp != null && !reverseLookUp.equals(name)) {
+        replacement = replacement0 + ':' + (suffix++);
+        reverseLookUp = mBackwardsMap.get(replacement);
+      }
+      if (reverseLookUp == null) {
+        mBackwardsMap.put(replacement, name);
+      }
+      return replacement;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Map<String,String> mBackwardsMap = new HashMap<>();
+  }
+
+
+  //#########################################################################
+  //# Inner Class LevelComparator
   /**
    * A class used to compare the values of the levels of subsystems. Low level
    * subsystems are ordered before high level subsystems. This class is used as
@@ -977,12 +1029,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
       return (e1Level > e2Level ? -1 : (e1Level == e2Level ? 0 : 1));
     }
-
   }
 
 
-  // #########################################################################
-  // # Inner Class IdPair
+  //#########################################################################
+  //# Inner Class IdPair
   /**
    * A class used to pair the ID numbers for the source and target states of a
    * transition/event.
@@ -1018,8 +1069,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     private final int mTarget;
   }
 
-  // #########################################################################
-  // # Data Members
+
+  //#########################################################################
+  //# Data Members
   /**
    * Stores the ID number the despot file uses to reference a state and the
    * location of the state in the 'nodes' list.
@@ -1064,7 +1116,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Maps the name of a module to its ModuleProxy.
    */
   private final Map<String,ModuleProxy> mModules =
-      new HashMap<String,ModuleProxy>();
+    new HashMap<String,ModuleProxy>();
+
+  private final IdentifierReplacement mEventIdentification =
+    new IdentifierReplacement();
+  private final IdentifierReplacement mComponentIdentification =
+    new IdentifierReplacement();
+  private final IdentifierReplacement mStateIdentification =
+    new IdentifierReplacement();
+
   /**
    * The factory used to build up the modules for the <CODE>.wmod</CODE> files
    * we are converting into.
@@ -1075,8 +1135,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   private DocumentManager mDocumentManager;
 
-  // #########################################################################
-  // # Class Constants
+
+  //#########################################################################
+  //# Class Constants
   private static final String DESPOTEXT = ".desp";
   private static final Collection<String> EXTENSIONS =
       Collections.singletonList(DESPOTEXT);

@@ -2,49 +2,49 @@
 <Module Name="Node0" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="allow:exit"/>
-        <EventDecl Kind="CONTROLLABLE" Name="deposit:part"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="finish:exit:1">
+        <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
+        <EventDecl Kind="CONTROLLABLE" Name="deposit_part"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_1">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="finish:exit:2">
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_2">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="finish:exit:3">
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish_exit_3">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="new:part"/>
+        <EventDecl Kind="CONTROLLABLE" Name="new_part"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="package"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:enter:1">
+        <EventDecl Kind="CONTROLLABLE" Name="part_enter_1">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="part:enter:2">
+        <EventDecl Kind="CONTROLLABLE" Name="part_enter_2">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="part:enter:3">
+        <EventDecl Kind="CONTROLLABLE" Name="part_enter_3">
             <ns2:AttributeMap>
                 <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="part:f:obuff"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="part:fails"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:o:fbuff"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="part:passes"/>
-        <EventDecl Kind="CONTROLLABLE" Name="ret:inbuff"/>
-        <EventDecl Kind="CONTROLLABLE" Name="take:item"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_f_obuff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_fails"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_o_fbuff"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_passes"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ret_inbuff"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_item"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="Ensure:matFb">
+        <SimpleComponent Kind="SPEC" Name="Ensure_matFb">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -94,7 +94,7 @@
                 <EdgeList>
                     <Edge Source="s3" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:passes"/>
+                            <SimpleIdentifier Name="part_passes"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-32" Y="-31"/>
                             </LabelGeometry>
@@ -105,7 +105,7 @@
                     </Edge>
                     <Edge Source="s3" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-24" Y="-51"/>
                             </LabelGeometry>
@@ -116,7 +116,7 @@
                     </Edge>
                     <Edge Source="s4" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:passes"/>
+                            <SimpleIdentifier Name="part_passes"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-63" Y="4"/>
                             </LabelGeometry>
@@ -127,7 +127,7 @@
                     </Edge>
                     <Edge Source="s4" Target="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-28" Y="9"/>
                             </LabelGeometry>
@@ -138,7 +138,7 @@
                     </Edge>
                     <Edge Source="s5" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:passes"/>
+                            <SimpleIdentifier Name="part_passes"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-107" Y="-19"/>
                             </LabelGeometry>
@@ -149,7 +149,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:passes"/>
+                            <SimpleIdentifier Name="part_passes"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-34" Y="6"/>
                             </LabelGeometry>
@@ -160,7 +160,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-104" Y="34"/>
                             </LabelGeometry>
@@ -172,7 +172,7 @@
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-33" Y="-23"/>
                             </LabelGeometry>
@@ -184,7 +184,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="In:Buff">
+        <SimpleComponent Kind="SPEC" Name="In_Buff">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -226,8 +226,8 @@
                 <EdgeList>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ret:inbuff"/>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-17" Y="-31"/>
                             </LabelGeometry>
@@ -238,9 +238,9 @@
                     </Edge>
                     <Edge Source="s2" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter:3"/>
-                            <SimpleIdentifier Name="part:enter:1"/>
-                            <SimpleIdentifier Name="part:enter:2"/>
+                            <SimpleIdentifier Name="part_enter_3"/>
+                            <SimpleIdentifier Name="part_enter_1"/>
+                            <SimpleIdentifier Name="part_enter_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -251,8 +251,8 @@
                     </Edge>
                     <Edge Source="s3" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ret:inbuff"/>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-3"/>
                             </LabelGeometry>
@@ -263,9 +263,9 @@
                     </Edge>
                     <Edge Source="s3" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter:3"/>
-                            <SimpleIdentifier Name="part:enter:1"/>
-                            <SimpleIdentifier Name="part:enter:2"/>
+                            <SimpleIdentifier Name="part_enter_3"/>
+                            <SimpleIdentifier Name="part_enter_1"/>
+                            <SimpleIdentifier Name="part_enter_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-23" Y="2"/>
                             </LabelGeometry>
@@ -276,8 +276,8 @@
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ret:inbuff"/>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
+                            <SimpleIdentifier Name="new_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-46" Y="-35"/>
                             </LabelGeometry>
@@ -288,9 +288,9 @@
                     </Edge>
                     <Edge Source="s4" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter:3"/>
-                            <SimpleIdentifier Name="part:enter:1"/>
-                            <SimpleIdentifier Name="part:enter:2"/>
+                            <SimpleIdentifier Name="part_enter_3"/>
+                            <SimpleIdentifier Name="part_enter_1"/>
+                            <SimpleIdentifier Name="part_enter_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-53" Y="17"/>
                             </LabelGeometry>
@@ -302,7 +302,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="Out:Buff">
+        <SimpleComponent Kind="SPEC" Name="Out_Buff">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -344,9 +344,9 @@
                 <EdgeList>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit:1"/>
-                            <SimpleIdentifier Name="finish:exit:2"/>
-                            <SimpleIdentifier Name="finish:exit:3"/>
+                            <SimpleIdentifier Name="finish_exit_1"/>
+                            <SimpleIdentifier Name="finish_exit_2"/>
+                            <SimpleIdentifier Name="finish_exit_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-46" Y="-35"/>
                             </LabelGeometry>
@@ -357,9 +357,9 @@
                     </Edge>
                     <Edge Source="s1" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter:3"/>
-                            <SimpleIdentifier Name="part:enter:2"/>
-                            <SimpleIdentifier Name="part:enter:1"/>
+                            <SimpleIdentifier Name="part_enter_3"/>
+                            <SimpleIdentifier Name="part_enter_2"/>
+                            <SimpleIdentifier Name="part_enter_1"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="102" Y="152"/>
@@ -367,7 +367,7 @@
                     </Edge>
                     <Edge Source="s4" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:o:fbuff"/>
+                            <SimpleIdentifier Name="part_o_fbuff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-53" Y="17"/>
                             </LabelGeometry>
@@ -378,7 +378,7 @@
                     </Edge>
                     <Edge Source="s3" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:o:fbuff"/>
+                            <SimpleIdentifier Name="part_o_fbuff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-23" Y="2"/>
                             </LabelGeometry>
@@ -389,9 +389,9 @@
                     </Edge>
                     <Edge Source="s3" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit:1"/>
-                            <SimpleIdentifier Name="finish:exit:2"/>
-                            <SimpleIdentifier Name="finish:exit:3"/>
+                            <SimpleIdentifier Name="finish_exit_1"/>
+                            <SimpleIdentifier Name="finish_exit_2"/>
+                            <SimpleIdentifier Name="finish_exit_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="1" Y="-3"/>
                             </LabelGeometry>
@@ -402,7 +402,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:o:fbuff"/>
+                            <SimpleIdentifier Name="part_o_fbuff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -413,9 +413,9 @@
                     </Edge>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit:1"/>
-                            <SimpleIdentifier Name="finish:exit:2"/>
-                            <SimpleIdentifier Name="finish:exit:3"/>
+                            <SimpleIdentifier Name="finish_exit_1"/>
+                            <SimpleIdentifier Name="finish_exit_2"/>
+                            <SimpleIdentifier Name="finish_exit_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-17" Y="-31"/>
                             </LabelGeometry>
@@ -426,9 +426,9 @@
                     </Edge>
                     <Edge Source="s2" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter:3"/>
-                            <SimpleIdentifier Name="part:enter:2"/>
-                            <SimpleIdentifier Name="part:enter:1"/>
+                            <SimpleIdentifier Name="part_enter_3"/>
+                            <SimpleIdentifier Name="part_enter_2"/>
+                            <SimpleIdentifier Name="part_enter_1"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="332" Y="102"/>
@@ -437,7 +437,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="Package:Buffer">
+        <SimpleComponent Kind="SPEC" Name="Package_Buffer">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -487,7 +487,7 @@
                 <EdgeList>
                     <Edge Source="s3" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -498,7 +498,7 @@
                     </Edge>
                     <Edge Source="s3" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="deposit:part"/>
+                            <SimpleIdentifier Name="deposit_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="109" Y="22"/>
                             </LabelGeometry>
@@ -509,7 +509,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -520,7 +520,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="deposit:part"/>
+                            <SimpleIdentifier Name="deposit_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="9" Y="22"/>
                             </LabelGeometry>
@@ -531,7 +531,7 @@
                     </Edge>
                     <Edge Source="s5" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -542,7 +542,7 @@
                     </Edge>
                     <Edge Source="s4" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-43" Y="3"/>
                             </LabelGeometry>
@@ -553,7 +553,7 @@
                     </Edge>
                     <Edge Source="s4" Target="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="deposit:part"/>
+                            <SimpleIdentifier Name="deposit_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="209" Y="22"/>
                             </LabelGeometry>
@@ -564,7 +564,7 @@
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="deposit:part"/>
+                            <SimpleIdentifier Name="deposit_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-46" Y="-35"/>
                             </LabelGeometry>
@@ -576,7 +576,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Packaging:System">
+        <SimpleComponent Kind="PLANT" Name="Packaging_System">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -610,7 +610,7 @@
                 <EdgeList>
                     <Edge Source="s3" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="allow:exit"/>
+                            <SimpleIdentifier Name="allow_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-87" Y="-34"/>
                             </LabelGeometry>
@@ -626,7 +626,7 @@
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-45" Y="-38"/>
                             </LabelGeometry>
@@ -653,7 +653,7 @@
                 <EdgeList>
                     <Edge Source="s1" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="allow:exit"/>
+                            <SimpleIdentifier Name="allow_exit"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="267" Y="150"/>
@@ -680,7 +680,7 @@
                 <EdgeList>
                     <Edge Source="s1" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="new:part"/>
+                            <SimpleIdentifier Name="new_part"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="270" Y="177"/>
@@ -689,7 +689,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Test:Unit">
+        <SimpleComponent Kind="PLANT" Name="Test_Unit">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -731,7 +731,7 @@
                 <EdgeList>
                     <Edge Source="s4" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="deposit:part"/>
+                            <SimpleIdentifier Name="deposit_part"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-67" Y="-114"/>
                             </LabelGeometry>
@@ -739,7 +739,7 @@
                     </Edge>
                     <Edge Source="s3" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="ret:inbuff"/>
+                            <SimpleIdentifier Name="ret_inbuff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-87" Y="-34"/>
                             </LabelGeometry>
@@ -747,7 +747,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:passes"/>
+                            <SimpleIdentifier Name="part_passes"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-147" Y="-84"/>
                             </LabelGeometry>
@@ -755,7 +755,7 @@
                     </Edge>
                     <Edge Source="s2" Target="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:fails"/>
+                            <SimpleIdentifier Name="part_fails"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-11" Y="13"/>
                             </LabelGeometry>
@@ -763,7 +763,7 @@
                     </Edge>
                     <Edge Source="s1" Target="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:f:obuff"/>
+                            <SimpleIdentifier Name="part_f_obuff"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-45" Y="-38"/>
                             </LabelGeometry>
@@ -776,33 +776,33 @@
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish:exit:1">
-                <SimpleIdentifier Name="finish:exit:1"/>
+            <ParameterBinding Name="finish_exit_1">
+                <SimpleIdentifier Name="finish_exit_1"/>
             </ParameterBinding>
-            <ParameterBinding Name="part:enter:1">
-                <SimpleIdentifier Name="part:enter:1"/>
+            <ParameterBinding Name="part_enter_1">
+                <SimpleIdentifier Name="part_enter_1"/>
             </ParameterBinding>
         </Instance>
         <Instance ModuleName="Node2" Name="Node2">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish:exit:2">
-                <SimpleIdentifier Name="finish:exit:2"/>
+            <ParameterBinding Name="finish_exit_2">
+                <SimpleIdentifier Name="finish_exit_2"/>
             </ParameterBinding>
-            <ParameterBinding Name="part:enter:2">
-                <SimpleIdentifier Name="part:enter:2"/>
+            <ParameterBinding Name="part_enter_2">
+                <SimpleIdentifier Name="part_enter_2"/>
             </ParameterBinding>
         </Instance>
         <Instance ModuleName="Node3" Name="Node3">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish:exit:3">
-                <SimpleIdentifier Name="finish:exit:3"/>
+            <ParameterBinding Name="finish_exit_3">
+                <SimpleIdentifier Name="finish_exit_3"/>
             </ParameterBinding>
-            <ParameterBinding Name="part:enter:3">
-                <SimpleIdentifier Name="part:enter:3"/>
+            <ParameterBinding Name="part_enter_3">
+                <SimpleIdentifier Name="part_enter_3"/>
             </ParameterBinding>
         </Instance>
     </ComponentList>

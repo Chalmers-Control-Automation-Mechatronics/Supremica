@@ -12,7 +12,7 @@
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="a2:2">
+<EventDecl Kind="CONTROLLABLE" Name="a2_2">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
@@ -289,8 +289,8 @@
 <ParameterBinding Name="a1">
 <SimpleIdentifier Name="a1"/>
 </ParameterBinding>
-<ParameterBinding Name="a2:2">
-<SimpleIdentifier Name="a2:2"/>
+<ParameterBinding Name="a2_2">
+<SimpleIdentifier Name="a2_2"/>
 </ParameterBinding>
 <ParameterBinding Name="r1">
 <SimpleIdentifier Name="r1"/>

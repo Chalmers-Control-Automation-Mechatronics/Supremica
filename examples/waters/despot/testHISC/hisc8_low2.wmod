@@ -7,7 +7,7 @@
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2:2">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2_2">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
@@ -37,7 +37,7 @@
 </Edge>
 <Edge Target="iX1" Source="iX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
 </Edge>
@@ -60,7 +60,7 @@
 <EdgeList>
 <Edge Target="lX1" Source="lX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 <SimpleIdentifier Name="a1"/>
 </LabelBlock>
 </Edge>
@@ -75,7 +75,7 @@
 <SimpleComponent Kind="PLANT" Name="lplnt7">
 <Graph>
 <LabelBlock>
-<SimpleIdentifier Name="a2:2"/>
+<SimpleIdentifier Name="a2_2"/>
 </LabelBlock>
 <NodeList>
 <SimpleNode Initial="true" Name="lX1">

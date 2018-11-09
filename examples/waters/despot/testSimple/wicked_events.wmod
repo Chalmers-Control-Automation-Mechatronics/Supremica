@@ -2,12 +2,12 @@
 <Module Name="wicked_events" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
 <EventDeclList>
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="CONTROLLABLE" Name="e:1"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="e::x"/>
-<EventDecl Kind="CONTROLLABLE" Name="e:_x"/>
 <EventDecl Kind="CONTROLLABLE" Name="e_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_:x"/>
-<EventDecl Kind="CONTROLLABLE" Name="e__x"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="e__x"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x:1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_1:1"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x:2"/>
+<EventDecl Kind="CONTROLLABLE" Name="e__x:3"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT" Name="wicked_events_1">
@@ -25,22 +25,22 @@
 <EdgeList>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e::x"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e:_x"/>
+<SimpleIdentifier Name="e__x:1"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e_:x"/>
+<SimpleIdentifier Name="e__x:2"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e__x:3"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -61,22 +61,22 @@
 <EdgeList>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e__x:3"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e_:x"/>
+<SimpleIdentifier Name="e__x:2"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e_1"/>
+<SimpleIdentifier Name="e_1:1"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e:1"/>
+<SimpleIdentifier Name="e_1"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -97,27 +97,27 @@
 <EdgeList>
 <Edge Target="s1" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e::x"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s2" Source="s1">
 <LabelBlock>
-<SimpleIdentifier Name="e__x"/>
+<SimpleIdentifier Name="e__x:3"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s3" Source="s2">
 <LabelBlock>
-<SimpleIdentifier Name="e_:x"/>
+<SimpleIdentifier Name="e__x:2"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s4" Source="s3">
 <LabelBlock>
-<SimpleIdentifier Name="e:_x"/>
+<SimpleIdentifier Name="e__x:1"/>
 </LabelBlock>
 </Edge>
 <Edge Target="s1" Source="s4">
 <LabelBlock>
-<SimpleIdentifier Name="e::x"/>
+<SimpleIdentifier Name="e__x"/>
 </LabelBlock>
 </Edge>
 </EdgeList>

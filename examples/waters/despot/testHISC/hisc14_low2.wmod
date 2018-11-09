@@ -7,12 +7,12 @@
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2:10">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a2_10">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="UNCONTROLLABLE" Name="lev:1"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="lev_1"/>
 <EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="r1">
 <ns2:AttributeMap>
 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
@@ -43,7 +43,7 @@
 </Edge>
 <Edge Target="iX2" Source="iX2">
 <LabelBlock>
-<SimpleIdentifier Name="a2:10"/>
+<SimpleIdentifier Name="a2_10"/>
 </LabelBlock>
 </Edge>
 </EdgeList>
@@ -137,7 +137,7 @@
 <EdgeList>
 <Edge Target="lX2" Source="lX2">
 <LabelBlock>
-<SimpleIdentifier Name="lev:1"/>
+<SimpleIdentifier Name="lev_1"/>
 </LabelBlock>
 </Edge>
 <Edge Target="lX2" Source="lX1">

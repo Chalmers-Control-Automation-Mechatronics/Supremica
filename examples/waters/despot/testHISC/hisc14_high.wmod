@@ -12,12 +12,12 @@
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="a2:10">
+<EventDecl Kind="CONTROLLABLE" Name="a2_10">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="a3:9">
+<EventDecl Kind="CONTROLLABLE" Name="a3_9">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
 </ns2:AttributeMap>
@@ -29,7 +29,7 @@
 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Kind="CONTROLLABLE" Name="ld2:9">
+<EventDecl Kind="CONTROLLABLE" Name="ld2_9">
 <ns2:AttributeMap>
 <ns2:Attribute Name="HISC:EventType" Value="LOWDATA"/>
 </ns2:AttributeMap>
@@ -282,8 +282,8 @@
 <ParameterBinding Name="a1">
 <SimpleIdentifier Name="a1"/>
 </ParameterBinding>
-<ParameterBinding Name="a2:10">
-<SimpleIdentifier Name="a2:10"/>
+<ParameterBinding Name="a2_10">
+<SimpleIdentifier Name="a2_10"/>
 </ParameterBinding>
 <ParameterBinding Name="r1">
 <SimpleIdentifier Name="r1"/>
@@ -296,14 +296,14 @@
 <ParameterBinding Name="a2">
 <SimpleIdentifier Name="a2"/>
 </ParameterBinding>
-<ParameterBinding Name="a3:9">
-<SimpleIdentifier Name="a3:9"/>
+<ParameterBinding Name="a3_9">
+<SimpleIdentifier Name="a3_9"/>
 </ParameterBinding>
 <ParameterBinding Name="ld1">
 <SimpleIdentifier Name="ld1"/>
 </ParameterBinding>
-<ParameterBinding Name="ld2:9">
-<SimpleIdentifier Name="ld2:9"/>
+<ParameterBinding Name="ld2_9">
+<SimpleIdentifier Name="ld2_9"/>
 </ParameterBinding>
 <ParameterBinding Name="r2">
 <SimpleIdentifier Name="r2"/>

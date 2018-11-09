@@ -25,7 +25,7 @@
 </EventDeclList>
 <ComponentList>
 <Instance ModuleName="wicked-low">
-<SimpleIdentifier Name="wicked:low"/>
+<SimpleIdentifier Name="wicked_low"/>
 <ParameterBinding Name=":accepting">
 <SimpleIdentifier Name=":accepting"/>
 </ParameterBinding>
@@ -37,7 +37,7 @@
 </ParameterBinding>
 </Instance>
 <Instance ModuleName="wicked_low">
-<SimpleIdentifier Name="wicked_low"/>
+<SimpleIdentifier Name="wicked_low:1"/>
 <ParameterBinding Name=":accepting">
 <SimpleIdentifier Name=":accepting"/>
 </ParameterBinding>

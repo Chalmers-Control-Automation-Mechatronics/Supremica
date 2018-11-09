@@ -4,7 +4,7 @@
 <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
 </EventDeclList>
 <ComponentList>
-<SimpleComponent Kind="SPEC" Name="wicked:states:1">
+<SimpleComponent Kind="SPEC" Name="wicked_states_1">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st">
@@ -15,21 +15,21 @@
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_states_1">
+<SimpleComponent Kind="PLANT" Name="wicked_states_1:1">
 <Graph>
 <NodeList>
-<SimpleNode Initial="true" Name="st::2">
+<SimpleNode Initial="true" Name="st__2">
 <EventList>
 <SimpleIdentifier Name=":accepting"/>
 </EventList>
 </SimpleNode>
-<SimpleNode Name="st__2"/>
-<SimpleNode Name="st_:2"/>
-<SimpleNode Name="st:_2"/>
+<SimpleNode Name="st__2:1"/>
+<SimpleNode Name="st__2:2"/>
+<SimpleNode Name="st__2:3"/>
 </NodeList>
 </Graph>
 </SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="wicked_states:1">
+<SimpleComponent Kind="PLANT" Name="wicked_states_1:2">
 <Graph>
 <NodeList>
 <SimpleNode Initial="true" Name="st">

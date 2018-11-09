@@ -2,64 +2,64 @@
 <Module Name="High-Level Subsystem" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
     <EventDeclList>
         <EventDecl Scope="OPTIONAL_PARAMETER" Kind="PROPOSITION" Name=":accepting"/>
-        <EventDecl Kind="CONTROLLABLE" Name="allow:exit"/>
-        <EventDecl Kind="CONTROLLABLE" Name="attach:part:a">
+        <EventDecl Kind="CONTROLLABLE" Name="allow_exit"/>
+        <EventDecl Kind="CONTROLLABLE" Name="attach_part_a">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="attach:part:b">
+        <EventDecl Kind="CONTROLLABLE" Name="attach_part_b">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="complete:case">
+        <EventDecl Kind="UNCONTROLLABLE" Name="complete_case">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="complete:polish">
+        <EventDecl Kind="UNCONTROLLABLE" Name="complete_polish">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="finish:attach:a">
+        <EventDecl Kind="CONTROLLABLE" Name="finish_attach_a">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="finish:attach:b">
+        <EventDecl Kind="CONTROLLABLE" Name="finish_attach_b">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="UNCONTROLLABLE" Name="finish:exit"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish_exit"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="package"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="part:arrive:1"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="part:arrive:2"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="part:arrive:3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:enter"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:leave:1"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:leave:2"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:leave:3"/>
-        <EventDecl Kind="CONTROLLABLE" Name="part:leave:exit"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="recognize:part:a"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="recognize:part:b"/>
-        <EventDecl Kind="CONTROLLABLE" Name="start:case">
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arrive_1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arrive_2"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="part_arrive_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_enter"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_leave_1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_leave_2"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_leave_3"/>
+        <EventDecl Kind="CONTROLLABLE" Name="part_leave_exit"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recognize_part_a"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="recognize_part_b"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_case">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="start:exit"/>
-        <EventDecl Kind="CONTROLLABLE" Name="start:polish">
+        <EventDecl Kind="CONTROLLABLE" Name="start_exit"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start_polish">
             <ns2:AttributeMap>
                 <ns2:Attribute Value="REQUEST" Name="HISC:EventType"/>
             </ns2:AttributeMap>
         </EventDecl>
-        <EventDecl Kind="CONTROLLABLE" Name="take:item"/>
+        <EventDecl Kind="CONTROLLABLE" Name="take_item"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="SPEC" Name="Exit:Buffer">
+        <SimpleComponent Kind="SPEC" Name="Exit_Buffer">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -93,7 +93,7 @@
                 <EdgeList>
                     <Edge Target="s2" Source="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:exit"/>
+                            <SimpleIdentifier Name="start_exit"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="202" X="362"/>
@@ -101,7 +101,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="18" X="-39"/>
                             </LabelGeometry>
@@ -109,7 +109,7 @@
                     </Edge>
                     <Edge Target="s3" Source="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit"/>
+                            <SimpleIdentifier Name="finish_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="73" X="-2"/>
                             </LabelGeometry>
@@ -120,7 +120,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-70" X="-3"/>
                             </LabelGeometry>
@@ -131,7 +131,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:exit"/>
+                            <SimpleIdentifier Name="start_exit"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="202" X="202"/>
@@ -139,7 +139,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit"/>
+                            <SimpleIdentifier Name="finish_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-18" X="39"/>
                             </LabelGeometry>
@@ -148,7 +148,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="SPEC" Name="Sequence:Tasks">
+        <SimpleComponent Kind="SPEC" Name="Sequence_Tasks">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -294,7 +294,7 @@
                 <EdgeList>
                     <Edge Target="s9" Source="s7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach:part:a"/>
+                            <SimpleIdentifier Name="attach_part_a"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="1" X="-33"/>
                             </LabelGeometry>
@@ -302,7 +302,7 @@
                     </Edge>
                     <Edge Target="s11" Source="s10">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:attach:b"/>
+                            <SimpleIdentifier Name="finish_attach_b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-30" X="-22"/>
                             </LabelGeometry>
@@ -310,7 +310,7 @@
                     </Edge>
                     <Edge Target="s13" Source="s12">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:3"/>
+                            <SimpleIdentifier Name="part_arrive_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="6" X="-46"/>
                             </LabelGeometry>
@@ -318,7 +318,7 @@
                     </Edge>
                     <Edge Target="s7" Source="s6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize:part:a"/>
+                            <SimpleIdentifier Name="recognize_part_a"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-31" X="-103"/>
                             </LabelGeometry>
@@ -326,8 +326,8 @@
                     </Edge>
                     <Edge Target="s6" Source="s6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:2"/>
-                            <SimpleIdentifier Name="part:leave:exit"/>
+                            <SimpleIdentifier Name="part_arrive_2"/>
+                            <SimpleIdentifier Name="part_leave_exit"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="87" X="674"/>
@@ -335,7 +335,7 @@
                     </Edge>
                     <Edge Target="s8" Source="s6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize:part:b"/>
+                            <SimpleIdentifier Name="recognize_part_b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="17" X="-127"/>
                             </LabelGeometry>
@@ -343,7 +343,7 @@
                     </Edge>
                     <Edge Target="s11" Source="s9">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:attach:a"/>
+                            <SimpleIdentifier Name="finish_attach_a"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-36" X="-72"/>
                             </LabelGeometry>
@@ -351,7 +351,7 @@
                     </Edge>
                     <Edge Target="s12" Source="s11">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:2"/>
+                            <SimpleIdentifier Name="part_leave_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-12" X="0"/>
                             </LabelGeometry>
@@ -359,7 +359,7 @@
                     </Edge>
                     <Edge Target="s6" Source="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:1"/>
+                            <SimpleIdentifier Name="part_leave_1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-34" X="-24"/>
                             </LabelGeometry>
@@ -367,7 +367,7 @@
                     </Edge>
                     <Edge Target="s10" Source="s8">
                         <LabelBlock>
-                            <SimpleIdentifier Name="attach:part:b"/>
+                            <SimpleIdentifier Name="attach_part_b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-28" X="-68"/>
                             </LabelGeometry>
@@ -375,7 +375,7 @@
                     </Edge>
                     <Edge Target="s5" Source="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete:polish"/>
+                            <SimpleIdentifier Name="complete_polish"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-32" X="-49"/>
                             </LabelGeometry>
@@ -383,7 +383,7 @@
                     </Edge>
                     <Edge Target="s14" Source="s13">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:case"/>
+                            <SimpleIdentifier Name="start_case"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-28" X="-44"/>
                             </LabelGeometry>
@@ -391,7 +391,7 @@
                     </Edge>
                     <Edge Target="s4" Source="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:polish"/>
+                            <SimpleIdentifier Name="start_polish"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-35" X="-40"/>
                             </LabelGeometry>
@@ -399,7 +399,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter"/>
+                            <SimpleIdentifier Name="part_enter"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-29" X="-33"/>
                             </LabelGeometry>
@@ -407,7 +407,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit"/>
+                            <SimpleIdentifier Name="finish_exit"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="106" X="44"/>
@@ -415,7 +415,7 @@
                     </Edge>
                     <Edge Target="s3" Source="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:1"/>
+                            <SimpleIdentifier Name="part_arrive_1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-32" X="-50"/>
                             </LabelGeometry>
@@ -423,7 +423,7 @@
                     </Edge>
                     <Edge Target="s17" Source="s17">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:1"/>
+                            <SimpleIdentifier Name="part_leave_1"/>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point Y="462" X="41"/>
@@ -431,7 +431,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s17">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:exit"/>
+                            <SimpleIdentifier Name="start_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-96" X="1"/>
                             </LabelGeometry>
@@ -439,7 +439,7 @@
                     </Edge>
                     <Edge Target="s16" Source="s15">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:3"/>
+                            <SimpleIdentifier Name="part_leave_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="10" X="-24"/>
                             </LabelGeometry>
@@ -447,7 +447,7 @@
                     </Edge>
                     <Edge Target="s15" Source="s14">
                         <LabelBlock>
-                            <SimpleIdentifier Name="complete:case"/>
+                            <SimpleIdentifier Name="complete_case"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-28" X="-4"/>
                             </LabelGeometry>
@@ -455,7 +455,7 @@
                     </Edge>
                     <Edge Target="s17" Source="s16">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:1"/>
+                            <SimpleIdentifier Name="part_arrive_1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="5" X="2"/>
                             </LabelGeometry>
@@ -464,7 +464,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Packaging:System">
+        <SimpleComponent Kind="PLANT" Name="Packaging_System">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -506,7 +506,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="allow:exit"/>
+                            <SimpleIdentifier Name="allow_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-39" X="-18"/>
                             </LabelGeometry>
@@ -514,7 +514,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="take:item"/>
+                            <SimpleIdentifier Name="take_item"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-18" X="39"/>
                             </LabelGeometry>
@@ -523,7 +523,7 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="Path:Flow:Model">
+        <SimpleComponent Kind="PLANT" Name="Path_Flow_Model">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s1">
@@ -613,7 +613,7 @@
                 <EdgeList>
                     <Edge Target="s4" Source="s3">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:1"/>
+                            <SimpleIdentifier Name="part_leave_1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="17" X="-6"/>
                             </LabelGeometry>
@@ -621,7 +621,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s9">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:3"/>
+                            <SimpleIdentifier Name="part_leave_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-31" X="-1"/>
                             </LabelGeometry>
@@ -629,7 +629,7 @@
                     </Edge>
                     <Edge Target="s6" Source="s5">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:2"/>
+                            <SimpleIdentifier Name="part_arrive_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-10" X="1"/>
                             </LabelGeometry>
@@ -637,7 +637,7 @@
                     </Edge>
                     <Edge Target="s10" Source="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="start:exit"/>
+                            <SimpleIdentifier Name="start_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="9" X="-42"/>
                             </LabelGeometry>
@@ -645,7 +645,7 @@
                     </Edge>
                     <Edge Target="s5" Source="s4">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:exit"/>
+                            <SimpleIdentifier Name="part_leave_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-27" X="-8"/>
                             </LabelGeometry>
@@ -653,8 +653,8 @@
                     </Edge>
                     <Edge Target="s7" Source="s6">
                         <LabelBlock>
-                            <SimpleIdentifier Name="recognize:part:a"/>
-                            <SimpleIdentifier Name="recognize:part:b"/>
+                            <SimpleIdentifier Name="recognize_part_a"/>
+                            <SimpleIdentifier Name="recognize_part_b"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-22" X="-125"/>
                             </LabelGeometry>
@@ -662,7 +662,7 @@
                     </Edge>
                     <Edge Target="s8" Source="s7">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:leave:2"/>
+                            <SimpleIdentifier Name="part_leave_2"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="3" X="-30"/>
                             </LabelGeometry>
@@ -670,7 +670,7 @@
                     </Edge>
                     <Edge Target="s2" Source="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:enter"/>
+                            <SimpleIdentifier Name="part_enter"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-7" X="4"/>
                             </LabelGeometry>
@@ -678,7 +678,7 @@
                     </Edge>
                     <Edge Target="s9" Source="s8">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:3"/>
+                            <SimpleIdentifier Name="part_arrive_3"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="7" X="-53"/>
                             </LabelGeometry>
@@ -686,7 +686,7 @@
                     </Edge>
                     <Edge Target="s1" Source="s10">
                         <LabelBlock>
-                            <SimpleIdentifier Name="finish:exit"/>
+                            <SimpleIdentifier Name="finish_exit"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="-5" X="-2"/>
                             </LabelGeometry>
@@ -694,7 +694,7 @@
                     </Edge>
                     <Edge Target="s3" Source="s2">
                         <LabelBlock>
-                            <SimpleIdentifier Name="part:arrive:1"/>
+                            <SimpleIdentifier Name="part_arrive_1"/>
                             <LabelGeometry Anchor="NW">
                                 <Point Y="2" X="-34"/>
                             </LabelGeometry>
@@ -703,33 +703,33 @@
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <Instance ModuleName="Manuf-Cells" Name="Manuf:Cells">
+        <Instance ModuleName="Manuf-Cells" Name="Manuf_Cells">
             <ParameterBinding Name=":accepting">
                 <SimpleIdentifier Name=":accepting"/>
             </ParameterBinding>
-            <ParameterBinding Name="attach:part:a">
-                <SimpleIdentifier Name="attach:part:a"/>
+            <ParameterBinding Name="attach_part_a">
+                <SimpleIdentifier Name="attach_part_a"/>
             </ParameterBinding>
-            <ParameterBinding Name="attach:part:b">
-                <SimpleIdentifier Name="attach:part:b"/>
+            <ParameterBinding Name="attach_part_b">
+                <SimpleIdentifier Name="attach_part_b"/>
             </ParameterBinding>
-            <ParameterBinding Name="complete:case">
-                <SimpleIdentifier Name="complete:case"/>
+            <ParameterBinding Name="complete_case">
+                <SimpleIdentifier Name="complete_case"/>
             </ParameterBinding>
-            <ParameterBinding Name="complete:polish">
-                <SimpleIdentifier Name="complete:polish"/>
+            <ParameterBinding Name="complete_polish">
+                <SimpleIdentifier Name="complete_polish"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish:attach:a">
-                <SimpleIdentifier Name="finish:attach:a"/>
+            <ParameterBinding Name="finish_attach_a">
+                <SimpleIdentifier Name="finish_attach_a"/>
             </ParameterBinding>
-            <ParameterBinding Name="finish:attach:b">
-                <SimpleIdentifier Name="finish:attach:b"/>
+            <ParameterBinding Name="finish_attach_b">
+                <SimpleIdentifier Name="finish_attach_b"/>
             </ParameterBinding>
-            <ParameterBinding Name="start:case">
-                <SimpleIdentifier Name="start:case"/>
+            <ParameterBinding Name="start_case">
+                <SimpleIdentifier Name="start_case"/>
             </ParameterBinding>
-            <ParameterBinding Name="start:polish">
-                <SimpleIdentifier Name="start:polish"/>
+            <ParameterBinding Name="start_polish">
+                <SimpleIdentifier Name="start_polish"/>
             </ParameterBinding>
         </Instance>
     </ComponentList>

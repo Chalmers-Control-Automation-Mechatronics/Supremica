@@ -7,7 +7,7 @@
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a3:9">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="a3_9">
 <ns2:AttributeMap>
 <ns2:Attribute Value="ANSWER" Name="HISC:EventType"/>
 </ns2:AttributeMap>
@@ -17,7 +17,7 @@
 <ns2:Attribute Value="LOWDATA" Name="HISC:EventType"/>
 </ns2:AttributeMap>
 </EventDecl>
-<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ld2:9">
+<EventDecl Scope="REQUIRED_PARAMETER" Kind="CONTROLLABLE" Name="ld2_9">
 <ns2:AttributeMap>
 <ns2:Attribute Value="LOWDATA" Name="HISC:EventType"/>
 </ns2:AttributeMap>
@@ -56,8 +56,8 @@
 </Edge>
 <Edge Target="iY2" Source="iY2">
 <LabelBlock>
-<SimpleIdentifier Name="a3:9"/>
-<SimpleIdentifier Name="ld2:9"/>
+<SimpleIdentifier Name="a3_9"/>
+<SimpleIdentifier Name="ld2_9"/>
 </LabelBlock>
 </Edge>
 <Edge Target="iY1" Source="iY1">
