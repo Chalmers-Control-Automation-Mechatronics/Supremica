@@ -268,10 +268,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
                                        uri);
             } else if (!interfaceMap.containsKey(name)) {
               throw new WatersUnmarshalException
-                ("The interface " + name + " does not exist.");
+                ("The interface '" + name +
+                 "' is not defined in the DESpot file.");
             }
           }
-        } else if (section.getTagName().equals("Uses")) {
+        } else if (tagName.equals("Uses")) {
           constructModuleInstance(section);
         }
       }
@@ -506,15 +507,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
         final String inputType = inst.getAttribute("InputType");
         final NodeList paramList = inst.getElementsByTagName("Parameter");
-        final DESpotParameters params;
+        DESpotParameters params;
         if (paramList.getLength() == 0) {
           params = new DESpotNoParameters();
         } else if ("Range".equals(inputType)) {
-          params = new DESpotRangeParameters(paramList);
+          params = null;
+          for (int p = 0; p < paramList.getLength(); p++) {
+            final Element param = (Element) paramList.item(p);
+            params = new DESpotRangeParameters(param, params);
+          }
         } else if ("Tuple".equals(inputType)) {
           if (paramList.getLength() > 1) {
             throw new WatersUnmarshalException
-              ("Tuple instantiation with more than one parameters unsupported.");
+              ("Tuple instantiation with more than one parameter unsupported.");
           }
           final Element param = (Element) paramList.item(0);
           params = new DESpotTupleParameters(param);
@@ -1170,16 +1175,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   {
     //#######################################################################
     //# Constructor
-    private DESpotRangeParameters(final NodeList list)
+    private DESpotRangeParameters(final Element param,
+                                  final DESpotParameters next)
       throws WatersUnmarshalException
     {
-      this (list, 0);
-    }
-
-    private DESpotRangeParameters(final NodeList list, final int index)
-      throws WatersUnmarshalException
-    {
-      final Element param = (Element) list.item(index);
       final String name = param.getAttribute("Name");
       mPattern = Pattern.compile("%" + name + "%");
       final String value = param.getAttribute("Value");
@@ -1220,11 +1219,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         }
       }
       mIterator = mValues.isEmpty() ? null : mValues.iterator();
-      if (index + 1 < list.getLength()) {
-        mNext = new DESpotRangeParameters(list, index + 1);
-      } else {
-        mNext = null;
-      }
+      mNext = next;
     }
 
     //#######################################################################
@@ -1263,7 +1258,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     private final List<String> mValues;
     private Iterator<String> mIterator;
     private String mCurrentValue;
-    private final DESpotRangeParameters mNext;
+    private final DESpotParameters mNext;
   }
 
 
