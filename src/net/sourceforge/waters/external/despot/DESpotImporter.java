@@ -75,6 +75,7 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
+import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
@@ -215,26 +216,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     ModuleProxy module = null;
 
     // maps the name of the interfaces to their filenames for this module
-    final Map<String,String> interfaceMap = new HashMap<String,String>();
+    final Map<String,Element> interfaceMap = new HashMap<>();
     final NodeList interfaces = project.getElementsByTagName("Interface");
     for (int j = 0; j < interfaces.getLength(); j++) {
-      final Element interfaceDES = (Element) interfaces.item(j);
-      final Element des =
-          (Element) interfaceDES.getElementsByTagName("Des").item(0);
-      final String name = interfaceDES.getAttribute("name");
-      if (des == null) {
-        interfaceMap.put(name, "");
-      } else {
-        final String location = des.getAttribute("location");
-        final URI fileURI = uri.resolve(location);
-        final File file = new File(fileURI);
-        if (file.exists()) {
-          interfaceMap.put(name, location);
-        } else {
-          throw new FileNotFoundException("The interface file " + file
-              + " could not be located.");
-        }
-      }
+      final Element iface = (Element) interfaces.item(j);
+      final String name = iface.getAttribute("name");
+      final Element des = (Element) iface.getElementsByTagName("Des").item(0);
+      interfaceMap.put(name, des);
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
     // extracts each subsystem element and puts them into an array list
@@ -252,23 +240,25 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         final Element section = (Element) sections.item(i);
         if (section.getTagName().equals("Supervisor")) {
           // builds all specification automata
-          constructSimpleComponent(section, ComponentKind.SPEC, uri);
+          constructSimpleComponents(section, ComponentKind.SPEC, uri);
         } else if (section.getTagName().equals("Plant")) {
           // builds all plant automata
-          constructSimpleComponent(section, ComponentKind.PLANT, uri);
+          constructSimpleComponents(section, ComponentKind.PLANT, uri);
         } else if (section.getTagName().equals("Implements")) {
-          final NodeList list = section.getElementsByTagName("*");
+          final NodeList list = section.getElementsByTagName("InterfaceRef");
           for (int j = 0; j < list.getLength(); j++) {
-            clearGraphStructures();
             final Element interfaceRef = (Element) list.item(i);
-            final String interfaceNm = interfaceRef.getAttribute("name");
-            final String interfaceLocation = interfaceMap.get(interfaceNm);
-            if (interfaceLocation == null) {
+            final String name = interfaceRef.getAttribute("name");
+            final Element des = interfaceMap.get(name);
+            if (des != null) {
+              constructSimpleComponent(des,
+                                       ComponentKind.SPEC,
+                                       HISCAttributeFactory.ATTRIBUTES_INTERFACE,
+                                       true,
+                                       uri);
+            } else if (!interfaceMap.containsKey(name)) {
               throw new WatersUnmarshalException
-                ("The interface " + interfaceNm + " does not exist.");
-            } else if (!interfaceLocation.equals("")) {
-              constructSimpleComponent(interfaceNm, interfaceLocation,
-                                       ComponentKind.SPEC, uri);
+                ("The interface " + name + " does not exist.");
             }
           }
         } else if (section.getTagName().equals("Uses")) {
@@ -425,16 +415,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           mFactory.createSimpleIdentifierProxy(eventName);
       final String eventKind = event.getAttribute("ctrl");
       final String eventType = event.getAttribute("type");
-      EventDeclProxy eventDecl = null;
 
-      ScopeKind scope;
+      final ScopeKind scope;
       if (implementation) {
         scope = ScopeKind.REQUIRED_PARAMETER;
       } else {
         scope = ScopeKind.LOCAL;
       }
 
-      EventKind controllability;
+      final EventKind controllability;
       if (eventKind.equals("1")) {
         controllability = EventKind.CONTROLLABLE;
       } else {
@@ -449,73 +438,70 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       } else if (eventType.equals("ld")) {
         attributes = HISCAttributeFactory.ATTRIBUTES_LOWDATA;
       }
-      eventDecl =
-          mFactory.createEventDeclProxy(identifier, controllability, true,
-                                        scope, null, null, attributes);
+      final EventDeclProxy eventDecl =
+        mFactory.createEventDeclProxy(identifier, controllability, true,
+                                      scope, null, null, attributes);
 
       mEvents.put(eventName, eventDecl);
     }
   }
 
   /**
-   * Constructs the SimpleComponent section for the module of a
-   * <CODE>.wmod</CODE> file.
-   *
-   * @throws WatersUnmarshalException
+   * Constructs all simple components for a section of the DESpot file.
+   * @param  section  The <CODE>&lt;Plant&gt;</CODE> or
+   *                  <CODE>&lt;Supervisor&gt;</CODE> section to be
+   *                  converted.
+   * @param  kind     The type of components to be generated.
+   * @param  path     The URI of the the DESpot file being converted.
    */
-  private void constructSimpleComponent(final Element automaton,
-                                        final ComponentKind kind, final URI path)
-      throws ParserConfigurationException, SAXException, IOException,
-      URISyntaxException, WatersUnmarshalException
+  private void constructSimpleComponents(final Element section,
+                                         final ComponentKind kind,
+                                         final URI path)
+    throws ParserConfigurationException, SAXException, IOException,
+           URISyntaxException, WatersUnmarshalException
   {
-    final NodeList desList = automaton.getElementsByTagName("*");
+    final NodeList desList = section.getElementsByTagName("*");
     for (int i = 0; i < desList.getLength(); i++) {
-      clearGraphStructures();
       final Element des = (Element) desList.item(i);
-      final String location = des.getAttribute("location");
-      final URI uri = new URI(null, null, location, null);
-      final Element root = openDESFile(path.resolve(uri));
-      final Element definition =
-          (Element) root.getElementsByTagName("Definition").item(0);
-      final NodeList allHeaders = definition.getElementsByTagName("Header");
-      final Element header = (Element) allHeaders.item(0);
-      final GraphProxy graph = constructGraph(location, root, false);
-      if (graph != null) {
-        final String name = header.getAttribute("name");
-        final IdentifierProxy identifier =
-          mComponentIdentification.createIdentifier(name);
-        mComponents.add(mFactory.createSimpleComponentProxy(identifier, kind,
-                                                            graph));
-      } else {
-        continue;
-      }
+      constructSimpleComponent(des, kind, null, false, path);
     }
   }
 
   /**
-   * Constructs the SimpleComponent section for the module of a
-   * <CODE>.wmod</CODE> file.
+   * Constructs a simple component for an entry of the DESpot file.
+   * @param  des      The <CODE>&lt;Des&gt;</CODE> element to be
+   *                  converted.
+   * @param  kind     The type of component to be generated.
+   * @param  attribs  The attribute map used for the simple component,
+   *                  or <CODE>null</CODE>.
+   * @param  implementation Whether an implementation section is being
+   *                  converted.
+   * @param  path     The URI of the the DESpot file being converted.
    */
-  private void constructSimpleComponent(final String desName,
-                                        final String desLocation,
-                                        final ComponentKind kind, final URI path)
+  private void constructSimpleComponent(final Element des,
+                                        final ComponentKind kind,
+                                        final Map<String,String> attribs,
+                                        final boolean implementation,
+                                        final URI path)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersUnmarshalException
   {
-    final URI uri = new URI(desLocation);
+    clearGraphStructures();
+    final String location = des.getAttribute("location");
+    final URI uri = new URI(null, null, location, null);
     final Element root = openDESFile(path.resolve(uri));
     final Element definition =
         (Element) root.getElementsByTagName("Definition").item(0);
     final NodeList allHeaders = definition.getElementsByTagName("Header");
     final Element header = (Element) allHeaders.item(0);
-    final GraphProxy graph = constructGraph(desLocation, root, true);
+    final GraphProxy graph = constructGraph(location, root, implementation);
     if (graph != null) {
       final String name = header.getAttribute("name");
       final IdentifierProxy identifier =
         mComponentIdentification.createIdentifier(name);
-      mComponents.add(mFactory
-          .createSimpleComponentProxy(identifier, kind, graph,
-                                      HISCAttributeFactory.ATTRIBUTES_INTERFACE));
+      final SimpleComponentProxy comp =
+        mFactory.createSimpleComponentProxy(identifier, kind, graph, attribs);
+      mComponents.add(comp);
     }
   }
 
