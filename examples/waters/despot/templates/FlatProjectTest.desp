@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project projVer="1.0.0">
+    <Header name="FlatProjectTest" type="flat">
+        <Integrity status="not-verified" date-stamp=""/>
+        <Nonblocking status="not-verified" date-stamp=""/>
+        <Controllable status="not-verified" date-stamp=""/>
+    </Header>
+    <Subsystem name="FlatProjectTest">
+        <Supervisor>
+        </Supervisor>
+        <Plant>
+        </Plant>
+        <Template>
+            <Des name="%a%" location="empty-a.des">
+                <Instantiation DlgName="in1" Type="P" InputType="Range">
+                    <Parameter Name="a" Value="a,b"/>
+                </Instantiation>
+                <Instantiation DlgName="in2" Type="S" InputType="Range">
+                    <Parameter Name="a" Value="r..t"/>
+                </Instantiation>
+            </Des>
+            <Des name="%I%%J%" location="empty-IJ.des">
+                <Instantiation DlgName="in3" Type="S" InputType="Tuple">
+                    <Parameter Name="(I,J)" Value="(a,b),(A,B)"/>
+                </Instantiation>
+            </Des>
+        </Template>
+    </Subsystem>
+</Project>

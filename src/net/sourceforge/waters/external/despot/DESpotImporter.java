@@ -46,9 +46,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.DocumentBuilder;
@@ -238,20 +241,22 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final NodeList sections = subsystem.getElementsByTagName("*");
       for (int i = 0; i < sections.getLength(); i++) {
         final Element section = (Element) sections.item(i);
-        if (section.getTagName().equals("Supervisor")) {
-          // builds all specification automata
+        final String tagName = section.getTagName();
+        if (tagName.equals("Supervisor")) {
           constructSimpleComponents(section, ComponentKind.SPEC, uri);
-        } else if (section.getTagName().equals("Plant")) {
-          // builds all plant automata
+        } else if (tagName.equals("Plant")) {
           constructSimpleComponents(section, ComponentKind.PLANT, uri);
-        } else if (section.getTagName().equals("Implements")) {
+        } else if (tagName.equals("Template")) {
+          constructTemplateComponents(section, uri);
+        } else if (tagName.equals("Implements")) {
           final NodeList list = section.getElementsByTagName("InterfaceRef");
           for (int j = 0; j < list.getLength(); j++) {
             final Element interfaceRef = (Element) list.item(i);
             final String name = interfaceRef.getAttribute("name");
             final Element des = interfaceMap.get(name);
             if (des != null) {
-              constructSimpleComponent(des,
+              final DESpotParameters params = new DESpotNoParameters();
+              constructSimpleComponent(des, params,
                                        ComponentKind.SPEC,
                                        HISCAttributeFactory.ATTRIBUTES_INTERFACE,
                                        true,
@@ -460,10 +465,56 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     throws ParserConfigurationException, SAXException, IOException,
            URISyntaxException, WatersUnmarshalException
   {
-    final NodeList desList = section.getElementsByTagName("*");
+    final NodeList desList = section.getElementsByTagName("Des");
     for (int i = 0; i < desList.getLength(); i++) {
       final Element des = (Element) desList.item(i);
-      constructSimpleComponent(des, kind, null, false, path);
+      final DESpotParameters params = new DESpotNoParameters();
+      constructSimpleComponent(des, params, kind, null, false, path);
+    }
+  }
+
+  private void constructTemplateComponents(final Element section,
+                                           final URI path)
+    throws ParserConfigurationException, SAXException, IOException,
+           URISyntaxException, WatersUnmarshalException
+  {
+    final NodeList desList = section.getElementsByTagName("Des");
+    for (int i = 0; i < desList.getLength(); i++) {
+      final Element des = (Element) desList.item(i);
+      final NodeList instList = des.getElementsByTagName("Instantiation");
+      for (int j = 0; j < instList.getLength(); j++) {
+        final Element inst = (Element) instList.item(j);
+        final String type = inst.getAttribute("Type");
+        final ComponentKind kind;
+        if ("P".equals(type)) {
+          kind = ComponentKind.PLANT;
+        } else if ("S".equals(type)) {
+          kind = ComponentKind.SPEC;
+        } else {
+          throw new WatersUnmarshalException
+            ("Unsupported instantiation type '" + type + "' in DESpot file.");
+        }
+        final String inputType = inst.getAttribute("InputType");
+        final NodeList paramList = inst.getElementsByTagName("Parameter");
+        final DESpotParameters params;
+        if (paramList.getLength() == 0) {
+          params = new DESpotNoParameters();
+        } else if ("Range".equals(inputType)) {
+          params = new DESpotRangeParameters(paramList);
+        } else if ("Tuple".equals(inputType)) {
+          if (paramList.getLength() > 1) {
+            throw new WatersUnmarshalException
+              ("Tuple instantiation with more than one parameters unsupported.");
+
+          }
+          final Element param = (Element) paramList.item(0);
+          params = new DESpotTupleParameters(param);
+        } else {
+          throw new WatersUnmarshalException
+            ("Unsupported input type '" + inputType + "' in DESpot file.");
+        }
+        constructSimpleComponent(des, params, kind, null, false, path);
+      }
     }
   }
 
@@ -471,6 +522,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Constructs a simple component for an entry of the DESpot file.
    * @param  des      The <CODE>&lt;Des&gt;</CODE> element to be
    *                  converted.
+   * @param  params   Instantiation parameter object for DESpot templates.
    * @param  kind     The type of component to be generated.
    * @param  attribs  The attribute map used for the simple component,
    *                  or <CODE>null</CODE>.
@@ -479,6 +531,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param  path     The URI of the the DESpot file being converted.
    */
   private void constructSimpleComponent(final Element des,
+                                        final DESpotParameters params,
                                         final ComponentKind kind,
                                         final Map<String,String> attribs,
                                         final boolean implementation,
@@ -486,22 +539,24 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersUnmarshalException
   {
-    clearGraphStructures();
-    final String location = des.getAttribute("location");
-    final URI uri = new URI(null, null, location, null);
-    final Element root = openDESFile(path.resolve(uri));
-    final Element definition =
+    while (params.advance()) {
+      clearGraphStructures();
+      final String location = des.getAttribute("location");
+      final URI uri = new URI(null, null, location, null);
+      final Element root = openDESFile(path.resolve(uri));
+      final Element definition =
         (Element) root.getElementsByTagName("Definition").item(0);
-    final NodeList allHeaders = definition.getElementsByTagName("Header");
-    final Element header = (Element) allHeaders.item(0);
-    final GraphProxy graph = constructGraph(location, root, implementation);
-    if (graph != null) {
-      final String name = header.getAttribute("name");
-      final IdentifierProxy identifier =
-        mComponentIdentification.createIdentifier(name);
-      final SimpleComponentProxy comp =
-        mFactory.createSimpleComponentProxy(identifier, kind, graph, attribs);
-      mComponents.add(comp);
+      final NodeList allHeaders = definition.getElementsByTagName("Header");
+      final Element header = (Element) allHeaders.item(0);
+      final GraphProxy graph = constructGraph(location, root, implementation);
+      if (graph != null) {
+        final String name = header.getAttribute("name");
+        final IdentifierProxy identifier =
+          mComponentIdentification.createIdentifier(name, params);
+        final SimpleComponentProxy comp =
+          mFactory.createSimpleComponentProxy(identifier, kind, graph, attribs);
+        mComponents.add(comp);
+      }
     }
   }
 
@@ -605,19 +660,24 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList transLoopList = transitions.getElementsByTagName("*");
     final LabelBlockProxy blockedEvents =
         findBlockedEvents(transLoopList, stElmntLst);
-
-    return mFactory.createGraphProxy(true, blockedEvents, mNodes, mEdges);
+    final boolean det = !mNodes.isEmpty();
+    return mFactory.createGraphProxy(det, blockedEvents, mNodes, mEdges);
   }
 
   /**
-   * Determines which events are blocked in this automata. Events are blocked if
-   * they do not appear on a transition or selfloop.
+   * Determines which events are blocked in this automaton. Events are
+   * blocked if they do not appear on a transition or selfloop.
    * @param transitions
    *          The list of Transitions and self-loops from the DOM.
    */
   private LabelBlockProxy findBlockedEvents(final NodeList transitions,
                                             final NodeList states)
   {
+    // forget about blocked events if there are no states
+    if (states.getLength() == 0) {
+      return null;
+    }
+
     boolean found = false;
     final List<SimpleIdentifierProxy> blockedEventList =
         new ArrayList<SimpleIdentifierProxy>();
@@ -932,6 +992,27 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
 
   //#########################################################################
+  //# Inner Class LevelComparator
+  /**
+   * A class used to compare the values of the levels of subsystems. Low level
+   * subsystems are ordered before high level subsystems. This class is used as
+   * a comparator for the sort method.
+   */
+  private static class LevelComparator implements Comparator<Element>
+  {
+    @Override
+    public int compare(final Element e1, final Element e2)
+    {
+      final String LEVEL = "level";
+      final Integer e1Level = Integer.parseInt(e1.getAttribute(LEVEL));
+      final Integer e2Level = Integer.parseInt(e2.getAttribute(LEVEL));
+
+      return (e1Level > e2Level ? -1 : (e1Level == e2Level ? 0 : 1));
+    }
+  }
+
+
+  //#########################################################################
   //# Inner Class IdentifierReplacement
   /**
    * <P>Auxiliary class to ensure that identifiers (i.e., names of automata,
@@ -949,6 +1030,21 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     private void clear()
     {
       mBackwardsMap.clear();
+    }
+
+    private IdentifierProxy createIdentifier(final String name,
+                                             final DESpotParameters params)
+    {
+      final String replacement = params.replace(name);
+      return createIdentifier(replacement);
+    }
+
+    @SuppressWarnings("unused")
+    private String getReplacementName(final String name,
+                                      final DESpotParameters params)
+    {
+      final String replacement = params.replace(name);
+      return getReplacementName(replacement);
     }
 
     private IdentifierProxy createIdentifier(final String name)
@@ -998,23 +1094,235 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
 
   //#########################################################################
-  //# Inner Class LevelComparator
-  /**
-   * A class used to compare the values of the levels of subsystems. Low level
-   * subsystems are ordered before high level subsystems. This class is used as
-   * a comparator for the sort method.
-   */
-  private static class LevelComparator implements Comparator<Element>
+  //# Inner Interface DESpotParameters
+  private interface DESpotParameters
   {
-    @Override
-    public int compare(final Element e1, final Element e2)
-    {
-      final String LEVEL = "level";
-      final Integer e1Level = Integer.parseInt(e1.getAttribute(LEVEL));
-      final Integer e2Level = Integer.parseInt(e2.getAttribute(LEVEL));
+    //#######################################################################
+    //# Iteration
+    public boolean advance();
+    public String replace(final String text);
+  }
 
-      return (e1Level > e2Level ? -1 : (e1Level == e2Level ? 0 : 1));
+
+  //#########################################################################
+  //# Inner Class DESpotNoParameters
+  private static class DESpotNoParameters implements DESpotParameters
+  {
+    //#######################################################################
+    //# Iteration
+    @Override
+    public boolean advance()
+    {
+      if (mDone) {
+        return false;
+      } else {
+        return mDone = true;
+      }
     }
+
+    @Override
+    public String replace(final String text)
+    {
+      return text;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private boolean mDone = false;
+  }
+
+
+  //#########################################################################
+  //# Inner Class DESpotRangeParameters
+  private static class DESpotRangeParameters implements DESpotParameters
+  {
+    //#######################################################################
+    //# Constructor
+    private DESpotRangeParameters(final NodeList list)
+      throws WatersUnmarshalException
+    {
+      this (list, 0);
+    }
+
+    private DESpotRangeParameters(final NodeList list, final int index)
+      throws WatersUnmarshalException
+    {
+      final Element param = (Element) list.item(index);
+      final String name = param.getAttribute("Name");
+      mPattern = Pattern.compile("%" + name + "%");
+      final String value = param.getAttribute("Value");
+      final String[] values = value.split(",");
+      mValues = new ArrayList<>(values.length);
+      for (final String entry : values) {
+        final int dotPos = entry.indexOf("..");
+        if (dotPos < 0) {
+          mValues.add(entry);
+        } else {
+          final String first = entry.substring(0, dotPos);
+          final String last = entry.substring(dotPos + 2);
+          try {
+            final int firstInt = Integer.parseInt(first);
+            final int lastInt = Integer.parseInt(last);
+            for (int i = firstInt; i <= lastInt; i++) {
+              mValues.add(Integer.toString(i));
+            }
+          } catch (final NumberFormatException exception) {
+            boolean ok = false;
+            if (first.length() == 1 && last.length() == 1) {
+              final char firstChar = first.charAt(0);
+              final char lastChar = last.charAt(0);
+              if (firstChar >= 'a' && lastChar <= 'z' ||
+                  firstChar >= 'A' && lastChar <= 'Z') {
+                for (char ch = firstChar; ch <= lastChar; ch++) {
+                  mValues.add(Character.toString(ch));
+                }
+                ok = true;
+              }
+            }
+            if (!ok) {
+              throw new WatersUnmarshalException
+                ("Unsupported instantiation range '" + entry +
+                 "' in DESpot file.");
+            }
+          }
+        }
+      }
+      mIterator = mValues.isEmpty() ? null : mValues.iterator();
+      if (index + 1 < list.getLength()) {
+        mNext = new DESpotRangeParameters(list, index + 1);
+      } else {
+        mNext = null;
+      }
+    }
+
+    //#######################################################################
+    //# Iteration
+    @Override
+    public boolean advance()
+    {
+      if (mIterator == null) {
+        return false;
+      } else if (mIterator.hasNext()) {
+        mCurrentValue = mIterator.next();
+        return true;
+      } else if (mNext != null && mNext.advance()) {
+        mIterator = mValues.iterator();
+        mCurrentValue = mIterator.next();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public String replace(String text)
+    {
+      final Matcher matcher = mPattern.matcher(text);
+      text = matcher.replaceAll(mCurrentValue);
+      if (mNext != null) {
+        text = mNext.replace(text);
+      }
+      return text;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Pattern mPattern;
+    private final List<String> mValues;
+    private Iterator<String> mIterator;
+    private String mCurrentValue;
+    private final DESpotRangeParameters mNext;
+  }
+
+
+  //#########################################################################
+  //# Inner Class DESpotTupleParameters
+  private static class DESpotTupleParameters implements DESpotParameters
+  {
+    //#######################################################################
+    //# Constructors
+    private DESpotTupleParameters(final Element param)
+      throws WatersUnmarshalException
+    {
+      String name = param.getAttribute("Name");
+      final int len = name.length();
+      if (len == 0) {
+        throw new WatersUnmarshalException
+          ("Found empty name in tuple instantiation in DESpot file.");
+      }
+      int start = name.charAt(0) == '(' ? 1 : 0;
+      int end = name.charAt(len - 1) == ')' ? len - 1 : len;
+      name = name.substring(start, end);
+      final String[] names = name.split(",");
+      final int width = names.length;
+      mPatterns = new Pattern[width];
+      for (int i = 0; i < width; i++) {
+        mPatterns[i] = Pattern.compile("%" + names[i] + "%");
+      }
+      mTuples = new ArrayList<>();
+      final String value = param.getAttribute("Value");
+      int p = 0;
+      while (p < value.length()) {
+        if (p > 0 && value.charAt(p++) != ',') {
+          throw new WatersUnmarshalException
+            ("Error parsing tuple values in DESpot file.");
+        }
+        if (value.charAt(p++) != '(') {
+          throw new WatersUnmarshalException
+            ("Error parsing tuple values in DESpot file.");
+        }
+        final String[] tuple = new String[width];
+        for (int i = 0; i < width; i++) {
+          if (i > 0 && value.charAt(p++) != ',') {
+            throw new WatersUnmarshalException
+              ("Error parsing tuple values in DESpot file.");
+          }
+          start = p;
+          char ch;
+          do {
+            ch = value.charAt(p++);
+          } while (ch != ')' && ch != ',');
+          end = --p;
+          tuple[i] = value.substring(start, end);
+        }
+        if (value.charAt(p++) != ')') {
+          throw new WatersUnmarshalException
+            ("Error parsing tuple values in DESpot file.");
+        }
+        mTuples.add(tuple);
+      }
+      mIterator = mTuples.iterator();
+    }
+
+    //#######################################################################
+    //# Iteration
+    @Override
+    public boolean advance()
+    {
+      if (mIterator.hasNext()) {
+        mCurrentTuple = mIterator.next();
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public String replace(String text)
+    {
+      for (int i = 0; i < mPatterns.length; i++) {
+        final Matcher matcher = mPatterns[i].matcher(text);
+        text = matcher.replaceAll(mCurrentTuple[i]);
+      }
+      return text;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Pattern[] mPatterns;
+    private final List<String[]> mTuples;
+    private final Iterator<String[]> mIterator;
+    private String[] mCurrentTuple;
   }
 
 
@@ -1059,7 +1367,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   //#########################################################################
   //# Data Members
   /**
-   * Stores the ID number the despot file uses to reference a state and the
+   * Stores the ID number the DESpot file uses to reference a state and the
    * location of the state in the 'nodes' list.
    */
   private final Map<Integer,Integer> mStates = new HashMap<Integer,Integer>();
@@ -1103,12 +1411,20 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    */
   private final Map<String,ModuleProxy> mModules =
     new HashMap<String,ModuleProxy>();
-
+  /**
+   * Replacement map to convert event names from DESpot to Waters.
+   */
   private final IdentifierReplacement mEventIdentification =
     new IdentifierReplacement();
+  /**
+   * Replacement map to convert component names from DESpot to Waters.
+   */
   private final IdentifierReplacement mComponentIdentification =
     new IdentifierReplacement();
-  private final IdentifierReplacement mStateIdentification =
+  /**
+   * Replacement map to convert state names from DESpot to Waters.
+   */
+ private final IdentifierReplacement mStateIdentification =
     new IdentifierReplacement();
 
   /**

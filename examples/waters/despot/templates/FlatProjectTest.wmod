@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<Module Name="FlatProjectTest" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<EventDeclList>
+<EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+</EventDeclList>
+<ComponentList>
+  <SimpleComponent Kind="PLANT" Name="a">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="PLANT" Name="b">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="SPEC" Name="r">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="SPEC" Name="s">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="SPEC" Name="t">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="SPEC" Name="ab">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+  <SimpleComponent Kind="SPEC" Name="AB">
+    <Graph Deterministic="false"/>
+  </SimpleComponent>
+</ComponentList>
+</Module>

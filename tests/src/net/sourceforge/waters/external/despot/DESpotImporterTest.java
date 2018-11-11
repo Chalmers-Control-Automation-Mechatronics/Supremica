@@ -69,9 +69,8 @@ import org.xml.sax.SAXException;
 public class DESpotImporterTest extends AbstractWatersTest
 {
 
-  // #########################################################################
-  // # Successful Test Cases
-
+  //########################################################################
+  //# Successful Test Cases
   public void testImport_output_aip_leducversion_old() throws Exception
   {
     testImport("output-aip_leducversion-old", "output-aip_leducversion-old");
@@ -217,6 +216,13 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("testHISC", "testHISCld");
   }
 
+
+  public void testImport_FlatProjectTest() throws Exception
+  {
+    testImport("templates", "FlatProjectTest");
+  }
+
+
   public void testImport_SimpleManufacturingExample() throws Exception
   {
     testImport("simpleManufacturingExample", "Manufacturing-Example-Simple");
@@ -227,8 +233,9 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("parallelManufacturingExample", "mtlyiintf");
   }
 
-  // #########################################################################
-  // # Exception Throwing Test Cases
+
+  //########################################################################
+  //# Exception Throwing Test Cases
   public void testException_nonexist_des() throws Exception
   {
     testException("testSimple", "nonexist_des", FileNotFoundException.class,
@@ -261,8 +268,9 @@ public class DESpotImporterTest extends AbstractWatersTest
                   WatersUnmarshalException.class, "srcID_nonexist.des");
   }
 
-  // #########################################################################
-  // # Utilities
+
+  //########################################################################
+  //# Utilities
   void testException(final String subdir, final String name,
                      final Class<? extends Exception> exclass,
                      final String culprit) throws Exception
@@ -301,8 +309,8 @@ public class DESpotImporterTest extends AbstractWatersTest
     final String wmodextname =
         module.getName() + mModuleMarshaller.getDefaultExtension();
     final File wmodfilename = new File(outdirname, wmodextname);
-    assertEquals("Unexpected location of output file!", wmodfilename, module
-        .getFileLocation());
+    assertEquals("Unexpected location of output file!", wmodfilename,
+                 module.getFileLocation());
     parseGeneratedModules(name, despotURI, indirname, outdirname);
     final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
@@ -360,9 +368,8 @@ public class DESpotImporterTest extends AbstractWatersTest
               final URI expecturi = expectfile.toURI();
               final ModuleProxy expectmodule =
                   mModuleMarshaller.unmarshal(expecturi);
-              assertModuleProxyEquals(
-                                      "Unexpected module contents for subsystem '"
-                                          + sysname + "' after parse back!",
+              assertModuleProxyEquals("Unexpected module contents for subsystem '" +
+                                      sysname + "' after parse back!",
                                       outmodule, expectmodule);
             }
           }
