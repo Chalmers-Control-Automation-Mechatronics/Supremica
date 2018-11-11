@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.external.despot;
 
+import gnu.trove.iterator.TIntObjectIterator;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -269,7 +274,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         } else if (section.getTagName().equals("Uses")) {
           constructModuleInstance(section);
         }
-        clearGraphStructures();
       }
 
       module = constructModule(subsystem);
@@ -394,11 +398,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * Initialises the data structures used to store the states, events and
    * transitions in the construction of a graph.
    */
-  private void clearGraphStructures()
+  private void startNewGraph(final int numStates, final int numTransitions)
   {
-    mStates.clear();
+    mStates = new TIntIntHashMap(numStates, 0.5f, -1, -1);
     mEventIDs.clear();
-    mTransitions.clear();
+    mTransitions = new TObjectIntHashMap<>(numTransitions, 0.5f, -1);
     mNodes.clear();
     mEdges.clear();
   }
@@ -511,7 +515,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           if (paramList.getLength() > 1) {
             throw new WatersUnmarshalException
               ("Tuple instantiation with more than one parameters unsupported.");
-
           }
           final Element param = (Element) paramList.item(0);
           params = new DESpotTupleParameters(param);
@@ -547,7 +550,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       URISyntaxException, WatersUnmarshalException
   {
     while (params.advance()) {
-      clearGraphStructures();
       final String location = des.getAttribute("location");
       final URI uri = new URI(null, null, location, null);
       final Element root = openDESFile(path.resolve(uri));
@@ -615,10 +617,17 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     final Element definition =
         (Element) des.getElementsByTagName("Definition").item(0);
-
-    // converts each State in the despot file into nodes for waters
     final NodeList allStates = definition.getElementsByTagName("States");
     final Element states = (Element) allStates.item(0);
+    final int numStates = Integer.parseInt(states.getAttribute("count"));
+    final NodeList transFunctionList =
+      definition.getElementsByTagName("Trans-Function");
+    final Element transFunction = (Element) transFunctionList.item(0);
+    final int numTransitions =
+      Integer.parseInt(transFunction.getAttribute("count"));
+    startNewGraph(numStates, numTransitions);
+
+    // converts each State in the despot file into nodes for waters
     final NodeList stElmntLst = states.getElementsByTagName("*");
     for (int i = 0; i < stElmntLst.getLength(); i++) {
       final Element stElmnt = (Element) stElmntLst.item(i);
@@ -637,12 +646,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     // converts each transition in the despot file into edges for waters
     final NodeList transitionList =
-        definition.getElementsByTagName("Trans-Function");
+      transFunction.getElementsByTagName("Transitions");
     final Element transitions = (Element) transitionList.item(0);
-    final NodeList transElmntLst =
-        transitions.getElementsByTagName("Transitions");
-    final Element transition = (Element) transElmntLst.item(0);
-    final NodeList trList = transition.getElementsByTagName("Tr");
+    final NodeList trList = transitions.getElementsByTagName("Tr");
     for (int i = 0; i < trList.getLength(); i++) {
       final Element trElmnt = (Element) trList.item(i);
 
@@ -672,7 +678,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
 
     // gets the blocked events for this automata
-    final NodeList transLoopList = transitions.getElementsByTagName("*");
+    final NodeList transLoopList = transFunction.getElementsByTagName("*");
     final LabelBlockProxy blockedEvents =
         findBlockedEvents(transLoopList, stElmntLst);
     final boolean det = !mNodes.isEmpty();
@@ -711,8 +717,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     }
 
     // checks if each event is used in this automaton
-    found = false;
-    for (final int eventID : mEventIDs.keySet()) {
+    final TIntObjectIterator<String> iter = mEventIDs.iterator();
+    while (iter.hasNext()) {
+      iter.advance();
+      final int eventID = iter.key();
       found = false;
       for (int j = 0; j < transitions.getLength(); j++) {
         final Element tr = (Element) transitions.item(j);
@@ -811,14 +819,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
     // gets the index number of the source and target states in the list
     final Integer srcIndex = mStates.get(srcID);
-    if (srcIndex == null) {
+    if (srcIndex < 0) {
       throw new WatersUnmarshalException("The source state ID " + srcID
           + " does not exist on the transition with target state ID "
           + targetID + " and event ID " + eventID + " in the file "
           + autfilename + ".");
     }
     final Integer targetIndex = mStates.get(targetID);
-    if (targetIndex == null) {
+    if (targetIndex < 0) {
       throw new WatersUnmarshalException("The target state ID " + targetID
           + " does not exist on the transition with source state ID " + srcID
           + " and event ID " + eventID + " in the file " + autfilename + ".");
@@ -1064,7 +1072,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       return createIdentifier(replacement);
     }
 
-    @SuppressWarnings("unused")
     private String getReplacementName(final String name,
                                       final DESpotParameters params)
     {
@@ -1392,46 +1399,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   //#########################################################################
   //# Data Members
   /**
-   * Stores the ID number the DESpot file uses to reference a state and the
-   * location of the state in the 'nodes' list.
-   */
-  private final Map<Integer,Integer> mStates = new HashMap<Integer,Integer>();
-  /**
-   * Stores the ID number the despot file uses to reference an event and the
-   * name of the event.
-   */
-  private final Map<Integer,String> mEventIDs = new HashMap<Integer,String>();
-  // The above two hash maps are needed for finding the correct source/target
-  // state of a transition and correct event name.
-
-  /**
-   * Maps the source state and target state together (as an IdPair) for a
-   * transition to the index number where this edge exists in the list 'mEdges'.
-   * This is used to lookup quickly whether an edge already exists.
-   */
-  private final Map<IdPair,Integer> mTransitions =
-      new HashMap<IdPair,Integer>();
-
-  /**
-   * This list stores all the nodes (states) for the current automaton.
-   */
-  private final List<SimpleNodeProxy> mNodes = new ArrayList<SimpleNodeProxy>();
-  /**
-   * This list stores all the edges (transitions) for the current automaton.
-   */
-  private final List<EdgeProxy> mEdges = new ArrayList<EdgeProxy>();
-  /**
-   * List that stores all the components for a module, such as the automata
-   * (SimpleComponent's) or instances of other modules.
-   */
-  private final List<Proxy> mComponents = new ArrayList<Proxy>();
-  /**
-   * Maps the name of an event to the EventDecl for that event.
-   */
-  private final Map<String,EventDeclProxy> mEvents =
-      new TreeMap<String,EventDeclProxy>();
-
-  /**
    * Maps the name of a module to its ModuleProxy.
    */
   private final Map<String,ModuleProxy> mModules =
@@ -1449,8 +1416,46 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * Replacement map to convert state names from DESpot to Waters.
    */
- private final IdentifierReplacement mStateIdentification =
+  private final IdentifierReplacement mStateIdentification =
     new IdentifierReplacement();
+
+  /**
+   * Stores the ID number the DESpot file uses to reference a state and the
+   * location of the state in the 'nodes' list.
+   */
+  private TIntIntHashMap mStates;
+  /**
+   * Stores the ID number the despot file uses to reference an event and the
+   * name of the event.
+   */
+  private final TIntObjectHashMap<String> mEventIDs = new TIntObjectHashMap<>();
+  // The above two hash maps are needed for finding the correct source/target
+  // state of a transition and correct event name.
+
+  /**
+   * Maps the source state and target state together (as an IdPair) for a
+   * transition to the index number where this edge exists in the list 'mEdges'.
+   * This is used to lookup quickly whether an edge already exists.
+   */
+  private TObjectIntHashMap<IdPair> mTransitions;
+
+  /**
+   * This list stores all the nodes (states) for the current automaton.
+   */
+  private final List<SimpleNodeProxy> mNodes = new ArrayList<>();
+  /**
+   * This list stores all the edges (transitions) for the current automaton.
+   */
+  private final List<EdgeProxy> mEdges = new ArrayList<>();
+  /**
+   * List that stores all the components for a module, such as the automata
+   * (SimpleComponent's) or instances of other modules.
+   */
+  private final List<Proxy> mComponents = new ArrayList<>();
+  /**
+   * Maps the name of an event to the EventDecl for that event.
+   */
+  private final Map<String,EventDeclProxy> mEvents = new TreeMap<>();
 
   /**
    * The factory used to build up the modules for the <CODE>.wmod</CODE> files
