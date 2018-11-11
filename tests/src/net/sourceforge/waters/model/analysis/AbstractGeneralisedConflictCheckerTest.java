@@ -220,7 +220,7 @@ public abstract class AbstractGeneralisedConflictCheckerTest
   {
     final ProductDESProxy des =
       getCompiledHighLevel("despot", "testHISC", "hisc8_low2.wmod");
-    testSICPropertyV(des, "a2:2", false);
+    testSICPropertyV(des, "a2_2", false);
   }
 
   public void testSIC5__parManEg_I_mfb_lowlevel() throws Exception
