@@ -2149,7 +2149,7 @@ public class GraphEditorPanel
     @Override
     public void mousePressed(final MouseEvent event)
     {
-      LogManager.getLogger().info("ToolController.mousePressed");
+      // LogManager.getLogger().info("ToolController.mousePressed");
       // Issue #122: Ensure focus is transferred when clicked
       requestFocusInWindow();
       final ProxySubject item = getDraggableItem(event, true);
@@ -2210,7 +2210,7 @@ public class GraphEditorPanel
     @Override
     public void mouseReleased(final MouseEvent event)
     {
-      LogManager.getLogger().info("ToolController.mouseReleased");
+      // LogManager.getLogger().info("ToolController.mouseReleased");
       mStartPoint = null;
       mPopupFactory.maybeShowPopup
         (GraphEditorPanel.this, event, mFocusedObject);
