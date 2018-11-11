@@ -222,6 +222,11 @@ public class DESpotImporterTest extends AbstractWatersTest
     testImport("templates", "FlatProjectTest");
   }
 
+  public void testImport_SmallFactory() throws Exception
+  {
+    testImport("templates", "small-factory");
+  }
+
 
   public void testImport_SimpleManufacturingExample() throws Exception
   {

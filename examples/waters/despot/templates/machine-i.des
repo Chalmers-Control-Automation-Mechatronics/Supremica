@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="Machine-%i%" type="subsystem">
+            <Integrity status="valid" date-stamp="Fri Jan 22 18:19:20 2016"/>
+            <Reachable status="yes" date-stamp="Fri Jan 22 18:19:20 2016"/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+        <States count="3" marked-count="1">
+            <InitSt id="1" nm="Idle-%i%" al="I%i%" mk="1" rch="1" sx="160" sy="160" lx="-36" ly="-37"/>
+            <St id="2" nm="Working-%i%" al="W%i%" mk="0" rch="1" sx="320" sy="160" lx="10" ly="-17"/>
+            <St id="3" nm="Down-%i%" al="D%i%" mk="0" rch="1" sx="160" sy="320" lx="-25" ly="18"/>
+        </States>
+        <Events count="4" ctrl-count="2" unctrl-count="2" def-count="4" ans-count="0" req-count="0">
+            <Ev id="1" nm="start-job-%i%" al="a%i%" ctrl="1" type="d"/>
+            <Ev id="2" nm="finish-job-%i%" al="b%i%" ctrl="0" type="d"/>
+            <Ev id="3" nm="break-down-%i%" al="l%i%" ctrl="0" type="d"/>
+            <Ev id="4" nm="repaired-%i%" al="m%i%" ctrl="1" type="d"/>
+        </Events>
+        <Trans-Function count="4">
+            <Transitions count="4">
+                <Tr fID="1" eID="1" tID="2" lx="248.347" ly="103.989" cnt="3">
+                    <Pos x="310" y="155.75"/>
+                    <Pos x="240" y="126"/>
+                    <Pos x="170" y="155.75"/>
+                </Tr>
+                <Tr fID="2" eID="3" tID="3" lx="226.854" ly="288.618" cnt="3">
+                    <Pos x="170" y="315.373"/>
+                    <Pos x="294" y="258"/>
+                    <Pos x="317.347" y="170"/>
+                </Tr>
+                <Tr fID="2" eID="2" tID="1" lx="198.809" ly="183.627" cnt="3">
+                    <Pos x="170" y="162.53"/>
+                    <Pos x="243" y="181"/>
+                    <Pos x="310" y="162.727"/>
+                </Tr>
+                <Tr fID="3" eID="4" tID="1" lx="60" ly="221.177" cnt="2">
+                    <Pos x="160" y="170"/>
+                    <Pos x="160" y="310"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

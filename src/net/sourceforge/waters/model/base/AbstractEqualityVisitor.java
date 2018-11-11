@@ -508,10 +508,11 @@ public abstract class AbstractEqualityVisitor
     final ProxyAccessorCollection<Proxy> emap =
       new ProxyAccessorHashCollection<Proxy>(eq, expected);
     for (final Map.Entry<ProxyAccessor<Proxy>,Integer> entry :
-      map.entrySet()) {
+         map.entrySet()) {
       final ProxyAccessor<Proxy> accessor = entry.getKey();
       final Integer count2 = emap.get(accessor);
       if (count2 == null) {
+        emap.get(accessor);
         final Proxy proxy = accessor.getProxy();
         return reportSuperfluousItem(proxy);
       } else if (entry.getValue() != count2.intValue()) {

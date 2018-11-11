@@ -407,14 +407,20 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   //#########################################################################
   //# Element Conversion
   /**
-   * Checks if an event already exists. If the event hasn't been used already
+   * Checks if an event already exists. If the event has not been used already
    * an {@link EventDeclProxy} is created and stored.
+   * @param  event        The <CODE>&lt;Ev%gt;</CODE> element from the
+   *                      <CODE>.des</CODE> file to be converted.
+   * @param  eventName    The name to be used for the new event, after
+   *                      replacements.
+   * @param  implementation Whether the automaton is being converted as part of
+   *                      an <CODE>&lt;Implementation&gt;</CODE> section of a
+   *                      <CODE>.desp</CODE> file.
    */
   private void constructEventDecl(final Element event,
+                                  final String eventName,
                                   final boolean implementation)
   {
-    final String name = event.getAttribute("nm");
-    final String eventName = mEventIdentification.getReplacementName(name);
     if (!mEvents.containsKey(eventName)) {
       final IdentifierProxy identifier =
           mFactory.createSimpleIdentifierProxy(eventName);
@@ -526,8 +532,9 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param  kind     The type of component to be generated.
    * @param  attribs  The attribute map used for the simple component,
    *                  or <CODE>null</CODE>.
-   * @param  implementation Whether an implementation section is being
-   *                  converted.
+   * @param  implementation Whether the automaton is being converted as part
+   *                  of an <CODE>&lt;Implementation&gt;</CODE> section of a
+   *                  <CODE>.desp</CODE> file.
    * @param  path     The URI of the the DESpot file being converted.
    */
   private void constructSimpleComponent(final Element des,
@@ -548,7 +555,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         (Element) root.getElementsByTagName("Definition").item(0);
       final NodeList allHeaders = definition.getElementsByTagName("Header");
       final Element header = (Element) allHeaders.item(0);
-      final GraphProxy graph = constructGraph(location, root, implementation);
+      final GraphProxy graph =
+        constructGraph(location, root, params, implementation);
       if (graph != null) {
         final String name = header.getAttribute("name");
         final IdentifierProxy identifier =
@@ -585,14 +593,21 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
   /**
-   * Constructs the Graph section for the module of a <CODE>.wmod</CODE> file.
-   * Converts transitions to edges, and converts states to nodes.
-   *
-   * @param des
-   *          The root element of the .des file that contains the automaton.
+   * Constructs the {@link GraphProxy} object for a Waters module
+   * from a <CODE>.des</CODE> file. This method converts transitions to edges,
+   * and states to nodes.
+   * @param  autfilename  The name of the <CODE>.des</CODE> file that contains
+   *                      the automaton.
+   * @param  des          The root <CODE>&lt;DES&gt;</CODE> element of the
+   *                      <CODE>.des</CODE> file that contains the automaton.
+   * @param  params       Instantiation parameter object for DESpot templates.
+   * @param  implementation Whether the file is being converted as part of
+   *                      an <CODE>&lt;Implementation&gt;</CODE> section of a
+   *                      <CODE>.desp</CODE> file.
    */
   private GraphProxy constructGraph(final String autfilename,
                                     final Element des,
+                                    final DESpotParameters params,
                                     final boolean implementation)
       throws ParserConfigurationException, SAXException, IOException,
       WatersUnmarshalException
@@ -607,7 +622,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList stElmntLst = states.getElementsByTagName("*");
     for (int i = 0; i < stElmntLst.getLength(); i++) {
       final Element stElmnt = (Element) stElmntLst.item(i);
-      final SimpleNodeProxy node = convertState(stElmnt);
+      final SimpleNodeProxy node = convertState(stElmnt, params);
       storeStateId(stElmnt, i);
       mNodes.add(node);
     }
@@ -618,7 +633,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     final NodeList allEvents = definition.getElementsByTagName("Events");
     final Element events = (Element) allEvents.item(0);
     final NodeList evElmntLst = events.getElementsByTagName("*");
-    storeEvents(evElmntLst, implementation);
+    storeEvents(evElmntLst, params, implementation);
 
     // converts each transition in the despot file into edges for waters
     final NodeList transitionList =
@@ -722,21 +737,28 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
   /**
-   * Maps the IDs for all the events in the despot file to their name. Creates
-   * an EventDecl for this event if it didn't already exist.
-   *
-   * @param events
-   *          The list of event elements from the DOM.
+   * Maps the IDs for all the events in the DESpot file to their name. Creates
+   * an {@link EventDeclProxy} object for each event if that does not already
+   * exist in the module being created.   *
+   * @param  events       The list of event from the <CODE>&lt;Events&gt;</CODE>
+   *                      element of the <CODE>.des</CODE> file.
+   * @param  params       Instantiation parameter object for DESpot templates.
+   * @param  implementation Whether the automaton is being converted as part of
+   *                      an <CODE>&lt;Implementation&gt;</CODE> section of a
+   *                      <CODE>.desp</CODE> file.
    */
-  private void storeEvents(final NodeList events, final boolean implementation)
+  private void storeEvents(final NodeList events,
+                           final DESpotParameters params,
+                           final boolean implementation)
   {
     for (int i = 0; i < events.getLength(); i++) {
       final Element event = (Element) events.item(i);
       final int eventID = Integer.parseInt(event.getAttribute("id"));
       final String name = event.getAttribute("nm");
-      final String eventName = mEventIdentification.getReplacementName(name);
+      final String eventName =
+        mEventIdentification.getReplacementName(name, params);
       mEventIDs.put(eventID, eventName);
-      constructEventDecl(event, implementation);
+      constructEventDecl(event, eventName, implementation);
     }
   }
 
@@ -935,14 +957,17 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
   /**
-   * Converts a state from the despot file into a node for the waters file.
-   * @param state
-   *          The state to be converted.
+   * Converts a state from the DESpot file into a node for the Waters file.
+   * @param  state        The <CODE>&lt;St&gt;</CODE> or
+   *                      <CODE>&lt;InitSt&gt;</CODE> element to be converted.
+   * @param  params       Instantiation parameter object for DESpot templates.
    */
-  private SimpleNodeProxy convertState(final Element state)
+  private SimpleNodeProxy convertState(final Element state,
+                                       final DESpotParameters params)
   {
     final String name = state.getAttribute("nm");
-    final String stateName = mStateIdentification.getReplacementName(name);
+    final String stateName =
+      mStateIdentification.getReplacementName(name, params);
     // reads and stores the geometry (layout) data for the node
     String xPosStr = state.getAttribute("sx");
     String yPosStr = state.getAttribute("sy");
@@ -964,8 +989,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       final Point2D labelPoint = new Point2D.Double(xPos, yPos);
       labelPos = mFactory.createLabelGeometryProxy(labelPoint);
     }
-    final boolean initial = !state.getTagName().equals("St");
-    final boolean marked = state.getAttribute("mk").equals(ONE);
+    final boolean initial = state.getTagName().equals("InitSt");
+    final boolean marked = ONE.equals(state.getAttribute("mk"));
     return createNode(stateName, initial, marked, nodePos, labelPos);
   }
 
