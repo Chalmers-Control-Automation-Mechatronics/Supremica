@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.modular;
 
-import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -75,7 +74,6 @@ public class ModularModelVerifierFactory
     addArgument(ModularHeuristicFactory.getPreferenceArgument());
     addArgument(new MergeVersionAgument());
     addArgument(new SelectVersionArgument());
-    addArgument(new DetectorVersionArgument());
   }
 
 
@@ -211,37 +209,6 @@ public class ModularModelVerifierFactory
         final ModularControlLoopChecker checker =
           (ModularControlLoopChecker) verifier;
         checker.setSelectVersion(method);
-      } else {
-        fail(getName() + " option only supported for modular control loop checker!");
-      }
-    }
-  }
-
-
-  //#########################################################################
-  //# Inner Class DetectorVersion
-  private static class DetectorVersionArgument
-    extends CommandLineArgumentEnum<MonolithicSCCControlLoopChecker.CLDetector>
-  {
-    //#######################################################################
-    //# Constructors
-    private DetectorVersionArgument()
-    {
-      super("-detect", "Method used to select the control loop of a synchronous product",
-            MonolithicSCCControlLoopChecker.CLDetector.class);
-    }
-
-    //#######################################################################
-    //# Overrides for Abstract Base Class
-    //# net.sourceforge.waters.model.analysis.CommandLineArgument
-    @Override
-    public void configureAnalyzer(final Object verifier)
-    {
-      final MonolithicSCCControlLoopChecker.CLDetector method = getValue();
-      if (verifier instanceof ModularControlLoopChecker) {
-        final ModularControlLoopChecker checker =
-          (ModularControlLoopChecker) verifier;
-        checker.setControlLoopDetection(method);
       } else {
         fail(getName() + " option only supported for modular control loop checker!");
       }

@@ -174,11 +174,6 @@ public class MonolithicSCCControlLoopChecker
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ControlLoopChecker
-  public static void setLoopDetector(final CLDetector newDetector)
-  {
-    DETECTOR_VERSION = newDetector;
-  }
-
   /**
    * Gets a counterexample if the model was found to be not control-loop free.
    * representing a control-loop error trace. A control-loop error
@@ -1021,9 +1016,6 @@ public class MonolithicSCCControlLoopChecker
   /** used for the visit procedure */
   private Stack<EncodedStateTuple> stack;
 
-  /** used to determine which control loop is returned */
-  @SuppressWarnings("unused")
-  private static CLDetector DETECTOR_VERSION;
 
   //#########################################################################
   //# Variables used for encoding/decoding
@@ -1038,14 +1030,6 @@ public class MonolithicSCCControlLoopChecker
 
   /** an index of first automaton in each integer buffer */
   private int mIndexAutomata[];
-
-  //#########################################################################
-  //# Enumerations
-
-  public enum CLDetector
-  {
-    ShortestLoop
-  }
 
 
   //#########################################################################

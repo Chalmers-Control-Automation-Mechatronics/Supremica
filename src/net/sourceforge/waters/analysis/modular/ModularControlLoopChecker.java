@@ -142,11 +142,6 @@ public class ModularControlLoopChecker
     AutomataGroup.setSelectVersion(s);
   }
 
-  public void setControlLoopDetection(final MonolithicSCCControlLoopChecker.CLDetector c)
-  {
-    MonolithicSCCControlLoopChecker.setLoopDetector(c);
-  }
-
 
   //#########################################################################
   //# Invocation
