@@ -147,6 +147,19 @@ public class SelectionHeuristicMinS
   }
 
 
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String getName()
+  {
+    final String name = super.getName();
+    if (mStateEstimator.getName().endsWith("a")) {
+      return name + "a";
+    } else {
+      return name;
+    }
+  }
+
 
   //#########################################################################
   //# Data Members
