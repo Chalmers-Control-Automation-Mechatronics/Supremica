@@ -214,6 +214,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersMarshalException, WatersUnmarshalException
   {
+    mCurrentDESpotFile = uri;
     final URL url = uri.toURL();
     final InputStream stream = url.openStream();
     final DocumentBuilder builder =
@@ -229,12 +230,11 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int j = 0; j < interfaces.getLength(); j++) {
       final Element iface = (Element) interfaces.item(j);
       final String name = iface.getAttribute("name");
-      final Element des = (Element) iface.getElementsByTagName("Des").item(0);
-      interfaceMap.put(name, des);
+      interfaceMap.put(name, iface);
     }
     final NodeList subsystemList = project.getElementsByTagName("Subsystem");
     // extracts each subsystem element and puts them into an array list
-    final ArrayList<Element> subsystems = convertNodeList(subsystemList);
+    final List<Element> subsystems = convertNodeList(subsystemList);
 
     // sorts the subsystems in order of their level (lowest to highest)
     Collections.sort(subsystems, new LevelComparator());
@@ -248,24 +248,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
         final Element section = (Element) sections.item(i);
         final String tagName = section.getTagName();
         if (tagName.equals("Supervisor")) {
-          constructSimpleComponents(section, ComponentKind.SPEC, uri);
+          constructSimpleComponents(section, ComponentKind.SPEC);
         } else if (tagName.equals("Plant")) {
-          constructSimpleComponents(section, ComponentKind.PLANT, uri);
+          constructSimpleComponents(section, ComponentKind.PLANT);
         } else if (tagName.equals("Template")) {
-          constructTemplateComponents(section, uri);
+          constructTemplateComponents(section, null, false);
         } else if (tagName.equals("Implements")) {
           final NodeList list = section.getElementsByTagName("InterfaceRef");
           for (int j = 0; j < list.getLength(); j++) {
             final Element interfaceRef = (Element) list.item(i);
             final String name = interfaceRef.getAttribute("name");
-            final Element des = interfaceMap.get(name);
-            if (des != null) {
-              final DESpotParameters params = new DESpotNoParameters();
-              constructSimpleComponent(des, params,
-                                       ComponentKind.SPEC,
-                                       HISCAttributeFactory.ATTRIBUTES_INTERFACE,
-                                       true,
-                                       uri);
+            final Element iface = interfaceMap.get(name);
+            if (iface != null) {
+              constructInterfaceComponents(iface);
             } else if (!interfaceMap.containsKey(name)) {
               throw new WatersUnmarshalException
                 ("The interface '" + name +
@@ -303,11 +298,12 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   /**
    * Converts a node list read from the DOM into an array list.
    */
-  private ArrayList<Element> convertNodeList(final NodeList nodeList)
+  private List<Element> convertNodeList(final NodeList nodeList)
   {
     // extracts each subsystem element and puts them into an array list
-    final ArrayList<Element> list = new ArrayList<Element>();
-    for (int i = 0; i < nodeList.getLength(); i++) {
+    final int len = nodeList.getLength();
+    final List<Element> list = new ArrayList<>(len);
+    for (int i = 0; i < len; i++) {
       final Element subsystem = (Element) nodeList.item(i);
       list.add(subsystem);
     }
@@ -463,16 +459,15 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   }
 
   /**
-   * Constructs all simple components for a section of the DESpot file.
+   * Constructs all simple components for a <CODE>&lt;Plant&gt;</CODE> or
+   * <CODE>&lt;Supervisor&gt;</CODE> section of the DESpot file.
    * @param  section  The <CODE>&lt;Plant&gt;</CODE> or
    *                  <CODE>&lt;Supervisor&gt;</CODE> section to be
    *                  converted.
    * @param  kind     The type of components to be generated.
-   * @param  path     The URI of the the DESpot file being converted.
    */
   private void constructSimpleComponents(final Element section,
-                                         final ComponentKind kind,
-                                         final URI path)
+                                         final ComponentKind kind)
     throws ParserConfigurationException, SAXException, IOException,
            URISyntaxException, WatersUnmarshalException
   {
@@ -480,12 +475,54 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < desList.getLength(); i++) {
       final Element des = (Element) desList.item(i);
       final DESpotParameters params = new DESpotNoParameters();
-      constructSimpleComponent(des, params, kind, null, false, path);
+      constructSimpleComponent(des, params, kind, null, false);
     }
   }
 
+  /**
+   * Constructs all simple components for an <CODE>&lt;Interface&gt;</CODE>
+   * section of the DESpot file.
+   * @param  section  The <CODE>&lt;Interface&gt;</CODE> section to be
+   *                  converted.
+   */
+  private void constructInterfaceComponents(final Element section)
+    throws ParserConfigurationException, SAXException, IOException,
+           URISyntaxException, WatersUnmarshalException
+  {
+    final NodeList list = section.getElementsByTagName("*");
+    for (int i = 0; i < list.getLength(); i++) {
+      final Element element = (Element) list.item(i);
+      final String tagName = element.getTagName();
+      if ("Des".equals(tagName)) {
+        final DESpotParameters params = new DESpotNoParameters();
+        constructSimpleComponent(element,
+                                 params,
+                                 ComponentKind.SPEC,
+                                 HISCAttributeFactory.ATTRIBUTES_INTERFACE,
+                                 true);
+      } else if ("InterfaceTemplate".equals(tagName)) {
+        constructTemplateComponents(element,
+                                    HISCAttributeFactory.ATTRIBUTES_INTERFACE,
+                                    true);
+      }
+    }
+  }
+
+  /**
+   * Constructs all simple components for a <CODE>&lt;Template&gt;</CODE> or
+   * <CODE>&lt;InterfaceTemplate&gt;</CODE> section of the DESpot file.
+   * @param  section  The <CODE>&lt;Template&gt;</CODE> or
+   *                  <CODE>&lt;InterfaceTemplate&gt;</CODE> section to be
+   *                  converted.
+   * @param  attribs  The attribute map used for the simple component,
+   *                  or <CODE>null</CODE>.
+   * @param  implementation Whether the section is being converted as part
+   *                  of an <CODE>&lt;Implementation&gt;</CODE> section of a
+   *                  <CODE>.desp</CODE> file.
+   */
   private void constructTemplateComponents(final Element section,
-                                           final URI path)
+                                           final Map<String,String> attribs,
+                                           final boolean implementation)
     throws ParserConfigurationException, SAXException, IOException,
            URISyntaxException, WatersUnmarshalException
   {
@@ -527,7 +564,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
           throw new WatersUnmarshalException
             ("Unsupported input type '" + inputType + "' in DESpot file.");
         }
-        constructSimpleComponent(des, params, kind, null, false, path);
+        constructSimpleComponent(des, params, kind, attribs, implementation);
       }
     }
   }
@@ -543,21 +580,19 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param  implementation Whether the automaton is being converted as part
    *                  of an <CODE>&lt;Implementation&gt;</CODE> section of a
    *                  <CODE>.desp</CODE> file.
-   * @param  path     The URI of the the DESpot file being converted.
    */
   private void constructSimpleComponent(final Element des,
                                         final DESpotParameters params,
                                         final ComponentKind kind,
                                         final Map<String,String> attribs,
-                                        final boolean implementation,
-                                        final URI path)
+                                        final boolean implementation)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersUnmarshalException
   {
     while (params.advance()) {
       final String location = des.getAttribute("location");
       final URI uri = new URI(null, null, location, null);
-      final Element root = openDESFile(path.resolve(uri));
+      final Element root = openDESFile(mCurrentDESpotFile.resolve(uri));
       final Element definition =
         (Element) root.getElementsByTagName("Definition").item(0);
       final NodeList allHeaders = definition.getElementsByTagName("Header");
@@ -1394,10 +1429,14 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   //#########################################################################
   //# Data Members
   /**
+   * The URI of the DESpot file being converted.
+   */
+  private URI mCurrentDESpotFile;
+
+  /**
    * Maps the name of a module to its ModuleProxy.
    */
-  private final Map<String,ModuleProxy> mModules =
-    new HashMap<String,ModuleProxy>();
+  private final Map<String,ModuleProxy> mModules = new HashMap<>();
   /**
    * Replacement map to convert event names from DESpot to Waters.
    */
