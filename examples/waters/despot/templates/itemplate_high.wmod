@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="itemplate_high" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <EventDeclList>
+        <EventDecl Kind="PROPOSITION" Scope="OPTIONAL_PARAMETER" Name=":accepting"/>
+        <EventDecl Kind="CONTROLLABLE" Name="ASDwnAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ASDwnAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="DoRprAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="DoRprAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcCplAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcCplAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcErrAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcErrAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPalletAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="ProcPalletAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="REQUEST"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="RobUpAS2">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+        <EventDecl Kind="CONTROLLABLE" Name="RobUpAS3">
+            <ns2:AttributeMap>
+                <ns2:Attribute Name="HISC:EventType" Value="ANSWER"/>
+            </ns2:AttributeMap>
+        </EventDecl>
+    </EventDeclList>
+    <ComponentList>
+        <Instance ModuleName="itemplate_subsystem" Name="itemplate_subsystem">
+            <ParameterBinding Name=":accepting">
+                <SimpleIdentifier Name=":accepting"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ASDwnAS2">
+                <SimpleIdentifier Name="ASDwnAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ASDwnAS3">
+                <SimpleIdentifier Name="ASDwnAS3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="DoRprAS2">
+                <SimpleIdentifier Name="DoRprAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="DoRprAS3">
+                <SimpleIdentifier Name="DoRprAS3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcCplAS2">
+                <SimpleIdentifier Name="ProcCplAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcCplAS3">
+                <SimpleIdentifier Name="ProcCplAS3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcErrAS2">
+                <SimpleIdentifier Name="ProcErrAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcErrAS3">
+                <SimpleIdentifier Name="ProcErrAS3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcPalletAS2">
+                <SimpleIdentifier Name="ProcPalletAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="ProcPalletAS3">
+                <SimpleIdentifier Name="ProcPalletAS3"/>
+            </ParameterBinding>
+            <ParameterBinding Name="RobUpAS2">
+                <SimpleIdentifier Name="RobUpAS2"/>
+            </ParameterBinding>
+            <ParameterBinding Name="RobUpAS3">
+                <SimpleIdentifier Name="RobUpAS3"/>
+            </ParameterBinding>
+        </Instance>
+    </ComponentList>
+</Module>

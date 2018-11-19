@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DES desVer="1.0">
+    <Definition desDefVer="1.0">
+        <Header name="IntfAssmbStn_AS%j%" type="interface template">
+            <Integrity status="not-verified" date-stamp=""/>
+            <Reachable status="not-verified" date-stamp=""/>
+            <Nonblocking status="not-verified" date-stamp=""/>
+        </Header>
+     	<States count="4" marked-count="2">
+            <InitSt id="1" nm="s0" al="s0" mk="1" rch="1" sx="148" sy="42" lx="16" ly="5"/>
+            <St id="2" nm="s3" al="s3" mk="1" rch="1" sx="359" sy="239" lx="10" ly="8"/>
+            <St id="3" nm="s2" al="s2" mk="0" rch="1" sx="360" sy="43" lx="19" ly="-8"/>
+            <St id="4" nm="s1" al="s1" mk="0" rch="1" sx="149" sy="239" lx="-3" ly="14"/>
+        </States>
+        <Events count="6" ctrl-count="6" unctrl-count="0" ans-count="4" req-count="2" ld-count="0">
+            <Ev id="1" nm="ASDwnAS%j%" al="ASDwnAS%j%" ctrl="1" type="a"/>
+            <Ev id="2" nm="ProcErrAS%j%" al="ProcErrAS%j%" ctrl="1" type="a"/>
+            <Ev id="3" nm="DoRprAS%j%" al="DoRprAS%j%" ctrl="1" type="r"/>
+            <Ev id="4" nm="RobUpAS%j%" al="RobUpAS%j%" ctrl="1" type="a"/>
+            <Ev id="5" nm="ProcCplAS%j%" al="ProcCplAS%j%" ctrl="1" type="a"/>
+            <Ev id="6" nm="ProcPalletAS%j%" al="ProcPalletAS%j%" ctrl="1" type="r"/>
+        </Events>
+        <Trans-Function count="6">
+            <Transitions count="6">
+                <Tr fID="1" eID="6" tID="4" lx="185.589" ly="163.85" cnt="3">
+                    <Pos x="153.481" y="229"/>
+                    <Pos x="190" y="147.5"/>
+                    <Pos x="151.981" y="52"/>
+                </Tr>
+                <Tr fID="4" eID="2" tID="1" lx="16.9931" ly="166.546" cnt="3">
+                    <Pos x="145.371" y="52"/>
+                    <Pos x="120" y="148.5"/>
+                    <Pos x="145.796" y="229"/>
+                </Tr>
+                <Tr fID="4" eID="1" tID="2" lx="247.823" ly="247.998" cnt="2">
+                    <Pos x="349" y="238.998"/>
+                    <Pos x="159" y="239"/>
+                </Tr>
+                <Tr fID="4" eID="5" tID="1" lx="16.9931" ly="166.546" cnt="3">
+                    <Pos x="145.371" y="52"/>
+                    <Pos x="120" y="148.5"/>
+                    <Pos x="145.796" y="229"/>
+                </Tr>
+                <Tr fID="2" eID="3" tID="3" lx="368.414" ly="94.893" cnt="2">
+                    <Pos x="360" y="53"/>
+                    <Pos x="359.054" y="229"/>
+                </Tr>
+                <Tr fID="3" eID="4" tID="1" lx="220.173" ly="4.96" cnt="2">
+                    <Pos x="158" y="42.0496"/>
+                    <Pos x="350" y="43.0025"/>
+                </Tr>
+            </Transitions>
+            <Self-Loops count="0">
+            </Self-Loops>
+        </Trans-Function>
+    </Definition>
+</DES>

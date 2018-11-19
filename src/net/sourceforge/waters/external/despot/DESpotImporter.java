@@ -95,6 +95,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -475,7 +476,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     for (int i = 0; i < desList.getLength(); i++) {
       final Element des = (Element) desList.item(i);
       final DESpotParameters params = new DESpotNoParameters();
-      constructSimpleComponent(des, params, kind, null, false);
+      constructSimpleComponents(des, params, kind, null, false);
     }
   }
 
@@ -489,21 +490,23 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     throws ParserConfigurationException, SAXException, IOException,
            URISyntaxException, WatersUnmarshalException
   {
-    final NodeList list = section.getElementsByTagName("*");
-    for (int i = 0; i < list.getLength(); i++) {
-      final Element element = (Element) list.item(i);
-      final String tagName = element.getTagName();
-      if ("Des".equals(tagName)) {
-        final DESpotParameters params = new DESpotNoParameters();
-        constructSimpleComponent(element,
-                                 params,
-                                 ComponentKind.SPEC,
-                                 HISCAttributeFactory.ATTRIBUTES_INTERFACE,
-                                 true);
-      } else if ("InterfaceTemplate".equals(tagName)) {
-        constructTemplateComponents(element,
-                                    HISCAttributeFactory.ATTRIBUTES_INTERFACE,
-                                    true);
+    for (Node child = section.getFirstChild(); child != null;
+         child = child.getNextSibling()) {
+      if (child.getNodeType() == Node.ELEMENT_NODE) {
+        final Element element = (Element) child;
+        final String tagName = element.getTagName();
+        if ("Des".equals(tagName)) {
+          final DESpotParameters params = new DESpotNoParameters();
+          constructSimpleComponents(element,
+                                   params,
+                                   ComponentKind.SPEC,
+                                   HISCAttributeFactory.ATTRIBUTES_INTERFACE,
+                                   true);
+        } else if ("InterfaceTemplate".equals(tagName)) {
+          constructTemplateComponents(element,
+                                      HISCAttributeFactory.ATTRIBUTES_INTERFACE,
+                                      true);
+        }
       }
     }
   }
@@ -514,11 +517,10 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param  section  The <CODE>&lt;Template&gt;</CODE> or
    *                  <CODE>&lt;InterfaceTemplate&gt;</CODE> section to be
    *                  converted.
-   * @param  attribs  The attribute map used for the simple component,
+   * @param  attribs  The attribute map used for the instantiated components,
    *                  or <CODE>null</CODE>.
    * @param  implementation Whether the section is being converted as part
-   *                  of an <CODE>&lt;Implementation&gt;</CODE> section of a
-   *                  <CODE>.desp</CODE> file.
+   *                  of an <CODE>&lt;Implementation&gt;</CODE> section.
    */
   private void constructTemplateComponents(final Element section,
                                            final Map<String,String> attribs,
@@ -526,51 +528,78 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
     throws ParserConfigurationException, SAXException, IOException,
            URISyntaxException, WatersUnmarshalException
   {
-    final NodeList desList = section.getElementsByTagName("Des");
-    for (int i = 0; i < desList.getLength(); i++) {
-      final Element des = (Element) desList.item(i);
-      final NodeList instList = des.getElementsByTagName("Instantiation");
-      for (int j = 0; j < instList.getLength(); j++) {
-        final Element inst = (Element) instList.item(j);
-        final String type = inst.getAttribute("Type");
-        final ComponentKind kind;
-        if ("P".equals(type)) {
-          kind = ComponentKind.PLANT;
-        } else if ("S".equals(type)) {
-          kind = ComponentKind.SPEC;
-        } else {
-          throw new WatersUnmarshalException
-            ("Unsupported instantiation type '" + type + "' in DESpot file.");
-        }
-        final String inputType = inst.getAttribute("InputType");
-        final NodeList paramList = inst.getElementsByTagName("Parameter");
-        DESpotParameters params;
-        if (paramList.getLength() == 0) {
-          params = new DESpotNoParameters();
-        } else if ("Range".equals(inputType)) {
-          params = null;
-          for (int p = 0; p < paramList.getLength(); p++) {
-            final Element param = (Element) paramList.item(p);
-            params = new DESpotRangeParameters(param, params);
-          }
-        } else if ("Tuple".equals(inputType)) {
-          if (paramList.getLength() > 1) {
-            throw new WatersUnmarshalException
-              ("Tuple instantiation with more than one parameter unsupported.");
-          }
-          final Element param = (Element) paramList.item(0);
-          params = new DESpotTupleParameters(param);
-        } else {
-          throw new WatersUnmarshalException
-            ("Unsupported input type '" + inputType + "' in DESpot file.");
-        }
-        constructSimpleComponent(des, params, kind, attribs, implementation);
+    // Note this list includes recursive descent ...
+    final NodeList list = section.getElementsByTagName("*");
+    Element des = null;
+    for (int i = 0; i < list.getLength(); i++) {
+      final Element element = (Element) list.item(i);
+      final String tag = element.getTagName();
+      if ("Des".equals(tag)) {
+        des = element;
+      } else if ("Instantiation".equals(tag) && des != null) {
+        final Element inst = (Element) list.item(i);
+        constructInstantiatedTemplate(des, inst, attribs, implementation);
       }
     }
   }
 
   /**
-   * Constructs a simple component for an entry of the DESpot file.
+   * Instantiates a template found within a <CODE>&lt;Template&gt;</CODE> or
+   * <CODE>&lt;InterfaceTemplate&gt;</CODE> section of the DESpot file.
+   * @param  des      The <CODE>&lt;Des&gt;</CODE> element identifying the
+   *                  <CODE>.des</CODE> file to be instantiated.
+   * @param  inst     The <CODE>&lt;Instantiation&gt;</CODE> element providing
+   *                  the parameter substitutions for the instantiation.
+   * @param  attribs  The attribute map used for the instantiated components,
+   *                  or <CODE>null</CODE>.
+   * @param  implementation Whether the template is being instantiated as part
+   *                  of an <CODE>&lt;Implementation&gt;</CODE> section.
+   */
+  private void constructInstantiatedTemplate(final Element des,
+                                             final Element inst,
+                                             final Map<String,String> attribs,
+                                             final boolean implementation)
+    throws ParserConfigurationException, SAXException, IOException,
+           URISyntaxException, WatersUnmarshalException
+  {
+    final String type = inst.getAttribute("Type");
+    final ComponentKind kind;
+    if ("P".equals(type)) {
+      kind = ComponentKind.PLANT;
+    } else if ("S".equals(type)) {
+      kind = ComponentKind.SPEC;
+    } else {
+      throw new WatersUnmarshalException
+        ("Unsupported instantiation type '" + type + "' in DESpot file.");
+    }
+    final String inputType = inst.getAttribute("InputType");
+    final NodeList paramList = inst.getElementsByTagName("Parameter");
+    DESpotParameters params;
+    if (paramList.getLength() == 0) {
+      params = new DESpotNoParameters();
+    } else if ("Range".equals(inputType)) {
+      params = null;
+      for (int p = 0; p < paramList.getLength(); p++) {
+        final Element param = (Element) paramList.item(p);
+        params = new DESpotRangeParameters(param, params);
+      }
+    } else if ("Tuple".equals(inputType)) {
+      if (paramList.getLength() > 1) {
+        throw new WatersUnmarshalException
+          ("Tuple instantiation with more than one parameter unsupported.");
+      }
+      final Element param = (Element) paramList.item(0);
+      params = new DESpotTupleParameters(param);
+    } else {
+      throw new WatersUnmarshalException
+        ("Unsupported input type '" + inputType + "' in DESpot file.");
+    }
+    constructSimpleComponents(des, params, kind, attribs, implementation);
+  }
+
+  /**
+   * Constructs one or more simple components by instantiating a
+   * <CODE>&lt;Des&gt;</CODE> element in a DESpot file.
    * @param  des      The <CODE>&lt;Des&gt;</CODE> element to be
    *                  converted.
    * @param  params   Instantiation parameter object for DESpot templates.
@@ -578,14 +607,13 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
    * @param  attribs  The attribute map used for the simple component,
    *                  or <CODE>null</CODE>.
    * @param  implementation Whether the automaton is being converted as part
-   *                  of an <CODE>&lt;Implementation&gt;</CODE> section of a
-   *                  <CODE>.desp</CODE> file.
+   *                  of an <CODE>&lt;Implementation&gt;</CODE> section.
    */
-  private void constructSimpleComponent(final Element des,
-                                        final DESpotParameters params,
-                                        final ComponentKind kind,
-                                        final Map<String,String> attribs,
-                                        final boolean implementation)
+  private void constructSimpleComponents(final Element des,
+                                         final DESpotParameters params,
+                                         final ComponentKind kind,
+                                         final Map<String,String> attribs,
+                                         final boolean implementation)
       throws ParserConfigurationException, SAXException, IOException,
       URISyntaxException, WatersUnmarshalException
   {
