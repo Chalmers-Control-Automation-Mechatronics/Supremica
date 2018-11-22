@@ -333,10 +333,10 @@ public class EFSMNormaliser extends AbortableCompiler
     final List<SimpleNodeProxy> nodes = Collections.singletonList(node);
     final GraphProxy graph =
       mFactory.createGraphProxy(true, null, nodes, edges);
-    final IdentifierProxy name =
-      mFactory.createSimpleIdentifierProxy(":updates");
-    return
-      mFactory.createSimpleComponentProxy(name, ComponentKind.PLANT, graph);
+    final IdentifierProxy ident =
+      mFactory.createSimpleIdentifierProxy(EFSMCompiler.NAME_UPDATES);
+    return mFactory.createSimpleComponentProxy
+      (ident, ComponentKind.PLANT, graph, EFSMCompiler.ATTRIBUTES_UPDATES);
   }
 
 

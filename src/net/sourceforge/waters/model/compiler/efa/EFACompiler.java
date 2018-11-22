@@ -64,6 +64,7 @@ import net.sourceforge.waters.model.compiler.context.SimpleExpressionCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.compiler.efsm.EFSMCompiler;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -1012,8 +1013,10 @@ public class EFACompiler extends AbortableCompiler
     {
       try {
         // If the component is the ':updates' automata, then do nothing.
-        if (comp.getName().equals(":updates")) return null;
-
+        final Map<String,String> attribs = comp.getAttributes();
+        if (attribs.containsKey(EFSMCompiler.ATTRIB_UPDATES)) {
+          return null;
+        }
         mCurrentComponent = comp;
         final IdentifierProxy ident0 = comp.getIdentifier();
         final IdentifierProxy ident1 =
@@ -1021,14 +1024,12 @@ public class EFACompiler extends AbortableCompiler
         final ComponentKind kind = comp.getKind();
         final GraphProxy graph0 = comp.getGraph();
         final GraphProxy graph1 = visitGraphProxy(graph0);
-        final Map<String,String> attribs = comp.getAttributes();
         final SimpleComponentProxy result =
           mFactory.createSimpleComponentProxy(ident1, kind, graph1, attribs);
         mCompilationInfo.add(result, comp);
         mComponents.add(result);
         return result;
-      }
-      finally {
+      } finally {
         mCurrentComponent = null;
       }
     }

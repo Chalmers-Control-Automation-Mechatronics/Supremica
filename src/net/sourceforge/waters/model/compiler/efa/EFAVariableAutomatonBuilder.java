@@ -33,8 +33,9 @@
 
 package net.sourceforge.waters.model.compiler.efa;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -140,8 +141,7 @@ class EFAVariableAutomatonBuilder extends AbortableCompiler
     final SimpleExpressionProxy initpred = comp.getInitialStatePredicate();
     final List<VariableMarkingProxy> markings = comp.getVariableMarkings();
     final int nummarkings = markings.size();
-    final Set<IdentifierProxy> blocked =
-      new HashSet<IdentifierProxy>(nummarkings);
+    final Set<IdentifierProxy> blocked = new THashSet<>(nummarkings);
     for (final VariableMarkingProxy marking : markings) {
       final IdentifierProxy prop = marking.getProposition();
       blocked.add(prop);

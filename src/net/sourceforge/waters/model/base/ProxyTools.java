@@ -44,7 +44,7 @@ public class ProxyTools
 {
 
   //#########################################################################
-  //# Object Equality respecting NULL
+  //# Object Comparison Respecting NULL
   /**
    * Checks whether two objects are equal, handling <CODE>null</CODE>
    * references properly. The {@link java.lang.Object Object} equality
@@ -72,6 +72,27 @@ public class ProxyTools
       return HASH_NULL;
     } else {
       return object.hashCode();
+    }
+  }
+
+  /**
+   * Compares to objects that may also be <CODE>null</CODE>
+   * references properly. Object references equal to <CODE>null</CODE>
+   * are considered smallest in ordering; if both arguments are
+   * non-<CODE>null</CODE>, the method {@link Comparable#compareTo(Object)}
+   * is used to determine the ordering.
+   * @return -1, 0, or 1 according to {@link Comparable#compareTo(Object)}
+   *         contract.
+   */
+  public static <T extends Comparable<? super T>>
+  int compare(final T object1, final T object2)
+  {
+    if (object1 == null) {
+      return object2 == null ? 0 : -1;
+    } else if (object2 == null) {
+      return 1;
+    } else {
+      return object1.compareTo(object2);
     }
   }
 
