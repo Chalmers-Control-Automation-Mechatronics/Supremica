@@ -49,6 +49,7 @@ public interface SimpleExpressionProxy
   extends ExpressionProxy
 {
 
+  @Override
   public SimpleExpressionProxy clone();
 
   /**
@@ -61,6 +62,4 @@ public interface SimpleExpressionProxy
    */
   // @geometry
   public String getPlainText();
-  
-  public void setPlainText(final String plainText);
 }

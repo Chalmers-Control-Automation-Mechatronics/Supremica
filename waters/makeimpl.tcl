@@ -1590,8 +1590,21 @@ proc Java_GenerateVisitor {subpack prefix destname classnames
         Java_WriteLn $stream $umap ""
         Java_WriteLn $stream $umap "  \{"
         set attribs [Java_ClassGetAttributes $classinfo]
-        set numattribs [llength $attribs]
-        if {$descending && $numattribs > 0} {
+        set hasAttribs 0
+        if {$descending} {
+          foreach attrib $attribs {
+            set decltype [Java_AttribGetDeclaredType $attrib ""]
+            if {[regexp {Proxy$} $decltype all]} {
+              set hasAttribs 1
+              break
+            } elseif {[Java_IsCollectionType $decltype] &&
+                      [regexp {<(\? extends )?[a-zA-Z]*Proxy>} $decltype all]} {
+              set hasAttribs 1
+              break
+            }
+          }
+        }
+        if {$hasAttribs} {
           Java_WriteLn $stream $umap "    visit${supername}(proxy);"
           foreach attrib $attribs {
             set decltype [Java_AttribGetDeclaredType $attrib ""]
