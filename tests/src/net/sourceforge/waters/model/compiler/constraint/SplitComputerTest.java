@@ -112,6 +112,46 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+  public void testPropose_array_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("i");
+    final String[] constraints = {"a[i]"};
+    final String[] expected = {"!i", "i"};
+    testPropose(constraints, expected);
+  }
+
+  public void testPropose_array_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("i");
+    final CompiledIntRange range = createIntRange(0, 3);
+    addVariable("x", range);
+    final String[] constraints = {"a[i]", "x>0", "x*x==3"};
+    final String[] expected = {"!i", "i"};
+    testPropose(constraints, expected);
+  }
+
+  public void testPropose_array_3()
+    throws EvalException, ParseException
+  {
+    addAtom("A");
+    addBooleanVariable("a[A]");
+    final String[] constraints = {"a[A]"};
+    testPropose(constraints, null);
+  }
+
+  public void testPropose_array_4()
+    throws EvalException, ParseException
+  {
+    createEnumRange(new String[] {"A", "B"});
+    addBooleanVariable("a[A]");
+    addBooleanVariable("a[B]");
+    final String[] constraints = {"a[A] + a[B] == 1"};
+    final String[] expected = {"!a[A]", "a[A]"};
+    testPropose(constraints, expected);
+  }
+
   public void testPropose_disjunction_1()
     throws EvalException, ParseException
   {
@@ -142,15 +182,15 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
-  public void testPropose_crc_1()
+  public void testPropose_funcall_1()
     throws EvalException, ParseException
   {
-    final CompiledEnumRange range =
-      createEnumRange(new String[] {"ok", "nok"});
-    addVariable("crc", range);
-    addBooleanVariable("trouble");
-    final String[] constraints = {"crc==nok", "crc==ok & trouble"};
-    final String[] expected = {"crc==ok", "crc==nok"};
+    final CompiledIntRange range = createIntRange(0, 3);
+    addVariable("x", range);
+    addBooleanVariable("b");
+    addBooleanVariable("b'");
+    final String[] constraints = {"b'==\\max(x, b)"};
+    final String[] expected = {"x==0", "x==1", "x==2", "x==3"};
     testPropose(constraints, expected);
   }
 
@@ -165,6 +205,7 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+  /*
   public void testPropose_ite_1()
     throws EvalException, ParseException
   {
@@ -176,16 +217,18 @@ public class SplitComputerTest extends TestCase
     final String[] expected = {"numcycles>1", "!(numcycles>1)"};
     testPropose(constraints, expected);
   }
+  */
 
-  public void testPropose_funcall_1()
+
+  public void testPropose_crc_1()
     throws EvalException, ParseException
   {
-    final CompiledIntRange range = createIntRange(0, 3);
-    addVariable("x", range);
-    addBooleanVariable("b");
-    addBooleanVariable("b'");
-    final String[] constraints = {"b'==\\max(x, b)"};
-    final String[] expected = {"x==0", "x==1", "x==2", "x==3"};
+    final CompiledEnumRange range =
+      createEnumRange(new String[] {"ok", "nok"});
+    addVariable("crc", range);
+    addBooleanVariable("trouble");
+    final String[] constraints = {"crc==nok", "crc==ok & trouble"};
+    final String[] expected = {"crc==ok", "crc==nok"};
     testPropose(constraints, expected);
   }
 
@@ -239,6 +282,14 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+  public void testPropose_martijn_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("x");
+    final String[] constraints = {"x'==0 | x'==1"};
+    testPropose(constraints, null);
+  }
+
   public void testPropose_profisafe_1()
     throws EvalException, ParseException
   {
@@ -257,6 +308,7 @@ public class SplitComputerTest extends TestCase
     testPropose(constraints, expected);
   }
 
+
   public void testReentrant()
     throws EvalException, ParseException
   {
@@ -270,7 +322,6 @@ public class SplitComputerTest extends TestCase
 
   //#########################################################################
   //# Utilities
-  @SuppressWarnings("unused")
   private void addAtom(final String name)
     throws ParseException
   {

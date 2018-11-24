@@ -41,11 +41,25 @@ import java.util.List;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.BinaryOperator;
-import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
+
+/**
+ * A split candidate resulting from a disjunction.
+ *
+ * Examples showing the usefulness for disjunctive split candidates:
+ * <UL>
+ * <LI><CODE>examples/waters/tests/compiler/efsm/alice_room.wmod</CODE></LI>
+ * <LI><CODE>examples/waters/tests/compiler/efsm/batch_tank_vout.wmod</CODE></LI>
+ * <LI><CODE>examples/waters/tests/compiler/efsm/GlobalAndLocalVariables.wmod</CODE></LI>
+ * </UL>
+ *
+ * @see SplitComputer
+ * @author Robi Malik
+ */
 
 class DisjunctionSplitCandidate
   extends AbstractSplitCandidate
@@ -73,11 +87,13 @@ class DisjunctionSplitCandidate
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.compiler.constraint.SplitCandidate
+  @Override
   public void recall(final ConstraintPropagator propagator)
   {
     propagator.removeConstraint(mDisjunction);
   }
 
+  @Override
   public List<SimpleExpressionProxy> getSplitExpressions
     (final ModuleProxyFactory factory, final CompilerOperatorTable optable)
   {
@@ -90,26 +106,31 @@ class DisjunctionSplitCandidate
   //#########################################################################
   //# Overrides for Abstract Baseclass
   //# net.sourceforge.waters.model.compiler.constraint.AbstractSplitCandidate
+  @Override
   int getNumberOfOccurrences()
   {
     return 2;
   }
 
+  @Override
   int getSplitSize()
   {
     return mSplitSize;
   }
 
+  @Override
   boolean getOccursWithNext()
   {
     return false;
   }
 
+  @Override
   int getKindValue()
   {
     return AbstractSplitCandidate.DISJUNCTION_SPLIT;
   }
 
+  @Override
   SimpleExpressionProxy getSplitExpression()
   {
     return mDisjunction;
@@ -136,7 +157,7 @@ class DisjunctionSplitCandidate
     private List<SimpleExpressionProxy> collect()
     {
       try {
-        mResult = new ArrayList<SimpleExpressionProxy>(mSplitSize);
+        mResult = new ArrayList<>(mSplitSize);
         mDisjunction.acceptVisitor(this);
         assert mResult.size() == mSplitSize :
           "Unexpected size of split list---wrong expressions in parts?";
@@ -150,6 +171,7 @@ class DisjunctionSplitCandidate
 
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
     public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
       throws VisitorException
     {
@@ -164,6 +186,7 @@ class DisjunctionSplitCandidate
       }
     }
 
+    @Override
     public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
       throws VisitorException
     {

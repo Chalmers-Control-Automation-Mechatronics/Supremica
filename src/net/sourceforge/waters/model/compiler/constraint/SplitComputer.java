@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyAccessor;
@@ -51,9 +52,12 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.context.VariableContext;
+import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionComparator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
+import net.sourceforge.waters.model.module.BinaryExpressionProxy;
+import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
@@ -64,6 +68,64 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
+/**
+ * <P>An EFSM compiler tool to determine how to split a multi-variable
+ * guard to generate transitions.</P>
+ *
+ * <P>If a guard contains more than one variable, e.g., <CODE>x'==y+1 &amp;
+ * y>2</CODE>, then may not be possible to generate events that can be
+ * assigned to separate variable automata. In this case, the guard is
+ * split into a disjunction such that an event can be generated for
+ * each event. This can be done by selecting a variable and substituting
+ * each of its values. If the domain of <CODE>y</CODE> in the above example
+ * is <CODE>1..4</CODE> then a split can be done into for guards:</P>
+ * <UL>
+ * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==1</CODE>
+ *     &rarr; <CODE>false</CODE>;</LI>
+ * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==2</CODE>
+ *     &rarr; <CODE>false</CODE>;</LI>
+ * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==3</CODE>
+ *     &rarr; <CODE>x'==4 &amp; y==3</CODE>;</LI>
+ * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==4</CODE>
+ *     &rarr; <CODE>x'==5 &amp; y==4</CODE>.</LI>
+ * </UL>
+ * <P>Each of these guards is a conjunction, where each conjunct mentions
+ * at most one variable. Then it is possible to generate an event and
+ * add appropriate transitions to the variable automata for each
+ * variable.</P>
+ *
+ * <P>The split computer analyses a guard given as a {@link ConstraintList}
+ * and proposes a single split, or reports that no split is necessary
+ * because each constraint mentions at most one variable. If splitting is
+ * necessary, it is returned in the form of a {@link SplitCandidate},
+ * which can be used to generate the modified guards for each case.</P>
+ *
+ * <P>The split computer uses three ways to find splits:</P>
+ * <DL>
+ * <DT>Disjunctive split.</DT>
+ * <DD>If the constraint list contains a disjunction <I>A<sub>1</sub> | ...
+ * | A<sub>n</sub></I> that uses more than one variable, then a split
+ * into the disjoints <I>A<sub>1</sub></I>, ..., <I>A<sub>n</sub></I> is
+ * proposed. If this option is available, it is considered above all other
+ * options.</DD>
+ * <DT>Index split.</DT>
+ * <DD>If the constraint list contains an array index expression
+ * <I>a[index]</I> where the <I>index</I> contains a variable, then a split
+ * on a variable within an array index is proposed. Index splitting takes
+ * precedence over splitting on other variables.</DD>
+ * <DT>Variable split.</DT>
+ * <DD>If the constraint list contains a element that uses more than one
+ * variable, then a split over one of the variables in that element is
+ * proposed. Here, if a formula contains a variable both in its current
+ * and next-state (primed) form, this counts as only one variable.</DD>
+ * <DL>
+ * <P>If more than on split is available in one of the above categories,
+ * heuristics are used to guess a split that results in fewer events.
+ * The most common of these is to favour splits over variables that
+ * occur more frequently.</P>
+ *
+ * @author Robi Malik
+ */
 public class SplitComputer
 {
 
@@ -75,12 +137,13 @@ public class SplitComputer
   {
     mFactory = factory;
     mOperatorTable = optable;
+    mDisjunctionChecker = new DisjunctionChecker();
     mCollector = new IndexDistinguishingVariableCollector();
     mEquality = new ModuleEqualityVisitor(false);
     mExpressionComparator = new ExpressionComparator(optable);
     mCandidateComparator = new CandidateComparator();
     mCombinations = new THashSet<>();
-    mCandidateMap = new ProxyAccessorHashMap<>(mEquality);
+    mVariableCandidateMap = new ProxyAccessorHashMap<>(mEquality);
   }
 
 
@@ -92,70 +155,63 @@ public class SplitComputer
   {
     try {
       mContext = context;
+      final List<SimpleExpressionProxy> list = constraints.getConstraints();
+
+      // 1. Check for disjunction
+      DisjunctionSplitCandidate bestDisjunction = null;
+      for (final SimpleExpressionProxy constraint : list) {
+        final int size = mDisjunctionChecker.getDisjunctionSize(constraint);
+        if (size > 1 &&
+            // only split on disjunction if multiple variables included
+            mCollector.collect(constraint, false) != null) {
+          final DisjunctionSplitCandidate cand =
+            new DisjunctionSplitCandidate(constraint, size);
+          if (bestDisjunction == null ||
+              mCandidateComparator.compare(bestDisjunction, cand) < 0) {
+            bestDisjunction = cand;
+          }
+        }
+      }
+      if (bestDisjunction != null) {
+        return bestDisjunction;
+      }
+
+      // 2. Collect variables and variable combinations
       boolean hasIndexVars = false;
-      for (final SimpleExpressionProxy constraint :
-             constraints.getConstraints()) {
-        final ProxyAccessorSet<SimpleExpressionProxy> collection =
+      for (final SimpleExpressionProxy constraint : list) {
+        final VariableCombination comb =
           mCollector.collect(constraint, hasIndexVars);
         if (!hasIndexVars && mCollector.hasIndexVariables()) {
           mCombinations.clear();
           hasIndexVars = true;
         }
-        final VariableCombination comb =
-          createVariableCombination(collection, hasIndexVars);
         if (comb != null) {
           mCombinations.add(comb);
         }
       }
+
+      // 3. Choose best split
       for (final VariableCombination comb : mCombinations) {
         createVariableSplitCandidates(comb);
       }
-      if (mCandidateMap.isEmpty()) {
+      if (mVariableCandidateMap.isEmpty()) {
         return null;
       } else {
         final Collection<VariableSplitCandidate> candidates =
-          mCandidateMap.values();
+          mVariableCandidateMap.values();
         return Collections.min(candidates, mCandidateComparator);
       }
+
     } finally {
       mContext = null;
       mCombinations.clear();
-      mCandidateMap.clear();
+      mVariableCandidateMap.clear();
     }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private VariableCombination createVariableCombination
-    (final ProxyAccessorSet<SimpleExpressionProxy> contents,
-     final boolean hasIndexVars)
-  {
-    if (contents == null || contents.isEmpty()) {
-      return null;
-    } else if (hasIndexVars) {
-      return new VariableCombination(contents);
-    } else {
-      switch (contents.size()) {
-      case 0:
-      case 1:
-        return null;
-      case 2:
-        final Iterator<SimpleExpressionProxy> iter =
-        contents.values().iterator();
-        final SimpleExpressionProxy first = iter.next();
-        final SimpleExpressionProxy second = iter.next();
-        if (isNextOf(first, second) || isNextOf(second, first)) {
-          return null;
-        } else {
-          return new VariableCombination(contents);
-        }
-      default:
-        return new VariableCombination(contents);
-      }
-    }
-  }
-
   private void createVariableSplitCandidates(final VariableCombination comb)
   {
     final UnaryOperator nextOp = mOperatorTable.getNextOperator();
@@ -184,12 +240,12 @@ public class SplitComputer
     (final SimpleExpressionProxy varName)
   {
     final ProxyAccessor<SimpleExpressionProxy> accessor =
-      mCandidateMap.createAccessor(varName);
-    VariableSplitCandidate cand = mCandidateMap.get(accessor);
+      mVariableCandidateMap.createAccessor(varName);
+    VariableSplitCandidate cand = mVariableCandidateMap.get(accessor);
     if (cand == null) {
       final CompiledRange range = mContext.getVariableRange(varName);
       cand = new VariableSplitCandidate(varName, range);
-      mCandidateMap.put(accessor, cand);
+      mVariableCandidateMap.put(accessor, cand);
     }
     return cand;
   }
@@ -213,14 +269,13 @@ public class SplitComputer
   //#########################################################################
   //# Inner Class CandidateComparator
   private class CandidateComparator
-    implements Comparator<VariableSplitCandidate>
+    implements Comparator<AbstractSplitCandidate>
   {
-
     //#######################################################################
     //# Interface java.util.Comparator
     @Override
-    public int compare(final VariableSplitCandidate cand1,
-                       final VariableSplitCandidate cand2)
+    public int compare(final AbstractSplitCandidate cand1,
+                       final AbstractSplitCandidate cand2)
     {
       final int numocc1 = cand1.getNumberOfOccurrences();
       final int numocc2 = cand2.getNumberOfOccurrences();
@@ -248,7 +303,59 @@ public class SplitComputer
       final SimpleExpressionProxy expr2 = cand2.getSplitExpression();
       return mExpressionComparator.compare(expr1, expr2);
     }
+  }
 
+
+  //#########################################################################
+  //# Inner Class DisjunctionChecker
+  /**
+   * A visitor that collects the variables in an expression.
+   */
+  private class DisjunctionChecker
+    extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    int getDisjunctionSize(final SimpleExpressionProxy expr)
+    {
+      try {
+        mDisjunctionSize = 0;
+        expr.acceptVisitor(this);
+        return mDisjunctionSize;
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public Object visitBinaryExpressionProxy(final BinaryExpressionProxy expr)
+      throws VisitorException
+    {
+      final BinaryOperator op = expr.getOperator();
+      if (op == mOperatorTable.getOrOperator()) {
+        final SimpleExpressionProxy lhs = expr.getLeft();
+        lhs.acceptVisitor(this);
+        final SimpleExpressionProxy rhs = expr.getRight();
+        rhs.acceptVisitor(this);
+        return null;
+      } else {
+        return visitSimpleExpressionProxy(expr);
+      }
+    }
+
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+      throws VisitorException
+    {
+      mDisjunctionSize++;
+      return null;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mDisjunctionSize;
   }
 
 
@@ -311,7 +418,7 @@ public class SplitComputer
       for (final SimpleExpressionProxy index : ident.getIndexes()) {
         final ProxyAccessorSet<SimpleExpressionProxy> indexVars =
           mIndexCollector.collect(index);
-        ground &= indexVars.isEmpty();
+        ground &= indexVars == null;
         addIndexVariables(indexVars);
       }
       if (ground) {
@@ -411,13 +518,15 @@ public class SplitComputer
   {
     //#######################################################################
     //# Invocation
-    ProxyAccessorSet<SimpleExpressionProxy>
-    collect(final SimpleExpressionProxy expr, final boolean indexOnly)
+    VariableCombination collect(final SimpleExpressionProxy expr,
+                                final boolean indexOnly)
       throws EvalException
     {
       try {
         mHasIndexVariables = indexOnly;
-        return super.collect(expr);
+        final ProxyAccessorSet<SimpleExpressionProxy> collection =
+          super.collect(expr);
+        return createVariableCombination(collection);
       } catch (final VisitorException exception) {
         final Throwable cause = exception.getCause();
         if (cause instanceof EvalException) {
@@ -456,6 +565,34 @@ public class SplitComputer
       }
     }
 
+    private VariableCombination createVariableCombination
+      (final ProxyAccessorSet<SimpleExpressionProxy> collection)
+    {
+      if (collection == null || collection.isEmpty()) {
+        return null;
+      } else if (mHasIndexVariables) {
+        return new VariableCombination(collection);
+      } else {
+        switch (collection.size()) {
+        case 0:
+        case 1:
+          return null;
+        case 2:
+          final Iterator<SimpleExpressionProxy> iter =
+          collection.values().iterator();
+          final SimpleExpressionProxy first = iter.next();
+          final SimpleExpressionProxy second = iter.next();
+          if (isNextOf(first, second) || isNextOf(second, first)) {
+            return null;
+          } else {
+            return new VariableCombination(collection);
+          }
+        default:
+          return new VariableCombination(collection);
+        }
+      }
+    }
+
     //#######################################################################
     //# Data Members
     private boolean mHasIndexVariables = false;
@@ -487,7 +624,7 @@ public class SplitComputer
     }
 
     //#######################################################################
-    //# Overrides for Baseclass java.lang.Object
+    //# Overrides for java.lang.Object
     @Override
     public String toString()
     {
@@ -523,14 +660,14 @@ public class SplitComputer
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
-  private final IndexDistinguishingVariableCollector
-    mCollector;
+  private final DisjunctionChecker mDisjunctionChecker;
+  private final IndexDistinguishingVariableCollector mCollector;
   private final ModuleEqualityVisitor mEquality;
   private final Comparator<SimpleExpressionProxy> mExpressionComparator;
-  private final Comparator<VariableSplitCandidate> mCandidateComparator;
+  private final Comparator<AbstractSplitCandidate> mCandidateComparator;
   private final Set<VariableCombination> mCombinations;
   private final ProxyAccessorMap<SimpleExpressionProxy,VariableSplitCandidate>
-    mCandidateMap;
+    mVariableCandidateMap;
 
   private VariableContext mContext;
 
