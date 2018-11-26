@@ -213,6 +213,12 @@ public class EFSMModuleContext
     }
 
     @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return null;
+    }
+
+    @Override
     public EFSMComponent visitUnaryExpressionProxy
       (final UnaryExpressionProxy expr)
     {
@@ -276,6 +282,12 @@ public class EFSMModuleContext
     public EFSMComponent visitIdentifierProxy(final IdentifierProxy ident)
     {
       return mMap.getByProxy(ident);
+    }
+
+    @Override
+    public Object visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
+    {
+      return null;
     }
 
     @Override

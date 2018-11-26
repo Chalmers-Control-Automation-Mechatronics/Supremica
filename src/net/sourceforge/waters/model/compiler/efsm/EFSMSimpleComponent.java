@@ -81,12 +81,13 @@ class EFSMSimpleComponent extends EFSMComponent
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.compiler.efsm.EFSMComponent
   @Override
-  boolean addEventInstance(final EFSMEventInstance inst,
-                           final ConstraintList constraints,
-                           final EFSMTransitionIteratorFactory factory)
+  TransitionGroup createTransitionGroup
+    (final EFSMEventInstance inst,
+     final ConstraintList constraints,
+     final EFSMTransitionIteratorFactory factory)
   {
     // TODO Auto-generated method stub
-    return true;
+    return null;
   }
 
 
@@ -113,6 +114,15 @@ class EFSMSimpleComponent extends EFSMComponent
       }
       mEventMap.put(decl, group);
     }
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return "EFSM " + getKind() + " " + getName();
   }
 
 

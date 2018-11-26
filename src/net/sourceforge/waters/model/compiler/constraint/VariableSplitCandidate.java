@@ -153,6 +153,12 @@ class VariableSplitCandidate
     return result;
   }
 
+  @Override
+  public boolean isDisjoint()
+  {
+    return true;
+  }
+
 
   //#########################################################################
   //# Overrides for Abstract Baseclass

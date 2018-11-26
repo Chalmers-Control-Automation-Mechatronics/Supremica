@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.model.compiler.efsm;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
@@ -60,7 +60,7 @@ class EFSMEventDeclaration
   {
     mEventDecl = decl;
     mGuardedActions = ConstraintList.TRUE;
-    mInstances = new ArrayList<>();
+    mInstances = new LinkedList<>();
   }
 
 
@@ -69,6 +69,11 @@ class EFSMEventDeclaration
   EventDeclProxy getEventDeclProxy()
   {
     return mEventDecl;
+  }
+
+  String getName()
+  {
+    return mEventDecl.getName();
   }
 
   ConstraintList getGuardedActions()
@@ -103,6 +108,11 @@ class EFSMEventDeclaration
     mInstances.add(inst);
   }
 
+  void removeAllInstances()
+  {
+    mInstances.clear();
+  }
+
 
   //#########################################################################
   //# Event Compilation
@@ -134,6 +144,16 @@ class EFSMEventDeclaration
       output.add(decl);
       compilationInfo.add(decl, mEventDecl);
     }
+  }
+
+
+  //#######################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return "EFSM-event " + getName() +
+      " (" + getNumberOfInstances() + " instances)";
   }
 
 

@@ -38,6 +38,7 @@ import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,28 +83,77 @@ abstract class EFSMComponent
     return mComponent.getIdentifier();
   }
 
+  String getName()
+  {
+    return mComponent.getName();
+  }
+
   CompiledRange getRange()
   {
     return mRange;
   }
 
 
-  //#########################################################################
-  //# Building the Transition Relation
-  abstract boolean addEventInstance(EFSMEventInstance inst,
-                                    ConstraintList constraints,
-                                    EFSMTransitionIteratorFactory factory)
-    throws EvalException;
-
-  void associateEventInstance(final EFSMEventInstance event,
-                              final TransitionGroup group)
+  //#######################################################################
+  //# Subsumption Checking
+  boolean subsumes(final TransitionGroup newTransitionGroup,
+                   final EFSMEventInstance inst)
   {
-    mEventInstanceMap.put(event, group);
+    final TransitionGroup transitionGroup = mEventInstanceMap.get(inst);
+    return subsumes(newTransitionGroup, transitionGroup);
   }
 
-  void removeEventInstance(final EFSMEventInstance event)
+  boolean isSubsumed(final TransitionGroup newTransitionGroup,
+                     final EFSMEventInstance inst)
   {
-    mEventInstanceMap.remove(event);
+    final TransitionGroup transitionGroup = mEventInstanceMap.get(inst);
+    return subsumes(transitionGroup, newTransitionGroup);
+  }
+
+  boolean subsumes(final TransitionGroup group1,
+                   final TransitionGroup group2)
+  {
+    if (group1 == group2) {
+      return true;
+    } else if (group1 == null) {
+      return group2.isSelfloopOnly();
+    } else if (group2 == null) {
+      return isNeutral(group1);
+    } else {
+      return group1.subsumes(group2);
+    }
+  }
+
+  boolean isNeutral(final TransitionGroup group)
+  {
+    if (group == null) {
+      return true;
+    } else {
+      return group.isSelfloopOnly() &&
+             group.getNumberOfTransitions() == getRange().size();
+    }
+  }
+
+
+  //#########################################################################
+  //# Building the Transition Relation
+  abstract TransitionGroup createTransitionGroup
+    (EFSMEventInstance inst,
+     ConstraintList constraints,
+     EFSMTransitionIteratorFactory factory)
+    throws EvalException;
+
+  void associateEventInstance(final EFSMEventInstance inst,
+                              final TransitionGroup transitionGroup)
+  {
+    if (!isNeutral(transitionGroup)) {
+      mEventInstanceMap.put(inst, transitionGroup);
+    }
+  }
+
+  void removeEventInstance(final EFSMEventInstance inst)
+  {
+    mEventInstanceMap.remove(inst);
   }
 
   long getTransitionCode(final SimpleExpressionProxy source,
@@ -118,8 +168,8 @@ abstract class EFSMComponent
   {
     final TLongObjectMap<List<EFSMEventInstance>> map =
       new TLongObjectHashMap<>();
-    for (final Map.Entry<EFSMEventInstance,TransitionGroup> entry :
-         mEventInstanceMap.entrySet()) {
+    for (final Map.Entry<EFSMEventInstance,TransitionGroup>
+         entry : mEventInstanceMap.entrySet()) {
       final EFSMEventInstance event = entry.getKey();
       final TransitionGroup group = entry.getValue();
       group.collect(map, event);
@@ -155,11 +205,20 @@ abstract class EFSMComponent
     private TransitionGroup()
     {
       mTransitions = null;
+      mNumberOfSelfloops = 0;
     }
 
     TransitionGroup(final TLongArrayList transitions)
     {
       mTransitions = transitions.toArray();
+      Arrays.sort(mTransitions);
+      int selfloops = 0;
+      for (final long transition : mTransitions) {
+        if (getTransitionSource(transition) == getTransitionTarget(transition)) {
+          selfloops++;
+        }
+      }
+      mNumberOfSelfloops = selfloops;
     }
 
     //#######################################################################
@@ -167,6 +226,54 @@ abstract class EFSMComponent
     boolean isEmpty()
     {
       return mTransitions == null;
+    }
+
+    boolean isSelfloopOnly()
+    {
+      if (mTransitions == null) {
+        return true;
+      } else {
+        return mNumberOfSelfloops == mTransitions.length;
+      }
+    }
+
+    int getNumberOfTransitions()
+    {
+      if (mTransitions == null) {
+        return 0;
+      } else {
+        return mTransitions.length;
+      }
+    }
+
+    //#######################################################################
+    //# Subsumption Checking
+    boolean subsumes(final TransitionGroup group)
+    {
+      final long[] groupTransitions = group.mTransitions;
+      if (mTransitions == null) {
+        return groupTransitions == null;
+      } else if (groupTransitions == null) {
+        return true;
+      } else if (mTransitions.length < groupTransitions.length) {
+        return false;
+      } else if (mNumberOfSelfloops < group.mNumberOfSelfloops) {
+        return false;
+      } else {
+        final int d = mTransitions.length - groupTransitions.length + 1;
+        int i = 0;
+        for (int j = 0; j < groupTransitions.length; j++) {
+          final int stop = d + j;
+          final long transition = groupTransitions[j];
+          while (i < stop && mTransitions[i] < transition) {
+            i++;
+          }
+          if (i == stop || mTransitions[i] > transition) {
+            return false;
+          }
+        }
+        return true;
+      }
     }
 
     //#######################################################################
@@ -187,8 +294,32 @@ abstract class EFSMComponent
     }
 
     //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final StringBuilder builder = new StringBuilder("[");
+      boolean first = true;
+      for (final long transition : mTransitions) {
+        if (first) {
+          first = false;
+        } else {
+          builder.append(',');
+        }
+        final long s = getTransitionSource(transition);
+        builder.append(s);
+        builder.append("->");
+        final long t = getTransitionTarget(transition);
+        builder.append(t);
+      }
+      builder.append(']');
+      return builder.toString();
+    }
+
+    //#######################################################################
     //# Data Members
     private final long[] mTransitions;
+    private final int mNumberOfSelfloops;
   }
 
 

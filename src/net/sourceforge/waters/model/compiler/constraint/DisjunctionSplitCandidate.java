@@ -102,6 +102,12 @@ class DisjunctionSplitCandidate
     return visitor.collect();
   }
 
+  @Override
+  public boolean isDisjoint()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Overrides for Abstract Baseclass

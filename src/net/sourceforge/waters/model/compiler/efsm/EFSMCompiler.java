@@ -209,7 +209,6 @@ public class EFSMCompiler extends AbortableCompiler
   void setAutomatonVariablesEnabled(final boolean enabled)
   {
     mAutomatonVariablesEnabled = enabled;
-
   }
 
 
@@ -262,11 +261,13 @@ public class EFSMCompiler extends AbortableCompiler
         } else {
           mCurrentGuard = visitGuardActionBlockProxy(ga);
         }
-        final NodeProxy source = edge.getSource();
-        final int s = mCurrentRangeMap.get(source);
-        final NodeProxy target = edge.getTarget();
-        final int t = mCurrentRangeMap.get(target);
-        mCurrentTransition = EFSMComponent.getTransitionCode(s, t);
+        if (mCurrentComponent != null) {
+          final NodeProxy source = edge.getSource();
+          final int s = mCurrentRangeMap.get(source);
+          final NodeProxy target = edge.getTarget();
+          final int t = mCurrentRangeMap.get(target);
+          mCurrentTransition = EFSMComponent.getTransitionCode(s, t);
+        }
         final LabelBlockProxy block = edge.getLabelBlock();
         visitLabelBlockProxy(block);
         return null;
@@ -380,7 +381,7 @@ public class EFSMCompiler extends AbortableCompiler
       final int numEvents = decls.size();
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
       mEFSMEventDeclarationMap = new ProxyAccessorHashMap<>(eq, numEvents);
-      mEFSMComponents = new ArrayList<>(numEvents);
+      mEFSMEventDeclarations = new ArrayList<>(numEvents);
       visitCollection(decls);
       final List<ConstantAliasProxy> aliases = module.getConstantAliasList();
       visitCollection(aliases);
@@ -417,7 +418,10 @@ public class EFSMCompiler extends AbortableCompiler
             }
           }
           visitCollection(graph.getEdges());
-          visitLabelBlockProxy(graph.getBlockedEvents());
+          final LabelBlockProxy blocked = graph.getBlockedEvents();
+          if (blocked != null) {
+            visitLabelBlockProxy(blocked);
+          }
           mCurrentComponent.initialiseTransitions(mCurrentEventMap);
         }
         return mCurrentComponent;
@@ -508,7 +512,6 @@ public class EFSMCompiler extends AbortableCompiler
     {
       for (final EFSMEventDeclaration decl : mEFSMEventDeclarations) {
         splitEvent(decl);
-        decl.provideSuffixes(mEventNameBuilder);
       }
     }
 
@@ -522,21 +525,42 @@ public class EFSMCompiler extends AbortableCompiler
         final EFSMEventInstance inst = new EFSMEventInstance(decl);
         decl.addInstance(inst);
       } else {
+        mCollectedConstraintLists = new THashSet<>();
+        mCollectedEFSMComponents = new THashSet<>();
+        final ConstraintPropagator propagator =
+          new ConstraintPropagator(mFactory, mCompilationInfo,
+                                   mOperatorTable, mRootContext);
+        propagator.addConstraints(ga);
         try {
-          final ConstraintPropagator propagator =
-            new ConstraintPropagator(mFactory, mCompilationInfo,
-                                     mOperatorTable, mRootContext);
-          propagator.addConstraints(ga);
           propagator.propagate();
-          splitEvent(decl, propagator);
+          mSubsumptionEnabled = false;
+          splitEvent(propagator);
         } catch (final EvalException exception) {
           mCompilationInfo.raise(exception);
+          mCollectedConstraintLists = null;
+          mCollectedEFSMComponents = null;
+          return;
         }
+        final EFSMComponent[] components =
+          new EFSMComponent[mCollectedEFSMComponents.size()];
+        mCollectedEFSMComponents.toArray(components);
+        try {
+          for (final ConstraintList inst : mCollectedConstraintLists) {
+            createInstance(decl, inst, components);
+          }
+        } catch (final EvalException exception) {
+          mCompilationInfo.raise(exception);
+          cancel(decl, components);
+          return;
+        } finally {
+          mCollectedConstraintLists = null;
+          mCollectedEFSMComponents = null;
+        }
+        decl.provideSuffixes(mEventNameBuilder);
       }
     }
 
-    private void splitEvent(final EFSMEventDeclaration decl,
-                            final ConstraintPropagator parent)
+    private void splitEvent(final ConstraintPropagator parent)
       throws EvalException
     {
       checkAbort();
@@ -545,8 +569,9 @@ public class EFSMCompiler extends AbortableCompiler
         final VariableContext context = parent.getContext();
         final SplitCandidate split = mSplitComputer.proposeSplit(ga, context);
         if (split == null) {
-          createInstance(decl, ga);
+          recordInstance(ga);
         } else {
+          mSubsumptionEnabled |= !split.isDisjoint();
           for (final SimpleExpressionProxy expr :
             split.getSplitExpressions(mFactory, mOperatorTable)) {
             final ConstraintPropagator propagator =
@@ -554,48 +579,134 @@ public class EFSMCompiler extends AbortableCompiler
             split.recall(propagator);
             propagator.addConstraint(expr);
             propagator.propagate();
-            splitEvent(decl, propagator);
+            splitEvent(propagator);
           }
         }
       }
     }
 
+    private void recordInstance(final ConstraintList ga)
+    {
+      if (mCollectedConstraintLists.add(ga)) {
+        for (final SimpleExpressionProxy literal : ga.getConstraints()) {
+          final EFSMComponent comp =
+            mRootContext.getMentionedEFSMComponent(literal);
+          mCollectedEFSMComponents.add(comp);
+        }
+      }
+    }
+
     private void createInstance(final EFSMEventDeclaration decl,
-                                final ConstraintList ga)
+                                final ConstraintList ga,
+                                final EFSMComponent[] components)
       throws EvalException
     {
-      final EFSMEventInstance inst = new EFSMEventInstance(decl, ga);
-      final Map<EFSMComponent,List<SimpleExpressionProxy>> map =
-        new HashMap<>();
+      final Map<EFSMComponent,List<SimpleExpressionProxy>> map1 =
+        new HashMap<>(components.length);
       for (final SimpleExpressionProxy literal : ga.getConstraints()) {
         final EFSMComponent comp =
           mRootContext.getMentionedEFSMComponent(literal);
-        List<SimpleExpressionProxy> list = map.get(comp);
+        List<SimpleExpressionProxy> list = map1.get(comp);
         if (list == null) {
           list = new ArrayList<>(4);
-          map.put(comp, list);
+          map1.put(comp, list);
         }
         list.add(literal);
       }
-      boolean blocked = false;
-      for (final Map.Entry<EFSMComponent,List<SimpleExpressionProxy>> entry :
-           map.entrySet()) {
+      final EFSMEventInstance inst = new EFSMEventInstance(decl, ga);
+      final Map<EFSMComponent,EFSMComponent.TransitionGroup> map2 =
+        new HashMap<>(components.length);
+      for (final Map.Entry<EFSMComponent,List<SimpleExpressionProxy>>
+           entry : map1.entrySet()) {
         final EFSMComponent comp = entry.getKey();
         final List<SimpleExpressionProxy> list = entry.getValue();
         final ConstraintList constraints = new ConstraintList(list);
-        if (!comp.addEventInstance(inst, constraints, this)) {
-          blocked = true;
-          break;
+        final EFSMComponent.TransitionGroup group =
+          comp.createTransitionGroup(inst, constraints, this);
+        if (group == null) {
+          return;
         }
+        map2.put(comp, group);
       }
-      if (blocked) {
-        for (final EFSMComponent comp : map.keySet()) {
-          comp.removeEventInstance(inst);
-        }
-      } else {
+      if (survivesSubsumptionCheck(components, map2, decl)) {
         decl.addInstance(inst);
+        for (final Map.Entry<EFSMComponent,EFSMComponent.TransitionGroup>
+             entry : map2.entrySet()) {
+          final EFSMComponent comp = entry.getKey();
+          final EFSMComponent.TransitionGroup group = entry.getValue();
+          comp.associateEventInstance(inst, group);
+        }
       }
     }
+
+    private void cancel(final EFSMEventDeclaration decl,
+                        final EFSMComponent[] components)
+    {
+      for (final EFSMComponent comp : components) {
+        for (final EFSMEventInstance inst : decl.getInstances()) {
+          comp.removeEventInstance(inst);
+        }
+      }
+      decl.removeAllInstances();
+    }
+
+
+    //#######################################################################
+    //# Subsumption Check
+    private boolean survivesSubsumptionCheck
+      (final EFSMComponent[] components,
+       final Map<EFSMComponent,EFSMComponent.TransitionGroup> newGroups,
+       final EFSMEventDeclaration decl)
+    {
+      if (mSubsumptionEnabled) {
+        final Iterable<EFSMEventInstance> instances = decl.getInstances();
+        for (final EFSMEventInstance inst : instances) {
+          if (isSubsumed(components, newGroups, inst)) {
+            return false;
+          }
+        }
+        final Iterator<EFSMEventInstance> iter = instances.iterator();
+        while (iter.hasNext()) {
+          final EFSMEventInstance inst = iter.next();
+          if (subsumes(components, newGroups, inst)) {
+            iter.remove();
+            for (final EFSMComponent comp : components) {
+              comp.removeEventInstance(inst);
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    private boolean isSubsumed
+      (final EFSMComponent[] components,
+       final Map<EFSMComponent,EFSMComponent.TransitionGroup> newGroups,
+       final EFSMEventInstance existingInst)
+    {
+      for (final EFSMComponent comp : components) {
+        final EFSMComponent.TransitionGroup group = newGroups.get(comp);
+        if (!comp.isSubsumed(group, existingInst)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    private boolean subsumes
+      (final EFSMComponent[] components,
+       final Map<EFSMComponent,EFSMComponent.TransitionGroup> newGroups,
+       final EFSMEventInstance existingInst)
+    {
+      for (final EFSMComponent comp : components) {
+        final EFSMComponent.TransitionGroup group = newGroups.get(comp);
+        if (!comp.subsumes(group, existingInst)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
 
     //#######################################################################
     //# Interface
@@ -674,6 +785,9 @@ public class EFSMCompiler extends AbortableCompiler
     //# Data Members
     private final SplitComputer mSplitComputer;
     private final EFAEventNameBuilder mEventNameBuilder;
+    private Collection<ConstraintList> mCollectedConstraintLists;
+    private Collection<EFSMComponent> mCollectedEFSMComponents;
+    private boolean mSubsumptionEnabled;
   }
 
 

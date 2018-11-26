@@ -77,9 +77,9 @@ class EFSMVariableComponent extends EFSMComponent
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.compiler.efsm.EFSMComponent
   @Override
-  boolean addEventInstance(final EFSMEventInstance event,
-                           final ConstraintList constraints,
-                           final EFSMTransitionIteratorFactory factory)
+  TransitionGroup createTransitionGroup(final EFSMEventInstance event,
+                                        final ConstraintList constraints,
+                                        final EFSMTransitionIteratorFactory factory)
     throws EvalException
   {
     TransitionGroup group = getTransitionGroup(constraints);
@@ -101,10 +101,9 @@ class EFSMVariableComponent extends EFSMComponent
       }
     }
     if (group.isEmpty()) {
-      return false;
+      return null;
     } else {
-      associateEventInstance(event, group);
-      return true;
+      return group;
     }
   }
 
@@ -132,6 +131,15 @@ class EFSMVariableComponent extends EFSMComponent
   {
     mTransitionGroupMap.put(constraints, EMPTY_GROUP);
     return EMPTY_GROUP;
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    return "EFSM variable " + getName();
   }
 
 

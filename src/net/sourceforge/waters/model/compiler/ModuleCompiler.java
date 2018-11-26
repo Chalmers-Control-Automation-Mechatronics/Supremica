@@ -43,11 +43,13 @@ import java.util.Map;
 import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.SourceInfoCloner;
 import net.sourceforge.waters.model.compiler.efa.EFACompiler;
+import net.sourceforge.waters.model.compiler.efsm.EFSMCompiler;
 import net.sourceforge.waters.model.compiler.efsm.EFSMNormaliser;
 import net.sourceforge.waters.model.compiler.graph.ModuleGraphCompiler;
 import net.sourceforge.waters.model.compiler.groupnode.GroupNodeCompiler;
@@ -223,14 +225,8 @@ public class ModuleCompiler extends AbortableCompiler
   public void requestAbort()
   {
     super.requestAbort();
-    if (mInstanceCompiler != null) {
-      mInstanceCompiler.requestAbort();
-    }
-    if (mEFACompiler != null) {
-      mEFACompiler.requestAbort();
-    }
-    if (mGraphCompiler != null) {
-      mGraphCompiler.requestAbort();
+    if (mActiveAbortable != null) {
+      mActiveAbortable.requestAbort();
     }
   }
 
@@ -238,14 +234,8 @@ public class ModuleCompiler extends AbortableCompiler
   public void resetAbort()
   {
     super.resetAbort();
-    if (mInstanceCompiler != null) {
-      mInstanceCompiler.resetAbort();
-    }
-    if (mEFACompiler != null) {
-      mEFACompiler.resetAbort();
-    }
-    if (mGraphCompiler != null) {
-      mGraphCompiler.resetAbort();
+    if (mActiveAbortable != null) {
+      mActiveAbortable.resetAbort();
     }
   }
 
@@ -297,63 +287,79 @@ public class ModuleCompiler extends AbortableCompiler
         mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
                                                mIsMultiExceptionsEnabled);
       }
-      final ModuleProxyFactory modfactory = ModuleElementFactory.getInstance();
+      final ModuleProxyFactory modFactory = ModuleElementFactory.getInstance();
 
-      // Resolve instances.
-      mInstanceCompiler = new ModuleInstanceCompiler
-        (mDocumentManager, modfactory, mCompilationInfo, mInputModule);
-      mInstanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
-      mInstanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
-      mInstanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
-      mInstanceCompiler.setHISCCompileMode(mHISCCompileMode);
+      // resolve instances
+      ModuleInstanceCompiler instanceCompiler = new ModuleInstanceCompiler
+        (mDocumentManager, modFactory, mCompilationInfo, mInputModule);
+      instanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      instanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
+      instanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
+      instanceCompiler.setHISCCompileMode(mHISCCompileMode);
       checkAbort();
-      ModuleProxy intermediate = mInstanceCompiler.compile(bindings);
-      final boolean efa = mInstanceCompiler.getHasEFAElements();
-      mInstanceCompiler = null;
+      mActiveAbortable = instanceCompiler;
+      ModuleProxy intermediate = instanceCompiler.compile(bindings);
+      final boolean efa = instanceCompiler.getHasEFAElements();
+      mActiveAbortable = instanceCompiler = null;
       checkAbort();
 
-      // Simplify group nodes.
-      mGroupNodeCompiler =
-        new GroupNodeCompiler(modfactory, mCompilationInfo, intermediate);
-      intermediate = mGroupNodeCompiler.compile();
-      mGroupNodeCompiler = null;
+      // simplify group nodes
+      GroupNodeCompiler groupNodeCompiler =
+        new GroupNodeCompiler(modFactory, mCompilationInfo, intermediate);
+      mActiveAbortable = groupNodeCompiler;
+      intermediate = groupNodeCompiler.compile();
+      mActiveAbortable = groupNodeCompiler = null;
       checkAbort();
 
       if (efa && mIsExpandingEFATransitions) {
-        if (mIsNormalizationEnabled) { // Perform normalisation.
-          mEFANormaliser =
-            new EFSMNormaliser(modfactory, mCompilationInfo, intermediate);
-          mEFANormaliser.setUsesEventNameBuilder(true);
-          mEFANormaliser.setCreatesGuardAutomaton(true);
-          intermediate = mEFANormaliser.compile();
-          mEFANormaliser = null;
-        }
+        if (mIsNormalizationEnabled) {
+          // perform normalisation
+          EFSMNormaliser normaliser =
+            new EFSMNormaliser(modFactory, mCompilationInfo, intermediate);
+          normaliser.setUsesEventNameBuilder(true);
+          normaliser.setCreatesGuardAutomaton(true);
+          mActiveAbortable = normaliser;
+          intermediate = normaliser.compile();
+          mActiveAbortable = normaliser = null;
 
-        // Create variable automata.
-        mEFACompiler =
-          new EFACompiler(modfactory, mCompilationInfo, intermediate);
-        checkAbort();
-        intermediate = mEFACompiler.compile();
-        mEFACompiler = null;
+          // compile normalised EFSM system
+          EFSMCompiler efsmCompiler =
+            new EFSMCompiler(modFactory, mCompilationInfo, intermediate);
+          mActiveAbortable = efsmCompiler;
+          intermediate = efsmCompiler.compile();
+          mActiveAbortable = efsmCompiler = null;
+
+        } else {
+          // use old EFA compiler
+          EFACompiler efaCompiler =
+            new EFACompiler(modFactory, mCompilationInfo, intermediate);
+          checkAbort();
+          mActiveAbortable = efaCompiler;
+          intermediate = efaCompiler.compile();
+          mActiveAbortable = efaCompiler = null;
+        }
       }
 
-      // Build Product DES.
-      mGraphCompiler =
+      // build product DES
+      ModuleGraphCompiler graphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
-      mGraphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      graphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
       checkAbort();
-      final ProductDESProxy des = mGraphCompiler.compile();
+      mActiveAbortable = graphCompiler;
+      final ProductDESProxy des = graphCompiler.compile();
+      mActiveAbortable = graphCompiler = null;
       setLocation(des);
       return des;
     }
 
     catch (final EvalException exception) {
       mCompilationInfo.raise(exception);
-      throw mCompilationInfo.getExceptions();
-    }
-
-    finally {
+      return null;
+    } finally {
       tearDown();
+      if (mCompilationInfo.hasExceptions()) {
+        throw mCompilationInfo.getExceptions();
+      }
     }
   }
 
@@ -609,9 +615,7 @@ public class ModuleCompiler extends AbortableCompiler
   private void tearDown()
   {
     mCompilationInfoIsDirty = true;
-    mInstanceCompiler = null;
-    mEFACompiler = null;
-    mGraphCompiler = null;
+    mActiveAbortable = null;
   }
 
   private void setLocation(final ProductDESProxy des)
@@ -638,12 +642,7 @@ public class ModuleCompiler extends AbortableCompiler
   private ModuleProxy mInputModule;
   private CompilationInfo mCompilationInfo;
   private boolean mCompilationInfoIsDirty;
-
-  private ModuleInstanceCompiler mInstanceCompiler;
-  private GroupNodeCompiler mGroupNodeCompiler;
-  private EFSMNormaliser mEFANormaliser;
-  private EFACompiler mEFACompiler;
-  private ModuleGraphCompiler mGraphCompiler;
+  private Abortable mActiveAbortable;
 
   private boolean mIsOptimizationEnabled = true;
   private boolean mIsExpandingEFATransitions = true;

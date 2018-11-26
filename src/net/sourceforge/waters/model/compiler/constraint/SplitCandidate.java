@@ -48,4 +48,6 @@ public interface SplitCandidate
   public List<SimpleExpressionProxy> getSplitExpressions
     (ModuleProxyFactory factory, CompilerOperatorTable optable);
 
+  public boolean isDisjoint();
+
 }
