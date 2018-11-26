@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="error7_small" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns="http://waters.sourceforge.net/xsd/module">
+<Module Name="error7_small" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A compiler test to check whether undefined namespaces produce a proper error message. The automaton machine1 includes a guard mentioning 'buffer.current', but buffer is an automaton, which cannot be further qualified. This should result in an UndefinedIdentifierException.</ns2:Comment>
+    <ConstantAliasList>
+        <ConstantAlias Name="states">
+            <ConstantAliasExpression>
+                <EnumSetExpression Text="[empty,full]">
+                    <SimpleIdentifier Name="empty"/>
+                    <SimpleIdentifier Name="full"/>
+                </EnumSetExpression>
+            </ConstantAliasExpression>
+        </ConstantAlias>
+    </ConstantAliasList>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>

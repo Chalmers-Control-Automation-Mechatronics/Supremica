@@ -247,7 +247,9 @@ public class RangeEstimator
                                          final CompiledRange range)
     throws TypeMismatchException
   {
-    if (range instanceof CompiledIntRange) {
+    if (range == null) {
+      return null;
+    } else if (range instanceof CompiledIntRange) {
       return (CompiledIntRange) range;
     } else {
       throw new TypeMismatchException(expr, "INTEGER");
@@ -328,14 +330,9 @@ public class RangeEstimator
   public CompiledRange visitIdentifierProxy(final IdentifierProxy ident)
     throws VisitorException
   {
-    final CompiledRange range = mContext.getVariableRange(ident);
-    if (range != null) {
-      return range;
-    } else {
-      final UndefinedIdentifierException exception =
-        new UndefinedIdentifierException(ident);
-      throw wrap(exception);
-    }
+    return mContext.getVariableRange(ident);
+    // Range estimator must work for undefined identifiers,
+    // so no exception here.
   }
 
   @Override

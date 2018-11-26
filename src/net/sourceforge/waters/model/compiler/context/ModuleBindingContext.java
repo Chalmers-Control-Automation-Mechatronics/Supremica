@@ -78,17 +78,20 @@ public class ModuleBindingContext implements BindingContext
   //# Constructors
   public ModuleBindingContext(final ModuleProxy module)
   {
-    this(module, null, null);
+    this(module, null, null, null);
   }
 
   public ModuleBindingContext(final ModuleProxy module,
                               final IdentifierProxy prefix,
-                              final SourceInfo info)
+                              final SourceInfo info,
+                              final BindingContext parent)
   {
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     mModule = module;
     mPrefix = prefix;
     mInstanceSource = info;
+    mParentModuleBindingContext =
+      parent == null ? null : parent.getModuleBindingContext();
     mMap = new ProxyAccessorHashSet<>(eq);
     mEnumAtoms = new ArrayList<>();
   }
@@ -191,6 +194,9 @@ public class ModuleBindingContext implements BindingContext
         throw new DuplicateIdentifierException(name);
       }
     }
+    if (mParentModuleBindingContext != null) {
+      mParentModuleBindingContext.insertEnumAtom(ident);
+    }
   }
 
   public List<SimpleIdentifierProxy> getEnumAtoms()
@@ -204,6 +210,7 @@ public class ModuleBindingContext implements BindingContext
   private final ModuleProxy mModule;
   private final IdentifierProxy mPrefix;
   private final SourceInfo mInstanceSource;
+  private final ModuleBindingContext mParentModuleBindingContext;
   private final ProxyAccessorSet<SimpleExpressionProxy> mMap;
   private final List<SimpleIdentifierProxy> mEnumAtoms;
 

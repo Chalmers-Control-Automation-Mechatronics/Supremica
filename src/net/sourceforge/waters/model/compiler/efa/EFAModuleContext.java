@@ -89,7 +89,7 @@ public class EFAModuleContext
                           final IdentifierProxy prefix,
                           final SourceInfo info)
   {
-    super(module, prefix, info);
+    super(module, prefix, info, null);
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final int size = 2 * module.getComponentList().size();
     mMap = new ProxyAccessorHashMap<>(eq, size);

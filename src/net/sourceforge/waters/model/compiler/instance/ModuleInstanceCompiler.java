@@ -902,7 +902,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
         final String filename = inst.getModuleName();
         final ModuleProxy module =
           mDocumentManager.load(uri, filename, ModuleProxy.class);
-        mContext = new ModuleBindingContext(module, fullname, info);
+        mContext = new ModuleBindingContext(module, fullname, info, mContext);
         mNameSpace = mNameSpace.getOrAddChildNameSpace(suffix);
         mCompilationInfo.setExceptions(new MultiEvalException());
         return visitModuleProxy(module);

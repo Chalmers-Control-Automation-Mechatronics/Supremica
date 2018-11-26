@@ -72,7 +72,8 @@ public interface BindingContext
   public boolean isEnumAtom(IdentifierProxy ident);
 
   /**
-   * Gets the module context of this binding.
+   * Gets the closest ancestor of this that is a module binding context.
+   * @return A module binding context, which may be this context itself.
    */
   public ModuleBindingContext getModuleBindingContext();
 

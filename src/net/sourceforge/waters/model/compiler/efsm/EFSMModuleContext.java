@@ -94,7 +94,7 @@ public class EFSMModuleContext
                            final SourceInfo info,
                            final CompilerOperatorTable optable)
   {
-    super(module, prefix, info);
+    super(module, prefix, info, null);
     mNextOperator = optable.getNextOperator();
     final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
     final int size = module.getComponentList().size();
