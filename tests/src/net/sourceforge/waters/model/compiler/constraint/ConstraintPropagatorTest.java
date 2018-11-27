@@ -38,6 +38,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.context.CompiledEnumRange;
 import net.sourceforge.waters.model.compiler.context.CompiledIntRange;
@@ -50,8 +52,6 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import junit.framework.TestCase;
 
 
 public class ConstraintPropagatorTest extends TestCase
@@ -168,54 +168,6 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, constraints);
   }
 
-  public void testPropagate_a_and_a_or_b()
-    throws EvalException, ParseException
-  {
-    final String[] constraints = {"a", "a | b"};
-    testPropagate(constraints, constraints);
-  }
-
-  public void testPropagate_negliteral_1()
-    throws EvalException, ParseException
-  {
-    addBooleanVariable("a");
-    addBooleanVariable("b");
-    final String[] constraints = {"!a", "a==b"};
-    final String[] expected = {"!a", "!b"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_negliteral_2()
-  throws EvalException, ParseException
-{
-  addBooleanVariable("a");
-  addBooleanVariable("b'");
-  final String[] constraints = {"!b'", "a==b'"};
-  final String[] expected = {"!a", "!b'"};
-  testPropagate(constraints, expected);
-}
-
-  public void testPropagate_increment()
-    throws EvalException, ParseException
-  {
-    addBooleanVariable("v");
-    addBooleanVariable("v'");
-    final String[] constraints = {"v' == v+1"};
-    final String[] expected = {"!v", "v'"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_enumvar()
-    throws EvalException, ParseException
-  {
-    final CompiledEnumRange range =
-      createEnumRange(new String[] {"a", "b", "c"});
-    addVariable("enumvar", range);
-    final String[] constraints = {"a==enumvar"};
-    final String[] expected = {"enumvar==a"};
-    testPropagate(constraints, expected);
-  }
-
   public void testPropagate_crc_1()
     throws EvalException, ParseException
   {
@@ -235,6 +187,90 @@ public class ConstraintPropagatorTest extends TestCase
     addVariable("crc", range);
     final String[] constraints = {"crc!=ok", "crc==ok | trouble"};
     final String[] expected = {"crc==nok", "trouble"};
+    testPropagate(constraints, expected);
+  }
+
+
+  public void testPropagate_absorption_1()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"a!=b", "a!=b | c!=d"};
+    final String[] expected = {"a!=b"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_absorption_2()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"b", "a | b | c"};
+    final String[] expected = {"b"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("x'");
+    final String[] constraints = {"x'==0"};
+    final String[] expected = {"!x'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("x'");
+    final String[] constraints = {"x'==1"};
+    final String[] expected = {"x'"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_3()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("x'", range);
+    final String[] constraints = {"x'==1"};
+    final String[] expected = {"x'==1"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_boolrange_4()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"xx'==0"};
+    final String[] expected = {"xx'==0"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_compare_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 10);
+    addVariable("x", range);
+    final String[] constraints = {"x<x"};
+    final String[] expected = null;
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_enumvar()
+    throws EvalException, ParseException
+  {
+    final CompiledEnumRange range =
+      createEnumRange(new String[] {"a", "b", "c"});
+    addVariable("enumvar", range);
+    final String[] constraints = {"a==enumvar"};
+    final String[] expected = {"enumvar==a"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_increment()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("v");
+    addBooleanVariable("v'");
+    final String[] constraints = {"v' == v+1"};
+    final String[] expected = {"!v", "v'"};
     testPropagate(constraints, expected);
   }
 
@@ -317,52 +353,6 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate_boolrange_1()
-    throws EvalException, ParseException
-  {
-    addBooleanVariable("x'");
-    final String[] constraints = {"x'==0"};
-    final String[] expected = {"!x'"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_boolrange_2()
-    throws EvalException, ParseException
-  {
-    addBooleanVariable("x'");
-    final String[] constraints = {"x'==1"};
-    final String[] expected = {"x'"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_boolrange_3()
-    throws EvalException, ParseException
-  {
-    final CompiledIntRange range = createIntRange(0, 2);
-    addVariable("x'", range);
-    final String[] constraints = {"x'==1"};
-    final String[] expected = {"x'==1"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_boolrange_4()
-    throws EvalException, ParseException
-  {
-    final String[] constraints = {"xx'==0"};
-    final String[] expected = {"xx'==0"};
-    testPropagate(constraints, expected);
-  }
-
-  public void testPropagate_compare_1()
-    throws EvalException, ParseException
-  {
-    final CompiledIntRange range = createIntRange(0, 10);
-    addVariable("x", range);
-    final String[] constraints = {"x<x"};
-    final String[] expected = null;
-    testPropagate(constraints, expected);
-  }
-
   public void testPropagate_ite_1()
     throws EvalException, ParseException
   {
@@ -409,6 +399,26 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_negliteral_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    addBooleanVariable("b");
+    final String[] constraints = {"!a", "a==b"};
+    final String[] expected = {"!a", "!b"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_negliteral_2()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("a");
+    addBooleanVariable("b'");
+    final String[] constraints = {"!b'", "a==b'"};
+    final String[] expected = {"!a", "!b'"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_sum_1()
     throws EvalException, ParseException
   {
@@ -434,11 +444,31 @@ public class ConstraintPropagatorTest extends TestCase
   {
     final CompiledIntRange range = createIntRange(0, 2);
     addVariable("x", range);
+    final String[] constraints = {"y + x + 2 == 1 + y + 1 + x"};
+    final String[] expected = {};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_sum_4()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("x", range);
+    final String[] constraints = {"x != x + 1"};
+    final String[] expected = {};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_sum_5()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(0, 2);
+    addVariable("x", range);
     final String[] constraints = {"x + 1 == x + 2"};
     testPropagate(constraints, null);
   }
 
-  public void testPropagate_sum_4()
+  public void testPropagate_sum_6()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(0, 2);
@@ -452,7 +482,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate_sum_5()
+  public void testPropagate_sum_7()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(0, 2);
@@ -463,7 +493,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate_sum_6()
+  public void testPropagate_sum_8()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(0, 2);
@@ -473,7 +503,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, null);
   }
 
-  public void testPropagate_sum_7()
+  public void testPropagate_sum_9()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(0, 2);
@@ -484,7 +514,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate_sum_8()
+  public void testPropagate_sum_10()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(-2, 2);
@@ -495,7 +525,7 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
-  public void testPropagate_sum_9()
+  public void testPropagate_sum_11()
     throws EvalException, ParseException
   {
     final CompiledIntRange range = createIntRange(-2, 2);
@@ -505,6 +535,7 @@ public class ConstraintPropagatorTest extends TestCase
     final String[] expected = {"0 < -x - y"};
     testPropagate(constraints, expected);
   }
+
 
   public void testPropagate_balllift_1()
     throws EvalException, ParseException

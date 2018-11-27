@@ -69,7 +69,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * Constants are aggregated and terms that appears both positively and
  * negatively are removed. Subterms that use the unary minus operator are
  * also included in the normalisation process. The sum simplifier does not
- * investigate multiplicative subterms, nor does it aggregate substerms that
+ * investigate multiplicative subterms, nor does it aggregate subterms that
  * appear more than once into multiplicative terms.</P>
  *
  * <P>The sum simplifier includes support for the normalisation of equations
@@ -173,7 +173,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return <CODE>true</CODE> if the equation is already normalised,
    *         <CODE>false</CODE> otherwise. A return value of <CODE>true</CODE>
-   *         means that a call to {@link #normaliseEquation(SimpleExpressionProxy,SimpleExpressionProxy,Comparator)
+   *         means that a call to {@link #normaliseEquation(SimpleExpressionProxy,SimpleExpressionProxy,BinaryOperator,Comparator)
    *         normaliseEquation()} will return a changed equation.
    */
   public boolean isNormalisedEquation
@@ -223,6 +223,10 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    * equation into the form <CODE>x = <I>new-rhs</I></CODE>.
    * @param  lhs                The left-hand side of the equation.
    * @param  rhs                The right-hand side of the equation.
+   * @param  op                 The equation operator, which should be either
+   *                            <CODE>==</CODE> or <CODE>!=</CODE>.
+   *                            Greater-than and less-than are not yet
+   *                            fully supported.
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return The normalised sum. This method always returns a new object;
    *         please use {@link #isNormalisedEquation(SimpleExpressionProxy,SimpleExpressionProxy,Comparator)
@@ -232,6 +236,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
   public BinaryExpressionProxy normaliseEquation
     (final SimpleExpressionProxy lhs,
      final SimpleExpressionProxy rhs,
+     final BinaryOperator op,
      final Comparator<SimpleExpressionProxy> leadTermComparator)
     throws EvalException
   {
@@ -247,7 +252,6 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
       final List<SimpleExpressionProxy> orderedLiterals = getOrderedLiterals();
       final SimpleExpressionProxy normalisedSum =
         createNormalisedSum(orderedLiterals);
-      final BinaryOperator op = mOperatorTable.getEqualsOperator();
       return mFactory.createBinaryExpressionProxy(op, leadTerm, normalisedSum);
     } catch (final VisitorException exception) {
       if (exception.getCause() instanceof EvalException) {

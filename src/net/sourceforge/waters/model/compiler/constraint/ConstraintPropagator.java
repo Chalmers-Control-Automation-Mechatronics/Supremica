@@ -144,7 +144,8 @@ public class ConstraintPropagator
     mNormalizationRules = new SimplificationRule[] {
       AndEliminationRule.createRule(factory, optable),
       RelationNormalizationRule.createNegativeRule(factory, optable),
-      SumSimplificationRule.createRule(factory, optable),
+      SumSimplificationRule.createRule(factory, optable.getEqualsOperator()),
+      SumSimplificationRule.createRule(factory, optable.getNotEqualsOperator()),
       mNormalizer,
       TrueEliminationRule.createRule(factory, optable),
       FalseEliminationRule.createRule(factory, optable),
@@ -159,6 +160,7 @@ public class ConstraintPropagator
       BooleanLiteralRule.createPositiveLiteralRule(factory, optable),
       BooleanLiteralRule.createNegativeLiteralRule(factory, optable),
       EqualitySubstitutionRule.createRule(factory, optable),
+      KnownLiteralReplacementRule.createRule(factory, optable),
       LeftNotEqualsRestrictionRule.createRule(factory, optable),
       LeftLessThanRestrictionRule.createRule(factory, optable),
       LeftLessEqualsRestrictionRule.createRule(factory, optable),
@@ -600,6 +602,11 @@ public class ConstraintPropagator
 
   //#########################################################################
   //# Restricted Access
+  Iterable<SimpleExpressionProxy> getCurrentNormalisedConstraints()
+  {
+    return mNormalizedConstraints;
+  }
+
   void removeConstraint(final SimpleExpressionProxy constraint)
   {
     mNormalizedConstraints.remove(constraint);
@@ -679,20 +686,31 @@ public class ConstraintPropagator
     }
   }
 
+  SimpleExpressionProxy getNegativeSubTerm(final SimpleExpressionProxy expr)
+    throws EvalException
+  {
+    if (expr instanceof UnaryExpressionProxy) {
+      final UnaryOperator notOp = mOperatorTable.getNotOperator();
+      final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
+      if (unary.getOperator() == notOp) {
+        return unary.getSubTerm();
+      }
+    }
+    return null;
+  }
+
   SimpleExpressionProxy getNegatedLiteral(final SimpleExpressionProxy expr)
     throws EvalException
   {
-    final UnaryOperator notop = mOperatorTable.getNotOperator();
-    if (expr instanceof UnaryExpressionProxy) {
-      final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
-      if (unary.getOperator() == notop) {
-        final SimpleExpressionProxy subterm = unary.getSubTerm();
-        return getNormalisedLiteral(subterm);
-      }
+    final SimpleExpressionProxy subTerm = getNegativeSubTerm(expr);
+    if (subTerm != null) {
+      return getNormalisedLiteral(subTerm);
     } else if (mNegator.match(expr, this)) {
       return mNegator.getResult(this);
+    } else {
+      final UnaryOperator notOp = mOperatorTable.getNotOperator();
+      return mFactory.createUnaryExpressionProxy(notOp, expr);
     }
-    return mFactory.createUnaryExpressionProxy(notop, expr);
   }
 
   CompiledRange estimateRange(final SimpleExpressionProxy expr)

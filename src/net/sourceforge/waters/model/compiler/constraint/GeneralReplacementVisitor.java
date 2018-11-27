@@ -44,57 +44,73 @@ import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
-import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 
 
-class ReplaceVisitor extends DefaultModuleProxyVisitor
+/**
+ * A visitor that replaces simple all occurrences of an arbitrary subterm
+ * in an expression with another subterm.
+ *
+ * @author Robi Malik
+ */
+
+class GeneralReplacementVisitor extends DefaultModuleProxyVisitor
 {
 
   //#########################################################################
   //# Singleton Pattern
-  static ReplaceVisitor getInstance()
+  static GeneralReplacementVisitor getInstance()
   {
     return SingletonHolder.INSTANCE;
   }
 
   private static class SingletonHolder {
-    private static final ReplaceVisitor INSTANCE = new ReplaceVisitor();
+    private static final GeneralReplacementVisitor INSTANCE =
+      new GeneralReplacementVisitor();
   }
 
-  private ReplaceVisitor()
+  private GeneralReplacementVisitor()
   {
+    mEquality = new ModuleEqualityVisitor(false);
   }
 
 
   //#########################################################################
   //# Invocation
-  SimpleExpressionProxy replace(final SimpleExpressionProxy template,
-                                final SimplificationRule rule,
-                                final ModuleProxyFactory factory)
+  SimpleExpressionProxy replaceAll(final SimpleExpressionProxy expr,
+                                   final SimpleExpressionProxy sought,
+                                   final SimpleExpressionProxy replacement,
+                                   final ModuleProxyFactory factory)
   {
     try {
       mFactory = factory;
-      mCurrentRule = rule;
-      return replace(template);
+      mSoughtExpression = sought;
+      mReplacement = replacement;
+      return replaceAll(expr);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     } finally {
       mFactory = null;
-      mCurrentRule = null;
+      mSoughtExpression = null;
+      mReplacement = null;
     }
   }
 
 
   //#########################################################################
   //# Auxiliary Methods
-  private SimpleExpressionProxy replace(final SimpleExpressionProxy template)
+  private SimpleExpressionProxy replaceAll(final SimpleExpressionProxy expr)
     throws VisitorException
   {
-    return (SimpleExpressionProxy) template.acceptVisitor(this);
+    if (mEquality.equals(expr, mSoughtExpression)) {
+      return mReplacement;
+    } else {
+      return (SimpleExpressionProxy) expr.acceptVisitor(this);
+    }
   }
 
 
@@ -105,15 +121,15 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     (final BinaryExpressionProxy binary)
     throws VisitorException
   {
-    final SimpleExpressionProxy oldleft = binary.getLeft();
-    final SimpleExpressionProxy newleft = replace(oldleft);
-    final SimpleExpressionProxy oldright = binary.getRight();
-    final SimpleExpressionProxy newright = replace(oldright);
-    if (newleft == oldleft && newright == oldright) {
+    final SimpleExpressionProxy oldLeft = binary.getLeft();
+    final SimpleExpressionProxy newLeft = replaceAll(oldLeft);
+    final SimpleExpressionProxy oldRight = binary.getRight();
+    final SimpleExpressionProxy newRight = replaceAll(oldRight);
+    if (newLeft == oldLeft && newRight == oldRight) {
       return binary;
     } else {
       final BinaryOperator op = binary.getOperator();
-      return mFactory.createBinaryExpressionProxy(op, newleft, newright);
+      return mFactory.createBinaryExpressionProxy(op, newLeft, newRight);
     }
   }
 
@@ -128,7 +144,7 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     boolean change = false;
     for (int i = 0; i < numArgs; i++) {
       final SimpleExpressionProxy oldArg = args.get(i);
-      final SimpleExpressionProxy newArg = replace(oldArg);
+      final SimpleExpressionProxy newArg = replaceAll(oldArg);
       if (newArg != oldArg) {
         args.set(i, newArg);
         change = true;
@@ -153,7 +169,7 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     boolean change = false;
     for (int i = 0; i < numIndexes; i++) {
       final SimpleExpressionProxy oldIndex = indexes.get(i);
-      final SimpleExpressionProxy newIndex = replace(oldIndex);
+      final SimpleExpressionProxy newIndex = replaceAll(oldIndex);
       if (newIndex != oldIndex) {
         indexes.set(i, newIndex);
         change = true;
@@ -172,14 +188,16 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
     (final QualifiedIdentifierProxy qual)
     throws VisitorException
   {
-    final IdentifierProxy oldbase = qual.getBaseIdentifier();
-    final IdentifierProxy newbase = (IdentifierProxy) replace(oldbase);
-    final IdentifierProxy oldcomp = qual.getComponentIdentifier();
-    final IdentifierProxy newcomp = (IdentifierProxy) replace(oldcomp);
-    if (newbase == oldbase && newcomp == oldcomp) {
+    final IdentifierProxy oldBase = qual.getBaseIdentifier();
+    final IdentifierProxy newBase =
+      (IdentifierProxy) oldBase.acceptVisitor(this);
+    final IdentifierProxy oldComp = qual.getComponentIdentifier();
+    final IdentifierProxy newComp =
+      (IdentifierProxy) oldComp.acceptVisitor(this);
+    if (newBase == oldBase && newComp == oldComp) {
       return qual;
     } else {
-      return mFactory.createQualifiedIdentifierProxy(newbase, newcomp);
+      return mFactory.createQualifiedIdentifierProxy(newBase, newComp);
     }
   }
 
@@ -191,36 +209,26 @@ class ReplaceVisitor extends DefaultModuleProxyVisitor
   }
 
   @Override
-  public SimpleExpressionProxy visitSimpleIdentifierProxy
-    (final SimpleIdentifierProxy ident)
-  {
-    final PlaceHolder placeholder = mCurrentRule.getPlaceHolder(ident);
-    if (placeholder != null) {
-      return placeholder.getBoundExpression();
-    } else {
-      return visitSimpleExpressionProxy(ident);
-    }
-  }
-
-  @Override
   public UnaryExpressionProxy visitUnaryExpressionProxy
     (final UnaryExpressionProxy unary)
     throws VisitorException
   {
-    final SimpleExpressionProxy oldsub = unary.getSubTerm();
-    final SimpleExpressionProxy newsub = replace(oldsub);
-    if (newsub == oldsub) {
+    final SimpleExpressionProxy oldSub = unary.getSubTerm();
+    final SimpleExpressionProxy newSub = replaceAll(oldSub);
+    if (newSub == oldSub) {
       return unary;
     } else {
       final UnaryOperator op = unary.getOperator();
-      return mFactory.createUnaryExpressionProxy(op, newsub);
+      return mFactory.createUnaryExpressionProxy(op, newSub);
     }
   }
 
 
   //#########################################################################
   //# Data Members
+  private final ModuleEqualityVisitor mEquality;
   private ModuleProxyFactory mFactory;
-  private SimplificationRule mCurrentRule;
+  private SimpleExpressionProxy mSoughtExpression;
+  private SimpleExpressionProxy mReplacement;
 
 }

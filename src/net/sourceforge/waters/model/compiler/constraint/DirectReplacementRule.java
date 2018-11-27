@@ -79,15 +79,18 @@ class DirectReplacementRule extends SimplificationRule {
 
   //#########################################################################
   //# Invocation Interface
+  @Override
   boolean isMakingReplacement()
   {
     return true;
   }
 
+  @Override
   void execute(final ConstraintPropagator propagator)
   {
     final ModuleProxyFactory factory = propagator.getFactory();
-    final ReplaceVisitor visitor = ReplaceVisitor.getInstance();
+    final PlaceholderReplacementVisitor visitor =
+      PlaceholderReplacementVisitor.getInstance();
     for (final SimpleExpressionProxy template : mReplacements) {
       final SimpleExpressionProxy replacement =
         visitor.replace(template, this, factory);

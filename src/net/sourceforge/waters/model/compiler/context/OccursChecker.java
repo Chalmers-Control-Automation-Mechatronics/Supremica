@@ -73,21 +73,22 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   private OccursChecker()
   {
+    mEquality = new ModuleEqualityVisitor(false);
   }
 
 
   //#########################################################################
   //# Invocation
   /**
-   * Searches a constraint list for a variable.
+   * Searches a constraint list for a subterm.
    * @return <CODE>true</CODE> if the given variable occurs in the given
    *         constraint list, in its primed or unprimed form.
    */
-  public boolean occurs(final SimpleExpressionProxy varname,
+  public boolean occurs(final SimpleExpressionProxy sought,
                         final ConstraintList constraints)
   {
     try {
-      mVarName = varname;
+      mSoughtExpression = sought;
       for (final SimpleExpressionProxy expr : constraints.getConstraints()) {
         if (occurs(expr)) {
           return true;
@@ -97,25 +98,25 @@ public class OccursChecker extends DefaultModuleProxyVisitor
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     } finally {
-      mVarName = null;
+      mSoughtExpression = null;
     }
   }
 
   /**
-   * Searches an expression for a variable.
+   * Searches an expression for a subterm.
    * @return <CODE>true</CODE> if the given variable occurs in the given
    *         expression, in its primed or unprimed form.
    */
-  public boolean occurs(final SimpleExpressionProxy varname,
+  public boolean occurs(final SimpleExpressionProxy sought,
                         final SimpleExpressionProxy expr)
   {
     try {
-      mVarName = varname;
+      mSoughtExpression = sought;
       return occurs(expr);
     } catch (final VisitorException exception) {
       throw exception.getRuntimeException();
     } finally {
-      mVarName = null;
+      mSoughtExpression = null;
     }
   }
 
@@ -125,8 +126,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
   private boolean occurs(final SimpleExpressionProxy expr)
     throws VisitorException
   {
-    final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-    if (eq.equals(expr, mVarName)) {
+    if (mEquality.equals(expr, mSoughtExpression)) {
       return true;
     } else {
       return (Boolean) expr.acceptVisitor(this);
@@ -207,6 +207,7 @@ public class OccursChecker extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Data Members
-  private SimpleExpressionProxy mVarName;
+  private final ModuleEqualityVisitor mEquality;
+  private SimpleExpressionProxy mSoughtExpression;
 
 }

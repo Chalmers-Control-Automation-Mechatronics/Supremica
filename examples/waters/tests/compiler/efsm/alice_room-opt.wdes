@@ -65,17 +65,17 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:Event Kind="CONTROLLABLE" Name="au.{1&lt;=yb}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="au.{yb!=1}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="au.{yb&lt;=1}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{ya==0}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xa'==xa}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==0,ya==1}"/>
-<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==0,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==0,xa'==0}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{1&lt;=xb}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{xb!=1}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==1,ya==1}"/>
-<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==1,yb==2}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==1,xa'==1}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{xb&lt;=1}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==2,ya==1}"/>
-<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==2,yb==2}"/>
-<ns2:Event Kind="CONTROLLABLE" Name="bd.{ya==0}"/>
-<ns2:Event Kind="CONTROLLABLE" Name="bd.{xa'==xa}"/>
+<ns2:Event Kind="CONTROLLABLE" Name="bd.{xb==2,xa'==2}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==0}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==1}"/>
 <ns2:Event Kind="CONTROLLABLE" Name="bl.{xb==0,yb==2}"/>
@@ -129,11 +129,11 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:EventRef Name="au.{yb&lt;=1}"/>
 <ns2:EventRef Name="bd.{xa'==xa}"/>
 <ns2:EventRef Name="bd.{xb==0,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==0,xa'==0}"/>
 <ns2:EventRef Name="bd.{xb==1,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,xa'==1}"/>
 <ns2:EventRef Name="bd.{xb==2,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,xa'==2}"/>
 <ns2:EventRef Name="bl.{xb==0,yb==1}"/>
 <ns2:EventRef Name="bl.{xb==0,yb==2}"/>
 <ns2:EventRef Name="bl.{xb==1,yb==1}"/>
@@ -184,9 +184,9 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:EventRef Name="bd.{xb!=1}"/>
 <ns2:EventRef Name="bd.{xb&lt;=1}"/>
 <ns2:EventRef Name="bd.{xb==1,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,xa'==1}"/>
 <ns2:EventRef Name="bd.{xb==2,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,xa'==2}"/>
 <ns2:EventRef Name="bl.{xb!=1}"/>
 <ns2:EventRef Name="bl.{xb&lt;=1}"/>
 <ns2:EventRef Name="bl.{xb==1,yb==0}"/>
@@ -236,11 +236,11 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:EventRef Name="bd.{xb!=1}"/>
 <ns2:EventRef Name="bd.{xb&lt;=1}"/>
 <ns2:EventRef Name="bd.{xb==0,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==0,xa'==0}"/>
 <ns2:EventRef Name="bd.{xb==1,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,xa'==1}"/>
 <ns2:EventRef Name="bd.{xb==2,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,xa'==2}"/>
 <ns2:EventRef Name="bd.{ya==0}"/>
 <ns2:EventRef Name="bl.{1&lt;=yb}"/>
 <ns2:EventRef Name="bl.{xb==0,yb==1}"/>
@@ -287,9 +287,9 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:EventRef Name="au.{xb==2,yb==2}"/>
 <ns2:EventRef Name="bd.{1&lt;=xb}"/>
 <ns2:EventRef Name="bd.{xb==1,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,xa'==1}"/>
 <ns2:EventRef Name="bd.{xb==2,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,xa'==2}"/>
 <ns2:EventRef Name="bl.{1&lt;=xb}"/>
 <ns2:EventRef Name="bl.{xb==1,yb==0}"/>
 <ns2:EventRef Name="bl.{xb==1,yb==1}"/>
@@ -371,11 +371,11 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:EventRef Name="bd.{xb!=1}"/>
 <ns2:EventRef Name="bd.{xb&lt;=1}"/>
 <ns2:EventRef Name="bd.{xb==0,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==0,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==0,xa'==0}"/>
 <ns2:EventRef Name="bd.{xb==1,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==1,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==1,xa'==1}"/>
 <ns2:EventRef Name="bd.{xb==2,ya==1}"/>
-<ns2:EventRef Name="bd.{xb==2,yb==2}"/>
+<ns2:EventRef Name="bd.{xb==2,xa'==2}"/>
 <ns2:EventRef Name="bd.{ya==0}"/>
 <ns2:EventRef Name="bl.{1&lt;=xb}"/>
 <ns2:EventRef Name="bl.{1&lt;=yb}"/>
@@ -471,11 +471,11 @@ In this test case, a hash collision occurs between the predicate for the :accept
 <ns2:Transition Source="S0" Event="bd.{xb!=1}" Target="S0"/>
 <ns2:Transition Source="S0" Event="bd.{xb&lt;=1}" Target="S0"/>
 <ns2:Transition Source="S0" Event="bd.{xb==0,ya==1}" Target="S1"/>
-<ns2:Transition Source="S0" Event="bd.{xb==0,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==0,xa'==0}" Target="S1"/>
 <ns2:Transition Source="S0" Event="bd.{xb==1,ya==1}" Target="S1"/>
-<ns2:Transition Source="S0" Event="bd.{xb==1,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==1,xa'==1}" Target="S1"/>
 <ns2:Transition Source="S0" Event="bd.{xb==2,ya==1}" Target="S1"/>
-<ns2:Transition Source="S0" Event="bd.{xb==2,yb==2}" Target="S1"/>
+<ns2:Transition Source="S0" Event="bd.{xb==2,xa'==2}" Target="S1"/>
 <ns2:Transition Source="S0" Event="bd.{ya==0}" Target="S0"/>
 <ns2:Transition Source="S0" Event="bl.{1&lt;=xb}" Target="S0"/>
 <ns2:Transition Source="S0" Event="bl.{1&lt;=yb}" Target="S0"/>

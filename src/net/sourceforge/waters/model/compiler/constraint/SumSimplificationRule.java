@@ -67,6 +67,10 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  *     x == 0        x == 1 - y - y
  * </PRE>
  *
+ * <P>The rule can be parametrised with an operator, which can be
+ * <CODE>==</CODE> or <CODE>!=</CODE>. Other inequalities are not yet
+ * supported.</P>
+ *
  * <P>The implementation of the rule is based on {@link SumSimplifier},
  * which performs the normalisation of additive terms in the {@link
  * SimpleExpressionCompiler} and provides most of the simplification logic.</P>
@@ -81,9 +85,8 @@ class SumSimplificationRule extends SimplificationRule
   //# Construction
   static SumSimplificationRule createRule
     (final ModuleProxyFactory factory,
-     final CompilerOperatorTable optable)
+     final BinaryOperator op)
   {
-    final BinaryOperator op = optable.getEqualsOperator();
     final SumPlaceHolder LHS = new SumPlaceHolder(factory, "LHS");
     final SumPlaceHolder RHS = new SumPlaceHolder(factory, "RHS");
     final SimpleIdentifierProxy lhs = LHS.getIdentifier();
@@ -142,10 +145,13 @@ class SumSimplificationRule extends SimplificationRule
     final SumSimplifier simplifier = propagator.getSumSimplifier();
     final SimpleExpressionProxy lhs = mLHS.getBoundExpression();
     final SimpleExpressionProxy rhs = mRHS.getBoundExpression();
+    final BinaryExpressionProxy template =
+      (BinaryExpressionProxy) getTemplate();
+    final BinaryOperator op = template.getOperator();
     final Comparator<SimpleExpressionProxy> comparator =
       propagator.getEquationComparator();
     final SimpleExpressionProxy constraint =
-      simplifier.normaliseEquation(lhs, rhs, comparator);
+      simplifier.normaliseEquation(lhs, rhs, op, comparator);
     propagator.addConstraint(constraint);
   }
 
