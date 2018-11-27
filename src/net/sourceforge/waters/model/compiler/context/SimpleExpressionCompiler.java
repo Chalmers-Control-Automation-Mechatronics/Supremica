@@ -217,10 +217,25 @@ public class SimpleExpressionCompiler
 
 
   public CompiledRange estimateRange(final SimpleExpressionProxy expr,
-                                         final VariableContext context)
+                                     final VariableContext context)
     throws EvalException
   {
     return mRangeEstimator.estimateRange(expr, context);
+  }
+
+  public boolean isBooleanExpression(final SimpleExpressionProxy expr,
+                                     final VariableContext context)
+    throws EvalException
+  {
+    final CompiledRange range = estimateRange(expr, context);
+    if (range == null) {
+      return false;
+    } else if (range instanceof CompiledIntRange) {
+      final CompiledIntRange intRange = (CompiledIntRange) range;
+      return intRange.isBooleanRange();
+    } else {
+      return false;
+    }
   }
 
 

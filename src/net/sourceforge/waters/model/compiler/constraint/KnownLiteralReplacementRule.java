@@ -99,8 +99,8 @@ class KnownLiteralReplacementRule extends SimplificationRule
           return true;
         }
         final SimpleExpressionProxy negative =
-          propagator.getNegativeSubTerm(expr);
-        if (negative != null && checker.occurs(subTerm, expr)) {
+          propagator.getNegativeSubTerm(subTerm);
+        if (negative != null && checker.occurs(negative, expr)) {
           mFoundSubTerm = negative;
           mReplacementValue = 0;
           return true;

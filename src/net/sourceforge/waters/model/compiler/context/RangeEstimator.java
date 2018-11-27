@@ -263,9 +263,9 @@ public class RangeEstimator
     if (range == null) {
       return null;
     } else if (range instanceof CompiledIntRange) {
-      final CompiledIntRange intrange = (CompiledIntRange) range;
-      if (intrange.getLower() >= 0 && intrange.getUpper() <= 1) {
-        return intrange;
+      final CompiledIntRange intRange = (CompiledIntRange) range;
+      if (intRange.isBooleanRange()) {
+        return intRange;
       }
     }
     throw new TypeMismatchException(expr, "BOOLEAN");
@@ -291,19 +291,13 @@ public class RangeEstimator
     throws VisitorException
   {
     try {
-      final SimpleExpressionProxy leftexpr = expr.getLeft();
-      final CompiledRange leftrange = process(leftexpr);
-      if (leftrange == null) {
-        return null;
-      }
-      final SimpleExpressionProxy rightexpr = expr.getRight();
-      final CompiledRange rightrange = process(rightexpr);
-      if (rightrange == null) {
-        return null;
-      }
+      final SimpleExpressionProxy leftExpr = expr.getLeft();
+      final CompiledRange leftRange = process(leftExpr);
+      final SimpleExpressionProxy rightExpr = expr.getRight();
+      final CompiledRange rightRange = process(rightExpr);
       final BinaryOperator op = expr.getOperator();
       final BinaryEvaluator evaluator = getEvaluator(op);
-      return evaluator.eval(leftexpr, leftrange, rightexpr, rightrange);
+      return evaluator.eval(leftExpr, leftRange, rightExpr, rightRange);
     } catch (final EvalException exception) {
       exception.provideLocation(expr);
       throw wrap(exception);
@@ -421,16 +415,21 @@ public class RangeEstimator
     //#######################################################################
     //# Evaluation
     @Override
-    CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
-                          final CompiledRange leftrange,
-                          final SimpleExpressionProxy rightexpr,
-                          final CompiledRange rightrange)
+    CompiledIntRange eval(final SimpleExpressionProxy leftExpr,
+                          final CompiledRange leftRange,
+                          final SimpleExpressionProxy rightExpr,
+                          final CompiledRange rightRange)
       throws EvalException
     {
-      final CompiledIntRange leftint = checkBooleanRange(leftexpr, leftrange);
-      final CompiledIntRange rightint =
-        checkBooleanRange(rightexpr, rightrange);
-      return eval(leftexpr, leftint, rightexpr, rightint);
+      final CompiledIntRange leftInt =
+        checkBooleanRange(leftExpr, leftRange);
+      final CompiledIntRange rightInt =
+        checkBooleanRange(rightExpr, rightRange);
+      if (leftInt == null || rightInt == null) {
+        return BOOLEAN_RANGE;
+      } else {
+        return eval(leftExpr, leftInt, rightExpr, rightInt);
+      }
     }
 
     abstract CompiledIntRange eval(SimpleExpressionProxy leftexpr,
@@ -566,6 +565,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
+      if (leftrange == null || rightrange == null) {
+        return null;
+      }
       int leftlower = leftrange.getLower();
       int leftupper = leftrange.getUpper();
       int rightlower = rightrange.getLower();
@@ -628,9 +630,11 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledRange rightrange)
     {
-      if (leftrange.size() == 1 &&
-          rightrange.size() == 1 &&
-          leftrange.equals(rightrange)) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.size() == 1 &&
+                 rightrange.size() == 1 &&
+                 leftrange.equals(rightrange)) {
         return TRUE_RANGE;
       } else if (leftrange.intersects(rightrange)) {
         return BOOLEAN_RANGE;
@@ -654,7 +658,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      if (leftrange.getLower() >= rightrange.getUpper()) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.getLower() >= rightrange.getUpper()) {
         return TRUE_RANGE;
       } else if (leftrange.getUpper() < rightrange.getLower()) {
         return FALSE_RANGE;
@@ -678,7 +684,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      if (leftrange.getLower() > rightrange.getUpper()) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.getLower() > rightrange.getUpper()) {
         return TRUE_RANGE;
       } else if (leftrange.getUpper() <= rightrange.getLower()) {
         return FALSE_RANGE;
@@ -702,7 +710,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      if (leftrange.getUpper() <= rightrange.getLower()) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.getUpper() <= rightrange.getLower()) {
         return TRUE_RANGE;
       } else if (leftrange.getLower() > rightrange.getUpper()) {
         return FALSE_RANGE;
@@ -726,7 +736,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      if (leftrange.getUpper() < rightrange.getLower()) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.getUpper() < rightrange.getLower()) {
         return TRUE_RANGE;
       } else if (leftrange.getLower() >= rightrange.getUpper()) {
         return FALSE_RANGE;
@@ -750,9 +762,13 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      final int lower = leftrange.getLower() - rightrange.getUpper();
-      final int upper = leftrange.getUpper() - rightrange.getLower();
-      return new CompiledIntRange(lower, upper);
+      if (leftrange == null || rightrange == null) {
+        return null;
+      } else {
+        final int lower = leftrange.getLower() - rightrange.getUpper();
+        final int upper = leftrange.getUpper() - rightrange.getLower();
+        return new CompiledIntRange(lower, upper);
+      }
     }
 
   }
@@ -770,6 +786,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
+      if (leftrange == null || rightrange == null) {
+        return null;
+      }
       final int leftlower = leftrange.getLower();
       final int leftupper = leftrange.getUpper();
       int rightlower = rightrange.getLower();
@@ -838,9 +857,11 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledRange rightrange)
     {
-      if (leftrange.size() == 1 &&
-          rightrange.size() == 1 &&
-          leftrange.equals(rightrange)) {
+      if (leftrange == null || rightrange == null) {
+        return BOOLEAN_RANGE;
+      } else if (leftrange.size() == 1 &&
+                 rightrange.size() == 1 &&
+                 leftrange.equals(rightrange)) {
         return FALSE_RANGE;
       } else if (leftrange.intersects(rightrange)) {
         return BOOLEAN_RANGE;
@@ -890,9 +911,13 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
-      final int lower = leftrange.getLower() + rightrange.getLower();
-      final int upper = leftrange.getUpper() + rightrange.getUpper();
-      return new CompiledIntRange(lower, upper);
+      if (leftrange == null || rightrange == null) {
+        return null;
+      } else {
+        final int lower = leftrange.getLower() + rightrange.getLower();
+        final int upper = leftrange.getUpper() + rightrange.getUpper();
+        return new CompiledIntRange(lower, upper);
+      }
     }
 
   }
@@ -910,6 +935,9 @@ public class RangeEstimator
                           final SimpleExpressionProxy rightexpr,
                           final CompiledIntRange rightrange)
     {
+      if (leftrange == null || rightrange == null) {
+        return null;
+      }
       final int leftlower = leftrange.getLower();
       final int leftupper = leftrange.getUpper();
       final int rightlower = rightrange.getLower();
@@ -953,9 +981,13 @@ public class RangeEstimator
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {
-      final int lower = -range.getUpper();
-      final int upper = -range.getLower();
-      return new CompiledIntRange(lower, upper);
+      if (range == null) {
+        return null;
+      } else {
+        final int lower = -range.getUpper();
+        final int upper = -range.getLower();
+        return new CompiledIntRange(lower, upper);
+      }
     }
 
   }
@@ -1000,7 +1032,9 @@ public class RangeEstimator
     CompiledIntRange eval(final SimpleExpressionProxy subterm,
                           final CompiledIntRange range)
     {
-      if (range.equals(FALSE_RANGE)) {
+      if (range == null) {
+        return BOOLEAN_RANGE;
+      } else if (range.equals(FALSE_RANGE)) {
         return TRUE_RANGE;
       } else if (range.equals(TRUE_RANGE)) {
         return FALSE_RANGE;
@@ -1051,7 +1085,13 @@ public class RangeEstimator
           return process(thenExpr);
         } else {
           final CompiledRange thenRange = process(thenExpr);
+          if (thenRange == null) {
+            return null;
+          }
           final CompiledRange elseRange = process(elseExpr);
+          if (elseRange == null) {
+            return null;
+          }
           return thenRange.union(elseRange);
         }
       } catch (final TypeMismatchException exception) {
@@ -1078,6 +1118,9 @@ public class RangeEstimator
         for (final SimpleExpressionProxy arg : expr.getArguments()) {
           final CompiledRange range = process(arg);
           final CompiledIntRange intRange = checkIntRange(arg, range);
+          if (intRange == null) {
+            return null;
+          }
           if (intRange.getLower() > min) {
             min = intRange.getLower();
           }
@@ -1110,6 +1153,9 @@ public class RangeEstimator
         for (final SimpleExpressionProxy arg : expr.getArguments()) {
           final CompiledRange range = process(arg);
           final CompiledIntRange intRange = checkIntRange(arg, range);
+          if (intRange == null) {
+            return null;
+          }
           if (intRange.getLower() < min) {
             min = intRange.getLower();
           }

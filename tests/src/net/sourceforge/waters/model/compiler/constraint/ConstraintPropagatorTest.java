@@ -207,6 +207,14 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_absorption_3()
+    throws EvalException, ParseException
+  {
+    final String[] constraints = {"!b", "a | b | c"};
+    final String[] expected = {"!b", "a | c"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_boolrange_1()
     throws EvalException, ParseException
   {

@@ -221,6 +221,11 @@ public class ConstraintPropagator
     return mOperatorTable;
   }
 
+  SimpleExpressionCompiler getSimpleExpressionCompiler()
+  {
+    return mSimpleExpressionCompiler;
+  }
+
   Comparator<SimpleExpressionProxy> getListComparator()
   {
     return mListComparator;
@@ -576,21 +581,6 @@ public class ConstraintPropagator
   }
 
   /**
-   * Returns whether the given expression represents a variable name
-   * (primed or unprimed) in the current context of this constraint
-   * propagator.
-   */
-  public boolean isVariable(final SimpleExpressionProxy expr)
-  {
-    if (expr instanceof IdentifierProxy) {
-      final IdentifierProxy ident = (IdentifierProxy) expr;
-      return mContext.getVariableRange(ident) != null;
-    } else {
-      return false;
-    }
-  }
-
-  /**
    * Returns the number of times the {@link #propagate()} method of this
    * constraint propagator has been called since its creation.
    */
@@ -690,8 +680,8 @@ public class ConstraintPropagator
     throws EvalException
   {
     if (expr instanceof UnaryExpressionProxy) {
-      final UnaryOperator notOp = mOperatorTable.getNotOperator();
       final UnaryExpressionProxy unary = (UnaryExpressionProxy) expr;
+      final UnaryOperator notOp = mOperatorTable.getNotOperator();
       if (unary.getOperator() == notOp) {
         return unary.getSubTerm();
       }
