@@ -206,7 +206,7 @@ public class EFSMCompiler extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
-  void setAutomatonVariablesEnabled(final boolean enabled)
+  public void setAutomatonVariablesEnabled(final boolean enabled)
   {
     mAutomatonVariablesEnabled = enabled;
   }
@@ -229,7 +229,7 @@ public class EFSMCompiler extends AbortableCompiler
     private Pass1Processor()
     {
       mGuardCompiler = new EFAGuardCompiler(mFactory, mOperatorTable);
-      mCurrentEventMap = new HashMap<>();
+      mAutVarTransitionMap = mAutomatonVariablesEnabled ? new HashMap<>() : null;
     }
 
     //#######################################################################
@@ -340,8 +340,9 @@ public class EFSMCompiler extends AbortableCompiler
       }
       if (mCurrentGuard == null) {
         // in blocked events list
-        if (!mCurrentEventMap.containsKey(decl)) {
-          mCurrentEventMap.put(decl, null);
+        if (mAutomatonVariablesEnabled &&
+            !mAutVarTransitionMap.containsKey(decl)) {
+          mAutVarTransitionMap.put(decl, null);
         }
       } else {
         // in edge label block
@@ -351,12 +352,12 @@ public class EFSMCompiler extends AbortableCompiler
           mCompilationInfo.raiseInVisitor(exception);
           return null;
         }
-        if (mCurrentComponent != null) {
+        if (mAutomatonVariablesEnabled && mCurrentComponent != null) {
           // Don't do this for the ":updates" automaton
-          TLongArrayList transitions = mCurrentEventMap.get(decl);
+          TLongArrayList transitions = mAutVarTransitionMap.get(decl);
           if (transitions == null) {
             transitions = new TLongArrayList();
-            mCurrentEventMap.put(decl, transitions);
+            mAutVarTransitionMap.put(decl, transitions);
           }
           transitions.add(mCurrentTransition);
         }
@@ -422,14 +423,18 @@ public class EFSMCompiler extends AbortableCompiler
           if (blocked != null) {
             visitLabelBlockProxy(blocked);
           }
-          mCurrentComponent.initialiseTransitions(mCurrentEventMap);
+          if (mAutomatonVariablesEnabled) {
+            mCurrentComponent.initialiseTransitions(mAutVarTransitionMap);
+          }
         }
         return mCurrentComponent;
       } finally {
         mCurrentComponent = null;
         mCurrentRangeList = null;
         mCurrentRangeMap = null;
-        mCurrentEventMap.clear();
+        if (mAutomatonVariablesEnabled) {
+          mAutVarTransitionMap.clear();
+        }
       }
     }
 
@@ -479,7 +484,7 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Data Members
     private final EFAGuardCompiler mGuardCompiler;
-    private final Map<EFSMEventDeclaration,TLongArrayList> mCurrentEventMap;
+    private final Map<EFSMEventDeclaration,TLongArrayList> mAutVarTransitionMap;
     private List<SimpleIdentifierProxy> mCurrentRangeList;
     private TObjectIntMap<SimpleNodeProxy> mCurrentRangeMap;
     private EFSMSimpleComponent mCurrentComponent;

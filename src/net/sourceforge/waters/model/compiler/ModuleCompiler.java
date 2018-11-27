@@ -284,22 +284,22 @@ public class ModuleCompiler extends AbortableCompiler
     try
     {
       if (mCompilationInfoIsDirty) {
-        mCompilationInfo = new CompilationInfo(mIsSourceInfoEnabled,
-                                               mIsMultiExceptionsEnabled);
+        mCompilationInfo = new CompilationInfo(mSourceInfoEnabled,
+                                               mMultiExceptionsEnabled);
       }
       final ModuleProxyFactory modFactory = ModuleElementFactory.getInstance();
 
       // resolve instances
       ModuleInstanceCompiler instanceCompiler = new ModuleInstanceCompiler
         (mDocumentManager, modFactory, mCompilationInfo, mInputModule);
-      instanceCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      instanceCompiler.setOptimizationEnabled(mOptimizationEnabled);
       instanceCompiler.setEnabledPropertyNames(mEnabledPropertyNames);
       instanceCompiler.setEnabledPropositionNames(mEnabledPropositionNames);
       instanceCompiler.setHISCCompileMode(mHISCCompileMode);
       checkAbort();
       mActiveAbortable = instanceCompiler;
       ModuleProxy intermediate = instanceCompiler.compile(bindings);
-      final boolean efa = instanceCompiler.getHasEFAElements();
+      final boolean efsm = instanceCompiler.getHasEFSMElements();
       mActiveAbortable = instanceCompiler = null;
       checkAbort();
 
@@ -311,13 +311,14 @@ public class ModuleCompiler extends AbortableCompiler
       mActiveAbortable = groupNodeCompiler = null;
       checkAbort();
 
-      if (efa && mIsExpandingEFATransitions) {
-        if (mIsNormalizationEnabled) {
+      if (efsm && mExpandingEFATransitions) {
+        if (mNormalizationEnabled) {
           // perform normalisation
           EFSMNormaliser normaliser =
             new EFSMNormaliser(modFactory, mCompilationInfo, intermediate);
           normaliser.setUsesEventNameBuilder(true);
           normaliser.setCreatesGuardAutomaton(true);
+          normaliser.setAutomatonVariablesEnabled(mAutomatonVariablesEnabled);
           mActiveAbortable = normaliser;
           intermediate = normaliser.compile();
           mActiveAbortable = normaliser = null;
@@ -325,6 +326,7 @@ public class ModuleCompiler extends AbortableCompiler
           // compile normalised EFSM system
           EFSMCompiler efsmCompiler =
             new EFSMCompiler(modFactory, mCompilationInfo, intermediate);
+          efsmCompiler.setAutomatonVariablesEnabled(mAutomatonVariablesEnabled);
           mActiveAbortable = efsmCompiler;
           intermediate = efsmCompiler.compile();
           mActiveAbortable = efsmCompiler = null;
@@ -343,7 +345,7 @@ public class ModuleCompiler extends AbortableCompiler
       // build product DES
       ModuleGraphCompiler graphCompiler =
         new ModuleGraphCompiler(mFactory, mCompilationInfo, intermediate);
-      graphCompiler.setOptimizationEnabled(mIsOptimizationEnabled);
+      graphCompiler.setOptimizationEnabled(mOptimizationEnabled);
       checkAbort();
       mActiveAbortable = graphCompiler;
       final ProductDESProxy des = graphCompiler.compile();
@@ -422,7 +424,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isOptimizationEnabled()
   {
-    return mIsOptimizationEnabled;
+    return mOptimizationEnabled;
   }
 
   /**
@@ -431,9 +433,9 @@ public class ModuleCompiler extends AbortableCompiler
    * remove selfloops and unused events or automata from the output.
    * This option is enabled by default.
    */
-  public void setOptimizationEnabled(final boolean enable)
+  public void setOptimizationEnabled(final boolean enabled)
   {
-    mIsOptimizationEnabled = enable;
+    mOptimizationEnabled = enabled;
   }
 
   /**
@@ -442,7 +444,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isExpandingEFATransitions()
   {
-    return mIsExpandingEFATransitions;
+    return mExpandingEFATransitions;
   }
 
   /**
@@ -454,7 +456,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public void setExpandingEFATransitions(final boolean expanding)
   {
-    mIsExpandingEFATransitions = expanding;
+    mExpandingEFATransitions = expanding;
   }
 
   /**
@@ -463,7 +465,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isNormalizationEnabled()
   {
-    return mIsNormalizationEnabled;
+    return mNormalizationEnabled;
   }
 
   /**
@@ -488,9 +490,45 @@ public class ModuleCompiler extends AbortableCompiler
    * Discrete Event Dynamic Systems. September 2015.
    * DOI:&nbsp;<A HREF="http://link.springer.com/article/10.1007/s10626-015-0217-y">10.1007/s10626-015-0217-y</A></P>
    */
-  public void setNormalizationEnabled(final boolean enable)
+  public void setNormalizationEnabled(final boolean enabled)
   {
-    mIsNormalizationEnabled = enable;
+    mNormalizationEnabled = enabled;
+  }
+
+  /**
+   * Returns whether automaton variables are enabled.
+   * @see #setAutomatonVariablesEnabled(boolean)
+   */
+  boolean isAutomatonVariablesEnabled()
+  {
+    return mAutomatonVariablesEnabled;
+  }
+
+  /**
+   * <P>Sets whether automaton variables are enabled.</P>
+   *
+   * <P>If enabled, the EFSM compiler recognises the names of automata
+   * (plant, spec, etc.) and their state names in guard expression to impose
+   * additional constraints on transitions. It is then possible to specify
+   * through a guard that a certain transition is only possible if a specific
+   * automaton is in a specific state.</P>
+   *
+   * <P>If automaton variables are enabled, the compiler must perform
+   * additional identifier checking. It is not allowed to use the same
+   * name for a variable and an automaton, or for a variable/automaton and
+   * a state. Duplicate identifiers are reported in case of such clashes.
+   * The additional identifier checking can be avoided by disabling automaton
+   * variables.</P>
+   *
+   * <P>Automaton variables are disabled by default. Automaton variables
+   * only work in combination with the normalising compiler, so the option
+   * has no effect if normalisation is disabled.</P>
+   *
+   * @see #setNormalizationEnabled(boolean)
+   */
+  void setAutomatonVariablesEnabled(final boolean enabled)
+  {
+    mAutomatonVariablesEnabled = enabled;
   }
 
   /**
@@ -499,7 +537,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isSourceInfoEnabled()
   {
-    return mIsSourceInfoEnabled;
+    return mSourceInfoEnabled;
   }
 
   /**
@@ -517,7 +555,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public void setSourceInfoEnabled(final boolean enable)
   {
-    mIsSourceInfoEnabled = enable;
+    mSourceInfoEnabled = enable;
     mCompilationInfo.setSourceInfoEnabled(enable);
   }
 
@@ -527,7 +565,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isMultiExceptionsEnabled()
   {
-    return mIsMultiExceptionsEnabled;
+    return mMultiExceptionsEnabled;
   }
 
   /**
@@ -541,7 +579,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public void setMultiExceptionsEnabled(final boolean enable)
   {
-    mIsMultiExceptionsEnabled = enable;
+    mMultiExceptionsEnabled = enable;
     mCompilationInfo.setMultiExceptionsEnabled(enable);
   }
 
@@ -644,11 +682,12 @@ public class ModuleCompiler extends AbortableCompiler
   private boolean mCompilationInfoIsDirty;
   private Abortable mActiveAbortable;
 
-  private boolean mIsOptimizationEnabled = true;
-  private boolean mIsExpandingEFATransitions = true;
-  private boolean mIsNormalizationEnabled = true;
-  private boolean mIsSourceInfoEnabled = false;
-  private boolean mIsMultiExceptionsEnabled = false;
+  private boolean mOptimizationEnabled = true;
+  private boolean mExpandingEFATransitions = true;
+  private boolean mNormalizationEnabled = true;
+  private boolean mAutomatonVariablesEnabled = false;
+  private boolean mSourceInfoEnabled = false;
+  private boolean mMultiExceptionsEnabled = false;
   private Collection<String> mEnabledPropertyNames = null;
   private Collection<String> mEnabledPropositionNames = null;
   private HISCCompileMode mHISCCompileMode = HISCCompileMode.NOT_HISC;

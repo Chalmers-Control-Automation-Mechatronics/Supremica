@@ -58,7 +58,7 @@ public class OldCompilerTest extends AbstractCompilerTest
   @Override
   void configure(final ModuleCompiler compiler)
   {
-    compiler.setNormalizationEnabled(false);
+    super.configure(compiler);
     compiler.setOptimizationEnabled(false);
     compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
@@ -69,5 +69,17 @@ public class OldCompilerTest extends AbstractCompilerTest
   {
     final String[] array = {"", ""};
     return array;
+  }
+
+  @Override
+  boolean isNormalisationEnabled()
+  {
+    return false;
+  }
+
+  @Override
+  boolean isAutomatonVariablesEnabled()
+  {
+    return false;
   }
 }

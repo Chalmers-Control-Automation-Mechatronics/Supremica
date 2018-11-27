@@ -326,7 +326,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
    * Returns whether the last instantiation run has found any variables or
    * guard/action blocks in the input module.
    */
-  public boolean getHasEFAElements()
+  public boolean getHasEFSMElements()
   {
     return mHasEFAElements;
   }

@@ -55,6 +55,7 @@ import net.sourceforge.waters.model.compiler.context.DuplicateIdentifierExceptio
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.compiler.context.UndefinedIdentifierException;
 import net.sourceforge.waters.model.compiler.efa.ActionSyntaxException;
+import net.sourceforge.waters.model.compiler.efsm.EFSMControllabilityException;
 import net.sourceforge.waters.model.compiler.graph.NondeterministicModuleException;
 import net.sourceforge.waters.model.compiler.instance.EmptyLabelBlockException;
 import net.sourceforge.waters.model.compiler.instance.EventKindException;
@@ -431,6 +432,16 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_controllability() throws IOException, WatersException
+  {
+    if (isNormalisationEnabled()) {
+      final ModuleProxy module =
+        loadModule("tests", "compiler", "efsm", "controllability");
+      final String[] culprit = {"'x'", "'event'"};
+      compileError(module, null, EFSMControllabilityException.class, culprit);
+    }
+  }
+
   public void testCompile_ControllableTestModelEFA()
     throws IOException, WatersException
   {
@@ -484,7 +495,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("efa", "transferline_efa");
-    testCompile(module);
+    if (isNormalisationEnabled()) {
+      final String[] culprit1 = {"'bufferA[1].c'", "'acceptT[0]'"};
+      final String[] culprit2 = {"'bufferA[1].c'", "'rejectT[1]'"};
+      final String[] culprit3 = {"'bufferB[1].c'", "'finishM[1]'"};
+      compileError(module, null, EFSMControllabilityException.class,
+                   culprit1, culprit2, culprit3);
+    } else {
+      testCompile(module);
+    }
   }
 
   public void testCompile_EFATransferLineNorm()
@@ -622,6 +641,20 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_normalise1() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "normalise1");
+    testCompile(module);
+  }
+
+  public void testCompile_normalise2() throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler" ,"efsm", "normalise2");
+    testCompile(module);
+  }
+
   public void testCompile_patrik1()
     throws IOException, WatersException
   {
@@ -709,13 +742,40 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases Using Automaton Variables
-  // TODO Generation of automaton variables - disabled for now
   public void testCompile_autvars1()
     throws IOException, WatersException
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "autvars1");
-    compileError(module, UndefinedIdentifierException.class, "'buffer'");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'buffer'");
+    }
+  }
+
+  public void testCompile_autvars2()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars2");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'mach1'");
+    }
+  }
+
+  public void testCompile_autvars3()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars3");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'mach1'");
+    }
   }
 
   public void testCompile_error_batch_tank_out()
@@ -723,8 +783,11 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "batch_tank_out");
-    testCompile(module);
-    //compileError(module, DuplicateIdentifierException.class, "'out'");
+    if (isAutomatonVariablesEnabled()) {
+      compileError(module, DuplicateIdentifierException.class, "'out'");
+    } else {
+      testCompile(module);
+    }
   }
 
   public void testCompile_duplicate_identifier()
@@ -732,8 +795,11 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   {
     final ModuleProxy module =
       loadModule("tests", "compiler", "efsm", "duplicate_identifier");
-    testCompile(module);
-    //compileError(module, DuplicateIdentifierException.class, "'x'");
+    if (isAutomatonVariablesEnabled()) {
+      compileError(module, DuplicateIdentifierException.class, "'x'");
+    } else {
+      testCompile(module);
+    }
   }
 
 
@@ -959,9 +1025,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   //# Customisation
   void configure(final ModuleCompiler compiler)
   {
+    compiler.setNormalizationEnabled(isNormalisationEnabled());
+    compiler.setAutomatonVariablesEnabled(isAutomatonVariablesEnabled());
   }
 
   abstract String[] getTestSuffices();
+
+  abstract boolean isNormalisationEnabled();
+
+  abstract boolean isAutomatonVariablesEnabled();
 
 
   //#########################################################################
@@ -985,8 +1057,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   private void compileError(final ModuleProxy module,
-                              final Class<? extends WatersException> exclass,
-                              final String... culprit)
+                            final Class<? extends WatersException> exclass,
+                            final String... culprit)
     throws IOException, WatersException
   {
     final String[][] culprits = {culprit};
@@ -1005,9 +1077,9 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   protected void compileError(final ModuleProxy module,
-                            final List<ParameterBindingProxy> bindings,
-                            final Class<? extends WatersException> exclass,
-                            final String[]... culprits)
+                              final List<ParameterBindingProxy> bindings,
+                              final Class<? extends WatersException> exclass,
+                              final String[]... culprits)
     throws IOException, WatersException
   {
     try {

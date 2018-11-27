@@ -37,20 +37,19 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
-public class OldOptimisingCompilerTest extends AbstractCompilerTest
+public class AutVarsCompilerTest extends AbstractCompilerTest
 {
   //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
-    return new TestSuite(OldOptimisingCompilerTest.class);
+    return new TestSuite(AutVarsCompilerTest.class);
   }
 
   public static void main(final String[] args)
   {
     junit.textui.TestRunner.run(suite());
   }
-
 
   //#########################################################################
   //# Overrides for abstract base class
@@ -59,27 +58,27 @@ public class OldOptimisingCompilerTest extends AbstractCompilerTest
   void configure(final ModuleCompiler compiler)
   {
     super.configure(compiler);
-    compiler.setOptimizationEnabled(true);
-    compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
+    compiler.setOptimizationEnabled(false);
+    compiler.setSourceInfoEnabled(true);
   }
 
   @Override
   String[] getTestSuffices()
   {
-    final String[] array = {"-opt", ""};
+    final String[] array = {"-norm", ""};
     return array;
   }
 
   @Override
   boolean isNormalisationEnabled()
   {
-    return false;
+    return true;
   }
 
   @Override
   boolean isAutomatonVariablesEnabled()
   {
-    return false;
+    return true;
   }
 }

@@ -59,8 +59,7 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
 
 
   //#########################################################################
-  //# Overrides for abstract base class
-  //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
+  //# Overridden Test Cases
   @Override
   public void testCompile_EFATransferLine()
     throws IOException, WatersException
@@ -73,10 +72,14 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
                  culprit1, culprit2, culprit3);
   }
 
+
+  //#########################################################################
+  //# Overrides for abstract base class
+  //# net.sourceforge.waters.model.compiler.AbstractCompilerTest
   @Override
   void configure(final ModuleCompiler compiler)
   {
-    compiler.setNormalizationEnabled(true);
+    super.configure(compiler);
     compiler.setOptimizationEnabled(true);
     compiler.setSourceInfoEnabled(true);
     compiler.setMultiExceptionsEnabled(true);
@@ -87,5 +90,17 @@ public class NormalisingOptimisingCompilerTest extends AbstractCompilerTest
   {
     final String[] array = {"-norm", "-opt"};
     return array;
+  }
+
+  @Override
+  boolean isNormalisationEnabled()
+  {
+    return true;
+  }
+
+  @Override
+  boolean isAutomatonVariablesEnabled()
+  {
+    return false;
   }
 }

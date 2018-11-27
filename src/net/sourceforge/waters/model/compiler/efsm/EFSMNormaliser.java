@@ -233,6 +233,11 @@ public class EFSMNormaliser extends AbortableCompiler
     mUsesEventNameBuilder = use;
   }
 
+  public void setAutomatonVariablesEnabled(final boolean enabled)
+  {
+    mAutomatonVariablesEnabled = enabled;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -1702,7 +1707,7 @@ public class EFSMNormaliser extends AbortableCompiler
   // Flags
   private boolean mCreatesGuardAutomaton = false;
   private boolean mUsesEventNameBuilder = false;
-  private final boolean mAutomatonVariablesEnabled = false;
+  private boolean mAutomatonVariablesEnabled = false;
 
   // Utilities
   private final ModuleProxyFactory mFactory;
