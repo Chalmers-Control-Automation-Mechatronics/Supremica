@@ -35,6 +35,7 @@ package net.sourceforge.waters.model.compiler;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,6 +73,7 @@ import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -706,6 +708,36 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
 
   //#########################################################################
+  //# Test Cases Using Automaton Variables
+  // TODO Generation of automaton variables - disabled for now
+  public void testCompile_autvars1()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars1");
+    compileError(module, UndefinedIdentifierException.class, "'buffer'");
+  }
+
+  public void testCompile_error_batch_tank_out()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "batch_tank_out");
+    testCompile(module);
+    //compileError(module, DuplicateIdentifierException.class, "'out'");
+  }
+
+  public void testCompile_duplicate_identifier()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "duplicate_identifier");
+    testCompile(module);
+    //compileError(module, DuplicateIdentifierException.class, "'x'");
+  }
+
+
+  //#########################################################################
   //# Test Cases Expecting Exceptions
   public void testCompile_assignmentInGuard1()
     throws IOException, WatersException
@@ -729,32 +761,12 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, TypeMismatchException.class, "'2'");
   }
 
-  // TODO Generation of automaton variables - disabled for now
-  /*
-  public void testCompile_duplicate_identifier()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "duplicate_identifier");
-    compileError(module, DuplicateIdentifierException.class, "'x'");
-  }
-  */
-
   public void testCompile_edge0()
     throws IOException, WatersException
   {
     final ModuleProxy module = loadModule("tests", "compiler", "graph", "edge0");
     compileError(module, EmptyLabelBlockException.class, "q0");
   }
-
-  // TODO Generation of automaton variables - disabled for now
-  /*
-  public void testCompile_error_batch_tank_out()
-    throws IOException, WatersException
-  {
-    final ModuleProxy module = loadModule("tests", "compiler", "efsm", "batch_tank_out");
-    compileError(module, DuplicateIdentifierException.class, "'out'");
-  }
-  */
 
   public void testCompile_error_ims()
     throws IOException, WatersException
@@ -999,7 +1011,8 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     throws IOException, WatersException
   {
     try {
-      compile(module, bindings);
+      final ProductDESProxy des = compile(module, bindings);
+      save(module, bindings, des);
       fail("Expected " + exclass.getSimpleName() + " not caught!");
     } catch (final WatersException exception) {
       checkExceptions(module, exception, exclass, culprits);
@@ -1029,32 +1042,21 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       }
     }
 
-    // Obtain components of the final file name.
-    final String name = module.getName();
+    // Save output
+    final List<ParameterBindingProxy> nameBindings =
+      appendToName ? bindings : null;
+    final String stem = save(module, nameBindings, des);
+
+    // Generate file names for expected result
     final String[] suffices = getTestSuffices();
-    final String ext = mProductDESMarshaller.getDefaultExtension();
-
-    // Manipulate bindings.
-    final StringBuilder buffer = new StringBuilder(name);
-    if (bindings != null && appendToName) {
-      for (final ParameterBindingProxy binding : bindings) {
-        buffer.append('-');
-        buffer.append(binding.getExpression().toString());
-      }
-    }
-    final String stem = buffer.toString();
-
-    // Generate file names with suffices.
     final String[] fileNames = {stem + suffices[0] + suffices[1],
-                                stem + suffices[1], stem + suffices[0], stem};
-
-    // Append the file extension.
-    for (int i = 0; i < fileNames.length; i++)
+                                stem + suffices[1],
+                                stem + suffices[0],
+                                stem};
+    final String ext = mProductDESMarshaller.getDefaultExtension();
+    for (int i = 0; i < fileNames.length; i++) {
       fileNames[i] = fileNames[i] + ext;
-
-    // Write the output file.
-    final File producedFileName = new File(mOutputDirectory, stem + ext);
-    mProductDESMarshaller.marshal(des, producedFileName);
+    }
 
     // Find the expected file, and compare.
     final File location = module.getFileLocation().getParentFile();
@@ -1096,6 +1098,31 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       new ModuleCompiler(mDocumentManager, mProductDESFactory, module);
     configure(mCompiler);
     return mCompiler.compile(bindings);
+  }
+
+  private String save(final ModuleProxy module,
+                      final List<ParameterBindingProxy> bindings,
+                      final ProductDESProxy des)
+    throws WatersMarshalException, IOException, MalformedURLException
+  {
+    // Obtain components of the final file name.
+    final String name = module.getName();
+    final String ext = mProductDESMarshaller.getDefaultExtension();
+
+    // Manipulate bindings.
+    final StringBuilder buffer = new StringBuilder(name);
+    if (bindings != null) {
+      for (final ParameterBindingProxy binding : bindings) {
+        buffer.append('-');
+        buffer.append(binding.getExpression().toString());
+      }
+    }
+    final String stem = buffer.toString();
+
+    // Write the output file.
+    final File producedFileName = new File(mOutputDirectory, stem + ext);
+    mProductDESMarshaller.marshal(des, producedFileName);
+    return stem;
   }
 
   private void compare(final DocumentProxy doc1, final File filename2)
@@ -1194,7 +1221,7 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   /**
-   * Asserts that the exception fulfills all the requirements.
+   * Asserts that the exception fulfils all the requirements.
    * <CODE>MultiEvalExceptions</CODE> are handled appropriately.
    */
   private void checkExceptions(final ModuleProxy module,
@@ -1431,7 +1458,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       checkExpectedType(trans, info, IdentifierProxy.class);
       return null;
     }
-
 
     //#######################################################################
     //# Auxiliary Methods

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="duplicate_identifier" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="e"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="plant">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="e"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="x"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="x" Event="e" Target="x"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="x">
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="0"/>
+                <ns2:State Name="1"/>
+                <ns2:State Name="2"/>
+            </ns2:StateList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

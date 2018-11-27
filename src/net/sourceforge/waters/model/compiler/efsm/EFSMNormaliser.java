@@ -360,7 +360,9 @@ public class EFSMNormaliser extends AbortableCompiler
       try {
         final Collection<NodeProxy> nodes = graph.getNodes();
         final int size = nodes.size();
-        mCurrentRange = new ArrayList<>(size);
+        if (mAutomatonVariablesEnabled) {
+          mCurrentRange = new ArrayList<>(size);
+        }
         visitCollection(nodes);
         return mCurrentRange;
       } finally {
@@ -384,16 +386,18 @@ public class EFSMNormaliser extends AbortableCompiler
     }
 
     @Override
-    public CompiledRange visitSimpleComponentProxy
+    public Object visitSimpleComponentProxy
       (final SimpleComponentProxy comp)
       throws VisitorException
     {
       try {
         final GraphProxy graph = comp.getGraph();
         final List<SimpleIdentifierProxy> list = visitGraphProxy(graph);
-        final CompiledRange range = new CompiledEnumRange(list);
-        mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
-        return range;
+        if (mAutomatonVariablesEnabled) {
+          final CompiledRange range = new CompiledEnumRange(list);
+          mRootContext.createVariables(comp, range, mFactory, mOperatorTable);
+        }
+        return null;
       } catch (final DuplicateIdentifierException exception) {
         throw wrap(exception);
       }
@@ -408,8 +412,10 @@ public class EFSMNormaliser extends AbortableCompiler
         final String name = node.getName();
         final SimpleIdentifierProxy ident =
           mFactory.createSimpleIdentifierProxy(name);
-        mRootContext.insertEnumAtom(ident);
-        mCurrentRange.add(ident);
+        if (mAutomatonVariablesEnabled) {
+          mRootContext.insertEnumAtom(ident);
+          mCurrentRange.add(ident);
+        }
         return ident;
       } catch (final EvalException exception) {
         exception.replaceLocation(node);
@@ -1693,11 +1699,12 @@ public class EFSMNormaliser extends AbortableCompiler
 
   //#########################################################################
   //# Data Members
-  // Flags:
+  // Flags
   private boolean mCreatesGuardAutomaton = false;
   private boolean mUsesEventNameBuilder = false;
+  private final boolean mAutomatonVariablesEnabled = false;
 
-  // Utilities:
+  // Utilities
   private final ModuleProxyFactory mFactory;
   private final CompilerOperatorTable mOperatorTable;
   private final EFAIdentifierComparator mComparator;
@@ -1707,7 +1714,7 @@ public class EFSMNormaliser extends AbortableCompiler
   private EFAGuardCompiler mGuardCompiler;
   private EFAEventNameBuilder mEventNameBuilder;
 
-  // Module Information:
+  // Module Information
   private final ModuleProxy mInputModule;
 
   /**

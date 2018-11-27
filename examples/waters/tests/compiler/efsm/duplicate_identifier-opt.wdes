@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="duplicate_identifier" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <ns2:EventList>
+        <ns2:Event Kind="CONTROLLABLE" Name="e"/>
+    </ns2:EventList>
+</ns2:ProductDES>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Module Name="autvars1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+    <ns2:Comment>A compiler test with automaton variables.
+The guard 'buffer==empty' in plant machine1 refers to the state of the specification 'buffer', which must be in state 'empty' for the transition to be enabled.</ns2:Comment>
+    <EventDeclList>
+        <EventDecl Kind="CONTROLLABLE" Name="start1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="break1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="repair1"/>
+        <EventDecl Kind="CONTROLLABLE" Name="start2"/>
+    </EventDeclList>
+    <ComponentList>
+        <SimpleComponent Kind="PLANT" Name="machine1">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="idle">
+                        <PointGeometry>
+                            <Point X="96" Y="16"/>
+                        </PointGeometry>
+                        <InitialArrowGeometry>
+                            <Point X="1" Y="-19"/>
+                        </InitialArrowGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="14" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="working">
+                        <PointGeometry>
+                            <Point X="48" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-34" Y="9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="down">
+                        <PointGeometry>
+                            <Point X="144" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="-6" Y="11"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="idle" Target="working">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-56" Y="-19"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="57" Y="48"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==" Text="buffer == empty">
+                                    <SimpleIdentifier Name="buffer"/>
+                                    <SimpleIdentifier Name="empty"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-116" Y="-4"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="working" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-11" Y="1"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="79" Y="60"/>
+                        </SplineGeometry>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="working" Target="down">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="break1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-20" Y="7"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                    <Edge Source="down" Target="idle">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="repair1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-15"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <GuardActionBlock>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="0" Y="20"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+        <SimpleComponent Kind="SPEC" Name="buffer">
+            <Graph>
+                <NodeList>
+                    <SimpleNode Initial="true" Name="empty">
+                        <PointGeometry>
+                            <Point X="144" Y="96"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="11" Y="-9"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                    <SimpleNode Name="full">
+                        <PointGeometry>
+                            <Point X="144" Y="176"/>
+                        </PointGeometry>
+                        <LabelGeometry Anchor="NW">
+                            <Point X="10" Y="-5"/>
+                        </LabelGeometry>
+                    </SimpleNode>
+                </NodeList>
+                <EdgeList>
+                    <Edge Source="empty" Target="full">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="finish1"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-52" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="134" Y="136"/>
+                        </SplineGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                    <Edge Source="full" Target="empty">
+                        <LabelBlock>
+                            <SimpleIdentifier Name="start2"/>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="7" Y="-9"/>
+                            </LabelGeometry>
+                        </LabelBlock>
+                        <SplineGeometry>
+                            <Point X="154" Y="136"/>
+                        </SplineGeometry>
+                        <GuardActionBlock/>
+                    </Edge>
+                </EdgeList>
+            </Graph>
+        </SimpleComponent>
+    </ComponentList>
+</Module>
