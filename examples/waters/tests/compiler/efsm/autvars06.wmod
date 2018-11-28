@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="autvars2" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="autvars06" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A compiler test with automaton variables.
-The guard 'mach1==mach2' in the plant 'cond' ensures that event eq is only possible when mach1 and mach2 are in the same state. This means that they must be either 'working' or 'down' (as 'idle1' and 'idle2' are different names and not considered equal).</ns2:Comment>
+The guard 'mach1==mach2' in the specification 'cond' requires that the event eq only occurs when mach1 and mach2 are in the same state. This means that they must be either 'working' or 'down' (as 'idle1' and 'idle2' are different names and not considered equal). The model is not controllable as the event can also occur under other circumstances.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
@@ -102,7 +102,7 @@ The guard 'mach1==mach2' in the plant 'cond' ensures that event eq is only possi
                 </EdgeList>
             </Graph>
         </SimpleComponent>
-        <SimpleComponent Kind="PLANT" Name="cond">
+        <SimpleComponent Kind="SPEC" Name="cond">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="S0">
@@ -133,7 +133,7 @@ The guard 'mach1==mach2' in the plant 'cond' ensures that event eq is only possi
                                 </BinaryExpression>
                             </Guards>
                             <LabelGeometry Anchor="NW">
-                                <Point X="7" Y="-3"/>
+                                <Point X="6" Y="0"/>
                             </LabelGeometry>
                         </GuardActionBlock>
                     </Edge>

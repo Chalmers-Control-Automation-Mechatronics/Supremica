@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="autvars1" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="autvars02" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A compiler test with automaton variables.
-The guard 'buffer==empty' in plant machine1 refers to the state of the specification 'buffer', which must be in state 'empty' for the transition to be enabled.</ns2:Comment>
+The guard 'buffer'==empty' in plant machine1 refers to the state of the specification 'buffer', which must enter state 'empty' for the transition to be enabled. Primed automaton variables cannot be used to force a state change, but refer to the state of the indicated automaton after a transion that the automaton already has. In this example, this is the same as the current state as the event 'start1' is not in the 'buffer' specification, resulting in an implicit selfloop.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="CONTROLLABLE" Name="start1"/>
         <EventDecl Kind="UNCONTROLLABLE" Name="finish1"/>
@@ -54,8 +54,10 @@ The guard 'buffer==empty' in plant machine1 refers to the state of the specifica
                         </SplineGeometry>
                         <GuardActionBlock>
                             <Guards>
-                                <BinaryExpression Operator="==" Text="buffer == empty">
-                                    <SimpleIdentifier Name="buffer"/>
+                                <BinaryExpression Operator="==" Text="buffer' == empty">
+                                    <UnaryExpression Operator="'">
+                                        <SimpleIdentifier Name="buffer"/>
+                                    </UnaryExpression>
                                     <SimpleIdentifier Name="empty"/>
                                 </BinaryExpression>
                             </Guards>

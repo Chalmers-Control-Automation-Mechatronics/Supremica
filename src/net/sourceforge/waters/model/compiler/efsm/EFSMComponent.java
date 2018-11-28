@@ -39,6 +39,7 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
@@ -164,6 +166,20 @@ abstract class EFSMComponent
     return getTransitionCode(s, t);
   }
 
+  SimpleExpressionProxy getTransitionSourceExpression
+    (final long transition, final ModuleProxyFactory factory)
+  {
+    final int s = getTransitionSource(transition);
+    return mRange.getByIndex(s, factory);
+  }
+
+  SimpleExpressionProxy getTransitionTargetExpression
+    (final long transition, final ModuleProxyFactory factory)
+  {
+    final int t = getTransitionTarget(transition);
+    return mRange.getByIndex(t, factory);
+  }
+
   TLongObjectMap<List<EFSMEventInstance>> getAllTransitions()
   {
     final TLongObjectMap<List<EFSMEventInstance>> map =
@@ -175,6 +191,22 @@ abstract class EFSMComponent
       group.collect(map, event);
     }
     return map;
+  }
+
+  boolean isValidTransition(final EFSMEventInstance inst,
+                            final long transition)
+  {
+    final TransitionGroup group = mEventInstanceMap.get(inst);
+    if (group == null) {
+      return true;
+    } else {
+      return group.contains(transition);
+    }
+  }
+
+  Collection<EFSMEventInstance> getAssociatedInstances()
+  {
+    return mEventInstanceMap.keySet();
   }
 
 
@@ -193,6 +225,11 @@ abstract class EFSMComponent
   static int getTransitionTarget(final long transition)
   {
     return (int) (transition & 0x7fffffff);
+  }
+
+  static boolean isSelfloop(final long transition)
+  {
+    return (transition >>> 32) == (transition & 0x7fffffff);
   }
 
 
@@ -214,11 +251,19 @@ abstract class EFSMComponent
       Arrays.sort(mTransitions);
       int selfloops = 0;
       for (final long transition : mTransitions) {
-        if (getTransitionSource(transition) == getTransitionTarget(transition)) {
+        if (isSelfloop(transition)) {
           selfloops++;
         }
       }
       mNumberOfSelfloops = selfloops;
+    }
+
+    private TransitionGroup(final long[] transitions,
+                            final int numSelfloops)
+    {
+      mTransitions = transitions;
+      Arrays.sort(mTransitions);
+      mNumberOfSelfloops = numSelfloops;
     }
 
     //#######################################################################
@@ -243,6 +288,20 @@ abstract class EFSMComponent
         return 0;
       } else {
         return mTransitions.length;
+      }
+    }
+
+    long getTransition(final int i)
+    {
+      return mTransitions[i];
+    }
+
+    boolean contains(final long transition)
+    {
+      if (mTransitions == null) {
+        return false;
+      } else {
+        return Arrays.binarySearch(mTransitions, transition) >= 0;
       }
     }
 
@@ -274,6 +333,35 @@ abstract class EFSMComponent
         }
         return true;
       }
+    }
+
+    //#######################################################################
+    //# Plantification
+    TransitionGroup addMissingSelfloops(final int numStates)
+    {
+      final boolean[] enabled = new boolean[numStates];
+      int numEnabled = 0;
+      for (final long transition : mTransitions) {
+        final int s = getTransitionSource(transition);
+        if (!enabled[s]) {
+          enabled[s] = true;
+          numEnabled++;
+        }
+      }
+      if (numEnabled == numStates) {
+        return this;
+      }
+      final int numAdded = numStates - numEnabled;
+      int p = mTransitions.length;
+      final long[] newTransitions = new long[p + numAdded];
+      System.arraycopy(mTransitions, 0, newTransitions, 0, p);
+      for (int s = 0; s < numStates; s++) {
+        if (!enabled[s]) {
+          newTransitions[p++] = getTransitionCode(s, s);
+        }
+      }
+      return new TransitionGroup(newTransitions,
+                                 mNumberOfSelfloops + numAdded);
     }
 
     //#######################################################################

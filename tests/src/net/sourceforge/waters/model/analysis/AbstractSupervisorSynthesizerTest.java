@@ -630,7 +630,7 @@ public abstract class AbstractSupervisorSynthesizerTest
            ProxyTools.getShortClassName(NondeterministicDESException.class) +
            " not caught!");
     } catch (final NondeterministicDESException exception) {
-      assertMentions(exception, "'blocker'");
+      assertMentionsAll(exception, "'blocker'");
     }
   }
 
@@ -645,7 +645,7 @@ public abstract class AbstractSupervisorSynthesizerTest
            ProxyTools.getShortClassName(NondeterministicDESException.class) +
            " not caught!");
     } catch (final NondeterministicDESException exception) {
-      assertMentions(exception, "'NondeterministicAut'", "'S1'", "'a2'");
+      assertMentionsAll(exception, "'NondeterministicAut'", "'S1'", "'a2'");
     }
   }
 

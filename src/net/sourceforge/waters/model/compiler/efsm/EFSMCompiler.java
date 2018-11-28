@@ -41,11 +41,11 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,10 +106,10 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**
- * <P>The third pass of the {@link ModuleCompiler}.</P>
+ * <P>A subtask of the {@link ModuleCompiler} to compile EFSM guards.</P>
  *
- * <P>This compiler accepts a module ({@link ModuleProxy}) as input and
- * produces another module as output. It expands all guard/action blocks
+ * <P>This compiler accepts a normalised module ({@link ModuleProxy}) as input
+ * and produces another module as output. It expands all guard/action blocks
  * by partitioning the events, and replaces all variables by simple
  * components. Event arrays, event aliases, foreach constructs, and
  * instantiations are not allowed in the input. Constant alias declarations
@@ -121,29 +121,24 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
  * <P>The EFA compiler ensures that the resultant module only contains
  * nodes of the following types:</P>
  * <UL>
+ * <LI>{@link ConstantAliasProxy}, where the defined type is an enumeration
+ *     type.
  * <LI>{@link EventDeclProxy}, where only simple events are defined,
- *     i.e., the list of ranges is guaranteed to be empty;</LI>
+ *     i.e., the list of ranges is guaranteed to be empty.
+ *     Also the guards must be normalised, which means that each occurrence
+ *     of a given event in an automaton has the same guard/action block,
+ *     and occurrences of the same event in different automata either have
+ *     the same or no guard/action block.</LI>
  * <LI>{@link SimpleComponentProxy}.</LI>
  * </UL>
  *
  * <P><STRONG>Algorithm</STRONG></P>
  *
- * <P>The EFA compiler proceeds in four passes:</P>
+ * <P>The EFSM compiler proceeds in three passes:</P>
  * <OL>
  * <LI>Identify all components (simple or variable) and their state
  *     space.</LI>
- * <LI>Collect and normalise guards, and identify the event variable set
- *     for each event.<BR>
- *     The event variable set consists of the set of all variables whose
- *     value may change if an event occurs. It can be computed in two
- *     different ways, depending on the configuration.<BR>
- *     In <CODE>AUTOMATON_ALPHABET</CODE> mode, the event variable set of
- *     an event is the set of all the variables updated in some simple
- *     component using the event.<BR>
- *     In <CODE>EVENT_ALPHABET</CODE> mode, the event variable set of an
- *     event is the set of all the variables updated in some guard/action
- *     block whose edge includes the event.</LI>
- * <LI>Compute event partitionings.</LI>
+ * <LI>Collect and split guards.</LI>
  * <LI>Build output automata.</LI>
  * </OL>
  *
@@ -786,6 +781,21 @@ public class EFSMCompiler extends AbortableCompiler
       }
     }
 
+    @Override
+    public boolean isValidTransition(final EFSMComponent comp,
+                                     final ConstraintList constraints,
+                                     final long transition)
+      throws EvalException
+    {
+      final SimpleExpressionProxy source =
+        comp.getTransitionSourceExpression(transition, mFactory);
+      final SimpleExpressionProxy target =
+        comp.getTransitionTargetExpression(transition, mFactory);
+      final ComponentBindingContext context =
+        new ComponentBindingContext(comp, source, target);
+      return context.eval(constraints);
+    }
+
     //#######################################################################
     //# Data Members
     private final SplitComputer mSplitComputer;
@@ -797,18 +807,24 @@ public class EFSMCompiler extends AbortableCompiler
 
 
   //#########################################################################
-  //# Inner Class AbstractTransitionIterator
-  abstract class AbstractTransitionIterator
-    implements EFSMTransitionIterator, BindingContext
+  //# Inner Class ComponentBindingContext
+  private class ComponentBindingContext
+    implements BindingContext
   {
     //#######################################################################
     //# Constructor
-    private AbstractTransitionIterator
-      (final EFSMComponent comp,
-       final ConstraintList constraints)
+    private ComponentBindingContext(final EFSMComponent comp)
     {
       mEFSMComponent = comp;
-      mConstraints = constraints;
+    }
+
+    private ComponentBindingContext(final EFSMComponent comp,
+                                    final SimpleExpressionProxy source,
+                                    final SimpleExpressionProxy target)
+    {
+      this(comp);
+      mCurrentSourceState = source;
+      mCurrentTargetState = target;
     }
 
     //#######################################################################
@@ -818,19 +834,37 @@ public class EFSMCompiler extends AbortableCompiler
       return mEFSMComponent.getRange();
     }
 
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.model.compiler.efsm.TransitionIterator
-    @Override
-    public boolean advance()
+    public SimpleExpressionProxy getCurrentSourceState()
+    {
+      return mCurrentSourceState;
+    }
+
+    public SimpleExpressionProxy getCurrentTargetState()
+    {
+      return mCurrentTargetState;
+    }
+
+    void setCurrentSourceState(final SimpleExpressionProxy expr)
+    {
+      mCurrentSourceState = expr;
+    }
+
+    void setCurrentTargetState(final SimpleExpressionProxy expr)
+    {
+      mCurrentTargetState = expr;
+    }
+
+    boolean eval(final ConstraintList constraints)
       throws EvalException
     {
-      while (advanceOnce()) {
-        if (evalConstraints()) {
-          return true;
+      for (final SimpleExpressionProxy constraint : constraints.getConstraints()) {
+        final SimpleExpressionProxy value =
+          mSimpleExpressionCompiler.eval(constraint, this);
+        if (!mSimpleExpressionCompiler.getBooleanValue(value)) {
+          return false;
         }
       }
-      return false;
+      return true;
     }
 
     //#######################################################################
@@ -842,9 +876,9 @@ public class EFSMCompiler extends AbortableCompiler
     {
       final IdentifierProxy sought = mEFSMComponent.getIdentifier();
       if (mUnprimedSearchVisitor.matches(ident, sought)) {
-        return getCurrentSourceState();
+        return mCurrentSourceState;
       } else if (mPrimedSearchVisitor.matches(ident, sought)) {
-        return getCurrentTargetState();
+        return mCurrentTargetState;
       } else {
         return mRootContext.getBoundExpression(ident);
       }
@@ -863,25 +897,50 @@ public class EFSMCompiler extends AbortableCompiler
     }
 
     //#######################################################################
-    //# Auxiliary Methods
-    abstract boolean advanceOnce() throws EvalException;
+    //# Data Members
+    private final EFSMComponent mEFSMComponent;
+    private SimpleExpressionProxy mCurrentSourceState;
+    private SimpleExpressionProxy mCurrentTargetState;
+  }
 
-    boolean evalConstraints()
-      throws EvalException
+
+  //#########################################################################
+  //# Inner Class AbstractTransitionIterator
+  abstract class AbstractTransitionIterator
+    extends ComponentBindingContext
+    implements EFSMTransitionIterator
+  {
+    //#######################################################################
+    //# Constructor
+    private AbstractTransitionIterator
+      (final EFSMComponent comp,
+       final ConstraintList constraints)
     {
-      for (final SimpleExpressionProxy constraint : mConstraints.getConstraints()) {
-        final SimpleExpressionProxy value =
-          mSimpleExpressionCompiler.eval(constraint, this);
-        if (!mSimpleExpressionCompiler.getBooleanValue(value)) {
-          return false;
-        }
-      }
-      return true;
+      super(comp);
+      mConstraints = constraints;
     }
 
     //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.model.compiler.efsm.TransitionIterator
+    @Override
+    public boolean advance()
+      throws EvalException
+    {
+      while (advanceOnce()) {
+        if (eval(mConstraints)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    abstract boolean advanceOnce() throws EvalException;
+
+    //#######################################################################
     //# Data Members
-    private final EFSMComponent mEFSMComponent;
     private final ConstraintList mConstraints;
   }
 
@@ -952,18 +1011,6 @@ public class EFSMCompiler extends AbortableCompiler
     //# Interface
     //# net.sourceforge.waters.model.compiler.efsm.TransitionIterator
     @Override
-    public SimpleExpressionProxy getCurrentSourceState()
-    {
-      return mCurrentState;
-    }
-
-    @Override
-    public SimpleExpressionProxy getCurrentTargetState()
-    {
-      return mNextState;
-    }
-
-    @Override
     public int getEstimatedSize()
     {
       return Math.max(mCurrentStates.size(), mNextStates.size());
@@ -978,19 +1025,19 @@ public class EFSMCompiler extends AbortableCompiler
         mCurrentIter = mCurrentStates.iterator();
         mNextIter = mNextStates.iterator();
         if (mCurrentIter.hasNext() && mNextIter.hasNext()) {
-          mCurrentState = mCurrentIter.next();
-          mNextState = mNextIter.next();
+          setCurrentSourceState(mCurrentIter.next());
+          setCurrentTargetState(mNextIter.next());
           return true;
         } else {
           return false;
         }
       } else if (mNextIter.hasNext()) {
-        mNextState = mNextIter.next();
+        setCurrentTargetState(mNextIter.next());
         return true;
       } else if (mCurrentIter.hasNext()) {
-        mCurrentState = mCurrentIter.next();
+        setCurrentSourceState(mCurrentIter.next());
         mNextIter = mNextStates.iterator();
-        mNextState = mNextIter.next();
+        setCurrentTargetState(mNextIter.next());
         return true;
       } else {
         return false;
@@ -1003,8 +1050,6 @@ public class EFSMCompiler extends AbortableCompiler
     private final List<? extends SimpleExpressionProxy> mNextStates;
     private Iterator<? extends SimpleExpressionProxy> mCurrentIter;
     private Iterator<? extends SimpleExpressionProxy> mNextIter;
-    private SimpleExpressionProxy mCurrentState;
-    private SimpleExpressionProxy mNextState;
   }
 
 
@@ -1031,18 +1076,6 @@ public class EFSMCompiler extends AbortableCompiler
     //# Interface
     //# net.sourceforge.waters.model.compiler.efsm.TransitionIterator
     @Override
-    public SimpleExpressionProxy getCurrentSourceState()
-    {
-      return mCurrentState;
-    }
-
-    @Override
-    public SimpleExpressionProxy getCurrentTargetState()
-    {
-      return mNextState;
-    }
-
-    @Override
     public int getEstimatedSize()
     {
       return getRange().size();
@@ -1057,33 +1090,37 @@ public class EFSMCompiler extends AbortableCompiler
       if (!mIterator.hasNext()) {
         return false;
       } else if (mOnCurrent) {
-        mCurrentState = mIterator.next();
-        mNextState =
+        final SimpleExpressionProxy source = mIterator.next();
+        setCurrentSourceState(source);
+        final SimpleExpressionProxy target =
           mSimpleExpressionCompiler.eval(mFunctionalDependency, this);
+        setCurrentTargetState(target);
         return true;
       } else {
-        mNextState = mIterator.next();
-        mCurrentState =
+        final SimpleExpressionProxy target = mIterator.next();
+        setCurrentTargetState(target);
+        final SimpleExpressionProxy source =
           mSimpleExpressionCompiler.eval(mFunctionalDependency, this);
+        setCurrentSourceState(source);
         return true;
       }
     }
 
     @Override
-    boolean evalConstraints()
+    boolean eval(final ConstraintList constraints)
       throws EvalException
     {
       final CompiledRange range = getRange();
       if (mOnCurrent) {
-        if (!range.contains(mNextState)) {
+        if (!range.contains(getCurrentTargetState())) {
           return false;
         }
       } else {
-        if (!range.contains(mCurrentState)) {
+        if (!range.contains(getCurrentSourceState())) {
           return false;
         }
       }
-      return super.evalConstraints();
+      return super.eval(constraints);
     }
 
     //#######################################################################
@@ -1091,8 +1128,6 @@ public class EFSMCompiler extends AbortableCompiler
     private final SimpleExpressionProxy mFunctionalDependency;
     private final boolean mOnCurrent;
     private final Iterator<? extends SimpleExpressionProxy> mIterator;
-    private SimpleExpressionProxy mCurrentState;
-    private SimpleExpressionProxy mNextState;
   }
 
 
@@ -1108,6 +1143,7 @@ public class EFSMCompiler extends AbortableCompiler
     private Pass3Processor()
     {
       mCloner = new SourceInfoCloner(mFactory, mCompilationInfo);
+      mLabelList = new ArrayList<>();
     }
 
     //#######################################################################
@@ -1144,44 +1180,33 @@ public class EFSMCompiler extends AbortableCompiler
     public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
-      final NodeProxy source0 = edge.getSource();
-      final NodeProxy source1 = mNodeMap.get(source0);
-      final NodeProxy target0 = edge.getTarget();
-      final NodeProxy target1 = mNodeMap.get(target0);
-      final LabelBlockProxy block0 = edge.getLabelBlock();
-      final LabelBlockProxy block1 = visitLabelBlockProxy(block0);
-      final EdgeProxy result = mFactory.createEdgeProxy
-        (source1, target1, block1, null, null, null, null);
-      mEdgeList.add(result);
-      return result;
-    }
-
-    @Override
-    public GraphProxy visitGraphProxy(final GraphProxy graph)
-      throws VisitorException
-    {
       try {
-        final Collection<NodeProxy> nodes = graph.getNodes();
-        final int numNodes = nodes.size();
-        mNodeList = new ArrayList<>(numNodes);
-        mNodeMap = new HashMap<NodeProxy,NodeProxy>(numNodes);
-        visitCollection(nodes);
-        final Collection<EdgeProxy> edges = graph.getEdges();
-        final int numEdges = edges.size();
-        mEdgeList = new ArrayList<>(numEdges);
-        visitCollection(edges);
-        final LabelBlockProxy blocked0 = graph.getBlockedEvents();
-        if (blocked0 != null) {
-          mBlockedEvents = visitLabelBlockProxy(blocked0);
+        final NodeProxy source0 = edge.getSource();
+        final StateInfo sourceInfo = mNodeMap.get(source0);
+        final NodeProxy source1 = sourceInfo.getNode();
+        final NodeProxy target0 = edge.getTarget();
+        final StateInfo targetInfo = mNodeMap.get(target0);
+        final NodeProxy target1 = targetInfo.getNode();
+        final int s = sourceInfo.getCode();
+        if (mAutomatonVariablesEnabled) {
+          final int t = targetInfo.getCode();
+          mCurrentTransition = EFSMComponent.getTransitionCode(s, t);
         }
-        final boolean deterministic = graph.isDeterministic();
-        return mFactory.createGraphProxy
-          (deterministic, mBlockedEvents, mNodeList, mEdgeList);
+        final LabelBlockProxy block0 = edge.getLabelBlock();
+        visitLabelBlockProxy(block0);
+        if (mAdditionalEventInstances != null &&
+            EFSMComponent.isSelfloop(mCurrentTransition) &&
+            !mSelfloops.get(s)) {
+          addSelfloopLabels(s);
+        }
+        final LabelBlockProxy block1 =
+          mFactory.createLabelBlockProxy(mLabelList, null);
+        final EdgeProxy result = mFactory.createEdgeProxy
+          (source1, target1, block1, null, null, null, null);
+        mEdgeList.add(result);
+        return result;
       } finally {
-        mNodeList = null;
-        mNodeMap = null;
-        mEdgeList = null;
-        mLabelList = null;
+        mLabelList.clear();
       }
     }
 
@@ -1192,26 +1217,19 @@ public class EFSMCompiler extends AbortableCompiler
       checkAbortInVisitor();
       final EFSMEventDeclaration decl =
         mEFSMEventDeclarationMap.getByProxy(ident);
-      for (final EFSMEventInstance event : decl.getInstances()) {
-        final IdentifierProxy compiled = event.createIdentifier(mFactory);
-        mLabelList.add(compiled);
-        mCompilationInfo.add(compiled, ident);
+      for (final EFSMEventInstance inst : decl.getInstances()) {
+        addEventLabel(inst, ident);
       }
       return null;
     }
 
     @Override
-    public LabelBlockProxy visitLabelBlockProxy(final LabelBlockProxy block)
+    public Object visitLabelBlockProxy(final LabelBlockProxy block)
       throws VisitorException
     {
-      try {
-        mLabelList = new LinkedList<IdentifierProxy>();
-        final List<Proxy> list = block.getEventIdentifierList();
-        visitCollection(list);
-        return mFactory.createLabelBlockProxy(mLabelList, null);
-      } finally {
-        mLabelList = null;
-      }
+      final List<Proxy> list = block.getEventIdentifierList();
+      visitCollection(list);
+      return null;
     }
 
     @Override
@@ -1220,29 +1238,61 @@ public class EFSMCompiler extends AbortableCompiler
       throws VisitorException
     {
       try {
+        final EFSMSimpleComponent simple =
+          (EFSMSimpleComponent) mCurrentEFSMComponent;
+        mAdditionalEventInstances = simple.getAdditionalEventInstances();
+        mCurrentTransition = -1;
         final GraphProxy graph = comp.getGraph();
         final Collection<NodeProxy> nodes = graph.getNodes();
         final int numNodes = nodes.size();
         mNodeList = new ArrayList<>(numNodes);
-        mNodeMap = new HashMap<NodeProxy,NodeProxy>(numNodes);
+        mNodeMap = new HashMap<>(numNodes);
         visitCollection(nodes);
         final Collection<EdgeProxy> edges = graph.getEdges();
         final int numEdges = edges.size();
         mEdgeList = new ArrayList<>(numEdges);
+        mSelfloops = new BitSet(numNodes);
         visitCollection(edges);
+        if (mAdditionalEventInstances != null) {
+          for (int s = mSelfloops.nextClearBit(0);
+               s < numNodes;
+               s = mSelfloops.nextClearBit(s + 1)) {
+            try {
+              addSelfloopLabels(s);
+              if (!mLabelList.isEmpty()) {
+                final NodeProxy node = mNodeList.get(s);
+                final LabelBlockProxy block =
+                  mFactory.createLabelBlockProxy(mLabelList, null);
+                final EdgeProxy edge =  mFactory.createEdgeProxy
+                  (node, node, block, null, null, null, null);
+                mEdgeList.add(edge);
+              }
+            } finally {
+              mLabelList.clear();
+            }
+          }
+        }
         final LabelBlockProxy blocked0 = graph.getBlockedEvents();
         if (blocked0 != null) {
-          mBlockedEvents = visitLabelBlockProxy(blocked0);
+          try {
+            mCurrentTransition = -1;
+            visitLabelBlockProxy(blocked0);
+            mBlockedEvents = mFactory.createLabelBlockProxy(mLabelList, null);
+          } finally {
+            mLabelList.clear();
+          }
         }
         final ComponentKind kind = comp.getKind();
         final boolean deterministic = graph.isDeterministic();
         final Map<String,String> attribs = comp.getAttributes();
         return createSimpleComponent(comp, kind, deterministic, attribs);
       } finally {
+        mAdditionalEventInstances = null;
         mNodeList = null;
         mNodeMap = null;
         mBlockedEvents = null;
         mEdgeList = null;
+        mSelfloops = null;
       }
     }
 
@@ -1259,8 +1309,10 @@ public class EFSMCompiler extends AbortableCompiler
       final boolean initial = node.isInitial();
       final SimpleNodeProxy result = mFactory.createSimpleNodeProxy
         (name, props1, attribs, initial, null, null, null);
+      final int code = mNodeList.size();
+      final StateInfo info = new StateInfo(result, code);
       mNodeList.add(result);
-      mNodeMap.put(node, result);
+      mNodeMap.put(node, info);
       mCompilationInfo.add(result, node);
       return result;
     }
@@ -1280,6 +1332,31 @@ public class EFSMCompiler extends AbortableCompiler
         mEdgeList = null;
       }
     }
+
+    //#######################################################################
+    //# Simple Component Compilation
+    private void addSelfloopLabels(final int s)
+    {
+      mCurrentTransition = EFSMComponent.getTransitionCode(s, s);
+      mSelfloops.set(s);
+      for (final EFSMEventInstance inst : mAdditionalEventInstances) {
+        addEventLabel(inst, null);
+      }
+    }
+
+    private void addEventLabel(final EFSMEventInstance inst,
+                               final IdentifierProxy location)
+    {
+      if (mCurrentTransition < 0 ||
+          mCurrentEFSMComponent.isValidTransition(inst, mCurrentTransition)) {
+        final IdentifierProxy compiled = inst.createIdentifier(mFactory);
+        mLabelList.add(compiled);
+        if (location != null) {
+          mCompilationInfo.add(compiled, location);
+        }
+      }
+    }
+
 
     //#######################################################################
     //# Variable Compilation
@@ -1384,16 +1461,49 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Data Members
     private final ModuleProxyCloner mCloner;
+    private final List<IdentifierProxy> mLabelList;
 
     private List<SimpleComponentProxy> mComponents;
     private EFSMComponent mCurrentEFSMComponent;
-    private List<NodeProxy> mNodeList;
-    private Map<NodeProxy,NodeProxy> mNodeMap;
+    private List<EFSMEventInstance> mAdditionalEventInstances;
+    private List<SimpleNodeProxy> mNodeList;
+    private Map<SimpleNodeProxy,StateInfo> mNodeMap;
     private LabelBlockProxy mBlockedEvents;
     private List<EdgeProxy> mEdgeList;
-    private List<IdentifierProxy> mLabelList;
+    private BitSet mSelfloops;
+    private long mCurrentTransition;
   }
 
+
+  //#########################################################################
+  //# Inner Class StateInfo
+  private static class StateInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private StateInfo(final SimpleNodeProxy node, final int code)
+    {
+      mNode = node;
+      mCode = code;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private SimpleNodeProxy getNode()
+    {
+      return mNode;
+    }
+
+    private int getCode()
+    {
+      return mCode;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final SimpleNodeProxy mNode;
+    private final int mCode;
+  }
 
 
   //#########################################################################

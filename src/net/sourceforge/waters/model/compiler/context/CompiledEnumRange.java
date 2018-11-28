@@ -140,6 +140,13 @@ public class CompiledEnumRange implements CompiledRange
   }
 
   @Override
+  public SimpleExpressionProxy getByIndex(final int index,
+                                          final ModuleProxyFactory factory)
+  {
+    return mAtoms.get(index);
+  }
+
+  @Override
   public boolean contains(final SimpleExpressionProxy value)
   {
     if (value instanceof IdentifierProxy) {

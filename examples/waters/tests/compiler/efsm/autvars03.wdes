@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars03" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test with automaton variables.
+The guards in plant 'select' refer to the state of the plant 'clock', which must be in state 's1' or 's2' for the transition to be enabled. This distinguishes the 'tick' transition that exist in 'clock', while also removing the 'tick' transition from state 's0' which is not enabled by any guard.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tick.{clock==s1}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tick.{clock==s2}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tock"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="toggle"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="clock">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tick.{clock==s1}"/>
+                <ns2:EventRef Name="tick.{clock==s2}"/>
+                <ns2:EventRef Name="tock"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+                <ns2:State Name="s2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="tock" Target="s1"/>
+                <ns2:Transition Source="s1" Event="tick.{clock==s1}" Target="s2"/>
+                <ns2:Transition Source="s1" Event="tock" Target="s2"/>
+                <ns2:Transition Source="s2" Event="tick.{clock==s2}" Target="s0"/>
+                <ns2:Transition Source="s2" Event="tock" Target="s0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="select">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tick.{clock==s1}"/>
+                <ns2:EventRef Name="tick.{clock==s2}"/>
+                <ns2:EventRef Name="toggle"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="tick.{clock==s1}" Target="s0"/>
+                <ns2:Transition Source="s0" Event="toggle" Target="s1"/>
+                <ns2:Transition Source="s1" Event="tick.{clock==s2}" Target="s1"/>
+                <ns2:Transition Source="s1" Event="toggle" Target="s0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

@@ -48,6 +48,9 @@ public interface CompiledRange {
 
   public int indexOf(SimpleExpressionProxy value);
 
+  public SimpleExpressionProxy getByIndex(int index,
+                                          ModuleProxyFactory factory);
+
   public boolean contains(SimpleExpressionProxy value);
 
   public boolean intersects(CompiledRange range);

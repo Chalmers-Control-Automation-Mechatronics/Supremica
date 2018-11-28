@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars04" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test with automaton variables.
+The guards in plant 'select' refer to the state of the plant 'clock', which must not be in state 's1' or 's2' for the transition to be enabled. Some of the selfloops for event 'at' must be removed from plant 'clock', while also adding selfloops for event 'notat' that is not yet in the alphabet.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="at"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="notat"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tick"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="toggle"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="clock">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="at"/>
+                <ns2:EventRef Name="notat"/>
+                <ns2:EventRef Name="tick"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+                <ns2:State Name="s2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="notat" Target="s0"/>
+                <ns2:Transition Source="s0" Event="tick" Target="s1"/>
+                <ns2:Transition Source="s1" Event="at" Target="s1"/>
+                <ns2:Transition Source="s1" Event="tick" Target="s2"/>
+                <ns2:Transition Source="s2" Event="notat" Target="s2"/>
+                <ns2:Transition Source="s2" Event="tick" Target="s0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="select">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="at"/>
+                <ns2:EventRef Name="notat"/>
+                <ns2:EventRef Name="toggle"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="notat" Target="s0"/>
+                <ns2:Transition Source="s0" Event="toggle" Target="s1"/>
+                <ns2:Transition Source="s1" Event="at" Target="s1"/>
+                <ns2:Transition Source="s1" Event="toggle" Target="s0"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

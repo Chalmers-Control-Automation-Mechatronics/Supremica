@@ -860,6 +860,16 @@ public abstract class AbstractControllabilityCheckerTest
 
 
   //#########################################################################
+  //# Test Cases --- tests/compiler/efsm
+  public void testAutVars06() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "compiler", "efsm", "autvars06.wmod");
+    runModelVerifier(des, false);
+  }
+
+
+  //#########################################################################
   //# Test Cases -- Parameterised
   public void testTransferline__1() throws Exception
   {
@@ -911,6 +921,7 @@ public abstract class AbstractControllabilityCheckerTest
   @Override
   protected void configure(final ModuleCompiler compiler)
   {
+    super.configure(compiler);
     final Collection<String> empty = Collections.emptyList();
     compiler.setEnabledPropositionNames(empty);
     compiler.setEnabledPropertyNames(empty);

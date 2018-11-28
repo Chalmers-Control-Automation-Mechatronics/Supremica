@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars06" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<Comment>A compiler test with automaton variables.
+The guard 'mach1==mach2' in the specification 'cond' requires that the event eq only occurs when mach1 and mach2 are in the same state. This means that they must be either 'working' or 'down' (as 'idle1' and 'idle2' are different names and not considered equal). The model is not controllable as the event can also occur under other circumstances.</Comment>
+<ns2:EventList>
+<ns2:Event Kind="UNCONTROLLABLE" Name="break1"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="break2"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="eq.{mach1==mach2}.{mach1==down}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="eq.{mach1==mach2}.{mach1==working}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="eq.{mach1!=mach2}.{mach1==down}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="eq.{mach1!=mach2}.{mach1==idle1}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="eq.{mach1!=mach2}.{mach1==working}"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="finish1"/>
+<ns2:Event Kind="UNCONTROLLABLE" Name="finish2"/>
+<ns2:Event Kind="CONTROLLABLE" Name="repair1"/>
+<ns2:Event Kind="CONTROLLABLE" Name="repair2"/>
+<ns2:Event Kind="CONTROLLABLE" Name="start1"/>
+<ns2:Event Kind="CONTROLLABLE" Name="start2"/>
+</ns2:EventList>
+<ns2:AutomataList>
+<ns2:Automaton Kind="PLANT" Name="mach1">
+<ns2:EventRefList>
+<ns2:EventRef Name="break1"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==down}"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==idle1}"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==working}"/>
+<ns2:EventRef Name="eq.{mach1==mach2}.{mach1==down}"/>
+<ns2:EventRef Name="eq.{mach1==mach2}.{mach1==working}"/>
+<ns2:EventRef Name="finish1"/>
+<ns2:EventRef Name="repair1"/>
+<ns2:EventRef Name="start1"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="idle1"/>
+<ns2:State Name="working"/>
+<ns2:State Name="down"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="idle1" Event="start1" Target="working"/>
+<ns2:Transition Source="working" Event="finish1" Target="idle1"/>
+<ns2:Transition Source="working" Event="break1" Target="down"/>
+<ns2:Transition Source="down" Event="repair1" Target="idle1"/>
+<ns2:Transition Source="idle1" Event="eq.{mach1!=mach2}.{mach1==idle1}" Target="idle1"/>
+<ns2:Transition Source="working" Event="eq.{mach1!=mach2}.{mach1==working}" Target="working"/>
+<ns2:Transition Source="working" Event="eq.{mach1==mach2}.{mach1==working}" Target="working"/>
+<ns2:Transition Source="down" Event="eq.{mach1!=mach2}.{mach1==down}" Target="down"/>
+<ns2:Transition Source="down" Event="eq.{mach1==mach2}.{mach1==down}" Target="down"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+<ns2:Automaton Kind="SPEC" Name="cond">
+<ns2:EventRefList>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==down}"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==idle1}"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==working}"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="S0"/>
+</ns2:StateList>
+</ns2:Automaton>
+<ns2:Automaton Kind="PLANT" Name="mach2">
+<ns2:EventRefList>
+<ns2:EventRef Name="break2"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==down}"/>
+<ns2:EventRef Name="eq.{mach1!=mach2}.{mach1==working}"/>
+<ns2:EventRef Name="eq.{mach1==mach2}.{mach1==down}"/>
+<ns2:EventRef Name="eq.{mach1==mach2}.{mach1==working}"/>
+<ns2:EventRef Name="finish2"/>
+<ns2:EventRef Name="repair2"/>
+<ns2:EventRef Name="start2"/>
+</ns2:EventRefList>
+<ns2:StateList>
+<ns2:State Initial="true" Name="idle2"/>
+<ns2:State Name="working"/>
+<ns2:State Name="down"/>
+</ns2:StateList>
+<ns2:TransitionList>
+<ns2:Transition Source="idle2" Event="start2" Target="working"/>
+<ns2:Transition Source="working" Event="break2" Target="down"/>
+<ns2:Transition Source="working" Event="finish2" Target="idle2"/>
+<ns2:Transition Source="down" Event="repair2" Target="idle2"/>
+<ns2:Transition Source="idle2" Event="eq.{mach1!=mach2}.{mach1==down}" Target="idle2"/>
+<ns2:Transition Source="idle2" Event="eq.{mach1!=mach2}.{mach1==working}" Target="idle2"/>
+<ns2:Transition Source="working" Event="eq.{mach1!=mach2}.{mach1==down}" Target="working"/>
+<ns2:Transition Source="working" Event="eq.{mach1==mach2}.{mach1==working}" Target="working"/>
+<ns2:Transition Source="down" Event="eq.{mach1!=mach2}.{mach1==working}" Target="down"/>
+<ns2:Transition Source="down" Event="eq.{mach1==mach2}.{mach1==down}" Target="down"/>
+</ns2:TransitionList>
+</ns2:Automaton>
+</ns2:AutomataList>
+</ns2:ProductDES>

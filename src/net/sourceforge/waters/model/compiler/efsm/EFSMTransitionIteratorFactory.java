@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.compiler.efsm;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
+import net.sourceforge.waters.model.expr.EvalException;
 
 
 /**
@@ -46,4 +47,8 @@ interface EFSMTransitionIteratorFactory
     (EFSMComponent comp,
      ConstraintList constraints);
 
+  public boolean isValidTransition(EFSMComponent comp,
+                                   ConstraintList constraints,
+                                   long transition)
+    throws EvalException;
 }

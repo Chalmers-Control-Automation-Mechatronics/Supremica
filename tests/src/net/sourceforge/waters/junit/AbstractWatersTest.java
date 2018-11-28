@@ -37,6 +37,9 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
+
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
@@ -46,9 +49,6 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
-
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
 
 public abstract class AbstractWatersTest
@@ -224,8 +224,8 @@ public abstract class AbstractWatersTest
    *                    each of these strings, then an {@link
    *                    AssertionFailedError} will result.
    */
-  public void assertMentions(final WatersException exception,
-                             final String... culprits)
+  public void assertMentionsAll(final WatersException exception,
+                                final String... culprits)
   {
     final String msg = exception.getMessage();
     for (final String culprit : culprits) {

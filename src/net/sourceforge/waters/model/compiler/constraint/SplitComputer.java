@@ -400,6 +400,8 @@ public class SplitComputer
         }
         return true;
       } else {
+        // This method is only called for ground identifiers,
+        // so we can throw an exception of not defined
         final UndefinedIdentifierException exception =
           new UndefinedIdentifierException(ident);
         throw wrap(exception);

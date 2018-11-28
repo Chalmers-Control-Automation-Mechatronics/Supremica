@@ -742,11 +742,11 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
 
   //#########################################################################
   //# Test Cases Using Automaton Variables
-  public void testCompile_autvars1()
+  public void testCompile_autvars01()
     throws IOException, WatersException
   {
     final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "autvars1");
+      loadModule("tests", "compiler", "efsm", "autvars01");
     if (isAutomatonVariablesEnabled()) {
       testCompile(module);
     } else {
@@ -754,11 +754,47 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     }
   }
 
-  public void testCompile_autvars2()
+  public void testCompile_autvars02()
     throws IOException, WatersException
   {
     final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "autvars2");
+      loadModule("tests", "compiler", "efsm", "autvars02");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'buffer'");
+    }
+  }
+
+  public void testCompile_autvars03()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars03");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, null, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars04()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars04");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, null, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars05()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars05");
     if (isAutomatonVariablesEnabled()) {
       testCompile(module);
     } else {
@@ -766,16 +802,24 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     }
   }
 
-  public void testCompile_autvars3()
+  public void testCompile_autvars06()
     throws IOException, WatersException
   {
     final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "autvars3");
+      loadModule("tests", "compiler", "efsm", "autvars06");
     if (isAutomatonVariablesEnabled()) {
       testCompile(module);
     } else {
       compileError(module, UndefinedIdentifierException.class, "'mach1'");
     }
+  }
+
+  public void testCompile_autvars07()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars07");
+    testCompile(module);
   }
 
   public void testCompile_error_batch_tank_out()
@@ -1065,7 +1109,6 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     compileError(module, null, exclass, culprits);
   }
 
-  @SuppressWarnings("unused")
   private void compileError(final ModuleProxy module,
                             final List<ParameterBindingProxy> bindings,
                             final Class<? extends WatersException> exclass,
@@ -1213,28 +1256,13 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
   }
 
   /**
-   * Checks if the exception mentions all of the phrases in the culprit.
-   */
-  private boolean mentions(final WatersException exception,
-                           final String[] culprit)
-  {
-    final String msg = exception.getMessage();
-    for (final String phrase : culprit) {
-      if (!msg.contains(phrase)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * Asserts that the culprit is mentioned by at least one exception.
    */
   private void assertMentioned(final String[] culprit,
                                final Collection<? extends WatersException> exceptions)
   {
     for (final WatersException exception : exceptions) {
-      if (mentions(exception, culprit)) {
+      if (mentionsAll(exception, culprit)) {
         return;
       }
     }
@@ -1249,10 +1277,10 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
                                  final String[][] culprits)
   {
     if (culprits.length == 1) {
-      assertMentions(exception, culprits[0]);
+      assertMentionsAll(exception, culprits[0]);
     } else {
       for (final String[] culprit : culprits) {
-        if (mentions(exception, culprit)) {
+        if (mentionsAll(exception, culprit)) {
           return;
         }
       }
@@ -1261,6 +1289,21 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
            "' does not mention any of the culprits: " +
            Arrays.deepToString(culprits) + "!");
     }
+  }
+
+  /**
+   * Checks if the exception mentions all of the phrases in the culprit.
+   */
+  private boolean mentionsAll(final WatersException exception,
+                              final String[] culprit)
+  {
+    final String msg = exception.getMessage();
+    for (final String phrase : culprit) {
+      if (!msg.contains(phrase)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**
@@ -1526,8 +1569,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     public Object visitTransitionProxy(final TransitionProxy trans)
     {
       final SourceInfo info = mCompiler.getSourceInfoMap().get(trans);
-      checkInModule(trans, info);
-      checkExpectedType(trans, info, IdentifierProxy.class);
+      if (info == null) {
+        // Not all transitions have source info when automaton variables are used
+        assertTrue("Missing source information for transition!",
+                   isAutomatonVariablesEnabled());
+      } else {
+        checkInModule(trans, info);
+        checkExpectedType(trans, info, IdentifierProxy.class);
+      }
       return null;
     }
 

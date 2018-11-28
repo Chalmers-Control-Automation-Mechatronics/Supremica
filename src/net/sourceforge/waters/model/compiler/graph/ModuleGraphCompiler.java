@@ -682,7 +682,10 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
         final StateProxy targetstate = mTarget.getState();
         final TransitionProxy trans =
           mFactory.createTransitionProxy(sourcestate, mEvent, targetstate);
-        mCompilationInfo.add(trans, mLocation);
+        // Source info only for transitions that appear in the input module
+        if (mCompilationInfo.getSourceInfo(mLocation) != null) {
+          mCompilationInfo.add(trans, mLocation);
+        }
         return trans;
       }
     }

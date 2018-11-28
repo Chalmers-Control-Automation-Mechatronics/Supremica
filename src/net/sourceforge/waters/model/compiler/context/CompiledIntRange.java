@@ -129,6 +129,13 @@ public class CompiledIntRange implements CompiledRange
   }
 
   @Override
+  public SimpleExpressionProxy getByIndex(final int index,
+                                          final ModuleProxyFactory factory)
+  {
+    return factory.createIntConstantProxy(mLower + index);
+  }
+
+  @Override
   public boolean contains(final SimpleExpressionProxy value)
   {
     return indexOf(value) >= 0;

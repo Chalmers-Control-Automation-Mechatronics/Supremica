@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<ns2:ProductDES Name="autvars2" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<ns2:ProductDES Name="autvars05" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
     <Comment>A compiler test with automaton variables.
 The guard 'mach1==mach2' in the plant 'cond' ensures that event eq is only possible when mach1 and mach2 are in the same state. This means that they must be either 'working' or 'down' (as 'idle1' and 'idle2' are different names and not considered equal).</Comment>
     <ns2:EventList>
@@ -36,6 +36,19 @@ The guard 'mach1==mach2' in the plant 'cond' ensures that event eq is only possi
                 <ns2:Transition Source="working" Event="break1" Target="down"/>
                 <ns2:Transition Source="working" Event="eq.{mach1==working}" Target="working"/>
                 <ns2:Transition Source="working" Event="finish1" Target="idle1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="cond">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="eq.{mach1==down}"/>
+                <ns2:EventRef Name="eq.{mach1==working}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="S0"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="S0" Event="eq.{mach1==down}" Target="S0"/>
+                <ns2:Transition Source="S0" Event="eq.{mach1==working}" Target="S0"/>
             </ns2:TransitionList>
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="mach2">

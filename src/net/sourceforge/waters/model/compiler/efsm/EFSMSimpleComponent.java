@@ -35,13 +35,19 @@ package net.sourceforge.waters.model.compiler.efsm;
 
 import gnu.trove.list.array.TLongArrayList;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -79,20 +85,7 @@ class EFSMSimpleComponent extends EFSMComponent
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.compiler.efsm.EFSMComponent
-  @Override
-  TransitionGroup createTransitionGroup
-    (final EFSMEventInstance inst,
-     final ConstraintList constraints,
-     final EFSMTransitionIteratorFactory factory)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
+  //# Building the Transition Relation
   void initialiseTransitions(final Map<EFSMEventDeclaration,TLongArrayList> map)
   {
     final int size = map.size();
@@ -114,6 +107,114 @@ class EFSMSimpleComponent extends EFSMComponent
       }
       mEventMap.put(decl, group);
     }
+    mTransitionGroupMap = new HashMap<>(size);
+  }
+
+  List<EFSMEventInstance> getAdditionalEventInstances()
+  {
+    if (mEventMap == null) {
+      return null;
+    }
+    final Collection<EFSMEventInstance> associated = getAssociatedInstances();
+    final List<EFSMEventInstance> result = new ArrayList<>(associated.size());
+    for (final EFSMEventInstance inst : associated) {
+      final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
+      if (!mEventMap.containsKey(decl)) {
+        result.add(inst);
+      }
+    }
+    if (result.isEmpty()) {
+      return null;
+    }
+    Collections.sort(result);
+    return result;
+  }
+
+  boolean isConsideredControllable(final EFSMEventDeclaration decl)
+  {
+    switch (getKind()) {
+    case PLANT:
+      return true;
+    case SPEC:
+    case SUPERVISOR:
+      return decl.getKind() == EventKind.CONTROLLABLE;
+    default:
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.compiler.efsm.EFSMComponent
+  @Override
+  TransitionGroup createTransitionGroup
+    (final EFSMEventInstance inst,
+     final ConstraintList constraints,
+     final EFSMTransitionIteratorFactory factory)
+    throws EvalException
+  {
+    final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
+    final TransitionGroup master = mEventMap.get(decl);
+    if (master != null && master.isEmpty()) {
+      return isConsideredControllable(decl) ? null : master;
+    }
+    final GroupKey key = new GroupKey(master, constraints);
+    TransitionGroup group = getTransitionGroup(key);
+    if (group == null) {
+      final TLongArrayList transitions;
+      if (master ==  null) {
+        final int numStates = getRange().size();
+        transitions = new TLongArrayList(numStates);
+        for (int s = 0; s < numStates; s++) {
+          final long transition = getTransitionCode(s, s);
+          if (factory.isValidTransition(this, constraints, transition)) {
+            transitions.add(transition);
+          }
+        }
+      } else {
+        final int numTransitions = master.getNumberOfTransitions();
+        transitions = new TLongArrayList(numTransitions);
+        for (int i = 0; i < numTransitions; i++) {
+          final long transition = master.getTransition(i);
+          if (factory.isValidTransition(this, constraints, transition)) {
+            transitions.add(transition);
+          }
+        }
+      }
+      group = addTransitionGroup(key, transitions);
+    }
+    if (group.isEmpty() && isConsideredControllable(decl)) {
+      return null;
+    } else {
+      return group;
+    }
+  }
+
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private TransitionGroup getTransitionGroup(final GroupKey key)
+  {
+    return mTransitionGroupMap.get(key);
+  }
+
+  private TransitionGroup addTransitionGroup(final GroupKey key,
+                                             final TLongArrayList transitions)
+  {
+    if (transitions.size() == 0) {
+      return addEmptyTransitionGroup(key);
+    } else {
+      final TransitionGroup group = new TransitionGroup(transitions);
+      mTransitionGroupMap.put(key, group);
+      return group;
+    }
+  }
+
+  private TransitionGroup addEmptyTransitionGroup(final GroupKey key)
+  {
+    mTransitionGroupMap.put(key, EMPTY_GROUP);
+    return EMPTY_GROUP;
   }
 
 
@@ -127,7 +228,51 @@ class EFSMSimpleComponent extends EFSMComponent
 
 
   //#########################################################################
+  //# Inner Class GroupKey
+  private static class GroupKey
+  {
+    //#######################################################################
+    //# Constructor
+    private GroupKey(final TransitionGroup master,
+                     final ConstraintList constraints)
+    {
+      mMaster = master;
+      mConstraints = constraints;
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public boolean equals(final Object other)
+    {
+      if (other.getClass() == getClass()) {
+        final GroupKey key = (GroupKey) other;
+        return mMaster == key.mMaster && mConstraints.equals(key.mConstraints);
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int result = mConstraints.hashCode();
+      if (mMaster != null) {
+        result += 5 * mMaster.hashCode();
+      }
+      return result;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TransitionGroup mMaster;
+    private final ConstraintList mConstraints;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private Map<EFSMEventDeclaration,TransitionGroup> mEventMap;
+  private Map<GroupKey,TransitionGroup> mTransitionGroupMap;
 
 }

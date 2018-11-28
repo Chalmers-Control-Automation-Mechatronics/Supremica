@@ -42,6 +42,7 @@ import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.efa.EFAEventNameBuilder;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**
@@ -74,6 +75,11 @@ class EFSMEventDeclaration
   String getName()
   {
     return mEventDecl.getName();
+  }
+
+  EventKind getKind()
+  {
+    return mEventDecl.getKind();
   }
 
   ConstraintList getGuardedActions()
@@ -162,4 +168,5 @@ class EFSMEventDeclaration
   private final EventDeclProxy mEventDecl;
   private ConstraintList mGuardedActions;
   private final List<EFSMEventInstance> mInstances;
+
 }

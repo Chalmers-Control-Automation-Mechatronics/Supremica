@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<ns2:ProductDES Name="autvars1" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<ns2:ProductDES Name="autvars02" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
     <Comment>A compiler test with automaton variables.
-The guard 'buffer==empty' in plant machine1 refers to the state of the specification 'buffer', which must be in state 'empty' for the transition to be enabled.</Comment>
+The guard 'buffer'==empty' in plant machine1 refers to the state of the specification 'buffer', which must enter state 'empty' for the transition to be enabled. Primed automaton variables cannot be used to force a state change, but refer to the state of the indicated automaton after a transion that the automaton already has. In this example, this is the same as the current state as the event 'start1' is not in the 'buffer' specification, resulting in an implicit selfloop.</Comment>
     <ns2:EventList>
         <ns2:Event Kind="UNCONTROLLABLE" Name="break1"/>
         <ns2:Event Kind="UNCONTROLLABLE" Name="finish1"/>

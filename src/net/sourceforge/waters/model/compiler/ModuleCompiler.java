@@ -311,7 +311,7 @@ public class ModuleCompiler extends AbortableCompiler
       mActiveAbortable = groupNodeCompiler = null;
       checkAbort();
 
-      if (efsm && mExpandingEFATransitions) {
+      if (efsm && mExpandingEFSMTransitions) {
         if (mNormalizationEnabled) {
           // perform normalisation
           EFSMNormaliser normaliser =
@@ -444,7 +444,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public boolean isExpandingEFATransitions()
   {
-    return mExpandingEFATransitions;
+    return mExpandingEFSMTransitions;
   }
 
   /**
@@ -456,7 +456,7 @@ public class ModuleCompiler extends AbortableCompiler
    */
   public void setExpandingEFATransitions(final boolean expanding)
   {
-    mExpandingEFATransitions = expanding;
+    mExpandingEFSMTransitions = expanding;
   }
 
   /**
@@ -499,7 +499,7 @@ public class ModuleCompiler extends AbortableCompiler
    * Returns whether automaton variables are enabled.
    * @see #setAutomatonVariablesEnabled(boolean)
    */
-  boolean isAutomatonVariablesEnabled()
+  public boolean isAutomatonVariablesEnabled()
   {
     return mAutomatonVariablesEnabled;
   }
@@ -526,7 +526,7 @@ public class ModuleCompiler extends AbortableCompiler
    *
    * @see #setNormalizationEnabled(boolean)
    */
-  void setAutomatonVariablesEnabled(final boolean enabled)
+  public void setAutomatonVariablesEnabled(final boolean enabled)
   {
     mAutomatonVariablesEnabled = enabled;
   }
@@ -683,7 +683,7 @@ public class ModuleCompiler extends AbortableCompiler
   private Abortable mActiveAbortable;
 
   private boolean mOptimizationEnabled = true;
-  private boolean mExpandingEFATransitions = true;
+  private boolean mExpandingEFSMTransitions = true;
   private boolean mNormalizationEnabled = true;
   private boolean mAutomatonVariablesEnabled = false;
   private boolean mSourceInfoEnabled = false;

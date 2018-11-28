@@ -206,6 +206,8 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
 
   protected void configure(final ModuleCompiler compiler)
   {
+    compiler.setNormalizationEnabled(true);
+    compiler.setAutomatonVariablesEnabled(true);
   }
 
   protected DocumentManager getDocumentManager()
