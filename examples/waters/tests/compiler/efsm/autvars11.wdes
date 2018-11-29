@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars11" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test with automaton variables.
+The guards in plant 'select' refer to the state of the specification 'clock', which must be in state 's1' or 's2' for the transition to be enabled. However, the specification disables the uncontrollable event in these states, and the model is not controllable as the plant can enable the event while the specification is in one of these states. To compile the automaton variable while preserving controllability, a new plant must be created to observe the state of the specification and select the correct event without disabling it, while the specification continues to disable.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tick"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tock.{clock==s1}"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="tock.{clock==s2}"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="stay"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="toggle"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="clock">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tick"/>
+                <ns2:EventRef Name="tock.{clock==s1}"/>
+                <ns2:EventRef Name="tock.{clock==s2}"/>
+                <ns2:EventRef Name="stay"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+                <ns2:State Name="s2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="tick" Target="s1"/>
+                <ns2:Transition Source="s1" Event="tick" Target="s2"/>
+                <ns2:Transition Source="s2" Event="tick" Target="s0"/>
+                <ns2:Transition Source="s1" Event="stay" Target="s1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="clock:plant">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="tick"/>
+                <ns2:EventRef Name="tock.{clock==s1}"/>
+                <ns2:EventRef Name="tock.{clock==s2}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+                <ns2:State Name="s2"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="tick" Target="s1"/>
+                <ns2:Transition Source="s1" Event="tick" Target="s2"/>
+                <ns2:Transition Source="s2" Event="tick" Target="s0"/>
+                <ns2:Transition Source="s1" Event="tock.{clock==s1}" Target="s1"/>
+                <ns2:Transition Source="s2" Event="tock.{clock==s2}" Target="s2"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PLANT" Name="select">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="toggle"/>
+                <ns2:EventRef Name="tock.{clock==s1}"/>
+                <ns2:EventRef Name="tock.{clock==s2}"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="s0"/>
+                <ns2:State Name="s1"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="s0" Event="toggle" Target="s1"/>
+                <ns2:Transition Source="s1" Event="toggle" Target="s0"/>
+                <ns2:Transition Source="s0" Event="tock.{clock==s1}" Target="s0"/>
+                <ns2:Transition Source="s1" Event="tock.{clock==s2}" Target="s1"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

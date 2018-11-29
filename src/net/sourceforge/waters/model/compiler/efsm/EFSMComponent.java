@@ -40,6 +40,7 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,11 @@ abstract class EFSMComponent
     return mRange;
   }
 
+  boolean isPlantificationNeeded()
+  {
+    return false;
+  }
+
 
   //#######################################################################
   //# Subsumption Checking
@@ -145,17 +151,25 @@ abstract class EFSMComponent
      EFSMTransitionIteratorFactory factory)
     throws EvalException;
 
-  void associateEventInstance(final EFSMEventInstance inst,
-                              final TransitionGroup transitionGroup)
+  boolean associateEventInstance(final EFSMEventInstance inst,
+                                 final TransitionGroup transitionGroup)
   {
-    if (!isNeutral(transitionGroup)) {
+    if (isNeutral(transitionGroup)) {
+      return false;
+    } else {
       mEventInstanceMap.put(inst, transitionGroup);
+      return true;
     }
   }
 
   void removeEventInstance(final EFSMEventInstance inst)
   {
     mEventInstanceMap.remove(inst);
+  }
+
+  TransitionGroup getTransitionGroup(final EFSMEventInstance inst)
+  {
+    return mEventInstanceMap.get(inst);
   }
 
   long getTransitionCode(final SimpleExpressionProxy source,
@@ -204,9 +218,30 @@ abstract class EFSMComponent
     }
   }
 
-  Collection<EFSMEventInstance> getAssociatedInstances()
+  Collection<EFSMEventInstance> getAssociatedEventInstances()
   {
     return mEventInstanceMap.keySet();
+  }
+
+  List<EFSMEventInstance> getBlockedEventInstances()
+  {
+    final List<EFSMEventInstance> blocked =
+      new ArrayList<>(mEventInstanceMap.size());
+    for (final Map.Entry<EFSMEventInstance,TransitionGroup> entry :
+         mEventInstanceMap.entrySet()) {
+      final TransitionGroup group = entry.getValue();
+      if (group.isEmpty()) {
+        final EFSMEventInstance inst = entry.getKey();
+        blocked.add(inst);
+      }
+    }
+    Collections.sort(blocked);
+    return blocked;
+  }
+
+  boolean isSuppressed(final EFSMEventInstance inst)
+  {
+    return false;
   }
 
 
@@ -243,19 +278,45 @@ abstract class EFSMComponent
     {
       mTransitions = null;
       mNumberOfSelfloops = 0;
+      mAlwaysEnabled = false;
     }
 
     TransitionGroup(final TLongArrayList transitions)
     {
-      mTransitions = transitions.toArray();
-      Arrays.sort(mTransitions);
-      int selfloops = 0;
-      for (final long transition : mTransitions) {
-        if (isSelfloop(transition)) {
-          selfloops++;
+      this(transitions, -1);
+    }
+
+    TransitionGroup(final TLongArrayList transitions, final int numStates)
+    {
+      if (transitions == null || transitions.size() == 0) {
+        mTransitions = null;
+        mNumberOfSelfloops = 0;
+        mAlwaysEnabled = (numStates == 0);
+      } else {
+        mTransitions = transitions.toArray();
+        Arrays.sort(mTransitions);
+        int selfloops = 0;
+        for (final long transition : mTransitions) {
+          if (isSelfloop(transition)) {
+            selfloops++;
+          }
+        }
+        mNumberOfSelfloops = selfloops;
+        if (numStates < 0) {
+          mAlwaysEnabled = false;
+        } else {
+          int next = 0;
+          for (final long transition : mTransitions) {
+            final int s = getTransitionSource(transition);
+            if (s > next) {
+              break;
+            } else if (s == next) {
+              next++;
+            }
+          }
+          mAlwaysEnabled = (next == numStates);
         }
       }
-      mNumberOfSelfloops = selfloops;
     }
 
     private TransitionGroup(final long[] transitions,
@@ -264,6 +325,7 @@ abstract class EFSMComponent
       mTransitions = transitions;
       Arrays.sort(mTransitions);
       mNumberOfSelfloops = numSelfloops;
+      mAlwaysEnabled = true;
     }
 
     //#######################################################################
@@ -280,6 +342,11 @@ abstract class EFSMComponent
       } else {
         return mNumberOfSelfloops == mTransitions.length;
       }
+    }
+
+    boolean isAlwaysEnabled()
+    {
+      return mAlwaysEnabled;
     }
 
     int getNumberOfTransitions()
@@ -339,6 +406,9 @@ abstract class EFSMComponent
     //# Plantification
     TransitionGroup addMissingSelfloops(final int numStates)
     {
+      if (mAlwaysEnabled) {
+        return this;
+      }
       final boolean[] enabled = new boolean[numStates];
       int numEnabled = 0;
       for (final long transition : mTransitions) {
@@ -347,9 +417,6 @@ abstract class EFSMComponent
           enabled[s] = true;
           numEnabled++;
         }
-      }
-      if (numEnabled == numStates) {
-        return this;
       }
       final int numAdded = numStates - numEnabled;
       int p = mTransitions.length;
@@ -387,20 +454,22 @@ abstract class EFSMComponent
     public String toString()
     {
       final StringBuilder builder = new StringBuilder("[");
-      boolean first = true;
-      for (final long transition : mTransitions) {
-        if (first) {
-          first = false;
-        } else {
-          builder.append(',');
+      if (mTransitions != null) {
+        boolean first = true;
+        for (final long transition : mTransitions) {
+          if (first) {
+            first = false;
+          } else {
+            builder.append(',');
+          }
+          final long s = getTransitionSource(transition);
+          builder.append(s);
+          builder.append("->");
+          final long t = getTransitionTarget(transition);
+          builder.append(t);
         }
-        final long s = getTransitionSource(transition);
-        builder.append(s);
-        builder.append("->");
-        final long t = getTransitionTarget(transition);
-        builder.append(t);
+        builder.append(']');
       }
-      builder.append(']');
       return builder.toString();
     }
 
@@ -408,6 +477,7 @@ abstract class EFSMComponent
     //# Data Members
     private final long[] mTransitions;
     private final int mNumberOfSelfloops;
+    private final boolean mAlwaysEnabled;
   }
 
 

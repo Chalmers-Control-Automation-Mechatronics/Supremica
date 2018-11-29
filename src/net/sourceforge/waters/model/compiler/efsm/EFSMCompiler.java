@@ -88,6 +88,7 @@ import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
+import net.sourceforge.waters.model.module.IndexedIdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -95,6 +96,7 @@ import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
+import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
@@ -513,6 +515,10 @@ public class EFSMCompiler extends AbortableCompiler
       for (final EFSMEventDeclaration decl : mEFSMEventDeclarations) {
         splitEvent(decl);
       }
+      if (isPlantificationNeeded()) {
+        plantify();
+        mSuffixVisitor = new SuffixVisitor();
+      }
     }
 
     //#######################################################################
@@ -546,7 +552,7 @@ public class EFSMCompiler extends AbortableCompiler
         mCollectedEFSMComponents.toArray(components);
         try {
           for (final ConstraintList inst : mCollectedConstraintLists) {
-            createInstance(decl, inst, components);
+            createEventInstance(decl, inst, components);
           }
         } catch (final EvalException exception) {
           mCompilationInfo.raise(exception);
@@ -569,7 +575,7 @@ public class EFSMCompiler extends AbortableCompiler
         final VariableContext context = parent.getContext();
         final SplitCandidate split = mSplitComputer.proposeSplit(ga, context);
         if (split == null) {
-          recordInstance(ga);
+          recordEventInstance(ga);
         } else {
           mSubsumptionEnabled |= !split.isDisjoint();
           for (final SimpleExpressionProxy expr :
@@ -585,7 +591,7 @@ public class EFSMCompiler extends AbortableCompiler
       }
     }
 
-    private void recordInstance(final ConstraintList ga)
+    private void recordEventInstance(final ConstraintList ga)
     {
       if (mCollectedConstraintLists.add(ga)) {
         for (final SimpleExpressionProxy literal : ga.getConstraints()) {
@@ -596,9 +602,9 @@ public class EFSMCompiler extends AbortableCompiler
       }
     }
 
-    private void createInstance(final EFSMEventDeclaration decl,
-                                final ConstraintList ga,
-                                final EFSMComponent[] components)
+    private void createEventInstance(final EFSMEventDeclaration decl,
+                                     final ConstraintList ga,
+                                     final EFSMComponent[] components)
       throws EvalException
     {
       final Map<EFSMComponent,List<SimpleExpressionProxy>> map1 =
@@ -620,9 +626,9 @@ public class EFSMCompiler extends AbortableCompiler
            entry : map1.entrySet()) {
         final EFSMComponent comp = entry.getKey();
         final List<SimpleExpressionProxy> list = entry.getValue();
-        final ConstraintList constraints = new ConstraintList(list);
+        final ConstraintList part = new ConstraintList(list);
         final EFSMComponent.TransitionGroup group =
-          comp.createTransitionGroup(inst, constraints, this);
+          comp.createTransitionGroup(inst, part, this);
         if (group == null) {
           return;
         }
@@ -794,6 +800,64 @@ public class EFSMCompiler extends AbortableCompiler
       final ComponentBindingContext context =
         new ComponentBindingContext(comp, source, target);
       return context.eval(constraints);
+    }
+
+    //#######################################################################
+    //# Plantification
+    private boolean isPlantificationNeeded()
+    {
+      for (final EFSMComponent comp : mEFSMComponents) {
+        if (comp.isPlantificationNeeded()) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void plantify()
+      throws EvalException
+    {
+      final int numComponents = mEFSMComponents.size();
+      final List<EFSMComponent> newComponents =
+        new ArrayList<>(2 * numComponents);
+      for (final EFSMComponent comp : mEFSMComponents) {
+        newComponents.add(comp);
+        if (comp.isPlantificationNeeded()) {
+          final EFSMSimpleComponent spec = (EFSMSimpleComponent) comp;
+          final EFSMSimpleComponent plant = plantify(spec);
+          if (!plant.isSubsumedPlantification()) {
+            newComponents.add(plant);
+          }
+        }
+      }
+      mEFSMComponents = newComponents;
+    }
+
+    private EFSMSimpleComponent plantify(final EFSMSimpleComponent spec)
+      throws EvalException
+    {
+      final EFSMSimpleComponent plant = spec.prePlantify();
+      for (final EFSMEventInstance inst : spec.getAssociatedEventInstances()) {
+        final ConstraintList ga = inst.getGuardedActions();
+        final ConstraintList part = getRelevantPart(ga, spec);
+        final EFSMComponent.TransitionGroup group =
+          plant.createTransitionGroup(inst, part, this);
+        assert group != null;
+        plant.associateEventInstance(inst, group);
+      }
+      return plant;
+    }
+
+    private ConstraintList getRelevantPart(final ConstraintList ga,
+                                           final EFSMSimpleComponent spec)
+    {
+      final List<SimpleExpressionProxy> list = new ArrayList<>(4);
+      for (final SimpleExpressionProxy literal : ga.getConstraints()) {
+        if (mRootContext.getMentionedEFSMComponent(literal) == spec) {
+          list.add(literal);
+        }
+      }
+      return new ConstraintList(list);
     }
 
     //#######################################################################
@@ -1177,7 +1241,7 @@ public class EFSMCompiler extends AbortableCompiler
     //#######################################################################
     //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
     @Override
-    public EdgeProxy visitEdgeProxy(final EdgeProxy edge)
+    public Object visitEdgeProxy(final EdgeProxy edge)
       throws VisitorException
     {
       try {
@@ -1199,12 +1263,14 @@ public class EFSMCompiler extends AbortableCompiler
             !mSelfloops.get(s)) {
           addSelfloopLabels(s);
         }
-        final LabelBlockProxy block1 =
-          mFactory.createLabelBlockProxy(mLabelList, null);
-        final EdgeProxy result = mFactory.createEdgeProxy
-          (source1, target1, block1, null, null, null, null);
-        mEdgeList.add(result);
-        return result;
+        if (!mLabelList.isEmpty()) {
+          final LabelBlockProxy block1 =
+            mFactory.createLabelBlockProxy(mLabelList, null);
+          final EdgeProxy result = mFactory.createEdgeProxy
+            (source1, target1, block1, null, null, null, null);
+          mEdgeList.add(result);
+        }
+        return null;
       } finally {
         mLabelList.clear();
       }
@@ -1272,20 +1338,28 @@ public class EFSMCompiler extends AbortableCompiler
             }
           }
         }
-        final LabelBlockProxy blocked0 = graph.getBlockedEvents();
-        if (blocked0 != null) {
-          try {
-            mCurrentTransition = -1;
+        try {
+          mCurrentTransition = -1;
+          final LabelBlockProxy blocked0 = graph.getBlockedEvents();
+          if (blocked0 != null) {
             visitLabelBlockProxy(blocked0);
-            mBlockedEvents = mFactory.createLabelBlockProxy(mLabelList, null);
-          } finally {
-            mLabelList.clear();
           }
+          addBlockedLabels();
+          if (!mLabelList.isEmpty()) {
+            mBlockedEvents = mFactory.createLabelBlockProxy(mLabelList, null);
+          }
+        } finally {
+          mLabelList.clear();
         }
-        final ComponentKind kind = comp.getKind();
+        final String suffix = simple.getPlantificationSuffix();
+        IdentifierProxy ident = comp.getIdentifier();
+        if (suffix != null) {
+          ident = mSuffixVisitor.addSuffix(ident, suffix);
+        }
+        final ComponentKind kind = simple.getKind();
         final boolean deterministic = graph.isDeterministic();
         final Map<String,String> attribs = comp.getAttributes();
-        return createSimpleComponent(comp, kind, deterministic, attribs);
+        return createSimpleComponent(comp, ident, kind, deterministic, attribs);
       } finally {
         mAdditionalEventInstances = null;
         mNodeList = null;
@@ -1325,7 +1399,9 @@ public class EFSMCompiler extends AbortableCompiler
       try {
         createStates(var);
         createEdges(var);
-        return createSimpleComponent(var, ComponentKind.PLANT, false, null);
+        final IdentifierProxy ident = var.getIdentifier();
+        return createSimpleComponent(var, ident, ComponentKind.PLANT,
+                                     false, null);
       } finally {
         mNodeList = null;
         mBlockedEvents = null;
@@ -1344,15 +1420,28 @@ public class EFSMCompiler extends AbortableCompiler
       }
     }
 
+    private void addBlockedLabels()
+    {
+      if (mCurrentEFSMComponent.isPlantificationNeeded()) {
+        final List<EFSMEventInstance> blocked =
+          mCurrentEFSMComponent.getBlockedEventInstances();
+        for (final EFSMEventInstance inst : blocked) {
+          addEventLabel(inst, null);
+        }
+      }
+    }
+
     private void addEventLabel(final EFSMEventInstance inst,
                                final IdentifierProxy location)
     {
       if (mCurrentTransition < 0 ||
           mCurrentEFSMComponent.isValidTransition(inst, mCurrentTransition)) {
-        final IdentifierProxy compiled = inst.createIdentifier(mFactory);
-        mLabelList.add(compiled);
-        if (location != null) {
-          mCompilationInfo.add(compiled, location);
+        if (!mCurrentEFSMComponent.isSuppressed(inst)) {
+          final IdentifierProxy compiled = inst.createIdentifier(mFactory);
+          mLabelList.add(compiled);
+          if (location != null) {
+            mCompilationInfo.add(compiled, location);
+          }
         }
       }
     }
@@ -1443,13 +1532,13 @@ public class EFSMCompiler extends AbortableCompiler
 
     private SimpleComponentProxy createSimpleComponent
       (final ComponentProxy source,
+       final IdentifierProxy ident,
        final ComponentKind kind,
        final boolean deterministic,
        final Map<String,String> attribs)
     {
       final GraphProxy graph = mFactory.createGraphProxy
         (deterministic, mBlockedEvents, mNodeList, mEdgeList);
-      final IdentifierProxy ident = source.getIdentifier();
       final IdentifierProxy iclone = (IdentifierProxy) mCloner.getClone(ident);
       final SimpleComponentProxy compiled =
         mFactory.createSimpleComponentProxy(iclone, kind, graph, attribs);
@@ -1709,6 +1798,77 @@ public class EFSMCompiler extends AbortableCompiler
 
 
   //#########################################################################
+  //# Inner Class SuffixVisitor
+  private class SuffixVisitor
+    extends DefaultModuleProxyVisitor
+  {
+    //#######################################################################
+    //# Invocation
+    private IdentifierProxy addSuffix(final IdentifierProxy ident,
+                                      final String suffix)
+    {
+      mSuffix = suffix;
+      int i = 0;
+      do {
+        final IdentifierProxy suffixed = addSuffix(ident);
+        if (mRootContext.getEFSMComponent(suffixed) == null) {
+          return suffixed;
+        }
+        i++;
+        mSuffix = suffix + i;
+      } while (true);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private IdentifierProxy addSuffix(final IdentifierProxy ident)
+    {
+      try {
+        return (IdentifierProxy) ident.acceptVisitor(this);
+      } catch (final VisitorException exception) {
+        throw exception.getRuntimeException();
+      }
+    }
+
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.module.ModuleProxyVisitor
+    @Override
+    public IndexedIdentifierProxy visitIndexedIdentifierProxy
+      (final IndexedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final String name = ident.getName();
+      final List<SimpleExpressionProxy> indexes = ident.getIndexes();
+      return mFactory.createIndexedIdentifierProxy(name + mSuffix, indexes);
+    }
+
+    @Override
+    public QualifiedIdentifierProxy visitQualifiedIdentifierProxy
+      (final QualifiedIdentifierProxy ident)
+      throws VisitorException
+    {
+      final IdentifierProxy base = ident.getBaseIdentifier();
+      final IdentifierProxy comp = ident.getComponentIdentifier();
+      final IdentifierProxy suffixed = addSuffix(comp);
+      return mFactory.createQualifiedIdentifierProxy(base, suffixed);
+    }
+
+    @Override
+    public SimpleIdentifierProxy visitSimpleIdentifierProxy
+      (final SimpleIdentifierProxy ident)
+      throws VisitorException
+    {
+      final String name = ident.getName();
+      return mFactory.createSimpleIdentifierProxy(name + mSuffix);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private String mSuffix;
+  }
+
+
+  //#########################################################################
   //# Data Members
   // Configuration
   private final ModuleProxy mInputModule;
@@ -1748,6 +1908,7 @@ public class EFSMCompiler extends AbortableCompiler
     new PrimedSearchVisitor();
   private final UnprimedSearchVisitor mUnprimedSearchVisitor =
     new UnprimedSearchVisitor();
+  private SuffixVisitor mSuffixVisitor = null;
 
 
   //#########################################################################

@@ -822,15 +822,99 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
-  public void testCompile_error_batch_tank_out()
+  public void testCompile_autvars08()
     throws IOException, WatersException
   {
     final ModuleProxy module =
-      loadModule("tests", "compiler", "efsm", "batch_tank_out");
+      loadModule("tests", "compiler", "efsm", "autvars08");
     if (isAutomatonVariablesEnabled()) {
-      compileError(module, DuplicateIdentifierException.class, "'out'");
-    } else {
       testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars09()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars09");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars10()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars10");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars11()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars11");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars12()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars12");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'buffer'");
+    }
+  }
+
+  public void testCompile_autvars13()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars13");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'buffer'");
+    }
+  }
+
+  public void testCompile_autvars14()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars14");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars15()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars15");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'buffer'");
     }
   }
 
@@ -841,6 +925,18 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       loadModule("tests", "compiler", "efsm", "duplicate_identifier");
     if (isAutomatonVariablesEnabled()) {
       compileError(module, DuplicateIdentifierException.class, "'x'");
+    } else {
+      testCompile(module);
+    }
+  }
+
+  public void testCompile_error_batch_tank_out()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "batch_tank_out");
+    if (isAutomatonVariablesEnabled()) {
+      compileError(module, DuplicateIdentifierException.class, "'out'");
     } else {
       testCompile(module);
     }

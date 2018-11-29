@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars12" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test with automaton variables.
+The guard 'buffer==empty' in plant machine1 refers to the state of the property 'buffer', which must be in state 'empty' for the transition to be enabled. In this case, the property includes the same constraint, so the guard has no effect.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="break1"/>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="finish1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="repair1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="start1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="start2"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="PLANT" Name="machine1">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="break1"/>
+                <ns2:EventRef Name="finish1"/>
+                <ns2:EventRef Name="repair1"/>
+                <ns2:EventRef Name="start1"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="idle"/>
+                <ns2:State Name="working"/>
+                <ns2:State Name="down"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="down" Event="repair1" Target="idle"/>
+                <ns2:Transition Source="idle" Event="start1" Target="working"/>
+                <ns2:Transition Source="working" Event="break1" Target="down"/>
+                <ns2:Transition Source="working" Event="finish1" Target="idle"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+        <ns2:Automaton Kind="PROPERTY" Name="buffer">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="finish1"/>
+                <ns2:EventRef Name="start1"/>
+                <ns2:EventRef Name="start2"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="full"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="empty" Event="finish1" Target="full"/>
+                <ns2:Transition Source="empty" Event="start1" Target="empty"/>
+                <ns2:Transition Source="full" Event="start2" Target="empty"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

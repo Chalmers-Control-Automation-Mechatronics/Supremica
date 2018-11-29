@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<ns2:ProductDES Name="autvars15" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+    <Comment>A compiler test with automaton variables.
+The guards 'buffer != empty' disable the 'start1' transition in state 'empty'. This test makes sure that automaton variables work correctly when a guard appears in the very automaton it references.</Comment>
+    <ns2:EventList>
+        <ns2:Event Kind="UNCONTROLLABLE" Name="finish1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="start1"/>
+        <ns2:Event Kind="CONTROLLABLE" Name="start2"/>
+    </ns2:EventList>
+    <ns2:AutomataList>
+        <ns2:Automaton Kind="SPEC" Name="buffer">
+            <ns2:EventRefList>
+                <ns2:EventRef Name="finish1"/>
+                <ns2:EventRef Name="start1"/>
+                <ns2:EventRef Name="start2"/>
+            </ns2:EventRefList>
+            <ns2:StateList>
+                <ns2:State Initial="true" Name="empty"/>
+                <ns2:State Name="partial"/>
+                <ns2:State Name="full"/>
+            </ns2:StateList>
+            <ns2:TransitionList>
+                <ns2:Transition Source="empty" Event="finish1" Target="partial"/>
+                <ns2:Transition Source="partial" Event="start2" Target="empty"/>
+                <ns2:Transition Source="partial" Event="finish1" Target="full"/>
+                <ns2:Transition Source="partial" Event="start1" Target="partial"/>
+                <ns2:Transition Source="full" Event="start2" Target="partial"/>
+            </ns2:TransitionList>
+        </ns2:Automaton>
+    </ns2:AutomataList>
+</ns2:ProductDES>

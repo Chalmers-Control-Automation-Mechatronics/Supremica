@@ -868,6 +868,13 @@ public abstract class AbstractControllabilityCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testAutVars10() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "compiler", "efsm", "autvars10.wmod");
+    runModelVerifier(des, false);
+  }
+
 
   //#########################################################################
   //# Test Cases -- Parameterised

@@ -65,7 +65,16 @@ class EFSMSimpleComponent extends EFSMComponent
   EFSMSimpleComponent(final SimpleComponentProxy comp,
                       final CompiledRange range)
   {
+    this(comp, range, null);
+  }
+
+  private EFSMSimpleComponent(final SimpleComponentProxy comp,
+                              final CompiledRange range,
+                              final EFSMSimpleComponent plantifiedSpec)
+  {
     super(comp, range);
+    mPlantifiedSpec = plantifiedSpec;
+    mPlantificiationNeeded = false;
   }
 
 
@@ -79,67 +88,26 @@ class EFSMSimpleComponent extends EFSMComponent
 
   ComponentKind getKind()
   {
-    final SimpleComponentProxy comp = getComponentProxy();
-    return comp.getKind();
-  }
-
-
-  //#########################################################################
-  //# Building the Transition Relation
-  void initialiseTransitions(final Map<EFSMEventDeclaration,TLongArrayList> map)
-  {
-    final int size = map.size();
-    final Map<TLongArrayList,TransitionGroup> groupMap = new HashMap<>(size);
-    mEventMap = new HashMap<>(size);
-    for (final Map.Entry<EFSMEventDeclaration,TLongArrayList> entry :
-         map.entrySet()) {
-      final EFSMEventDeclaration decl = entry.getKey();
-      final TLongArrayList transitions = entry.getValue();
-      TransitionGroup group;
-      if (transitions == null || transitions.size() == 0) {
-        group = EMPTY_GROUP;
-      } else {
-        group = groupMap.get(transitions);
-        if (group == null) {
-          group = new TransitionGroup(transitions);
-          groupMap.put(transitions, group);
-        }
-      }
-      mEventMap.put(decl, group);
+    if (mPlantifiedSpec != null) {
+      return ComponentKind.PLANT;
+    } else {
+      final SimpleComponentProxy comp = getComponentProxy();
+      return comp.getKind();
     }
-    mTransitionGroupMap = new HashMap<>(size);
   }
 
-  List<EFSMEventInstance> getAdditionalEventInstances()
+  @Override
+  boolean isPlantificationNeeded()
   {
-    if (mEventMap == null) {
+    return mPlantificiationNeeded;
+  }
+
+  String getPlantificationSuffix()
+  {
+    if (mPlantifiedSpec != null) {
+      return ":plant";
+    } else {
       return null;
-    }
-    final Collection<EFSMEventInstance> associated = getAssociatedInstances();
-    final List<EFSMEventInstance> result = new ArrayList<>(associated.size());
-    for (final EFSMEventInstance inst : associated) {
-      final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
-      if (!mEventMap.containsKey(decl)) {
-        result.add(inst);
-      }
-    }
-    if (result.isEmpty()) {
-      return null;
-    }
-    Collections.sort(result);
-    return result;
-  }
-
-  boolean isConsideredControllable(final EFSMEventDeclaration decl)
-  {
-    switch (getKind()) {
-    case PLANT:
-      return true;
-    case SPEC:
-    case SUPERVISOR:
-      return decl.getKind() == EventKind.CONTROLLABLE;
-    default:
-      return false;
     }
   }
 
@@ -190,6 +158,152 @@ class EFSMSimpleComponent extends EFSMComponent
     }
   }
 
+  @Override
+  boolean associateEventInstance(final EFSMEventInstance inst,
+                                 final TransitionGroup instGroup)
+  {
+    if (super.associateEventInstance(inst, instGroup)) {
+      if (!isConsideredControllable(inst) && !instGroup.isAlwaysEnabled()) {
+        mPlantificiationNeeded = true;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  boolean isSuppressed(final EFSMEventInstance inst)
+  {
+    if (mPlantifiedSpec == null) {
+      return false;
+    } else if (mPlantifiedSpec.isConsideredControllable(inst)) {
+      final TransitionGroup group = getTransitionGroup(inst);
+      return group == null || group.isSelfloopOnly();
+    } else {
+      return false;
+    }
+  }
+
+
+  //#########################################################################
+  //# Building the Transition Relation
+  void initialiseTransitions(final Map<EFSMEventDeclaration,TLongArrayList> map)
+  {
+    final int numStates = getRange().size();
+    final int size = map.size();
+    final Map<TLongArrayList,TransitionGroup> groupMap = new HashMap<>(size);
+    mEventMap = new HashMap<>(size);
+    for (final Map.Entry<EFSMEventDeclaration,TLongArrayList> entry :
+         map.entrySet()) {
+      final EFSMEventDeclaration decl = entry.getKey();
+      final TLongArrayList transitions = entry.getValue();
+      TransitionGroup group = groupMap.get(transitions);
+      if (group == null) {
+        group = new TransitionGroup(transitions, numStates);
+        groupMap.put(transitions, group);
+      }
+      mEventMap.put(decl, group);
+    }
+    mTransitionGroupMap = new HashMap<>(size);
+  }
+
+  List<EFSMEventInstance> getAdditionalEventInstances()
+  {
+    if (mEventMap == null) {
+      return null;
+    }
+    final Collection<EFSMEventInstance> associated = getAssociatedEventInstances();
+    final List<EFSMEventInstance> result = new ArrayList<>(associated.size());
+    for (final EFSMEventInstance inst : associated) {
+      final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
+      if (!mEventMap.containsKey(decl)) {
+        result.add(inst);
+      }
+    }
+    if (result.isEmpty()) {
+      return null;
+    }
+    Collections.sort(result);
+    return result;
+  }
+
+
+  //#########################################################################
+  //# Plantification
+  EFSMSimpleComponent prePlantify()
+  {
+    final SimpleComponentProxy proxy = getComponentProxy();
+    final CompiledRange range = getRange();
+    final EFSMSimpleComponent plant =
+      new EFSMSimpleComponent(proxy, range, this);
+    plant.prePlantify(this);
+    return plant;
+  }
+
+  boolean isSubsumedPlantification()
+  {
+    assert mPlantifiedSpec != null;
+    for (final EFSMEventInstance inst : getAssociatedEventInstances()) {
+      if (!mPlantifiedSpec.isConsideredControllable(inst)) {
+        final TransitionGroup plantGroup = getTransitionGroup(inst);
+        final TransitionGroup specGroup =
+          mPlantifiedSpec.getTransitionGroup(inst);
+        if (!subsumes(specGroup, plantGroup)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private void prePlantify(final EFSMSimpleComponent spec)
+  {
+    final Map<EFSMEventDeclaration,TransitionGroup>
+      oldEventMap = spec.mEventMap;
+    final int numEvents = oldEventMap.size();
+    final int numStates = getRange().size();
+    final Map<TransitionGroup,TransitionGroup> groupMap =
+      new HashMap<>(numEvents);
+    mEventMap = new HashMap<>(numEvents);
+    for (final Map.Entry<EFSMEventDeclaration,TransitionGroup> entry :
+         mEventMap.entrySet()) {
+      final EFSMEventDeclaration decl = entry.getKey();
+      final TransitionGroup group = entry.getValue();
+      TransitionGroup selflooped;
+      if (spec.isConsideredControllable(decl)) {
+        selflooped = group;
+      } else {
+        selflooped = groupMap.get(group);
+        if (selflooped == null) {
+          selflooped = group.addMissingSelfloops(numStates);
+          groupMap.put(group, selflooped);
+        }
+      }
+      mEventMap.put(decl, selflooped);
+    }
+    final int numTransitionGroups = spec.mTransitionGroupMap.size();
+    mTransitionGroupMap = new HashMap<>(numTransitionGroups);
+  }
+
+  private boolean isConsideredControllable(final EFSMEventDeclaration decl)
+  {
+    switch (getKind()) {
+    case PLANT:
+      return true;
+    case SPEC:
+    case SUPERVISOR:
+      return decl.getKind() == EventKind.CONTROLLABLE;
+    default:
+      return false;
+    }
+  }
+
+  private boolean isConsideredControllable(final EFSMEventInstance inst)
+  {
+    final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
+    return isConsideredControllable(decl);
+  }
 
 
   //#########################################################################
@@ -202,19 +316,10 @@ class EFSMSimpleComponent extends EFSMComponent
   private TransitionGroup addTransitionGroup(final GroupKey key,
                                              final TLongArrayList transitions)
   {
-    if (transitions.size() == 0) {
-      return addEmptyTransitionGroup(key);
-    } else {
-      final TransitionGroup group = new TransitionGroup(transitions);
-      mTransitionGroupMap.put(key, group);
-      return group;
-    }
-  }
-
-  private TransitionGroup addEmptyTransitionGroup(final GroupKey key)
-  {
-    mTransitionGroupMap.put(key, EMPTY_GROUP);
-    return EMPTY_GROUP;
+    final int numStates = getRange().size();
+    final TransitionGroup group = new TransitionGroup(transitions, numStates);
+    mTransitionGroupMap.put(key, group);
+    return group;
   }
 
 
@@ -272,7 +377,9 @@ class EFSMSimpleComponent extends EFSMComponent
 
   //#########################################################################
   //# Data Members
+  private final EFSMSimpleComponent mPlantifiedSpec;
   private Map<EFSMEventDeclaration,TransitionGroup> mEventMap;
   private Map<GroupKey,TransitionGroup> mTransitionGroupMap;
+  private boolean mPlantificiationNeeded;
 
 }
