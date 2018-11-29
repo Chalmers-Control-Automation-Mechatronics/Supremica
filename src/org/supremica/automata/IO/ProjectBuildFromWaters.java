@@ -186,13 +186,15 @@ public class ProjectBuildFromWaters
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final boolean optimize = Config.OPTIMIZING_COMPILER.isTrue();
-      final boolean normalize = Config.NORMALIZING_COMPILER.isTrue();
       final boolean expand = Config.EXPAND_EXTENDED_AUTOMATA.isTrue();
+      final boolean normalize = Config.NORMALIZING_COMPILER.isTrue();
+      final boolean autVars = Config.AUTOMATON_VARIABLES_COMPILER.isTrue();
       final ModuleCompiler compiler =
         new ModuleCompiler(mDocumentManager, factory, module);
       compiler.setOptimizationEnabled(optimize);
-      compiler.setNormalizationEnabled(normalize);
       compiler.setExpandingEFATransitions(expand);
+      compiler.setNormalizationEnabled(normalize);
+      compiler.setAutomatonVariablesEnabled(autVars);
       if (!mIncludesProperties) {
         final Collection<String> empty = Collections.emptyList();
         compiler.setEnabledPropertyNames(empty);

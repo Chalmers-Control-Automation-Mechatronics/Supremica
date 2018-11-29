@@ -129,7 +129,11 @@ public class BackgroundCompiler
       (mEnablementPropertyChangeListener);
     Config.OPTIMIZING_COMPILER.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
+    Config.EXPAND_EXTENDED_AUTOMATA.addPropertyChangeListener
+      (mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER.addPropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.AUTOMATON_VARIABLES_COMPILER.addPropertyChangeListener
       (mCompilerPropertyChangeListener);
     mAbortButtonAction = new ActionListener() {
       @Override
@@ -192,8 +196,14 @@ public class BackgroundCompiler
     if (mModuleChanged && !mRunning) {
       mModuleChanged = false;
       mRunning = true;
-      mCompiler.setOptimizationEnabled(Config.OPTIMIZING_COMPILER.isTrue());
-      mCompiler.setNormalizationEnabled(Config.NORMALIZING_COMPILER.isTrue());
+      mCompiler.setOptimizationEnabled
+        (Config.OPTIMIZING_COMPILER.isTrue());
+      mCompiler.setExpandingEFATransitions
+        (Config.EXPAND_EXTENDED_AUTOMATA.isTrue());
+      mCompiler.setNormalizationEnabled
+        (Config.NORMALIZING_COMPILER.isTrue());
+      mCompiler.setAutomatonVariablesEnabled
+        (Config.AUTOMATON_VARIABLES_COMPILER.isTrue());
       mCompiler.setInputModule(mModuleContainer.getModule(), true);
       mWorker.compile();
     } else if (mModuleChanged && mRunning) {
@@ -227,7 +237,11 @@ public class BackgroundCompiler
   {
     Config.OPTIMIZING_COMPILER.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
+    Config.EXPAND_EXTENDED_AUTOMATA.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
     Config.NORMALIZING_COMPILER.removePropertyChangeListener
+      (mCompilerPropertyChangeListener);
+    Config.AUTOMATON_VARIABLES_COMPILER.removePropertyChangeListener
       (mCompilerPropertyChangeListener);
     Config.BACKGROUND_COMPILER.removePropertyChangeListener
       (mEnablementPropertyChangeListener);

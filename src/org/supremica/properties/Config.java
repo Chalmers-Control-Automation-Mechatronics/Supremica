@@ -227,6 +227,9 @@ public final class Config
     public static final BooleanProperty NORMALIZING_COMPILER =
       new BooleanProperty(PropertyType.GUI, "normalizingCompiler", false,
               "Use normalising EFSM compiler");
+    public static final BooleanProperty AUTOMATON_VARIABLES_COMPILER =
+      new BooleanProperty(PropertyType.GUI, "automatonVariablesCompiler", false,
+              "Allow automaton names in EFSM guards");
     public static final BooleanProperty INCLUDE_RAS_SUPPORT =
       new BooleanProperty(PropertyType.GUI, "includeRASSupport", false,
               "Include RAS support");
