@@ -104,9 +104,8 @@ public class TraceJTree
             final int targetTime = eventNode.getTime();
             mSim.setState(targetTime);
           } else if (node instanceof AutomatonLeafNode) {
-            final AutomatonProxy toAdd = ((AutomatonLeafNode)node).getAutomaton();
-            mDesktop.addAutomaton(toAdd.getName(), mSim.getModuleContainer(),
-                                  mSim, 2);
+            final AutomatonProxy aut = ((AutomatonLeafNode)node).getAutomaton();
+            mDesktop.addAutomaton(aut, mSim.getModuleContainer(), mSim, 2);
           }
         }
       }

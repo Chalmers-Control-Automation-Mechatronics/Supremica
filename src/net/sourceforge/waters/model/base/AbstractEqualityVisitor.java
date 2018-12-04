@@ -654,7 +654,7 @@ public abstract class AbstractEqualityVisitor
     for (final Map.Entry<String,String> entry : attribs.entrySet()) {
       final String attrib = entry.getKey();
       if (!expected.containsKey(attrib)) {
-        final String value = expected.get(attrib);
+        final String value = entry.getValue();
         return reportAttributeMismatch(attrib, value, null);
       }
     }
@@ -1034,10 +1034,19 @@ public abstract class AbstractEqualityVisitor
     {
       writer.write("the attribute '");
       writer.write(mAttrib);
-      writer.write("' has value ");
-      writeValue(writer, mValue);
-      writer.write(", but should be ");
-      writeValue(writer, mExpected);
+      if (mValue == null) {
+        writer.write("' is undefined");
+      } else {
+        writer.write("' has value ");
+        writeValue(writer, mValue);
+      }
+      writer.write(", but it should ");
+      if (mExpected == null) {
+        writer.write("be undefined");
+      } else {
+        writer.write("have value ");
+        writeValue(writer, mExpected);
+      }
       writer.write('!');
     }
 
@@ -1046,7 +1055,6 @@ public abstract class AbstractEqualityVisitor
     private final String mAttrib;
     private final Object mValue;
     private final Object mExpected;
-
   }
 
 

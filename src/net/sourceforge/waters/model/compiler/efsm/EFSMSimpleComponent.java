@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
@@ -105,9 +106,23 @@ class EFSMSimpleComponent extends EFSMComponent
   String getPlantificationSuffix()
   {
     if (mPlantifiedSpec != null) {
-      return ":plant";
+      return EFSMCompiler.SUFFIX_PLANT;
     } else {
       return null;
+    }
+  }
+
+  Map<String,String> getAttributes()
+  {
+    final Map<String,String> map = getComponentProxy().getAttributes();
+    if (mPlantifiedSpec == null) {
+      return map;
+    } else if (map.isEmpty()) {
+      return EFSMCompiler.ATTRIBUTES_PLANT;
+    } else {
+      final Map<String,String> plantifiedMap = new TreeMap<>(map);
+      plantifiedMap.put(EFSMCompiler.ATTRIB_PLANT, "");
+      return plantifiedMap;
     }
   }
 

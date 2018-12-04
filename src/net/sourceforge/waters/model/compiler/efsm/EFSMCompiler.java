@@ -1363,7 +1363,7 @@ public class EFSMCompiler extends AbortableCompiler
         }
         final ComponentKind kind = simple.getKind();
         final boolean deterministic = graph.isDeterministic();
-        final Map<String,String> attribs = comp.getAttributes();
+        final Map<String,String> attribs = simple.getAttributes();
         return createSimpleComponent(comp, ident, kind, deterministic, attribs);
       } finally {
         mAdditionalEventInstances = null;
@@ -1938,5 +1938,23 @@ public class EFSMCompiler extends AbortableCompiler
    */
   public static final Map<String,String> ATTRIBUTES_UPDATES =
     Collections.singletonMap(ATTRIB_UPDATES, "");
+
+  /**
+   * The suffix used for plantified components generated when
+   * adding guards from automaton variables to specifications or
+   * properties.
+   */
+  public static final String SUFFIX_PLANT = ":plant";
+  /**
+   * The attribute key used to mark plantified components.
+   */
+  public static final String ATTRIB_PLANT = "EFSM:Plantified";
+  /**
+   * An unmodifiable attribute map that identifies a simple component as
+   * a plantified components. It contains a single entry mapping the key
+   * {@link #ATTRIB_PLANT} to the empty string.
+   */
+  public static final Map<String,String> ATTRIBUTES_PLANT =
+    Collections.singletonMap(ATTRIB_PLANT, "");
 
 }

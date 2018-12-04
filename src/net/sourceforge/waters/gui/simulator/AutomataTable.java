@@ -221,7 +221,7 @@ class AutomataTable extends JTable
       if (event.getButton() == MouseEvent.BUTTON1) {
         final AutomatonProxy aut = getAutomaton(event);
         if (aut != null) {
-          mDesktop.addAutomaton(aut.getName(), mSimulation.getModuleContainer(),
+          mDesktop.addAutomaton(aut, mSimulation.getModuleContainer(),
                                 mSimulation, event.getClickCount());
         }
       }

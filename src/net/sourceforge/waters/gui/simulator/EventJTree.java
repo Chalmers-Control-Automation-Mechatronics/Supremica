@@ -115,7 +115,7 @@ public class EventJTree
           } else if (node instanceof AutomatonProxy) {
             final AutomatonProxy aut = (AutomatonProxy) node;
             final ModuleContainer container = mSim.getModuleContainer();
-            mDesktop.addAutomaton(aut.getName(), container, mSim, 2);
+            mDesktop.addAutomaton(aut, container, mSim, 2);
           }
         }
       }

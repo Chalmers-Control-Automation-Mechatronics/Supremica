@@ -1691,9 +1691,15 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
       final SourceInfo info = mCompiler.getSourceInfoMap().get(trans);
       if (info == null) {
         // Not all selfloops have source info when automaton variables are used
-        assertTrue("Missing source information for transition!",
-                   trans.getSource() == trans.getTarget() &&
-                   isAutomatonVariablesEnabled());
+        final StateProxy source = trans.getSource();
+        final StateProxy target = trans.getTarget();
+        if (!isAutomatonVariablesEnabled() || source != target) {
+          final EventProxy event = trans.getEvent();
+          fail("Missing source information for transition " +
+               source.getName() + "-" + event.getName() + "-> " +
+               target.getName() + " in automaton '"+
+               mCurrentComponent.getName() + "'!");
+        }
       } else {
         checkInModule(trans, info);
         checkExpectedType(trans, info, IdentifierProxy.class);

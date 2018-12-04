@@ -34,10 +34,12 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Map;
 
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.compiler.efsm.EFSMCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 
@@ -63,14 +65,18 @@ public class DesktopOpenWindowAction extends WatersDesktopAction
       putValue(Action.NAME, "Show " + kindName);
     }
     putValue(Action.SHORT_DESCRIPTION, "Open this Automaton window");
-    setEnabled(true);
+    final Map<String,String> attribs = aut.getAttributes();
+    final boolean enabled = !attribs.containsKey(EFSMCompiler.ATTRIB_PLANT);
+    setEnabled(enabled);
   }
 
   @Override
   public void actionPerformed(final ActionEvent e)
   {
-    final ModuleContainer mContainer = (ModuleContainer)getIDE().getActiveDocumentContainer();
-    getDesktop().addAutomaton(mAutomaton.getName(), mContainer, mContainer.getSimulatorPanel().getSimulation(), 2);
+    final ModuleContainer mContainer =
+      (ModuleContainer) getIDE().getActiveDocumentContainer();
+    getDesktop().addAutomaton(mAutomaton, mContainer,
+                              mContainer.getSimulatorPanel().getSimulation(), 2);
   }
 
   private final AutomatonProxy mAutomaton;

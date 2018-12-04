@@ -58,6 +58,7 @@ import net.sourceforge.waters.gui.renderer.GeometryAbsentException;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.BindingContext;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.compiler.efsm.EFSMCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
@@ -127,16 +128,30 @@ public class AutomatonDesktopPane
     return mOpenAutomata.containsKey(automaton.getName());
   }
 
-  public void addAutomaton(final String aut,
+  public void addAutomaton(final AutomatonProxy aut,
                            final ModuleContainer container,
                            final Simulation sim,
                            final int clicks)
   {
-    if (aut == null) {
+    if (aut != null) {
+      final Map<String,String> attribs = aut.getAttributes();
+      if (!attribs.containsKey(EFSMCompiler.ATTRIB_PLANT)) {
+        final String name = aut.getName();
+        addAutomaton(name, container, sim, clicks);
+      }
+    }
+  }
+
+  public void addAutomaton(final String name,
+                           final ModuleContainer container,
+                           final Simulation sim,
+                           final int clicks)
+  {
+    if (name == null) {
       return;
-    } else if (!mOpenAutomata.containsKey(aut)) {
+    } else if (!mOpenAutomata.containsKey(name)) {
       if (clicks == 2) {
-        final AutomatonProxy realAuto = sim.getAutomatonFromName(aut);
+        final AutomatonProxy realAuto = sim.getAutomatonFromName(name);
         if (realAuto == null) {
           return;
         }
@@ -156,8 +171,8 @@ public class AutomatonDesktopPane
             newFrame.setLocation(findLocation(otherScreens, newFrame.getSize()));
             add(newFrame);
             newFrame.moveToFront();
-            mOpenAutomata.put(aut, newFrame);
-            fireFrameOpenedEvent(aut, newFrame);
+            mOpenAutomata.put(name, newFrame);
+            fireFrameOpenedEvent(name, newFrame);
             newFrame.setVisible(true);
           } catch (final GeometryAbsentException exception) {
             final Logger logger = LogManager.getLogger();
@@ -167,7 +182,7 @@ public class AutomatonDesktopPane
         }
       }
     } else {
-      selectAutomaton(clicks, aut);
+      selectAutomaton(clicks, name);
     }
   }
 
@@ -295,7 +310,7 @@ public class AutomatonDesktopPane
   public void showAllAutomata()
   {
     for (final AutomatonProxy aut : mSim.getOrderedAutomata()) {
-      addAutomaton(aut.getName(), mContainer, mSim, 2);
+      addAutomaton(aut, mContainer, mSim, 2);
     }
   }
 
