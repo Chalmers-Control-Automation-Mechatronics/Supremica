@@ -211,24 +211,30 @@ public class AutomatonDisplayPane
     if (proxyToFire != null) {
       final RenderingStatus status = getRenderingStatus(mFocusedItem);
       if (status != null && status.isEnabled()) {
-        final Map<Object,SourceInfo> infomap = mContainer.getSourceInfoMap();
+        final Map<Object,SourceInfo> infoMap = mContainer.getSourceInfoMap();
         final List<SimulatorStep> possibleSteps =
           new ArrayList<SimulatorStep>();
         if (proxyToFire instanceof IdentifierProxy) {
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-            final Proxy source = infomap.get(trans).getGraphSourceObject();
-            if (source == proxyToFire && canBeFired(trans)) {
-              addSteps(trans, possibleSteps);
+            final SourceInfo info = infoMap.get(trans);
+            if (info != null) {
+              final Proxy source = info.getGraphSourceObject();
+              if (source == proxyToFire && canBeFired(trans)) {
+                addSteps(trans, possibleSteps);
+              }
             }
           }
         } else if (proxyToFire instanceof EdgeProxy) {
           for (final TransitionProxy trans : mAutomaton.getTransitions()) {
-            final Proxy source = infomap.get(trans).getGraphSourceObject();
-            final AbstractSubject subject = (AbstractSubject) source;
-            final EdgeSubject edge =
-              SubjectTools.getAncestor(subject, EdgeSubject.class);
-            if (proxyToFire == edge && canBeFired(trans)) {
-              addSteps(trans, possibleSteps);
+            final SourceInfo info = infoMap.get(trans);
+            if (info != null) {
+              final Proxy source = info.getGraphSourceObject();
+              final AbstractSubject subject = (AbstractSubject) source;
+              final EdgeSubject edge =
+                SubjectTools.getAncestor(subject, EdgeSubject.class);
+              if (proxyToFire == edge && canBeFired(trans)) {
+                addSteps(trans, possibleSteps);
+              }
             }
           }
         }
