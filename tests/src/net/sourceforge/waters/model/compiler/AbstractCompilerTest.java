@@ -918,6 +918,30 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     }
   }
 
+  public void testCompile_autvars16()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars16");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
+  public void testCompile_autvars17()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "efsm", "autvars17");
+    if (isAutomatonVariablesEnabled()) {
+      testCompile(module);
+    } else {
+      compileError(module, UndefinedIdentifierException.class, "'clock'");
+    }
+  }
+
   public void testCompile_duplicate_identifier()
     throws IOException, WatersException
   {
@@ -1666,8 +1690,9 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     {
       final SourceInfo info = mCompiler.getSourceInfoMap().get(trans);
       if (info == null) {
-        // Not all transitions have source info when automaton variables are used
+        // Not all selfloops have source info when automaton variables are used
         assertTrue("Missing source information for transition!",
+                   trans.getSource() == trans.getTarget() &&
                    isAutomatonVariablesEnabled());
       } else {
         checkInModule(trans, info);

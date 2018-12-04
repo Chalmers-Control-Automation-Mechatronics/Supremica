@@ -32,6 +32,7 @@ The guards in plant 'select' refer to the state of the specification 'clock', wh
         <ns2:Automaton Kind="PLANT" Name="clock:plant">
             <ns2:EventRefList>
                 <ns2:EventRef Name="tick"/>
+                <ns2:EventRef Name="stay"/>
                 <ns2:EventRef Name="tock.{clock==s1}"/>
                 <ns2:EventRef Name="tock.{clock==s2}"/>
             </ns2:EventRefList>
@@ -44,6 +45,7 @@ The guards in plant 'select' refer to the state of the specification 'clock', wh
                 <ns2:Transition Source="s0" Event="tick" Target="s1"/>
                 <ns2:Transition Source="s1" Event="tick" Target="s2"/>
                 <ns2:Transition Source="s2" Event="tick" Target="s0"/>
+                <ns2:Transition Source="s1" Event="stay" Target="s1"/>
                 <ns2:Transition Source="s1" Event="tock.{clock==s1}" Target="s1"/>
                 <ns2:Transition Source="s2" Event="tock.{clock==s2}" Target="s2"/>
             </ns2:TransitionList>

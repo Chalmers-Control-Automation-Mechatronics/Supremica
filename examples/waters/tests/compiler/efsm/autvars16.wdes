@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
-<ns2:ProductDES Name="autvars14" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
+<ns2:ProductDES Name="autvars16" xmlns="http://waters.sourceforge.net/xsd/base" xmlns:ns2="http://waters.sourceforge.net/xsd/des" xmlns:ns3="http://waters.sourceforge.net/xsd/module">
     <Comment>A compiler test with automaton variables.
 The guards in plant 'select' refer to the state of the specification 'clock', which must be in state 's1' or 's2' for the transition to be enabled. However, the specification disables the uncontrollable event in these states, and the model is not controllable as the plant can enable the event while the specification is in one of these states. To compile the automaton variable while preserving controllability, a new plant must be created to observe the state of the specification and select the correct event without disabling it, while the specification continues to disable.</Comment>
     <ns2:EventList>
@@ -27,6 +27,7 @@ The guards in plant 'select' refer to the state of the specification 'clock', wh
                 <ns2:Transition Source="s1" Event="tick" Target="s2"/>
                 <ns2:Transition Source="s2" Event="tick" Target="s0"/>
                 <ns2:Transition Source="s1" Event="stay" Target="s1"/>
+                <ns2:Transition Source="s2" Event="stay" Target="s0"/>
             </ns2:TransitionList>
         </ns2:Automaton>
         <ns2:Automaton Kind="PLANT" Name="clock:plant">
@@ -47,7 +48,7 @@ The guards in plant 'select' refer to the state of the specification 'clock', wh
                 <ns2:Transition Source="s2" Event="tick" Target="s0"/>
                 <ns2:Transition Source="s0" Event="stay" Target="s0"/>
                 <ns2:Transition Source="s1" Event="stay" Target="s1"/>
-                <ns2:Transition Source="s2" Event="stay" Target="s2"/>
+                <ns2:Transition Source="s2" Event="stay" Target="s0"/>
                 <ns2:Transition Source="s1" Event="tock.{clock==s1}" Target="s1"/>
                 <ns2:Transition Source="s2" Event="tock.{clock==s2}" Target="s2"/>
             </ns2:TransitionList>

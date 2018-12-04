@@ -187,12 +187,13 @@ class EFSMSimpleComponent extends EFSMComponent
   @Override
   boolean isSuppressed(final EFSMEventInstance inst)
   {
-    if (mPlantifiedSpec == null) {
-      return false; // only suppress in plantification (no optimisation here!)
+    if (mEventMap == null) {
+      return false; // no automaton variables
     } else {
       final TransitionGroup group = getTransitionGroup(inst);
       assert group != null;
-      if (mPlantifiedSpec.isConsideredControllable(inst)) {
+      if (mPlantifiedSpec != null &&
+          mPlantifiedSpec.isConsideredControllable(inst)) {
         return group.isSelfloopOnly();
       } else {
         return group.isAlwaysEnabled() && group.isSelfloopOnly();

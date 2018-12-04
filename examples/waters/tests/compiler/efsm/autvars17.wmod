@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Module Name="autvars04a" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
+<Module Name="autvars17" xmlns="http://waters.sourceforge.net/xsd/module" xmlns:ns2="http://waters.sourceforge.net/xsd/base" xmlns:ns3="http://waters.sourceforge.net/xsd/des">
     <ns2:Comment>A compiler test with automaton variables.
-The guards in plant 'select' refer to the state of the plant 'clock', which must not be in state 's1' or 's2' for the transition to be enabled. Some of the selfloops for event 'at' must be removed from plant 'clock', while also adding selfloops for event 'notat' that is not yet in the alphabet.</ns2:Comment>
+The guards in plant 'select' refer to the state of the specification 'clock', which must be in state 's1' or 's2' for the transition to be enabled. However, the specification disables the uncontrollable event in these states, and the model is not controllable as the plant can enable the event while the specification is in one of these states. To compile the automaton variable while preserving controllability, a new plant must be created to observe the state of the specification and select the correct event without disabling it, while the specification continues to disable.</ns2:Comment>
     <EventDeclList>
         <EventDecl Kind="UNCONTROLLABLE" Name="tick"/>
+        <EventDecl Kind="UNCONTROLLABLE" Name="tock"/>
         <EventDecl Kind="CONTROLLABLE" Name="toggle"/>
-        <EventDecl Kind="UNCONTROLLABLE" Name="at"/>
-        <EventDecl Kind="CONTROLLABLE" Name="notat"/>
     </EventDeclList>
     <ComponentList>
-        <SimpleComponent Kind="PLANT" Name="clock">
+        <SimpleComponent Kind="SPEC" Name="clock">
             <Graph>
                 <NodeList>
                     <SimpleNode Initial="true" Name="s0">
@@ -17,7 +16,7 @@ The guards in plant 'select' refer to the state of the plant 'clock', which must
                             <Point X="144" Y="80"/>
                         </PointGeometry>
                         <LabelGeometry Anchor="NW">
-                            <Point X="7" Y="-22"/>
+                            <Point X="-33" Y="-4"/>
                         </LabelGeometry>
                     </SimpleNode>
                     <SimpleNode Name="s1">
@@ -57,42 +56,21 @@ The guards in plant 'select' refer to the state of the plant 'clock', which must
                     <Edge Source="s2" Target="s0">
                         <LabelBlock>
                             <SimpleIdentifier Name="tick"/>
+                            <SimpleIdentifier Name="tock"/>
                             <LabelGeometry Anchor="NW">
                                 <Point X="-40" Y="-25"/>
                             </LabelGeometry>
                         </LabelBlock>
                     </Edge>
-                    <Edge Source="s1" Target="s1">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="at"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-25" Y="-11"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="237" Y="162"/>
-                        </SplineGeometry>
-                    </Edge>
-                    <Edge Source="s2" Target="s2">
-                        <LabelBlock>
-                            <SimpleIdentifier Name="notat"/>
-                            <LabelGeometry Anchor="NW">
-                                <Point X="-6" Y="-30"/>
-                            </LabelGeometry>
-                        </LabelBlock>
-                        <SplineGeometry>
-                            <Point X="54" Y="160"/>
-                        </SplineGeometry>
-                    </Edge>
                     <Edge Source="s0" Target="s0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="notat"/>
+                            <SimpleIdentifier Name="tock"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-12" Y="-8"/>
+                                <Point X="-31" Y="-4"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
-                            <Point X="187" Y="77"/>
+                            <Point X="200" Y="68"/>
                         </SplineGeometry>
                     </Edge>
                 </EdgeList>
@@ -146,25 +124,47 @@ The guards in plant 'select' refer to the state of the plant 'clock', which must
                     </Edge>
                     <Edge Source="s0" Target="s0">
                         <LabelBlock>
-                            <SimpleIdentifier Name="notat"/>
+                            <SimpleIdentifier Name="tock"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="-43" Y="-18"/>
+                                <Point X="-36" Y="-19"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="82" Y="97"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="clock"/>
+                                    <SimpleIdentifier Name="s1"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="-70" Y="-1"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                     <Edge Source="s1" Target="s1">
                         <LabelBlock>
-                            <SimpleIdentifier Name="at"/>
+                            <SimpleIdentifier Name="tock"/>
                             <LabelGeometry Anchor="NW">
-                                <Point X="3" Y="-19"/>
+                                <Point X="1" Y="-16"/>
                             </LabelGeometry>
                         </LabelBlock>
                         <SplineGeometry>
                             <Point X="289" Y="93"/>
                         </SplineGeometry>
+                        <GuardActionBlock>
+                            <Guards>
+                                <BinaryExpression Operator="==">
+                                    <SimpleIdentifier Name="clock"/>
+                                    <SimpleIdentifier Name="s2"/>
+                                </BinaryExpression>
+                            </Guards>
+                            <LabelGeometry Anchor="NW">
+                                <Point X="4" Y="0"/>
+                            </LabelGeometry>
+                        </GuardActionBlock>
                     </Edge>
                 </EdgeList>
             </Graph>

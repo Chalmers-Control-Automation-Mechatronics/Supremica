@@ -203,6 +203,11 @@ public class EFSMCompiler extends AbortableCompiler
 
   //#########################################################################
   //# Configuration
+  public void setOptimizationEnabled(final boolean enabled)
+  {
+    mOptimizationEnabled = enabled;
+  }
+
   public void setAutomatonVariablesEnabled(final boolean enabled)
   {
     mAutomatonVariablesEnabled = enabled;
@@ -1436,7 +1441,8 @@ public class EFSMCompiler extends AbortableCompiler
     {
       if (mCurrentTransition < 0 ||
           mCurrentEFSMComponent.isValidTransition(inst, mCurrentTransition)) {
-        if (!mCurrentEFSMComponent.isSuppressed(inst)) {
+        if (!mOptimizationEnabled ||
+            !mCurrentEFSMComponent.isSuppressed(inst)) {
           final IdentifierProxy compiled = inst.createIdentifier(mFactory);
           mLabelList.add(compiled);
           if (location != null) {
@@ -1872,6 +1878,7 @@ public class EFSMCompiler extends AbortableCompiler
   //# Data Members
   // Configuration
   private final ModuleProxy mInputModule;
+  private boolean mOptimizationEnabled = true;
   private boolean mAutomatonVariablesEnabled = false;
 
   // Data structures

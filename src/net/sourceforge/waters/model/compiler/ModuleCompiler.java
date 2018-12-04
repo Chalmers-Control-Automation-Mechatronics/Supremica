@@ -326,6 +326,7 @@ public class ModuleCompiler extends AbortableCompiler
           // compile normalised EFSM system
           EFSMCompiler efsmCompiler =
             new EFSMCompiler(modFactory, mCompilationInfo, intermediate);
+          efsmCompiler.setOptimizationEnabled(mOptimizationEnabled);
           efsmCompiler.setAutomatonVariablesEnabled(mAutomatonVariablesEnabled);
           mActiveAbortable = efsmCompiler;
           intermediate = efsmCompiler.compile();
