@@ -210,7 +210,7 @@ abstract class EFSMComponent
   boolean isValidTransition(final EFSMEventInstance inst,
                             final long transition)
   {
-    final TransitionGroup group = mEventInstanceMap.get(inst);
+    final TransitionGroup group = getTransitionGroup(inst);
     if (group == null) {
       return true;
     } else {
@@ -274,18 +274,6 @@ abstract class EFSMComponent
   {
     //#######################################################################
     //# Constructor
-    private TransitionGroup()
-    {
-      mTransitions = null;
-      mNumberOfSelfloops = 0;
-      mAlwaysEnabled = false;
-    }
-
-    TransitionGroup(final TLongArrayList transitions)
-    {
-      this(transitions, -1);
-    }
-
     TransitionGroup(final TLongArrayList transitions, final int numStates)
     {
       if (transitions == null || transitions.size() == 0) {
@@ -408,27 +396,34 @@ abstract class EFSMComponent
     {
       if (mAlwaysEnabled) {
         return this;
-      }
-      final boolean[] enabled = new boolean[numStates];
-      int numEnabled = 0;
-      for (final long transition : mTransitions) {
-        final int s = getTransitionSource(transition);
-        if (!enabled[s]) {
-          enabled[s] = true;
-          numEnabled++;
+      } else if (mTransitions == null) {
+        final long[] newTransitions = new long[numStates];
+        for (int s = 0; s < numStates; s++) {
+          newTransitions[s] = getTransitionCode(s, s);
         }
-      }
-      final int numAdded = numStates - numEnabled;
-      int p = mTransitions.length;
-      final long[] newTransitions = new long[p + numAdded];
-      System.arraycopy(mTransitions, 0, newTransitions, 0, p);
-      for (int s = 0; s < numStates; s++) {
-        if (!enabled[s]) {
-          newTransitions[p++] = getTransitionCode(s, s);
+        return new TransitionGroup(newTransitions, numStates);
+      } else {
+        final boolean[] enabled = new boolean[numStates];
+        int numEnabled = 0;
+        for (final long transition : mTransitions) {
+          final int s = getTransitionSource(transition);
+          if (!enabled[s]) {
+            enabled[s] = true;
+            numEnabled++;
+          }
         }
+        final int numAdded = numStates - numEnabled;
+        int p = mTransitions.length;
+        final long[] newTransitions = new long[p + numAdded];
+        System.arraycopy(mTransitions, 0, newTransitions, 0, p);
+        for (int s = 0; s < numStates; s++) {
+          if (!enabled[s]) {
+            newTransitions[p++] = getTransitionCode(s, s);
+          }
+        }
+        return new TransitionGroup(newTransitions,
+                                   mNumberOfSelfloops + numAdded);
       }
-      return new TransitionGroup(newTransitions,
-                                 mNumberOfSelfloops + numAdded);
     }
 
     //#######################################################################
@@ -486,10 +481,5 @@ abstract class EFSMComponent
   private final ComponentProxy mComponent;
   private final CompiledRange mRange;
   private final Map<EFSMEventInstance,TransitionGroup> mEventInstanceMap;
-
-
-  //#########################################################################
-  //# Class Constants
-  static final TransitionGroup EMPTY_GROUP = new TransitionGroup();
 
 }

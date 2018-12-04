@@ -159,6 +159,18 @@ class EFSMSimpleComponent extends EFSMComponent
   }
 
   @Override
+  TransitionGroup getTransitionGroup(final EFSMEventInstance inst)
+  {
+    final TransitionGroup group = super.getTransitionGroup(inst);
+    if (group != null) {
+      return group;
+    } else {
+      final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
+      return mEventMap.get(decl);
+    }
+  }
+
+  @Override
   boolean associateEventInstance(final EFSMEventInstance inst,
                                  final TransitionGroup instGroup)
   {
@@ -176,12 +188,15 @@ class EFSMSimpleComponent extends EFSMComponent
   boolean isSuppressed(final EFSMEventInstance inst)
   {
     if (mPlantifiedSpec == null) {
-      return false;
-    } else if (mPlantifiedSpec.isConsideredControllable(inst)) {
-      final TransitionGroup group = getTransitionGroup(inst);
-      return group == null || group.isSelfloopOnly();
+      return false; // only suppress in plantification (no optimisation here!)
     } else {
-      return false;
+      final TransitionGroup group = getTransitionGroup(inst);
+      assert group != null;
+      if (mPlantifiedSpec.isConsideredControllable(inst)) {
+        return group.isSelfloopOnly();
+      } else {
+        return group.isAlwaysEnabled() && group.isSelfloopOnly();
+      }
     }
   }
 
@@ -219,6 +234,15 @@ class EFSMSimpleComponent extends EFSMComponent
       final EFSMEventDeclaration decl = inst.getEFSMEventDeclaration();
       if (!mEventMap.containsKey(decl)) {
         result.add(inst);
+      }
+    }
+    if (mPlantifiedSpec != null) {
+      for (final EFSMEventDeclaration decl : mEventMap.keySet()) {
+        if (!mPlantifiedSpec.isConsideredControllable(decl)) {
+          for (final EFSMEventInstance inst : decl.getInstances()) {
+            result.add(inst);
+          }
+        }
       }
     }
     if (result.isEmpty()) {
@@ -267,7 +291,7 @@ class EFSMSimpleComponent extends EFSMComponent
       new HashMap<>(numEvents);
     mEventMap = new HashMap<>(numEvents);
     for (final Map.Entry<EFSMEventDeclaration,TransitionGroup> entry :
-         mEventMap.entrySet()) {
+         oldEventMap.entrySet()) {
       final EFSMEventDeclaration decl = entry.getKey();
       final TransitionGroup group = entry.getValue();
       TransitionGroup selflooped;

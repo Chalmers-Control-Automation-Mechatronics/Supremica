@@ -86,19 +86,19 @@ class EFSMVariableComponent extends EFSMComponent
     if (group == null) {
       final EFSMTransitionIterator iter =
         factory.createTransitionIterator(this, constraints);
+      final TLongArrayList transitions;
       if (iter == null) {
-        group = addEmptyTransitionGroup(constraints);
+        transitions = null;
       } else {
-        final TLongArrayList transitions =
-          new TLongArrayList(iter.getEstimatedSize());
+        transitions = new TLongArrayList(iter.getEstimatedSize());
         while (iter.advance()) {
           final SimpleExpressionProxy source = iter.getCurrentSourceState();
           final SimpleExpressionProxy target = iter.getCurrentTargetState();
           final long code = getTransitionCode(source, target);
           transitions.add(code);
         }
-        group = addTransitionGroup(constraints, transitions);
       }
+      group = addTransitionGroup(constraints, transitions);
     }
     if (group.isEmpty()) {
       return null;
@@ -118,19 +118,10 @@ class EFSMVariableComponent extends EFSMComponent
   private TransitionGroup addTransitionGroup(final ConstraintList constraints,
                                              final TLongArrayList transitions)
   {
-    if (transitions.size() == 0) {
-      return addEmptyTransitionGroup(constraints);
-    } else {
-      final TransitionGroup group = new TransitionGroup(transitions);
-      mTransitionGroupMap.put(constraints, group);
-      return group;
-    }
-  }
-
-  private TransitionGroup addEmptyTransitionGroup(final ConstraintList constraints)
-  {
-    mTransitionGroupMap.put(constraints, EMPTY_GROUP);
-    return EMPTY_GROUP;
+    final int numStates = getRange().size();
+    final TransitionGroup group = new TransitionGroup(transitions, numStates);
+    mTransitionGroupMap.put(constraints, group);
+    return group;
   }
 
 
