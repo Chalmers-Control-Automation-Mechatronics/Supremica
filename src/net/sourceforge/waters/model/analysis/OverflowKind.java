@@ -72,7 +72,12 @@ public enum OverflowKind {
 
   //#########################################################################
   //# Display
-  String getMessage(final int limit)
+  public String getMessage()
+  {
+    return getMessage(-1);
+  }
+
+  public String getMessage(final int limit)
   {
     final StringBuilder buffer = new StringBuilder();
     final String name = toString();
