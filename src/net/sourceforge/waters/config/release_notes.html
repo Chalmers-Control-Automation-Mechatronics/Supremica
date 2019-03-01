@@ -1,3 +1,17 @@
+<H3 STYLE="color: #00008d; font-size: 110%;">New in version 2.4.1</H3>
+<UL STYLE="padding: 0px; margin-left: 14px;">
+<LI><STRONG>Automaton variables.</STRONG>
+It is now possible to reference the names of arbitrary automata in
+guard/action blocks. For example, if the model includes a
+plant <CODE>mach1</CODE> with a state <CODE>idle</CODE>, then a
+guard <CODE>mach1==idle</CODE> in any automaton restricts the events of its
+transition to situations where plant <CODE>mach1</CODE> is in state
+<CODE>idle</CODE>.
+To use this feature, both <I>Use normalising EFSM compiler</I> and <I>Allow
+automaton names in EFSM guards</I> must be checked in the <I>gui</I> tab
+in the <I>Options</I>. Enabling automaton variables introduces additional
+syntax restrictions, as there cannot be clashes between variables,
+automata, state names, and enumeration constants.</LI>
 <H3 STYLE="color: #00008d; font-size: 110%;">New in version 2.4</H3>
 <UL STYLE="padding: 0px; margin-left: 14px;">
 <LI><STRONG>Global font and display scaling.</STRONG>

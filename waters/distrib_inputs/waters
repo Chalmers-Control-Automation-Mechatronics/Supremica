@@ -33,6 +33,10 @@ if [ "$JAVACMD" = "" ]; then
     export JAVA_HOME=/usr/lib/jvm/java-8-oracle
     JAVACMD=$JAVA_HOME/bin/java
     if [ ! -x $JAVACMD ]; then
+        export JAVA_HOME=/home/comp452/lib/jdk1.8.0_60
+        JAVACMD=$JAVA_HOME/bin/java
+    fi
+    if [ ! -x $JAVACMD ]; then
         echo "Cannot find a working installation of Java 8, 9, or 10."
         echo "Please make sure it is installed and JAVA_HOME points to it."
         exit 1
