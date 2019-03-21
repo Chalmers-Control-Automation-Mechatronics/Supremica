@@ -64,8 +64,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
   //#########################################################################
   //# Constructor
   public WatersAnalyzeDialog(final Frame owner,
-                             final ProductDESProxy des,
-                             final ModelAnalyzer Verifier)
+                             final ProductDESProxy des)
   {
     super(owner);
     final String title = getAnalysisName();
