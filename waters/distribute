@@ -4,7 +4,7 @@
 
 if [ "$1" = "552" ]
 then
-  WWW=$HOME/public_html/comp552-18a
+  WWW=$HOME/public_html/compx552-19a
   INST_DIR=/home/comp452/lib
 else
   WWW=$HOME/public_html/download_waters
@@ -15,7 +15,7 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside24
+ARCHIVE_PREFIX=waterside241
 
 #############################################################################
 

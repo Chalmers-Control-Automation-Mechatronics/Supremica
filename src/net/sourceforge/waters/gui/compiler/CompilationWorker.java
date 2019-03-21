@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.compiler;
 
 import javax.swing.SwingUtilities;
 
+import net.sourceforge.waters.model.compiler.EvalOverflowException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.EvalException;
@@ -65,8 +66,15 @@ public class CompilationWorker implements Runnable
       try {
         final ProductDESProxy compiledDES = mCompiler.compile();
         notifyOwner(compiledDES, null);
-      } catch (final EvalException evalException) {
-        notifyOwner(null, evalException);
+      } catch (final OutOfMemoryError error) {
+        System.gc();
+        final EvalException exception = new EvalOverflowException(error);
+        notifyOwner(null, exception);
+      } catch (final StackOverflowError error) {
+        final EvalException exception = new EvalOverflowException(error);
+        notifyOwner(null, exception);
+      } catch (final EvalException exception) {
+        notifyOwner(null, exception);
       }
     }
   }
