@@ -701,12 +701,11 @@ public class ModelAssessor
 
   //#########################################################################
   //# Auxiliary Static Methods
-  private static EventProxy getSecondaryMarking(final ProductDESProxy des)
+  private static EventProxy getSecondaryMarking(final AutomatonProxy aut)
   {
     EventProxy result = null;
-    for (final EventProxy event : des.getEvents()) {
-      if (event.getKind() == EventKind.PROPOSITION &&
-          !event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getKind() == EventKind.PROPOSITION) {
         if (result == null) {
           result = event;
         } else {
@@ -1000,21 +999,9 @@ public class ModelAssessor
     //#######################################################################
     //# Model Creation
     ProductDESProxy createInclusionModel(final ProductDESProxy des,
-                                         final String propname,
+                                         final AutomatonProxy property,
                                          final ComponentKind kind)
     {
-      AutomatonProxy prop1 = null;
-      for (final AutomatonProxy aut : mProductDES.getAutomata()) {
-        if (aut.getName().equals(propname)) {
-          prop1 = aut;
-        }
-      }
-      if (prop1 == null) {
-        throw new IllegalArgumentException
-          ("Product DES " + mProductDES.getName() +
-           " does not contain any property named " + propname + "!");
-      }
-
       final String desname = des.getName();
       final Collection<EventProxy> events0 = des.getEvents();
       final Collection<EventProxy> events =
@@ -1042,13 +1029,14 @@ public class ModelAssessor
         switch (aut.getKind()) {
         case PLANT:
         case SPEC:
+        case SUPERVISOR:
           automata.add(aut);
           break;
         default:
           break;
         }
       }
-      final AutomatonProxy prop = replaceEvents(prop1, eventmap, kind);
+      final AutomatonProxy prop = replaceEvents(property, eventmap, kind);
       automata.add(prop);
       return mProductDESFactory.createProductDESProxy(desname, events, automata);
     }
@@ -1056,17 +1044,7 @@ public class ModelAssessor
     ProductDESProxy createExclusionModel(final ProductDESProxy des,
                                          final String propname)
     {
-      AutomatonProxy prop1 = null;
-      for (final AutomatonProxy aut : mProductDES.getAutomata()) {
-        if (aut.getName().equals(propname)) {
-          prop1 = aut;
-        }
-      }
-      if (prop1 == null) {
-        throw new IllegalArgumentException
-          ("Product DES " + mProductDES.getName() +
-           " does not contain any property named " + propname + "!");
-      }
+      final AutomatonProxy prop1 = getAutomaton(propname);
 
       final String desname = des.getName();
       final Collection<EventProxy> events0 = des.getEvents();
@@ -1179,6 +1157,22 @@ public class ModelAssessor
       } else {
         return event1;
       }
+    }
+
+    AutomatonProxy getAutomaton(final String name)
+    {
+      AutomatonProxy found = null;
+      for (final AutomatonProxy aut : mProductDES.getAutomata()) {
+        if (aut.getName().equals(name)) {
+          found = aut;
+        }
+      }
+      if (found == null) {
+        throw new IllegalArgumentException
+          ("Product DES " + mProductDES.getName() +
+           " does not contain any automaton named " + name + "!");
+      }
+      return found;
     }
 
     //#######################################################################
@@ -1501,14 +1495,15 @@ public class ModelAssessor
         return super.check(des);
       } else {
         final Solution sol = getSolution();
-        final ProductDESProxy propdes =
-          sol.createInclusionModel(des, mPropertyName, ComponentKind.PLANT);
-        final EventProxy marking = getSecondaryMarking(propdes);
+        final AutomatonProxy property = sol.getAutomaton(mPropertyName);
+        final ProductDESProxy propDES =
+          sol.createInclusionModel(des, property, ComponentKind.PLANT);
+        final EventProxy marking = getSecondaryMarking(property);
         if (marking != null) {
           final ConflictChecker checker = (ConflictChecker) getModelVerifier();
           checker.setConfiguredDefaultMarking(marking);
         }
-        return super.check(propdes);
+        return super.check(propDES);
       }
     }
 
@@ -1528,7 +1523,7 @@ public class ModelAssessor
     //# Constructor
     LoopTest(final Solution sol, final float marks)
     {
-      super(sol, "Loop check", marks,
+      super(sol, "Control-loop check", marks,
             new NativeControlLoopChecker(mProductDESFactory));
     }
 
@@ -1560,9 +1555,10 @@ public class ModelAssessor
       throws AnalysisException
     {
       final Solution sol = getSolution();
-      final ProductDESProxy propdes =
-        sol.createInclusionModel(des, mPropertyName, ComponentKind.PROPERTY);
-      return super.check(propdes);
+      final AutomatonProxy property = sol.getAutomaton(mPropertyName);
+      final ProductDESProxy propDES =
+        sol.createInclusionModel(des, property, ComponentKind.PROPERTY);
+      return super.check(propDES);
     }
 
     //#######################################################################
