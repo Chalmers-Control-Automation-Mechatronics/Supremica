@@ -42,6 +42,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.List;
+import java.util.Vector;
 
 import javax.swing.Action;
 import javax.swing.ButtonGroup;
@@ -59,6 +60,8 @@ import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFac
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -79,7 +82,7 @@ import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
 
 
 /**
- * @author George Hewlett, Robi Malik
+ * @author George Hewlett, Robi Malik, Brandon Bassett
  */
 public class AutomatonSynthesizerDialog extends JDialog
 {
@@ -126,10 +129,10 @@ public class AutomatonSynthesizerDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent event)
       {
-         localSuperviserNeeded();
+         superviserChanged();
       }
     };
-
+    //Synthesizer type
     mCompMonLabel = new JLabel("Choose Type");
     mMonRadio =  new JRadioButton("Monlithic", true);
     mCompRadio =  new JRadioButton("Compositional");
@@ -141,6 +144,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     mCompRadio.addActionListener(RadioHandler);
     mMonRadio.addActionListener(RadioHandler);
 
+    //Controllable and Non-blocking
     mObjectLabel = new JLabel("Objective: ");
     mControllable = new JCheckBox("Controllable", true);
     mNonBlocking = new JCheckBox("Nonblocking", true);
@@ -155,9 +159,10 @@ public class AutomatonSynthesizerDialog extends JDialog
 
     mControllable.addActionListener(ObjectiveHandler);
     mNonBlocking.addActionListener(ObjectiveHandler);
+
+    //Supervisor Reduction
     mSupReductionLabel = new JLabel("Supervisor reduction: ");
-    mSupReductionType = new JComboBox<>
-      (DefaultSupervisorReductionFactory.class.getEnumConstants());
+    mSupReductionType = new JComboBox<> (DefaultSupervisorReductionFactory.class.getEnumConstants());
     mSupReductionType.setSelectedIndex(0);
 
     final ActionListener ReductionHandler = new ActionListener() {
@@ -169,8 +174,23 @@ public class AutomatonSynthesizerDialog extends JDialog
     };
 
     mSupReductionType.addActionListener(ReductionHandler);
+
+    //Monolithic Supervisor Reduction
     mLocalisedSupervisor = new JCheckBox("Supervisor localization", false);
     mLocalisedSupervisor.setEnabled(false);
+
+    //Composition heuristic
+    mHeuristic = new JLabel("Selected Compositional Heuristic: ");
+
+    final List<SelectionHeuristicCreator> list = CompositionalSelectionHeuristicFactory.getInstance().getEnumConstants();
+    final Vector<SelectionHeuristicCreator> vector = new Vector<> (list);
+    mSelectionHeuristic = new JComboBox<>(vector);
+    mSelectionHeuristic.setEnabled(false);
+
+    //Composition SelfloopOnlyEventsEnabled
+    mCompLoopLabel = new JLabel("Compositional SelfloopOnlyEventsEnabled");
+    mCompLoopEnabled = new JCheckBox("Enable");
+    mCompLoopEnabled.setEnabled(false);
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
@@ -280,6 +300,36 @@ public class AutomatonSynthesizerDialog extends JDialog
     mainlayout.setConstraints(mLocalisedSupervisor, constraints);
     mMainPanel.add(mLocalisedSupervisor);
 
+    // mHeuristicLabel
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.weightx = 0.0;
+    constraints.anchor = GridBagConstraints.WEST;
+    mainlayout.setConstraints(mHeuristic, constraints);
+    mMainPanel.add(mHeuristic);
+    // mSelectionHeuristic
+    constraints.gridx = constraints.gridx + 2;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    mainlayout.setConstraints(mSelectionHeuristic, constraints);
+    mMainPanel.add(mSelectionHeuristic);
+
+    // mCompLoopLabelLabel
+    constraints.gridx = 0;
+    constraints.gridy++;
+    constraints.weightx = 0.0;
+    constraints.anchor = GridBagConstraints.WEST;
+    mainlayout.setConstraints(mCompLoopLabel, constraints);
+    mMainPanel.add(mCompLoopLabel);
+    // mCompLoopEnabled
+    constraints.gridx = constraints.gridx + 2;
+    constraints.gridwidth = 2;
+    constraints.weightx = 3.0;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    mainlayout.setConstraints(mCompLoopEnabled, constraints);
+    mMainPanel.add(mCompLoopEnabled);
+
     // Finally, build the full dialog ...
     final Container contents = getContentPane();
     final GridBagLayout layout = new GridBagLayout();
@@ -339,9 +389,11 @@ public class AutomatonSynthesizerDialog extends JDialog
     }
     else {
       final CompositionalAutomataSynthesizer synthesizer = new CompositionalAutomataSynthesizer(des, factory, translator, AutomataSynthesisAbstractionProcedureFactory.WSOE);
+      synthesizer.getPreselectingMethodFactory();
       synthesizer.setOutputName(prefixName);
       synthesizer.setKindTranslator(translator);
-     // cSynthesizer.setNonblockingSupported(mNonBlocking.isSelected());
+      synthesizer.setSelfloopOnlyEventsEnabled(mCompLoopEnabled.isSelected());
+      synthesizer.setSelectionHeuristic(mSelectionHeuristic.getItemAt(mSelectionHeuristic.getSelectedIndex()));
       reduction = (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
       synthesizer.setSupervisorReductionFactory(reduction);
       mSynthesizer = synthesizer;
@@ -370,12 +422,16 @@ public class AutomatonSynthesizerDialog extends JDialog
     }
   }
 
-  private void localSuperviserNeeded() {
+  private void superviserChanged() {
 
     if(mCompRadio.isSelected()){
       mLocalisedSupervisor.setEnabled(false);
+      mCompLoopEnabled.setEnabled(true);
+      mSelectionHeuristic.setEnabled(true);
     }
     else {
+      mCompLoopEnabled.setEnabled(false);
+      mSelectionHeuristic.setEnabled(false);
       reductionChanged();
     }
   }
@@ -392,8 +448,6 @@ public class AutomatonSynthesizerDialog extends JDialog
       }
     }
   }
-
-
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
@@ -485,6 +539,10 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JLabel mSupReductionLabel;
   private JComboBox<SupervisorReductionFactory> mSupReductionType;
   private JCheckBox mLocalisedSupervisor;
+  private JLabel mHeuristic;
+  private JComboBox<SelectionHeuristicCreator> mSelectionHeuristic;
+  private JLabel mCompLoopLabel;
+  private JCheckBox mCompLoopEnabled;
 
   // Analysis workers
   private SupervisorSynthesizer mSynthesizer;
@@ -493,5 +551,4 @@ public class AutomatonSynthesizerDialog extends JDialog
   //# Class Constants
   private static final long serialVersionUID = 6159733639861131531L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
-
 }
