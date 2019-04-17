@@ -2,30 +2,43 @@ package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
 
-import javax.swing.JLabel;
 
 /**
+ * Abstract class for parameters, stores the default IDs.
+ *
  * @author Brandon Bassett
- * @description Abstract class for parameters, stores the default ID's
  */
 
-public abstract class Parameter{
+public abstract class Parameter
+{
 
-        @SuppressWarnings("unused")
-        private final String name;
-        private final JLabel label;
-        private Component component;
+  @SuppressWarnings("unused")
+  private final int mID;
+  private final String mName;
+  private final String mDescription;
 
-        public Parameter(final String name){
-            this.name = name;
-            label = new JLabel(name);
-        }
+  public Parameter(final int id, final String name)
+  {
+    this(id, name, null);
+  }
 
-        public JLabel getLabel() {
-            return label;
-        }
+  public Parameter(final int id, final String name, final String description)
+  {
+    mID = id;
+    mName = name;
+    mDescription = description;
+  }
 
-        public Component getComponent() {
-            return component;
-        }
+  public String getName()
+  {
+    return mName;
+  }
+
+  public String getDescription()
+  {
+    return mDescription;
+  }
+
+  public abstract Component getComponent();
+
 }

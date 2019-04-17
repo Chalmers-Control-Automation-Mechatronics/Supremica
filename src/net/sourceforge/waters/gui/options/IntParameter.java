@@ -18,8 +18,9 @@ public class IntParameter extends Parameter {
     private final JSlider slider;
     private final JTextField currentValue = new JTextField();
 
-    public IntParameter(final String name, final int min, final int max) {
-        super(name);
+    public IntParameter(final int id, final String name, final String description,
+                        final int min, final int max) {
+        super(id, name, description);
         this.min = min;
         this.max = max;
         slider = new JSlider(min, max);
