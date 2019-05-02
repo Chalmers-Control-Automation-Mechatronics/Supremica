@@ -35,9 +35,6 @@ package net.sourceforge.waters.gui.options;
 
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -54,46 +51,30 @@ public class ParameterPanel extends JPanel
 
   public ParameterPanel(final Parameter param, final int row)
   {
-    final GridBagConstraints constraints = new GridBagConstraints();
-    final GridBagLayout mainlayout = new GridBagLayout();
-
     mParameter = param;
-    constraints.insets = new Insets(2, 4, 2, 4);
-    constraints.weighty = 0.0;
+    add(mParameter.createLabel());
+    add(mParameter.createComponent());
 
-    //Label
-    constraints.gridx = 0;
-    constraints.gridy = row;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mParameter.createLabel(), constraints);
-    this.add(mParameter.createLabel());
-
-    //Component
-    constraints.gridx = constraints.gridx + 2;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mParameter.createComponent(), constraints);
-    this.add(mParameter.createComponent());
-
+    //Components are horizontal
+    /*
+    setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+    add(mParameter.createLabel());
+    add(mParameter.createComponent());
+*/
     storedComponents = getComponents();
     for (final Component component : storedComponents)
       ((JComponent) component).setToolTipText(mParameter.getDescription());
   }
-
-  /*
-   * Updates the stored parameters value using the value stored in the
-   * component, knows component passed on parameter class stored
-   */
-  public void updateParameter()
+  //Updates parameter with itself
+  public void commitParameter()
   {
-    if (mParameter.getClass().equals(IntParameter.class))
-      ((IntParameter) mParameter).setValue(Integer
-        .parseInt(((JTextField) storedComponents[1]).getText()));
-    else if (mParameter.getClass().equals(BoolParameter.class))
-      ((BoolParameter) mParameter)
-        .setValue(((JCheckBox) storedComponents[1]).isSelected());
+    mParameter.updateFromGUI(this);
+  }
+  //Updates parameter and itself with other panel
+  public void copyFromPanel(final ParameterPanel panel)
+  {
+    mParameter.updateFromGUI(panel);
+    mParameter.displayInGUI(this);
   }
 
   public Parameter getParameter()
@@ -109,13 +90,12 @@ public class ParameterPanel extends JPanel
   public void setComponentValue(final int input)
   {
     ((JTextField) storedComponents[1]).setText(Integer.toString(input));
-    updateParameter();
+    commitParameter();
   }
 
   public void setComponentValue(final boolean input)
   {
     ((JCheckBox) storedComponents[1]).setSelected(input);
-    updateParameter();
+    commitParameter();
   }
-
 }

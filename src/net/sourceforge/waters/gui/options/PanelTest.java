@@ -76,7 +76,6 @@ public class PanelTest {
 		final CardLayout cl = (CardLayout)(cards.getLayout());
 		final HashMap<Integer, String> algPosName = new HashMap<Integer, String>();
 		final HashMap<Integer, List<ParameterPanel>> parameterPanelList = new HashMap<Integer, List<ParameterPanel>>();
-		final HashMap<Integer, List<Parameter>> allParameters = new HashMap<Integer, List<Parameter>>(); // should not be needed
 		final String alg1Name = "ALG1";
 		final String alg2Name = "ALG2";
 		final String alg3Name = "ALG3";
@@ -114,10 +113,10 @@ public class PanelTest {
 	    mMainPanel.add(mAlgThreeRadio);
 
 	    final JButton updateButton = new JButton("Update Parameters");
-	    final JButton nextButton = new JButton("Print Algorithm Panel");
+	    final JButton printButton = new JButton("Print Algorithm Panel");
 
 	    mButtonPanel.add(updateButton);
-	    mButtonPanel.add(nextButton);
+	    mButtonPanel.add(printButton);
 
 	    final List<Parameter> alg1 = new ArrayList<Parameter>();
 
@@ -179,7 +178,7 @@ public class PanelTest {
 	        		else if(tmp.getClass().equals(BoolParameter.class))
 	        			System.out.print("Before: " + ((BoolParameter) tmp).getValue() + " ");
 	        		*/
-	        		panel.updateParameter();
+	        		panel.commitParameter();
 	        		/*
 	        		if(tmp.getClass().equals(IntParameter.class))
 	        			System.out.print("After: " + ((IntParameter) tmp).getValue() + " ");
@@ -191,13 +190,14 @@ public class PanelTest {
 	        }
 	      };
 
-	    final ActionListener nextPanel = new ActionListener() {
+	    final ActionListener printPanel = new ActionListener() {
 		        @Override
 		        public void actionPerformed(final ActionEvent event)
 		        {
 		    	    //cl.next(cards);
-		    	    for(final Parameter p : allParameters.get(currentAlgHome)) {
+		    	    for(final ParameterPanel panel : parameterPanelList.get(currentAlgHome)) {
 
+		    	        final Parameter p = panel.getParameter();
 		    	    	if(p.getClass().equals(IntParameter.class))
 		    	    		 System.out.print(((IntParameter)p).getValue() + " ");		//default parameter doesnt have getValue
 		    	    	if(p.getClass().equals(BoolParameter.class))
@@ -212,7 +212,7 @@ public class PanelTest {
 		        public void actionPerformed(final ActionEvent event)
 		        {
 		        	for(final ParameterPanel panel : parameterPanelList.get(currentAlgHome))
-		    	    	panel.updateParameter();
+		    	    	panel.commitParameter();
 
 		    	    if(mAlgOneRadio.isSelected()) {
 		    	    	copyValue(parameterPanelList.get(currentAlgHome), parameterPanelList.get(0));
@@ -237,7 +237,7 @@ public class PanelTest {
 		mAlgThreeRadio.addActionListener(changePanel);
 
 	    updateButton.addActionListener(updateParameters);
-	    nextButton.addActionListener(nextPanel);
+	    printButton.addActionListener(printPanel);
 
 		// Finally, build the full dialog ...
 	    final GridBagLayout layout = new GridBagLayout();
@@ -277,13 +277,12 @@ public class PanelTest {
 	    //hashmap for retrieving active card
 	    algPosName.put(0, alg1Name);
 	    parameterPanelList.put(0, alg1Panels);
-	    allParameters.put(0, alg1);
+
 	    algPosName.put(1, alg2Name);
 	    parameterPanelList.put(1, alg2Panels);
-	    allParameters.put(1, alg2);
+
 	    algPosName.put(2, alg3Name);
 	    parameterPanelList.put(2, alg3Panels);
-	    allParameters.put(2, alg3);
 
 	    frame.add(cards);
 	    layout.setConstraints(mButtonPanel, constraints);
@@ -320,6 +319,10 @@ public class PanelTest {
 
 			 final ParameterPanel o = findID(oldPanel, i);
 			 final ParameterPanel n = findID(newPanel, i);
+
+			 o.commitParameter();
+			 n.copyFromPanel(o);
+
 			 /*
 			  * This is what we want:
 			 Parameter oldParam = o.getParameter();
@@ -329,15 +332,8 @@ public class PanelTest {
 			 newParam.displayInGUI(n);
 			 */
 
-			 //both panels have same parameter ie type and component
-			 if(o.getParameter().getClass().equals(IntParameter.class))
-				 n.setComponentValue(((IntParameter)o.getParameter()).getValue());
-			 if(o.getParameter().getClass().equals(BoolParameter.class))
-				 n.setComponentValue(((BoolParameter)o.getParameter()).getValue());
-
 		 }
 	}
-
 
 	public static ParameterPanel findID(final List<ParameterPanel> Panels, final int id) {
 
