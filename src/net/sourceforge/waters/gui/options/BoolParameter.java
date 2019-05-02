@@ -63,11 +63,21 @@ public class BoolParameter extends Parameter
       mValue = value;
   }
 
+ //Updates parameter value using the component stored in the passed panel
   @Override
   public void updateFromGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
     final JCheckBox checkBox = (JCheckBox) comp;
     mValue = checkBox.isSelected();
+  }
+
+  //Updates a ParameterPanels component with parameter value
+  @Override
+  public void displayInGUI(final ParameterPanel panel)
+  {
+    final Component comp = panel.getEntryComponent();
+    final JCheckBox checkBox = (JCheckBox) comp;
+    checkBox.setSelected(mValue);
   }
 }

@@ -35,6 +35,8 @@ package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 public class IntParameter extends Parameter {
@@ -86,12 +88,31 @@ public class IntParameter extends Parameter {
     	clamp();
     }
 
+  //Updates parameter value using the component stored in the passed panel
     @Override
     public void updateFromGUI(final ParameterPanel panel)
     {
-      @SuppressWarnings("unused")
       final Component comp = panel.getEntryComponent();
-      // TODO
+      final JTextField textField = (JTextField) comp;
+      int val;
+      try {
+        val = (Integer.parseInt(textField.getText()));
+        setValue(val);
+      }
+      catch(final NumberFormatException e) {
+        value = min;
+        textField.setText(String.valueOf(value));
+        final JFrame frame = new JFrame();
+        JOptionPane.showMessageDialog(frame, "Invalid value in " + this.getName() + " field, resetting to minimum value.");
+      }
     }
 
+    //Updates a ParameterPanels component with parameter value
+    @Override
+    public void displayInGUI(final ParameterPanel panel)
+    {
+      final Component comp = panel.getEntryComponent();
+      final JTextField textField = (JTextField) comp;
+      textField.setText(String.valueOf(value));
+    }
 }

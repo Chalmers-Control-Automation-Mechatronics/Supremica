@@ -81,6 +81,6 @@ public abstract class Parameter
 
   public abstract void updateFromGUI(ParameterPanel panel);
 
-  //public abstract void displayInGUI(ParameterPanel panel);
+  public abstract void displayInGUI(ParameterPanel panel);
 
 }
