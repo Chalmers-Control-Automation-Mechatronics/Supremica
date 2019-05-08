@@ -73,20 +73,20 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * guard to generate transitions.</P>
  *
  * <P>If a guard contains more than one variable, e.g., <CODE>x'==y+1 &amp;
- * y>2</CODE>, then may not be possible to generate events that can be
+ * y&gt;2</CODE>, then may not be possible to generate events that can be
  * assigned to separate variable automata. In this case, the guard is
  * split into a disjunction such that an event can be generated for
  * each event. This can be done by selecting a variable and substituting
  * each of its values. If the domain of <CODE>y</CODE> in the above example
  * is <CODE>1..4</CODE> then a split can be done into for guards:</P>
  * <UL>
- * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==1</CODE>
+ * <LI><CODE>x'==y+1 &amp; y&gt;2 &amp; y==1</CODE>
  *     &rarr; <CODE>false</CODE>;</LI>
- * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==2</CODE>
+ * <LI><CODE>x'==y+1 &amp; y&gt;2 &amp; y==2</CODE>
  *     &rarr; <CODE>false</CODE>;</LI>
- * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==3</CODE>
+ * <LI><CODE>x'==y+1 &amp; y&gt;2 &amp; y==3</CODE>
  *     &rarr; <CODE>x'==4 &amp; y==3</CODE>;</LI>
- * <LI><CODE>x'==y+1 &amp; y>2 &amp; y==4</CODE>
+ * <LI><CODE>x'==y+1 &amp; y&gt;2 &amp; y==4</CODE>
  *     &rarr; <CODE>x'==5 &amp; y==4</CODE>.</LI>
  * </UL>
  * <P>Each of these guards is a conjunction, where each conjunct mentions
@@ -105,7 +105,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * <DT>Disjunctive split.</DT>
  * <DD>If the constraint list contains a disjunction <I>A<sub>1</sub> | ...
  * | A<sub>n</sub></I> that uses more than one variable, then a split
- * into the disjoints <I>A<sub>1</sub></I>, ..., <I>A<sub>n</sub></I> is
+ * into the disjuncts <I>A<sub>1</sub></I>, ..., <I>A<sub>n</sub></I> is
  * proposed. If this option is available, it is considered above all other
  * options.</DD>
  * <DT>Index split.</DT>
@@ -118,7 +118,7 @@ import net.sourceforge.waters.model.module.UnaryExpressionProxy;
  * variable, then a split over one of the variables in that element is
  * proposed. Here, if a formula contains a variable both in its current
  * and next-state (primed) form, this counts as only one variable.</DD>
- * <DL>
+ * </DL>
  * <P>If more than on split is available in one of the above categories,
  * heuristics are used to guess a split that results in fewer events.
  * The most common of these is to favour splits over variables that

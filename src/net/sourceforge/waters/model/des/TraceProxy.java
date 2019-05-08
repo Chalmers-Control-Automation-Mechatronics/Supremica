@@ -96,7 +96,7 @@ public interface TraceProxy
    * and the loop index is at position&nbsp;<I>i</I>, then it represents the
    * loop 0,...,<I>n</I>,<I>i</I>,...,<I>n</I>,...
    * @return The index of the trace step starting a cycle,
-   *         or <CODE>-1</CODE< if it is not a cyclic trace.
+   *         or <CODE>-1</CODE> if it is not a cyclic trace.
    */
   public int getLoopIndex();
 
