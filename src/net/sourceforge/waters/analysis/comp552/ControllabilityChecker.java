@@ -195,19 +195,19 @@ public class ControllabilityChecker extends ModelChecker
     // The following creates a trace that consists of all the events in
     // the input model.
     // This code is only here to demonstrate the use of the interfaces.
-    // IT DOES NOT GIVE A CORRECT TRACE!
+    // IT DOES NOT GIVE A CORRECT COUNTEREXAMPLE!
 
     final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy des = getModel();
     final String desName = des.getName();
     final String traceName = desName + ":uncontrollable";
     final Collection<EventProxy> events = des.getEvents();
-    final List<EventProxy> traceList = new LinkedList<>();
+    final List<EventProxy> eventList = new LinkedList<>();
     for (final EventProxy event : events) {
-      traceList.add(event);
+      eventList.add(event);
     }
     return
-      desFactory.createSafetyCounterExampleProxy(traceName, des, traceList);
+      desFactory.createSafetyCounterExampleProxy(traceName, des, eventList);
   }
 
 

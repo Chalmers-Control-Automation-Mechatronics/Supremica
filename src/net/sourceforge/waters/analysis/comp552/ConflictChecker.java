@@ -207,21 +207,21 @@ public class ConflictChecker extends ModelChecker
     // The following creates a trace that consists of all the events in
     // the input model.
     // This code is only here to demonstrate the use of the interfaces.
-    // IT DOES NOT GIVE A CORRECT TRACE!
+    // IT DOES NOT GIVE A CORRECT COUNTEREXAMPLE!
 
     final ProductDESProxyFactory desFactory = getFactory();
     final ProductDESProxy model = getModel();
-    final String modelname = model.getName();
-    final String tracename = modelname + "-conflicting";
+    final String modelName = model.getName();
+    final String traceName = modelName + "-conflicting";
     final Collection<EventProxy> events = model.getEvents();
-    final List<EventProxy> tracelist = new LinkedList<>();
+    final List<EventProxy> eventList = new LinkedList<>();
     for (final EventProxy event : events) {
-      tracelist.add(event);
+      eventList.add(event);
     }
     // Note. The conflict kind field of the trace is optional for
     // this assignment---it will not be tested.
     return desFactory.createConflictCounterExampleProxy
-      (tracename, model, tracelist, ConflictKind.CONFLICT);
+      (traceName, model, eventList, ConflictKind.CONFLICT);
   }
 
 
