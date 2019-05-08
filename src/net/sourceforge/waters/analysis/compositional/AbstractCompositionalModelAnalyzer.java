@@ -672,11 +672,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
   }
 
-  public void setPropositions(final Collection<EventProxy> props)
-  {
-    mPropositions = props;
-  }
-
   public Collection<EventProxy> getPropositions()
   {
     return mPropositions;
