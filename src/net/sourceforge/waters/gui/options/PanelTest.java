@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.options;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -43,7 +44,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -52,6 +55,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
+import net.sourceforge.waters.analysis.compositional.ModularAndCompositionalSynthesizer;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 public class PanelTest
@@ -82,8 +93,8 @@ public class PanelTest
 
     final GridBagLayout mainlayout = new GridBagLayout();
 
-    final JRadioButton mAlgOneRadio = new JRadioButton("AlgOne", true);
-    final JRadioButton mAlgTwoRadio = new JRadioButton("AlgTwo");
+    final JRadioButton mAlgOneRadio = new JRadioButton("Monolithic", true);
+    final JRadioButton mAlgTwoRadio = new JRadioButton("Compositional");
 
     final ButtonGroup superviserType = new ButtonGroup();
     superviserType.add(mAlgOneRadio);
@@ -95,6 +106,32 @@ public class PanelTest
     constrainComponent(mAlgTwoRadio, constraints, mainlayout, 2, 1, 3);
     mMainPanel.add(mAlgTwoRadio);
 
+  //  final JComboBox superviserCombobox;
+
+ //   final List<String> Superviserlist = new ArrayList<String>();
+/*
+    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
+
+      try {
+      //  Superviserlist.add(dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).toString());
+        dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getClass().toString();
+
+      } catch (final ClassNotFoundException exception) {
+      //  exception.printStackTrace();
+      } catch (final AnalysisConfigurationException exception) {
+     //   exception.printStackTrace();
+      }
+    }*/
+/*
+    for(final String str: Superviserlist) {
+      System.out.println(str);
+    }
+
+    final Vector<String> vector = new Vector<> (Superviserlist);
+    superviserCombobox = new JComboBox<>(vector);
+    constrainComponent(superviserCombobox, constraints, mainlayout, 0, 2, 3);
+    mMainPanel.add(superviserCombobox);
+*/
     final JButton updateButton = new JButton("Update Parameters");
     final JButton printButton = new JButton("Print Algorithm Panel");
 
@@ -138,11 +175,13 @@ public class PanelTest
 
           final Parameter p = panel.getParameter();
           if (p.getClass().equals(IntParameter.class))
-            System.out.print(((IntParameter) p).getValue() + " "); //default parameter doesn't have getValue
+            System.out.print("Int: " + ((IntParameter) p).getValue() + " "); //default parameter doesn't have getValue
           if (p.getClass().equals(BoolParameter.class))
-            System.out.print(((BoolParameter) p).getValue() + " ");
+            System.out.print("Boolean: " + ((BoolParameter) p).getValue() + " ");
           if (p.getClass().equals(StringParameter.class))
-            System.out.print(((StringParameter) p).getValue() + " ");
+            System.out.print("String: " + ((StringParameter) p).getValue() + " ");
+          if (p.getClass().equals(EnumParameter.class))
+            System.out.print("Enum: " + ((EnumParameter<?>) p).getValue() + " ");
         }
         System.out.println();
       }
@@ -179,7 +218,7 @@ public class PanelTest
 
     // Finally, build the full dialog ...
     final GridBagLayout layout = new GridBagLayout();
-    frame.setLayout(layout);
+    //frame.setLayout(layout);
     constraints.gridx = 0;
     constraints.gridy = GridBagConstraints.RELATIVE;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
@@ -188,12 +227,11 @@ public class PanelTest
     constraints.fill = GridBagConstraints.BOTH;
     constraints.insets = new Insets(0, 0, 0, 0);
     layout.setConstraints(mMainPanel, constraints);
-    frame.add(mMainPanel);
+    frame.add(mMainPanel, BorderLayout.PAGE_START);
 
     //All panels occur vertically, one column many rows
     mMonolithicHomePanel
       .setLayout(new BoxLayout(mMonolithicHomePanel, BoxLayout.Y_AXIS));
-    //   mMonolithicHomePanel.setPreferredSize(new Dimension(200, 200));
 
     for (final ParameterPanel panel : alg1Panels) {
       mMonolithicHomePanel.add(panel);
@@ -201,20 +239,19 @@ public class PanelTest
 
     mCompositionalHomePanel
       .setLayout(new BoxLayout(mCompositionalHomePanel, BoxLayout.Y_AXIS));
-    // mCompositionalHomePanel.setPreferredSize(new Dimension(200, 200));
+
     for (final ParameterPanel panel : alg2Panels) {
       mCompositionalHomePanel.add(panel);
     }
 
     //Using cardlayout
     layout.setConstraints(cards, constraints);
-    cards.setPreferredSize(new Dimension(300, 300));
+    cards.setPreferredSize(new Dimension(cards.getWidth(), 300));
+
     final JScrollPane mono = new JScrollPane(mMonolithicHomePanel);
     cards.add(mono, alg1Name);
-    // cards.add(mMonolithicHomePanel, alg1Name);
     final JScrollPane comp = new JScrollPane(mCompositionalHomePanel);
     cards.add(comp, alg2Name);
-    //cards.add(mCompositionalHomePanel, alg2Name);
 
     //hashmap for retrieving active card
     algPosName.put(0, alg1Name);
@@ -223,13 +260,14 @@ public class PanelTest
     algPosName.put(1, alg2Name);
     parameterPanelList.put(1, alg2Panels);
 
-    frame.add(cards);
+    frame.add(cards, BorderLayout.CENTER);
     layout.setConstraints(mButtonPanel, constraints);
-    frame.add(mButtonPanel);
+    frame.add(mButtonPanel, BorderLayout.PAGE_END);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
     frame.setVisible(true);
-  }
+
+    }
 
   public static void constrainComponent(final Component comp,
                                         final GridBagConstraints constraints,
@@ -284,29 +322,99 @@ public class PanelTest
     return null;
   }
 
-  public static List<Parameter> fakeMonolithic()
+  public static List<Parameter> fakeSupervizerSynthesizer()
+  {
+    /*
+     * setConfiguredDefaultMarking(EventProxy marking)
+     * setNondeterminismEnabled(boolean enable);
+     * setSupervisorLocalizationEnabled(final boolean enable);
+     * setSupervisorReductionFactory(final SupervisorReductionFactory factory);
+     */
+
+    /*
+      final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    mAutomata = panel.getAutomataTable().getOperationArgument();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
+                                           mAutomata, factory);
+
+    final List<EventProxy> test = new ArrayList<>(des.getEvents());
+    final Vector<EventProxy> testVector = new Vector<> (test);
+    mEventProxy = new JComboBox<>(testVector);
+   */
+    final List<Parameter> list = new ArrayList<Parameter>();
+    final Set<String> set = new HashSet<String>();
+    set.add("1");
+    set.add("2");
+    set.add("3");
+    set.add("4");
+   // list.add(new EnumParameter(5, "ConfiguredDefaultMarking", "ConfiguredDefaultMarking", set));
+    list.add(new BoolParameter(1, "NonDeterminismEnabled", "Turn on or off",true));
+    list.add(new BoolParameter(3, "SuperviserLocalisationEnabled", "Turn on or off",true));
+    list.add(new EnumParameter<SupervisorReductionFactory>(4,"SuperviserReductionFactory", "SuperviserReductionFactory",
+                                                                  DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    return list;
+  }
+
+
+  public static List<Parameter> fakeModularAndCompositionalSynthesizer()
   {
     final List<Parameter> list = new ArrayList<Parameter>();
-    list.addAll(fakeModelAnalyzer());                                               //Parameters from a parent
-    list.add(new BoolParameter(91, "NonBlockingSupported", "Turn on or off",
+    list.addAll(fakeModelAnalyzer());
+    //list.addAll(fakeSupervizerSynthesizer());
+
+    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    final ModularAndCompositionalSynthesizer mds= new ModularAndCompositionalSynthesizer(factory);
+    ModularAndCompositionalSynthesizer.class.getEnumConstants();
+    mds.getConfiguredDefaultMarking();
+
+    /*
+     * ConfiguredDefaultMarking(EventProxy)
+     * InternalStateLimit(int)
+     * MonolithicStateLimit(int)
+     * MonolithicTransitionLimit(int)
+     * NondeterminismEnabled(boolean)
+     * PreselectingMethod(PreselectingMethod)
+     * RemovesUnnecessarySupervisors(boolean)
+     * setSelectionHeuristic(SelectionHeuristicCreator)
+     * setSupervisorLocalizationEnabled(boolean)
+     * setSupervisorReductionFactory(SupervisorReductionFactory)
+     */
+    return list;
+  }
+
+  public static List<Parameter> fakeMonolithic()
+  {
+    /*
+     * setNonblockingSupported(boolean)
+     */
+    final List<Parameter> list = new ArrayList<Parameter>();
+    list.addAll(fakeModelAnalyzer());                                           //Parameters from a parent
+    list.addAll(fakeSupervizerSynthesizer());
+    list.addAll(fakeAbstractModelBuilder());
+    list.add(new StringParameter(2, "OutputName", "OutputName for file"));         // OutputName     StringParameter
+    return list;
+  }
+
+  public static List<Parameter> fakeAbstractModelBuilder()
+  {
+    /*
+     * setOutputName(String)
+     */
+    final List<Parameter> list = new ArrayList<Parameter>();
+    list.add(new BoolParameter(0, "NonBlockingSupported", "Turn on or off",
                                true));                                              // NonBlockingSupported    BoolParameter
-    list.add(new BoolParameter(92, "NonDeterminismEnabled", "Turn on or off",
-                               true));                                              // NonDeterminismEnabled    BoolParameter
-    list.add(new StringParameter(93, "OutputName", "OutputName for file"));         // OutputName     StringParameter
-    list.add(new BoolParameter(94, "NonDeterminismEnabled", "Turn on or off",
-                               true)); // SuperviserLocalisationEnabled   BoolParameter
-    // list.add(new EnumParameter(95, "SuperviserReductionFactory", "SuperviserReductionFactory", DefaultSupervisorReductionFactory.class.getEnumConstants())); // SuperviserReductionFactory  SuperviserReductionFactory  EnumParameter
-    //list.add(new EnumParameter(90, "ConfiguredDefaultMarking", "ConfiguredDefaultMarking", enum list));            // ConfiguredDefaultMarking  EventProxy
+
     return list;
   }
 
   public static List<Parameter> fakeModelAnalyzer()
   {
     final List<Parameter> list = new ArrayList<Parameter>();
-    list.add(new IntParameter(96, "TransitionLimit", "TransitionLimit", 0,
+    list.add(new IntParameter(10, "TransitionLimit", "TransitionLimit", 0,
                               100));                                            // TransitionLimit IntParameter
-    list.add(new IntParameter(97, "NodeLimit", "NodeLimit", 0, 100));           //NodeLimit    IntParameter
-    list.add(new BoolParameter(98, "DetailedOutputEnabled",
+    list.add(new IntParameter(11, "NodeLimit", "NodeLimit", 0, 100));           //NodeLimit    IntParameter
+    list.add(new BoolParameter(12, "DetailedOutputEnabled",
                                "DetailedOutputEnabled", true));                 //DetailedOutputEnabled   BoolParameter
     return list;
   }
@@ -315,6 +423,7 @@ public class PanelTest
   {
     final List<Parameter> list = new ArrayList<Parameter>();
     list.addAll(fakeModelAnalyzer());                              //Parameters from a parent
+    list.addAll(fakeSupervizerSynthesizer());
     list.add(new BoolParameter(40, "UsingSpecialEvents", "UsingSpecialEvents",
                                true));                                                  // UsingSpecialEvents  boolean BoolParameter
     list.add(new IntParameter(41, "UpperInternalStateLimit",
@@ -325,9 +434,7 @@ public class PanelTest
                                "SelfLoopOnlyEnabled", true));                           // SelfLoopOnlyEnabled boolean     BoolParameter
     list.add(new BoolParameter(45, "PruningDeadlocks", "PruningDeadlocks",
                                true));                                                  //PruningDeadlocks    boolean     BoolParameter
-    list.add(new StringParameter(47, "OutputName", "OutputName for file"));             // OutputName  String     StringParameter
-    list.add(new BoolParameter(48, "NonDeterminismEnabled",
-                               "NonDeterminismEnabled", true));                         // NonDeterminismEnabled   boolean     BoolParameter
+    list.add(new StringParameter(2, "OutputName", "OutputName for file"));              // OutputName  String     StringParameter
     list.add(new IntParameter(49, "MonolithicTransitionLimit",
                               "MonolithicTransitionLimit", 0, 100));                    // MonolithicTransitionLimit   int    IntParameter
     list.add(new IntParameter(50, "MonolithicStateLimit",
@@ -342,11 +449,17 @@ public class PanelTest
                                "FailingEventsEnabled", true));                          // FailingEventsEnabled    boolean     BoolParameter
     list.add(new BoolParameter(55, "BlockedEventsEnabled",
                                "BlockedEventsEnabled", true));                          // BlockedEventsEnabled    boolean     BoolParameter
-    // list.add(new EnumParameter(56, "SuperviserReductionFactory", "SuperviserReductionFactory", ?); //  AbstractionProcedureCreator AbstractionProcedureCreator     EnumParameter
-    // list.add(new EnumParameter(57, "SuperviserReductionFactory", "SuperviserReductionFactory", ?);  // ConfiguredDefaultMarking    EventProxy
+    // list.add(new EnumParameter(56, "AbstractionProcedureCreator", "AbstractionProcedureCreator", ?); //  AbstractionProcedureCreator AbstractionProcedureCreator     EnumParameter
+
     // MonolithicAnalyzer  ModelAnalyzer       DialogParameter
-    // list.add(new EnumParameter(44, "SuperviserReductionFactory", "SuperviserReductionFactory", ?); // SelectionHeuristic  SelectionHeuristicCreator       EnumParameter
-    // list.add(new EnumParameter(46, "SuperviserReductionFactory", "SuperviserReductionFactory", ?); // PreselectingMethod  PreselectingMethod      EnumParameter
+    list
+      .add(new EnumParameter<SelectionHeuristicCreator>(44,
+                                                        "SelectionHeuristic",
+                                                        "SelectionHeuristic",
+                                                        CompositionalSelectionHeuristicFactory
+                                                          .getInstance()
+                                                          .getEnumConstants()));       // SelectionHeuristic  SelectionHeuristicCreator       EnumParameter
+    // list.add(new EnumParameter(46, "PreselectingMethod", "PreselectingMethod", ?); // PreselectingMethod  PreselectingMethod      EnumParameter
     return list;
   }
 
@@ -355,10 +468,9 @@ public class PanelTest
   {
     final List<Parameter> list = new ArrayList<Parameter>();
     list.addAll(fakeAbstractCompositionalModelAnalyzer());                      //Parameters from a parent
-    list.add(new StringParameter(93, "SuperviserNamePrefix",
+    list.add(new StringParameter(100, "SuperviserNamePrefix",
                                  "SuperviserNamePrefix for file"));             //SuperviserNamePrefix    StringParameter
-    //list.add(new BoolParameter(98, "DetailedOutputEnabled", "DetailedOutputEnabled", true));           // SuperviserLocalisationEnabled    null
-    //list.add(new EnumParameter(95, "SuperviserReductionFactory", "SuperviserReductionFactory",CompositionalSelectionHeuristicFactory.getInstance().getEnumConstants())); // SuperviserReductionFactory  EnumParameter
+    //list.add(new BoolParameter(98, "SuperviserLocalisationEnabled", "SuperviserLocalisationEnabled", true));           // SuperviserLocalisationEnabled    null
     return list;
   }
 

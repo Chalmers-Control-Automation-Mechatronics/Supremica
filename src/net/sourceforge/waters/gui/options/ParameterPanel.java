@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.options;
 
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
@@ -50,9 +51,10 @@ public class ParameterPanel extends JPanel
 
   public ParameterPanel(final Parameter param, final int row)
   {
+    setLayout(new BorderLayout());
     mParameter = param;
-    add(mParameter.createLabel());
-    add(mParameter.createComponent());
+    add(mParameter.createLabel(), BorderLayout.WEST);
+    add(mParameter.createComponent(), BorderLayout.EAST);
 
     storedComponents = getComponents();
     for (final Component component : storedComponents)
