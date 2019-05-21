@@ -1,8 +1,9 @@
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
 
 import javax.swing.JTextField;
+
 
 
 public class StringParameter extends Parameter

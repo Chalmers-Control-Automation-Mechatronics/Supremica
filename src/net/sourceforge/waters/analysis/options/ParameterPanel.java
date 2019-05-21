@@ -31,56 +31,73 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 
-import javax.swing.JLabel;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-public abstract class Parameter
+
+
+public class ParameterPanel extends JPanel
 {
+  private static final long serialVersionUID = 1L;
+  private final Parameter mParameter;
+  private final Component[] storedComponents; // don't need, just use getComponents()
 
-  private final int mID;
-  private final String mName;
-  private final String mDescription;
-
-  public Parameter(final int id, final String name)
+  public ParameterPanel(final Parameter param, final int row)
   {
-    this(id, name, null);
+    setLayout(new BorderLayout());
+    mParameter = param;
+    add(mParameter.createLabel(), BorderLayout.WEST);
+    add(mParameter.createComponent(), BorderLayout.EAST);
+
+    storedComponents = getComponents();
+    for (final Component component : storedComponents)
+      ((JComponent) component).setToolTipText(mParameter.getDescription());
+  }
+  //Updates parameter with itself
+  public void commitParameter()
+  {
+    mParameter.updateFromGUI(this);
+  }
+  //Updates parameter and itself with other panel
+  public void copyFromPanel(final ParameterPanel panel)
+  {
+    mParameter.updateFromGUI(panel);
+    mParameter.displayInGUI(this);
   }
 
-  public Parameter(final int id, final String name, final String description)
+  public Parameter getParameter()
   {
-    mID = id;
-    mName = name;
-    mDescription = description;
+    return mParameter;
   }
 
-  public String getName()
+  public Component getEntryComponent()
   {
-    return mName;
+    return getComponents()[1];
   }
 
-  public String getDescription()
+  public void setComponentValue(final int input)
   {
-    return mDescription;
+    ((JTextField) storedComponents[1]).setText(Integer.toString(input));
+    commitParameter();
   }
 
-  public int getID()
+  public void setComponentValue(final boolean input)
   {
-    return mID;
+    ((JCheckBox) storedComponents[1]).setSelected(input);
+    commitParameter();
   }
 
-  public JLabel createLabel()
+  public void setComponentValue(final String input)
   {
-    return new JLabel(mName);
+    ((JTextField) storedComponents[1]).setText(input);
+    commitParameter();
   }
-
-  public abstract Component createComponent();
-
-  public abstract void updateFromGUI(ParameterPanel panel);
-
-  public abstract void displayInGUI(ParameterPanel panel);
-
 }

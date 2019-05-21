@@ -31,53 +31,57 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
+
 
 import java.awt.Component;
 
-import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 
-public class BoolParameter extends Parameter
+public abstract class Parameter
 {
-  private boolean mValue;
 
-  public BoolParameter(final int id, final String name,
-                       final String description, final boolean value)
+  private final int mID;
+  private final String mName;
+  private final String mDescription;
+
+  public Parameter(final int id, final String name)
   {
-    super(id, name, description);
-    mValue = value;
+    this(id, name, null);
   }
 
-  @Override
-  public Component createComponent()
+  public Parameter(final int id, final String name, final String description)
   {
-    return new JCheckBox("", mValue);
+    mID = id;
+    mName = name;
+    mDescription = description;
   }
 
-  public boolean getValue() {
-      return mValue;
-  }
-
-  public void setValue(final boolean value) {
-      mValue = value;
-  }
-
- //Updates parameter value using the component stored in the passed panel
-  @Override
-  public void updateFromGUI(final ParameterPanel panel)
+  public String getName()
   {
-    final Component comp = panel.getEntryComponent();
-    final JCheckBox checkBox = (JCheckBox) comp;
-    mValue = checkBox.isSelected();
+    return mName;
   }
 
-  //Updates a ParameterPanels component with parameter value
-  @Override
-  public void displayInGUI(final ParameterPanel panel)
+  public String getDescription()
   {
-    final Component comp = panel.getEntryComponent();
-    final JCheckBox checkBox = (JCheckBox) comp;
-    checkBox.setSelected(mValue);
+    return mDescription;
   }
+
+  public int getID()
+  {
+    return mID;
+  }
+
+  public JLabel createLabel()
+  {
+    return new JLabel(mName);
+  }
+
+  public abstract Component createComponent();
+
+  public abstract void updateFromGUI(ParameterPanel panel);
+
+  public abstract void displayInGUI(ParameterPanel panel);
+
 }

@@ -31,72 +31,53 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
-
-import java.awt.BorderLayout;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 
-public class ParameterPanel extends JPanel
+public class BoolParameter extends Parameter
 {
-  private static final long serialVersionUID = 1L;
-  private final Parameter mParameter;
-  private final Component[] storedComponents; // don't need, just use getComponents()
+  private boolean mValue;
 
-  public ParameterPanel(final Parameter param, final int row)
+  public BoolParameter(final int id, final String name,
+                       final String description, final boolean value)
   {
-    setLayout(new BorderLayout());
-    mParameter = param;
-    add(mParameter.createLabel(), BorderLayout.WEST);
-    add(mParameter.createComponent(), BorderLayout.EAST);
-
-    storedComponents = getComponents();
-    for (final Component component : storedComponents)
-      ((JComponent) component).setToolTipText(mParameter.getDescription());
-  }
-  //Updates parameter with itself
-  public void commitParameter()
-  {
-    mParameter.updateFromGUI(this);
-  }
-  //Updates parameter and itself with other panel
-  public void copyFromPanel(final ParameterPanel panel)
-  {
-    mParameter.updateFromGUI(panel);
-    mParameter.displayInGUI(this);
+    super(id, name, description);
+    mValue = value;
   }
 
-  public Parameter getParameter()
+  @Override
+  public Component createComponent()
   {
-    return mParameter;
+    return new JCheckBox("", mValue);
   }
 
-  public Component getEntryComponent()
-  {
-    return getComponents()[1];
+  public boolean getValue() {
+      return mValue;
   }
 
-  public void setComponentValue(final int input)
-  {
-    ((JTextField) storedComponents[1]).setText(Integer.toString(input));
-    commitParameter();
+  public void setValue(final boolean value) {
+      mValue = value;
   }
 
-  public void setComponentValue(final boolean input)
+ //Updates parameter value using the component stored in the passed panel
+  @Override
+  public void updateFromGUI(final ParameterPanel panel)
   {
-    ((JCheckBox) storedComponents[1]).setSelected(input);
-    commitParameter();
+    final Component comp = panel.getEntryComponent();
+    final JCheckBox checkBox = (JCheckBox) comp;
+    mValue = checkBox.isSelected();
   }
 
-  public void setComponentValue(final String input)
+  //Updates a ParameterPanels component with parameter value
+  @Override
+  public void displayInGUI(final ParameterPanel panel)
   {
-    ((JTextField) storedComponents[1]).setText(input);
-    commitParameter();
+    final Component comp = panel.getEntryComponent();
+    final JCheckBox checkBox = (JCheckBox) comp;
+    checkBox.setSelected(mValue);
   }
 }

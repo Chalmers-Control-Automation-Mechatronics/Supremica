@@ -1,4 +1,4 @@
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
 import java.util.ArrayList;

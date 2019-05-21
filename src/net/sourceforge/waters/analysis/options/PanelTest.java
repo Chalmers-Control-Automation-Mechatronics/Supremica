@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.options;
+package net.sourceforge.waters.analysis.options;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -69,6 +69,7 @@ public class PanelTest
 {
 
   static int currentAlgHome = 0; //current active algorithm panel
+  final static ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
 
   public static void main(final String[] args)
   {
@@ -106,32 +107,23 @@ public class PanelTest
     constrainComponent(mAlgTwoRadio, constraints, mainlayout, 2, 1, 3);
     mMainPanel.add(mAlgTwoRadio);
 
-  //  final JComboBox superviserCombobox;
+    /*
+    final JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox = new JComboBox<>();
 
- //   final List<String> Superviserlist = new ArrayList<String>();
-/*
     for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
-
       try {
-      //  Superviserlist.add(dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).toString());
-        dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getClass().toString();
+       if(dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance()) != null);
+         superviserCombobox.addItem(dir);
 
-      } catch (final ClassNotFoundException exception) {
+      } catch (ClassNotFoundException | AnalysisConfigurationException | UnsatisfiedLinkError exception) {
       //  exception.printStackTrace();
-      } catch (final AnalysisConfigurationException exception) {
-     //   exception.printStackTrace();
       }
-    }*/
-/*
-    for(final String str: Superviserlist) {
-      System.out.println(str);
     }
 
-    final Vector<String> vector = new Vector<> (Superviserlist);
-    superviserCombobox = new JComboBox<>(vector);
     constrainComponent(superviserCombobox, constraints, mainlayout, 0, 2, 3);
     mMainPanel.add(superviserCombobox);
-*/
+    */
+
     final JButton updateButton = new JButton("Update Parameters");
     final JButton printButton = new JButton("Print Algorithm Panel");
 
@@ -139,6 +131,7 @@ public class PanelTest
     mButtonPanel.add(printButton);
 
     final List<Parameter> alg1 = fakeMonolithic();
+    //final List<Parameter> alg1 = new MonolithicSynthesizer(factory).getParameters();
 
     final List<ParameterPanel> alg1Panels = new ArrayList<ParameterPanel>();
 
@@ -147,6 +140,7 @@ public class PanelTest
     }
 
     final List<Parameter> alg2 = fakeCompositionAutomataSynthesizer();
+    //final List<Parameter> alg2 = new CompositionalAutomataSynthesizer(factory).getParameters();
 
     final List<ParameterPanel> alg2Panels = new ArrayList<ParameterPanel>();
 
@@ -158,8 +152,7 @@ public class PanelTest
       @Override
       public void actionPerformed(final ActionEvent event)
       {
-        for (final ParameterPanel panel : parameterPanelList
-          .get(currentAlgHome)) {
+        for (final ParameterPanel panel : parameterPanelList.get(currentAlgHome)) {
           panel.commitParameter();
         }
       }
@@ -313,7 +306,6 @@ public class PanelTest
   public static ParameterPanel findID(final List<ParameterPanel> Panels,
                                       final int id)
   {
-
     for (final ParameterPanel p : Panels) {
       if (p.getParameter().getID() == id)
         return p;
@@ -331,9 +323,7 @@ public class PanelTest
      * setSupervisorReductionFactory(final SupervisorReductionFactory factory);
      */
 
-    /*
-      final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
-    mAutomata = panel.getAutomataTable().getOperationArgument();
+   /* mAutomata = panel.getAutomataTable().getOperationArgument();
     final ProductDESProxy des =
       AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
                                            mAutomata, factory);
@@ -341,7 +331,9 @@ public class PanelTest
     final List<EventProxy> test = new ArrayList<>(des.getEvents());
     final Vector<EventProxy> testVector = new Vector<> (test);
     mEventProxy = new JComboBox<>(testVector);
+    list.add(new EnumParameter<EventProxy>(4,"ConfiguredDefaultMarking", "ConfiguredDefaultMarking", des.getEvents()));
    */
+
     final List<Parameter> list = new ArrayList<Parameter>();
     final Set<String> set = new HashSet<String>();
     set.add("1");
@@ -404,7 +396,6 @@ public class PanelTest
     final List<Parameter> list = new ArrayList<Parameter>();
     list.add(new BoolParameter(0, "NonBlockingSupported", "Turn on or off",
                                true));                                              // NonBlockingSupported    BoolParameter
-
     return list;
   }
 
