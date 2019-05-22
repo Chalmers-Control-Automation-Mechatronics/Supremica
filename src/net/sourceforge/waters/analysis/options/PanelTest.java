@@ -58,9 +58,11 @@ import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ModularAndCompositionalSynthesizer;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
+import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -137,8 +139,8 @@ public class PanelTest
 
 
 
-     final List<Parameter> alg1 = fakeMonolithic();
-    //final List<Parameter> alg1 =     new MonolithicSynthesizer(factory).getParameters();
+    // final List<Parameter> alg1 = fakeMonolithic();
+    final List<Parameter> alg1 =     new MonolithicSynthesizer(factory).getParameters();
 
     final List<ParameterPanel> alg1Panels = new ArrayList<ParameterPanel>();
 
@@ -146,8 +148,8 @@ public class PanelTest
       alg1Panels.add(new ParameterPanel(alg1.get(i), i));
     }
 
-    final List<Parameter> alg2 = fakeCompositionAutomataSynthesizer();
-   // final List<Parameter> alg2 = new CompositionalAutomataSynthesizer(factory).getParameters();
+    //final List<Parameter> alg2 = fakeCompositionAutomataSynthesizer();
+    final List<Parameter> alg2 = new CompositionalAutomataSynthesizer(factory).getParameters();
 
     final List<ParameterPanel> alg2Panels = new ArrayList<ParameterPanel>();
 
@@ -354,7 +356,8 @@ public class PanelTest
     set.add("2");
     set.add("3");
     set.add("4");
-     list.add(new EnumParameter<EventProxy>(5, "ConfiguredDefaultMarking", "ConfiguredDefaultMarking", des.getEvents()));
+    final List<EventProxy> events = new ArrayList<>(des.getEvents());
+    list.add(new EnumParameter<EventProxy>(5, "ConfiguredDefaultMarking", "ConfiguredDefaultMarking", events));
     list.add(new BoolParameter(1, "NonDeterminismEnabled", "Turn on or off",
                                true));
     list.add(new BoolParameter(3, "SuperviserLocalisationEnabled",

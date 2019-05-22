@@ -1,36 +1,49 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
 
+import net.sourceforge.waters.model.analysis.EnumFactory;
+
+
 public class EnumParameter<T> extends Parameter
 {
-  private List<T> mList;
-  private T mData;
 
-  public EnumParameter(final int id, final String name, final String description, final List<T> data)
+  //#########################################################################
+  //# Constructors
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
+                       final List<? extends T> data)
   {
     super(id, name, description);
     mList = data;
-    mData = mList.get(0);
+    mValue = mList.get(0);
   }
 
-  public EnumParameter(final int id, final String name, final String description, final T[] data)
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
+                       final T[] data)
   {
     this(id, name, description, Arrays.asList(data));
   }
 
-  public EnumParameter(final int id, final String name, final String description, final Set<T> data)
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
+                       final EnumFactory<? extends T> factory)
   {
-    this(id, name, description, new ArrayList<T>(data));
+    this(id, name, description, factory.getEnumConstants());
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.Parameter
   @Override
   public Component createComponent()
   {
@@ -41,7 +54,7 @@ public class EnumParameter<T> extends Parameter
 
   public T getValue()
   {
-    return  mData;
+    return  mValue;
   }
 
   @SuppressWarnings("unchecked")
@@ -49,8 +62,9 @@ public class EnumParameter<T> extends Parameter
   public void updateFromGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
-    final JComboBox<T> comboField = (JComboBox<T>) comp;
-    mData = (T) comboField.getSelectedItem();
+    final JComboBox<T> comboBox = (JComboBox<T>) comp;
+    final int index = comboBox.getSelectedIndex();
+    mValue = comboBox.getItemAt(index);
   }
 
   @SuppressWarnings("unchecked")
@@ -58,7 +72,14 @@ public class EnumParameter<T> extends Parameter
   public void displayInGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
-    final JComboBox<T> comboField = (JComboBox<T>) comp;
-    comboField.setSelectedItem(mData);
+    final JComboBox<T> comboBox = (JComboBox<T>) comp;
+    comboBox.setSelectedItem(mValue);
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private List<? extends T> mList;
+  private T mValue;
+
 }

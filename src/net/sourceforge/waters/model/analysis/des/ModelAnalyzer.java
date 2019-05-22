@@ -151,7 +151,7 @@ public interface ModelAnalyzer
 
   /**
    * Sets the node limit for this model analyser.
-   * If set, the node limit is the maximum number of nodes the verifier
+   * If set, the node limit is the maximum number of nodes the analyser
    * is allowed to keep in memory at any one time. If this number is
    * exceeded, an {@link OverflowException} is thrown.
    * A 'node' here represents a basic unit of memory such as a state
@@ -172,7 +172,7 @@ public interface ModelAnalyzer
   /**
    * Sets the transition limit for this model analyser.
    * If set, the transition limit is the maximum number of transitions the
-   * verifier is allowed to keep in memory at any one time. If this number
+   * analyser is allowed to keep in memory at any one time. If this number
    * is exceeded, an {@link OverflowException} is thrown.
    * Many algorithms do not explicitly store any transitions and can ignore
    * this parameter.
@@ -192,9 +192,10 @@ public interface ModelAnalyzer
   public int getTransitionLimit();
 
   /**
-   * Returns the list of parameters that are created by this class
+   * Returns a list of configurable parameters supported by this model analyser.
    */
   public List<Parameter> getParameters();
+
 
   //#########################################################################
   //# Accessing the Result

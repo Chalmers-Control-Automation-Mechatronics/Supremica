@@ -38,14 +38,19 @@ import java.awt.Component;
 
 import javax.swing.JLabel;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
+
+/**
+ * A configurable parameter of a {@link ModelAnalyzer}.
+ *
+ * @author Brandon Basset
+ */
 public abstract class Parameter
 {
 
-  private final int mID;
-  private final String mName;
-  private final String mDescription;
-
+  //#########################################################################
+  //# Constructors
   public Parameter(final int id, final String name)
   {
     this(id, name, null);
@@ -58,9 +63,22 @@ public abstract class Parameter
     mDescription = description;
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  public int getID()
+  {
+    return mID;
+  }
+
   public String getName()
   {
     return mName;
+  }
+
+  public void setName(final String name)
+  {
+    mName = name;
   }
 
   public String getDescription()
@@ -68,11 +86,14 @@ public abstract class Parameter
     return mDescription;
   }
 
-  public int getID()
+  public void setDescription(final String description)
   {
-    return mID;
+    mDescription = description;
   }
 
+
+  //#########################################################################
+  //# GUI
   public JLabel createLabel()
   {
     return new JLabel(mName);
@@ -83,5 +104,12 @@ public abstract class Parameter
   public abstract void updateFromGUI(ParameterPanel panel);
 
   public abstract void displayInGUI(ParameterPanel panel);
+
+
+  //#########################################################################
+  //# Data Members
+  private final int mID;
+  private String mName;
+  private String mDescription;
 
 }

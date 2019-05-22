@@ -66,15 +66,14 @@ public interface ModelBuilder<P extends Proxy> extends ModelAnalyzer
   //#########################################################################
   //# Configuration
   /**
-   * Sets the name to be given to the output automaton.
-   * @param  name   Name for output automaton, or <CODE>null</CODE> to
-   *                indicate that the name of the input automaton is to
-   *                be used.
+   * Sets the name to be given to the output object.
+   * @param  name   Name for output, or <CODE>null</CODE> to indicate that a
+   *                default name chosen based on the input is to be used.
    */
   public void setOutputName(String name);
 
   /**
-   * Gets the configured name of the output automaton.
+   * Gets the configured name of the output object.
    * @see #setOutputName(String) setOutputName()
    */
   public String getOutputName();

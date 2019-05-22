@@ -251,23 +251,37 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return (MonolithicSynthesisResult) super.getAnalysisResult();
   }
 
-  //#########################################################################
-  //# List of Parameters used by this class, pulling from super classes and interfaces
-
   @Override
-  public List<Parameter> getParameters(){
+  public List<Parameter> getParameters()
+  {
     final List<Parameter> list = super.getParameters();
-    // list.add(new EnumParameter(2, "ConfiguredDefaultMarking", "Sets the <I>marking proposition</I> to be used for synthesis.", ))
-    list.add(new BoolParameter(ParameterIDs.MonolithicSynthesizer_setNonblockingSupported, "setNonblockingSupported", "Turn on or off",true));
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_setNondeterminismEnabled, "setNondeterminismEnabled", "Sets whether the synthesiser allows nondeterministic input.",true));
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled, "setSupervisorLocalizationEnabled", "Sets whether synthesis should use supervisor localisation.\n" +
-      "If enabled, every synthesised supervisor component may be replaced by\n" +
-      "several smaller automata, one for each controllable event to be disabled\n" +
-      "by the supervisor.",true));
-    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,"SuperviserReductionFactory", "Sets the method of supervisor reduction to be used after synthesis",
-      DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    for (final Parameter param : list) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled) {
+        param.setName("Create supervisor automata");
+        param.setDescription("Disable this to suppress the creation of supervisor " +
+                             "automata, and only determine whether a supervisor " +
+                             "exists.");
+      }
+    }
+    list.add(new BoolParameter
+               (ParameterIDs.MonolithicSynthesizer_setNonblockingSupported,
+                "Nonblocking",
+                "Synthesise a nonblocking supervisor.", true));
+    // list.add(new EnumParameter(2, "Marking proposition", "If synthesising a nonblocking supervisor, select the proposition that defines the marked states."))
+    list.add(new EnumParameter<SupervisorReductionFactory>
+               (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
+                "Supervisor reduction",
+                "Method of supervisor reduction to be used after synthesis",
+                DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    list.add(new BoolParameter
+               (ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled,
+                "Localise supervisors",
+                "If using supervisor reduction, create a separate supervisor " +
+                "for each controllable event that needs to be disabled.",
+                true));
     return list;
   }
+
 
   //#########################################################################
   //# Overrides for Base Class

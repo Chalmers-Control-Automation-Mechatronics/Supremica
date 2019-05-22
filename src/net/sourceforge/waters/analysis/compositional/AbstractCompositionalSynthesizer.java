@@ -38,10 +38,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -176,17 +172,6 @@ public abstract class AbstractCompositionalSynthesizer
     final EventProxy defaultMarking = createDefaultMarking();
     setPropositionsForMarkings(defaultMarking, null);
     super.setUp();
-  }
-
-  //#########################################################################
-  //# List of Parameters used by this class, pulling from super classes and interfaces
-
-  @Override
-  public List<Parameter> getParameters(){
-    final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_setNondeterminismEnabled,"setNondeterminismEnabled","setNondeterminismEnabled", true));
-    list.add(new StringParameter(ParameterIDs.ModelBuilder_setOutputName,"setNondeterminismEnabled","setNondeterminismEnabled"));
-    return list;
   }
 
 

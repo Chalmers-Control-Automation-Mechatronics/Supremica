@@ -1,4 +1,3 @@
-//# -*- indent-tabs-mode: nil  c-basic-offset: 2 -*-
 //###########################################################################
 //# Copyright (C) 2004-2019 Robi Malik
 //###########################################################################
@@ -255,6 +254,38 @@ public class CompositionalAutomataSynthesizer
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.getID() == ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled) {
+        param.setName("Create supervisor automata.");
+        param.setDescription("Disable this to suppress the creation of supervisor " +
+                             "automata, and only determine whether a supervisor " +
+                             "exists.");
+        iter.add(new StringParameter
+                   (ParameterIDs.CompositionalAutomataSynthesizer_setSupervisorNamePrefix,
+                    "Supervisor name prefix",
+                    "Name prefix for synthesised supervisors."));
+        break;
+      }
+    }
+    list.add(new EnumParameter<SupervisorReductionFactory>
+               (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
+                "Supervisor reduction",
+                "Method of supervisor reduction to be used after synthesis",
+                DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
+    //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
+    return list;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
   public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
@@ -277,20 +308,6 @@ public class CompositionalAutomataSynthesizer
   public boolean getSupervisorLocalizationEnabled()
   {
     return false;
-  }
-
-  //#########################################################################
-  //# List of Parameters used by this class, pulling from super classes and interfaces
-
-  public List<Parameter> getParameters(final ProductDESProxy des){
-    final List<Parameter> list = super.getParameters();
-   // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
-   //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
-    list.add(new StringParameter(ParameterIDs.CompositionalAutomataSynthesizer_setSupervisorNamePrefix,
-                                 "setSupervisorNamePrefix","setSupervisorNamePrefix"));
-    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,"SuperviserReductionFactory", "Sets the method of supervisor reduction to be used after synthesis",
-      DefaultSupervisorReductionFactory.class.getEnumConstants()));
-    return list;
   }
 
 

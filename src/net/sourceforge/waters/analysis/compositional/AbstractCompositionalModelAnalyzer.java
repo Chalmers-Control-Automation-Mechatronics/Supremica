@@ -593,6 +593,16 @@ public abstract class AbstractCompositionalModelAnalyzer
     return mSynchronousProductBuilder;
   }
 
+  public void setMonolithicAnalyzer(final ModelAnalyzer analyzer)
+  {
+    mMonolithicAnalyzer = analyzer;
+  }
+
+  public ModelAnalyzer getMonolithicAnalyzer()
+  {
+    return mMonolithicAnalyzer;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -617,14 +627,108 @@ public abstract class AbstractCompositionalModelAnalyzer
     setMonolithicStateLimit(limit);
   }
 
-  public void setMonolithicAnalyzer(final ModelAnalyzer analyzer)
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+  @Override
+  public List<Parameter> getParameters()
   {
-    mMonolithicAnalyzer = analyzer;
-  }
+    final List<Parameter> list = super.getParameters();
+    final Iterator<Parameter> iter = list.iterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_setNodeLimit:
+      case ParameterIDs.ModelAnalyzer_setTransitionLimit:
+        iter.remove();
+        break;
+      default:
+        break;
+      }
+    }
 
-  public ModelAnalyzer getMonolithicAnalyzer()
-  {
-    return mMonolithicAnalyzer;
+    //ConfiguredDefaultMarking
+    // list.add(new EnumParameter<EventProxy>(200,"ConfiguredPreconditionMarking", "Gets the marking proposition used for synthesis.", des.getEvents()));
+
+    list.add(new EnumParameter<PreselectingMethod>
+               (ParameterIDs.AbstractCompositionalSynthesizer_setPreselectingMethod,
+                "Preselection method",
+                "Preselection heuristic to choose groups of automata to" +
+                "consider for composition.",
+                getPreselectingMethodFactory()));
+    list.add(new EnumParameter<SelectionHeuristicCreator>
+               (ParameterIDs.AbstractCompositionalSynthesizer_setSelectionHeurisitc,
+                "Selection heuristic",
+                "Heuristic to choose the group of automata to compose and simplify " +
+                "from the options produced by the preselection method.",
+                getSelectionHeuristicFactory()));
+    list.add(new BoolParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setSubumptionEnabled,
+                "Use subumption test",
+                "Suppress candidate groups of automata that are supersets of " +
+                "other candidates.",
+                true));
+    list.add(new EnumParameter<AbstractionProcedureCreator>
+               (ParameterIDs.AbstractCompositionalSynthesizer_setAbstractionProcedureCreator,
+                "Abstraction procedure",
+                "Abstraction procedure to simplify automata during compositional " +
+                "minimisation.",
+                AutomataSynthesisAbstractionProcedureFactory.getInstance()));
+    list.add(new IntParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setInternalStateLimit,
+                "Internal state limit",
+                "The maximum number of states allowed for intermediate automata.",
+                0, Integer.MAX_VALUE));
+    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
+    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
+    list.add(new IntParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setInternalTransitionLimit,
+                "Internal transition limit",
+                "The maximum number of transitions allowed for intermediate automata.",
+                0, Integer.MAX_VALUE));
+    list.add(new IntParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicStatelimit,
+                "Monolithic state limit",
+                "The maximum number of states allowed during monolithic analysis " +
+                "attempts.",
+                0, Integer.MAX_VALUE));
+    list.add(new IntParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicTransitionLimit,
+                "Monolithic transition limit",
+                "The maximum number of transitions allowed during monolithic " +
+                "analysis attempts.",
+                0, Integer.MAX_VALUE));
+    list.add(new BoolParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setBlockedEventsEnabled,
+                "Use blocked events",
+                "Detect and remove events known to be globablly disabled.",
+                true));
+    list.add(new BoolParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setSelfLoopOnlyEventsEnabled,
+                "Use selfloop-only events",
+                "Detect events that are appear only as selfloop outside of the " +
+                "subsystem being abstract, and use this information to help with " +
+                "minimisation.",
+                true));
+    list.add(new BoolParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setFailingEventsEnabled,
+                "Use failing events",
+                "Detect events that only lead to blocking states and " +
+                "simplify automata based on this information.",
+                true));
+    list.add(new BoolParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setPruningDeadlocks,
+                "Prune deadlocks",
+                "Allow synchronous product construction to stop when " +
+                "encountering states that are a deadlock in one of the " +
+                "components.",
+                true));
+    //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
+    list.add(new StringParameter
+               (ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicDumpFileName,
+                "Dump file name",
+                "If set, any abstracted model will be written to this file " +
+                "before being sent for monolithic verification."));
+    return list;
   }
 
 
@@ -744,50 +848,6 @@ public abstract class AbstractCompositionalModelAnalyzer
       final KindTranslator translator = getKindTranslator();
       mCurrentMonolithicAnalyzer.setKindTranslator(translator);
     }
-  }
-
-  //#########################################################################
-  //# List of Parameters used by this class, pulling from super classes and interfaces
-
-
-  @Override
-  public List<Parameter> getParameters(/*final ProductDESProxy des*/){
-    final List<Parameter> list = super.getParameters();
-
-    list.add(new EnumParameter<AbstractionProcedureCreator>(ParameterIDs.AbstractCompositionalSynthesizer_setAbstractionProcedureCreator, "AbstractionProcedureCreator", "AbstractionProcedureCreator", AutomataSynthesisAbstractionProcedureFactory.getInstance().getEnumConstants()));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setBlockedEventsEnabled, "BlockedEventsEnabled", "Sets whether blocked events are to be considered in abstraction.", true));
-    //ConfiguredDefaultMarking
-   // list.add(new EnumParameter<EventProxy>(200,"ConfiguredPreconditionMarking", "Gets the marking proposition used for synthesis.", des.getEvents()));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setFailingEventsEnabled, "FailingEventsEnabled", "Sets whether failing events are to be considered in abstraction.", true));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setInternalStateLimit, "InternalStateLimit", "InternalSateLimit", 0, Integer.MAX_VALUE));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setInternalTransitionLimit, "InternalTransitionLimit", "InternalTransitionLimit", 0, Integer.MAX_VALUE));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
-    //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
-    list.add(new StringParameter(ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicDumpFileName, "MonolithicDumpFileName",  "Sets a file name to dump abstracted models before monolithic\n" +
-      "verification. If set, any abstracted model will be written to this file\n" +
-      "before being sent for monolithic verification."));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicStatelimit, "MonolithicStateLimit", "MonolithicStateLimit", 0, Integer.MAX_VALUE));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicTransitionLimit, "MonolithicTransitionLimit",
-                              "MonolithicTransitionLimit", 0, Integer.MAX_VALUE));
-    list.add(new EnumParameter<PreselectingMethod>(ParameterIDs.AbstractCompositionalSynthesizer_setPreselectingMethod, "PreselectingMethod", "Sets the preselecting heuristics used to choose candidates.",
-                                                getPreselectingMethodFactory().getEnumConstants()));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setPruningDeadlocks, "PruningDeadlocks", "Sets whether deadlock states are pruned in synchronous products.", true));
-    list.add(new EnumParameter<SelectionHeuristicCreator>(ParameterIDs.AbstractCompositionalSynthesizer_setSelectionHeurisitc, "SelectionHeuristic",
-                                                      "Sets the selecting heuristics to be used to choose candidates.",
-                                                      getSelectionHeuristicFactory().getEnumConstants()));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setSelfLoopOnlyEventsEnabled, "SelfLoopOnlyEnabled", "Sets whether selfloop-only events are to be considered in abstraction.", true));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setSubumptionEnabled, "SubumptionEnabled", "Sets whether subsumption is enabled in the selecting heuristic.\n" +
-      "If subsumption is enabled, and the heuristic returns a candidate that\n" +
-      "is subsumed by another candidate, the a new candidate will be selected\n" +
-      "from the list of all preselected candidates that subsume the originally\n" +
-      "selected candidate. The selection heuristics will be used again to\n" +
-      "resolve ties.",    true));
-    //setSynchronusProductBuilder(MonolithicSynchronousProductBuilder)
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUsingSpecialEvents, "UsingSpecialEvents", "Sets whether special events are to be considered in abstraction.\n" +
-      "This method enables or disables blocked events, selfloop-only events,\n" +
-      "and failing events.", true));
-    return list;
   }
 
 
