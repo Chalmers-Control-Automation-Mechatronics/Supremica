@@ -51,6 +51,10 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -105,6 +109,7 @@ public class CompositionalAutomataSynthesizer
   {
     this(factory, AutomataSynthesisAbstractionProcedureFactory.WSOE);
   }
+
 
   /**
    * Creates a compositional synthesiser without a model.
@@ -272,6 +277,20 @@ public class CompositionalAutomataSynthesizer
   public boolean getSupervisorLocalizationEnabled()
   {
     return false;
+  }
+
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+
+  public List<Parameter> getParameters(final ProductDESProxy des){
+    final List<Parameter> list = super.getParameters();
+   // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
+   //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
+    list.add(new StringParameter(ParameterIDs.CompositionalAutomataSynthesizer_setSupervisorNamePrefix,
+                                 "setSupervisorNamePrefix","setSupervisorNamePrefix"));
+    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,"SuperviserReductionFactory", "Sets the method of supervisor reduction to be used after synthesis",
+      DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    return list;
   }
 
 

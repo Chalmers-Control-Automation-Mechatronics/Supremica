@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -110,6 +113,14 @@ public abstract class AbstractProductDESBuilder
   public ProductDESResult createAnalysisResult()
   {
     return new DefaultProductDESResult(this);
+  }
+
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+
+  @Override
+  public List<Parameter> getParameters(){
+    return super.getParameters();
   }
 
 

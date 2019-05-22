@@ -56,6 +56,10 @@ import net.sourceforge.waters.analysis.abstraction.SelfloopSupervisorReductionTR
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -247,6 +251,23 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     return (MonolithicSynthesisResult) super.getAnalysisResult();
   }
 
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+
+  @Override
+  public List<Parameter> getParameters(){
+    final List<Parameter> list = super.getParameters();
+    // list.add(new EnumParameter(2, "ConfiguredDefaultMarking", "Sets the <I>marking proposition</I> to be used for synthesis.", ))
+    list.add(new BoolParameter(ParameterIDs.MonolithicSynthesizer_setNonblockingSupported, "setNonblockingSupported", "Turn on or off",true));
+    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_setNondeterminismEnabled, "setNondeterminismEnabled", "Sets whether the synthesiser allows nondeterministic input.",true));
+    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled, "setSupervisorLocalizationEnabled", "Sets whether synthesis should use supervisor localisation.\n" +
+      "If enabled, every synthesised supervisor component may be replaced by\n" +
+      "several smaller automata, one for each controllable event to be disabled\n" +
+      "by the supervisor.",true));
+    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,"SuperviserReductionFactory", "Sets the method of supervisor reduction to be used after synthesis",
+      DefaultSupervisorReductionFactory.class.getEnumConstants()));
+    return list;
+  }
 
   //#########################################################################
   //# Overrides for Base Class

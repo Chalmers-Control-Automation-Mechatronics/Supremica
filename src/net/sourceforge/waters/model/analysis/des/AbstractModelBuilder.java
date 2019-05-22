@@ -34,7 +34,11 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ProxyResult;
@@ -122,6 +126,18 @@ public abstract class AbstractModelBuilder<P extends Proxy>
   public ProxyResult<P> getAnalysisResult()
   {
     return (ProxyResult<P>) super.getAnalysisResult();
+  }
+
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+
+  @Override
+  public List<Parameter> getParameters(){
+    final List<Parameter> list = super.getParameters();
+    list.add(new StringParameter(ParameterIDs.ModelBuilder_setOutputName, "setOutputName", "Sets the name to be given to the output automaton.\n" +
+      "@param  name   Name for output automaton, or <CODE>null</CODE> to\n" +
+      "indicate that the name of the input automaton is to be used.\n"));
+    return list;
   }
 
 

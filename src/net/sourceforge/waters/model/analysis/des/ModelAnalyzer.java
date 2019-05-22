@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -188,6 +191,10 @@ public interface ModelAnalyzer
    */
   public int getTransitionLimit();
 
+  /**
+   * Returns the list of parameters that are created by this class
+   */
+  public List<Parameter> getParameters();
 
   //#########################################################################
   //# Accessing the Result

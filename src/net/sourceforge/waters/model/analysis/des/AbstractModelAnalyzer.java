@@ -33,8 +33,14 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -185,6 +191,27 @@ public abstract class AbstractModelAnalyzer
     mAnalysisResult = null;
   }
 
+  //#########################################################################
+  //# List of Parameters used by this class, pulling from super classes and interfaces
+
+  @Override
+  public List<Parameter> getParameters(){
+    final List<Parameter> list = new ArrayList<Parameter>();
+    list.add(new BoolParameter(ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled, "DetailedOutputEnabled", "Sets whether computation of full output is enabled.\n" +
+      "If set to <CODE>true</CODE> (the default), the model analyser should\n" +
+      "compute detailed results (e.g., counterexamples or supervisors) in\n" +
+      "all cases where it is applicable. If disabled, the model analyser only\n" +
+      "needs to return a Boolean result, which may enable it to run faster.", true));
+    //setKindTranslator(KindTranslator translator)
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_setNodeLimit, "NodeLimit", "Sets the node limit for this model analyser.\n" +
+      "If set, the node limit is the maximum number of nodes the verifier\n" +
+      "is allowed to keep in memory at any one time.", 0, Integer.MAX_VALUE));
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_setTransitionLimit, "TransitionLimit", "Sets the transition limit for this model analyser.\n" +
+      "If set, the transition limit is the maximum number of transitions the\n" +
+      "verifier is allowed to keep in memory at any one time.", 0, Integer.MAX_VALUE));
+    return list;
+  }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -272,6 +299,7 @@ public abstract class AbstractModelAnalyzer
    * overridden by subclasses the require a more specific analysis result
    * type.
    */
+  @Override
   public AnalysisResult createAnalysisResult()
   {
     return new DefaultAnalysisResult(this);
