@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.about;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,6 @@ import java.net.URL;
 
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.MutableAttributeSet;
@@ -72,7 +72,7 @@ public class HTMLPopup
 
   //#########################################################################
   //# Constructor
-  public HTMLPopup(final String title, final URL url, final JFrame owner)
+  public HTMLPopup(final String title, final URL url, final Frame owner)
     throws IOException
   {
     super(owner, title);

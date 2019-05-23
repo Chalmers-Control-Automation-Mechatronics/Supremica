@@ -34,6 +34,8 @@
 package net.sourceforge.waters.gui.about;
 
 import java.awt.Color;
+import java.awt.Frame;
+import java.awt.Window;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +47,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
@@ -140,7 +141,7 @@ public class AboutPanel
       }
       final String name = event.getDescription();
       final URL url = Version.class.getResource(name);
-      final JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
+      final Frame owner = getOwningFrame();
       try {
         @SuppressWarnings("unused")
         final HTMLPopup popup = new HTMLPopup(title, url, owner);
@@ -163,6 +164,15 @@ public class AboutPanel
 
   //#########################################################################
   //# Auxiliary Methods
+  private Frame getOwningFrame()
+  {
+    Window ancestor = SwingUtilities.getWindowAncestor(this);
+    while (!(ancestor instanceof Frame)) {
+      ancestor = ancestor.getOwner();
+    }
+    return (Frame) ancestor;
+  }
+
   private HTMLDocument createContents()
   {
     final Version version = Version.getInstance();
