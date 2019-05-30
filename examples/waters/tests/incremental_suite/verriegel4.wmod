@@ -129,7 +129,10 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
         <EventDecl Kind="UNCONTROLLABLE" Name="ER_BT"/>
         <EventDecl Kind="CONTROLLABLE" Name="time">
             <RangeList>
-                <SimpleIdentifier Name="Timers"/>
+                <EnumSetExpression Text="[FS,WSP]">
+                    <SimpleIdentifier Name="FS"/>
+                    <SimpleIdentifier Name="WSP"/>
+                </EnumSetExpression>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="ER_FS"/>
@@ -152,12 +155,12 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="MZS_aus">
             <RangeList>
-                <SimpleIdentifier Name="Tueren"/>
+                <SimpleIdentifier Name="HeckTueren"/>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="soft_SER">
             <RangeList>
-                <SimpleIdentifier Name="Tueren"/>
+                <SimpleIdentifier Name="FahrerTueren"/>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="soft_CS"/>
@@ -213,7 +216,7 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
         </EventDecl>
         <EventDecl Kind="CONTROLLABLE" Name="MZS_an">
             <RangeList>
-                <SimpleIdentifier Name="Tueren"/>
+                <SimpleIdentifier Name="HeckTueren"/>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="UNCONTROLLABLE" Name="TASTVR"/>
@@ -247,7 +250,7 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
         <EventDecl Kind="UNCONTROLLABLE" Name="VR_HK"/>
         <EventDecl Kind="CONTROLLABLE" Name="done_SER">
             <RangeList>
-                <SimpleIdentifier Name="Tueren"/>
+                <SimpleIdentifier Name="FahrerTueren"/>
             </RangeList>
         </EventDecl>
         <EventDecl Kind="PROPOSITION" Name=":accepting"/>
@@ -311,21 +314,21 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":3">
+                        <NodeRef Name="AU2"/>
                         <NodeRef Name="AU1"/>
                         <NodeRef Name="AU3"/>
-                        <NodeRef Name="AU2"/>
                         <BoxGeometry>
                             <Box X="192" Y="304" Width="144" Height="224"/>
                         </BoxGeometry>
                     </GroupNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="AU1"/>
-                        <NodeRef Name="FS"/>
-                        <NodeRef Name="VR"/>
                         <NodeRef Name="ER"/>
-                        <NodeRef Name=":3"/>
                         <NodeRef Name="AU3"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="FS"/>
                         <NodeRef Name="AU2"/>
+                        <NodeRef Name=":3"/>
+                        <NodeRef Name="AU1"/>
                         <BoxGeometry>
                             <Box X="80" Y="112" Width="320" Height="432"/>
                         </BoxGeometry>
@@ -1153,17 +1156,17 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                         </LabelGeometry>
                     </SimpleNode>
                     <GroupNode Name=":1">
-                        <NodeRef Name="ER"/>
-                        <NodeRef Name="ZS"/>
-                        <NodeRef Name="COD"/>
-                        <NodeRef Name="RQER"/>
-                        <NodeRef Name="TSTZS"/>
-                        <NodeRef Name="SER"/>
-                        <NodeRef Name="RQSER"/>
-                        <NodeRef Name="VR"/>
                         <NodeRef Name="IN"/>
-                        <NodeRef Name="RQZS"/>
+                        <NodeRef Name="VR"/>
+                        <NodeRef Name="SER"/>
                         <NodeRef Name="RQVR"/>
+                        <NodeRef Name="ZS"/>
+                        <NodeRef Name="RQER"/>
+                        <NodeRef Name="RQSER"/>
+                        <NodeRef Name="ER"/>
+                        <NodeRef Name="TSTZS"/>
+                        <NodeRef Name="RQZS"/>
+                        <NodeRef Name="COD"/>
                         <BoxGeometry>
                             <Box X="112" Y="16" Width="480" Height="416"/>
                         </BoxGeometry>
@@ -2196,32 +2199,32 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":0">
-                                <NodeRef Name="IN"/>
-                                <NodeRef Name="vr3"/>
-                                <NodeRef Name="zs8"/>
                                 <NodeRef Name="vr1"/>
-                                <NodeRef Name="vr4"/>
-                                <NodeRef Name="vr6"/>
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="zs6"/>
-                                <NodeRef Name="VR"/>
-                                <NodeRef Name="zs7"/>
-                                <NodeRef Name="er3"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="vr7"/>
-                                <NodeRef Name="zs5"/>
-                                <NodeRef Name="er1"/>
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="ER"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="zs3"/>
-                                <NodeRef Name="vr5"/>
-                                <NodeRef Name="zs2"/>
                                 <NodeRef Name="vr8"/>
+                                <NodeRef Name="ER"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="zs7"/>
                                 <NodeRef Name="ZS"/>
+                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="zs3"/>
+                                <NodeRef Name="zs5"/>
+                                <NodeRef Name="vr6"/>
+                                <NodeRef Name="vr5"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="zs6"/>
+                                <NodeRef Name="er2"/>
+                                <NodeRef Name="vr3"/>
+                                <NodeRef Name="vr4"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="IN"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="vr7"/>
                                 <NodeRef Name="zs9"/>
+                                <NodeRef Name="zs8"/>
+                                <NodeRef Name="zs4"/>
+                                <NodeRef Name="VR"/>
                                 <BoxGeometry>
-                                    <Box X="80" Y="64" Width="512" Height="416"/>
+                                    <Box X="80" Y="48" Width="512" Height="448"/>
                                 </BoxGeometry>
                             </GroupNode>
                         </NodeList>
@@ -3747,32 +3750,32 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":1">
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="er3"/>
-                                <NodeRef Name="vr8"/>
-                                <NodeRef Name="vr4"/>
-                                <NodeRef Name="zs6"/>
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="ER"/>
-                                <NodeRef Name="er1"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="zs9"/>
-                                <NodeRef Name="zs2"/>
-                                <NodeRef Name="IN"/>
-                                <NodeRef Name="VR"/>
-                                <NodeRef Name="zs7"/>
-                                <NodeRef Name="vr5"/>
-                                <NodeRef Name="zs5"/>
-                                <NodeRef Name="zs3"/>
-                                <NodeRef Name="zs8"/>
-                                <NodeRef Name="vr6"/>
-                                <NodeRef Name="vr2"/>
                                 <NodeRef Name="vr3"/>
-                                <NodeRef Name="vr1"/>
-                                <NodeRef Name="ZS"/>
+                                <NodeRef Name="zs8"/>
                                 <NodeRef Name="vr7"/>
+                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="zs5"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="IN"/>
+                                <NodeRef Name="vr6"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="zs9"/>
+                                <NodeRef Name="zs3"/>
+                                <NodeRef Name="zs7"/>
+                                <NodeRef Name="zs4"/>
+                                <NodeRef Name="VR"/>
+                                <NodeRef Name="vr5"/>
+                                <NodeRef Name="ER"/>
+                                <NodeRef Name="er2"/>
+                                <NodeRef Name="er1"/>
+                                <NodeRef Name="vr8"/>
+                                <NodeRef Name="zs6"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="ZS"/>
+                                <NodeRef Name="vr4"/>
                                 <BoxGeometry>
-                                    <Box X="48" Y="32" Width="544" Height="432"/>
+                                    <Box X="48" Y="16" Width="544" Height="448"/>
                                 </BoxGeometry>
                             </GroupNode>
                         </NodeList>
@@ -3829,7 +3832,7 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                                     </LabelGeometry>
                                 </LabelBlock>
                                 <SplineGeometry>
-                                    <Point X="145" Y="486"/>
+                                    <Point X="145" Y="474"/>
                                 </SplineGeometry>
                             </Edge>
                             <Edge Source="zs5" Target="zs6">
@@ -4846,20 +4849,20 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":1">
-                                <NodeRef Name="zs4"/>
-                                <NodeRef Name="er4"/>
-                                <NodeRef Name="vr1"/>
-                                <NodeRef Name="IN"/>
-                                <NodeRef Name="vr4"/>
-                                <NodeRef Name="vr3"/>
-                                <NodeRef Name="er3"/>
                                 <NodeRef Name="zs2"/>
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="er2"/>
-                                <NodeRef Name="vr5"/>
-                                <NodeRef Name="zs3"/>
+                                <NodeRef Name="vr3"/>
+                                <NodeRef Name="vr4"/>
                                 <NodeRef Name="vr2"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="zs3"/>
+                                <NodeRef Name="vr5"/>
+                                <NodeRef Name="er4"/>
+                                <NodeRef Name="er3"/>
+                                <NodeRef Name="zs4"/>
                                 <NodeRef Name="er1"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="IN"/>
+                                <NodeRef Name="er2"/>
                                 <BoxGeometry>
                                     <Box X="48" Y="64" Width="512" Height="496"/>
                                 </BoxGeometry>
@@ -5325,21 +5328,21 @@ The model is controllable and nonblocking. It has 45,877,446,552 reachable state
                                 </LabelGeometry>
                             </SimpleNode>
                             <GroupNode Name=":0">
-                                <NodeRef Name="zs3b"/>
-                                <NodeRef Name="er1"/>
                                 <NodeRef Name="er4"/>
-                                <NodeRef Name="vr1"/>
-                                <NodeRef Name="vr4"/>
                                 <NodeRef Name="er3"/>
-                                <NodeRef Name="zs5"/>
-                                <NodeRef Name="vr2"/>
-                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="zs1"/>
+                                <NodeRef Name="zs3b"/>
                                 <NodeRef Name="zs4"/>
                                 <NodeRef Name="er2"/>
                                 <NodeRef Name="IN"/>
-                                <NodeRef Name="zs1"/>
-                                <NodeRef Name="zs3a"/>
                                 <NodeRef Name="vr3"/>
+                                <NodeRef Name="vr1"/>
+                                <NodeRef Name="zs5"/>
+                                <NodeRef Name="zs3a"/>
+                                <NodeRef Name="vr2"/>
+                                <NodeRef Name="zs2"/>
+                                <NodeRef Name="vr4"/>
+                                <NodeRef Name="er1"/>
                                 <BoxGeometry>
                                     <Box X="32" Y="16" Width="512" Height="544"/>
                                 </BoxGeometry>
