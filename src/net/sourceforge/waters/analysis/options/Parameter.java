@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 /**
  * A configurable parameter of a {@link ModelAnalyzer}.
  *
- * @author Brandon Basset
+ * @author Brandon Bassett
  */
 public abstract class Parameter
 {

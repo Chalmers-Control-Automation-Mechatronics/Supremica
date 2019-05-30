@@ -256,17 +256,28 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   {
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
-      if (param.getID() == ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled:
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
                              "exists.");
-      }
+        break;
+      case ParameterIDs.ModelAnalyzer_setNodeLimit:
+        param.setName("State limit");
+        param.setDescription("Maximum number of states before aborting.");
+        break;
+      case ParameterIDs.ModelAnalyzer_setTransitionLimit:
+        param.setDescription("Maximum number of transitions before aborting.");
+        break;
+      default:
+        break;
+     }
     }
     list.add(new BoolParameter
                (ParameterIDs.MonolithicSynthesizer_setNonblockingSupported,
                 "Nonblocking",
-                "Synthesise a nonblocking supervisor.", true));
+                "Synthesize a nonblocking supervisor.", true));
     // list.add(new EnumParameter(2, "Marking proposition", "If synthesising a nonblocking supervisor, select the proposition that defines the marked states."))
     list.add(new EnumParameter<SupervisorReductionFactory>
                (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
@@ -275,7 +286,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                 DefaultSupervisorReductionFactory.class.getEnumConstants()));
     list.add(new BoolParameter
                (ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled,
-                "Localise supervisors",
+                "Localize supervisors",
                 "If using supervisor reduction, create a separate supervisor " +
                 "for each controllable event that needs to be disabled.",
                 true));

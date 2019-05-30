@@ -39,8 +39,15 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
+
+/**
+ * A configurable parameter of a {@link ModelAnalyzer} of <CODE>int</CODE> type.
+ *
+ * @author Brandon Bassett
+ */
 public class IntParameter extends Parameter {
 
     private final int min;

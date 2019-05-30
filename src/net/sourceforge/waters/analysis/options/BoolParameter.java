@@ -37,7 +37,14 @@ import java.awt.Component;
 
 import javax.swing.JCheckBox;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
+
+/**
+ * A configurable parameter of a {@link ModelAnalyzer} of <CODE>boolean</CODE> type.
+ *
+ * @author Brandon Bassett
+ */
 public class BoolParameter extends Parameter
 {
   private boolean mValue;
