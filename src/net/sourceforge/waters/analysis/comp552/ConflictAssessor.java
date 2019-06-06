@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
 
 
 /**
- * <P>The assessor for the COMP552 conflict checker programming
+ * <P>The assessor for explicit conflict checker programming
  * assignments. The assessor reads a test suite description,
  * passes all tests contained to a {@link ConflictChecker},
  * and prints a result with recommended grades.</P>
@@ -67,6 +67,7 @@ public class ConflictAssessor extends AbstractAssessor
     throws JAXBException, SAXException, IOException
   {
   }
+
 
   //#########################################################################
   //# Hooks

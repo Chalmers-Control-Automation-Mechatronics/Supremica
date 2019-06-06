@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
 
 
 /**
- * <P>The assessor for  explicit controllability checker programming
+ * <P>The assessor for explicit controllability checker programming
  * assignments. The assessor reads a test suite description,
  * passes all tests contained to a {@link ControllabilityChecker},
  * and prints a result with recommended grades.</P>
@@ -75,6 +75,7 @@ public class ControllabilityAssessor extends AbstractAssessor
     throws JAXBException, SAXException, IOException
   {
   }
+
 
   //#########################################################################
   //# Hooks

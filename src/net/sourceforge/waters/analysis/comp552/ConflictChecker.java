@@ -198,8 +198,9 @@ public class ConflictChecker extends ModelChecker
   /**
    * Computes a counterexample.
    * This method is to be called from {@link #run()} after the model was
-   * found to be conflicting, before the BDD factory has been closed. It
-   * uses BDD operations to build the counterexample.
+   * found to be conflicting, and while any data structures from the
+   * conflict check that may be needed to compute the counterexample are
+   * still available.
    * @return The computed counterexample.
    */
   private ConflictCounterExampleProxy computeCounterExample()

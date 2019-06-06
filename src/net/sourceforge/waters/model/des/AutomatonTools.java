@@ -82,7 +82,7 @@ public final class AutomatonTools
   /**
    * Returns the first initial state of the given automaton,
    * or <CODE> null</CODE>.
-   * This method does a sequential search and its complexity is linear in
+   * This method does a sequential search and its time complexity is linear in
    * the number of states of the automaton.
    */
   public static StateProxy getFirstInitialState(final AutomatonProxy aut)
@@ -97,7 +97,7 @@ public final class AutomatonTools
 
   /**
    * Returns the first successor state for the given state and event.
-   * This method does a sequential search and its complexity is linear in
+   * This method does a sequential search and its time complexity is linear in
    * the number of transitions of the automaton.
    * @param  aut       The automaton to be searched.
    * @param  source    The source state to be searched for.
