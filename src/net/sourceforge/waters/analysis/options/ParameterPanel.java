@@ -42,17 +42,19 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 public class ParameterPanel extends JPanel
 {
   private static final long serialVersionUID = 1L;
   private final Parameter mParameter;
 
-  public ParameterPanel(final Parameter param)
+  public ParameterPanel(final Parameter param, final ProductDESProxy model)
   {
     setLayout(new BorderLayout());
     mParameter = param;
     add(mParameter.createLabel(), BorderLayout.WEST);
-    add(mParameter.createComponent(), BorderLayout.EAST);
+    add(mParameter.createComponent(model), BorderLayout.EAST);
 
     for (final Component component : getComponents())
       ((JComponent) component).setToolTipText(mParameter.getDescription());

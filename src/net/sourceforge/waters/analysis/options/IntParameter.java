@@ -40,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 
@@ -63,7 +64,7 @@ public class IntParameter extends Parameter {
     }
 
     @Override
-    public Component createComponent() {
+    public Component createComponent(final ProductDESProxy model) {
     	final JTextField ret = new JTextField();
     	ret.setText(String.valueOf(value));
     	ret.setColumns(10);
