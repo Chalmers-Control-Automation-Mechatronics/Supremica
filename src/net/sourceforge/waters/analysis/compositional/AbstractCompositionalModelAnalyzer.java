@@ -37,6 +37,7 @@ import gnu.trove.iterator.TObjectByteIterator;
 import gnu.trove.map.hash.TObjectByteHashMap;
 import gnu.trove.set.hash.THashSet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -568,16 +569,16 @@ public abstract class AbstractCompositionalModelAnalyzer
    * verification. If set, any abstracted model will be written to this file
    * before being sent for monolithic verification.
    */
-  public void setMonolithicDumpFileName(final String fileName)
+  public void setMonolithicDumpFile(final File file)
   {
-    mMonolithicDumpFileName = fileName;
+    mMonolithicDumpFileName = file;
   }
 
   /**
    * Returns the file name abstracted models are written to.
-   * @see #setMonolithicDumpFileName(String) setMonolithicDumpFileName()
+   * @see #setMonolithicDumpFile(File) setMonolithicDumpFileName()
    */
-  public String getMonolithicDumpFileName()
+  public File getMonolithicDumpFileName()
   {
     return mMonolithicDumpFileName;
   }
@@ -724,7 +725,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                 true));
     //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
     list.add(new StringParameter
-               (ParameterIDs.AbstractCompositionalSynthesizer_setMonolithicDumpFileName,
+               (ParameterIDs.AbstractCompositionalSynthesizer_MonolithicDumpFile,
                 "Dump file name",
                 "If set, any abstracted model will be written to this file " +
                 "before being sent for monolithic verification."));
@@ -3229,7 +3230,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   private int mLowerInternalStateLimit;
   private int mUpperInternalStateLimit;
   private int mInternalTransitionLimit;
-  private String mMonolithicDumpFileName = null;
+  private File mMonolithicDumpFileName = null;
   private ModelAnalyzer mMonolithicAnalyzer;
   private ModelAnalyzer mCurrentMonolithicAnalyzer;
 

@@ -80,18 +80,30 @@ public class MarshallingTools
   /**
    * Saves a product DES as a product DES (<CODE>.wdes</CODE>) file.
    * @param  des       The product DES to be saved.
-   * @param  filename  The name of the output file,
+   * @param  fileName  The name of the output file,
    *                   should have <CODE>.wdes</CODE> extension.
    */
   public static void saveProductDES(final ProductDESProxy des,
-                                    final String filename)
+                                    final String fileName)
+  {
+    final File file = new File(fileName);
+    saveProductDES(des, file);
+  }
+
+  /**
+   * Saves a product DES as a product DES (<CODE>.wdes</CODE>) file.
+   * @param  des       The product DES to be saved.
+   * @param  file      The output file,
+   *                   should have <CODE>.wdes</CODE> extension.
+   */
+  public static void saveProductDES(final ProductDESProxy des,
+                                    final File file)
   {
     try {
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final ProxyMarshaller<ProductDESProxy> marshaller =
         new JAXBProductDESMarshaller(factory);
-      final File file = new File(filename);
       marshaller.marshal(des, file);
     } catch (final JAXBException exception) {
       throw new WatersRuntimeException(exception);
@@ -142,21 +154,34 @@ public class MarshallingTools
     saveProductDES(des, filename);
   }
 
+
   /**
    * Saves a module as a Waters module (<CODE>.wmod</CODE>) file.
    * @param  module    The module to be saved.
-   * @param  filename  The name of the output file,
+   * @param  fileName  The name of the output file,
    *                   should have <CODE>.wmod</CODE> extension.
    */
   public static void saveModule(final ModuleProxy module,
-                                final String filename)
+                                final String fileName)
+  {
+    final File file = new File(fileName);
+    saveModule(module, file);
+  }
+
+  /**
+   * Saves a module as a Waters module (<CODE>.wmod</CODE>) file.
+   * @param  module    The module to be saved.
+   * @param  file      The name output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
+  public static void saveModule(final ModuleProxy module,
+                                final File file)
   {
     try {
       final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ProxyMarshaller<ModuleProxy> marshaller =
         new JAXBModuleMarshaller(factory, optable);
-      final File file = new File(filename);
       marshaller.marshal(module, file);
     } catch (final JAXBException exception) {
       throw new WatersRuntimeException(exception);
@@ -174,17 +199,32 @@ public class MarshallingTools
    * This method converts the given product into a module and saves the
    * result to a file.
    * @param  des       The product DES to be saved.
-   * @param  filename  The name of the output file,
+   * @param  fileName  The name of the output file,
    *                   should have <CODE>.wmod</CODE> extension.
    */
   public static void saveModule(final ProductDESProxy des,
-                                final String filename)
+                                final String fileName)
+  {
+    final File file = new File(fileName);
+    saveModule(des, file);
+  }
+
+  /**
+   * Saves a product DES as a Waters module (<CODE>.wmod</CODE>) file.
+   * This method converts the given product into a module and saves the
+   * result to a file.
+   * @param  des       The product DES to be saved.
+   * @param  file      The output file,
+   *                   should have <CODE>.wmod</CODE> extension.
+   */
+  public static void saveModule(final ProductDESProxy des,
+                                final File file)
   {
     try {
       final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
       final ProductDESImporter importer = new ProductDESImporter(factory);
       final ModuleProxy module = importer.importModule(des);
-      saveModule(module, filename);
+      saveModule(module, file);
     } catch (final ParseException exception) {
       throw new WatersRuntimeException(exception);
     }
@@ -233,20 +273,38 @@ public class MarshallingTools
    * module (<CODE>.wmod</CODE>) file, depending on the extension found
    * in the file name.
    * @param  des       The product DES to be saved.
-   * @param  filename  The name of the output file. If no extension is
-   *                   present, <CODE>.wdes</CODE> is added.
+   * @param  fileName  The name of the output file. If no extension is
+   *                   present, the <CODE>.wdes</CODE> extension is added
+   *                   and a product DES is saved.
    */
   public static void saveProductDESorModule(final ProductDESProxy des,
-                                            String filename)
+                                            final String fileName)
+  {
+    final File file = new File(fileName);
+    saveProductDESorModule(des, file);
+  }
+
+  /**
+   * Saves a product DES as a product DES (<CODE>.wdes</CODE>) or
+   * module (<CODE>.wmod</CODE>) file, depending on the extension found
+   * in the file name.
+   * @param  des       The product DES to be saved.
+   * @param  file      The output file. If no extension is present,
+   *                   the <CODE>.wdes</CODE> extension is added
+   *                   and a product DES is saved.
+   */
+  public static void saveProductDESorModule(final ProductDESProxy des,
+                                            final File file)
   {
     try {
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       ProxyMarshaller<ProductDESProxy> desMarshaller;
       desMarshaller = new JAXBProductDESMarshaller(desFactory);
+      final String fileName = file.getName();
       final String desExt = desMarshaller.getDefaultExtension();
-      if (filename.endsWith(desExt)) {
-        saveProductDES(des, filename);
+      if (fileName.endsWith(desExt)) {
+        saveProductDES(des, file);
         return;
       }
       final ModuleProxyFactory modFactory = ModuleElementFactory.getInstance();
@@ -254,12 +312,14 @@ public class MarshallingTools
       final ProxyMarshaller<ModuleProxy> modMarshaller =
         new JAXBModuleMarshaller(modFactory, optable);
       final String modExt = modMarshaller.getDefaultExtension();
-      if (filename.endsWith(modExt)) {
-        saveModule(des, filename);
+      if (fileName.endsWith(modExt)) {
+        saveModule(des, file);
         return;
       }
-      filename += desExt;
-      saveProductDES(des, filename);
+      final String desName = fileName + desExt;
+      final File parent = file.getParentFile();
+      final File desFile = new File(parent, desName);
+      saveProductDES(des, desFile);
     } catch (final JAXBException | SAXException exception) {
       throw new WatersRuntimeException(exception);
     }

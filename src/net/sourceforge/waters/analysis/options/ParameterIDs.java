@@ -75,7 +75,7 @@ public class ParameterIDs
   public static final int AbstractCompositionalSynthesizer_setInternalTransitionLimit = 17;
   public static final int AbstractCompositionalSynthesizer_setLowerInternalStateLimit = 18;
   public static final int AbstractCompositionalSynthesizer_setMonolithicAnalyzer = 19;
-  public static final int AbstractCompositionalSynthesizer_setMonolithicDumpFileName = 20;
+  public static final int AbstractCompositionalSynthesizer_MonolithicDumpFile = 20;
   public static final int AbstractCompositionalSynthesizer_setMonolithicStatelimit = 21;
   public static final int AbstractCompositionalSynthesizer_setMonolithicTransitionLimit = 22;
   public static final int AbstractCompositionalSynthesizer_setPreselectingMethod = 23;
