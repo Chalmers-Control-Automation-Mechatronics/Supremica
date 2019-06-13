@@ -26,6 +26,7 @@ public class FileParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESProxy model)
   {
+    // TODO Should have text field plus button
     final JButton button = new JButton("Open File");
 
     final ActionListener openFile = new ActionListener() {

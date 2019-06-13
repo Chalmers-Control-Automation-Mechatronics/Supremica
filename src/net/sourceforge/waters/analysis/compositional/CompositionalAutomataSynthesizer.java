@@ -264,7 +264,7 @@ public class CompositionalAutomataSynthesizer
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       if (param.getID() == ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled) {
-        param.setName("Create supervisor automata.");
+        param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
                              "exists.");

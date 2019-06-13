@@ -22,12 +22,17 @@ public class EventParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESProxy model)
   {
+    // TODO Change to List<EventProxy>
     final List<String> propositions = new ArrayList<>();
     propositions.add("null");   //option to select null event
+    // ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    // EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
 
-    for(final EventProxy event: model.getEvents())
+    for(final EventProxy event: model.getEvents()) {
+      // event.getKind() == EventKind.PROPOSITION
+      // TODO Only add propositions
       propositions.add(event.getName());
-
+    }
 
     Collections.sort(propositions);
 
@@ -35,6 +40,7 @@ public class EventParameter extends Parameter
     ret.setSelectedItem(mValue);
 
     //:accepting is selected as default
+    // TODO Use the loop above to check
     if(propositions.contains(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue.equals(EventDeclProxy.DEFAULT_MARKING_NAME))
       ret.setSelectedItem(EventDeclProxy.DEFAULT_MARKING_NAME);
 
@@ -59,7 +65,8 @@ public class EventParameter extends Parameter
     comboBox.setSelectedItem(mValue);
   }
 
-//#########################################################################
+  //#########################################################################
   //# Data Members
+  // TODO Needs to be EventProxy
   private String mValue;
 }

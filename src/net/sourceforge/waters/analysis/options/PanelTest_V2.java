@@ -57,20 +57,21 @@ public class PanelTest_V2
 
   final static ProductDESProxyFactory factory =   ProductDESElementFactory.getInstance();
   final static ProductDESProxy des = MarshallingTools.loadAndCompileModule("examples/includeInJarFile/ModuleExamples/big_factory/bfactory.wmod");
+
+  // TODO not static
   static ParameterJScrollPane mScrollParametersPanel;
+  // TODO Mao<Integer,Parameter> or TIntObjectHashMap<Parameter>
   static HashMap<ModelAnalyzerFactoryLoader,List<Parameter>> algorithmsParameters =
     new HashMap<ModelAnalyzerFactoryLoader,List<Parameter>>();
 
   public static void main(final String[] args)
-    throws AnalysisConfigurationException
   {
     final JFrame frame = new JFrame("Test");
     final JPanel mSuperviserPanel = new JPanel();
 
     final JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox =
       new JComboBox<>();
-    final JLabel superviserComboboxLabel =
-      new JLabel("Available Synthesis Supervisers");
+    final JLabel superviserComboboxLabel = new JLabel("Algorithm");
 
     for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader
       .values()) {
@@ -78,7 +79,6 @@ public class PanelTest_V2
         if (dir.getModelAnalyzerFactory()
           .createSupervisorSynthesizer(ProductDESElementFactory
             .getInstance()) != null)
-          ;
         {
           superviserCombobox.addItem(dir);
           algorithmsParameters
@@ -89,7 +89,7 @@ public class PanelTest_V2
                    .getParameters());
           //System.out.println(dir.toString());
         }
-      } catch (ClassNotFoundException | UnsatisfiedLinkError
+      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
         | AnalysisConfigurationException exception) {
         // exception.printStackTrace(); }
       }

@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
+import java.io.File;
 import java.io.PrintStream;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -691,7 +692,8 @@ public class CompositionalModelAnalyzerFactory
       final AbstractCompositionalModelAnalyzer composer =
         (AbstractCompositionalModelAnalyzer) analyzer;
       final String fileName = getValue();
-      composer.setMonolithicDumpFileName(fileName);
+      final File file = new File(fileName);
+      composer.setMonolithicDumpFile(file);
     }
   }
 
