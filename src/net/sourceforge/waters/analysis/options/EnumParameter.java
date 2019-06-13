@@ -88,6 +88,7 @@ public class EnumParameter<T> extends Parameter
   {
     final Vector<T> vector = new Vector<> (mList);
     final JComboBox<T> ret = new JComboBox<>(vector);
+    ret.setSelectedItem(mValue);
     return ret;
   }
 
@@ -102,8 +103,9 @@ public class EnumParameter<T> extends Parameter
   {
     final Component comp = panel.getEntryComponent();
     final JComboBox<T> comboBox = (JComboBox<T>) comp;
-    final int index = comboBox.getSelectedIndex();
-    mValue = comboBox.getItemAt(index);
+  //  final int index = comboBox.getSelectedIndex();
+  //  mValue = comboBox.getItemAt(index);
+    mValue = (T) comboBox.getSelectedItem();
   }
 
   @SuppressWarnings("unchecked")

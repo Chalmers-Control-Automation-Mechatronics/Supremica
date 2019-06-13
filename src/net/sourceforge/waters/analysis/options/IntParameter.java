@@ -66,7 +66,7 @@ public class IntParameter extends Parameter {
     public Component createComponent() {
     	final JTextField ret = new JTextField();
     	ret.setText(String.valueOf(value));
-    	ret.setColumns(20);
+    	ret.setColumns(10);
     	return ret;
     }
 

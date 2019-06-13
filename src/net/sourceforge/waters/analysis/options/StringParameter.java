@@ -78,7 +78,7 @@ public class StringParameter extends Parameter
   {
     final JTextField ret = new JTextField();
     ret.setText(mValue);
-    ret.setColumns(20);
+    ret.setColumns(10);
     return ret;
   }
 

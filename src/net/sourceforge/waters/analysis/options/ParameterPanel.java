@@ -42,23 +42,19 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
-
 public class ParameterPanel extends JPanel
 {
   private static final long serialVersionUID = 1L;
   private final Parameter mParameter;
-  private final Component[] storedComponents; // don't need, just use getComponents()
 
-  public ParameterPanel(final Parameter param, final int row)
+  public ParameterPanel(final Parameter param)
   {
     setLayout(new BorderLayout());
     mParameter = param;
     add(mParameter.createLabel(), BorderLayout.WEST);
     add(mParameter.createComponent(), BorderLayout.EAST);
 
-    storedComponents = getComponents();
-    for (final Component component : storedComponents)
+    for (final Component component : getComponents())
       ((JComponent) component).setToolTipText(mParameter.getDescription());
   }
   //Updates parameter with itself
@@ -85,19 +81,19 @@ public class ParameterPanel extends JPanel
 
   public void setComponentValue(final int input)
   {
-    ((JTextField) storedComponents[1]).setText(Integer.toString(input));
+    ((JTextField) getEntryComponent()).setText(Integer.toString(input));
     commitParameter();
   }
 
   public void setComponentValue(final boolean input)
   {
-    ((JCheckBox) storedComponents[1]).setSelected(input);
+    ((JCheckBox) getEntryComponent()).setSelected(input);
     commitParameter();
   }
 
   public void setComponentValue(final String input)
   {
-    ((JTextField) storedComponents[1]).setText(input);
+    ((JTextField) getEntryComponent()).setText(input);
     commitParameter();
   }
 }
