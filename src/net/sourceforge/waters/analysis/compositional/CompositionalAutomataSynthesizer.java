@@ -271,7 +271,13 @@ public class CompositionalAutomataSynthesizer
         iter.add(new StringParameter
                    (ParameterIDs.CompositionalAutomataSynthesizer_setSupervisorNamePrefix,
                     "Supervisor name prefix",
-                    "Name prefix for synthesised supervisors."));
+                    "Name prefix for synthesised supervisors."){
+                     @Override
+                     public void commitValue()
+                     {
+                       setSupervisorNamePrefix(getValue());
+                     }
+                   });
         break;
       }
     }
@@ -279,7 +285,13 @@ public class CompositionalAutomataSynthesizer
                (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
                 "Supervisor reduction",
                 "Method of supervisor reduction to be used after synthesis",
-                DefaultSupervisorReductionFactory.class.getEnumConstants()));
+                DefaultSupervisorReductionFactory.class.getEnumConstants()) {
+                  @Override
+                  public void commitValue()
+                  {
+                    setSupervisorReductionFactory(getValue());
+                  }
+                });
     // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
     //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
     return list;

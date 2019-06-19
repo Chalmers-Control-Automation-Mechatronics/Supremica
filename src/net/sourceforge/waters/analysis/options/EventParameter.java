@@ -9,41 +9,48 @@ import javax.swing.JComboBox;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventParameter extends Parameter
 {
   public EventParameter(final int id, final String name, final String description)
   {
     super(id, name, description);
-    mValue = EventDeclProxy.DEFAULT_MARKING_NAME;
+    mValue = null;
   }
 
   @Override
   public Component createComponent(final ProductDESProxy model)
   {
-    // TODO Change to List<EventProxy>
-    final List<String> propositions = new ArrayList<>();
-    propositions.add("null");   //option to select null event
-    // ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
-    // EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
+
+    final List<EventProxy> propositions = new ArrayList<>();
+
+    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
+    //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
+
+    propositions.add(noEvent);
 
     for(final EventProxy event: model.getEvents()) {
-      // event.getKind() == EventKind.PROPOSITION
-      // TODO Only add propositions
-      propositions.add(event.getName());
+      if(event.getKind() == EventKind.PROPOSITION) {
+        propositions.add(event);
+        //if :accepting exists and this is first creation
+        if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue == null)
+          mValue = event;
+      }
     }
 
     Collections.sort(propositions);
 
-    final JComboBox<String> ret = new JComboBox<>(propositions.toArray(new String[propositions.size()]));
+    //:accepting no in alphabet, default to null event
+    if(mValue == null)
+      mValue = noEvent;
+
+    final JComboBox<EventProxy> ret = new JComboBox<>(propositions.toArray(new EventProxy[propositions.size()]));
     ret.setSelectedItem(mValue);
-
-    //:accepting is selected as default
-    // TODO Use the loop above to check
-    if(propositions.contains(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue.equals(EventDeclProxy.DEFAULT_MARKING_NAME))
-      ret.setSelectedItem(EventDeclProxy.DEFAULT_MARKING_NAME);
-
     return ret;
   }
 
@@ -53,8 +60,11 @@ public class EventParameter extends Parameter
   {
     final Component comp = panel.getEntryComponent();
     final JComboBox<String> comboBox = (JComboBox<String>) comp;
-    mValue =  (String) comboBox.getSelectedItem();
+    mValue =  (EventProxy) comboBox.getSelectedItem();
   }
+
+  public EventProxy getValue() { return mValue; }
+
 
   @SuppressWarnings("unchecked")
   @Override
@@ -67,6 +77,18 @@ public class EventParameter extends Parameter
 
   //#########################################################################
   //# Data Members
-  // TODO Needs to be EventProxy
-  private String mValue;
+
+  private EventProxy mValue;
+
+  @Override
+  public void updateFromParameter(final Parameter p)
+  {
+    mValue = ((EventParameter) p).getValue();
+  }
+
+  @Override
+  public void printValue()
+  {
+    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+  }
 }

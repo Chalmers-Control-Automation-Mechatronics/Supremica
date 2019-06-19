@@ -88,4 +88,16 @@ public class BoolParameter extends Parameter
     final JCheckBox checkBox = (JCheckBox) comp;
     checkBox.setSelected(mValue);
   }
+
+  @Override
+  public void updateFromParameter(final Parameter p)
+  {
+    mValue = ((BoolParameter) p).getValue();
+  }
+
+  @Override
+  public void printValue()
+  {
+      System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+  }
 }

@@ -200,20 +200,38 @@ public abstract class AbstractModelAnalyzer
                 "Detailed output",
                 "Compute full output, e.g., synthesised supervisor automata or " +
                 "counterexample.",
-                true));
+                true){
+                 @Override
+                 public void commitValue()
+                 {
+                   setDetailedOutputEnabled(getValue());
+                 }
+               });
     //setKindTranslator(KindTranslator translator)
     list.add(new IntParameter
                (ParameterIDs.ModelAnalyzer_setNodeLimit,
                 "Node limit",
                 "The maximum number of nodes the analyser is allowed to keep " +
                 "in memory at any one time.",
-                0, Integer.MAX_VALUE));
+                0, Integer.MAX_VALUE){
+                 @Override
+                 public void commitValue()
+                 {
+                   setNodeLimit(getValue());
+                 }
+               });
     list.add(new IntParameter
                (ParameterIDs.ModelAnalyzer_setTransitionLimit,
                 "Transition limit",
                 "The maximum number of transitions the analyser is allowed to " +
                 "keep in memory at any one time.",
-                0, Integer.MAX_VALUE));
+                0, Integer.MAX_VALUE){
+                 @Override
+                 public void commitValue()
+                 {
+                   setTransitionLimit(getValue());
+                 }
+               });
     return list;
   }
 

@@ -53,31 +53,31 @@ public class IntParameter extends Parameter {
 
     private final int min;
     private final int max;
-    private int value;
+    private int mValue;
 
     public IntParameter(final int id, final String name, final String description,
                         final int min, final int max) {
         super(id, name, description);
         this.min = min;
         this.max = max;
-        value = min + max / 2;
+        mValue = min + max / 2;
     }
 
     @Override
     public Component createComponent(final ProductDESProxy model) {
     	final JTextField ret = new JTextField();
-    	ret.setText(String.valueOf(value));
+    	ret.setText(String.valueOf(mValue));
     	ret.setColumns(10);
     	return ret;
     }
 
     public void clamp() {
 
-        if(value > max) {
-        	value = max;
+        if(mValue > max) {
+        	mValue = max;
         }
-        else if(value < min) {
-        	value = min;
+        else if(mValue < min) {
+        	mValue = min;
         }
     }
 
@@ -90,11 +90,11 @@ public class IntParameter extends Parameter {
     }
 
     public int getValue() {
-        return value;
+        return mValue;
     }
 
     public void setValue(final int val) {
-    	value = val;
+    	mValue = val;
     	clamp();
     }
 
@@ -110,8 +110,8 @@ public class IntParameter extends Parameter {
         setValue(val);
       }
       catch(final NumberFormatException e) {
-        value = min;
-        textField.setText(String.valueOf(value));
+        mValue = min;
+        textField.setText(String.valueOf(mValue));
         final JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, "Invalid value in " + this.getName() + " field, resetting to minimum value.");
       }
@@ -123,6 +123,20 @@ public class IntParameter extends Parameter {
     {
       final Component comp = panel.getEntryComponent();
       final JTextField textField = (JTextField) comp;
-      textField.setText(String.valueOf(value));
+      textField.setText(String.valueOf(mValue));
     }
+
+
+    @Override
+    public void updateFromParameter(final Parameter p)
+    {
+      mValue = ((IntParameter) p).getValue();
+    }
+
+    @Override
+    public void printValue()
+    {
+      System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+    }
+
 }

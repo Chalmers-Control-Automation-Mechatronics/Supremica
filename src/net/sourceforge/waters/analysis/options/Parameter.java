@@ -64,7 +64,6 @@ public abstract class Parameter
     mDescription = description;
   }
 
-
   //#########################################################################
   //# Simple Access
   public int getID()
@@ -92,6 +91,11 @@ public abstract class Parameter
     mDescription = description;
   }
 
+  public void commitValue()  {  }
+
+  public abstract void updateFromParameter(Parameter p);
+
+  public abstract void printValue();
 
   //#########################################################################
   //# GUI

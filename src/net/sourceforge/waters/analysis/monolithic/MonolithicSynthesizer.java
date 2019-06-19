@@ -277,19 +277,37 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     list.add(new BoolParameter
                (ParameterIDs.MonolithicSynthesizer_setNonblockingSupported,
                 "Nonblocking",
-                "Synthesize a nonblocking supervisor.", true));
+                "Synthesize a nonblocking supervisor.", true){
+                 @Override
+                 public void commitValue()
+                 {
+                   setNonblockingSupported(getValue());
+                 }
+               });
     // list.add(new EnumParameter(2, "Marking proposition", "If synthesising a nonblocking supervisor, select the proposition that defines the marked states."))
     list.add(new EnumParameter<SupervisorReductionFactory>
                (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
                 "Supervisor reduction",
                 "Method of supervisor reduction to be used after synthesis",
-                DefaultSupervisorReductionFactory.class.getEnumConstants()));
+                DefaultSupervisorReductionFactory.class.getEnumConstants()){
+                 @Override
+                 public void commitValue()
+                 {
+                   setSupervisorReductionFactory(getValue());
+                 }
+               });
     list.add(new BoolParameter
                (ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled,
                 "Localize supervisors",
                 "If using supervisor reduction, create a separate supervisor " +
                 "for each controllable event that needs to be disabled.",
-                true));
+                true){
+                 @Override
+                 public void commitValue()
+                 {
+                   setSupervisorLocalizationEnabled(getValue());
+                 }
+               });
     return list;
   }
 

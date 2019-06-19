@@ -98,4 +98,16 @@ public class StringParameter extends Parameter
     final JTextField textField = (JTextField) comp;
     textField.setText(mValue);
   }
+
+  @Override
+  public void updateFromParameter(final Parameter p)
+  {
+    mValue = ((StringParameter) p).getValue();
+  }
+
+  @Override
+  public void printValue()
+  {
+    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+  }
 }

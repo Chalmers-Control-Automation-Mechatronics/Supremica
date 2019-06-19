@@ -12,7 +12,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 public class ParameterJScrollPane extends JScrollPane
 {
-  JPanel activePanel = new JPanel();
+
 
   //#########################################################################
   //# Constructors
@@ -29,19 +29,20 @@ public class ParameterJScrollPane extends JScrollPane
     for (final ParameterPanel panel : parameterPanels) {
       tmp.add(panel);
     }
-    activePanel = tmp;
+
     setViewportView(tmp);
   }
 
-  public void replaceView(final List<Parameter> p, final ProductDESProxy model)
+  public void replaceView(final List<Parameter> newParams, final ProductDESProxy model)
   {
     //Generate new parameterPanels
     final JPanel current = new JPanel();
     final List<ParameterPanel> newPanels = new ArrayList<ParameterPanel>();
     current.setLayout(new BoxLayout(current, BoxLayout.Y_AXIS));
 
-    for(final Parameter param: p)
+    for(final Parameter param: newParams) {
       newPanels.add(new ParameterPanel(param, model));
+    }
 
     for (final ParameterPanel panel : newPanels) {
       current.add(panel);
@@ -54,22 +55,19 @@ public class ParameterJScrollPane extends JScrollPane
 
     for(final Component c: old.getComponents()) {
        oldPanels.add((ParameterPanel) c);
-      //((ParameterPanel) c).commitParameter();
     }
 
-    copyValue(oldPanels,newPanels);
+   // copyValue(oldPanels,newPanels);
 
     //change to new viewport
     setViewportView(current);
-    activePanel = current;
   }
 
 
   public void commit() {
-    for(final Component c: activePanel.getComponents())
+    for(final Component c: ((JPanel) getViewport().getComponent(0)).getComponents())
       ((ParameterPanel) c).commitParameter();
   }
-
 
   public static void copyValue(final List<ParameterPanel> oldPanels,
                                final List<ParameterPanel> newPanels)
@@ -109,6 +107,16 @@ public class ParameterJScrollPane extends JScrollPane
     }
 
     return null;
+  }
+
+  public List<Parameter> getParameters() {
+
+    final List<Parameter> activeParameters = new ArrayList<>();
+
+    for(final Component c: ((JPanel) getViewport().getComponent(0)).getComponents())
+      activeParameters.add(((ParameterPanel) c).getParameter());
+
+    return activeParameters;
   }
 
   private static final long serialVersionUID = 1L;

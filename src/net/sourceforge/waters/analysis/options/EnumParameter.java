@@ -98,6 +98,11 @@ public class EnumParameter<T> extends Parameter
     return  mValue;
   }
 
+  public void setValue(final T value)
+  {
+    mValue = value;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public void updateFromGUI(final ParameterPanel panel)
@@ -124,4 +129,16 @@ public class EnumParameter<T> extends Parameter
   private List<? extends T> mList;
   private T mValue;
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public void updateFromParameter(final Parameter p)
+  {
+    mValue = ((EnumParameter<T>) p).getValue();
+  }
+
+  @Override
+  public void printValue()
+  {
+    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+  }
 }
