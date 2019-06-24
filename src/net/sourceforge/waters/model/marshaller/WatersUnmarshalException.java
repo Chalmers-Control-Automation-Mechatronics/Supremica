@@ -147,13 +147,14 @@ public class WatersUnmarshalException extends WatersException {
         final StringBuilder buffer = new StringBuilder();
         final SAXParseException saxCause = (SAXParseException) cause;
         final String sysid = saxCause.getSystemId();
-        if (sysid != null) {
-          if (sysid.startsWith("file:")) {
+        final String culprit = sysid == null ? mCulprit : sysid;
+        if (culprit != null) {
+          if (culprit.startsWith("file:")) {
             buffer.append("In file ");
-            buffer.append(sysid.substring(5));
+            buffer.append(culprit.substring(5));
           } else {
             buffer.append("At ");
-            buffer.append(sysid);
+            buffer.append(culprit);
           }
         }
         final int lineno = saxCause.getLineNumber();

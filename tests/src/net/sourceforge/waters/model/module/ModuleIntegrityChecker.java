@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import junit.framework.Assert;
 
 import net.sourceforge.waters.model.base.Proxy;
@@ -69,6 +70,7 @@ public class ModuleIntegrityChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public void check(final ModuleProxy module)
     throws Exception
   {
@@ -94,7 +96,8 @@ public class ModuleIntegrityChecker
       } else if (proxy instanceof VariableComponentProxy) {
         // O.K.
       } else if (proxy instanceof InstanceProxy) {
-        // O.K.
+        final InstanceProxy inst = (InstanceProxy) proxy;
+        checkInstanceIntegrity(inst);
       } else if (proxy instanceof ForeachProxy) {
         final ForeachProxy foreach = (ForeachProxy) proxy;
         final List<Proxy> body = foreach.getBody();
@@ -142,6 +145,15 @@ public class ModuleIntegrityChecker
       Assert.assertTrue("Bad target node '" + target.getName() +
                         "' in graph '" + comp.getName() + "'!",
                         collected.contains(target));
+    }
+  }
+
+  private void checkInstanceIntegrity(final InstanceProxy inst)
+  {
+    for (final ParameterBindingProxy binding : inst.getBindingList()) {
+      Assert.assertNotNull("Null expression bound to parameter '" +
+                           binding.getName() + "' of instance '" +
+                           inst.getName() + "'!", binding.getExpression());
     }
   }
 

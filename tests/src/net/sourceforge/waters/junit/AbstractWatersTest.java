@@ -127,6 +127,20 @@ public abstract class AbstractWatersTest
     return mConfigurationFactory.getFileName();
   }
 
+  protected File getInputFile(final String[] path, final String ext)
+  {
+    File dir = getWatersInputRoot();
+    final int len = path.length - 1;
+    for (int i = 0; i < len; i++) {
+      dir = new File(dir, path[i]);
+    }
+    String name = path[len];
+    if (name.indexOf('.') < 0) {
+      name += ext;
+    }
+    return new File(dir, name);
+  }
+
 
   //#########################################################################
   //# Proxy Equality Assertions

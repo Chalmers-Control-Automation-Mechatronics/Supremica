@@ -230,7 +230,7 @@ public class ModuleProxyPrinter
         print(color);
       }
     }
-    return visitGeometryProxy(geo);
+    return null;
   }
 
   @Override
