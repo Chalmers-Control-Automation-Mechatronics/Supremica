@@ -30,7 +30,7 @@ public class FileParameter extends Parameter
   public Component createComponent(final ProductDESProxy model)
   {
     final JPanel panel = new JPanel();
-    final JButton button = new JButton("Save File");
+    final JButton button = new JButton("...");
     final JTextField text = new JTextField();
 
     text.setColumns(10);

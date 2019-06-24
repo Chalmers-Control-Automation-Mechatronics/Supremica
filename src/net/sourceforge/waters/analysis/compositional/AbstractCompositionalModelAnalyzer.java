@@ -713,7 +713,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                 "Abstraction procedure",
                 "Abstraction procedure to simplify automata during compositional " +
                 "minimisation.",
-                AutomataSynthesisAbstractionProcedureFactory.getInstance()){
+                getAbstractionProcedureFactory()) {
                  @Override
                  public void commitValue()
                  {
