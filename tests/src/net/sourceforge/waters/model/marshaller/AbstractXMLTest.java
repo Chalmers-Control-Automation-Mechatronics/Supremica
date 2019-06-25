@@ -36,10 +36,13 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.File;
 import java.io.FileFilter;
 import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.base.ProxyCloner;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
@@ -55,20 +58,28 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
   {
     final FileFilter filter = new TestDirectoryFilter();
     final File root = getInputRoot();
-    testDirectory(root, filter);
+    parseDirectory(root, filter);
+  }
+
+  public void testMarshalAll()
+    throws Exception
+  {
+    final FileFilter filter = new TestDirectoryFilter();
+    final File root = getInputRoot();
+    marshalDirectory(root, filter);
   }
 
 
   //#########################################################################
   //# Utilities
-  protected void testDirectory(final File file, final FileFilter filter)
+  protected void parseDirectory(final File file, final FileFilter filter)
     throws Exception
   {
     if (file.isDirectory()) {
       final File[] children = file.listFiles(filter);
       Arrays.sort(children);
       for (final File child : children) {
-        testDirectory(child, filter);
+        parseDirectory(child, filter);
       }
     } else {
       System.out.println(file + " ...");
@@ -76,12 +87,25 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     }
   }
 
+  protected void marshalDirectory(final File file, final FileFilter filter)
+    throws Exception
+  {
+    if (file.isDirectory()) {
+      final File[] children = file.listFiles(filter);
+      Arrays.sort(children);
+      for (final File child : children) {
+        marshalDirectory(child, filter);
+      }
+    } else if (file.length() <= FILE_SIZE_LIMIT) {
+      System.out.println(file + " ...");
+      testMarshal(file);
+    }
+  }
+
   protected D testParse(final String... path)
     throws Exception
   {
-    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
-    final String ext = marshaller.getDefaultExtension();
-    final File file = getInputFile(path, ext);
+    final File file = getInputFile(path);
     return testParse(file);
   }
 
@@ -92,17 +116,65 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     final URI uri = file.toURI();
     final D doc = unmarshaller.unmarshal(uri);
     checkIntegrity(doc);
-    if (file.length() <= 5000000) {
-      checkPrint(doc);
-      final ProxyUnmarshaller<D> altUnmarshaller = getAltProxyUnmarshaller();
-      if (altUnmarshaller != null) {
-        final D expected = altUnmarshaller.unmarshal(uri);
-        assertProxyEquals("Unexpected contents in unmarshalled document!",
-                          doc, expected);
-      }
-    }
+    checkPrint(doc);
     return doc;
   }
+
+  protected void testHandcraft(final D handcrafted, final String... path)
+    throws Exception
+  {
+    checkIntegrity(handcrafted);
+    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    final String name = handcrafted.getName();
+    final String extname = name + unmarshaller.getDefaultExtension();
+    final File dir = getInputDirectory(path);
+    final File inFile = new File(dir, extname);
+    final File outFile = new File(getOutputDirectory(), extname);
+    final URI inURI = inFile.toURI();
+    final URI outURI = outFile.toURI();
+    marshaller.marshal(handcrafted, outFile);
+    final D parsed1 = unmarshaller.unmarshal(outURI);
+    assertProxyEquals("Constructed structure differs from parsed-back!",
+                      handcrafted, parsed1);
+    assertProxyEquals("Constructed structure differs from parsed-back!",
+                      parsed1, handcrafted);
+    final D parsed2 = unmarshaller.unmarshal(inURI);
+    assertProxyEquals("Constructed structure differs from expected in file!",
+                      handcrafted, parsed2);
+    assertProxyEquals("Constructed structure differs from expected in file!",
+                      parsed2, handcrafted);
+  }
+
+  protected D testJar(final String... path)
+    throws Exception
+  {
+    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    boolean hasExtension = false;
+    final StringBuilder builder = new StringBuilder("examples");
+    for (final String part : path) {
+      builder.append('/');
+      builder.append(part);
+      hasExtension = part.contains(".");
+    }
+    if (!hasExtension) {
+      final String ext = marshaller.getDefaultExtension();
+      builder.append(ext);
+    }
+    final String name = builder.toString();
+    final URL url = AbstractJAXBTest.class.getResource(name);
+    final URI jarURI = url.toURI();
+    final D jarDoc = unmarshaller.unmarshal(jarURI);
+    checkIntegrity(jarDoc);
+    final File file = getInputFile(path);
+    final URI fileURI = file.toURI();
+    final D fileDoc = unmarshaller.unmarshal(fileURI);
+    checkIntegrity(fileDoc);
+    assertProxyEquals("Structure in JAR differs from file!", jarDoc, fileDoc);
+    return jarDoc;
+  }
+
 
   protected D testPrint(final String... path)
     throws Exception
@@ -114,6 +186,62 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
       mIsPrinting = false;
     }
   }
+
+  protected void testMarshal(final String... path)
+    throws Exception
+  {
+    final File file = getInputFile(path);
+    testMarshal(file);
+  }
+
+  protected void testMarshal(final File inFile)
+    throws Exception
+  {
+    final URI inURI = inFile.toURI();
+    final String name = inFile.getName();
+    final File outFile = new File(getOutputDirectory(), name);
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    final D inDoc = unmarshaller.unmarshal(inURI);
+    checkIntegrity(inDoc);
+    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
+    marshaller.marshal(inDoc, outFile);
+    final URI outURI = outFile.toURI();
+    final D outDoc = unmarshaller.unmarshal(outURI);
+    checkIntegrity(outDoc);
+    assertProxyEquals("Structure changed after marshalling!", inDoc, outDoc);
+    assertProxyEquals("Structure changed after marshalling!", outDoc, inDoc);
+  }
+
+
+  protected D testClone(final String... path)
+    throws Exception
+  {
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    final File file = getInputFile(path);
+    final URI uri = file.toURI();
+    final D proxy = unmarshaller.unmarshal(uri);
+    final D cloned = ProxyTools.clone(proxy);
+    checkIntegrity(cloned);
+    assertProxyEquals("Clone differs from original!", proxy, cloned);
+    return cloned;
+  }
+
+
+  protected D testCrossClone(final ProxyCloner cloner, final String... path)
+    throws Exception
+  {
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    final File file = getInputFile(path);
+    final URI uri = file.toURI();
+    final D proxy = unmarshaller.unmarshal(uri);
+    final Proxy clonedDoc = cloner.getClone(proxy);
+    final Class<D> clazz = unmarshaller.getDocumentClass();
+    final D cloned = clazz.cast(clonedDoc);
+    checkIntegrity(cloned);
+    assertProxyEquals("Clone differs from original!", proxy, cloned);
+    return cloned;
+  }
+
 
   protected void checkIntegrity(final D document)
     throws Exception
@@ -132,29 +260,27 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     }
   }
 
-  protected void checkTime(final ProxyUnmarshaller<D> unmarshaller,
-                           final URI uri)
-    throws Exception
+  protected File getInputFile(final String... path)
   {
-    System.gc();
-    final int NUM_RUNS = 3;
-    double sum = 0.0;
-    for (int i = 0; i < NUM_RUNS; i++) {
-      final long start = System.currentTimeMillis();
-      unmarshaller.unmarshal(uri);
-      final long stop = System.currentTimeMillis();
-      sum += (stop - start);
-    }
-    System.out.format("%s time: %.2f s\n",
-                      ProxyTools.getShortClassName(unmarshaller),
-                      (0.001 * sum) / NUM_RUNS);
+    final ProxyMarshaller<D> marshaller = getProxyMarshaller();
+    final String ext = marshaller.getDefaultExtension();
+    return getInputFile(path, ext);
   }
 
 
   //#########################################################################
-  //# Inner Class TestDirectoryFilter
-  private class TestDirectoryFilter implements FileFilter {
+  //# Provided by Subclasses
+  protected abstract ProxyMarshaller<D> getProxyMarshaller();
+  protected abstract ProxyUnmarshaller<D> getProxyUnmarshaller();
+  protected ProxyUnmarshaller<D> getAlternateProxyUnmarshaller() {return null;}
+  protected abstract ProxyPrinter getPrinter();
+  protected abstract DocumentIntegrityChecker<D> getIntegrityChecker();
 
+
+  //#########################################################################
+  //# Inner Class TestDirectoryFilter
+  private class TestDirectoryFilter implements FileFilter
+  {
     //#######################################################################
     //# Interface java.io.FileFilter
     @Override
@@ -174,21 +300,16 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
         return ext.equals(dftext);
       }
     }
-
   }
-
-
-  //#########################################################################
-  //# Provided by Subclasses
-  protected abstract ProxyMarshaller<D> getProxyMarshaller();
-  protected abstract ProxyUnmarshaller<D> getProxyUnmarshaller();
-  protected ProxyUnmarshaller<D> getAltProxyUnmarshaller() {return null;}
-  protected abstract ProxyPrinter getPrinter();
-  protected abstract DocumentIntegrityChecker<D> getIntegrityChecker();
 
 
   //#########################################################################
   //# Data Members
   private boolean mIsPrinting = false;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final int FILE_SIZE_LIMIT = 1 << 20;
 
 }

@@ -193,7 +193,7 @@ public abstract class AbstractProductDESImporterTest
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mImporter = new ProductDESImporter(modfactory, mDocumentManager);
     mIntegrityChecker =
-      ModuleIntegrityChecker.getModuleIntegrityCheckerInstance();
+      ModuleIntegrityChecker.getInstance();
   }
 
 

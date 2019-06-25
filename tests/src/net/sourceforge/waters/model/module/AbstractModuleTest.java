@@ -643,7 +643,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   @Override
   protected ModuleIntegrityChecker getIntegrityChecker()
   {
-    return ModuleIntegrityChecker.getModuleIntegrityCheckerInstance();
+    return ModuleIntegrityChecker.getInstance();
   }
 
 

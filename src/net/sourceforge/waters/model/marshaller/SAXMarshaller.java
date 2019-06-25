@@ -48,6 +48,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -82,10 +83,12 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   //#########################################################################
   //# Constructors
   public SAXMarshaller(final String schemaName,
-                       final SAXDocumentImporter<D> importer)
+                       final SAXDocumentImporter<D> importer,
+                       final StAXDocumentWriter<D> writer)
     throws SAXException, ParserConfigurationException
   {
     mImporter = importer;
+    mWriter = writer;
     final SchemaFactory schemaFactory =
       SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
     final URL url = SAXMarshaller.class.getResource(schemaName);
@@ -103,7 +106,7 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
    * Returns whether geometry information is provided when unmarshalling.
    * @see #setImportingGeometry(boolean)
    */
-  boolean isImportingGeometry()
+  public boolean isImportingGeometry()
   {
     return mImporter.isImportingGeometry();
   }
@@ -119,15 +122,20 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
    * @param  importing  <CODE>true</CODE> if geometry information is provided,
    *                    <CODE>false</CODE> otherwise.
    */
-  void setImportingGeometry(final boolean importing)
+  public void setImportingGeometry(final boolean importing)
   {
     mImporter.setImportingGeometry(importing);
   }
 
+  public boolean isInsertingLineBreaks()
+  {
+    return mWriter.isInsertingLineBreaks();
+  }
 
-  //#########################################################################
-  //# Simple Access
-
+  public void setInsertingLineBreaks(final boolean inserting)
+  {
+    mWriter.setInsertingLineBreaks(inserting);
+  }
 
 
   //#########################################################################
@@ -153,6 +161,7 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
       final XMLReader reader = mParser.getXMLReader();
       mImporter.setURI(uri);
       reader.setContentHandler(mImporter);
+      reader.setErrorHandler(mImporter);
       reader.parse(source);
       return mImporter.getParsedDocument();
     } catch (final SAXException exception) {
@@ -167,33 +176,21 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   /**
    * Write a document to a file.
    * @param  filename The name of the file to be written.
-   * @param  docProxy The document to be written.
+   * @param  doc      The document to be written.
    * @throws WatersMarshalException to indicate a failure while writing the
    *                  XML structures.
    * @throws IOException to indicate that the output file could not be
    *                  opened.
    */
   @Override
-  public void marshal(final D docProxy, final File filename)
+  public void marshal(final D doc, final File filename)
     throws WatersMarshalException, IOException
   {
-    /*
-    PrintWriter writer = null;
     try {
-      final T doc = mExporter.export(docProxy);
-      final FileOutputStream stream = new FileOutputStream(filename);
-      writer = new PrintWriter(stream);
-      mJAXBMarshaller.marshal(doc, writer);
-    } catch (final JAXBException exception) {
-      throw new WatersMarshalException(filename, exception);
-    } catch (final ModelException exception) {
-      throw new WatersMarshalException(filename, exception);
-    } finally {
-      if (writer != null) {
-        writer.close();
-      }
+      mWriter.marshal(doc, filename);
+    } catch (final XMLStreamException exception) {
+      throw new WatersMarshalException(exception);
     }
-    */
   }
 
   @Override
@@ -261,5 +258,6 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   //# Data Members
   private final SAXParser mParser;
   private final SAXDocumentImporter<D> mImporter;
+  private final StAXDocumentWriter<D> mWriter;
 
 }

@@ -96,7 +96,8 @@ public class SAXModuleMarshaller
     throws SAXException, ParserConfigurationException
   {
     super("waters-module.xsd",
-          new SAXModuleImporter(factory, optable));
+          new SAXModuleImporter(factory, optable),
+          new StAXModuleWriter());
     setImportingGeometry(importGeo);
   }
 

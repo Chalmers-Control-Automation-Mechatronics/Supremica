@@ -44,6 +44,9 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.xsd.SchemaBase;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
@@ -154,6 +157,34 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
 
 
   //#########################################################################
+  //# Interface org.xml.sax.ErrorHandler
+  @Override
+  public void warning(final SAXParseException exception)
+  {
+    final Logger logger = LogManager.getLogger();
+    logger.warn(exception.getMessage());
+  }
+
+  @Override
+  public void error(final SAXParseException exception)
+    throws SAXParseException
+  {
+    final Logger logger = LogManager.getLogger();
+    logger.error(exception.getMessage());
+    throw exception;
+  }
+
+  @Override
+  public void fatalError(final SAXParseException exception)
+    throws SAXParseException
+  {
+    final Logger logger = LogManager.getLogger();
+    logger.error(exception.getMessage());
+    throw exception;
+  }
+
+
+  //#########################################################################
   //# Parsing Support
   AbstractContentHandler<?> pushHandler(final String localName,
                                         final Attributes atts)
@@ -195,6 +226,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     if (mLastHandler == null) {
       return null;
     } else {
+      mLocator = null;
       final Class<D> clazz = getDocumentClass();
       final Object result = mLastHandler.getResult();
       try {
@@ -215,7 +247,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
   {
     final StringBuilder builder = new StringBuilder();
     builder.append("Unexpected XML content - found a ");
-    builder.append(ProxyTools.getShortClassName(found));
+    builder.append(ProxyTools.getShortProxyInterfaceName(found));
     builder.append(" where a ");
     builder.append(ProxyTools.getShortClassName(expected));
     builder.append(" is expected.");

@@ -50,7 +50,7 @@ public class ModuleIntegrityChecker
 
   //#########################################################################
   //# Singleton Pattern
-  public static ModuleIntegrityChecker getModuleIntegrityCheckerInstance()
+  public static ModuleIntegrityChecker getInstance()
   {
     return SingletonHolder.INSTANCE;
   }

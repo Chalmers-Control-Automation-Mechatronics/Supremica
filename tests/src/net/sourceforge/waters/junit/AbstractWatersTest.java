@@ -127,6 +127,15 @@ public abstract class AbstractWatersTest
     return mConfigurationFactory.getFileName();
   }
 
+  protected File getInputDirectory(final String[] path)
+  {
+    File dir = getWatersInputRoot();
+    for (final String part : path) {
+      dir = new File(dir, part);
+    }
+    return dir;
+  }
+
   protected File getInputFile(final String[] path, final String ext)
   {
     File dir = getWatersInputRoot();

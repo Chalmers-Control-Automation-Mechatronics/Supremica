@@ -166,7 +166,7 @@ public class SupremicaImporterTest
     mDocumentManager.registerUnmarshaller(mSupremicaUnmarshaller);
     mImporter = new ProductDESImporter(modfactory, mDocumentManager);
     mIntegrityChecker =
-      ModuleIntegrityChecker.getModuleIntegrityCheckerInstance();
+      ModuleIntegrityChecker.getInstance();
   }
 
 

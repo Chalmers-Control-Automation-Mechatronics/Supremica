@@ -164,6 +164,16 @@ public class ProxyTools
     }
   }
 
+  public static String getShortProxyInterfaceName(final Object item)
+  {
+    if (item instanceof Proxy) {
+      final Proxy proxy = (Proxy) item;
+      return getShortProxyInterfaceName(proxy);
+    } else {
+      return getShortClassName(item);
+    }
+  }
+
   public static String getShortProxyInterfaceName(final Proxy proxy)
   {
     final Class<? extends Proxy> iface = proxy.getProxyInterface();
