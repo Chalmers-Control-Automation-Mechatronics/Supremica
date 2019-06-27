@@ -33,15 +33,19 @@
 
 package net.sourceforge.waters.gui.dialog;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import javax.swing.Action;
@@ -63,13 +67,17 @@ import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthe
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -95,12 +103,13 @@ public class AutomatonSynthesizerDialog extends JDialog
     setTitle("Supervisor synthesis");
     mAnalyzerPanel = panel;
     mAutomata = panel.getAutomataTable().getOperationArgument();
-    createComponents();
-    layoutComponents();
+    generateGUI();
+    //createComponents();
+    //layoutComponents();
     setLocationRelativeTo(panel.getTopLevelAncestor());
-    mNamePrefix.requestFocusInWindow();
+    //mNamePrefix.requestFocusInWindow();
     setVisible(true);
-    setMinimumSize(getSize());
+   // setMinimumSize(getSize());
   }
 
   //#########################################################################
@@ -349,6 +358,178 @@ public class AutomatonSynthesizerDialog extends JDialog
     pack();
   }
 
+  //#########################################################################
+  //#Using Parameter Classes
+
+  public void generateGUI() {
+
+    final JPanel mSuperviserPanel = new JPanel(new GridLayout(0,2));
+    superviserCombobox = new JComboBox<>();
+    final JLabel superviserComboboxLabel = new JLabel("Algorithms");
+    AllParams = new HashMap<Integer,Parameter>();
+
+    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
+      try {
+        final SupervisorSynthesizer s = dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
+
+        if (s != null){
+          superviserCombobox.addItem(dir);
+          //database of parameters
+          for(final Parameter p : s.getParameters())
+            AllParams.put(p.getID(),p);
+        }
+      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
+        | AnalysisConfigurationException exception) {     }
+    }
+
+
+    final ActionListener Print = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        storeInDatabase();
+        printMap();
+      }
+    };
+
+    final JButton print = new JButton("Print Database");
+    print.addActionListener(Print);
+
+    mSuperviserPanel.add(superviserComboboxLabel);
+    mSuperviserPanel.add(superviserCombobox);
+    mSuperviserPanel.add(print);
+
+    final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
+
+    final ProductDESProxy des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer",   mAutomata, factory);
+
+    final ActionListener syntheisSuperviserChanged = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+
+        final ModelAnalyzerFactoryLoader tmp =
+          (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
+
+        try {
+
+          final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
+            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters();
+          storeInDatabase();
+          copyFromDatabase(newParams);
+          mScrollParametersPanel.replaceView(newParams, des);
+        } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
+
+          exception.printStackTrace();
+        }
+        //re-packing causes the frame to shrink/increase to preferred size
+         pack();
+      }
+    };
+
+    superviserCombobox.addActionListener(syntheisSuperviserChanged);
+
+    // superviserCombobox should have at least one item
+    final ModelAnalyzerFactoryLoader first = (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
+
+    try {
+      mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
+                                                        .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters(),des);
+    } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
+      exception.printStackTrace();
+    }
+
+    // Buttons panel ...
+
+    final ActionListener commithandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+       ParameterCommitDialog();
+      }
+    };
+
+    mButtonsPanel = new JPanel();
+    final JButton okButton = new JButton("OK");
+    okButton.setRequestFocusEnabled(false);
+    okButton.addActionListener(commithandler);
+    mButtonsPanel.add(okButton);
+    final Action cancelAction = DialogCancelAction.getInstance();
+    final JButton cancelButton = new JButton(cancelAction);
+    cancelButton.setRequestFocusEnabled(false);
+    mButtonsPanel.add(cancelButton);
+
+    final JRootPane root = getRootPane();
+    root.setDefaultButton(okButton);
+    DialogCancelAction.register(this);
+
+    //Finally, build the full dialog ...
+    add(mSuperviserPanel, BorderLayout.PAGE_START);
+    add(mScrollParametersPanel, BorderLayout.CENTER);
+    add(mButtonsPanel, BorderLayout.PAGE_END);
+    pack();
+    setVisible(true);
+  }
+
+
+  //Values stored in GUI Components are stored in corresponding parameter then added to the database
+  public void storeInDatabase() {
+
+    mScrollParametersPanel.commit();       //All ParameterPanels save their stored value in their corresponding parameter
+    final List<Parameter> activeParameters =  mScrollParametersPanel.getParameters();
+
+    for(final Parameter p: activeParameters) {  //overwrite stored parameters with new version
+      AllParams.put(p.getID(), p);
+    }
+  }
+
+  // updates the passed parameters to have same stored value as
+  // corresponding one in database
+  public void copyFromDatabase(final List<Parameter> newParams) {
+    for(final Parameter current: newParams)
+      current.updateFromParameter(AllParams.get(current.getID()));
+  }
+
+  public void printMap() {
+    for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
+      entry.getValue().printValue();
+    }
+  }
+
+  public void ParameterCommitDialog()
+  {
+    final Frame owner = (Frame) getOwner();;
+    final SynthesisPopUpDialog dialog;
+    final SupervisorSynthesizer synthesizer;
+
+    final ProductDESProxyFactory factory =    ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =   AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
+    final ModelAnalyzerFactoryLoader synth = (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
+
+    try {
+
+      //Generate desired synthesizer and set all its parameters to corresponding ones in database
+      synthesizer = synth.getModelAnalyzerFactory()
+                            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
+
+      final List<Parameter> parameters = synthesizer.getParameters();
+      storeInDatabase();
+      copyFromDatabase(parameters);
+
+      //commit all of the values to the synthesizer
+      for(final Parameter current: parameters)
+        current.commitValue();
+
+      //synthesizer.setKindTranslator(translator);
+
+      mSynthesizer = synthesizer;
+
+    } catch (AnalysisConfigurationException | ClassNotFoundException exception) { }
+
+    dialog = new SynthesisPopUpDialog(owner, des);
+    dispose();
+    dialog.setVisible(true);
+  }
 
   //#########################################################################
   //# Action Listeners
@@ -384,12 +565,10 @@ public class AutomatonSynthesizerDialog extends JDialog
       synthesizer.setSupervisorReductionFactory(reduction);
       synthesizer.setSupervisorLocalizationEnabled
         (mLocalisedSupervisor.isSelected());
-      synthesizer.setModel(des);
       mSynthesizer = synthesizer;
     }
     else {
       final CompositionalAutomataSynthesizer synthesizer = new CompositionalAutomataSynthesizer(des, factory, translator, AutomataSynthesisAbstractionProcedureFactory.WSOE);
-      synthesizer.getPreselectingMethodFactory();
       synthesizer.setOutputName(prefixName);
       synthesizer.setKindTranslator(translator);
       synthesizer.setSelfloopOnlyEventsEnabled(mCompLoopEnabled.isSelected());
@@ -397,7 +576,6 @@ public class AutomatonSynthesizerDialog extends JDialog
       reduction = (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
       synthesizer.setSupervisorReductionFactory(reduction);
       mSynthesizer = synthesizer;
-      synthesizer.setModel(des);
     }
 
     dialog = new SynthesisPopUpDialog(owner, des);
@@ -521,6 +699,11 @@ public class AutomatonSynthesizerDialog extends JDialog
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final List<AutomatonProxy> mAutomata;
 
+
+  //Parameter Components
+  ParameterJScrollPane mScrollParametersPanel;
+  HashMap<Integer,Parameter> AllParams;
+
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNamePrefixLabel;
@@ -543,6 +726,9 @@ public class AutomatonSynthesizerDialog extends JDialog
   private JComboBox<SelectionHeuristicCreator> mSelectionHeuristic;
   private JLabel mCompLoopLabel;
   private JCheckBox mCompLoopEnabled;
+
+  //Parameter Stuff
+  private JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox;
 
   // Analysis workers
   private SupervisorSynthesizer mSynthesizer;

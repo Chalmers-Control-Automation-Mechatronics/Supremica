@@ -46,6 +46,11 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
@@ -181,6 +186,114 @@ public class ModularControllabilitySynthesizer
   {
     return mDisabledEvents;
   }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.des.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    for (final Parameter param : list) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+        param.setName("Create supervisor automata");
+        param.setDescription("Disable this to suppress the creation of supervisor " +
+                             "automata, and only determine whether a supervisor " +
+                             "exists.");
+        break;
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription("Maximum number of states before aborting.");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription("Maximum number of transitions before aborting.");
+        break;
+      default:
+        break;
+     }
+    }
+
+    list.add(new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
+                              "ConfiguredDefaultMarking",
+                              "The default (omega) marking to be used for conflict checks.") {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
+
+    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_IncludesAllAutomata,
+                             "IncludesAllAutomata", "IncludesAllAutomata",
+                             true) {
+        @Override
+        public void commitValue()
+        {
+          setIncludesAllAutomata(getValue());
+        }
+      });
+
+    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_LocalNonblockingSupported,
+                             "setLocalNonblockingSupported",
+                             "setLocalNonblockingSupported", true) {
+        @Override
+        public void commitValue()
+        {
+          setLocalNonblockingSupported(getValue());
+        }
+      });
+
+    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_NondeterminismEnabled,
+                             "NondeterminismEnabled", "NondeterminismEnabled",
+                             true) {
+        @Override
+        public void commitValue()
+        {
+          setNondeterminismEnabled(getValue());
+        }
+      });
+
+    list
+      .add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors,
+                             "setRemovesUnnecessarySupervisors",
+                             "setRemovesUnnecessarySupervisors", true) {
+        @Override
+        public void commitValue()
+        {
+          setRemovesUnnecessarySupervisors(getValue());
+        }
+      });
+
+    list
+      .add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
+                             "SupervisorLocalizationEnabled",
+                             "SupervisorLocalizationEnabled", true) {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorLocalizationEnabled(getValue());
+        }
+      });
+
+    list
+      .add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
+                                                         "Supervisor reduction",
+                                                         "Method of supervisor reduction to be used after synthesis",
+                                                         DefaultSupervisorReductionFactory.class
+                                                           .getEnumConstants()) {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorReductionFactory(getValue());
+        }
+      });
+
+    return list;
+
+  }
+
 
 
   //#########################################################################

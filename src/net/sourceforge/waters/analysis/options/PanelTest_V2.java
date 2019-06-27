@@ -47,11 +47,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -81,8 +79,6 @@ public class PanelTest_V2
     //Buttons for testing synthesizer generation, storing/retrieval with database
     final Button commit = new Button("Store in Database");
     final Button setValue = new Button("Print Database");
-    final Button createMono = new Button("Create Monolithic");
-    final Button createComp = new Button("Create Compositional");
     final Button createSynth = new Button("Create Synthesizer");
 
     final ActionListener setValuePrint = new ActionListener() {
@@ -101,22 +97,6 @@ public class PanelTest_V2
       }
     };
 
-    final ActionListener compositional = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        CompSynthesizer();
-      }
-    };
-
-    final ActionListener monolithic = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        MonoSynthesizer();
-      }
-    };
-
     final ActionListener synthesizer = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -127,28 +107,23 @@ public class PanelTest_V2
 
     setValue.addActionListener(setValuePrint);
     commit.addActionListener(store);
-
-    createMono.addActionListener(monolithic);
-    createComp.addActionListener(compositional);
     createSynth.addActionListener(synthesizer);
 
     mButtons.add(commit);
     mButtons.add(setValue);
-    mButtons.add(createMono);
-    mButtons.add(createComp);
     mButtons.add(createSynth);
 
     for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
       try {
 
-        final SupervisorSynthesizer s = dir.getModelAnalyzerFactory()
-          .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
-
-       // final ConflictChecker s = dir.getModelAnalyzerFactory().createConflictChecker(ProductDESElementFactory.getInstance());
+        final ConflictChecker s = dir.getModelAnalyzerFactory()
+          .createConflictChecker(ProductDESElementFactory.getInstance());
 
         if (s != null)
         {
           superviserCombobox.addItem(dir);
+
+          //System.out.println(s);
 
           //database of parameters
           for(final Parameter p : s.getParameters()) {
@@ -158,7 +133,7 @@ public class PanelTest_V2
         }
       } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
         | AnalysisConfigurationException exception) {
-        // exception.printStackTrace(); }
+
       }
     }
 
@@ -176,7 +151,7 @@ public class PanelTest_V2
         try {
 
           final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
-            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters();
+            .createConflictChecker(ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
           mScrollParametersPanel.replaceView(newParams, des);
@@ -197,7 +172,7 @@ public class PanelTest_V2
 
     try {
       mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters(),des);
+                                                        .createConflictChecker(ProductDESElementFactory.getInstance()).getParameters(),des);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }
@@ -230,88 +205,18 @@ public class PanelTest_V2
   // updates the passed parameters to have same stored value as
   // corresponding one in database
   public static void copyFromDatabase(final List<Parameter> newParams) {
-    /*
-    //before copy
-    System.out.println( "Before Copy");
-    for(final Parameter current: newParams)
-      current.printValue();
-*/
+
     for(final Parameter current: newParams)
       current.updateFromParameter(AllParams.get(current.getID()));
-/*
-    //after copy
-    System.out.println( "After Copy");
-    for(final Parameter current: newParams)
-      current.printValue();
-    */
-  }
 
-
-  public static void MonoSynthesizer() {
-
-    final MonolithicSynthesizer syth = new MonolithicSynthesizer(ProductDESElementFactory.getInstance());
-
-    final List<Parameter> parameters = syth.getParameters();
-    storeInDatabase();                      //store active panels parameters
-    copyFromDatabase(parameters);           //update generated synthesizers parameters with stored ones
-
-    for(final Parameter current: parameters)
-      current.commitValue();
-/*
-     //verify changes were accepted
-    System.out.println("***************************************");
-    System.out.println("Synthesizer Values:");
-    System.out.println(syth.isDetailedOutputEnabled());
-    System.out.println(syth.getTransitionLimit());
-    System.out.println(syth.getNodeLimit());
-    System.out.println(syth.getNonblockingSupported());
-    System.out.println(syth.getSupervisorReductionFactory());
-    System.out.println(syth.getSupervisorLocalizationEnabled());
-    System.out.println("***************************************");
-    */
-  }
-
-  public static void CompSynthesizer() {
-
-    final CompositionalAutomataSynthesizer syth = new CompositionalAutomataSynthesizer(ProductDESElementFactory.getInstance());
-
-    final List<Parameter> parameters = syth.getParameters();
-    storeInDatabase();
-    copyFromDatabase(parameters);
-
-    for(final Parameter current: parameters)
-      current.commitValue();
-/*
-    //verify changes were accepted
-    System.out.println("***************************************");
-    System.out.println("Synthesizer Values:");
-    System.out.println(syth.isSubsumptionEnabled());
-    System.out.println(syth.getSupervisorNamePrefix());
-    System.out.println(syth.getConfiguredPreconditionMarking());
-    System.out.println(syth.getConfiguredDefaultMarking());
-    System.out.println(syth.getPreselectingMethod());
-    System.out.println(syth.getSelectionHeuristic());
-    System.out.println(syth.getAbstractionProcedureCreator());
-    System.out.println(syth.getInternalStateLimit());
-    System.out.println(syth.getInternalTransitionLimit());
-    System.out.println(syth.getMonolithicStateLimit());
-    System.out.println(syth.getMonolithicTransitionLimit());
-    System.out.println(syth.isBlockedEventsEnabled());
-    System.out.println(syth.isSelfloopOnlyEventsEnabled());
-    System.out.println(syth.isFailingEventsEnabled());
-    System.out.println(syth.isPruningDeadlocks());
-    System.out.println(syth.getMonolithicDumpFileName());
-    System.out.println(syth.getSupervisorReductionFactory());
-    System.out.println("***************************************");
-*/
   }
 
    public static void createSynthesizer(final ModelAnalyzerFactoryLoader synth ) {
 
-    SupervisorSynthesizer sythesizer;
+    ConflictChecker sythesizer;
     try {
       sythesizer = synth.getModelAnalyzerFactory()
-                            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
+                            .createConflictChecker(ProductDESElementFactory.getInstance());
 
       final List<Parameter> parameters = sythesizer.getParameters();
       storeInDatabase();
