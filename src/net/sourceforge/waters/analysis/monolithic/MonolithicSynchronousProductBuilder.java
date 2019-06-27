@@ -273,7 +273,8 @@ public class MonolithicSynchronousProductBuilder
       mStates.ensureCapacity(tableSize);
       mStateTuples = new ArrayList<int[]>();
       mTransitionBuffer = new TIntArrayList();
-      mTransitionBufferLimit = 3 * getTransitionLimit();
+      mTransitionBufferLimit = (int)
+        Math.min(3L * getTransitionLimit(), Integer.MAX_VALUE);
       mNumStates = 0;
       mUnvisited = new ArrayDeque<int[]>(100);
       permutations(mNumAutomata, null, -1, -1);
