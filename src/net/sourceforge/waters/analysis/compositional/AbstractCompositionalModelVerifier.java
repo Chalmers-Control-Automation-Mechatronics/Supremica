@@ -43,6 +43,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -333,6 +336,47 @@ public abstract class AbstractCompositionalModelVerifier
   {
     super.tearDown();
     mAbstractionSteps = null;
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+  
+    list.add(new BoolParameter
+             (ParameterIDs.ModelVerifier_CounterExampleEnabled,
+              "Counter Example Enabled",
+              "setCounterExampleEnabled",
+              true){
+               @Override
+               public void commitValue()
+               {
+                 setCounterExampleEnabled(getValue());
+               }
+             });
+    list.add(new BoolParameter
+             (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+              "Short Counter Example Enabled",
+              "ShortCounterExampleRequested",
+              true){
+               @Override
+               public void commitValue()
+               {
+                 setShortCounterExampleRequested(getValue());
+               }
+             });
+
+    list.add(new BoolParameter
+             (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
+              "Trace Checking Enabled","",
+              true){
+               @Override
+               public void commitValue()
+               {
+                 setTraceCheckingEnabled(getValue());
+               }
+             });
+    return list;
   }
 
 

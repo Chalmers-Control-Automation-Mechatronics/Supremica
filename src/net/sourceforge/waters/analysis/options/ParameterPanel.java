@@ -56,9 +56,20 @@ public class ParameterPanel extends JPanel
     add(mParameter.createLabel(), BorderLayout.WEST);
     add(mParameter.createComponent(model), BorderLayout.EAST);
 
-    for (final Component component : getComponents())
-      ((JComponent) component).setToolTipText(mParameter.getDescription());
+    toolTip(getComponents());
   }
+
+  //Recursively sets tooltip for components
+  public void toolTip(final Component[] StoredComponents) {
+
+    for (final Component component : StoredComponents)
+      if(component instanceof JPanel) {
+        toolTip(((JPanel) component).getComponents());
+      }
+      else
+        ((JComponent) component).setToolTipText(mParameter.getDescription());
+  }
+
   //Updates parameter with itself
   public void commitParameter()
   {

@@ -38,6 +38,9 @@ import java.util.List;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -182,6 +185,27 @@ public class BDDConflictChecker
     return (ConflictCounterExampleProxy) super.getCounterExample();
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(new EventParameter
+             (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+              "ConfiguredDefaultMarking",
+              "The default (omega) marking to be used for conflict checks."){
+               @Override
+               public void commitValue()
+               {
+                  setConfiguredDefaultMarking(getValue());
+               }
+             });
+
+    return list;
+  }
 
   //#########################################################################
   //# Invocation

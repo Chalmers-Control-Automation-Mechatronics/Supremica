@@ -51,6 +51,12 @@ import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
+
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -263,6 +269,82 @@ public abstract class BDDModelVerifier
         }
       }
     }
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(new EnumParameter<BDDPackage>
+    (ParameterIDs.BDDModelVerifier_BDDPackage,
+     "BDDPackage",  "",
+     BDDPackage.values()) {
+       @Override
+       public void commitValue()
+       {
+         setBDDPackage(getValue());
+       }
+     });
+
+    list.add(new IntParameter
+             (ParameterIDs.BDDModelVerifier_InitialSize,
+              "Initial Size", "",
+              0, Integer.MAX_VALUE){
+               @Override
+               public void commitValue()
+               {
+                 setInitialSize(getValue());
+               }
+             });
+
+    list.add(new IntParameter
+             (ParameterIDs.BDDModelVerifier_PartitionSizeLimit,
+              "Partition Size Limit", "",
+              0, Integer.MAX_VALUE){
+               @Override
+               public void commitValue()
+               {
+                 setPartitioningSizeLimit(getValue());
+               }
+             });
+
+    list.add(new BoolParameter
+             (ParameterIDs.BDDModelVerifier_ReorderingEnabled,
+              "Reordering Enabled", "",
+              true){
+               @Override
+               public void commitValue()
+               {
+                setReorderingEnabled(getValue());
+               }
+             });
+
+    list.add(new EnumParameter<TransitionPartitioningStrategy>
+    (ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy,
+     "TransactionPartitioningStrategy", "",
+     TransitionPartitioningStrategy.values())
+      {
+       @Override
+       public void commitValue()
+       {
+         setTransitionPartitioningStrategy(getValue());
+       }
+     });
+
+    list.add(new EnumParameter<VariableOrdering>
+    (ParameterIDs.BDDModelVerifier_VariableOrdering,
+     "VariableOrdering", "",
+     VariableOrdering.values())
+      {
+       @Override
+       public void commitValue()
+       {
+         setVariableOrdering(getValue());
+       }
+     });
+
+    return list;
   }
 
 

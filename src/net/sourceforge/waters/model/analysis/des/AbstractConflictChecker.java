@@ -34,7 +34,11 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -129,12 +133,31 @@ public abstract class AbstractConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public void setModel(final ProductDESProxy model)
   {
     super.setModel(model);
     mUsedMarking = null;
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(new EventParameter
+             (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+              "ConfiguredDefaultMarking",
+              "The default (omega) marking to be used for conflict checks."){
+               @Override
+               public void commitValue()
+               {
+                  setConfiguredDefaultMarking(getValue());
+               }
+             });
+
+    return list;
   }
 
 

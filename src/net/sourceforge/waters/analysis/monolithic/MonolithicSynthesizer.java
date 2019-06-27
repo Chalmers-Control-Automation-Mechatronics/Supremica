@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -257,17 +258,17 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled:
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
                              "exists.");
         break;
-      case ParameterIDs.ModelAnalyzer_setNodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
         param.setName("State limit");
         param.setDescription("Maximum number of states before aborting.");
         break;
-      case ParameterIDs.ModelAnalyzer_setTransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
         param.setDescription("Maximum number of transitions before aborting.");
         break;
       default:
@@ -275,7 +276,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
      }
     }
     list.add(new BoolParameter
-               (ParameterIDs.MonolithicSynthesizer_setNonblockingSupported,
+               (ParameterIDs.MonolithicSynthesizer_NonblockingSupported,
                 "Nonblocking",
                 "Synthesize a nonblocking supervisor.", true){
                  @Override
@@ -284,9 +285,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                    setNonblockingSupported(getValue());
                  }
                });
-    // list.add(new EnumParameter(2, "Marking proposition", "If synthesising a nonblocking supervisor, select the proposition that defines the marked states."))
     list.add(new EnumParameter<SupervisorReductionFactory>
-               (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
+               (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
                 "Supervisor reduction",
                 "Method of supervisor reduction to be used after synthesis",
                 DefaultSupervisorReductionFactory.class.getEnumConstants()){
@@ -297,7 +297,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                  }
                });
     list.add(new BoolParameter
-               (ParameterIDs.SupervisorSynthesizer_setSupervisorLocalisationEnabled,
+               (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
                 "Localize supervisors",
                 "If using supervisor reduction, create a separate supervisor " +
                 "for each controllable event that needs to be disabled.",
@@ -308,6 +308,24 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                    setSupervisorLocalizationEnabled(getValue());
                  }
                });
+    list.add(new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
+                                "ConfiguredDefaultMarking",
+                                "The default (omega) marking to be used for conflict checks.") {
+          @Override
+          public void commitValue()
+          {
+            setConfiguredDefaultMarking(getValue());
+          }
+        });
+    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_NondeterminismEnabled,
+                               "NondeterminismEnabled", "NondeterminismEnabled",
+                               true) {
+          @Override
+          public void commitValue()
+          {
+            setNondeterminismEnabled(getValue());
+          }
+        });
     return list;
   }
 

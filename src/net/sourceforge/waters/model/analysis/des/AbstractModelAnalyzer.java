@@ -196,7 +196,7 @@ public abstract class AbstractModelAnalyzer
   {
     final List<Parameter> list = new LinkedList<>();
     list.add(new BoolParameter
-               (ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled,
+               (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled,
                 "Detailed output",
                 "Compute full output, e.g., synthesised supervisor automata or " +
                 "counterexample.",
@@ -209,7 +209,7 @@ public abstract class AbstractModelAnalyzer
                });
     //setKindTranslator(KindTranslator translator)
     list.add(new IntParameter
-               (ParameterIDs.ModelAnalyzer_setNodeLimit,
+               (ParameterIDs.ModelAnalyzer_NodeLimit,
                 "Node limit",
                 "The maximum number of nodes the analyser is allowed to keep " +
                 "in memory at any one time.",
@@ -221,7 +221,7 @@ public abstract class AbstractModelAnalyzer
                  }
                });
     list.add(new IntParameter
-               (ParameterIDs.ModelAnalyzer_setTransitionLimit,
+               (ParameterIDs.ModelAnalyzer_TransitionLimit,
                 "Transition limit",
                 "The maximum number of transitions the analyser is allowed to " +
                 "keep in memory at any one time.",

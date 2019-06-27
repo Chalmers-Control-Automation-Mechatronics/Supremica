@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -133,6 +138,39 @@ public abstract class AbstractModelVerifier
   public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult(this);
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(new BoolParameter
+             (ParameterIDs.ModelVerifier_CounterExampleEnabled,
+              "Counter Example Enabled",
+              "setCounterExampleEnabled",
+              true){
+               @Override
+               public void commitValue()
+               {
+                 setCounterExampleEnabled(getValue());
+               }
+             });
+    list.add(new BoolParameter
+             (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+              "Short Counter Example Enabled",
+              "ShortCounterExampleRequested",
+              true){
+               @Override
+               public void commitValue()
+               {
+                 setShortCounterExampleRequested(getValue());
+               }
+             });
+    return list;
   }
 
 

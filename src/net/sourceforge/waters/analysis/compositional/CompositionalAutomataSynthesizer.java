@@ -263,15 +263,15 @@ public class CompositionalAutomataSynthesizer
     final ListIterator<Parameter> iter = list.listIterator();
     while (iter.hasNext()) {
       final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_setDetailedOutputEnabled) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
                              "exists.");
         iter.add(new StringParameter
-                   (ParameterIDs.CompositionalAutomataSynthesizer_setSupervisorNamePrefix,
+                   (ParameterIDs.CompositionalAutomataSynthesizer_SupervisorNamePrefix,
                     "Supervisor name prefix",
-                    "Name prefix for synthesised supervisors."){
+                    "Name prefix for synthesised supervisors.", "Supervisor"){
                      @Override
                      public void commitValue()
                      {
@@ -282,7 +282,7 @@ public class CompositionalAutomataSynthesizer
       }
     }
     list.add(new EnumParameter<SupervisorReductionFactory>
-               (ParameterIDs.SupervisorSynthesizer_setSupervisorReductionFactory,
+               (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
                 "Supervisor reduction",
                 "Method of supervisor reduction to be used after synthesis",
                 DefaultSupervisorReductionFactory.class.getEnumConstants()) {
@@ -292,6 +292,7 @@ public class CompositionalAutomataSynthesizer
                     setSupervisorReductionFactory(getValue());
                   }
                 });
+
     // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
     //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
     return list;

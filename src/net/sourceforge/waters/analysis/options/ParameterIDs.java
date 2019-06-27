@@ -35,57 +35,83 @@ package net.sourceforge.waters.analysis.options;
 
 public class ParameterIDs
 {
-  //Current Highest Number: 30
-  //Freed Numbers:
+  //net.sourceforge.waters.model.analysis.ModelAnalyzer
 
-
-  //net.sourceforge.waters.model.analysis.ModelAnalyser
-  public static final int ModelAnalyzer_setDetailedOutputEnabled = 0;
-  public static final int ModelAnalyzer_setKindTranslator = 1;
-  public static final int ModelAnalyzer_setNodeLimit = 2;
-  public static final int ModelAnalyzer_setTransitionLimit = 3;
+  public static final int ModelAnalyzer_DetailedOutputEnabled = 0;
+  public static final int ModelAnalyzer_KindTranslator = 1;
+  public static final int ModelAnalyzer_NodeLimit = 2;
+  public static final int ModelAnalyzer_TransitionLimit = 3;
 
   //net.sourceforge.waters.model.analysis.ModelBuilder
 
-  public static final int ModelBuilder_setOutputName = 4;
+  public static final int ModelBuilder_OutputName = 100;
 
   //net.sourceforge.waters.model.analysis.SupervisorSynthesizer
 
-  public static final int SupervisorSynthesizer_setConfiguredDefaultMarking = 5;
-  public static final int SupervisorSynthesizer_setNondeterminismEnabled = 6;
-  public static final int SupervisorSynthesizer_setSupervisorLocalisationEnabled = 7;
-  public static final int SupervisorSynthesizer_setSupervisorReductionFactory = 8;
+  public static final int SupervisorSynthesizer_ConfiguredDefaultMarking = 200;
+  public static final int SupervisorSynthesizer_NondeterminismEnabled = 201;
+  public static final int SupervisorSynthesizer_SupervisorLocalisationEnabled = 202;
+  public static final int SupervisorSynthesizer_SupervisorReductionFactory = 203;
 
   //net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 
-  public static final int MonolithicSynthesizer_setNonblockingSupported = 9;
-
+  public static final int MonolithicSynthesizer_NonblockingSupported = 300;
 
   //net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer
-  public static final int CompositionalAutomataSynthesizer_setSupervisorNamePrefix = 10;
 
-  //net.sourceforge.waters.analysis.compositional.AbstractCompositionalSynthesizer
+  public static final int CompositionalAutomataSynthesizer_SupervisorNamePrefix = 400;
 
-  public static final int AbstractCompositionalSynthesizer_setAbstractionProcedureCreator = 11;
-  public static final int AbstractCompositionalSynthesizer_setBlockedEventsEnabled = 12;
-  public static final int AbstractCompositionalSynthesizer_setConfiguredDefaultMarking = 13;
-  public static final int AbstractCompositionalSynthesizer_setConfiguredPreconditionMarking = 14;
-  public static final int AbstractCompositionalSynthesizer_setFailingEventsEnabled = 15;
-  public static final int AbstractCompositionalSynthesizer_setInternalStateLimit = 16;
-  public static final int AbstractCompositionalSynthesizer_setInternalTransitionLimit = 17;
-  public static final int AbstractCompositionalSynthesizer_setLowerInternalStateLimit = 18;
-  public static final int AbstractCompositionalSynthesizer_setMonolithicAnalyzer = 19;
-  public static final int AbstractCompositionalSynthesizer_MonolithicDumpFile = 20;
-  public static final int AbstractCompositionalSynthesizer_setMonolithicStatelimit = 21;
-  public static final int AbstractCompositionalSynthesizer_setMonolithicTransitionLimit = 22;
-  public static final int AbstractCompositionalSynthesizer_setPreselectingMethod = 23;
-  public static final int AbstractCompositionalSynthesizer_setPruningDeadlocks = 24;
-  public static final int AbstractCompositionalSynthesizer_setSelectionHeurisitc = 25;
-  public static final int AbstractCompositionalSynthesizer_setSelfLoopOnlyEventsEnabled = 26;
-  public static final int AbstractCompositionalSynthesizer_setSubumptionEnabled = 27;
-  public static final int AbstractCompositionalSynthesizer_setSynchronousProductBuilder = 28;
-  public static final int AbstractCompositionalSynthesizer_setUpperInternalStateLimit = 29;
-  public static final int AbstractCompositionalSynthesizer_setUsingSpecialEvents = 30;
+  //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer
+
+  public static final int AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator = 500;
+  public static final int AbstractCompositionalModelAnalyzer_BlockedEventsEnabled = 501;
+  public static final int AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking = 502;
+  //public static final int AbstractCompositionalModelAnalyzer_ConfiguredPreconditionMarking = 503;
+  public static final int AbstractCompositionalModelAnalyzer_FailingEventsEnabled = 504;
+  public static final int AbstractCompositionalModelAnalyzer_InternalStateLimit = 505;
+  public static final int AbstractCompositionalModelAnalyzer_InternalTransitionLimit = 506;
+  public static final int AbstractCompositionalModelAnalyzer_LowerInternalStateLimit = 507;
+  public static final int AbstractCompositionalModelAnalyzer_MonolithicAnalyzer = 508;
+  public static final int AbstractCompositionalModelAnalyzer_MonolithicDumpFile = 509;
+  public static final int AbstractCompositionalModelAnalyzer_MonolithicStatelimit = 510;
+  public static final int AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit = 511;
+  public static final int AbstractCompositionalModelAnalyzer_PreselectingMethod = 512;
+  public static final int AbstractCompositionalModelAnalyzer_PruningDeadlocks = 513;
+  public static final int AbstractCompositionalModelAnalyzer_SelectionHeurisitc = 514;
+  public static final int AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled = 515;
+  public static final int AbstractCompositionalModelAnalyzer_SubumptionEnabled = 516;
+  public static final int AbstractCompositionalModelAnalyzer_SynchronousProductBuilder = 517;
+  public static final int AbstractCompositionalModelAnalyzer_UpperInternalStateLimit = 518;
+  public static final int AbstractCompositionalModelAnalyzer_UsingSpecialEvents = 519;
+
+  //net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer
+
+  public static final int ModularControllabilitySynthesizer_IncludesAllAutomata = 600;
+  public static final int ModularControllabilitySynthesizer_LocalNonblockingSupported = 601;
+  public static final int ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors = 602;
+
+ //net.sourceforge.waters.model.analysis.ConflictChecker
+
+  public static final int ConflictChecker_ConfiguredDefaultMarking = 700;
+
+  //net.sourceforge.waters.model.analysis.des.ModelVerifier
+
+  public static final int ModelVerifier_CounterExampleEnabled = 800;
+  public static final int ModelVerifier_ShortCounterExampleRequested = 801;
+
+  //net.sourceforge.waters.model.analysis.bdd.BDDModelVerifier
+
+  public static final int BDDModelVerifier_BDDPackage = 900;
+  public static final int BDDModelVerifier_InitialSize = 901;
+  public static final int BDDModelVerifier_PartitionSizeLimit = 902;
+  public static final int BDDModelVerifier_ReorderingEnabled = 903;
+  public static final int BDDModelVerifier_TransactionPartitioningStrategy = 904;
+  public static final int BDDModelVerifier_VariableOrdering = 905;
+
+
+  //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelVerifier
+
+  public static final int AbstractCompositionalModelVerifier_TraceCheckingEnabled = 1000;
 
 
 }
