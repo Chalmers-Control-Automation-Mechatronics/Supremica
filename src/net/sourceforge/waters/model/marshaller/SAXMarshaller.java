@@ -84,7 +84,7 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   //# Constructors
   public SAXMarshaller(final String schemaName,
                        final SAXDocumentImporter<D> importer,
-                       final StAXDocumentWriter<D> writer)
+                       final StAXDocumentWriter writer)
     throws SAXException, ParserConfigurationException
   {
     mImporter = importer;
@@ -258,6 +258,6 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   //# Data Members
   private final SAXParser mParser;
   private final SAXDocumentImporter<D> mImporter;
-  private final StAXDocumentWriter<D> mWriter;
+  private final StAXDocumentWriter mWriter;
 
 }

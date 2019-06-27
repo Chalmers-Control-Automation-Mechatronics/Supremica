@@ -40,6 +40,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.DuplicateNameException;
+import net.sourceforge.waters.model.base.IndexedArrayList;
+import net.sourceforge.waters.model.base.IndexedList;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.xsd.SchemaBase;
@@ -284,6 +287,18 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
       return mParent;
     }
 
+    <H extends AbstractContentHandler<?>>
+    H getAncestor(final Class<H> clazz)
+    {
+      if (clazz.isAssignableFrom(getClass())) {
+        return clazz.cast(this);
+      } else if (mParent == null) {
+        return null;
+      } else {
+        return mParent.getAncestor(clazz);
+      }
+    }
+
     //#######################################################################
     //# Hooks
     void setAttributes(final Attributes atts)
@@ -304,7 +319,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
 
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       pushHandler(localName, atts);
     }
@@ -312,7 +327,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     public void characters(final char[] ch,
                            final int start,
                            final int length)
-      throws SAXException
+      throws SAXParseException
     {
     }
 
@@ -398,35 +413,31 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
 
   //#########################################################################
   //# Inner Class ListHandler
-  class ListHandler<T> extends AbstractContentHandler<List<T>>
+  abstract class ListHandler<T> extends AbstractContentHandler<List<T>>
   {
     //#######################################################################
     //# Constructor
-    ListHandler(final AbstractContentHandler<?> parent,
-                final Class<T> clazz)
+    ListHandler(final AbstractContentHandler<?> parent)
+    {
+      super(parent);
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class SimpleListHandler
+  abstract class SimpleListHandler<T> extends ListHandler<T>
+  {
+    //#######################################################################
+    //# Constructor
+    SimpleListHandler(final AbstractContentHandler<?> parent)
     {
       super(parent);
       mList = new ArrayList<>();
-      mElementClass = clazz;
     }
 
     //#######################################################################
     //# Overrides for AbstractContentHandler<List<T>>
-    @Override
-    void endSubElement(final AbstractContentHandler<?> subHandler)
-      throws SAXParseException
-    {
-      final Object item = subHandler.getResult();
-      if (item != null) {
-        try {
-          final T cast = mElementClass.cast(item);
-          mList.add(cast);
-        } catch (final ClassCastException exception) {
-          // ignore
-        }
-      }
-    }
-
     @Override
     List<T> getResult()
     {
@@ -434,9 +445,242 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     }
 
     //#######################################################################
+    //# Parsing Support
+    void add(final T item)
+    {
+      if (item != null) {
+        mList.add(item);
+      }
+    }
+
+    //#######################################################################
     //# Data Members
     private final List<T> mList;
-    private final Class<T> mElementClass;
+  }
+
+
+  //#########################################################################
+  //# Inner Class GenericListHandler
+  class GenericListHandler<T> extends SimpleListHandler<T>
+  {
+    //#######################################################################
+    //# Constructor
+    GenericListHandler(final AbstractContentHandler<?> parent,
+                       final Class<T> clazz)
+    {
+      super(parent);
+      mItemClass = clazz;
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<?>
+    @Override
+    void endSubElement(final AbstractContentHandler<?> subHandler)
+      throws SAXParseException
+    {
+      final Object object = subHandler.getResult();
+      try {
+        final T item = mItemClass.cast(object);
+        add(item);
+      } catch (final ClassCastException exception) {
+        // ignore
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Class<T> mItemClass;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StaticListHandler
+  class StaticListHandler<T> extends SimpleListHandler<T>
+  {
+    //#######################################################################
+    //# Constructor
+    StaticListHandler(final AbstractContentHandler<?> parent,
+                      final String itemKey,
+                      final SAXHandlerCreator<T> itemHandlerCreator)
+    {
+      super(parent);
+      mItemKey = itemKey;
+      mItemHandler = itemHandlerCreator.createHandler(this);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<List<T>>
+    @Override
+    public void startSubElement(final String localName,
+                                final Attributes atts)
+      throws SAXParseException
+    {
+      if (localName.equals(mItemKey)) {
+        pushHandler(mItemHandler, atts);
+      } else {
+        super.startSubElement(localName, atts);
+      }
+    }
+
+    @Override
+    void endSubElement(final AbstractContentHandler<?> subHandler)
+      throws SAXParseException
+    {
+      if (subHandler == mItemHandler) {
+        final T item = mItemHandler.getResult();
+        mItemHandler.reset();
+        add(item);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final String mItemKey;
+    private final AbstractContentHandler<T> mItemHandler;
+  }
+
+
+  //#########################################################################
+  //# Inner Class UniqueListHandler
+  abstract class UniqueListHandler<P extends NamedProxy>
+    extends ListHandler<P>
+  {
+    //#######################################################################
+    //# Constructor
+    UniqueListHandler(final AbstractContentHandler<?> parent)
+    {
+      super(parent);
+      mList = new IndexedArrayList<>();
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<List<P>>
+    @Override
+    List<P> getResult()
+    {
+      return mList;
+    }
+
+    //#######################################################################
+    //# Parsing Support
+    void insert(final P item)
+    {
+      if (item != null) {
+        mList.insert(item);
+      }
+    }
+
+    P get(final String name)
+    {
+      return mList.get(name);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final IndexedList<P> mList;
+  }
+
+
+  //#########################################################################
+  //# Inner Class GenericUniqueListHandler
+  class GenericUniqueListHandler<P extends NamedProxy>
+    extends UniqueListHandler<P>
+  {
+    //#######################################################################
+    //# Constructor
+    GenericUniqueListHandler(final AbstractContentHandler<?> parent,
+                             final Class<P> clazz)
+    {
+      super(parent);
+      mItemClass = clazz;
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<?>
+    @Override
+    void endSubElement(final AbstractContentHandler<?> subHandler)
+      throws SAXParseException
+    {
+      final Object object = subHandler.getResult();
+      P item = null;
+      try {
+        item = mItemClass.cast(object);
+        insert(item);
+      } catch (final ClassCastException exception) {
+        return;
+      } catch (final DuplicateNameException exception) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Invalid XML content - found two ");
+        builder.append(ProxyTools.getShortClassName(mItemClass));
+        builder.append(" entries both named '");
+        builder.append(item.getName());
+        builder.append("'.");
+        throw createSAXParseException(builder.toString());
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final Class<P> mItemClass;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StaticUniqueListHandler
+  class StaticUniqueListHandler<P extends NamedProxy>
+    extends UniqueListHandler<P>
+  {
+    //#######################################################################
+    //# Constructor
+    StaticUniqueListHandler(final AbstractContentHandler<?> parent,
+                            final String itemKey,
+                            final SAXHandlerCreator<P> itemHandlerCreator)
+    {
+      super(parent);
+      mItemKey = itemKey;
+      mItemHandler = itemHandlerCreator.createHandler(this);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<List<T>>
+    @Override
+    public void startSubElement(final String localName,
+                                final Attributes atts)
+      throws SAXParseException
+    {
+      if (localName.equals(mItemKey)) {
+        pushHandler(mItemHandler, atts);
+      } else {
+        super.startSubElement(localName, atts);
+      }
+    }
+
+    @Override
+    void endSubElement(final AbstractContentHandler<?> subHandler)
+      throws SAXParseException
+    {
+      final P item;
+      if (subHandler == mItemHandler) {
+        item = mItemHandler.getResult();
+        mItemHandler.reset();
+        try {
+          insert(item);
+        } catch (final DuplicateNameException exception) {
+          final StringBuilder builder = new StringBuilder();
+          builder.append("Invalid XML content - found two ");
+          builder.append(ProxyTools.getShortProxyInterfaceName(item));
+          builder.append(" entries both named '");
+          builder.append(item.getName());
+          builder.append("'.");
+          throw createSAXParseException(builder.toString());
+        }
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final String mItemKey;
+    private final AbstractContentHandler<P> mItemHandler;
   }
 
 
@@ -500,7 +744,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaBase.ELEMENT_Attribute)) {
         mAttributeHandler.reset();
@@ -638,7 +882,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaBase.ELEMENT_Comment)) {
         mCommentHandler = new TextContentHandler(this);

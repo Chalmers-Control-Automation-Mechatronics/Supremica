@@ -38,7 +38,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +90,6 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
@@ -313,7 +311,7 @@ public class SAXModuleImporter
 
   //#########################################################################
   //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.marshaller.DOMDocumentImporter<ModuleProxy>
+  //# net.sourceforge.waters.model.marshaller.SAXDocumentImporter<ModuleProxy>
   @Override
   Class<ModuleProxy> getDocumentClass()
   {
@@ -338,7 +336,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       final AbstractContentHandler<?> handler = pushHandler(localName, atts);
       if (handler instanceof SimpleExpressionProxyHandler) {
@@ -395,7 +393,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                              final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Box)) {
         mBoxHandler = new BoxHandler(this);
@@ -480,7 +478,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Color)) {
         pushHandler(mColorHandler, atts);
@@ -578,7 +576,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_ConstantAliasExpression)) {
         mExpressionHandler =
@@ -634,7 +632,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_LabelBlock)) {
         mLabelBlockProxyHandler = new LabelBlockProxyHandler(this);
@@ -661,7 +659,7 @@ public class SAXModuleImporter
     }
 
     @Override
-    EdgeProxy getResult()
+    EdgeProxy getResult() throws SAXParseException
     {
       final LabelBlockProxy labelBlock = mLabelBlockProxyHandler == null ?
         null : mLabelBlockProxyHandler.getResult();
@@ -683,7 +681,8 @@ public class SAXModuleImporter
     private NodeProxy getNode(final String name)
       throws SAXParseException
     {
-      final NodeProxy node = mNodeMap.get(name);
+      final GraphProxyHandler handler = getAncestor(GraphProxyHandler.class);
+      final NodeProxy node = handler.getNode(name);
       if (node == null) {
         final StringBuilder builder = new StringBuilder();
         builder.append("An edge references an undefined node named '");
@@ -723,7 +722,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_SimpleIdentifier)) {
         pushHandler(mIdentifierHandler, atts);
@@ -788,10 +787,10 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_RangeList)) {
-        mRangeListHandler = new ListHandler<>(this, SimpleExpressionProxy.class);
+        mRangeListHandler = new GenericListHandler<>(this, SimpleExpressionProxy.class);
         pushHandler(mRangeListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_ColorGeometry) &&
                  isImportingGeometry()) {
@@ -806,7 +805,7 @@ public class SAXModuleImporter
     }
 
     @Override
-    EventDeclProxy getResult()
+    EventDeclProxy getResult() throws SAXParseException
     {
       final IdentifierProxy ident = getIdentifier();
       final List<SimpleExpressionProxy> rangeList =
@@ -847,7 +846,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_EventListExpression)) {
         mExpressionHandler = new UnpackingEventListProxyHandler(this);
@@ -933,10 +932,10 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(mListKey)) {
-        mBodyHandler = new ListHandler<>(this, Proxy.class);
+        mBodyHandler = new GenericListHandler<>(this, Proxy.class);
         pushHandler(mBodyHandler);
       } else {
         final AbstractContentHandler<?> handler = pushHandler(localName, atts);
@@ -1034,7 +1033,6 @@ public class SAXModuleImporter
     private GraphProxyHandler(final AbstractContentHandler<?> parent)
     {
       super(parent);
-      mNodeMap = new HashMap<>();
     }
 
     //#######################################################################
@@ -1053,13 +1051,13 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_NodeList)) {
-        mNodeListHandler = new ListHandler<>(this, NodeProxy.class);
+        mNodeListHandler = new GenericUniqueListHandler<>(this, NodeProxy.class);
         pushHandler(mNodeListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_EdgeList)) {
-        mEdgeListHandler = new ListHandler<>(this, EdgeProxy.class);
+        mEdgeListHandler = new GenericListHandler<>(this, EdgeProxy.class);
         pushHandler(mEdgeListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_LabelBlock)) {
         mBlockedEventsHandler = new LabelBlockProxyHandler(this);
@@ -1071,6 +1069,7 @@ public class SAXModuleImporter
 
     @Override
     GraphProxy getResult()
+      throws SAXParseException
     {
       final LabelBlockProxy blocked =
         mBlockedEventsHandler == null ? null : mBlockedEventsHandler.getResult();
@@ -1082,10 +1081,17 @@ public class SAXModuleImporter
     }
 
     //#######################################################################
+    //# Parsing Support
+    NodeProxy getNode(final String name)
+    {
+      return mNodeListHandler == null ? null : mNodeListHandler.get(name);
+    }
+
+    //#######################################################################
     //# Data Members
     private boolean mDeterministic = SchemaModule.DEFAULT_Deterministic;
     private LabelBlockProxyHandler mBlockedEventsHandler = null;
-    private ListHandler<NodeProxy> mNodeListHandler = null;
+    private UniqueListHandler<NodeProxy> mNodeListHandler = null;
     private ListHandler<EdgeProxy> mEdgeListHandler = null;
   }
 
@@ -1107,7 +1113,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_NodeRef)) {
         pushHandler(mNodeRefHandler, atts);
@@ -1140,7 +1146,6 @@ public class SAXModuleImporter
         mGeometryHandler == null ? null : mGeometryHandler.getResult();
       final GroupNodeProxy node =
         mFactory.createGroupNodeProxy(name, props, attribs, mChildNodes, geo);
-      mNodeMap.put(name, node);
       return node;
     }
 
@@ -1169,13 +1174,13 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Guards)) {
-        mGuardHandler = new ListHandler<>(this, SimpleExpressionProxy.class);
+        mGuardHandler = new GenericListHandler<>(this, SimpleExpressionProxy.class);
         pushHandler(mGuardHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_Actions)) {
-        mActionHandler = new ListHandler<>(this, BinaryExpressionProxy.class);
+        mActionHandler = new GenericListHandler<>(this, BinaryExpressionProxy.class);
         pushHandler(mActionHandler);
       } else if (isImportingGeometry() &&
                  localName.equals(SchemaModule.ELEMENT_LabelGeometry)) {
@@ -1187,7 +1192,7 @@ public class SAXModuleImporter
     }
 
     @Override
-    GuardActionBlockProxy getResult()
+    GuardActionBlockProxy getResult() throws SAXParseException
     {
       final List<SimpleExpressionProxy> guards =
         mGuardHandler == null ? null : mGuardHandler.getResult();
@@ -1310,7 +1315,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       final AbstractContentHandler<?> handler = pushHandler(localName, atts);
       if (handler instanceof SimpleExpressionProxyHandler) {
@@ -1371,7 +1376,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_ParameterBinding)) {
         pushHandler(mBindingHandler, atts);
@@ -1464,7 +1469,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                              final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (isImportingGeometry() &&
           localName.equals(SchemaModule.ELEMENT_LabelGeometry)) {
@@ -1516,7 +1521,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Point)) {
         mPointHandler = new PointHandler(this);
@@ -1556,21 +1561,21 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_ConstantAliasList)) {
         mConstantAliasListHandler =
-          new ListHandler<>(this, ConstantAliasProxy.class);
+          new GenericUniqueListHandler<>(this, ConstantAliasProxy.class);
         pushHandler(mConstantAliasListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_EventDeclList)) {
         mEventDeclListHandler =
-          new ListHandler<>(this, EventDeclProxy.class);
+          new GenericUniqueListHandler<>(this, EventDeclProxy.class);
         pushHandler(mEventDeclListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_EventAliasList)) {
-        mEventAliasListHandler = new ListHandler<>(this, Proxy.class);
+        mEventAliasListHandler = new GenericListHandler<>(this, Proxy.class);
         pushHandler(mEventAliasListHandler);
       } else if (localName.equals(SchemaModule.ELEMENT_ComponentList)) {
-        mComponentListHandler = new ListHandler<>(this, Proxy.class);
+        mComponentListHandler = new GenericListHandler<>(this, Proxy.class);
         pushHandler(mComponentListHandler);
       } else {
         super.startSubElement(localName, atts);
@@ -1579,6 +1584,7 @@ public class SAXModuleImporter
 
     @Override
     ModuleProxy getResult()
+      throws SAXParseException
     {
       final String name = getName();
       final String comment = getComment();
@@ -1626,7 +1632,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_EventList)) {
         mEventListHandler = new PlainEventListProxyHandler(this);
@@ -1686,7 +1692,8 @@ public class SAXModuleImporter
     private NodeProxy getNode(final String refName)
       throws SAXParseException
     {
-      final NodeProxy node = mNodeMap.get(refName);
+      final GraphProxyHandler handler = getAncestor(GraphProxyHandler.class);
+      final NodeProxy node = handler.getNode(refName);
       if (node == null) {
         final StringBuilder builder = new StringBuilder();
         final GroupNodeProxyHandler parent = (GroupNodeProxyHandler) getParent();
@@ -1795,7 +1802,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Point)) {
         mPointHandler = new PointHandler(this);
@@ -1872,7 +1879,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       final AbstractContentHandler<?> handler = pushHandler(localName, atts);
       if (handler instanceof IdentifierProxyHandler) {
@@ -1930,7 +1937,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Graph)) {
         mGraphProxyHandler = new GraphProxyHandler(this);
@@ -1944,7 +1951,7 @@ public class SAXModuleImporter
     }
 
     @Override
-    SimpleComponentProxy getResult()
+    SimpleComponentProxy getResult() throws SAXParseException
     {
       final IdentifierProxy ident = getIdentifier();
       final GraphProxy graph = mGraphProxyHandler.getResult();
@@ -2057,7 +2064,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (isImportingGeometry()) {
         if (localName.equals(SchemaModule.ELEMENT_PointGeometry)) {
@@ -2092,7 +2099,6 @@ public class SAXModuleImporter
       final SimpleNodeProxy node =
         mFactory.createSimpleNodeProxy(name, props, attribs, mInitial,
                                        pointGeo, initialGeo, labelGeo);
-      mNodeMap.put(name, node);
       return node;
     }
 
@@ -2132,7 +2138,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_Point)) {
         pushHandler(mPointHandler, atts);
@@ -2192,7 +2198,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                              final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       final AbstractContentHandler<?> handler = pushHandler(localName, atts);
       if (handler instanceof SimpleExpressionProxyHandler &&
@@ -2245,10 +2251,10 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                              final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_EventList)) {
-        mEventListHandler = new ListHandler<>(this, Proxy.class);
+        mEventListHandler = new GenericListHandler<>(this, Proxy.class);
         pushHandler(mEventListHandler);
       } else {
         super.startSubElement(localName, atts);
@@ -2298,7 +2304,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ELEMENT_VariableRange)) {
         mRangeHandler =
@@ -2368,7 +2374,7 @@ public class SAXModuleImporter
     @Override
     public void startSubElement(final String localName,
                                 final Attributes atts)
-      throws SAXException
+      throws SAXParseException
     {
       final AbstractContentHandler<?> handler = pushHandler(localName, atts);
       if (mIdentifierHandler == null &&
@@ -2407,7 +2413,5 @@ public class SAXModuleImporter
   //# Data Members
   private final ModuleProxyFactory mFactory;
   private final OperatorTable mOperatorTable;
-
-  private Map<String,NodeProxy> mNodeMap;
 
 }

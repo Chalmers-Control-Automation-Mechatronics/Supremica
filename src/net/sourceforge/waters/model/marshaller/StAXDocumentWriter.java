@@ -56,7 +56,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.xsd.SchemaBase;
 
 
-public class StAXDocumentWriter<D extends DocumentProxy>
+public class StAXDocumentWriter
   implements ProxyVisitor
 {
 
@@ -75,7 +75,7 @@ public class StAXDocumentWriter<D extends DocumentProxy>
 
   //#########################################################################
   //# Invocation
-  public void marshal(final D doc, final File filename)
+  public void marshal(final DocumentProxy doc, final File filename)
     throws WatersMarshalException, XMLStreamException, IOException
   {
     try {
@@ -226,7 +226,16 @@ public class StAXDocumentWriter<D extends DocumentProxy>
     } catch (final XMLStreamException exception) {
       throw wrap(exception);
     }
+  }
 
+  void writeAttribute(final String localName,
+                      final String value,
+                      final String defaultValue)
+    throws VisitorException
+  {
+    if (value != null && !value.equals(defaultValue)) {
+      writeAttribute(localName, value);
+    }
   }
 
   void writeAttribute(final String localName, final boolean value)

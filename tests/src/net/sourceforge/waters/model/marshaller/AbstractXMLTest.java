@@ -35,6 +35,10 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -67,6 +71,14 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     final FileFilter filter = new TestDirectoryFilter();
     final File root = getInputRoot();
     marshalDirectory(root, filter);
+  }
+
+  public void testJAXBAll(final JAXBMarshaller<D,?> jaxbUnmarshaller)
+    throws Exception
+  {
+    final FileFilter filter = new TestDirectoryFilter();
+    final File root = getInputRoot();
+    jaxbDirectory(root, filter, jaxbUnmarshaller);
   }
 
 
@@ -102,6 +114,23 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     }
   }
 
+  protected void jaxbDirectory(final File file,
+                               final FileFilter filter,
+                               final JAXBMarshaller<D,?> jaxbUnmarshaller)
+    throws Exception
+  {
+    if (file.isDirectory()) {
+      final File[] children = file.listFiles(filter);
+      Arrays.sort(children);
+      for (final File child : children) {
+        jaxbDirectory(child, filter, jaxbUnmarshaller);
+      }
+    } else if (file.length() <= FILE_SIZE_LIMIT) {
+      System.out.println(file + " ...");
+      testJAXB(file, jaxbUnmarshaller);
+    }
+  }
+
   protected D testParse(final String... path)
     throws Exception
   {
@@ -118,6 +147,17 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     checkIntegrity(doc);
     checkPrint(doc);
     return doc;
+  }
+
+  protected void testJAXB(final File file,
+                          final JAXBMarshaller<D,?> jaxbUnmarshaller)
+    throws Exception
+  {
+    final D saxDoc = testParse(file);
+    final URI uri = file.toURI();
+    final D jaxbDoc = jaxbUnmarshaller.unmarshal(uri);
+    assertProxyEquals("SAX unmarshalling gives different result from JAXB!",
+                      saxDoc, jaxbDoc);
   }
 
   protected void testHandcraft(final D handcrafted, final String... path)
@@ -210,6 +250,28 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     checkIntegrity(outDoc);
     assertProxyEquals("Structure changed after marshalling!", inDoc, outDoc);
     assertProxyEquals("Structure changed after marshalling!", outDoc, inDoc);
+  }
+
+
+  protected D testSerialize(final String... path)
+    throws Exception
+  {
+    final File inFile = getInputFile(path);
+    final URI inURI = inFile.toURI();
+    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
+    final D doc1 = unmarshaller.unmarshal(inURI);
+    final String name = path[path.length - 1] + ".ser";
+    final File outFile = new File(getOutputDirectory(), name);
+    final FileOutputStream fos =  new FileOutputStream(outFile);
+    final ObjectOutputStream out = new ObjectOutputStream(fos);
+    out.writeObject(doc1);
+    out.close();
+    final FileInputStream fis =  new FileInputStream(outFile);
+    final ObjectInputStream in = new ObjectInputStream(fis);
+    final DocumentProxy doc2 = (DocumentProxy) in.readObject();
+    in.close();
+    assertProxyEquals("Structure changed after serialising!", doc1, doc2);
+    return doc1;
   }
 
 

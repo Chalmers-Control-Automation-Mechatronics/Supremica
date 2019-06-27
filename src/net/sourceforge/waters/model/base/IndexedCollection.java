@@ -123,7 +123,7 @@ public interface IndexedCollection<P extends NamedProxy>
    * the collection contains items equal to all the members of the given
    * collection. It will attempt to add items not yet contained.
    * @param  collection  A list of items to be added.
-   * @return <CODE>true</CODE> of the collection changed as a result of
+   * @return <CODE>true</CODE> if the collection changed as a result of
    *         this call.
    * @throws DuplicateNameException to indicate that some item could not be
    *                added because the collection already contains a different

@@ -89,7 +89,7 @@ import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 public class StAXModuleWriter
-  extends StAXDocumentWriter<ModuleProxy>
+  extends StAXDocumentWriter
   implements ModuleProxyVisitor
 {
 
@@ -453,7 +453,7 @@ public class StAXModuleWriter
                         SchemaModule.ELEMENT_ComponentList,
                         module.getComponentList());
       writeEndElement();
-    return null;
+      return null;
     } finally {
       mListType = oldType;
     }
