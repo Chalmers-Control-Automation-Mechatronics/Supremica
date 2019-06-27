@@ -76,17 +76,12 @@ public enum ModelAnalyzerFactoryLoader
       final Class<?> clazz = loader.loadClass(mClassName);
       final Method method = clazz.getMethod("getInstance");
       return (ModelAnalyzerFactory) method.invoke(null);
-    } catch (final SecurityException exception) {
-      throw wrap(exception);
-    } catch (final NoSuchMethodException exception) {
-      throw wrap(exception);
-    } catch (final IllegalAccessException exception) {
-      throw wrap(exception);
-    } catch (final InvocationTargetException exception) {
-      throw wrap(exception);
-    } catch (final ClassCastException exception) {
-      throw wrap(exception);
-    } catch (final UnsatisfiedLinkError exception) {
+    } catch (final SecurityException |
+             NoSuchMethodException |
+             IllegalAccessException |
+             InvocationTargetException |
+             ClassCastException |
+             UnsatisfiedLinkError exception) {
       throw wrap(exception);
     }
   }

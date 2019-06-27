@@ -275,57 +275,46 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         break;
      }
     }
-    list.add(new BoolParameter
-               (ParameterIDs.MonolithicSynthesizer_NonblockingSupported,
-                "Nonblocking",
-                "Synthesize a nonblocking supervisor.", true){
-                 @Override
-                 public void commitValue()
-                 {
-                   setNonblockingSupported(getValue());
-                 }
-               });
+    // NonblockingSupported is configured through ConfiguredDefaultMarking
+    list.add(new EventParameter
+      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
+       "Marking proposition",
+       "The proposition to identify marked states " +
+       "for the nonblocking property - or use (none) to consider " +
+       "all states as marked.")
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
     list.add(new EnumParameter<SupervisorReductionFactory>
-               (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-                "Supervisor reduction",
-                "Method of supervisor reduction to be used after synthesis",
-                DefaultSupervisorReductionFactory.class.getEnumConstants()){
-                 @Override
-                 public void commitValue()
-                 {
-                   setSupervisorReductionFactory(getValue());
-                 }
-               });
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
+       "Supervisor reduction",
+       "Method of supervisor reduction to be used after synthesis",
+       DefaultSupervisorReductionFactory.class.getEnumConstants())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorReductionFactory(getValue());
+        }
+      });
     list.add(new BoolParameter
-               (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
-                "Localize supervisors",
-                "If using supervisor reduction, create a separate supervisor " +
-                "for each controllable event that needs to be disabled.",
-                true){
-                 @Override
-                 public void commitValue()
-                 {
-                   setSupervisorLocalizationEnabled(getValue());
-                 }
-               });
-    list.add(new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-                                "ConfiguredDefaultMarking",
-                                "The default (omega) marking to be used for conflict checks.") {
-          @Override
-          public void commitValue()
-          {
-            setConfiguredDefaultMarking(getValue());
-          }
-        });
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_NondeterminismEnabled,
-                               "NondeterminismEnabled", "NondeterminismEnabled",
-                               true) {
-          @Override
-          public void commitValue()
-          {
-            setNondeterminismEnabled(getValue());
-          }
-        });
+      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
+       "Localize supervisors",
+       "If using supervisor reduction, create a separate supervisor " +
+       "for each controllable event that needs to be disabled.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorLocalizationEnabled(getValue());
+        }
+      });
+    // NondeterminismEnabled is not a configurable parameter
     return list;
   }
 

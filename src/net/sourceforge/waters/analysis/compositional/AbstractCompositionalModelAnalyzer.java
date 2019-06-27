@@ -629,8 +629,6 @@ public abstract class AbstractCompositionalModelAnalyzer
     setMonolithicStateLimit(limit);
   }
 
-  //#########################################################################
-  //# List of Parameters used by this class, pulling from super classes and interfaces
   @Override
   public List<Parameter> getParameters()
   {
@@ -648,17 +646,17 @@ public abstract class AbstractCompositionalModelAnalyzer
       }
     }
 
-     list.add(new EventParameter
-              (ParameterIDs.AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking,
-               "ConfiguredDefaultMarking",
-               "The default (omega) marking to be used for conflict checks."){
-                @Override
-                public void commitValue()
-                {
-                   setConfiguredDefaultMarking(getValue());
-                }
-              });
-
+    list.add(new EventParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking,
+       "Marking proposition",
+       "The proposition to identify marked states for the nonblocking property.")
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
     list.add(new EnumParameter<PreselectingMethod>
                (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod,
                 "Preselection method",

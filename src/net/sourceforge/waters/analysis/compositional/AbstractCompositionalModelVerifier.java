@@ -342,40 +342,44 @@ public abstract class AbstractCompositionalModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-  
     list.add(new BoolParameter
-             (ParameterIDs.ModelVerifier_CounterExampleEnabled,
-              "Counter Example Enabled",
-              "setCounterExampleEnabled",
-              true){
-               @Override
-               public void commitValue()
-               {
-                 setCounterExampleEnabled(getValue());
-               }
-             });
+      (ParameterIDs.ModelVerifier_CounterExampleEnabled,
+       "Compute counterexample",
+       "Enable computation of a counterexample if model checking " +
+       "gives a failed result.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setCounterExampleEnabled(getValue());
+        }
+      });
     list.add(new BoolParameter
-             (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
-              "Short Counter Example Enabled",
-              "ShortCounterExampleRequested",
-              true){
-               @Override
-               public void commitValue()
-               {
-                 setShortCounterExampleRequested(getValue());
-               }
-             });
-
+      (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+       "Short counterexample",
+       "Try to compute counterexamples that are as short as possible.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setShortCounterExampleRequested(getValue());
+        }
+      });
     list.add(new BoolParameter
-             (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
-              "Trace Checking Enabled","",
-              true){
-               @Override
-               public void commitValue()
-               {
-                 setTraceCheckingEnabled(getValue());
-               }
-             });
+      (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
+       "Counterexample debugging",
+       "When computing counterexamples, perform debug checks to ensure that " +
+       "the counterexample is accepted after every abstraction step",
+       false)
+      {
+        @Override
+        public void commitValue()
+        {
+          setTraceCheckingEnabled(getValue());
+        }
+      });
     return list;
   }
 

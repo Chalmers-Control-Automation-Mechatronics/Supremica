@@ -59,8 +59,8 @@ public class EventParameter extends Parameter
   public void updateFromGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
-    final JComboBox<String> comboBox = (JComboBox<String>) comp;
-    mValue =  (EventProxy) comboBox.getSelectedItem();
+    final JComboBox<EventProxy> comboBox = (JComboBox<EventProxy>) comp;
+    mValue = (EventProxy) comboBox.getSelectedItem();
   }
 
   public EventProxy getValue() { return mValue; }
@@ -75,11 +75,6 @@ public class EventParameter extends Parameter
     comboBox.setSelectedItem(mValue);
   }
 
-  //#########################################################################
-  //# Data Members
-
-  private EventProxy mValue;
-
   @Override
   public void updateFromParameter(final Parameter p)
   {
@@ -91,4 +86,10 @@ public class EventParameter extends Parameter
   {
     System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private EventProxy mValue;
+
 }

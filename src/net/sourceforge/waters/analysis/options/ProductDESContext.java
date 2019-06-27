@@ -31,39 +31,18 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
 
-import javax.swing.JPopupMenu;
+package net.sourceforge.waters.analysis.options;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import javax.swing.Icon;
+
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+public interface ProductDESContext
 {
+  public ProductDESProxy getProductDES();
 
-  //#########################################################################
-  //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
-  {
-    super(master);
-  }
-
-  //#########################################################################
-  //# Shared Menu Items
-  @Override
-  protected void addCommonMenuItems()
-  {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
-    final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
-    popup.add(showSychronous);
-    popup.add(showSynthesize);
-  }
-
+  public Icon getEventIcon(EventProxy event);
 }

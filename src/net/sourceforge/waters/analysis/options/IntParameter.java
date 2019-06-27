@@ -49,17 +49,26 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  *
  * @author Brandon Bassett
  */
+
 public class IntParameter extends Parameter {
 
-    private final int min;
-    private final int max;
+    private final int mMin;
+    private final int mMax;
     private int mValue;
+
+    // TODO Use specified default value, do not use average of min and max.
+    // TODO Treat Integer.MAX_VALUE specially: Show Integer.MAX_VALUE as
+    // blank in text box, and if the text input is blank interpret as
+    // Integer.MAX_VALUE.
+    // TODO Reject values that are out of range, do not clamp.
+    // TODO Restrict character input: only digits, and possibly minus if
+    // the min value is negative.
 
     public IntParameter(final int id, final String name, final String description,
                         final int min, final int max) {
         super(id, name, description);
-        this.min = min;
-        this.max = max;
+        mMin = min;
+        mMax = max;
         mValue = min + max / 2;
     }
 
@@ -73,20 +82,20 @@ public class IntParameter extends Parameter {
 
     public void clamp() {
 
-        if(mValue > max) {
-        	mValue = max;
+        if(mValue > mMax) {
+        	mValue = mMax;
         }
-        else if(mValue < min) {
-        	mValue = min;
+        else if(mValue < mMin) {
+        	mValue = mMin;
         }
     }
 
     public int getMin() {
-        return min;
+        return mMin;
     }
 
     public int getMax() {
-        return max;
+        return mMax;
     }
 
     public int getValue() {
@@ -110,7 +119,7 @@ public class IntParameter extends Parameter {
         setValue(val);
       }
       catch(final NumberFormatException e) {
-        mValue = min;
+        mValue = mMin;
         textField.setText(String.valueOf(mValue));
         final JFrame frame = new JFrame();
         JOptionPane.showMessageDialog(frame, "Invalid value in " + this.getName() + " field, resetting to minimum value.");

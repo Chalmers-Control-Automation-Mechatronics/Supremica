@@ -86,6 +86,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
 
 
@@ -117,6 +120,7 @@ public class AutomatonSynthesizerDialog extends JDialog
   /**
    * Initialise buttons and components.
    */
+  @SuppressWarnings("unused")
   private void createComponents()
   {
     final ActionListener commithandler = new ActionListener() {
@@ -222,6 +226,7 @@ public class AutomatonSynthesizerDialog extends JDialog
    * all needed components have been created by a call to
    * {@link #createComponents()} before.
    */
+  @SuppressWarnings("unused")
   private void layoutComponents()
   {
     final GridBagConstraints constraints = new GridBagConstraints();
@@ -412,18 +417,20 @@ public class AutomatonSynthesizerDialog extends JDialog
           (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
 
         try {
-
+          // TODO Store the synthesiser as mSynthesizer and use throughout
+          // Avoid creating again when starting synthesis
           final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
             .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
           mScrollParametersPanel.replaceView(newParams, des);
-        } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
-
-          exception.printStackTrace();
+        } catch (AnalysisConfigurationException |
+                 ClassNotFoundException exception) {
+          final Logger logger = LogManager.getLogger();
+          logger.error(exception.getMessage());
         }
         //re-packing causes the frame to shrink/increase to preferred size
-         pack();
+        pack();
       }
     };
 
@@ -667,17 +674,22 @@ public class AutomatonSynthesizerDialog extends JDialog
     protected String getSuccessText()
     {
       final int size;
-
-        final ProductDESResult result = mSynthesizer.getAnalysisResult();
+      final ProductDESResult result = mSynthesizer.getAnalysisResult();
+      final Collection<? extends AutomatonProxy> automata =
+        result.getComputedAutomata();
+      if (automata == null) {
+        return "Synthesis successful.";
+      } else {
         size = result.getComputedAutomata().size();
-      switch (size) {
-      case 0:
-        return "The system already satisfies all control objectives. " +
-               "No supervisor is needed.";
-      case 1:
-        return "Successfully synthesised a supervisor.";
-      default:
-        return "Successfully synthesised " + size + " supervisor components.";
+        switch (size) {
+        case 0:
+          return "The system already satisfies all control objectives. " +
+                 "No supervisor is needed.";
+        case 1:
+          return "Successfully synthesised a supervisor.";
+        default:
+          return "Successfully synthesised " + size + " supervisor components.";
+        }
       }
     }
 

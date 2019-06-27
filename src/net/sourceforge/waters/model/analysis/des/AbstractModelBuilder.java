@@ -34,11 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
-import java.util.List;
 
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.ProxyResult;
@@ -94,26 +90,6 @@ public abstract class AbstractModelBuilder<P extends Proxy>
   {
     super(aut, factory, translator);
   }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-    list.add(new StringParameter(ParameterIDs.ModelBuilder_OutputName,
-      "Output name", "Sets the name to be given to the output object.", "Supervisor") {
-      @Override
-      public void commitValue()
-      {
-        setOutputName(getValue());
-      }
-    });
-    return list;
-  }
-
 
 
   //#########################################################################

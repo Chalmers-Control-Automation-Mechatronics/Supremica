@@ -31,39 +31,63 @@
 //# exception.
 //###########################################################################
 
+
 package net.sourceforge.waters.gui.analyzer;
 
-import javax.swing.JPopupMenu;
+import java.util.Map;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import javax.swing.Icon;
+
+import net.sourceforge.waters.analysis.options.ProductDESContext;
+import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.Proxy;
+import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.module.EventDeclProxy;
+
+import org.supremica.gui.ide.ModuleContainer;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+public class AnalyzerProductDESContext
+  implements ProductDESContext
 {
 
   //#########################################################################
   //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  public AnalyzerProductDESContext(final WatersAnalyzerPanel panel)
   {
-    super(master);
+    mModuleContainer = panel.getModuleContainer();
   }
 
   //#########################################################################
-  //# Shared Menu Items
+  //# Constructors
   @Override
-  protected void addCommonMenuItems()
+  public ProductDESProxy getProductDES()
   {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
-    final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
-    popup.add(showSychronous);
-    popup.add(showSynthesize);
+    return mModuleContainer.getCompiledDES();
   }
+
+  @Override
+  public Icon getEventIcon(final EventProxy event)
+  {
+    final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
+    final SourceInfo info = infoMap.get(event);
+    if (info == null) {
+      return null;
+    }
+    final Proxy proxy = info.getSourceObject();
+    if (!(proxy instanceof EventDeclProxy)) {
+      return null;
+    }
+    final EventDeclProxy decl = (EventDeclProxy) proxy;
+    final ModuleContext context = mModuleContainer.getModuleContext();
+    return context.getIcon(decl);
+  }
+
+
+  //#########################################################################
+  //# Constructors
+  private final ModuleContainer mModuleContainer;
 
 }
