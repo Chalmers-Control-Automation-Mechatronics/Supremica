@@ -34,10 +34,14 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.text.NumberFormat;
+import java.text.ParseException;
 
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -55,75 +59,96 @@ public class IntParameter extends Parameter {
     private final int mMin;
     private final int mMax;
     private int mValue;
-
-    // TODO Use specified default value, do not use average of min and max.
-    // TODO Treat Integer.MAX_VALUE specially: Show Integer.MAX_VALUE as
-    // blank in text box, and if the text input is blank interpret as
-    // Integer.MAX_VALUE.
-    // TODO Reject values that are out of range, do not clamp.
-    // TODO Restrict character input: only digits, and possibly minus if
-    // the min value is negative.
+    private final int defaultValue;
+    NumberFormat format;
+    String alphabet;
 
     public IntParameter(final int id, final String name, final String description,
-                        final int min, final int max) {
+                        final int min, final int max, final int defValue) {
         super(id, name, description);
         mMin = min;
         mMax = max;
-        mValue = min + max / 2;
+        defaultValue = defValue;
+        mValue = defValue;
+        format = NumberFormat.getIntegerInstance();
+        format.setGroupingUsed(false);
+
+        if(min < 0)
+          alphabet = "-?[0-9]+";
+        else
+          alphabet = "[0-9]+";
     }
 
     @Override
     public Component createComponent(final ProductDESProxy model) {
-    	final JTextField ret = new JTextField();
-    	ret.setText(String.valueOf(mValue));
-    	ret.setColumns(10);
+
+    final JFormattedTextField ret = new JFormattedTextField();
+
+    setTextField(ret, mValue);
+
+    ret.setColumns(10);
+
+    ret.addFocusListener(new FocusListener(){
+      @Override
+      public void focusGained(final FocusEvent e){}
+
+      @Override
+      public void focusLost(final FocusEvent e){
+        //Input matches alphabet
+        if (ret.getText().matches(alphabet)) {
+          try {
+            final Number tmp = format.parse(ret.getText());
+            //value not in range
+            if (tmp.longValue() < mMin || tmp.longValue() > mMax) {
+              JOptionPane
+                .showMessageDialog(new JFrame(),
+                                   "Value must be a number between " + mMin
+                                                 + "-" + mMax
+                                                 + "\nSetting value to default.");
+              setTextField(ret, defaultValue);
+            }
+          } catch (final ParseException exception) {
+            exception.printStackTrace();
+          }
+        }
+        //Input doesn't match alphabet and isn't empty
+        else if (!ret.getText().equals("")){
+          JOptionPane
+            .showMessageDialog(new JFrame(),
+                               "Invalid Input. Value must be a number between " + mMin
+                                             + "-" + mMax + ". "
+                                             + "\nSetting value to default.");
+          setTextField(ret, defaultValue);
+        }
+      }
+    });
     	return ret;
-    }
-
-    public void clamp() {
-
-        if(mValue > mMax) {
-        	mValue = mMax;
-        }
-        else if(mValue < mMin) {
-        	mValue = mMin;
-        }
-    }
-
-    public int getMin() {
-        return mMin;
-    }
-
-    public int getMax() {
-        return mMax;
     }
 
     public int getValue() {
         return mValue;
     }
 
-    public void setValue(final int val) {
-    	mValue = val;
-    	clamp();
+    //Sets the text of the textField to the desired value, empty string if value is Integer.MAX_VALUE
+    private void setTextField(final JFormattedTextField ret, final int value) {
+      if (value == Integer.MAX_VALUE)
+        ret.setText("");
+      else
+        ret.setText(String.valueOf(value));
     }
 
-  //Updates parameter value using the component stored in the passed panel
+    //Updates parameter value using the component stored in the passed panel
+    //Used when commit a parameter from panel
     @Override
     public void updateFromGUI(final ParameterPanel panel)
     {
       final Component comp = panel.getEntryComponent();
-      final JTextField textField = (JTextField) comp;
-      int val;
-      try {
-        val = (Integer.parseInt(textField.getText()));
-        setValue(val);
-      }
-      catch(final NumberFormatException e) {
-        mValue = mMin;
-        textField.setText(String.valueOf(mValue));
-        final JFrame frame = new JFrame();
-        JOptionPane.showMessageDialog(frame, "Invalid value in " + this.getName() + " field, resetting to minimum value.");
-      }
+      final JFormattedTextField textField = (JFormattedTextField) comp;
+      //empty field default to max
+      if(textField.getText().equals(""))
+        mValue = Integer.MAX_VALUE;
+      else
+        mValue = Integer.parseInt(textField.getText());
     }
 
     //Updates a ParameterPanels component with parameter value
@@ -131,10 +156,9 @@ public class IntParameter extends Parameter {
     public void displayInGUI(final ParameterPanel panel)
     {
       final Component comp = panel.getEntryComponent();
-      final JTextField textField = (JTextField) comp;
-      textField.setText(String.valueOf(mValue));
+      final JFormattedTextField textField = (JFormattedTextField) comp;
+      setTextField(textField, mValue);
     }
-
 
     @Override
     public void updateFromParameter(final Parameter p)
@@ -147,5 +171,4 @@ public class IntParameter extends Parameter {
     {
       System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
     }
-
 }

@@ -290,7 +290,7 @@ public abstract class BDDModelVerifier
     list.add(new IntParameter
              (ParameterIDs.BDDModelVerifier_InitialSize,
               "Initial Size", "",
-              0, Integer.MAX_VALUE){
+              0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                @Override
                public void commitValue()
                {
@@ -301,7 +301,7 @@ public abstract class BDDModelVerifier
     list.add(new IntParameter
              (ParameterIDs.BDDModelVerifier_PartitionSizeLimit,
               "Partition Size Limit", "",
-              0, Integer.MAX_VALUE){
+              0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                @Override
                public void commitValue()
                {

@@ -213,7 +213,7 @@ public abstract class AbstractModelAnalyzer
                 "Node limit",
                 "The maximum number of nodes the analyser is allowed to keep " +
                 "in memory at any one time.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {
@@ -225,7 +225,7 @@ public abstract class AbstractModelAnalyzer
                 "Transition limit",
                 "The maximum number of transitions the analyser is allowed to " +
                 "keep in memory at any one time.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {

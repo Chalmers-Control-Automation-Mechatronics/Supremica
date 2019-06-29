@@ -425,8 +425,8 @@ public class PanelTest
   {
     final List<Parameter> list = new ArrayList<Parameter>();
     list.add(new IntParameter(10, "TransitionLimit", "TransitionLimit", 0,
-                              100)); // TransitionLimit IntParameter
-    list.add(new IntParameter(11, "NodeLimit", "NodeLimit", 0, 100)); //NodeLimit    IntParameter
+                              100, 100)); // TransitionLimit IntParameter
+    list.add(new IntParameter(11, "NodeLimit", "NodeLimit", 0, 100, 100)); //NodeLimit    IntParameter
     list.add(new BoolParameter(12, "DetailedOutputEnabled",
                                "DetailedOutputEnabled", true)); //DetailedOutputEnabled   BoolParameter
     return list;
@@ -440,7 +440,7 @@ public class PanelTest
     list.add(new BoolParameter(40, "UsingSpecialEvents", "UsingSpecialEvents",
                                true)); // UsingSpecialEvents  boolean BoolParameter
     list.add(new IntParameter(41, "UpperInternalStateLimit",
-                              "UpperInternalStateLimit", 0, 100)); // UpperInternalStateLimit int   IntParameter
+                              "UpperInternalStateLimit", 0, 100, 100)); // UpperInternalStateLimit int   IntParameter
     list.add(new BoolParameter(42, "SubumptionEnabled", "SubumptionEnabled",
                                true)); // SubumptionEnabled   boolean     BoolParameter
     list.add(new BoolParameter(43, "SelfLoopOnlyEnabled",
@@ -449,15 +449,15 @@ public class PanelTest
                                true)); //PruningDeadlocks    boolean     BoolParameter
     list.add(new StringParameter(2, "OutputName", "OutputName for file")); // OutputName  String     StringParameter
     list.add(new IntParameter(49, "MonolithicTransitionLimit",
-                              "MonolithicTransitionLimit", 0, 100)); // MonolithicTransitionLimit   int    IntParameter
+                              "MonolithicTransitionLimit", 0, 100, 100)); // MonolithicTransitionLimit   int    IntParameter
     list.add(new IntParameter(50, "MonolithicStateLimit",
-                              "MonolithicStateLimit", 0, 100)); // MonolithicStateLimit    int    IntParameter
+                              "MonolithicStateLimit", 0, 100, 100)); // MonolithicStateLimit    int    IntParameter
     list.add(new StringParameter(51, "MonolithicDumpFileName",
                                  "MonolithicDumpFileName for file")); // MonolithicDumpFileName  String     StringParameter
     list.add(new IntParameter(52, "LowerInternalStateLimit",
-                              "LowerInternalStateLimit", 0, 100)); // LowerInternalStateLimit int    IntParameter
+                              "LowerInternalStateLimit", 0, 100, 100)); // LowerInternalStateLimit int    IntParameter
     list.add(new IntParameter(53, "InternalTransitionLimit",
-                              "InternalTransitionLimit", 0, 100)); // InternalTransitionLimit int    IntParameter
+                              "InternalTransitionLimit", 0, 100, 100)); // InternalTransitionLimit int    IntParameter
     list.add(new BoolParameter(54, "FailingEventsEnabled",
                                "FailingEventsEnabled", true)); // FailingEventsEnabled    boolean     BoolParameter
     list.add(new BoolParameter(55, "BlockedEventsEnabled",

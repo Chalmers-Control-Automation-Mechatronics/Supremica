@@ -709,7 +709,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit,
                 "Internal state limit",
                 "The maximum number of states allowed for intermediate automata.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {
@@ -722,7 +722,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit,
                 "Internal transition limit",
                 "The maximum number of transitions allowed for intermediate automata.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {
@@ -734,7 +734,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                 "Monolithic state limit",
                 "The maximum number of states allowed during monolithic analysis " +
                 "attempts.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {
@@ -746,7 +746,7 @@ public abstract class AbstractCompositionalModelAnalyzer
                 "Monolithic transition limit",
                 "The maximum number of transitions allowed during monolithic " +
                 "analysis attempts.",
-                0, Integer.MAX_VALUE){
+                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
                  @Override
                  public void commitValue()
                  {
