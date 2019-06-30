@@ -9,9 +9,10 @@ import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.filechooser.FileSystemView;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -19,6 +20,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 public class FileParameter extends Parameter
 {
   File mValue;
+  JFileChooser jfc;
 
   public FileParameter(final int id, final String name,
                        final String description)
@@ -36,29 +38,53 @@ public class FileParameter extends Parameter
 
     text.setColumns(10);
 
+    if (getValue() != null)
+      text.setText(getValue().getAbsolutePath());
+
     text.addFocusListener(new FocusListener() {
       @Override
-      public void focusGained(final FocusEvent e) {}
+      public void focusGained(final FocusEvent e){}
 
       @Override
-      public void focusLost(final FocusEvent e) {
-      //if text empty default to null file
-        if(!text.getText().equals("")) {
-          mValue = new File(System.getProperty("user.home") + File.separator + "Desktop", text.getText());
-          text.setText(getValue().getAbsolutePath());
-        }
+      public void focusLost(final FocusEvent e)
+      {
+        final File tmp = new File(text.getText());
+
+        //no parent, default to desktop
+        if (!text.getText().equals("") && tmp.getParent() == null) {
+          mValue = new File(System.getProperty("user.home") + File.separator
+                            + "Desktop", text.getText());
+          text.setText(mValue.getAbsolutePath());
+        }//file has a parent
+        else if (!text.getText().equals("") && tmp.getParent() != null){
+
+          //does parent exist
+          if(new File(tmp.getParent()).exists()) {
+            mValue = new File(text.getText());
+            text.setText(mValue.getAbsolutePath());
+          }
+          else {
+            JOptionPane.showMessageDialog(new JFrame(), "Invalid File");
+            text.setText(mValue.getAbsolutePath());
+          }
+
+        }//empty textField
         else
           mValue = null;
       }
     });
 
-    final ActionListener openFile = new ActionListener() {
+    final ActionListener saveFile = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
       {
-        final JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
-        //opening a file - jfc.showOpenDialog(null)
-        //saving a file  - jfc.showSaveDialog(null)
+        //Go to parent directory, text field set to file name
+        if (mValue != null) {
+          jfc = new JFileChooser(mValue.getParent());
+          jfc.setSelectedFile(mValue);
+        } else
+          jfc = new JFileChooser();
+
         if (jfc.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
           mValue = jfc.getSelectedFile();
           text.setText(getValue().getAbsolutePath());
@@ -66,15 +92,9 @@ public class FileParameter extends Parameter
       }
     };
 
-    if(getValue() != null)
-      text.setText(getValue().getAbsolutePath());
-
-    button.addActionListener(openFile);
+    button.addActionListener(saveFile);
     panel.add(text);
     panel.add(button);
-
-    //text.setToolTipText(getDescription());
-    //button.setToolTipText(getDescription());
 
     return panel;
   }
@@ -84,21 +104,12 @@ public class FileParameter extends Parameter
   {
     final Component comp = panel.getEntryComponent();
     final JPanel compPanel = (JPanel) comp;
-    final JTextField text =  (JTextField) compPanel.getComponent(0);
+    final JTextField text = (JTextField) compPanel.getComponent(0);
     //if text empty default to null file
-    if(!text.getText().equals(""))
+    if (!text.getText().equals(""))
       mValue = new File(text.getText());
     else
       mValue = null;
-
-    //there is text and a directory has been chosen else default to desktop
-    /*
-    if(!text.getText().equals(""))
-      if(mValue != null)
-        mValue = new File(mValue.getParent() + File.separator +    text.getText());
-      else
-        mValue = new File(System.getProperty("user.home") + File.separator + "Desktop", text.getText());
-        */
   }
 
   @Override
@@ -121,7 +132,8 @@ public class FileParameter extends Parameter
   @Override
   public void printValue()
   {
-    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+    System.out.println("ID: " + getID() + " Name: " + getName() + " Value: "
+                       + getValue());
   }
 
 }
