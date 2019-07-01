@@ -448,7 +448,7 @@ public abstract class AbstractModelAnalyzerFactory
       final String markingname = getValue();
       if (markingname != null) {
         final EventProxy marking =
-          AbstractConflictChecker.getMarkingProposition(model, markingname);
+          AbstractConflictChecker.findMarkingProposition(model, markingname);
         cchecker.setConfiguredDefaultMarking(marking);
       }
     }
@@ -557,7 +557,7 @@ public abstract class AbstractModelAnalyzerFactory
       final String markingname = getValue();
       if (markingname != null) {
         final EventProxy marking =
-          AbstractConflictChecker.getMarkingProposition(model, markingname);
+          AbstractConflictChecker.findMarkingProposition(model, markingname);
         cchecker.setConfiguredPreconditionMarking(marking);
       }
     }

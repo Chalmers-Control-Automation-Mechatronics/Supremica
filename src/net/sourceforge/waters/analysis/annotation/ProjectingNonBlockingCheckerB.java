@@ -138,7 +138,7 @@ public class ProjectingNonBlockingCheckerB
     clearStats();
     mTime -= System.currentTimeMillis();
     if (getConfiguredDefaultMarking() == null) {
-      setConfiguredDefaultMarking(getUsedDefaultMarking());
+      setConfiguredDefaultMarking(setUpUsedDefaultMarking());
     }
     boolean result = false;
     double checkerstates = 0;

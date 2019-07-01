@@ -49,9 +49,7 @@ import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
-import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
+import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -73,8 +71,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class ModularAndCompositionalSynthesizer
-  extends AbstractProductDESBuilder
-  implements SupervisorSynthesizer
+  extends AbstractSupervisorSynthesizer
 {
 
   //#########################################################################
@@ -193,64 +190,6 @@ public class ModularAndCompositionalSynthesizer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mConfiguredMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mConfiguredMarking;
-  }
-
-  @Override
-  public void setNondeterminismEnabled(final boolean enable)
-  {
-    mModularSynthesizer.setNondeterminismEnabled(enable);
-    mCompositionalSynthesizer.setNondeterminismEnabled(enable);
-  }
-
-  @Override
-  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
-  {
-    mModularSynthesizer.setSupervisorReductionFactory(factory);
-    mCompositionalSynthesizer.setSupervisorReductionFactory(factory);
-  }
-
-  @Override
-  public SupervisorReductionFactory getSupervisorReductionFactory()
-  {
-    return mModularSynthesizer.getSupervisorReductionFactory();
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mModularSynthesizer.setSupervisorLocalizationEnabled(enable);
-    mCompositionalSynthesizer.setSupervisorLocalizationEnabled(enable);
-  }
-
-  @Override
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mModularSynthesizer.getSupervisorLocalizationEnabled();
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return mModularSynthesizer.supportsNondeterminism();
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
   @Override
   public void requestAbort()
@@ -290,21 +229,35 @@ public class ModularAndCompositionalSynthesizer
   protected void setUp() throws AnalysisException
   {
     super.setUp();
-    getUsedDefaultMarking();
     final KindTranslator translator =
       ConflictKindTranslator.getInstanceControllable();
     mCompositionalSynthesizer.setKindTranslator(translator);
-    mCompositionalSynthesizer.setMonolithicStateLimit(getNodeLimit());
-    mCompositionalSynthesizer.setMonolithicTransitionLimit(getTransitionLimit());
-    mCompositionalSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
     mCompositionalConflictChecker.setKindTranslator(translator);
-    mCompositionalConflictChecker.setMonolithicStateLimit(getNodeLimit());
-    mCompositionalConflictChecker.setMonolithicTransitionLimit(getTransitionLimit());
-    mCompositionalConflictChecker.setConfiguredDefaultMarking(mUsedMarking);
+    final EventProxy marking = getUsedDefaultMarking();
+    mCompositionalSynthesizer.setConfiguredDefaultMarking(marking);
+    mCompositionalConflictChecker.setConfiguredDefaultMarking(marking);
+    mModularSynthesizer.setConfiguredDefaultMarking(marking);
+    final int stateLimit = getNodeLimit();
+    mCompositionalSynthesizer.setMonolithicStateLimit(stateLimit);
+    mCompositionalConflictChecker.setMonolithicStateLimit(stateLimit);
+    mModularSynthesizer.setNodeLimit(stateLimit);
+    final int transLimit = getTransitionLimit();
+    mCompositionalSynthesizer.setMonolithicTransitionLimit(transLimit);
+    mCompositionalConflictChecker.setMonolithicTransitionLimit(transLimit);
+    mModularSynthesizer.setTransitionLimit(transLimit);
+    final String prefix = getOutputName();
+    mCompositionalSynthesizer.setOutputName(prefix);
+    mModularSynthesizer.setOutputName(prefix);
+    final SupervisorReductionFactory factory = getSupervisorReductionFactory();
+    mCompositionalSynthesizer.setSupervisorReductionFactory(factory);
+    mModularSynthesizer.setSupervisorReductionFactory(factory);
+    final boolean locEnabled = isSupervisorLocalizationEnabled();
+    mCompositionalSynthesizer.setSupervisorLocalizationEnabled(locEnabled);
+    mModularSynthesizer.setSupervisorLocalizationEnabled(locEnabled);
+    final boolean nd = supportsNondeterminism();
+    mCompositionalSynthesizer.setNondeterminismEnabled(nd);
+    mModularSynthesizer.setNondeterminismEnabled(nd);
     mModularSynthesizer.setIncludesAllAutomata(true);
-    mModularSynthesizer.setNodeLimit(getNodeLimit());
-    mModularSynthesizer.setTransitionLimit(getTransitionLimit());
-    mModularSynthesizer.setConfiguredDefaultMarking(mUsedMarking);
   }
 
   @Override
@@ -314,17 +267,10 @@ public class ModularAndCompositionalSynthesizer
   }
 
   @Override
-  protected void tearDown()
-  {
-    super.tearDown();
-    mUsedMarking = null;
-  }
-
-  @Override
   public CompositionalAutomataSynthesisResult createAnalysisResult()
   {
     final CompositionalAutomataSynthesisResult result =
-      new CompositionalAutomataSynthesisResult(this);
+      new CompositionalAutomataSynthesisResult(this, isDetailedOutputEnabled());
     final AbstractionProcedureCreator creator =
       mCompositionalSynthesizer.getAbstractionProcedureCreator();
     final AutomataSynthesisAbstractionProcedure proc =
@@ -376,13 +322,15 @@ public class ModularAndCompositionalSynthesizer
       }
       final CompositionalAutomataSynthesisResult results = getAnalysisResult();
       collectSupervisors(mModularSynthesizer);
+      final EventProxy marking = getUsedDefaultMarking();
+      final String prefix = getSupervisorNamePrefix();
       boolean maybeBlocking = false;
       int supCount = 1;
       do {
-        mCompositionalSynthesizer.setSupervisorNamePrefix("sup" + supCount + ":");
+        mCompositionalSynthesizer.setOutputName(prefix + supCount + ":");
         final ProductDESProxy modularResult =
           mModularSynthesizer.getComputedProductDES();
-        if (!modularResult.getEvents().contains(mUsedMarking)) {
+        if (!modularResult.getEvents().contains(marking)) {
           break;
         }
         mCompositionalConflictChecker.setModel(modularResult);
@@ -438,29 +386,6 @@ public class ModularAndCompositionalSynthesizer
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Gets the marking proposition to be used.
-   * This method returns the marking proposition specified by the {@link
-   * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method,
-   * if non-null, or the default marking proposition of the input model.
-   * @throws EventNotFoundException to indicate that the a
-   *         <CODE>null</CODE> marking was specified, but input model does
-   *         not contain any proposition with the default marking name.
-   */
-  protected EventProxy getUsedDefaultMarking()
-    throws EventNotFoundException
-  {
-    if (mUsedMarking == null) {
-      if (mConfiguredMarking == null) {
-        final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
-      } else {
-        mUsedMarking = mConfiguredMarking;
-      }
-    }
-    return mUsedMarking;
-  }
-
   private void collectSupervisors(final SupervisorSynthesizer synthesizer)
   {
     final CompositionalAutomataSynthesisResult results = getAnalysisResult();
@@ -514,10 +439,6 @@ public class ModularAndCompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
-  // Configuration options
-  private EventProxy mConfiguredMarking;
-  private EventProxy mUsedMarking;
-
   // Permanent tools
   private final ModularControllabilitySynthesizer mModularSynthesizer;
   private final CompositionalAutomataSynthesizer mCompositionalSynthesizer;

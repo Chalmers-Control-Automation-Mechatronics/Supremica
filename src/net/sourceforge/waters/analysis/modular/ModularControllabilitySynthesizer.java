@@ -44,11 +44,8 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
@@ -56,9 +53,8 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -95,8 +91,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class ModularControllabilitySynthesizer
-  extends AbstractProductDESBuilder
-  implements SupervisorSynthesizer
+  extends AbstractSupervisorSynthesizer
 {
 
   //#########################################################################
@@ -121,34 +116,11 @@ public class ModularControllabilitySynthesizer
     mModularControllabilityChecker =
       new ModularControllabilityChecker(factory, inner);
     mMonolithicSynthesizer = new MonolithicSynthesizer(factory);
-    mMonolithicSynthesizer.setNonblockingSupported(false);
   }
 
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets whether synthesis includes local nonblocking checks.
-   * If set, the algorithm will attempt to synthesise controllable
-   * and nonblocking supervisors each time a subsystem is sent for
-   * monolithic synthesis. While this setting may help to remove some
-   * blocking states, it does not ensure that the result is a globally
-   * nonblocking supervisor.
-   */
-  public void setLocalNonblockingSupported(final boolean support)
-  {
-    mMonolithicSynthesizer.setNonblockingSupported(support);
-  }
-
-  /**
-   * Returns whether synthesis includes local nonblocking checks.
-   * @see #setLocalNonblockingSupported(boolean) setLocalNonblockingSupported()
-   */
-  public boolean getLocalNonblockingSupported()
-  {
-    return mMonolithicSynthesizer.getNonblockingSupported();
-  }
-
   /**
    * Sets whether the synthesised supervisor should include automata from
    * the original model that have not been used in synthesis.
@@ -172,11 +144,21 @@ public class ModularControllabilitySynthesizer
     return mIncludesAllAutomata;
   }
 
+  /**
+   * Sets whether unnecessary supervisors are removed during synthesis.
+   * If set, the algorithm checks whether new supervisors impose additional
+   * constraints over those previously computed, and removes those that do
+   * not.
+   */
   public void setRemovesUnnecessarySupervisors(final boolean removes)
   {
     mRemovesUnnecessarySupervisors = removes;
   }
 
+  /**
+   * returns whether unnecessary supervisors are removed during synthesis.
+   * @see #setRemovesUnnecessarySupervisors(boolean)
+   */
   public boolean getRemovesUnnecessarySupervisors()
   {
     return mRemovesUnnecessarySupervisors;
@@ -187,157 +169,37 @@ public class ModularControllabilitySynthesizer
     return mDisabledEvents;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.des.ModelAnalyzer
-
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
     for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
-     }
+      if (param.getID() ==
+          ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
+        param.setName("Locally nonblocking supervisors");
+        param.setDescription
+          ("Attempt to synthesise nonblocking supervisors each time a " +
+           "subsystem is sent for monolithic synthesis. While this may help " +
+           "to remove some blocking states, it does not ensure a globally " +
+           "nonblocking supervisor.");
+      }
     }
-
-    list.add(new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-                              "ConfiguredDefaultMarking",
-                              "The default (omega) marking to be used for conflict checks.") {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
-
-    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_IncludesAllAutomata,
-                             "IncludesAllAutomata", "IncludesAllAutomata",
-                             true) {
-        @Override
-        public void commitValue()
-        {
-          setIncludesAllAutomata(getValue());
-        }
-      });
-
-    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_LocalNonblockingSupported,
-                             "setLocalNonblockingSupported",
-                             "setLocalNonblockingSupported", true) {
-        @Override
-        public void commitValue()
-        {
-          setLocalNonblockingSupported(getValue());
-        }
-      });
-
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_NondeterminismEnabled,
-                             "NondeterminismEnabled", "NondeterminismEnabled",
-                             true) {
-        @Override
-        public void commitValue()
-        {
-          setNondeterminismEnabled(getValue());
-        }
-      });
-
-    list
-      .add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors,
-                             "setRemovesUnnecessarySupervisors",
-                             "setRemovesUnnecessarySupervisors", true) {
+    list.add(new BoolParameter
+      (ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors,
+       "Remove unnecessary supervisors",
+       "Check whether new superivsors impose additional constraints over " +
+       "those previously computed, and remove those that do not.", true)
+      {
         @Override
         public void commitValue()
         {
           setRemovesUnnecessarySupervisors(getValue());
         }
       });
-
-    list
-      .add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
-                             "SupervisorLocalizationEnabled",
-                             "SupervisorLocalizationEnabled", true) {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorLocalizationEnabled(getValue());
-        }
-      });
-
-    list
-      .add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-                                                         "Supervisor reduction",
-                                                         "Method of supervisor reduction to be used after synthesis",
-                                                         DefaultSupervisorReductionFactory.class
-                                                           .getEnumConstants()) {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorReductionFactory(getValue());
-        }
-      });
-
     return list;
-
-  }
-
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mMonolithicSynthesizer.setConfiguredDefaultMarking(marking);
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mMonolithicSynthesizer.getConfiguredDefaultMarking();
-  }
-
-  @Override
-  public void setNondeterminismEnabled(final boolean enable)
-  {
-    mMonolithicSynthesizer.setNondeterminismEnabled(enable);
-  }
-
-  @Override
-  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
-  {
-    mMonolithicSynthesizer.setSupervisorReductionFactory(factory);
-  }
-
-  @Override
-  public SupervisorReductionFactory getSupervisorReductionFactory()
-  {
-    return mMonolithicSynthesizer.getSupervisorReductionFactory();
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mMonolithicSynthesizer.setSupervisorLocalizationEnabled(enable);
-  }
-
-  @Override
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mMonolithicSynthesizer.getSupervisorLocalizationEnabled();
   }
 
 
@@ -395,8 +257,15 @@ public class ModularControllabilitySynthesizer
     mModularControllabilityChecker.setNodeLimit(getNodeLimit());
     mModularControllabilityChecker.setTransitionLimit(getTransitionLimit());
     mMonolithicSynthesizer.setKindTranslator(translator);
+    mMonolithicSynthesizer.setNonblockingSynthesis(isNonblockingSynthesis());
     mMonolithicSynthesizer.setNodeLimit(getNodeLimit());
     mMonolithicSynthesizer.setTransitionLimit(getTransitionLimit());
+    mMonolithicSynthesizer.setNondeterminismEnabled(supportsNondeterminism());
+    mMonolithicSynthesizer.setSupervisorReductionFactory
+      (getSupervisorReductionFactory());
+    mMonolithicSynthesizer.setSupervisorLocalizationEnabled
+      (isSupervisorLocalizationEnabled());
+
     final int numEvents = model.getEvents().size();
     mUncontrollableEventMap = new HashMap<>(numEvents);
     if (mIncludesAllAutomata) {
@@ -488,7 +357,8 @@ public class ModularControllabilitySynthesizer
             plants.addAll(automata);
           }
         }
-        mMonolithicSynthesizer.setOutputName("sup:" + spec.getName());
+        final String prefix = getSupervisorNamePrefix() + ":" + spec.getName();
+        mMonolithicSynthesizer.setOutputName(prefix);
         boolean moreEvents = false;
         do {
           checkAbort();
@@ -519,7 +389,9 @@ public class ModularControllabilitySynthesizer
           mMonolithicSynthesizer.getDisabledEvents();
         final Collection<? extends AutomatonProxy> localSups =
           mMonolithicSynthesizer.getAnalysisResult().getComputedAutomata();
-        supervisors.addAll(localSups);
+        if (isDetailedOutputEnabled()) {
+          supervisors.addAll(localSups);
+        }
         mDisabledEvents.addAll(disabledEvents);
         if (mIncludesAllAutomata &&
             getSupervisorReductionFactory() ==
@@ -533,7 +405,7 @@ public class ModularControllabilitySynthesizer
       }
 
       // 4. Remove unnecessary supervisors
-      if (mRemovesUnnecessarySupervisors) {
+      if (isDetailedOutputEnabled() && mRemovesUnnecessarySupervisors) {
         final ControllabilityCheckKindTranslator controllabilityTranslator =
           new ControllabilityCheckKindTranslator(supervisors);
         mModularControllabilityChecker.setKindTranslator(controllabilityTranslator);
@@ -579,10 +451,14 @@ public class ModularControllabilitySynthesizer
           }
         }
       }
-      final ProductDESProxy des =
-        AutomatonTools.createProductDESProxy("supervisor", supervisors,
-                                             factory);
-      return setProxyResult(des);
+      if (isDetailedOutputEnabled()) {
+        final ProductDESProxy des =
+          AutomatonTools.createProductDESProxy("supervisor", supervisors,
+                                               factory);
+        return setProxyResult(des);
+      } else {
+        return setBooleanResult(true);
+      }
     } catch (final AnalysisException exception) {
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {

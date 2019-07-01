@@ -302,7 +302,7 @@ public class TRCompositionalConflictChecker
       if (mConfiguredDefaultMarking == null) {
         final ProductDESProxy model = getModel();
         mUsedDefaultMarking =
-          AbstractConflictChecker.getMarkingProposition(model);
+          AbstractConflictChecker.findMarkingProposition(model);
       } else {
         mUsedDefaultMarking = mConfiguredDefaultMarking;
       }

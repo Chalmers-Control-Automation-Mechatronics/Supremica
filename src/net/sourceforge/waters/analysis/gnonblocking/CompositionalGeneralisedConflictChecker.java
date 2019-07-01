@@ -224,10 +224,10 @@ public class CompositionalGeneralisedConflictChecker
 
   // Ugly override to make this method visible within package.
   @Override
-  protected EventProxy getUsedDefaultMarking()
+  protected EventProxy setUpUsedDefaultMarking()
       throws EventNotFoundException
   {
-    return super.getUsedDefaultMarking();
+    return super.setUpUsedDefaultMarking();
   }
 
   @Override
@@ -379,7 +379,7 @@ public class CompositionalGeneralisedConflictChecker
       }
       // MarshallingTools.saveModule(model, "model.wmod");
       final ConflictChecker checker =
-          new NativeConflictChecker(model, getUsedDefaultMarking(),
+          new NativeConflictChecker(model, setUpUsedDefaultMarking(),
               getFactory());
       // final ConflictChecker checker = new MonolithicConflictChecker(model,
       // getUsedMarkingProposition(), getFactory());
@@ -664,7 +664,7 @@ public class CompositionalGeneralisedConflictChecker
     mTemporaryModifyingSteps = new ArrayList<Step>();
     mUsedPreconditionMarking = null;
     final EventProxy alpha = getUsedPreconditionMarkingProposition();
-    final EventProxy omega = getUsedDefaultMarking();
+    final EventProxy omega = setUpUsedDefaultMarking();
     mPropositions = new ArrayList<EventProxy>(2);
     mPropositions.add(alpha);
     mPropositions.add(omega);

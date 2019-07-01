@@ -835,7 +835,7 @@ public abstract class AbstractCompositionalModelAnalyzer
   {
     if (mConfiguredDefaultMarking == null) {
       final ProductDESProxy model = getModel();
-      return AbstractConflictChecker.getMarkingProposition(model);
+      return AbstractConflictChecker.findMarkingProposition(model);
     } else {
       return mConfiguredDefaultMarking;
     }

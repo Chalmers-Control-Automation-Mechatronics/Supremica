@@ -52,11 +52,9 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -70,11 +68,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.ProxyResult;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -99,8 +95,8 @@ import org.apache.logging.log4j.Logger;
  * @author Fangqian Qiu, Robi Malik
  */
 
-public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
-  implements SupervisorSynthesizer
+public class MonolithicSynthesizerNormality
+  extends AbstractSupervisorSynthesizer
 {
 
   //#########################################################################
@@ -123,38 +119,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     super(model, factory, translator);
   }
 
-  //#########################################################################
-  //# Configuration
-  public void setNonblockingSupported(final boolean support)
-  {
-    mNonblockingSupported = support;
-  }
-
-  public boolean getNonblockingSupported()
-  {
-    return mNonblockingSupported;
-  }
-
-  /**
-   * Sets the preferred name (or name prefix) for any supervisors produced as
-   * output.
-   */
-  @Override
-  public void setOutputName(final String name)
-  {
-    mOutputName = name;
-  }
-
-  /**
-   * Gets the preferred name of supervisors produced as output.
-   *
-   * @see #setOutputName(String) setOutputName()
-   */
-  @Override
-  public String getOutputName()
-  {
-    return mOutputName;
-  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -176,51 +140,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     }
   }
 
+
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mConfiguredMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mConfiguredMarking;
-  }
-
-  @Override
-  public void setNondeterminismEnabled(final boolean enable)
-  {
-    mNondeterminismEnabled = enable;
-  }
-
-  @Override
-  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
-  {
-    mSupervisorReductionFactory = factory;
-  }
-
-  @Override
-  public SupervisorReductionFactory getSupervisorReductionFactory()
-  {
-    return mSupervisorReductionFactory;
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mSupervisorLocalizationEnabled = enable;
-  }
-
-  @Override
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mSupervisorLocalizationEnabled;
-  }
-
+  //# Specific Access
   public Collection<EventProxy> getDisabledEvents()
   {
     return mDisabledEvents;
@@ -590,7 +512,7 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
         mLocalVisited.clear();
       }
 
-      if (mNonblockingSupported) {
+      if (getUsedDefaultMarking() != null) {
         mMustContinue = false;
         do {
           // mark non-coreachable states (trim)
@@ -735,7 +657,8 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
       int numDeletions = 1;
       final int dumpStateIndex = mTransitionRelation.getDumpStateIndex();
-      final int markedStateCode = mEventEncoding.getEventCode(mUsedMarking);
+      final int markedStateCode =
+        mEventEncoding.getEventCode(getUsedDefaultMarking());
       while (numDeletions > 0) {
         numDeletions = 0;
         //Observability step
@@ -914,40 +837,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
     }
   }
 
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return mNondeterminismEnabled;
-  }
-
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Gets the marking proposition to be used. This method returns the marking
-   * proposition specified by the
-   * {@link #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()}
-   * method, if non-null, or the default marking proposition of the input
-   * model.
-   *
-   * @throws EventNotFoundException
-   *           to indicate that the a <CODE>null</CODE> marking was specified,
-   *           but input model does not contain any proposition with the
-   *           default marking name.
-   */
-  private EventProxy getUsedDefaultMarking() throws EventNotFoundException
-  {
-    if (mUsedMarking == null) {
-      if (mConfiguredMarking == null) {
-        final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
-      } else {
-        mUsedMarking = mConfiguredMarking;
-      }
-    }
-    return mUsedMarking;
-  }
-
   private boolean isMarkedState(final int[] tuple)
   {
     for (int a = 0; a < mNumAutomata; a++) {
@@ -987,7 +879,9 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
                                          final EventEncoding encoding)
     throws EventNotFoundException
   {
-    rel.setName(mOutputName);
+    if (rel.getName() == null) {
+      rel.setName(getSupervisorNamePrefix());
+    }
     final AutomatonProxy aut =
       rel.createAutomaton(getFactory(), encoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
@@ -1403,14 +1297,6 @@ public class MonolithicSynthesizerNormality extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Data Members
-  private EventProxy mConfiguredMarking;
-  private EventProxy mUsedMarking;
-  private boolean mNondeterminismEnabled = false;
-  private boolean mNonblockingSupported = true;
-  private SupervisorReductionFactory mSupervisorReductionFactory =
-    DefaultSupervisorReductionFactory.OFF;
-  private boolean mSupervisorLocalizationEnabled = false;
-  private String mOutputName = "supervisor";
   private Collection<EventProxy> mDisabledEvents;
 
   private List<AutomatonProxy> mAutomata;

@@ -50,17 +50,10 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SelfloopSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
@@ -72,12 +65,10 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
-import net.sourceforge.waters.model.analysis.des.AbstractProductDESBuilder;
+import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
-import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -102,8 +93,7 @@ import org.apache.logging.log4j.Logger;
  * @author Fangqian Qiu, Robi Malik
  */
 
-public class MonolithicSynthesizer extends AbstractProductDESBuilder
-  implements SupervisorSynthesizer
+public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
 {
 
   //#########################################################################
@@ -126,37 +116,12 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     super(model, factory, translator);
   }
 
+
   //#########################################################################
-  //# Configuration
-  public void setNonblockingSupported(final boolean support)
+  //# Specific Access
+  public Collection<EventProxy> getDisabledEvents()
   {
-    mNonblockingSupported = support;
-  }
-
-  public boolean getNonblockingSupported()
-  {
-    return mNonblockingSupported;
-  }
-
-  /**
-   * Sets the preferred name (or name prefix) for any supervisors produced as
-   * output.
-   */
-  @Override
-  public void setOutputName(final String name)
-  {
-    mOutputName = name;
-  }
-
-  /**
-   * Gets the preferred name of supervisors produced as output.
-   *
-   * @see #setOutputName(String) setOutputName()
-   */
-  @Override
-  public String getOutputName()
-  {
-    return mOutputName;
+    return mDisabledEvents;
   }
 
 
@@ -188,135 +153,13 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mConfiguredMarking = marking;
-    mUsedMarking = null;
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mConfiguredMarking;
-  }
-
-  @Override
-  public void setNondeterminismEnabled(final boolean enable)
-  {
-    mNondeterminismEnabled = enable;
-  }
-
-  @Override
-  public void setSupervisorReductionFactory(final SupervisorReductionFactory factory)
-  {
-    mSupervisorReductionFactory = factory;
-  }
-
-  @Override
-  public SupervisorReductionFactory getSupervisorReductionFactory()
-  {
-    return mSupervisorReductionFactory;
-  }
-
-  @Override
-  public void setSupervisorLocalizationEnabled(final boolean enable)
-  {
-    mSupervisorLocalizationEnabled = enable;
-  }
-
-  @Override
-  public boolean getSupervisorLocalizationEnabled()
-  {
-    return mSupervisorLocalizationEnabled;
-  }
-
-  public Collection<EventProxy> getDisabledEvents()
-  {
-    return mDisabledEvents;
-  }
-
-
-  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return mNondeterminismEnabled;
-  }
-
   @Override
   public MonolithicSynthesisResult getAnalysisResult()
   {
     return (MonolithicSynthesisResult) super.getAnalysisResult();
   }
 
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
-     }
-    }
-    // NonblockingSupported is configured through ConfiguredDefaultMarking
-    list.add(new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-       "Marking proposition",
-       "The proposition to identify marked states " +
-       "for the nonblocking property - or use (none) to consider " +
-       "all states as marked.")
-      {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
-    list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-       "Supervisor reduction",
-       "Method of supervisor reduction to be used after synthesis",
-       DefaultSupervisorReductionFactory.class.getEnumConstants())
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorReductionFactory(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
-       "Localize supervisors",
-       "If using supervisor reduction, create a separate supervisor " +
-       "for each controllable event that needs to be disabled.",
-       true)
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorLocalizationEnabled(getValue());
-        }
-      });
-    // NondeterminismEnabled is not a configurable parameter
-    return list;
-  }
 
 
   //#########################################################################
@@ -577,7 +420,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
                              EventEncoding.NONTAU, mNumProperEvents - 1);
     mDisabledEvents = new THashSet<>();
 
-    mReductionChain = mSupervisorReductionFactory.createSimplifier();
+    mReductionChain = getSupervisorReductionFactory().createSimplifier();
     if (mReductionChain != null) {
       final int stateLimit = getNodeLimit();
       final int transitionLimit = getTransitionLimit();
@@ -701,7 +544,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
         mLocalVisited.clear();
       }
 
-      if (mNonblockingSupported) {
+      if (getUsedDefaultMarking() != null) {
         mMustContinue = false;
         do {
           // mark non-coreachable states (trim)
@@ -767,7 +610,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
       // re-encode states (make only one bad state)
       final int markingID = 0;
       mTransitionRelation =
-        new ListBufferTransitionRelation(getOutputName(),
+        new ListBufferTransitionRelation(getSupervisorNamePrefix(),
                                          ComponentKind.SUPERVISOR,
                                          mEventEncoding,
                                          mNumGoodStates,
@@ -823,8 +666,8 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
             mMinimizationChain.setTransitionRelation(mTransitionRelation);
             mMinimizationChain.run();
           }
-          if (mSupervisorLocalizationEnabled ||
-              mSupervisorReductionFactory.isSupervisedEventRequired()) {
+          if (isSupervisorLocalizationEnabled() ||
+              getSupervisorReductionFactory().isSupervisedEventRequired()) {
             // localised supervisors, one per controllable event
             final List<AutomatonProxy> localizedSupervisors =
               new ArrayList<>(mNumControllableEvents);
@@ -871,6 +714,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
     }
     final IsomorphismChecker checker =
       new IsomorphismChecker(getFactory(), false, false);
+    final String prefix = getSupervisorNamePrefix() + ":";
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
       final byte status = mTransitionRelation.getProperEventStatus(e);
       if (EventStatus.isControllableEvent(status) && isEverDisabledEvent(e)) {
@@ -882,7 +726,7 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
         removeOtherControllableDisablements(supervisor, e);
         final EventProxy event = mEventEncoding.getProperEvent(e);
-        supervisor.setName("sup:" + event.getName());
+        supervisor.setName(prefix + event.getName());
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
         supervisor.removeDumpStateTransitions();
@@ -932,31 +776,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Auxiliary Methods
-  /**
-   * Gets the marking proposition to be used. This method returns the marking
-   * proposition specified by the
-   * {@link #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()}
-   * method, if non-null, or the default marking proposition of the input
-   * model.
-   *
-   * @throws EventNotFoundException
-   *           to indicate that the a <CODE>null</CODE> marking was specified,
-   *           but input model does not contain any proposition with the
-   *           default marking name.
-   */
-  private EventProxy getUsedDefaultMarking() throws EventNotFoundException
-  {
-    if (mUsedMarking == null) {
-      if (mConfiguredMarking == null) {
-        final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
-      } else {
-        mUsedMarking = mConfiguredMarking;
-      }
-    }
-    return mUsedMarking;
-  }
-
   private int getUsedDefaultMarkingID() throws EventNotFoundException
   {
     final EventProxy marking = getUsedDefaultMarking();
@@ -1001,7 +820,9 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
   private ProductDESProxy createDESProxy(final ListBufferTransitionRelation rel)
     throws EventNotFoundException
   {
-    rel.setName(mOutputName);
+    if (rel.getName() == null) {
+      rel.setName(getSupervisorNamePrefix());
+    }
     final AutomatonProxy aut =
       rel.createAutomaton(getFactory(), mEventEncoding);
     return AutomatonTools.createProductDESProxy(aut, getFactory());
@@ -1443,14 +1264,6 @@ public class MonolithicSynthesizer extends AbstractProductDESBuilder
 
   //#########################################################################
   //# Data Members
-  private EventProxy mConfiguredMarking;
-  private EventProxy mUsedMarking;
-  private boolean mNonblockingSupported = true;
-  private SupervisorReductionFactory mSupervisorReductionFactory =
-    DefaultSupervisorReductionFactory.OFF;
-  private boolean mNondeterminismEnabled = false;
-  private boolean mSupervisorLocalizationEnabled = false;
-  private String mOutputName = "supervisor";
   private Collection<EventProxy> mDisabledEvents;
 
   private TransitionRelationSimplifier mMinimizationChain;

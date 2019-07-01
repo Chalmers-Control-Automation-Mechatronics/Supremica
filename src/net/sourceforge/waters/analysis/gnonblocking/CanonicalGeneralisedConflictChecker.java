@@ -149,7 +149,7 @@ public class CanonicalGeneralisedConflictChecker extends AbstractConflictChecker
     mAlpha = getConfiguredPreconditionMarking();
     mTime -= System.currentTimeMillis();
     if (getConfiguredDefaultMarking() == null) {
-      setConfiguredDefaultMarking(getUsedDefaultMarking());
+      setConfiguredDefaultMarking(setUpUsedDefaultMarking());
     }
     try {
       mWriter = new BufferedWriter(new FileWriter("/home/darius/supremicastuff/reductions" + getModel().getName()));

@@ -76,7 +76,7 @@ import org.apache.logging.log4j.Logger;
 public class AutomatonSynthesizerDialog extends JDialog
 {
 
-  //#######################################################################
+  //#########################################################################
   //# Constructor
   public AutomatonSynthesizerDialog(final WatersAnalyzerPanel panel)
   {
@@ -89,9 +89,9 @@ public class AutomatonSynthesizerDialog extends JDialog
     setVisible(true);
   }
 
-  //#########################################################################
-  //#Using Parameter Classes
 
+  //#########################################################################
+  //# Using Parameter Classes
   public void generateGUI() {
 
     final JPanel mSuperviserPanel = new JPanel(new GridLayout(0,2));
@@ -247,6 +247,7 @@ public class AutomatonSynthesizerDialog extends JDialog
     dialog.setVisible(true);
   }
 
+
   //#########################################################################
   //# Inner Class AnalyzerDialog
   private class SynthesisPopUpDialog extends WatersAnalyzeDialog
@@ -265,10 +266,13 @@ public class AutomatonSynthesizerDialog extends JDialog
     public void succeed()
     {
       super.succeed();
-        final ProductDESResult result = mSynthesizer.getAnalysisResult();
-        final Collection<? extends AutomatonProxy> resultList = result.getComputedAutomata();
+      final ProductDESResult result = mSynthesizer.getAnalysisResult();
+      final Collection<? extends AutomatonProxy> supervisors =
+        result.getComputedAutomata();
+      if (supervisors != null) {
         final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
-        model.insertRows(resultList);
+        model.insertRows(supervisors);
+      }
     }
 
     @Override
@@ -286,14 +290,14 @@ public class AutomatonSynthesizerDialog extends JDialog
     @Override
     protected String getSuccessText()
     {
-      final int size;
       final ProductDESResult result = mSynthesizer.getAnalysisResult();
-      final Collection<? extends AutomatonProxy> automata =
+      final Collection<? extends AutomatonProxy> supervisors =
         result.getComputedAutomata();
-      if (automata == null) {
-        return "Synthesis successful.";
+      if (supervisors == null) {
+        return "Synthesis successful. " +
+               "A supervisor exists, but it has not been constructed.";
       } else {
-        size = result.getComputedAutomata().size();
+        final int size = supervisors.size();
         switch (size) {
         case 0:
           return "The system already satisfies all control objectives. " +

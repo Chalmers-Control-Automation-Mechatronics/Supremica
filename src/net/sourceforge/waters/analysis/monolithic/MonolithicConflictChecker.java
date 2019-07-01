@@ -170,7 +170,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
       final KindTranslator translator = getKindTranslator();
       final int numstates = mSyncProduct.getNumberOfStates();
       final BitSet coreachable = new BitSet(numstates);
-      final EventProxy marking = getUsedDefaultMarking();
+      final EventProxy marking = setUpUsedDefaultMarking();
       final EventProxy preconditionMarking = getConfiguredPreconditionMarking();
       final SyncStateSchema stateSchema =
           new SyncStateSchema(model, translator, mEventMap, marking,
@@ -406,7 +406,7 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
     {
       final ProductDESProxy model = getModel();
       final KindTranslator translator = getKindTranslator();
-      final EventProxy marking = getUsedDefaultMarking();
+      final EventProxy marking = setUpUsedDefaultMarking();
       final EventProxy preconditionMarking = getConfiguredPreconditionMarking();
       // Create a new state schema for the product.
       mStateSchema =

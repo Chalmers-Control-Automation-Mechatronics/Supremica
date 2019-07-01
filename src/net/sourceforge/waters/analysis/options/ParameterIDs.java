@@ -36,37 +36,32 @@ package net.sourceforge.waters.analysis.options;
 public class ParameterIDs
 {
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
-
   public static final int ModelAnalyzer_DetailedOutputEnabled = 0;
   public static final int ModelAnalyzer_KindTranslator = 1;
   public static final int ModelAnalyzer_NodeLimit = 2;
   public static final int ModelAnalyzer_TransitionLimit = 3;
 
   //net.sourceforge.waters.model.analysis.ModelBuilder
-
   public static final int ModelBuilder_OutputName = 100;
 
   //net.sourceforge.waters.model.analysis.SupervisorSynthesizer
-
-  public static final int SupervisorSynthesizer_ConfiguredDefaultMarking = 200;
-  public static final int SupervisorSynthesizer_NondeterminismEnabled = 201;
-  public static final int SupervisorSynthesizer_SupervisorLocalisationEnabled = 202;
-  public static final int SupervisorSynthesizer_SupervisorReductionFactory = 203;
+  public static final int SupervisorSynthesizer_ControllableSynthesis = 200;
+  public static final int SupervisorSynthesizer_NonblockingSynthesis = 201;
+  public static final int SupervisorSynthesizer_NormalSynthesis = 202;
+  public static final int SupervisorSynthesizer_ConfiguredDefaultMarking = 203;
+  public static final int SupervisorSynthesizer_SupervisorLocalisationEnabled = 204;
+  public static final int SupervisorSynthesizer_SupervisorReductionFactory = 205;
+  public static final int SupervisorSynthesizer_SupervisorNamePrefix = 206;
 
   //net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 
-  public static final int MonolithicSynthesizer_NonblockingSupported = 300;
-
   //net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer
 
-  public static final int CompositionalAutomataSynthesizer_SupervisorNamePrefix = 400;
-
   //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer
-
   public static final int AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator = 500;
   public static final int AbstractCompositionalModelAnalyzer_BlockedEventsEnabled = 501;
   public static final int AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking = 502;
-  //public static final int AbstractCompositionalModelAnalyzer_ConfiguredPreconditionMarking = 503;
+  public static final int AbstractCompositionalModelAnalyzer_ConfiguredPreconditionMarking = 503;
   public static final int AbstractCompositionalModelAnalyzer_FailingEventsEnabled = 504;
   public static final int AbstractCompositionalModelAnalyzer_InternalStateLimit = 505;
   public static final int AbstractCompositionalModelAnalyzer_InternalTransitionLimit = 506;
@@ -85,22 +80,18 @@ public class ParameterIDs
   public static final int AbstractCompositionalModelAnalyzer_UsingSpecialEvents = 519;
 
   //net.sourceforge.waters.analysis.modular.ModularControllabilitySynthesizer
-
   public static final int ModularControllabilitySynthesizer_IncludesAllAutomata = 600;
   public static final int ModularControllabilitySynthesizer_LocalNonblockingSupported = 601;
   public static final int ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors = 602;
 
  //net.sourceforge.waters.model.analysis.ConflictChecker
-
   public static final int ConflictChecker_ConfiguredDefaultMarking = 700;
 
   //net.sourceforge.waters.model.analysis.des.ModelVerifier
-
   public static final int ModelVerifier_CounterExampleEnabled = 800;
   public static final int ModelVerifier_ShortCounterExampleRequested = 801;
 
   //net.sourceforge.waters.model.analysis.bdd.BDDModelVerifier
-
   public static final int BDDModelVerifier_BDDPackage = 900;
   public static final int BDDModelVerifier_InitialSize = 901;
   public static final int BDDModelVerifier_PartitionSizeLimit = 902;
@@ -108,10 +99,7 @@ public class ParameterIDs
   public static final int BDDModelVerifier_TransactionPartitioningStrategy = 904;
   public static final int BDDModelVerifier_VariableOrdering = 905;
 
-
   //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelVerifier
-
   public static final int AbstractCompositionalModelVerifier_TraceCheckingEnabled = 1000;
-
 
 }

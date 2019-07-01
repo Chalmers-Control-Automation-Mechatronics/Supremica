@@ -531,7 +531,7 @@ public class ConflictPreorderExperiments
       new ListBufferTransitionRelation(aut1, enc, config);
     final ListBufferTransitionRelation rel2 =
       new ListBufferTransitionRelation(aut2, enc, config);
-    final EventProxy marking = AbstractConflictChecker.getMarkingProposition(des);
+    final EventProxy marking = AbstractConflictChecker.findMarkingProposition(des);
     final int markingID = enc.getEventCode(marking);
     final TRConflictPreorderChecker checker =
       new TRConflictPreorderChecker(rel1, rel2, markingID);

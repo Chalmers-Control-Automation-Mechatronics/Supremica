@@ -270,7 +270,7 @@ public class NativeConflictChecker
     if (mUsedMarking == null) {
       if (mMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
+        mUsedMarking = AbstractConflictChecker.findMarkingProposition(model);
       } else {
         mUsedMarking = mMarking;
       }

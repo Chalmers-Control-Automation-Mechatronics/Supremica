@@ -119,6 +119,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mSynthesizer = createSynthesizer(factory);
+    mSynthesizer.setOutputName("supervisor");
     mControllabilityChecker = new NativeControllabilityChecker(factory);
     mLanguageInclusionChecker = new NativeLanguageInclusionChecker(factory);
     mConflictChecker = new NativeConflictChecker(factory);
@@ -697,7 +698,7 @@ public abstract class AbstractSupervisorSynthesizerTest
   {
     mSynthesizer.setModel(des);
     final EventProxy marking =
-      AbstractConflictChecker.getMarkingProposition(des);
+      AbstractConflictChecker.findMarkingProposition(des);
     mSynthesizer.setConfiguredDefaultMarking(marking);
   }
 

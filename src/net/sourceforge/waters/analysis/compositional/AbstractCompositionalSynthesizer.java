@@ -37,14 +37,26 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -115,9 +127,30 @@ public abstract class AbstractCompositionalSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SupervisorSynthesizer
   @Override
+  public void setNonblockingSynthesis(final boolean nonblocking)
+  {
+    mNonblockingSynthesis = nonblocking;
+  }
+
+  @Override
+  public boolean isNonblockingSynthesis()
+  {
+    return mNonblockingSynthesis;
+  }
+
+  @Override
   public void setNondeterminismEnabled(final boolean enable)
   {
     mNondeterminismEnabled = enable;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
+  @Override
+  public ProductDESProxy getComputedProductDES()
+  {
+    return getComputedProxy();
   }
 
 
@@ -144,11 +177,108 @@ public abstract class AbstractCompositionalSynthesizer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ProductDESBuilder
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public ProductDESProxy getComputedProductDES()
+  public List<Parameter> getParameters()
   {
-    return getComputedProxy();
+    final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+        param.setName("Create supervisor automata");
+        param.setDescription("Disable this to suppress the creation of supervisor " +
+                             "automata, and only determine whether a supervisor " +
+                             "exists.");
+        iter.add(new StringParameter
+          (ParameterIDs.ModelBuilder_OutputName,
+           "Supervisor name prefix",
+           "Name or name prefix for synthesised supervisors.",
+           "sup")
+          {
+            @Override
+            public void commitValue()
+            {
+              setOutputName(getValue());
+            }
+          });
+        break;
+      case ParameterIDs.AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking:
+        iter.remove();
+        break;
+      default:
+        break;
+      }
+    }
+    list.add(0, new EventParameter
+      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
+       "Marking proposition",
+       "If synthesising a nonblocking supervisor, it will be nonblocking " +
+       "with respect to this proposition.")
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
+    list.add(0, new BoolParameter
+      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis,
+       "Nonblocking supervisor",
+       "Synthesise a supervisor that is nonblocking supervisor with respect " +
+       "to the configured marking proposition.",
+      isNonblockingSynthesis())
+      {
+        @Override
+        public void commitValue()
+        {
+          setNonblockingSynthesis(getValue());
+        }
+      });
+    list.add(0, new BoolParameter
+      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis,
+       "Controllable supervisor",
+       "Synthesise a controllable supervisor.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          final KindTranslator translator = getValue() ?
+            IdenticalKindTranslator.getInstance() :
+            ConflictKindTranslator.getInstanceControllable();
+          setKindTranslator(translator);
+        }
+      });
+    list.add(new EnumParameter<SupervisorReductionFactory>
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
+       "Supervisor reduction",
+       "Method of supervisor reduction to be used after synthesis",
+       DefaultSupervisorReductionFactory.class.getEnumConstants())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorReductionFactory(getValue());
+        }
+      });
+    /* Supervisor localisation not yet implemented ...
+    list.add(new BoolParameter
+      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
+       "Localize supervisors",
+       "If using supervisor reduction, create a separate supervisor " +
+       "for each controllable event that needs to be disabled.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setSupervisorLocalizationEnabled(getValue());
+        }
+      });
+    */
+    return list;
   }
 
 
@@ -177,6 +307,19 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Hooks
+  @Override
+  protected EventProxy createDefaultMarking()
+  {
+    if (!mNonblockingSynthesis) {
+      return null;
+    } else if (getConfiguredDefaultMarking() != null) {
+      return getConfiguredDefaultMarking();
+    } else {
+      final ProductDESProxy des = getModel();
+      return AbstractConflictChecker.getMarkingProposition(des);
+    }
+  }
+
   @Override
   protected AutomatonProxy plantify(final AutomatonProxy spec)
     throws OverflowException
@@ -376,7 +519,8 @@ public abstract class AbstractCompositionalSynthesizer
 
   //#########################################################################
   //# Data Members
+  private boolean mNonblockingSynthesis = true;
   private boolean mNondeterminismEnabled = false;
-  private String mOutputName;
+  private String mOutputName = "output";
 
 }

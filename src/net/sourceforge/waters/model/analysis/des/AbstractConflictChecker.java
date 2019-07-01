@@ -206,7 +206,7 @@ public abstract class AbstractConflictChecker
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Gets the marking proposition to be used.
+   * Determines the marking proposition to be used.
    * This method returns the marking proposition specified by the {@link
    * #setConfiguredDefaultMarking(EventProxy) setMarkingProposition()} method,
    * if non-null, or the default marking proposition of the input model.
@@ -214,13 +214,13 @@ public abstract class AbstractConflictChecker
    *         <CODE>null</CODE> marking was specified, but input model does
    *         not contain any proposition with the default marking name.
    */
-  protected EventProxy getUsedDefaultMarking()
+  protected EventProxy setUpUsedDefaultMarking()
     throws EventNotFoundException
   {
     if (mUsedMarking == null) {
       if (mConfiguredMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedMarking = getMarkingProposition(model);
+        mUsedMarking = findMarkingProposition(model);
       } else {
         mUsedMarking = mConfiguredMarking;
       }
@@ -232,14 +232,27 @@ public abstract class AbstractConflictChecker
    * Searches the given model for a proposition event with the default
    * marking name {@link EventDeclProxy#DEFAULT_MARKING_NAME} and returns
    * this event.
+   * @return The first event with the the default marking name in the model,
+   *         or <CODE>null</CODE> if no such event is present.
+   */
+  public static EventProxy getMarkingProposition(final ProductDESProxy model)
+  {
+    return getMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
+  }
+
+  /**
+   * Searches the given model for a proposition event with the default
+   * marking name {@link EventDeclProxy#DEFAULT_MARKING_NAME} and returns
+   * this event.
+   * @return The first event with the the default marking name in the model.
    * @throws EventNotFoundException to indicate that the given model
    *         does not contain any proposition with the default marking
    *         name.
    */
-  public static EventProxy getMarkingProposition(final ProductDESProxy model)
+  public static EventProxy findMarkingProposition(final ProductDESProxy model)
     throws EventNotFoundException
   {
-    return getMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
+    return findMarkingProposition(model, EventDeclProxy.DEFAULT_MARKING_NAME);
   }
 
   /**
@@ -275,13 +288,11 @@ public abstract class AbstractConflictChecker
   /**
    * Searches the given model for a proposition event with the given
    * name and returns this event.
-   * @throws EventNotFoundException to indicate that the given model
-   *         does not contain any proposition with the default marking
-   *         name.
+   * @return The first event with the given name found in the model,
+   *         or <CODE>null</CODE> if no such event is present.
    */
   public static EventProxy getMarkingProposition
     (final ProductDESProxy model, final String name)
-    throws EventNotFoundException
   {
     for (final EventProxy event : model.getEvents()) {
       if (event.getKind() == EventKind.PROPOSITION &&
@@ -289,7 +300,27 @@ public abstract class AbstractConflictChecker
         return event;
       }
     }
-    throw new EventNotFoundException(model, name, EventKind.PROPOSITION, false);
+    return null;
+  }
+
+  /**
+   * Searches the given model for a proposition event with the given
+   * name and returns this event.
+   * @return The first event with the given name found in the model.
+   * @throws EventNotFoundException to indicate that the given model
+   *         does not contain any proposition with the given name.
+   */
+  public static EventProxy findMarkingProposition
+    (final ProductDESProxy model, final String name)
+    throws EventNotFoundException
+  {
+    final EventProxy event = getMarkingProposition(model, name);
+    if (event != null) {
+      return event;
+    } else {
+      throw new EventNotFoundException(model, name,
+                                       EventKind.PROPOSITION, false);
+    }
   }
 
 

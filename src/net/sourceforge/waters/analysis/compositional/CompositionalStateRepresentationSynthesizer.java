@@ -258,7 +258,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   }
 
   @Override
-  public boolean getSupervisorLocalizationEnabled()
+  public boolean isSupervisorLocalizationEnabled()
   {
     return false;
   }
@@ -639,6 +639,7 @@ public class CompositionalStateRepresentationSynthesizer extends
     }
     return numBadState;
   }
+
 
   //#########################################################################
   //# Data Members

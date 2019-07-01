@@ -485,7 +485,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     if (mUsedMarking == null) {
       if (mConfiguredMarking == null) {
         final ProductDESProxy model = getModel();
-        mUsedMarking = AbstractConflictChecker.getMarkingProposition(model);
+        mUsedMarking = AbstractConflictChecker.findMarkingProposition(model);
       } else {
         mUsedMarking = mConfiguredMarking;
       }

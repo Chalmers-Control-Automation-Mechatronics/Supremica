@@ -196,7 +196,7 @@ public class HISCCPInterfaceConsistencyChecker extends AbstractModelVerifier
     mSynchronousProductBuilder.setKindTranslator(translator);
     if (mConfiguredMarking == null) {
       final ProductDESProxy des = getModel();
-      mUsedMarking = AbstractConflictChecker.getMarkingProposition(des);
+      mUsedMarking = AbstractConflictChecker.findMarkingProposition(des);
     } else {
       mUsedMarking = mConfiguredMarking;
     }

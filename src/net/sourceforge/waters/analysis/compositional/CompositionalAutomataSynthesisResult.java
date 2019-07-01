@@ -50,9 +50,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * A result returned by the compositional synthesis algorithms
- * ({@link CompositionalAutomataSynthesizer}). In addition to the common result data,
- * it includes a collection of automata representing the synthesised modular
- * supervisor.
+ * ({@link CompositionalAutomataSynthesizer}). In addition to the common
+ * result data, it includes a collection of automata representing the
+ * synthesised modular supervisor.
  *
  * @author Robi Malik, Sahar Mohajerani
  */
@@ -65,12 +65,17 @@ public class CompositionalAutomataSynthesisResult
   //# Constructors
   /**
    * Creates a new synthesis result representing an incomplete run.
+   * @param  analyzer  The model analyser controlling the synthesis process.
+   * @param  detailedOutputEnabled  Whether synthesis is configured to
+   *                   collect return supervisors.
    */
-  public CompositionalAutomataSynthesisResult(final ModelAnalyzer analyzer)
+  public CompositionalAutomataSynthesisResult
+    (final ModelAnalyzer analyzer,
+     final boolean detailedOutputEnabled)
   {
     super(analyzer);
     mNumberOfSupervisors = 0;
-    mSupervisors = new ArrayList<>();
+    mSupervisors = detailedOutputEnabled ? new ArrayList<>() : null;
     mMaxUnrenamedSupervisorStates = -1;
     mTotalUnrenamedSupervisorStates = -1;
     mMaxUnrenamedSupervisorTransitions = -1;
@@ -154,7 +159,9 @@ public class CompositionalAutomataSynthesisResult
       Math.max(mMaxRenamedSupervisorTransitions, numberOfTrans);
     mTotalRenamedSupervisorTransitions =
       mergeAdd(mTotalRenamedSupervisorTransitions, numberOfTrans);
-    mSupervisors.add(sup);
+    if (mSupervisors != null) {
+      mSupervisors.add(sup);
+    }
   }
 
   void increaseNumberOfSupervisors(final int num)
@@ -179,7 +186,7 @@ public class CompositionalAutomataSynthesisResult
   public void setSatisfied(final boolean sat)
   {
     super.setSatisfied(sat);
-    if (!sat) {
+    if (!sat && mSupervisors != null) {
       mSupervisors.clear();
     }
   }
@@ -193,7 +200,9 @@ public class CompositionalAutomataSynthesisResult
     final Collection<AutomatonProxy> sups = result.getComputedAutomata();
     mNumberOfSupervisors =
       mergeAdd(mNumberOfSupervisors, result.mNumberOfSupervisors);
-    mSupervisors.addAll(sups);
+    if (mSupervisors != null && sups != null) {
+      mSupervisors.addAll(sups);
+    }
     mNumberOfRenamings = mergeAdd(mNumberOfRenamings, result.mNumberOfRenamings);
     mMaxUnrenamedSupervisorStates = Math.max(mMaxUnrenamedSupervisorStates,
                                              result.mMaxUnrenamedSupervisorStates);
@@ -322,9 +331,10 @@ public class CompositionalAutomataSynthesisResult
    * @param  factory  Factory used to construct the product DES.
    * @param  name     Name to be given to the product DES.
    */
-  void close(final ProductDESProxyFactory factory, String name)
+  void close(final ProductDESProxyFactory factory,
+             String name)
   {
-    if (isSatisfied()) {
+    if (isSatisfied() && mSupervisors != null) {
       final Collection<EventProxy> events =
         Candidate.getOrderedEvents(mSupervisors);
       if (name == null) {

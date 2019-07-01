@@ -113,7 +113,7 @@ public class MonolithicSynthesizerTest
       builder.setOutputKind(ComponentKind.SUPERVISOR);
       builder.setRemovingSelfloops(true);
       final EventProxy marking =
-        AbstractConflictChecker.getMarkingProposition(des);
+        AbstractConflictChecker.findMarkingProposition(des);
       final Collection<EventProxy> props = Collections.singletonList(marking);
       builder.setPropositions(props);
       assertTrue(builder.run());

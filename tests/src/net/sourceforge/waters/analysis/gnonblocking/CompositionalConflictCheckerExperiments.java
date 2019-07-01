@@ -180,7 +180,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
     final ProductDESProxyFactory factory = mVerifier.getFactory();
     final EventProxy alpha = mVerifier.getUsedPreconditionMarkingProposition();
     mVerifier.setConfiguredPreconditionMarking(alpha);
-    final EventProxy omega = mVerifier.getUsedDefaultMarking();
+    final EventProxy omega = mVerifier.setUpUsedDefaultMarking();
     final List<EventProxy> propositions = new ArrayList<EventProxy>(2);
     propositions.add(alpha);
     propositions.add(omega);

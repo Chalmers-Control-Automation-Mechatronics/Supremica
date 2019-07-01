@@ -51,10 +51,6 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -228,16 +224,6 @@ public class CompositionalAutomataSynthesizer
     return AutomataSynthesisAbstractionProcedureFactory.getInstance();
   }
 
-  public void setSupervisorNamePrefix(final String name)
-  {
-    mSupervisorNamePrefix = name;
-  }
-
-  public String getSupervisorNamePrefix()
-  {
-    return mSupervisorNamePrefix;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable
@@ -251,51 +237,6 @@ public class CompositionalAutomataSynthesizer
     if (mHalfwaySimplifier != null) {
       mHalfwaySimplifier.requestAbort();
     }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        iter.add(new StringParameter
-                   (ParameterIDs.CompositionalAutomataSynthesizer_SupervisorNamePrefix,
-                    "Supervisor name prefix",
-                    "Name prefix for synthesised supervisors.", "Supervisor"){
-                     @Override
-                     public void commitValue()
-                     {
-                       setSupervisorNamePrefix(getValue());
-                     }
-                   });
-        break;
-      }
-    }
-    list.add(new EnumParameter<SupervisorReductionFactory>
-               (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-                "Supervisor reduction",
-                "Method of supervisor reduction to be used after synthesis",
-                DefaultSupervisorReductionFactory.class.getEnumConstants()) {
-                  @Override
-                  public void commitValue()
-                  {
-                    setSupervisorReductionFactory(getValue());
-                  }
-                });
-
-    // list.add(new BoolParameter(ParameterIDs.PARAM_SupervisorSynthesizer_setSupervisorLocalisationEnabled,
-    //                            "SupervisorLocalizationEnabled", "SupervisorLocalizationEnabled", true));
-    return list;
   }
 
 
@@ -319,7 +260,7 @@ public class CompositionalAutomataSynthesizer
   }
 
   @Override
-  public boolean getSupervisorLocalizationEnabled()
+  public boolean isSupervisorLocalizationEnabled()
   {
     return false;
   }
@@ -338,10 +279,8 @@ public class CompositionalAutomataSynthesizer
       }
       if (!result.isFinished()) {
         result.setSatisfied(true);
-        if (isDetailedOutputEnabled()) {
-          final ProductDESProxyFactory factory = getFactory();
-          result.close(factory, getOutputName());
-        }
+        final ProductDESProxyFactory factory = getFactory();
+        result.close(factory, getOutputName());
       }
       final Logger logger = LogManager.getLogger();
       logger.debug("CompositionalSynthesizer done.");
@@ -364,7 +303,8 @@ public class CompositionalAutomataSynthesizer
   @Override
   public CompositionalAutomataSynthesisResult createAnalysisResult()
   {
-    return new CompositionalAutomataSynthesisResult(this);
+    return new CompositionalAutomataSynthesisResult(this,
+                                                    isDetailedOutputEnabled());
   }
 
   @Override
@@ -928,9 +868,9 @@ public class CompositionalAutomataSynthesizer
     boolean found;
     do {
       if (index == 0) {
-        supname = mSupervisorNamePrefix + rel.getName();
+        supname = getOutputName() + ":" + rel.getName();
       } else {
-        supname = mSupervisorNamePrefix + index + ":" + rel.getName();
+        supname = getOutputName() + index + ":" + rel.getName();
       }
       found = false;
       for (final AutomatonProxy aut : supervisors) {
@@ -945,8 +885,8 @@ public class CompositionalAutomataSynthesizer
   }
 
   private int getUsedEvent(final EventProxy event,
-                              final EventEncoding enc,
-                              final ListBufferTransitionRelation rel)
+                           final EventEncoding enc,
+                           final ListBufferTransitionRelation rel)
   {
     final int e = enc.getEventCode(event);
     if (e < 0) {
@@ -1256,7 +1196,6 @@ public class CompositionalAutomataSynthesizer
   private SupervisorReductionFactory mSupervisorReductionFactory =
     DefaultSupervisorReductionFactory.OFF;
   private final boolean mReduceIncrementally = false;
-  private String mSupervisorNamePrefix = "sup:";
 
   private SupervisorReductionSimplifier mSupervisorSimplifier;
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;

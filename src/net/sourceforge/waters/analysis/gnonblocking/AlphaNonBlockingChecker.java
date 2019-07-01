@@ -115,7 +115,7 @@ public class AlphaNonBlockingChecker
     final SortedSet<AutomatonProxy> newmodel = new TreeSet<>();
     for (final AutomatonProxy aut : model) {
       final EventEncoding ee = new EventEncoding(aut, getKindTranslator());
-      ee.addEvent(getUsedDefaultMarking(), getKindTranslator(),
+      ee.addEvent(setUpUsedDefaultMarking(), getKindTranslator(),
                   EventStatus.STATUS_UNUSED);
       ee.addEvent(mAlpha, getKindTranslator(), EventStatus.STATUS_UNUSED);
       ee.addEvent(mCont, getKindTranslator(), EventStatus.STATUS_NONE);
@@ -147,7 +147,7 @@ public class AlphaNonBlockingChecker
       }
       final ConflictChecker checker =
         new NativeConflictChecker(list.getModel(),
-                                  getUsedDefaultMarking(),
+                                  setUpUsedDefaultMarking(),
                                   getFactory());
       checker.setConfiguredPreconditionMarking(mAlpha);
       checker.setNodeLimit(getNodeLimit());
@@ -216,9 +216,9 @@ public class AlphaNonBlockingChecker
     final Set<EventProxy> mPropositions = new THashSet<>();
     final ProductDESProxyFactory factory = getFactory();
     mPropositions.add(mAlpha);
-    mPropositions.add(getUsedDefaultMarking());
+    mPropositions.add(setUpUsedDefaultMarking());
     final EventProxy alpha = mAlpha;
-    final EventProxy omega = getUsedDefaultMarking();
+    final EventProxy omega = setUpUsedDefaultMarking();
     final TauLoopRemovalRule tlrRule =
         new TauLoopRemovalRule(factory, getKindTranslator(), mPropositions);
     mAbstractionRules.add(tlrRule);
@@ -275,7 +275,7 @@ public class AlphaNonBlockingChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numlocal =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getUsedDefaultMarking()) {
+      if (e == setUpUsedDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -322,7 +322,7 @@ public class AlphaNonBlockingChecker
     final TObjectIntHashMap<Set<AutomatonProxy>> numoccuring =
       new TObjectIntHashMap<Set<AutomatonProxy>>();
     for (final EventProxy e : model.getEvents()) {
-      if (e == getUsedDefaultMarking()) {
+      if (e == setUpUsedDefaultMarking()) {
         continue;
       }
       final Set<AutomatonProxy> possess = new THashSet<AutomatonProxy>();
@@ -359,7 +359,7 @@ public class AlphaNonBlockingChecker
       final MonolithicSynchronousProductBuilder composer =
         new MonolithicSynchronousProductBuilder(compmodel, getFactory());
       final List<EventProxy> propositions = new ArrayList<EventProxy>();
-      propositions.add(getUsedDefaultMarking());
+      propositions.add(setUpUsedDefaultMarking());
       propositions.add(mAlpha);
       composer.setPropositions(propositions);
       final int size = maxsize;
@@ -545,7 +545,7 @@ public class AlphaNonBlockingChecker
             List<AutomatonProxy> tocomp =
               Arrays.asList(new AutomatonProxy[] {aut1, aut2});
             final BlockedEvents be =
-              new BlockedEvents(tocomp, getFactory(), getUsedDefaultMarking());
+              new BlockedEvents(tocomp, getFactory(), setUpUsedDefaultMarking());
             be.setNodeLimit(100000);
             try {
               tocomp = be.run();
@@ -587,7 +587,7 @@ public class AlphaNonBlockingChecker
           mHidden.removeAll(a.getEvents());
         }
       }
-      mHidden.remove(getUsedDefaultMarking());
+      mHidden.remove(setUpUsedDefaultMarking());
       mHidden.remove(mAlpha);
       mHidden.remove(mCont);
       AutomatonProxy minAutomaton;
@@ -607,7 +607,7 @@ public class AlphaNonBlockingChecker
           final MonolithicSynchronousProductBuilder composer =
             new MonolithicSynchronousProductBuilder(compmodel, getFactory());
           final List<EventProxy> propositions = new ArrayList<EventProxy>();
-          propositions.add(getUsedDefaultMarking());
+          propositions.add(setUpUsedDefaultMarking());
           propositions.add(mAlpha);
           composer.setPropositions(propositions);
           composer.setNodeLimit(6500);
@@ -640,7 +640,7 @@ public class AlphaNonBlockingChecker
             tr.replaceEvent(evcode, tau);
             tr.removeEvent(evcode);
           }
-          final int marking = ee.getEventCode(getUsedDefaultMarking());
+          final int marking = ee.getEventCode(setUpUsedDefaultMarking());
           final int alpha = ee.getEventCode(mAlpha);
           final int cont = ee.getEventCode(mCont);
           tr.replaceEvent(cont, tau);
