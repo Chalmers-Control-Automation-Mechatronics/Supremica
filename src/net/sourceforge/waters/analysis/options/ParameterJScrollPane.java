@@ -18,95 +18,34 @@ public class ParameterJScrollPane extends JScrollPane
   //# Constructors
   public ParameterJScrollPane(final List<Parameter> p, final ProductDESProxy model)
   {
-    final JPanel tmp = new JPanel();
-    final List<ParameterPanel> parameterPanels = new ArrayList<ParameterPanel>();
-
-    tmp.setLayout(new BoxLayout(tmp, BoxLayout.Y_AXIS));
-
-    for(final Parameter param: p)
-      parameterPanels.add(new ParameterPanel(param, model));
-
-    for (final ParameterPanel panel : parameterPanels) {
-      tmp.add(panel);
-    }
-
-    setViewportView(tmp);
+    generateViewPort(p, model);
   }
 
   public void replaceView(final List<Parameter> newParams, final ProductDESProxy model)
   {
-    //Generate new parameterPanels
-    final JPanel current = new JPanel();
-    final List<ParameterPanel> newPanels = new ArrayList<ParameterPanel>();
-    current.setLayout(new BoxLayout(current, BoxLayout.Y_AXIS));
-
-    for(final Parameter param: newParams) {
-      newPanels.add(new ParameterPanel(param, model));
-    }
-
-    for (final ParameterPanel panel : newPanels) {
-      current.add(panel);
-    }
-
-    //Copy values from old panel
-    final JPanel old = (JPanel) getViewport().getComponent(0); //same as using active panel
-
-    final List<ParameterPanel> oldPanels = new ArrayList<>();
-
-    for(final Component c: old.getComponents()) {
-       oldPanels.add((ParameterPanel) c);
-    }
-
-   // copyValue(oldPanels,newPanels);
-
-    //change to new viewport
-    setViewportView(current);
+    generateViewPort(newParams, model);
   }
 
+  private void generateViewPort(final List<Parameter> parameters, final ProductDESProxy model) {
+
+    final JPanel newView = new JPanel();
+    final List<ParameterPanel> newParametersPanels = new ArrayList<ParameterPanel>();
+    newView.setLayout(new BoxLayout(newView, BoxLayout.Y_AXIS));
+    //Generate new parameterPanels
+    for(final Parameter param: parameters) {
+      newParametersPanels.add(new ParameterPanel(param, model));
+    }
+    //Store parameterPanels in Panel
+    for (final ParameterPanel panel : newParametersPanels) {
+      newView.add(panel);
+    }
+
+    setViewportView(newView);
+  }
 
   public void commit() {
     for(final Component c: ((JPanel) getViewport().getComponent(0)).getComponents())
       ((ParameterPanel) c).commitParameter();
-  }
-
-  public static void copyValue(final List<ParameterPanel> oldPanels,
-                               final List<ParameterPanel> newPanels)
-  {
-
-    final List<Integer> oldPanelIDs = new ArrayList<Integer>();
-    final List<Integer> newPanelIDs = new ArrayList<Integer>();
-
-    for (final ParameterPanel panel : oldPanels) {
-      oldPanelIDs.add(panel.getParameter().getID());
-    }
-
-    for (final ParameterPanel panel : newPanels) {
-      newPanelIDs.add(panel.getParameter().getID());
-    }
-
-    //intersection
-    oldPanelIDs.retainAll(newPanelIDs);
-
-    //copy value from old panel to new one
-    for (final Integer i : oldPanelIDs) {
-
-      final ParameterPanel o = findID(oldPanels, i);
-      final ParameterPanel n = findID(newPanels, i);
-
-    //  o.commitParameter();
-      n.copyFromPanel(o);
-    }
-  }
-
-  public static ParameterPanel findID(final List<ParameterPanel> Panels,
-                                      final int id)
-  {
-    for (final ParameterPanel p : Panels) {
-      if (p.getParameter().getID() == id)
-        return p;
-    }
-
-    return null;
   }
 
   public List<Parameter> getParameters() {
@@ -120,5 +59,4 @@ public class ParameterJScrollPane extends JScrollPane
   }
 
   private static final long serialVersionUID = 1L;
-
 }

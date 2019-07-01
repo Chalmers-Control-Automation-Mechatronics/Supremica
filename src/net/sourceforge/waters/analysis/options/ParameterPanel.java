@@ -33,14 +33,11 @@
 
 package net.sourceforge.waters.analysis.options;
 
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -90,23 +87,5 @@ public class ParameterPanel extends JPanel
   public Component getEntryComponent()
   {
     return getComponents()[1];
-  }
-
-  public void setComponentValue(final int input)
-  {
-    ((JTextField) getEntryComponent()).setText(Integer.toString(input));
-    commitParameter();
-  }
-
-  public void setComponentValue(final boolean input)
-  {
-    ((JCheckBox) getEntryComponent()).setSelected(input);
-    commitParameter();
-  }
-
-  public void setComponentValue(final String input)
-  {
-    ((JTextField) getEntryComponent()).setText(input);
-    commitParameter();
   }
 }

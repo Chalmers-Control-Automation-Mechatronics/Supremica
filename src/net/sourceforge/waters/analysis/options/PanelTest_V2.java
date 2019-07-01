@@ -34,7 +34,6 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.awt.BorderLayout;
-import java.awt.Button;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,6 +41,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -62,7 +62,6 @@ public class PanelTest_V2
 
   final static ProductDESProxy des = MarshallingTools.loadAndCompileModule("examples/includeInJarFile/ModuleExamples/" + car_fh);
 
-  // TODO not static
   static ParameterJScrollPane mScrollParametersPanel;
   static HashMap<Integer,Parameter> AllParams = new HashMap<Integer,Parameter>();
 
@@ -77,9 +76,9 @@ public class PanelTest_V2
     final JPanel mButtons = new JPanel(new GridLayout(0,2));
 
     //Buttons for testing synthesizer generation, storing/retrieval with database
-    final Button commit = new Button("Store in Database");
-    final Button setValue = new Button("Print Database");
-    final Button createSynth = new Button("Create Synthesizer");
+    final JButton commit = new JButton("Store in Database");
+    final JButton setValue = new JButton("Print Database");
+    final JButton createSynth = new JButton("Create Synthesizer");
 
     final ActionListener setValuePrint = new ActionListener() {
       @Override

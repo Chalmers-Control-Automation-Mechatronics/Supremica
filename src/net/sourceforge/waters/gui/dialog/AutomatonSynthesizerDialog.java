@@ -34,48 +34,29 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import javax.swing.Action;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
-import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
-import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
-import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
-import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
-import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
@@ -88,9 +69,6 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import org.supremica.automata.algorithms.ControllableSynthesisKindTranslator;
-
 
 /**
  * @author George Hewlett, Robi Malik, Brandon Bassett
@@ -107,260 +85,8 @@ public class AutomatonSynthesizerDialog extends JDialog
     mAnalyzerPanel = panel;
     mAutomata = panel.getAutomataTable().getOperationArgument();
     generateGUI();
-    //createComponents();
-    //layoutComponents();
     setLocationRelativeTo(panel.getTopLevelAncestor());
-    //mNamePrefix.requestFocusInWindow();
     setVisible(true);
-   // setMinimumSize(getSize());
-  }
-
-  //#########################################################################
-  //# Initialisation and Layout of Components
-  /**
-   * Initialise buttons and components.
-   */
-  @SuppressWarnings("unused")
-  private void createComponents()
-  {
-    final ActionListener commithandler = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        commitDialog();
-      }
-    };
-    // Main panel ...
-    mMainPanel = new RaisedDialogPanel();
-    mNamePrefixLabel = new JLabel("Name Prefix:");
-    mNamePrefix = new JTextField();
-    mNamePrefix.setText("sup");
-    mNamePrefix.addActionListener(commithandler);
-    mNamePrefix.setToolTipText("Name prefix for synthesised supervisor components");
-
-    final ActionListener RadioHandler = new ActionListener(){
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-         superviserChanged();
-      }
-    };
-    //Synthesizer type
-    mCompMonLabel = new JLabel("Choose Type");
-    mMonRadio =  new JRadioButton("Monlithic", true);
-    mCompRadio =  new JRadioButton("Compositional");
-
-    final ButtonGroup superviserType = new ButtonGroup();
-    superviserType.add(mCompRadio);
-    superviserType.add(mMonRadio);
-
-    mCompRadio.addActionListener(RadioHandler);
-    mMonRadio.addActionListener(RadioHandler);
-
-    //Controllable and Non-blocking
-    mObjectLabel = new JLabel("Objective: ");
-    mControllable = new JCheckBox("Controllable", true);
-    mNonBlocking = new JCheckBox("Nonblocking", true);
-    final ActionListener ObjectiveHandler = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        final JCheckBox checkbox = (JCheckBox) event.getSource();
-        objectiveChanged(checkbox);
-      }
-    };
-
-    mControllable.addActionListener(ObjectiveHandler);
-    mNonBlocking.addActionListener(ObjectiveHandler);
-
-    //Supervisor Reduction
-    mSupReductionLabel = new JLabel("Supervisor reduction: ");
-    mSupReductionType = new JComboBox<> (DefaultSupervisorReductionFactory.class.getEnumConstants());
-    mSupReductionType.setSelectedIndex(0);
-
-    final ActionListener ReductionHandler = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        reductionChanged();
-      }
-    };
-
-    mSupReductionType.addActionListener(ReductionHandler);
-
-    //Monolithic Supervisor Reduction
-    mLocalisedSupervisor = new JCheckBox("Supervisor localization", false);
-    mLocalisedSupervisor.setEnabled(false);
-
-    //Composition heuristic
-    mHeuristic = new JLabel("Selected Compositional Heuristic: ");
-
-    final List<SelectionHeuristicCreator> list = CompositionalSelectionHeuristicFactory.getInstance().getEnumConstants();
-    final Vector<SelectionHeuristicCreator> vector = new Vector<> (list);
-    mSelectionHeuristic = new JComboBox<>(vector);
-    mSelectionHeuristic.setEnabled(false);
-
-    //Composition SelfloopOnlyEventsEnabled
-    mCompLoopLabel = new JLabel("Compositional SelfloopOnlyEventsEnabled");
-    mCompLoopEnabled = new JCheckBox("Enable");
-    mCompLoopEnabled.setEnabled(false);
-
-    // Buttons panel ...
-    mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
-    final Action cancelAction = DialogCancelAction.getInstance();
-    final JButton cancelButton = new JButton(cancelAction);
-    cancelButton.setRequestFocusEnabled(false);
-    mButtonsPanel.add(cancelButton);
-
-    final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
-    DialogCancelAction.register(this);
-  }
-
-  /**
-   * Fill the panels and layout all buttons and components. It is assumed that
-   * all needed components have been created by a call to
-   * {@link #createComponents()} before.
-   */
-  @SuppressWarnings("unused")
-  private void layoutComponents()
-  {
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-    constraints.insets = INSETS;
-
-    // First, layout the main panel ...
-    final GridBagLayout mainlayout = new GridBagLayout();
-    mMainPanel.setLayout(mainlayout);
-    // mNameLabel
-    constraints.gridx = 0;
-    constraints.gridy = 0;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mNamePrefixLabel, constraints);
-    mMainPanel.add(mNamePrefixLabel);
-    // mNameInput
-    mNamePrefix.setColumns(20);
-    constraints.gridx = constraints.gridx + 2;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mNamePrefix, constraints);
-    mMainPanel.add(mNamePrefix);
-
-    //mCompMonLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mCompMonLabel, constraints);
-    mMainPanel.add(mCompMonLabel);
-    //mMonRadio
-    constraints.gridx = constraints.gridx + 2;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mMonRadio, constraints);
-    mMainPanel.add(mMonRadio);
-    //mCompRadio
-    constraints.gridy++;
-    constraints.gridx = 2;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mCompRadio, constraints);
-    mMainPanel.add(mCompRadio);
-
-    // mObjectLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mObjectLabel, constraints);
-    mMainPanel.add(mObjectLabel);
-    // mControllable
-    constraints.gridx = constraints.gridx + 2;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mControllable, constraints);
-    mMainPanel.add(mControllable);
-    // mNonBlocking
-    constraints.gridy++;
-    constraints.gridx = 2;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mNonBlocking, constraints);
-    mMainPanel.add(mNonBlocking);
-
-    // mSupReductionLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mSupReductionLabel, constraints);
-    mMainPanel.add(mSupReductionLabel);
-    // mSupReductionType
-    constraints.gridx = constraints.gridx + 2;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mSupReductionType, constraints);
-    mMainPanel.add(mSupReductionType);
-    // mLocalisedSupervisor
-    constraints.gridx = 2;
-    constraints.gridy++;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mLocalisedSupervisor, constraints);
-    mMainPanel.add(mLocalisedSupervisor);
-
-    // mHeuristicLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mHeuristic, constraints);
-    mMainPanel.add(mHeuristic);
-    // mSelectionHeuristic
-    constraints.gridx = constraints.gridx + 2;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mSelectionHeuristic, constraints);
-    mMainPanel.add(mSelectionHeuristic);
-
-    // mCompLoopLabelLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mCompLoopLabel, constraints);
-    mMainPanel.add(mCompLoopLabel);
-    // mCompLoopEnabled
-    constraints.gridx = constraints.gridx + 2;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mCompLoopEnabled, constraints);
-    mMainPanel.add(mCompLoopEnabled);
-
-    // Finally, build the full dialog ...
-    final Container contents = getContentPane();
-    final GridBagLayout layout = new GridBagLayout();
-    contents.setLayout(layout);
-    constraints.gridx = 0;
-    constraints.gridy = GridBagConstraints.RELATIVE;
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    constraints.insets = new Insets(0, 0, 0, 0);
-    layout.setConstraints(mMainPanel, constraints);
-    contents.add(mMainPanel);
-
-    layout.setConstraints(mButtonsPanel, constraints);
-    contents.add(mButtonsPanel);
-    pack();
   }
 
   //#########################################################################
@@ -387,7 +113,6 @@ public class AutomatonSynthesizerDialog extends JDialog
         | AnalysisConfigurationException exception) {     }
     }
 
-
     final ActionListener Print = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -402,7 +127,7 @@ public class AutomatonSynthesizerDialog extends JDialog
 
     mSuperviserPanel.add(superviserComboboxLabel);
     mSuperviserPanel.add(superviserCombobox);
-    mSuperviserPanel.add(print);
+    //mSuperviserPanel.add(print);
 
     final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
 
@@ -412,15 +137,14 @@ public class AutomatonSynthesizerDialog extends JDialog
       @Override
       public void actionPerformed(final ActionEvent event)
       {
-
         final ModelAnalyzerFactoryLoader tmp =
           (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
 
         try {
-          // TODO Store the synthesiser as mSynthesizer and use throughout
-          // Avoid creating again when starting synthesis
-          final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
-            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters();
+          mSynthesizer = tmp.getModelAnalyzerFactory()
+            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
+          final List<Parameter> newParams = mSynthesizer.getParameters();
+
           storeInDatabase();
           copyFromDatabase(newParams);
           mScrollParametersPanel.replaceView(newParams, des);
@@ -440,14 +164,14 @@ public class AutomatonSynthesizerDialog extends JDialog
     final ModelAnalyzerFactoryLoader first = (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
 
     try {
-      mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createSupervisorSynthesizer(ProductDESElementFactory.getInstance()).getParameters(),des);
+      mSynthesizer = first.getModelAnalyzerFactory()
+        .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
+      mScrollParametersPanel = new ParameterJScrollPane(mSynthesizer.getParameters(),des);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }
 
     // Buttons panel ...
-
     final ActionListener commithandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -478,7 +202,6 @@ public class AutomatonSynthesizerDialog extends JDialog
     setVisible(true);
   }
 
-
   //Values stored in GUI Components are stored in corresponding parameter then added to the database
   public void storeInDatabase() {
 
@@ -507,131 +230,21 @@ public class AutomatonSynthesizerDialog extends JDialog
   {
     final Frame owner = (Frame) getOwner();;
     final SynthesisPopUpDialog dialog;
-    final SupervisorSynthesizer synthesizer;
 
     final ProductDESProxyFactory factory =    ProductDESElementFactory.getInstance();
     final ProductDESProxy des =   AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
-    final ModelAnalyzerFactoryLoader synth = (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
 
-    try {
+    final List<Parameter> parameters = mSynthesizer.getParameters();
+    storeInDatabase();
+    copyFromDatabase(parameters);
 
-      //Generate desired synthesizer and set all its parameters to corresponding ones in database
-      synthesizer = synth.getModelAnalyzerFactory()
-                            .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
-
-      final List<Parameter> parameters = synthesizer.getParameters();
-      storeInDatabase();
-      copyFromDatabase(parameters);
-
-      //commit all of the values to the synthesizer
-      for(final Parameter current: parameters)
-        current.commitValue();
-
-      //synthesizer.setKindTranslator(translator);
-
-      mSynthesizer = synthesizer;
-
-    } catch (AnalysisConfigurationException | ClassNotFoundException exception) { }
+    //commit all of the values to the synthesizer
+    for(final Parameter current: parameters)
+      current.commitValue();
 
     dialog = new SynthesisPopUpDialog(owner, des);
     dispose();
     dialog.setVisible(true);
-  }
-
-  //#########################################################################
-  //# Action Listeners
-  /**
-   * Commits the contents of this dialog to the model. This method is attached
-   * to the action listener of the 'OK' button of the event editor dialog.
-   */
-  public void commitDialog()
-  {
-    final Frame owner = (Frame) getOwner();;
-    final SynthesisPopUpDialog dialog;
-    final SupervisorReductionFactory reduction;
-
-    final ProductDESProxyFactory factory =
-      ProductDESElementFactory.getInstance();
-    final String prefixName = mNamePrefix.getText();
-    final ProductDESProxy des =
-      AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                           mAutomata, factory);
-    final KindTranslator translator;
-    if (mControllable.isSelected()) {
-      translator = IdenticalKindTranslator.getInstance();
-    } else {
-      translator = ControllableSynthesisKindTranslator.getInstance();
-    }
-
-    if(mMonRadio.isSelected()) {
-      final MonolithicSynthesizer synthesizer = new MonolithicSynthesizer(des, factory);
-      synthesizer.setOutputName(prefixName);
-      synthesizer.setKindTranslator(translator);
-      synthesizer.setNonblockingSupported(mNonBlocking.isSelected());
-      reduction = (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
-      synthesizer.setSupervisorReductionFactory(reduction);
-      synthesizer.setSupervisorLocalizationEnabled
-        (mLocalisedSupervisor.isSelected());
-      mSynthesizer = synthesizer;
-    }
-    else {
-      final CompositionalAutomataSynthesizer synthesizer = new CompositionalAutomataSynthesizer(des, factory, translator, AutomataSynthesisAbstractionProcedureFactory.WSOE);
-      synthesizer.setOutputName(prefixName);
-      synthesizer.setKindTranslator(translator);
-      synthesizer.setSelfloopOnlyEventsEnabled(mCompLoopEnabled.isSelected());
-      synthesizer.setSelectionHeuristic(mSelectionHeuristic.getItemAt(mSelectionHeuristic.getSelectedIndex()));
-      reduction = (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
-      synthesizer.setSupervisorReductionFactory(reduction);
-      mSynthesizer = synthesizer;
-    }
-
-    dialog = new SynthesisPopUpDialog(owner, des);
-    dispose();
-    dialog.setVisible(true);
-  }
-
-  private void reductionChanged()
-  {
-    if(mMonRadio.isSelected()) {
-      final SupervisorReductionFactory reduction =
-        (SupervisorReductionFactory) mSupReductionType.getSelectedItem();
-      if (reduction == DefaultSupervisorReductionFactory.OFF) {
-        mLocalisedSupervisor.setSelected(false);
-        mLocalisedSupervisor.setEnabled(false);
-      } else if (reduction.isSupervisedEventRequired()) {
-        mLocalisedSupervisor.setSelected(true);
-        mLocalisedSupervisor.setEnabled(false);
-      } else {
-        mLocalisedSupervisor.setEnabled(true);
-      }
-    }
-  }
-
-  private void superviserChanged() {
-
-    if(mCompRadio.isSelected()){
-      mLocalisedSupervisor.setEnabled(false);
-      mCompLoopEnabled.setEnabled(true);
-      mSelectionHeuristic.setEnabled(true);
-    }
-    else {
-      mCompLoopEnabled.setEnabled(false);
-      mSelectionHeuristic.setEnabled(false);
-      reductionChanged();
-    }
-  }
-
-  private void objectiveChanged(final JCheckBox checkbox)
-  {
-    if (checkbox.equals(mControllable)) {
-      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
-        mNonBlocking.setSelected(true);
-      }
-    } else {
-      if (!mControllable.isSelected() && !mNonBlocking.isSelected()) {
-        mControllable.setSelected(true);
-      }
-    }
   }
 
   //#########################################################################
@@ -711,35 +324,10 @@ public class AutomatonSynthesizerDialog extends JDialog
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final List<AutomatonProxy> mAutomata;
 
-
   //Parameter Components
-  ParameterJScrollPane mScrollParametersPanel;
-  HashMap<Integer,Parameter> AllParams;
-
-  // Swing components
-  private JPanel mMainPanel;
-  private JLabel mNamePrefixLabel;
-  private JTextField mNamePrefix;
-  private JLabel mCompMonLabel;
-  private JRadioButton mCompRadio;
-  private JRadioButton mMonRadio;
-
-  // private JPanel mErrorPanel;
-  // private ErrorLabel mErrorLabel;
+  private ParameterJScrollPane mScrollParametersPanel;
+  private HashMap<Integer,Parameter> AllParams;
   private JPanel mButtonsPanel;
-
-  private JLabel mObjectLabel;
-  private JCheckBox mControllable;
-  private JCheckBox mNonBlocking;
-  private JLabel mSupReductionLabel;
-  private JComboBox<SupervisorReductionFactory> mSupReductionType;
-  private JCheckBox mLocalisedSupervisor;
-  private JLabel mHeuristic;
-  private JComboBox<SelectionHeuristicCreator> mSelectionHeuristic;
-  private JLabel mCompLoopLabel;
-  private JCheckBox mCompLoopEnabled;
-
-  //Parameter Stuff
   private JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox;
 
   // Analysis workers
@@ -748,5 +336,4 @@ public class AutomatonSynthesizerDialog extends JDialog
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 6159733639861131531L;
-  private static final Insets INSETS = new Insets(2, 4, 2, 4);
 }
