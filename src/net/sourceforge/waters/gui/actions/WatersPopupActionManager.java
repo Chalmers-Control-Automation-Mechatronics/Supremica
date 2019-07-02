@@ -404,6 +404,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerSynthesisAction.class);
   }
 
+  public IDEAction getAnalyzerConflictCheckAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerConflictCheckAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;

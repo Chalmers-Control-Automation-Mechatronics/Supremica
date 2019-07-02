@@ -84,6 +84,7 @@ public abstract class WatersActionManager implements Observer
     addAction(new AnalyzeProperTimeBehaviorPropertyAction(ide));
     addAction(new AnalyzerSynchronousProductAction(ide));
     addAction(new AnalyzerSynthesisAction(ide));
+    addAction(new AnalyzerConflictCheckAction(ide));
     addAction(new EditEventLabelAction(ide));
     addAction(new GraphLayoutAction(ide));
     addAction(new GraphSaveEPSAction(ide));

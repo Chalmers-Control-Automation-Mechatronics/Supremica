@@ -62,8 +62,10 @@ class AnalyzerPopupFactory
     popup.addSeparator();
     final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
     final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
+    final IDEAction showConflict = master.getAnalyzerConflictCheckAction();
     popup.add(showSychronous);
     popup.add(showSynthesize);
+    popup.add(showConflict);
   }
 
 }

@@ -71,6 +71,7 @@ import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
 import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
+import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -487,6 +488,8 @@ public class IDEMenuBar
     menu.add(sync);
     final Action synth = actions.getAction(AnalyzerSynthesisAction.class);
     menu.add(synth);
+    final Action conflict = actions.getAction(AnalyzerConflictCheckAction.class);
+    menu.add(conflict);
     add(menu);
   }
 
