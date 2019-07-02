@@ -383,7 +383,7 @@ public class WatersPopupActionManager
 
   public IDEAction getLanguageIncusionAction(final NamedProxy aut)
   {
-    return new AnalyzeLanguageInclusionAction(mIDE, aut);
+    return new VerifyLanguageInclusionAction(mIDE, aut);
   }
 
   public IDEAction getDesktopSetStateAction(final AutomatonProxy automaton,

@@ -33,30 +33,31 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
+import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
+import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
+import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to check Serial Interface Consistency Property VI (SIC&nbsp;VI)
- * of a HISC module.
+ * The action to invoke the HISC-CP interface consistency check.
  *
  * @author Robi Malik
  */
 
-public class AnalyzeSICProperty6Action
+public class VerifyHISCCPInterfaceConsistencyAction
   extends WatersAnalyzeHISCAction
 {
 
   //#########################################################################
   //# Constructor
-  protected AnalyzeSICProperty6Action(final IDE ide)
+  protected VerifyHISCCPInterfaceConsistencyAction(final IDE ide)
   {
     super(ide);
   }
@@ -68,13 +69,13 @@ public class AnalyzeSICProperty6Action
   @Override
   protected String getCheckName()
   {
-    return "SIC Property VI";
+    return "HISC-CP Interface Consistency";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "does not satisfy SIC Property VI";
+    return "is not interface consistent";
   }
 
   @Override
@@ -82,22 +83,27 @@ public class AnalyzeSICProperty6Action
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    final ConflictChecker conflictChecker =
-        factory.createConflictChecker(desFactory);
-    final SICProperty6Verifier verifier =
-        new SICProperty6Verifier(conflictChecker, null, desFactory);
-    return verifier;
+    final ConflictChecker checker = factory.createConflictChecker(desFactory);
+    if (checker == null) {
+      return null;
+    } else {
+      final CompositionalSimplifier simplifier =
+        new CompositionalSimplifier(desFactory,
+                                    ConflictAbstractionProcedureFactory.NB);
+      return new HISCCPInterfaceConsistencyChecker
+        (desFactory, checker, simplifier);
+    }
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "satisfies SIC Property VI";
+    return "is interface consistent";
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -1008097797553564719L;
+  private static final long serialVersionUID = 1L;
 
 }

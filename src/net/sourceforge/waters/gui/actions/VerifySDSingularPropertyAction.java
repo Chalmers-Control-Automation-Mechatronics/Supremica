@@ -33,43 +33,50 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDControllabilityChecker;
+import net.sourceforge.waters.analysis.sd.SDSingularProhibitableBehaviorVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
-public class AnalyzeSDControllabilityAction extends WatersAnalyzeAction
+
+public class VerifySDSingularPropertyAction extends WatersAnalyzeAction
 {
-  protected AnalyzeSDControllabilityAction(final IDE ide)
+
+  protected VerifySDSingularPropertyAction(final IDE ide)
   {
     super(ide);
   }
 
   protected String getCheckName()
   {
-    return "SD Controllability i";
+    return "S-Singular Prohibitable Behaviour";
   }
 
   protected String getFailureDescription()
   {
-    return "is not controllable";
+    return "does not satisfy S-Singular Prohibitable Behaviour Property ";
   }
 
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    final ControllabilityChecker checker=
-      factory.createControllabilityChecker(desFactory);
-    return new SDControllabilityChecker(desFactory,checker);
+    final LanguageInclusionChecker Checker =
+        factory.createLanguageInclusionChecker(desFactory);
+
+
+        final SDSingularProhibitableBehaviorVerifier verifier =
+        new SDSingularProhibitableBehaviorVerifier(Checker,null, desFactory);
+    return verifier;
   }
 
   protected String getSuccessDescription()
   {
-    return "is Controllable";
+    return "satisfies S-Singular Prohibitable Behaviour";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

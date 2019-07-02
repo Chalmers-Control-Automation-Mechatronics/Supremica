@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDSingularProhibitableBehaviorVerifier;
+import net.sourceforge.waters.analysis.sd.SDCTwoAVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -43,22 +43,22 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSDSingularPropertyAction extends WatersAnalyzeAction
+public class VerifySDCTwoApropertyAction extends WatersAnalyzeAction
 {
 
-  protected AnalyzeSDSingularPropertyAction(final IDE ide)
+  protected VerifySDCTwoApropertyAction(final IDE ide)
   {
     super(ide);
   }
 
   protected String getCheckName()
   {
-    return "S-Singular Prohibitable Behaviour";
+    return "SD Controllability ii_a";
   }
 
   protected String getFailureDescription()
   {
-    return "does not satisfy S-Singular Prohibitable Behaviour Property ";
+    return "does not satisfy SD Controllability Point ii ";
   }
 
   protected ModelVerifier createModelVerifier
@@ -69,14 +69,14 @@ public class AnalyzeSDSingularPropertyAction extends WatersAnalyzeAction
         factory.createLanguageInclusionChecker(desFactory);
 
 
-        final SDSingularProhibitableBehaviorVerifier verifier =
-        new SDSingularProhibitableBehaviorVerifier(Checker,null, desFactory);
+        final SDCTwoAVerifier verifier =
+        new SDCTwoAVerifier(Checker, null, desFactory);
     return verifier;
   }
 
   protected String getSuccessDescription()
   {
-    return "satisfies S-Singular Prohibitable Behaviour";
+    return "satisfies SD Controllability Point ii";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

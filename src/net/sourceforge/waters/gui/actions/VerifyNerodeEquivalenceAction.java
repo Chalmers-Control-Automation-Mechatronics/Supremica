@@ -42,10 +42,10 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeNerodeEquivalentAction extends WatersAnalyzeAction
+public class VerifyNerodeEquivalenceAction extends WatersAnalyzeAction
 {
 
-  protected AnalyzeNerodeEquivalentAction(final IDE ide)
+  protected VerifyNerodeEquivalenceAction(final IDE ide)
   {
     super(ide);
   }

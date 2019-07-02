@@ -34,26 +34,28 @@
 package net.sourceforge.waters.gui.actions;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the controllability check through the editor's
+ * The action to invoke a diagnosability check through the editor's
  * Verify menu.
+ *
+ * @see DiagnosabilityChecker
  *
  * @author Robi Malik
  */
 
-public class AnalyzeControllabilityCheckAction extends WatersAnalyzeAction
+public class VerifyDiagnosabilityCheckAction extends WatersAnalyzeAction
 {
 
   //#########################################################################
   //# Constructors
-  protected AnalyzeControllabilityCheckAction(final IDE ide)
+  protected VerifyDiagnosabilityCheckAction(final IDE ide)
   {
     super(ide);
   }
@@ -64,32 +66,33 @@ public class AnalyzeControllabilityCheckAction extends WatersAnalyzeAction
   @Override
   protected String getCheckName()
   {
-    return "Controllability";
+    return "Diagnosability";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "is not controllable";
+    return "is not diagnosable";
   }
 
   @Override
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory)
+  protected DiagnosabilityChecker createModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory)
     throws AnalysisConfigurationException
   {
-    return factory.createControllabilityChecker(desFactory);
+    return factory.createDiagnosabilityChecker(desFactory);
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "is controllable";
+    return "is diagnosable";
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -1008097797553564719L;
+  private static final long serialVersionUID = -6505471793647504953L;
 
 }

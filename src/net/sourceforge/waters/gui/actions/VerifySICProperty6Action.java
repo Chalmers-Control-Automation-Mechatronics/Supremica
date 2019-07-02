@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.ProperTimeBehaviorVerifier;
+import net.sourceforge.waters.analysis.hisc.SICProperty6Verifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -43,39 +43,61 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeProperTimeBehaviorPropertyAction extends WatersAnalyzeAction
+/**
+ * The action to check Serial Interface Consistency Property VI (SIC&nbsp;VI)
+ * of a HISC module.
+ *
+ * @author Robi Malik
+ */
+
+public class VerifySICProperty6Action
+  extends WatersAnalyzeHISCAction
 {
 
-  protected AnalyzeProperTimeBehaviorPropertyAction(final IDE ide)
+  //#########################################################################
+  //# Constructor
+  protected VerifySICProperty6Action(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Overrides for base class
+  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  @Override
   protected String getCheckName()
   {
-    return "Proper Time Behavior";
+    return "SIC Property VI";
   }
 
+  @Override
   protected String getFailureDescription()
   {
-    return "does not satisfy Proper Time Behavior";
+    return "does not satisfy SIC Property VI";
   }
 
+  @Override
   protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
     final ConflictChecker conflictChecker =
         factory.createConflictChecker(desFactory);
-    final ProperTimeBehaviorVerifier verifier =
-        new ProperTimeBehaviorVerifier(conflictChecker, null, desFactory);
+    final SICProperty6Verifier verifier =
+        new SICProperty6Verifier(conflictChecker, null, desFactory);
     return verifier;
   }
 
+  @Override
   protected String getSuccessDescription()
   {
-    return "satisfies Proper Time Behavior";
+    return "satisfies SIC Property VI";
   }
 
+
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -1008097797553564719L;
+
 }

@@ -43,10 +43,10 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSDCTwoBPropertyAction extends WatersAnalyzeAction
+public class VerifySDCTwoBPropertyAction extends WatersAnalyzeAction
 {
 
-  protected AnalyzeSDCTwoBPropertyAction(final IDE ide)
+  protected VerifySDCTwoBPropertyAction(final IDE ide)
   {
     super(ide);
   }

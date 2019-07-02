@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.analysis.sd.ProperTimeBehaviorVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -41,60 +43,39 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-/**
- * The action to invoke an HISC-CP controllability check.
- * This invokes just a standard controllability check.
- * The only difference to {@link AnalyzeControllabilityCheckAction} is that
- * the module is compiled differently for HISC, with only the interfaces
- * of instantiated modules included.
- *
- * @author Robi Malik
- */
-
-public class AnalyzeHISCCPControllabilityAction
-  extends WatersAnalyzeHISCAction
+public class VerifyProperTimeBehaviorAction extends WatersAnalyzeAction
 {
 
-  //#########################################################################
-  //# Constructor
-  protected AnalyzeHISCCPControllabilityAction(final IDE ide)
+  protected VerifyProperTimeBehaviorAction(final IDE ide)
   {
     super(ide);
   }
 
-
-  //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
   protected String getCheckName()
   {
-    return "HISC-CP Controllability";
+    return "Proper Time Behavior";
   }
 
-  @Override
   protected String getFailureDescription()
   {
-    return "is not locally controllable";
+    return "does not satisfy Proper Time Behavior";
   }
 
-  @Override
   protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    return factory.createControllabilityChecker(desFactory);
+    final ConflictChecker conflictChecker =
+        factory.createConflictChecker(desFactory);
+    final ProperTimeBehaviorVerifier verifier =
+        new ProperTimeBehaviorVerifier(conflictChecker, null, desFactory);
+    return verifier;
   }
 
-  @Override
   protected String getSuccessDescription()
   {
-    return "is locally controllable";
+    return "satisfies Proper Time Behavior";
   }
 
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
-
+  private static final long serialVersionUID = -1008097797553564719L;
 }

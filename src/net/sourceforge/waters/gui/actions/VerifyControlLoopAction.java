@@ -33,9 +33,8 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDThreeOneVerifier;
+import net.sourceforge.waters.gui.actions.WatersAnalyzeAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -43,41 +42,33 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSDCThree_one_propertyAction extends WatersAnalyzeAction
+public class VerifyControlLoopAction extends WatersAnalyzeAction
 {
-
-  protected AnalyzeSDCThree_one_propertyAction(final IDE ide)
+  protected VerifyControlLoopAction(final IDE ide)
   {
     super(ide);
   }
 
   protected String getCheckName()
   {
-    return "SD Controllability iii.1";
+    return "Control Loop";
   }
 
   protected String getFailureDescription()
   {
-    return "does not satisfy SD Controllability Point iii.1  ";
+    return "has a control loop";
   }
 
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
+                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    final LanguageInclusionChecker Checker =
-        factory.createLanguageInclusionChecker(desFactory);
-
-
-        final SDThreeOneVerifier verifier =
-        new SDThreeOneVerifier(Checker,null, desFactory);
-    return verifier;
+    return factory.createControlLoopChecker(desFactory);
   }
 
   protected String getSuccessDescription()
   {
-    return "satisfies SD Controllability Point iii.1";
+    return "is control-loop free";
   }
 
-  private static final long serialVersionUID = -1008097797553564719L;
+  private static final long serialVersionUID = 2167516363996006935L;
 }

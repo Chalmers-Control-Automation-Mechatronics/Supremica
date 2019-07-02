@@ -33,9 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDActivityLoopChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -43,53 +41,60 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSDActivityLoopAction extends WatersAnalyzeAction
+/**
+ * The action to invoke an HISC-CP controllability check.
+ * This invokes just a standard controllability check.
+ * The only difference to {@link VerifyControllabilityAction} is that
+ * the module is compiled differently for HISC, with only the interfaces
+ * of instantiated modules included.
+ *
+ * @author Robi Malik
+ */
+
+public class VerifyHISCCPControllabilityAction
+  extends WatersAnalyzeHISCAction
 {
 
   //#########################################################################
-  //# Constructors
-  public AnalyzeSDActivityLoopAction(final IDE ide)
+  //# Constructor
+  protected VerifyHISCCPControllabilityAction(final IDE ide)
   {
     super(ide);
   }
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  //# Overrides for base class
+  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
   protected String getCheckName()
   {
-    return "Activity Loop";
+    return "HISC-CP Controllability";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "has an activity loop";
+    return "is not locally controllable";
   }
 
   @Override
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    final ControlLoopChecker checker =
-      factory.createControlLoopChecker(desFactory);
-    if (checker == null) {
-      return null;
-    } else {
-      return new SDActivityLoopChecker(checker, desFactory);
-    }
+    return factory.createControllabilityChecker(desFactory);
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "is activity-loop free";
+    return "is locally controllable";
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 2167516363996006935L;
+  private static final long serialVersionUID = 1L;
 
 }

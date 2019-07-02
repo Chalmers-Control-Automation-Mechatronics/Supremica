@@ -33,11 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.compositional.CompositionalSimplifier;
-import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
-import net.sourceforge.waters.analysis.hisc.HISCCPInterfaceConsistencyChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -46,64 +42,53 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * The action to invoke the HISC-CP interface consistency check.
+ * The action to invoke the deadlock check operation.
  *
- * @author Robi Malik
+ * @author Hani al-Bahri
  */
 
-public class AnalyzeHISCCPInterfaceConsistencyAction
-  extends WatersAnalyzeHISCAction
+public class VerifyDeadlockCheckAction extends WatersAnalyzeAction
 {
 
   //#########################################################################
   //# Constructor
-  protected AnalyzeHISCCPInterfaceConsistencyAction(final IDE ide)
+  protected VerifyDeadlockCheckAction(final IDE ide)
   {
     super(ide);
   }
 
 
   //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
   @Override
   protected String getCheckName()
   {
-    return "HISC-CP Interface Consistency";
+    return "Deadlock";
   }
 
   @Override
   protected String getFailureDescription()
   {
-    return "is not interface consistent";
+    return "has a deadlock";
   }
 
   @Override
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
+                                           final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    final ConflictChecker checker = factory.createConflictChecker(desFactory);
-    if (checker == null) {
-      return null;
-    } else {
-      final CompositionalSimplifier simplifier =
-        new CompositionalSimplifier(desFactory,
-                                    ConflictAbstractionProcedureFactory.NB);
-      return new HISCCPInterfaceConsistencyChecker
-        (desFactory, checker, simplifier);
-    }
+    return factory.createDeadlockChecker(desFactory);
   }
 
   @Override
   protected String getSuccessDescription()
   {
-    return "is interface consistent";
+    return "is deadlock-free";
   }
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -8684703946705836025L;
 
 }

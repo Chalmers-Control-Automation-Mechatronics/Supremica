@@ -33,62 +33,51 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.analysis.sd.SDCFourVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 
-/**
- * The action to invoke the deadlock check operation.
- *
- * @author Hani al-Bahri
- */
-
-public class AnalyzeDeadlockCheckAction extends WatersAnalyzeAction
+public class VerifySDCFourPropertyAction extends WatersAnalyzeAction
 {
 
-  //#########################################################################
-  //# Constructor
-  protected AnalyzeDeadlockCheckAction(final IDE ide)
+  protected VerifySDCFourPropertyAction(final IDE ide)
   {
     super(ide);
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
   protected String getCheckName()
   {
-    return "Deadlock";
+    return "SD Controllability Four";
   }
 
-  @Override
   protected String getFailureDescription()
   {
-    return "has a deadlock";
+    return "does not satisfy SD Controllability Point iv ";
   }
 
-  @Override
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    return factory.createDeadlockChecker(desFactory);
+    final LanguageInclusionChecker Checker =
+      factory.createLanguageInclusionChecker(desFactory);
+
+
+        final SDCFourVerifier verifier =
+        new SDCFourVerifier(Checker, null, desFactory);
+    return verifier;
   }
 
-  @Override
   protected String getSuccessDescription()
   {
-    return "is deadlock-free";
+    return "satisfies SD Controllability Point iv";
   }
 
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -8684703946705836025L;
-
+  private static final long serialVersionUID = -1008097797553564719L;
 }

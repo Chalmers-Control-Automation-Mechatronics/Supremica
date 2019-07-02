@@ -51,37 +51,13 @@ import org.supremica.gui.ide.IDE;
 public abstract class WatersActionManager implements Observer
 {
 
-  // #########################################################################
-  // # Constructor
+  //#########################################################################
+  //# Constructor
   public WatersActionManager(final IDE ide)
   {
-    final int SIZE = 64;
+    final int SIZE = 128;
     mActionMap = new HashMap<Class<? extends IDEAction>,IDEAction>(SIZE);
     mKeyboardActionMap = new HashMap<Class<? extends IDEAction>,Action>(SIZE);
-    addAction(new AnalyzeConflictCheckAction(ide));
-    addAction(new AnalyzeControllabilityCheckAction(ide));
-    addAction(new AnalyzeControlLoopAction(ide));
-    addAction(new AnalyzeDeadlockCheckAction(ide));
-    addAction(new AnalyzeDiagnosabilityCheckAction(ide));
-    addAction(new AnalyzeHISCCPControllabilityAction(ide));
-    try {
-      addAction(new AnalyzeHISCCPInterfaceConsistencyAction(ide));
-    } catch (final NoClassDefFoundError error) {
-      // skip this one
-    }
-    addAction(new AnalyzeLanguageInclusionAction(ide));
-    addAction(new AnalyzeSICProperty5Action(ide));
-    addAction(new AnalyzeSICProperty6Action(ide));
-    addAction(new AnalyzeSDPlantCompletenessAction(ide));
-    addAction(new AnalyzeSDActivityLoopAction(ide));
-    addAction(new AnalyzeSDSingularPropertyAction(ide));
-    addAction(new AnalyzeSDControllabilityAction(ide));
-    addAction(new AnalyzeSDCTwoApropertyAction(ide));
-    addAction(new AnalyzeSDCTwoBPropertyAction(ide));
-    addAction(new AnalyzeSDCThree_one_propertyAction(ide));
-    addAction(new AnalyzeNerodeEquivalentAction(ide));
-    addAction(new AnalyzeSDCFourPropertyAction(ide));
-    addAction(new AnalyzeProperTimeBehaviorPropertyAction(ide));
     addAction(new AnalyzerSynchronousProductAction(ide));
     addAction(new AnalyzerSynthesisAction(ide));
     addAction(new AnalyzerConflictCheckAction(ide));
@@ -126,10 +102,35 @@ public abstract class WatersActionManager implements Observer
     addAction(new ToolGroupNodeAction(ide));
     addAction(new ToolNodeAction(ide));
     addAction(new ToolSelectAction(ide));
+    addAction(new VerifyConflictCheckAction(ide));
+    addAction(new VerifyControllabilityAction(ide));
+    addAction(new VerifyControlLoopAction(ide));
+    addAction(new VerifyDeadlockCheckAction(ide));
+    addAction(new VerifyDiagnosabilityCheckAction(ide));
+    addAction(new VerifyHISCCPControllabilityAction(ide));
+    try {
+      addAction(new VerifyHISCCPInterfaceConsistencyAction(ide));
+    } catch (final NoClassDefFoundError error) {
+      // skip this one
+    }
+    addAction(new VerifyLanguageInclusionAction(ide));
+    addAction(new VerifyNerodeEquivalenceAction(ide));
+    addAction(new VerifyProperTimeBehaviorAction(ide));
+    addAction(new VerifySDActivityLoopAction(ide));
+    addAction(new VerifySDPlantCompletenessAction(ide));
+    addAction(new VerifySDSingularPropertyAction(ide));
+    addAction(new VerifySDControllabilityAction(ide));
+    addAction(new VerifySDCTwoApropertyAction(ide));
+    addAction(new VerifySDCTwoBPropertyAction(ide));
+    addAction(new VerifySDCThree_one_propertyAction(ide));
+    addAction(new VerifySDCFourPropertyAction(ide));
+    addAction(new VerifySICProperty5Action(ide));
+    addAction(new VerifySICProperty6Action(ide));
     addAction(new WatersRedoAction(ide));
     addAction(new WatersUndoAction(ide));
     ide.attach(this);
   }
+
 
   // #########################################################################
   // # Access to Actions
@@ -138,8 +139,9 @@ public abstract class WatersActionManager implements Observer
     return mActionMap.get(clazz);
   }
 
-  // #########################################################################
-  // # Installing Keyboard Shortcuts
+
+  //#########################################################################
+  //# Installing Keyboard Shortcuts
   public void installCutCopyPasteActions(final JComponent comp)
   {
     installAction(comp, IDECutAction.class);
@@ -160,8 +162,9 @@ public abstract class WatersActionManager implements Observer
     amap.put(name, action);
   }
 
-  // #########################################################################
-  // # Interface net.sourceforge.waters.gui.observer.Observer
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
   @Override
   public void update(final EditorChangedEvent event)
   {
@@ -170,16 +173,18 @@ public abstract class WatersActionManager implements Observer
     }
   }
 
-  // #########################################################################
-  // # Initialization
+
+  //#########################################################################
+  //# Initialisation
   protected void addAction(final IDEAction action)
   {
     final Class<? extends IDEAction> clazz = action.getClass();
     mActionMap.put(clazz, action);
   }
 
-  // #######################################################################
-  // # Keyboard Actions
+
+  //#######################################################################
+  //# Keyboard Actions
   private Action getKeyboardAction(final Class<? extends IDEAction> clazz)
   {
     Action action = mKeyboardActionMap.get(clazz);
@@ -191,8 +196,9 @@ public abstract class WatersActionManager implements Observer
     return action;
   }
 
-  // #######################################################################
-  // # Data Members
+
+  //#######################################################################
+  //# Data Members
   private final Map<Class<? extends IDEAction>,IDEAction> mActionMap;
   private final Map<Class<? extends IDEAction>,Action> mKeyboardActionMap;
 

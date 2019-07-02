@@ -33,66 +33,47 @@
 
 package net.sourceforge.waters.gui.actions;
 
+import net.sourceforge.waters.analysis.sd.SDPlantCompletenessChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 
-/**
- * The action to invoke a diagnosability check through the editor's
- * Verify menu.
- *
- * @see DiagnosabilityChecker
- *
- * @author Robi Malik
- */
-
-public class AnalyzeDiagnosabilityCheckAction extends WatersAnalyzeAction
+public class VerifySDPlantCompletenessAction extends WatersAnalyzeAction
 {
 
-  //#########################################################################
-  //# Constructors
-  protected AnalyzeDiagnosabilityCheckAction(final IDE ide)
+  protected VerifySDPlantCompletenessAction(final IDE ide)
   {
     super(ide);
   }
 
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
   protected String getCheckName()
   {
-    return "Diagnosability";
+    return "Plant Completeness";
   }
 
-  @Override
   protected String getFailureDescription()
   {
-    return "is not diagnosable";
+    return "does not satisfy Plant Completeness";
   }
 
-  @Override
-  protected DiagnosabilityChecker createModelVerifier
+  protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
-  {
-    return factory.createDiagnosabilityChecker(desFactory);
+     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  {  final ControllabilityChecker checker=
+  factory.createControllabilityChecker(desFactory);
+
+     return new SDPlantCompletenessChecker(desFactory,checker);
   }
 
-  @Override
   protected String getSuccessDescription()
   {
-    return "is diagnosable";
+    return "satisfies Plant Completeness";
   }
 
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -6505471793647504953L;
-
+  private static final long serialVersionUID = -1008097797553564719L;
 }

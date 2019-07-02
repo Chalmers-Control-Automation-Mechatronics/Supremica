@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.sd.SDPlantCompletenessChecker;
+import net.sourceforge.waters.analysis.sd.SDThreeOneVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -43,36 +43,40 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeSDPlantCompletenessAction extends WatersAnalyzeAction
+public class VerifySDCThree_one_propertyAction extends WatersAnalyzeAction
 {
 
-  protected AnalyzeSDPlantCompletenessAction(final IDE ide)
+  protected VerifySDCThree_one_propertyAction(final IDE ide)
   {
     super(ide);
   }
 
   protected String getCheckName()
   {
-    return "Plant Completeness";
+    return "SD Controllability iii.1";
   }
 
   protected String getFailureDescription()
   {
-    return "does not satisfy Plant Completeness";
+    return "does not satisfy SD Controllability Point iii.1  ";
   }
 
   protected ModelVerifier createModelVerifier
     (final ModelAnalyzerFactory factory,
      final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {  final ControllabilityChecker checker=
-  factory.createControllabilityChecker(desFactory);
+  {
+    final LanguageInclusionChecker Checker =
+        factory.createLanguageInclusionChecker(desFactory);
 
-     return new SDPlantCompletenessChecker(desFactory,checker);
+
+        final SDThreeOneVerifier verifier =
+        new SDThreeOneVerifier(Checker,null, desFactory);
+    return verifier;
   }
 
   protected String getSuccessDescription()
   {
-    return "satisfies Plant Completeness";
+    return "satisfies SD Controllability Point iii.1";
   }
 
   private static final long serialVersionUID = -1008097797553564719L;

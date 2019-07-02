@@ -33,42 +33,63 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.gui.actions.WatersAnalyzeAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
 
-public class AnalyzeControlLoopAction extends WatersAnalyzeAction
+/**
+ * The action to invoke the controllability check through the editor's
+ * Verify menu.
+ *
+ * @author Robi Malik
+ */
+
+public class VerifyControllabilityAction extends WatersAnalyzeAction
 {
-  protected AnalyzeControlLoopAction(final IDE ide)
+
+  //#########################################################################
+  //# Constructors
+  protected VerifyControllabilityAction(final IDE ide)
   {
     super(ide);
   }
 
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
+  @Override
   protected String getCheckName()
   {
-    return "Control Loop";
+    return "Controllability";
   }
 
+  @Override
   protected String getFailureDescription()
   {
-    return "has a control loop";
+    return "is not controllable";
   }
 
+  @Override
   protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+                                           final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
   {
-    return factory.createControlLoopChecker(desFactory);
+    return factory.createControllabilityChecker(desFactory);
   }
 
+  @Override
   protected String getSuccessDescription()
   {
-    return "is control-loop free";
+    return "is controllable";
   }
 
-  private static final long serialVersionUID = 2167516363996006935L;
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -1008097797553564719L;
+
 }

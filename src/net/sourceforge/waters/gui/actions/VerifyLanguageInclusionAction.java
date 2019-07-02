@@ -64,17 +64,17 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AnalyzeLanguageInclusionAction extends WatersAnalyzeAction
+public class VerifyLanguageInclusionAction extends WatersAnalyzeAction
                                             implements ModelObserver
 {
   //#########################################################################
   //# Constructors
-  public AnalyzeLanguageInclusionAction(final IDE ide)
+  public VerifyLanguageInclusionAction(final IDE ide)
   {
     this(ide, null);
   }
 
-  public AnalyzeLanguageInclusionAction(final IDE ide, final NamedProxy aut)
+  public VerifyLanguageInclusionAction(final IDE ide, final NamedProxy aut)
   {
     super(ide);
     mNamedProxy = aut;

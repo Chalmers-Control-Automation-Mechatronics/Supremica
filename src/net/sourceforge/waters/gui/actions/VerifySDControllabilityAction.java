@@ -33,71 +33,44 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.analysis.hisc.SICProperty5Verifier;
+import net.sourceforge.waters.analysis.sd.SDControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
-
-/**
- * The action to check Serial Interface Consistency Property V (SIC&nbsp;V) of
- * a HISC module.
- *
- * @author Robi Malik
- */
-
-public class AnalyzeSICProperty5Action
-  extends WatersAnalyzeHISCAction
+public class VerifySDControllabilityAction extends WatersAnalyzeAction
 {
-
-  //#########################################################################
-  //# Constructor
-  protected AnalyzeSICProperty5Action(final IDE ide)
+  protected VerifySDControllabilityAction(final IDE ide)
   {
     super(ide);
   }
 
-
-  //#########################################################################
-  //# Overrides for base class
-  //# net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
   protected String getCheckName()
   {
-    return "SIC Property V";
+    return "SD Controllability i";
   }
 
-  @Override
   protected String getFailureDescription()
   {
-    return "does not satisfy SIC Property V";
+    return "is not controllable";
   }
 
-  @Override
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
+  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
+                                           final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
   {
-    final ConflictChecker conflictChecker =
-        factory.createConflictChecker(desFactory);
-    final SICProperty5Verifier verifier =
-        new SICProperty5Verifier(conflictChecker, null, desFactory);
-    return verifier;
+    final ControllabilityChecker checker=
+      factory.createControllabilityChecker(desFactory);
+    return new SDControllabilityChecker(desFactory,checker);
   }
 
-  @Override
   protected String getSuccessDescription()
   {
-    return "satisfies SIC Property V";
+    return "is Controllable";
   }
 
-
-  //#########################################################################
-  //# Class Constants
   private static final long serialVersionUID = -1008097797553564719L;
-
 }

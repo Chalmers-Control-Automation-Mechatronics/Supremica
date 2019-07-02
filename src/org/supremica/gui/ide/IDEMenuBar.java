@@ -51,26 +51,26 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sourceforge.waters.gui.actions.AnalyzeConflictCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzeControlLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeControllabilityCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzeDeadlockCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzeDiagnosabilityCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzeHISCCPControllabilityAction;
-import net.sourceforge.waters.gui.actions.AnalyzeHISCCPInterfaceConsistencyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeLanguageInclusionAction;
-import net.sourceforge.waters.gui.actions.AnalyzeNerodeEquivalentAction;
-import net.sourceforge.waters.gui.actions.AnalyzeProperTimeBehaviorPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCThree_one_propertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDControllabilityAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSDSingularPropertyAction;
-import net.sourceforge.waters.gui.actions.AnalyzeSICProperty5Action;
-import net.sourceforge.waters.gui.actions.AnalyzeSICProperty6Action;
+import net.sourceforge.waters.gui.actions.VerifyConflictCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
+import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifyDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyHISCCPControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifyHISCCPInterfaceConsistencyAction;
+import net.sourceforge.waters.gui.actions.VerifyLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.VerifyNerodeEquivalenceAction;
+import net.sourceforge.waters.gui.actions.VerifyProperTimeBehaviorAction;
+import net.sourceforge.waters.gui.actions.VerifySDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.VerifySDCFourPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCTwoBPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifySDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.VerifySDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySICProperty5Action;
+import net.sourceforge.waters.gui.actions.VerifySICProperty6Action;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
@@ -340,78 +340,78 @@ public class IDEMenuBar
     final JMenu menu = new JMenu("Verify");
     menu.setMnemonic(KeyEvent.VK_R);
     final Action controllability =
-      actions.getAction(AnalyzeControllabilityCheckAction.class);
+      actions.getAction(VerifyControllabilityAction.class);
     menu.add(controllability);
     final Action conflict =
-      actions.getAction(AnalyzeConflictCheckAction.class);
+      actions.getAction(VerifyConflictCheckAction.class);
     menu.add(conflict);
     final Action deadlock =
-      actions.getAction(AnalyzeDeadlockCheckAction.class);
+      actions.getAction(VerifyDeadlockCheckAction.class);
     menu.add(deadlock);
     final Action controlLoop =
-        actions.getAction(AnalyzeControlLoopAction.class);
+        actions.getAction(VerifyControlLoopAction.class);
     menu.add(controlLoop);
     final Action languageInclusion =
-        actions.getAction(AnalyzeLanguageInclusionAction.class);
+        actions.getAction(VerifyLanguageInclusionAction.class);
     menu.add(languageInclusion);
     addProperty(Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY);
     if (Config.GUI_ANALYZER_INCLUDE_DIAGNOSABILIY.isTrue()) {
       final Action diagnosability =
-        actions.getAction(AnalyzeDiagnosabilityCheckAction.class);
+        actions.getAction(VerifyDiagnosabilityCheckAction.class);
       menu.add(diagnosability);
     }
     addProperty(Config.GUI_ANALYZER_INCLUDE_HISC);
     if (Config.GUI_ANALYZER_INCLUDE_HISC.isTrue()) {
       menu.addSeparator();
       final Action sic5 =
-        actions.getAction(AnalyzeSICProperty5Action.class);
+        actions.getAction(VerifySICProperty5Action.class);
       menu.add(sic5);
       final Action sic6 =
-        actions.getAction(AnalyzeSICProperty6Action.class);
+        actions.getAction(VerifySICProperty6Action.class);
       menu.add(sic6);
       try {
         final Action hiscCp =
-          actions.getAction(AnalyzeHISCCPInterfaceConsistencyAction.class);
+          actions.getAction(VerifyHISCCPInterfaceConsistencyAction.class);
         menu.add(hiscCp);
       } catch (final NoClassDefFoundError error) {
         // skip this if it can't be loaded
       }
       final Action hiscCpCont =
-        actions.getAction(AnalyzeHISCCPControllabilityAction.class);
+        actions.getAction(VerifyHISCCPControllabilityAction.class);
       menu.add(hiscCpCont);
     }
     addProperty(Config.GUI_ANALYZER_INCLUDE_SD);
     if (Config.GUI_ANALYZER_INCLUDE_SD.isTrue()) {
       menu.addSeparator();
       final Action plantComplete =
-        actions.getAction(AnalyzeSDPlantCompletenessAction.class);
+        actions.getAction(VerifySDPlantCompletenessAction.class);
       menu.add(plantComplete);
       final Action activityLoop =
-        actions.getAction(AnalyzeSDActivityLoopAction.class);
+        actions.getAction(VerifySDActivityLoopAction.class);
       menu.add(activityLoop);
       final Action sSingular =
-        actions.getAction(AnalyzeSDSingularPropertyAction.class);
+        actions.getAction(VerifySDSingularPropertyAction.class);
       menu.add(sSingular);
       final Action ad1 =
-        actions.getAction(AnalyzeSDControllabilityAction.class);
+        actions.getAction(VerifySDControllabilityAction.class);
       menu.add(ad1);
       final Action sd2a =
-        actions.getAction(AnalyzeSDCTwoApropertyAction.class);
+        actions.getAction(VerifySDCTwoApropertyAction.class);
       menu.add(sd2a);
       final Action sd2b =
-        actions.getAction(AnalyzeSDCTwoBPropertyAction.class);
+        actions.getAction(VerifySDCTwoBPropertyAction.class);
       menu.add(sd2b);
       final Action sd31 =
-        actions.getAction(AnalyzeSDCThree_one_propertyAction.class);
+        actions.getAction(VerifySDCThree_one_propertyAction.class);
       menu.add(sd31);
       final Action sd32 =
-        actions.getAction(AnalyzeNerodeEquivalentAction.class);
+        actions.getAction(VerifyNerodeEquivalenceAction.class);
       menu.add(sd32);
       final Action sd4 =
-        actions.getAction(AnalyzeSDCFourPropertyAction.class);
+        actions.getAction(VerifySDCFourPropertyAction.class);
       menu.add(sd4);
       final Action properTimeBehavior =
-        actions.getAction(AnalyzeProperTimeBehaviorPropertyAction.class);
+        actions.getAction(VerifyProperTimeBehaviorAction.class);
       menu.add(properTimeBehavior);
     }
     add(menu);
