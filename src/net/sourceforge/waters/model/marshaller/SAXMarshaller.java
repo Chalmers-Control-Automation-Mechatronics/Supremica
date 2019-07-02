@@ -34,7 +34,6 @@
 package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -44,7 +43,6 @@ import java.util.Collections;
 
 import javax.swing.filechooser.FileFilter;
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -127,11 +125,19 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
     mImporter.setImportingGeometry(importing);
   }
 
+  /**
+   * Returns whether line breaks are written into XML file when marshalling.
+   * @see #setInsertingLineBreaks(boolean)
+   */
   public boolean isInsertingLineBreaks()
   {
     return mWriter.isInsertingLineBreaks();
   }
 
+  /**
+   * Sets whether line breaks are written into XML file when marshalling.
+   * If set, every element written to an XML file will start on a new line.
+   */
   public void setInsertingLineBreaks(final boolean inserting)
   {
     mWriter.setInsertingLineBreaks(inserting);
@@ -142,7 +148,7 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   //# Interfaces net.sourceforge.waters.model.marshaller.ProxyMarshaller
   //# and net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
   /**
-   * Load a document from a file.
+   * Loads a document from a file.
    * @param  uri      A URI specifying the location of the document
    *                  to be retrieved.
    * @return The loaded document.
@@ -170,11 +176,12 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
       if (stream != null) {
         stream.close();
       }
+      mImporter.reset();
     }
   }
 
   /**
-   * Write a document to a file.
+   * Writes a document to a file.
    * @param  filename The name of the file to be written.
    * @param  doc      The document to be written.
    * @throws WatersMarshalException to indicate a failure while writing the
@@ -193,16 +200,16 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
     }
   }
 
+  // TODO Remove document manager
   @Override
   public DocumentManager getDocumentManager()
   {
-    return mImporter.getDocumentManager();
+    return null;
   }
 
   @Override
   public void setDocumentManager(final DocumentManager manager)
   {
-    mImporter.setDocumentManager(manager);
   }
 
   @Override
@@ -230,23 +237,25 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
 
   //#########################################################################
   //# Specific Access
-  public void copyXMLFile(final File infilename, final File outfilename)
-    throws FileNotFoundException, JAXBException
+  /*
+  public void copyXMLFile(final File inFile, final File outFile)
+    throws WatersUnmarshalException, IOException,
+           WatersMarshalException, XMLStreamException
   {
-    /*
-    PrintWriter writer = null;
-    try {
-      final Object doc = mJAXBUnmarshaller.unmarshal(infilename);
-      final FileOutputStream stream = new FileOutputStream(outfilename);
-      writer = new PrintWriter(stream);
-      mJAXBMarshaller.marshal(doc, writer);
-    } finally {
-      if (writer != null) {
-        writer.close();
-      }
-    }
-    */
+    final URI uri = inFile.toURI();
+    final D doc = unmarshal(uri);
+    mWriter.marshal(doc, outFile);
   }
+  */
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  SAXDocumentImporter<D> getImporter()
+  {
+    return mImporter;
+  }
+
 
 
   //#########################################################################

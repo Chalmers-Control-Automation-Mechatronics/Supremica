@@ -152,6 +152,7 @@ public class SAXProductDESImporter
     //# Overrides for AbstractContentHandler<AutomatonProxyHandler>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaDES.ATTRIB_Kind)) {
         mKind = Enum.valueOf(ComponentKind.class, value);
@@ -239,6 +240,7 @@ public class SAXProductDESImporter
     //# Overrides for AbstractContentHandler<EventProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaDES.ATTRIB_Kind)) {
         mKind = Enum.valueOf(EventKind.class, value);
@@ -451,6 +453,7 @@ public class SAXProductDESImporter
     //# Overrides for AbstractContentHandler<StateProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaDES.ATTRIB_Initial)) {
         mInitial = Boolean.parseBoolean(value);

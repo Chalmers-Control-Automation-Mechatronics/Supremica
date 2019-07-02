@@ -565,6 +565,7 @@ public class SAXModuleImporter
     //# Overrides for AbstractContentHandler<ConstantAliasProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ATTRIB_Scope)) {
         mScope = Enum.valueOf(ScopeKind.class, value);
@@ -772,6 +773,7 @@ public class SAXModuleImporter
     //# Overrides for AbstractContentHandler<EventDeclProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ATTRIB_Kind)) {
         mKind = Enum.valueOf(EventKind.class, value);
@@ -1365,6 +1367,7 @@ public class SAXModuleImporter
     //# Overrides for AbstractContentHandler<InstanceProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ATTRIB_ModuleName)) {
         mModuleName = value;
@@ -1926,6 +1929,7 @@ public class SAXModuleImporter
     //# Overrides for AbstractContentHandler<SimpleComponentProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ATTRIB_Kind)) {
         mKind = Enum.valueOf(ComponentKind.class, value);
@@ -2053,6 +2057,7 @@ public class SAXModuleImporter
     //# Overrides for AbstractContentHandler<SimpleNodeProxy>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaModule.ATTRIB_Initial)) {
         mInitial = Boolean.parseBoolean(value);

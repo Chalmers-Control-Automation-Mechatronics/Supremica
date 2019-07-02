@@ -33,53 +33,77 @@
 
 package net.sourceforge.waters.model.marshaller;
 
-import javax.xml.bind.JAXBException;
+import java.io.IOException;
+import java.net.URI;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.des.CounterExampleType;
 
 import org.xml.sax.SAXException;
 
 
-public class JAXBCounterExampleMarshaller
-  extends JAXBMarshaller<CounterExampleProxy,CounterExampleType>
+/**
+ * <P>A helper class to read and write Waters Counterexample (<CODE>.wtra</CODE>)
+ * files.</P>
+ *
+ * @see DocumentManager
+ * @author Robi Malik
+ */
+
+public class SAXCounterExampleMarshaller
+  extends SAXMarshaller<CounterExampleProxy>
 {
 
   //#########################################################################
   //# Constructors
-  public JAXBCounterExampleMarshaller(final ProductDESProxyFactory factory)
-    throws JAXBException, SAXException
-  {
-    super(new JAXBCounterExampleExporter(),
-          new JAXBCounterExampleImporter(factory),
-          "net.sourceforge.waters.xsd.des",
-          "waters-des.xsd");
-  }
-
-
-  //#########################################################################
-  //# Configuration
   /**
-   * Sets the product DES corresponding to a counterexample to be unmarshalled.
-   * If non-<CODE>null</CODE> the name of the product DES in the
-   * <CODE>.wtra</CODE> file must match the name of the given product DES,
-   * so the counterexample automata and events can be taken from the given
-   * product DES. If <CODE>null</CODE>, the product DES will be obtained using
-   * the document manager, and an appropriate <CODE>.wdes</CODE> file must
-   * exist.
+   * Creates a new counterexample marshaller.
+   * @param  factory   The factory to be used to create the objects when
+   *                   loading a module from an XML file.
    */
-  public void setProductDES(final ProductDESProxy des)
+  public SAXCounterExampleMarshaller(final ProductDESProxyFactory factory)
+    throws SAXException, ParserConfigurationException
   {
-    final JAXBCounterExampleImporter importer =
-      (JAXBCounterExampleImporter) getImporter();
-    importer.setProductDES(des);
+    super("waters-des.xsd",
+          new SAXCounterExampleImporter(factory),
+          new StAXProductDESWriter());
   }
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBMarshaller
+  //# Specific Methods
+  /**
+   * Loads a counterexample from a file.
+   * @param  uri      A URI specifying the location of the counterexample
+   *                  to be retrieved.
+   * @param  des      The product DES containing the automata and events
+   *                  referenced in the file.
+   * @return The loaded counterexample.
+   * @throws WatersUnmarshalException to indicate that reading the XML file
+   *                  has failed for some reason.
+   */
+  public CounterExampleProxy unmarshal(final URI uri,
+                                       final ProductDESProxy des)
+    throws WatersUnmarshalException, IOException
+  {
+    final SAXCounterExampleImporter importer =
+      (SAXCounterExampleImporter) getImporter();
+    try {
+      importer.setProductDES(des);
+      return unmarshal(uri);
+    } finally {
+      importer.setProductDES(null);
+    }
+  }
+
+
+  //#########################################################################
+  //# Interfaces
+  //# net.sourceforge.waters.model.marshaller.ProxyMarshaller<CounterExampleProxy>
+  //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<CounterExampleProxy>
   @Override
   public String getDefaultExtension()
   {
@@ -92,16 +116,14 @@ public class JAXBCounterExampleMarshaller
     return CounterExampleProxy.class;
   }
 
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.marshaller.SAXMarshaller<CounterExampleProxy>
   @Override
   public String getDescription()
   {
-      return "Waters Trace files [*.wtra]";
-  }
-
-  @Override
-  public Class<CounterExampleType> getElementClass()
-  {
-    return CounterExampleType.class;
+      return "Waters trace files [*.wtra]";
   }
 
 }

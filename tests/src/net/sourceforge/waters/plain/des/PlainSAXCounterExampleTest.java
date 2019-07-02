@@ -31,77 +31,36 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
+package net.sourceforge.waters.plain.des;
 
-import javax.xml.bind.JAXBException;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.des.CounterExampleProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.AbstractXMLCounterExampleTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.des.CounterExampleType;
-
-import org.xml.sax.SAXException;
 
 
-public class JAXBCounterExampleMarshaller
-  extends JAXBMarshaller<CounterExampleProxy,CounterExampleType>
+public class PlainSAXCounterExampleTest extends AbstractXMLCounterExampleTest
 {
 
   //#########################################################################
-  //# Constructors
-  public JAXBCounterExampleMarshaller(final ProductDESProxyFactory factory)
-    throws JAXBException, SAXException
-  {
-    super(new JAXBCounterExampleExporter(),
-          new JAXBCounterExampleImporter(factory),
-          "net.sourceforge.waters.xsd.des",
-          "waters-des.xsd");
+  //# Overrides for junit.framework.TestCase
+  public static Test suite() {
+    return new TestSuite(PlainSAXCounterExampleTest.class);
+  }
+
+  public static void main(final String args[]) {
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Configuration
-  /**
-   * Sets the product DES corresponding to a counterexample to be unmarshalled.
-   * If non-<CODE>null</CODE> the name of the product DES in the
-   * <CODE>.wtra</CODE> file must match the name of the given product DES,
-   * so the counterexample automata and events can be taken from the given
-   * product DES. If <CODE>null</CODE>, the product DES will be obtained using
-   * the document manager, and an appropriate <CODE>.wdes</CODE> file must
-   * exist.
-   */
-  public void setProductDES(final ProductDESProxy des)
-  {
-    final JAXBCounterExampleImporter importer =
-      (JAXBCounterExampleImporter) getImporter();
-    importer.setProductDES(des);
-  }
-
-
-  //#########################################################################
-  //# Overrides for Abstract Base Class JAXBMarshaller
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.des.AbstractCounterExampleTest
   @Override
-  public String getDefaultExtension()
+  protected ProductDESProxyFactory getProductDESProxyFactory()
   {
-    return ".wtra";
-  }
-
-  @Override
-  public Class<CounterExampleProxy> getDocumentClass()
-  {
-    return CounterExampleProxy.class;
-  }
-
-  @Override
-  public String getDescription()
-  {
-      return "Waters Trace files [*.wtra]";
-  }
-
-  @Override
-  public Class<CounterExampleType> getElementClass()
-  {
-    return CounterExampleType.class;
+    return ProductDESElementFactory.getInstance();
   }
 
 }

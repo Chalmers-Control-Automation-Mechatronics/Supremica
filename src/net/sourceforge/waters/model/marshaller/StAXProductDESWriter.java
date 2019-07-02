@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.marshaller;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.waters.model.base.NamedProxy;
@@ -98,6 +99,7 @@ public class StAXProductDESWriter
     throws VisitorException
   {
     writeAttribute(SchemaDES.ATTRIB_ProductDES, cex.getProductDES().getName());
+    writeDefaultNamespace(SchemaDES.NAMESPACE);
     visitDocumentProxy(cex);
     writeAutomatonRefList(cex.getAutomata());
     writeOptionalList(NAMESPACE, SchemaDES.ELEMENT_TraceList, cex.getTraces());
@@ -188,8 +190,10 @@ public class StAXProductDESWriter
     writeAttribute(SchemaDES.ATTRIB_LoopIndex,
                    trace.getLoopIndex(), SchemaDES.DEFAULT_LoopIndex);
     visitProxy(trace);
-    writeOptionalList(NAMESPACE, SchemaDES.ELEMENT_TraceStepList,
-                      trace.getTraceSteps());
+    if (!isEmptyTrace(trace)) {
+      writeOptionalList(NAMESPACE, SchemaDES.ELEMENT_TraceStepList,
+                        trace.getTraceSteps());
+    }
     writeEndElement();
     return null;
   }
@@ -203,7 +207,7 @@ public class StAXProductDESWriter
       writeRef(SchemaDES.ELEMENT_EventRef, event);
     }
     final Map<AutomatonProxy,StateProxy> map = step.getStateMap();
-    if (map != null && !map.isEmpty()) {
+    if (!map.isEmpty()) {
       if (event == null) {
         writeStartElement(NAMESPACE, SchemaDES.ELEMENT_FirstTraceStateTuple);
       } else {
@@ -273,6 +277,17 @@ public class StAXProductDESWriter
     writeEmptyElement(NAMESPACE, key);
     writeAttribute(SchemaBase.ATTRIB_Name, item.getName());
     writeEndElement();
+  }
+
+  private boolean isEmptyTrace(final TraceProxy trace)
+  {
+    final List<TraceStepProxy> steps = trace.getTraceSteps();
+    if (steps.size() > 1) {
+      return false;
+    } else {
+      final TraceStepProxy step = steps.get(0);
+      return step.getStateMap().isEmpty();
+    }
   }
 
 

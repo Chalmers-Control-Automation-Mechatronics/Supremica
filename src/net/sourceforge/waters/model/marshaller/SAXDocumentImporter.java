@@ -73,19 +73,13 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
   //# Hooks
   abstract Class<D> getDocumentClass();
 
+  void reset()
+  {
+  }
+
 
   //#########################################################################
   //# Configuration
-  public DocumentManager getDocumentManager()
-  {
-    return mDocumentManager;
-  }
-
-  public void setDocumentManager(final DocumentManager manager)
-  {
-    mDocumentManager = manager;
-  }
-
   boolean isImportingGeometry()
   {
     return mImportingGeometry;
@@ -846,6 +840,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     //# Overrides for AbstractContentHandler<?>
     @Override
     void setAttribute(final String localName, final String value)
+      throws SAXParseException
     {
       if (localName.equals(SchemaBase.ATTRIB_Name)) {
         mName = value;
@@ -918,7 +913,6 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
   //# Data Members
   private final Map<String,SAXHandlerCreator<?>> mHandlerMap;
 
-  private DocumentManager mDocumentManager;
   private boolean mImportingGeometry = true;
   private URI mURI = null;
   private Locator mLocator;

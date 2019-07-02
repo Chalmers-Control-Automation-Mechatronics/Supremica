@@ -62,7 +62,7 @@ public class SAXProductDESMarshaller
   //#########################################################################
   //# Constructors
   /**
-   * Creates a new module marshaller.
+   * Creates a new product DES marshaller.
    * @param  factory   The factory to be used to create the objects when
    *                   loading a module from an XML file.
    */
@@ -98,7 +98,7 @@ public class SAXProductDESMarshaller
   @Override
   public String getDescription()
   {
-      return "Waters Product DES files [*.wmes]";
+      return "Waters Product DES files [*.wdes]";
   }
 
 }
