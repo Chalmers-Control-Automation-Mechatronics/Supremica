@@ -649,7 +649,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     list.add(new EventParameter
       (ParameterIDs.AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking,
        "Marking proposition",
-       "The proposition to identify marked states for the nonblocking property.")
+       "The proposition to identify marked states for the nonblocking property.", false)
       {
         @Override
         public void commitValue()

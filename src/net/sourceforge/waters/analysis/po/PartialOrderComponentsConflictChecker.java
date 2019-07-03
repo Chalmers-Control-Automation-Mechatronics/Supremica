@@ -172,7 +172,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     list.add(new EventParameter
              (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
               "ConfiguredDefaultMarking",
-              "The default (omega) marking to be used for conflict checks."){
+              "The default (omega) marking to be used for conflict checks.", false){
                @Override
                public void commitValue()
                {

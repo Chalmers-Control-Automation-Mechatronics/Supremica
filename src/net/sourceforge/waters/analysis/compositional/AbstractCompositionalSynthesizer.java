@@ -215,7 +215,7 @@ public abstract class AbstractCompositionalSynthesizer
       (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
        "Marking proposition",
        "If synthesising a nonblocking supervisor, it will be nonblocking " +
-       "with respect to this proposition.")
+       "with respect to this proposition.", false)
       {
         @Override
         public void commitValue()

@@ -16,10 +16,11 @@ import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventParameter extends Parameter
 {
-  public EventParameter(final int id, final String name, final String description)
+  public EventParameter(final int id, final String name, final String description, final boolean allowNull)
   {
     super(id, name, description);
     mValue = null;
+    allowNullEvent = allowNull;
   }
 
   @Override
@@ -32,7 +33,8 @@ public class EventParameter extends Parameter
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
     //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
-    propositions.add(noEvent);
+    if(allowNullEvent)
+      propositions.add(noEvent);
 
     for(final EventProxy event: model.getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
@@ -91,5 +93,6 @@ public class EventParameter extends Parameter
   //#########################################################################
   //# Data Members
   private EventProxy mValue;
+  private final boolean allowNullEvent;
 
 }
