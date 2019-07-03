@@ -65,7 +65,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -604,8 +604,8 @@ public class CompareLessConflicting
     final ModuleElementFactory mModuleFactory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     try {
-      final JAXBModuleMarshaller modmarshaller =
-        new JAXBModuleMarshaller(mModuleFactory, optable);
+      final SAXModuleMarshaller modmarshaller =
+        new SAXModuleMarshaller(mModuleFactory, optable);
       mDocumentManager.registerUnmarshaller(modmarshaller);
     } catch (final Exception e) {
       e.printStackTrace();

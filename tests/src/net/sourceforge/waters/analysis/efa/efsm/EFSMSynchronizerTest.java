@@ -42,7 +42,7 @@ import net.sourceforge.waters.junit.AbstractWatersTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -64,7 +64,7 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
     mFactory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller =
-      new JAXBModuleMarshaller(mFactory, optable, false);
+      new SAXModuleMarshaller(mFactory, optable, false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mModuleMarshaller);
@@ -327,7 +327,7 @@ public class EFSMSynchronizerTest extends AbstractWatersTest
   }
   //#########################################################################
   //# Data Members
-  private JAXBModuleMarshaller mModuleMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
   private ModuleProxyFactory mFactory;
   private EFSMSystemImporter mImporter;

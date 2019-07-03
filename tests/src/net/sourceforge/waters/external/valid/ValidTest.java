@@ -48,8 +48,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -304,8 +304,8 @@ public class ValidTest extends AbstractWatersTest
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final ValidUnmarshaller importer =
       new ValidUnmarshaller(moduleFactory, optable);
-    mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
-    mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
+    mModuleMarshaller = new SAXModuleMarshaller(moduleFactory, optable);
+    mProductDESMarshaller = new SAXProductDESMarshaller(mProductDESFactory);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
@@ -333,8 +333,8 @@ public class ValidTest extends AbstractWatersTest
   private File mInputDirectory;
   private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
   private DocumentManager mDocumentManager;
 
 }

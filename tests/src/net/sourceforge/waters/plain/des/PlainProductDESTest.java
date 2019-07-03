@@ -49,14 +49,15 @@ public class PlainProductDESTest extends AbstractProductDESTest
     return new TestSuite(PlainProductDESTest.class);
   }
 
-  public static void main(String args[]) {
+  public static void main(final String args[]) {
     junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
   //# Overrides for Abstract Base Class
-  //# net.sourceforge.waters.model.des.ProductDESTest
+  //# net.sourceforge.waters.model.des.AbstractProductDESTest
+  @Override
   protected ProductDESProxyFactory getProductDESProxyFactory()
   {
     return ProductDESElementFactory.getInstance();

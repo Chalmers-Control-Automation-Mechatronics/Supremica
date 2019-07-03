@@ -33,23 +33,18 @@
 
 package net.sourceforge.waters.model.des;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.AbstractXMLTest;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
-import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 public abstract class AbstractProductDESTest
-  extends AbstractJAXBTest<ProductDESProxy>
+  extends AbstractXMLTest<ProductDESProxy>
 {
 
   //#########################################################################
@@ -60,54 +55,98 @@ public abstract class AbstractProductDESTest
     testParse("handwritten", "small_factory_2");
   }
 
+  public void testParse_blocked_event_opt()
+    throws Exception
+  {
+    testParse("tests", "compiler", "efsm", "blocked_event-opt");
+  }
+
+
   public void testJar_small_factory_2()
     throws Exception
   {
     testParse("handwritten", "small_factory_2");
   }
 
+
   public void testMarshal_small_factory_2()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
     testMarshal("handwritten", "small_factory_2");
   }
 
+  public void testMarshal_blocked_event_opt()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "efsm", "blocked_event-opt");
+  }
+
   public void testMarshal_koordwsp()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
     testMarshal("valid", "central_locking", "koordwsp");
   }
 
+
   public void testSerialize_small_factory_2()
-    throws WatersUnmarshalException, IOException, ClassNotFoundException
+    throws Exception
   {
     testSerialize("handwritten", "small_factory_2");
   }
 
+  public void testSerialize_blocked_event_opt()
+    throws Exception
+  {
+    testSerialize("tests", "compiler", "efsm", "blocked_event-opt");
+  }
+
   public void testSerialize_koordwsp()
-    throws WatersUnmarshalException, IOException, ClassNotFoundException
+    throws Exception
   {
     testSerialize("valid", "central_locking", "koordwsp");
   }
 
 
+  public void testClone_small_factory_2()
+    throws Exception
+  {
+    testClone("handwritten", "small_factory_2");
+  }
+
+  public void testClone_blocked_event_opt()
+    throws Exception
+  {
+    testClone("tests", "compiler", "efsm", "blocked_event-opt");
+  }
+
+  public void testClone_koordwsp()
+    throws Exception
+  {
+    testClone("valid", "central_locking", "koordwsp");
+  }
+
+
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBTestCase
+  //# Overrides for Abstract Base Class AbstractXMLTest<ProductDESProxy>
+  @Override
   protected ProxyMarshaller<ProductDESProxy> getProxyMarshaller()
   {
     return mMarshaller;
   }
 
+  @Override
   protected ProxyUnmarshaller<ProductDESProxy> getProxyUnmarshaller()
   {
     return mMarshaller;
   }
 
+  @Override
   protected ProxyPrinter getPrinter()
   {
     return mPrinter;
   }
 
+  @Override
   protected ProductDESIntegrityChecker getIntegrityChecker()
   {
     return ProductDESIntegrityChecker.getInstance();
@@ -116,16 +155,18 @@ public abstract class AbstractProductDESTest
 
   //#########################################################################
   //# Overrides for junit.framework.TestCase
+  @Override
   protected void setUp()
     throws Exception
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mMarshaller = new JAXBProductDESMarshaller(factory);
+    mMarshaller = new SAXProductDESMarshaller(factory);
     final PrintWriter writer = new PrintWriter(System.out);
     mPrinter = new ProductDESProxyPrinter(writer);
   }
 
+  @Override
   protected void tearDown()
     throws Exception
   {
@@ -142,7 +183,7 @@ public abstract class AbstractProductDESTest
 
   //#########################################################################
   //# Data Members
-  private JAXBProductDESMarshaller mMarshaller;
+  private SAXProductDESMarshaller mMarshaller;
   private ProxyPrinter mPrinter;
 
 }

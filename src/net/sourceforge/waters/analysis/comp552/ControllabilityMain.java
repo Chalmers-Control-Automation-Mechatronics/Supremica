@@ -43,8 +43,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -109,10 +109,10 @@ public class ControllabilityMain
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final JAXBModuleMarshaller moduleMarshaller =
-        new JAXBModuleMarshaller(moduleFactory, optable);
-      final JAXBProductDESMarshaller desMarshaller =
-        new JAXBProductDESMarshaller(desFactory);
+      final SAXModuleMarshaller moduleMarshaller =
+        new SAXModuleMarshaller(moduleFactory, optable);
+      final SAXProductDESMarshaller desMarshaller =
+        new SAXProductDESMarshaller(desFactory);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);

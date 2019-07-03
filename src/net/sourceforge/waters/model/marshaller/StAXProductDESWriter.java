@@ -216,7 +216,10 @@ public class StAXProductDESWriter
       for (final Map.Entry<AutomatonProxy,StateProxy> entry : map.entrySet()) {
         writeEmptyElement(NAMESPACE, SchemaDES.ELEMENT_TraceState);
         writeAttribute(SchemaDES.ATTRIB_Automaton, entry.getKey().getName());
-        writeAttribute(SchemaDES.ATTRIB_State, entry.getValue().getName());
+        final StateProxy state = entry.getValue();
+        if (state != null) {
+          writeAttribute(SchemaDES.ATTRIB_State, entry.getValue().getName());
+        }
         writeEndElement();
       }
       writeEndElement();

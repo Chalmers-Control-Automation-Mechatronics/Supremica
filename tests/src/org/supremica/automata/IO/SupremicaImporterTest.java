@@ -21,10 +21,10 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleIntegrityChecker;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -154,9 +154,9 @@ public class SupremicaImporterTest
     mProductDESProxyFactory = ProductDESElementFactory.getInstance();
     final ModuleProxyFactory modfactory = ModuleSubjectFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(modfactory, optable);
+    mModuleMarshaller = new SAXModuleMarshaller(modfactory, optable);
     mProductDESMarshaller =
-      new JAXBProductDESMarshaller(mProductDESProxyFactory);
+      new SAXProductDESMarshaller(mProductDESProxyFactory);
     mSupremicaUnmarshaller = new SupremicaUnmarshaller(modfactory);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
@@ -237,8 +237,8 @@ public class SupremicaImporterTest
   //# Data Members
   private ProductDESProxyFactory mProductDESProxyFactory;
   private DocumentManager mDocumentManager;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
   private ProxyUnmarshaller<Project> mSupremicaUnmarshaller;
   private ProductDESImporter mImporter;
   private ModuleIntegrityChecker mIntegrityChecker;

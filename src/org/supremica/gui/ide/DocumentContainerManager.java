@@ -52,7 +52,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.external.despot.DESpotImporter;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
@@ -63,23 +63,20 @@ import net.sourceforge.waters.gui.observer.PendingSaveEvent;
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.CopyingProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProductDESToModuleUnmarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.samples.maze.MazeCompiler;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
@@ -104,7 +101,7 @@ public class DocumentContainerManager
   //#########################################################################
   //# Constructor
   DocumentContainerManager(final IDE ide)
-      throws JAXBException, SAXException
+      throws SAXException, ParserConfigurationException
   {
     mIDE = ide;
     mAllContainers = new HashSet<DocumentContainer>();
@@ -116,8 +113,8 @@ public class DocumentContainerManager
     mDocumentManager = new DocumentManager();
     final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
     final OperatorTable opTable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller moduleMarshaller =
-      new JAXBModuleMarshaller(factory, opTable);
+    final SAXModuleMarshaller moduleMarshaller =
+      new SAXModuleMarshaller(factory, opTable);
     final ProxyUnmarshaller<Project> supremicaUnmarshaller =
       new SupremicaUnmarshaller(factory);
     final ProxyMarshaller<Project> supremicaMarshaller =
@@ -128,26 +125,17 @@ public class DocumentContainerManager
       new HISCUnmarshaller(factory);
     final ProxyUnmarshaller<ModuleProxy> umdesUnmarshaller =
       new UMDESUnmarshaller(factory);
-    // final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
-    //  new ADSUnmarshaller(factory);
-    /**
-     * ADSUnmarshaller is replaced by ADSUnmarshaller2 since the
-     * former does not work!!! /Mohammad~Reza
-     */
+    /* ADSUnmarshaller is replaced by ADSUnmarshaller2 since the
+     * former does not work!!! /Mohammad~Reza */
     final ProxyUnmarshaller<ModuleProxy> adsUnmarshaller =
       new ADSUnmarshaller2(factory);
     final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
       new ValidUnmarshaller(factory, opTable);
     final ProxyUnmarshaller<ModuleProxy> tctUnmarshaller =
       new TCTUnmarshaller(factory);
-    final ProductDESProxyFactory desfactory =
-      ProductDESElementFactory.getInstance();
-    final JAXBCounterExampleMarshaller traceMarshaller =
-      new JAXBCounterExampleMarshaller(desfactory);
     // Add marshallers in order of importance ...
     mDocumentManager.registerMarshaller(moduleMarshaller);
     mDocumentManager.registerMarshaller(supremicaMarshaller);
-    mDocumentManager.registerMarshaller(traceMarshaller);
     // Add unmarshallers in order of importance ...
     // (shows up in the file-open dialog)
     mDocumentManager.registerUnmarshaller(moduleMarshaller);

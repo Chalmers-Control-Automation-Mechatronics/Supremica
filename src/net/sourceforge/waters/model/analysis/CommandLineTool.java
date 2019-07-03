@@ -69,8 +69,8 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -194,10 +194,10 @@ public class CommandLineTool
       final ClassLoader loader = CommandLineTool.class.getClassLoader();
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
-      final JAXBModuleMarshaller moduleMarshaller =
-        new JAXBModuleMarshaller(moduleFactory, optable, false);
-      final JAXBProductDESMarshaller desMarshaller =
-        new JAXBProductDESMarshaller(desFactory);
+      final SAXModuleMarshaller moduleMarshaller =
+        new SAXModuleMarshaller(moduleFactory, optable, false);
+      final SAXProductDESMarshaller desMarshaller =
+        new SAXProductDESMarshaller(desFactory);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(desMarshaller);
       docManager.registerUnmarshaller(moduleMarshaller);

@@ -38,18 +38,42 @@ import java.net.URI;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.StateProxy;
 
 import org.xml.sax.SAXException;
 
 
 /**
- * <P>A helper class to read and write Waters Counterexample (<CODE>.wtra</CODE>)
- * files.</P>
+ * <P>A helper class to read and write Waters Counterexample
+ * (<CODE>.wtra</CODE>) files.</P>
  *
- * @see DocumentManager
+ * <P>Unlike other document types, counterexamples are only useful in the
+ * context of a {@link ProductDESProxy}. When reading a counterexample file,
+ * it is important to ensure that the {@link CounterExampleProxy} obtained
+ * used references the same {@link AutomatonProxy}, {@link EventProxy}, and
+ * {@link StateProxy} objects as the corresponding {@link ProductDESProxy}.</P>
+ *
+ * <P>As a result, unmarshalling of counterexamples works differently from
+ * the other types. Although nominally implementing the {@link
+ * ProxyUnmarshaller}&lt;{@link CounterExampleProxy}&gt; interface, this class
+ * cannot be registered as an unmarshaller of a {@link DocumentManager}. The
+ * best way to load a counterexample is to instantiate a
+ * SAXCounterExampleMarshaller with its {@link
+ * #SAXCounterExampleMarshaller(ProductDESProxyFactory) constructor} and call
+ * the method {@link #unmarshal(URI, ProductDESProxy)} with the correct
+ * {@link ProductDESProxy} as argument. The unmarshalling process maps the
+ * names on the XML file to the appropriate objects in the {@link
+ * ProductDESProxy} and throws {@link WatersUnmarshalException} if the names
+ * do not match.</P>
+ *
+ * <P>Marshalling of counterexamples to files works normally, so registration
+ * as a marshaller of a {@link DocumentManager} is possible.</P>
+ *
  * @author Robi Malik
  */
 
@@ -67,8 +91,7 @@ public class SAXCounterExampleMarshaller
   public SAXCounterExampleMarshaller(final ProductDESProxyFactory factory)
     throws SAXException, ParserConfigurationException
   {
-    super("waters-des.xsd",
-          new SAXCounterExampleImporter(factory),
+    super(new SAXCounterExampleImporter(factory),
           new StAXProductDESWriter());
   }
 
@@ -83,7 +106,10 @@ public class SAXCounterExampleMarshaller
    *                  referenced in the file.
    * @return The loaded counterexample.
    * @throws WatersUnmarshalException to indicate that reading the XML file
-   *                  has failed for some reason.
+   *                  has failed for some reason. This exception is also
+   *                  thrown if the counterexample file mentions the names
+   *                  of automata, events, or states that do not exist in
+   *                  the given product DES.
    */
   public CounterExampleProxy unmarshal(final URI uri,
                                        final ProductDESProxy des)

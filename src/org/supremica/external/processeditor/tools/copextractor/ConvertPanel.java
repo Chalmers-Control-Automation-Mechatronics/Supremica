@@ -24,15 +24,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingWorker;
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-import org.jdom.Document;
-import org.jdom.output.XMLOutputter;
 import org.supremica.external.avocades.COPBuilder;
 import org.supremica.external.processeditor.SOCFileFilter;
 import org.supremica.external.processeditor.SOCGraphContainer;
@@ -46,6 +44,9 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.manufacturingTables.xsd.eop.EOP;
 import org.supremica.manufacturingTables.xsd.il.IL;
 import org.supremica.manufacturingTables.xsd.processeditor.ROP;
+
+import org.jdom.Document;
+import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
 /**
@@ -210,11 +211,9 @@ public class ConvertPanel extends JPanel implements ActionListener,
     private void loadFiles(){
         Object o = null;
 
-        try{
+        try {
         	builder = new COPBuilder();
-        }catch(final JAXBException e){
-        	;
-        }catch(final SAXException e){
+        }catch (final SAXException | ParserConfigurationException exception) {
         	;
         }
 
@@ -280,8 +279,8 @@ public class ConvertPanel extends JPanel implements ActionListener,
         //Save module to file
         try
 		{
-			final JAXBModuleMarshaller marshaller =
-				new JAXBModuleMarshaller(factory,
+			final SAXModuleMarshaller marshaller =
+				new SAXModuleMarshaller(factory,
 						                 CompilerOperatorTable.getInstance());
 			marshaller.marshal(module, file);
 		}
@@ -318,8 +317,8 @@ public class ConvertPanel extends JPanel implements ActionListener,
         //Save module to file
         try
 		{
-			final JAXBModuleMarshaller marshaller =
-				new JAXBModuleMarshaller(factory,
+			final SAXModuleMarshaller marshaller =
+				new SAXModuleMarshaller(factory,
 						                 CompilerOperatorTable.getInstance());
 			marshaller.marshal(module, file);
 		}
@@ -382,7 +381,7 @@ public class ConvertPanel extends JPanel implements ActionListener,
 
         try
 		{
-			final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
+			final SAXModuleMarshaller marshaller = new SAXModuleMarshaller(factory, CompilerOperatorTable.getInstance());
 			marshaller.marshal(module, file);
 		}
 		catch (final Exception e)
@@ -463,7 +462,7 @@ public class ConvertPanel extends JPanel implements ActionListener,
 
         try
 		{
-			final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
+			final SAXModuleMarshaller marshaller = new SAXModuleMarshaller(factory, CompilerOperatorTable.getInstance());
 			marshaller.marshal(module, file);
 		}
 		catch (final Exception e)

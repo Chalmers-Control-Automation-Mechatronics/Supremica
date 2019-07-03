@@ -39,7 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -72,7 +72,7 @@ public class ControllabilityAssessor extends AbstractAssessor
   //#########################################################################
   //# Constructor
   private ControllabilityAssessor()
-    throws JAXBException, SAXException, IOException
+    throws SAXException, ParserConfigurationException, IOException
   {
   }
 

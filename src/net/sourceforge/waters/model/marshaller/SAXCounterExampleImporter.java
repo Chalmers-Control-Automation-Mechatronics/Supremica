@@ -41,6 +41,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -57,6 +59,7 @@ import net.sourceforge.waters.xsd.SchemaDES;
 import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
@@ -66,8 +69,9 @@ public class SAXCounterExampleImporter
   //#########################################################################
   //# Constructors
   public SAXCounterExampleImporter(final ProductDESProxyFactory factory)
+    throws SAXException, ParserConfigurationException
   {
-    super(SchemaDES.NUMBER_OF_ELEMENTS);
+    super("waters-des.xsd", SchemaDES.NUMBER_OF_ELEMENTS);
     mFactory = factory;
 
     registerHandler(SchemaDES.ELEMENT_ConflictCounterExample,
@@ -564,9 +568,76 @@ public class SAXCounterExampleImporter
 
 
   //#########################################################################
+  //# Inner Class TraceProxyHandler
+  private class TraceProxyHandler
+    extends AbstractContentHandler<TraceProxy>
+  {
+    //#######################################################################
+    //# Constructor
+    private TraceProxyHandler(final AbstractContentHandler<?> parent)
+    {
+      super(parent);
+    }
+
+    //#######################################################################
+    //# Overrides for AbstractContentHandler<TraceProxy>
+    @Override
+    void setAttribute(final String localName, final String value)
+      throws SAXParseException
+    {
+      if (localName.equals(SchemaDES.ATTRIB_Name)) {
+        mName = value;
+      } else if (localName.equals(SchemaDES.ATTRIB_LoopIndex)) {
+        mLoopIndex = Integer.parseInt(value);
+      } else {
+        super.setAttribute(localName, value);
+      }
+    }
+
+    @Override
+    public void startSubElement(final String localName,
+                                final Attributes atts)
+      throws SAXParseException
+    {
+      if (localName.equals(SchemaDES.ELEMENT_TraceStepList)) {
+        mTraceStepListHandler = new TraceStepListHandler(this);
+        pushHandler(mTraceStepListHandler);
+      } else {
+        super.startSubElement(localName, atts);
+      }
+    }
+
+    @Override
+    TraceProxy getResult() throws SAXParseException
+    {
+      final List<TraceStepProxy> steps;
+      if (mTraceStepListHandler == null) {
+        final TraceStepProxy step = mFactory.createTraceStepProxy(null);
+        steps = Collections.singletonList(step);
+      } else {
+        steps = mTraceStepListHandler.getResult();
+      }
+      return mFactory.createTraceProxy(mName, steps, mLoopIndex);
+    }
+
+    @Override
+    void reset()
+    {
+      mName = "";
+      mLoopIndex = SchemaDES.DEFAULT_LoopIndex;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private String mName = "";
+    private int mLoopIndex = SchemaDES.DEFAULT_LoopIndex;
+    private TraceStepListHandler mTraceStepListHandler = null;
+  }
+
+
+  //#########################################################################
   //# Inner Class TraceStateHandler
-  private class TraceStateHandler
-    extends AbstractContentHandler<Object>
+  private class TraceStateHandler extends AbstractContentHandler<Object>
   {
     //#######################################################################
     //# Constructor
@@ -585,28 +656,46 @@ public class SAXCounterExampleImporter
         mAutomatonInfo = findAutomatonInfo(value);
       } else if (localName.equals(SchemaDES.ATTRIB_State)) {
         mStateName = value;
-      } else {
-        super.setAttribute(localName, value);
       }
     }
 
     @Override
-    Map<AutomatonProxy,StateProxy> getResult() throws SAXParseException
+    Object getResult()
     {
       return null;
     }
 
-    //#######################################################################
-    //# Parsing Support
-    AutomatonProxy getAutomaton()
+    @Override
+    void reset()
     {
-      return mAutomatonInfo.getAutomaton();
+      mAutomatonInfo = null;
+      mStateName = null;
     }
 
-    StateProxy getState()
+    //#######################################################################
+    //# Parsing Support
+    void put(final Map<AutomatonProxy,StateProxy> map)
       throws SAXParseException
-   {
-      return mAutomatonInfo.findState(mStateName);
+    {
+      final AutomatonProxy aut = mAutomatonInfo.getAutomaton();
+      boolean exists;
+      if (mStateName == null) {
+        exists = map.containsKey(aut);
+        if (!exists) {
+          map.put(aut, null);
+        }
+      } else {
+        final StateProxy state = mAutomatonInfo.findState(mStateName);
+        exists = map.put(aut, state) != null;
+      }
+      if (exists) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Invalid XML content - " +
+                       "multiple states recorded for automaton '");
+        builder.append(aut.getName());
+        builder.append("'.");
+        throw createSAXParseException(builder.toString());
+      }
     }
 
     //#######################################################################
@@ -638,7 +727,7 @@ public class SAXCounterExampleImporter
       throws SAXParseException
     {
       if (localName.equals(SchemaDES.ELEMENT_TraceState)) {
-        pushHandler(mTraceStateHandler);
+        pushHandler(mTraceStateHandler, atts);
       } else {
         super.startSubElement(localName, atts);
       }
@@ -649,9 +738,8 @@ public class SAXCounterExampleImporter
       throws SAXParseException
     {
       if (subHandler == mTraceStateHandler) {
-        final AutomatonProxy aut = mTraceStateHandler.getAutomaton();
-        final StateProxy state = mTraceStateHandler.getState();
-        mMap.put(aut, state);
+        mTraceStateHandler.put(mMap);
+        mTraceStateHandler.reset();
       } else {
         super.endSubElement(subHandler);
       }
@@ -731,74 +819,6 @@ public class SAXCounterExampleImporter
     private EventRefHandler mEventRefHandler = null;
     private TraceStateTupleHandler mTraceStateTupleHandler = null;
     List<TraceStepProxy> mList = new ArrayList<>();
-  }
-
-
-  //#########################################################################
-  //# Inner Class TraceProxyHandler
-  private class TraceProxyHandler
-    extends AbstractContentHandler<TraceProxy>
-  {
-    //#######################################################################
-    //# Constructor
-    private TraceProxyHandler(final AbstractContentHandler<?> parent)
-    {
-      super(parent);
-    }
-
-    //#######################################################################
-    //# Overrides for AbstractContentHandler<TraceProxy>
-    @Override
-    void setAttribute(final String localName, final String value)
-      throws SAXParseException
-    {
-      if (localName.equals(SchemaDES.ATTRIB_Name)) {
-        mName = value;
-      } else if (localName.equals(SchemaDES.ATTRIB_LoopIndex)) {
-        mLoopIndex = Integer.parseInt(value);
-      } else {
-        super.setAttribute(localName, value);
-      }
-    }
-
-    @Override
-    public void startSubElement(final String localName,
-                                final Attributes atts)
-      throws SAXParseException
-    {
-      if (localName.equals(SchemaDES.ELEMENT_TraceStepList)) {
-        mTraceStepListHandler = new TraceStepListHandler(this);
-        pushHandler(mTraceStepListHandler);
-      } else {
-        super.startSubElement(localName, atts);
-      }
-    }
-
-    @Override
-    TraceProxy getResult() throws SAXParseException
-    {
-      final List<TraceStepProxy> steps;
-      if (mTraceStepListHandler == null) {
-        final TraceStepProxy step = mFactory.createTraceStepProxy(null);
-        steps = Collections.singletonList(step);
-      } else {
-        steps = mTraceStepListHandler.getResult();
-      }
-      return mFactory.createTraceProxy(mName, steps, mLoopIndex);
-    }
-
-    @Override
-    void reset()
-    {
-      mName = "";
-      mLoopIndex = SchemaDES.DEFAULT_LoopIndex;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private String mName = "";
-    private int mLoopIndex = SchemaDES.DEFAULT_LoopIndex;
-    private TraceStepListHandler mTraceStepListHandler = null;
   }
 
 

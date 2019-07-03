@@ -44,9 +44,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -73,12 +73,12 @@ import net.sourceforge.waters.plain.module.ModuleElementFactory;
  *     the program will really attempt to open a file called
  *     <CODE>&lt;<I>project</I>&gt;_main.vmod</CODE> in the same
  *     directory. This is exactly the way how VALID works.
- *     The result of the conversion is saved as 
+ *     The result of the conversion is saved as
  *     <CODE>&lt;<I>project</I>&gt;.wmod</CODE>.</DD>
  * <DT><STRONG>VALID Modules (<CODE>.vmod</CODE>)</STRONG></DT>
  * <DD>Only <I>main modules</I> are supported, i.e., files named
  *     <CODE>&lt;<I>project</I>&gt;_main.vmod</CODE>.
- *     The result of the conversion is saved as 
+ *     The result of the conversion is saved as
  *     <CODE>&lt;<I>project</I>&gt;.wmod</CODE>.</DD>
  * <DD>Other names taken literally and assumed to contain VALID main
  *     modules. If present, their extension is replaced by <CODE>.wmod</CODE>
@@ -166,7 +166,7 @@ public class ValidToWaters
       String saveext = null;
       if (save) {
         final ProxyMarshaller<ModuleProxy> marshaller =
-          new JAXBModuleMarshaller(modfactory, optable);
+          new SAXModuleMarshaller(modfactory, optable);
         manager.registerMarshaller(marshaller);
         saveext = marshaller.getDefaultExtension();
       }
@@ -175,7 +175,7 @@ public class ValidToWaters
       if (compile) {
         desfactory = ProductDESElementFactory.getInstance();
         final ProxyMarshaller<ProductDESProxy> marshaller =
-          new JAXBProductDESMarshaller(desfactory);
+          new SAXProductDESMarshaller(desfactory);
         manager.registerMarshaller(marshaller);
         compileext = marshaller.getDefaultExtension();
       }

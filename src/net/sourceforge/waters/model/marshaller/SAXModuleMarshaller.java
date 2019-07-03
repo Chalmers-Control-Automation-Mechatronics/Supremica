@@ -95,8 +95,7 @@ public class SAXModuleMarshaller
                              final boolean importGeo)
     throws SAXException, ParserConfigurationException
   {
-    super("waters-module.xsd",
-          new SAXModuleImporter(factory, optable),
+    super(new SAXModuleImporter(factory, optable),
           new StAXModuleWriter());
     setImportingGeometry(importGeo);
   }

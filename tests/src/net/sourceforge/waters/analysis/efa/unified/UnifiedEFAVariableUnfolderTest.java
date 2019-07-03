@@ -40,22 +40,22 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 public class UnifiedEFAVariableUnfolderTest
@@ -262,7 +262,7 @@ public class UnifiedEFAVariableUnfolderTest
     mModuleFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
     mModuleMarshaller =
-      new JAXBModuleMarshaller(mModuleFactory, mOperatorTable);
+      new SAXModuleMarshaller(mModuleFactory, mOperatorTable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -287,7 +287,7 @@ public class UnifiedEFAVariableUnfolderTest
   //# Data Members
   private ModuleProxyFactory mModuleFactory;
   private CompilerOperatorTable mOperatorTable;
-  private JAXBModuleMarshaller mModuleMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
   private ModuleEqualityVisitor mEqualityChecker;
 

@@ -84,7 +84,7 @@ import net.sourceforge.waters.model.base.WatersRuntimeException;
  *   final DocumentManager manager = new {@link #DocumentManager() DocumentManager()};
  *   final {@link net.sourceforge.waters.model.module.ModuleProxyFactory ModuleProxyFactory} factory = {@link net.sourceforge.waters.plain.module.ModuleElementFactory}.{@link net.sourceforge.waters.plain.module.ModuleElementFactory#getInstance() getInstance}();
  *   final {@link net.sourceforge.waters.model.expr.OperatorTable OperatorTable} optable = {@link net.sourceforge.waters.model.compiler.CompilerOperatorTable CompilerOperatorTable}.{@link net.sourceforge.waters.model.compiler.CompilerOperatorTable#getInstance() getInstance}();
- *   final {@link JAXBMarshaller}&lt;{@link net.sourceforge.waters.model.module.ModuleProxy}&gt; marshaller = new {@link JAXBModuleMarshaller}(factory, optable);
+ *   final {@link SAXMarshaller}&lt;{@link net.sourceforge.waters.model.module.ModuleProxy}&gt; marshaller = new {@link SAXModuleMarshaller}(factory, optable);
  *   manager.{@link #registerMarshaller(ProxyMarshaller) registerMarshaller}(marshaller);
  *   manager.{@link #registerUnmarshaller(ProxyUnmarshaller) registerUnmarshaller}(marshaller);
  *   final {@link File} file = new File("myfile.wmod");
@@ -468,7 +468,6 @@ public class DocumentManager
       mExtensionUnmarshallerMap.put(lowerext, unmarshaller);
     }
     mFileFilters.addAll(unmarshaller.getSupportedFileFilters());
-    unmarshaller.setDocumentManager(this);
   }
 
 

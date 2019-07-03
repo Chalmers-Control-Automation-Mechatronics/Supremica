@@ -36,17 +36,18 @@ package net.sourceforge.waters.gui.renderer;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.junit.AbstractWatersTest;
-import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.DocumentProxy;
+import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
 import net.sourceforge.waters.model.module.ForeachProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -81,13 +82,14 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     super(name);
   }
 
+  @Override
   protected void setUp() throws Exception
   {
     super.setUp();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller modmarshaller =
-      new JAXBModuleMarshaller(factory, optable);
+    final SAXModuleMarshaller modmarshaller =
+      new SAXModuleMarshaller(factory, optable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(modmarshaller);
     mPrinter = new EPSPrinterVisitor();
@@ -206,6 +208,7 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
     /**
      * Visit all components in given module and print them.
      */
+    @Override
     public Object visitModuleProxy(final ModuleProxy module)
       throws VisitorException
     {
@@ -218,6 +221,7 @@ public class EPSGraphPrinterTest extends AbstractWatersTest
      * The only reason that visitGraphProxy is not used instead is that we
      * need the name ...
      */
+    @Override
     public Object visitSimpleComponentProxy(final SimpleComponentProxy comp)
       throws VisitorException
     {

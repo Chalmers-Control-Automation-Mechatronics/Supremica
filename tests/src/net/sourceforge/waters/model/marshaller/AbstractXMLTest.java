@@ -73,14 +73,6 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     marshalDirectory(root, filter);
   }
 
-  public void testJAXBAll(final JAXBMarshaller<D,?> jaxbUnmarshaller)
-    throws Exception
-  {
-    final FileFilter filter = new TestDirectoryFilter();
-    final File root = getInputRoot();
-    jaxbDirectory(root, filter, jaxbUnmarshaller);
-  }
-
 
   //#########################################################################
   //# Utilities
@@ -114,22 +106,6 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     }
   }
 
-  protected void jaxbDirectory(final File file,
-                               final FileFilter filter,
-                               final JAXBMarshaller<D,?> jaxbUnmarshaller)
-    throws Exception
-  {
-    if (file.isDirectory()) {
-      final File[] children = file.listFiles(filter);
-      Arrays.sort(children);
-      for (final File child : children) {
-        jaxbDirectory(child, filter, jaxbUnmarshaller);
-      }
-    } else if (file.length() <= FILE_SIZE_LIMIT) {
-      System.out.println(file + " ...");
-      testJAXB(file, jaxbUnmarshaller);
-    }
-  }
 
   protected D testParse(final String... path)
     throws Exception
@@ -147,17 +123,6 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
     checkIntegrity(doc);
     checkPrint(doc);
     return doc;
-  }
-
-  protected void testJAXB(final File file,
-                          final JAXBMarshaller<D,?> jaxbUnmarshaller)
-    throws Exception
-  {
-    final D saxDoc = testParse(file);
-    final URI uri = file.toURI();
-    final D jaxbDoc = jaxbUnmarshaller.unmarshal(uri);
-    assertProxyEquals("SAX unmarshalling gives different result from JAXB!",
-                      saxDoc, jaxbDoc);
   }
 
   protected void testHandcraft(final D handcrafted, final String... path)
@@ -289,10 +254,11 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
   }
 
 
-  protected D testCrossClone(final ProxyCloner cloner, final String... path)
+  protected D testCrossClone(final ProxyUnmarshaller<D> unmarshaller,
+                             final ProxyCloner cloner,
+                             final String... path)
     throws Exception
   {
-    final ProxyUnmarshaller<D> unmarshaller = getProxyUnmarshaller();
     final File file = getInputFile(path);
     final URI uri = file.toURI();
     final D proxy = unmarshaller.unmarshal(uri);
@@ -334,7 +300,6 @@ public abstract class AbstractXMLTest<D extends DocumentProxy>
   //# Provided by Subclasses
   protected abstract ProxyMarshaller<D> getProxyMarshaller();
   protected abstract ProxyUnmarshaller<D> getProxyUnmarshaller();
-  protected ProxyUnmarshaller<D> getAlternateProxyUnmarshaller() {return null;}
   protected abstract ProxyPrinter getPrinter();
   protected abstract DocumentIntegrityChecker<D> getIntegrityChecker();
 

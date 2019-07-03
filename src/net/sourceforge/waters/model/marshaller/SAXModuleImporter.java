@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.OperatorTable;
@@ -90,6 +92,7 @@ import net.sourceforge.waters.xsd.module.ScopeKind;
 import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
@@ -100,8 +103,9 @@ public class SAXModuleImporter
   //# Constructors
   public SAXModuleImporter(final ModuleProxyFactory factory,
                            final OperatorTable optable)
+    throws SAXException, ParserConfigurationException
   {
-    super(SchemaModule.NUMBER_OF_ELEMENTS);
+    super("waters-module.xsd", SchemaModule.NUMBER_OF_ELEMENTS);
     mFactory = factory;
     mOperatorTable = optable;
 

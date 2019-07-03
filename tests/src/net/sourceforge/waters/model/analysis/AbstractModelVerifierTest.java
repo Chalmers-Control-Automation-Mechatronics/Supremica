@@ -50,7 +50,7 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXCounterExampleMarshaller;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 
 
@@ -73,7 +73,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mTraceMarshaller = new JAXBCounterExampleMarshaller(factory);
+    mTraceMarshaller = new SAXCounterExampleMarshaller(factory);
     mModelVerifier = createModelVerifier(factory);
     setNodeLimit(mModelVerifier);
   }
@@ -514,7 +514,7 @@ public abstract class AbstractModelVerifierTest extends AbstractAnalysisTest
 
   //#########################################################################
   //# Data Members
-  private JAXBCounterExampleMarshaller mTraceMarshaller;
+  private SAXCounterExampleMarshaller mTraceMarshaller;
   private ModelVerifier mModelVerifier;
   private List<ParameterBindingProxy> mBindings;
 

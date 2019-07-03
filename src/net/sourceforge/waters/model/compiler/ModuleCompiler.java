@@ -60,9 +60,9 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.MultiEvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -103,7 +103,7 @@ import org.xml.sax.SAXException;
  *   {@link CompilerOperatorTable}.{@link CompilerOperatorTable#getInstance()
  *   getInstance}();</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link ProxyUnmarshaller}&lt;{@link ModuleProxy}&gt; unmarshaller =
- *   new {@link JAXBModuleMarshaller#JAXBModuleMarshaller(ModuleProxyFactory,OperatorTable)
+ *   new {@link SAXModuleMarshaller#SAXModuleMarshaller(ModuleProxyFactory,OperatorTable)
  *   JAXBModuleMarshaller}(modFactory, optable);</CODE><BR>
  * <CODE>&nbsp;&nbsp;{@link DocumentManager} manager =
  *   new {@link DocumentManager#DocumentManager() DocumentManager}();</CODE><BR>

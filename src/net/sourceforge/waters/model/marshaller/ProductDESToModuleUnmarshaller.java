@@ -36,8 +36,9 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -51,7 +52,7 @@ import org.xml.sax.SAXException;
 
 /**
  * A utility to load a product DES (<CODE>.wdes</CODE>) file as a module.
- * This marshaller combines a {@link JAXBProductDESMarshaller} with
+ * This marshaller combines a {@link SAXProductDESMarshaller} with
  * a {@link ProductDESImporter} to load a product DES and directly as a
  * module.
  *
@@ -65,17 +66,19 @@ public class ProductDESToModuleUnmarshaller
   //#########################################################################
   //# Constructor
   public ProductDESToModuleUnmarshaller(final ModuleProxyFactory modfactory)
-    throws JAXBException, SAXException
+    throws SAXException, ParserConfigurationException
   {
     final ProductDESProxyFactory desfactory =
       ProductDESElementFactory.getInstance();
-    mUnmarshaller = new JAXBProductDESMarshaller(desfactory);
+    mUnmarshaller = new SAXProductDESMarshaller(desfactory);
     mImporter = new ProductDESImporter(modfactory);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
+  @Override
   public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
@@ -87,34 +90,28 @@ public class ProductDESToModuleUnmarshaller
     }
   }
 
+  @Override
   public Class<ModuleProxy> getDocumentClass()
   {
     return ModuleProxy.class;
   }
 
+  @Override
   public String getDefaultExtension()
   {
     return mUnmarshaller.getDefaultExtension();
   }
 
+  @Override
   public Collection<String> getSupportedExtensions()
   {
     return mUnmarshaller.getSupportedExtensions();
   }
 
+  @Override
   public Collection<FileFilter> getSupportedFileFilters()
   {
       return mUnmarshaller.getSupportedFileFilters();
-  }
-
-  public DocumentManager getDocumentManager()
-  {
-    return mImporter.getDocumentManager();
-  }
-
-  public void setDocumentManager(final DocumentManager manager)
-  {
-    mImporter.setDocumentManager(manager);
   }
 
 

@@ -36,7 +36,7 @@ package net.sourceforge.waters.analysis.comp552;
 import java.io.IOException;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -64,7 +64,7 @@ public class ConflictAssessor extends AbstractAssessor
   //#########################################################################
   //# Constructor
   private ConflictAssessor()
-    throws JAXBException, SAXException, IOException
+    throws SAXException, ParserConfigurationException, IOException
   {
   }
 

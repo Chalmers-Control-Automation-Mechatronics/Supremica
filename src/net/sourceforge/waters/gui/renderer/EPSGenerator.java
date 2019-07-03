@@ -40,8 +40,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
-
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -52,9 +50,9 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.DescendingModuleProxyVisitor;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -124,8 +122,8 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
       }
 
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final JAXBModuleMarshaller moduleUnmarshaller =
-        new JAXBModuleMarshaller(factory, optable, true);
+      final SAXModuleMarshaller moduleUnmarshaller =
+        new SAXModuleMarshaller(factory, optable, true);
       final ValidUnmarshaller validUnmarshaller =
         new ValidUnmarshaller(factory, optable);
       final ProxyUnmarshaller<Project> supremicaUnmarshaller =
@@ -160,7 +158,7 @@ public class EPSGenerator extends DescendingModuleProxyVisitor
       }
 
     } catch (final WatersUnmarshalException | IOException |
-                   JAXBException | SAXException | ParseException exception) {
+                   SAXException | ParseException exception) {
       System.err.print("FATAL ERROR (");
       System.err.print(ProxyTools.getShortClassName(exception));
       System.err.println(")");

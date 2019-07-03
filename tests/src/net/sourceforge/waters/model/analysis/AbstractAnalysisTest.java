@@ -60,9 +60,9 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersMarshalException;
 import net.sourceforge.waters.model.module.IntConstantProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -92,10 +92,10 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   {
     super.setUp();
     mProductDESMarshaller =
-      new JAXBProductDESMarshaller(mProductDESProxyFactory);
+      new SAXProductDESMarshaller(mProductDESProxyFactory);
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     mModuleMarshaller =
-      new JAXBModuleMarshaller(mModuleProxyFactory, optable, false);
+      new SAXModuleMarshaller(mModuleProxyFactory, optable, false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -439,8 +439,8 @@ public abstract class AbstractAnalysisTest extends AbstractWatersTest
   private final ModuleProxyFactory mModuleProxyFactory =
     ModuleElementFactory.getInstance();
 
-  private JAXBProductDESMarshaller mProductDESMarshaller;
-  private JAXBModuleMarshaller mModuleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
   private ProductDESImporter mProductDESImporter;
 

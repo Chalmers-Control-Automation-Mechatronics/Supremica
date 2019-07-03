@@ -183,9 +183,9 @@ public abstract class AbstractProductDESImporterTest
     mProductDESProxyFactory = ProductDESElementFactory.getInstance();
     final ModuleProxyFactory modfactory = getModuleProxyFactory();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(modfactory, optable);
+    mModuleMarshaller = new SAXModuleMarshaller(modfactory, optable);
     mProductDESMarshaller =
-      new JAXBProductDESMarshaller(mProductDESProxyFactory);
+      new SAXProductDESMarshaller(mProductDESProxyFactory);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerMarshaller(mProductDESMarshaller);
@@ -213,8 +213,8 @@ public abstract class AbstractProductDESImporterTest
   //# Data Members
   private ProductDESProxyFactory mProductDESProxyFactory;
   private DocumentManager mDocumentManager;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
   private ProductDESImporter mImporter;
   private ModuleIntegrityChecker mIntegrityChecker;
 

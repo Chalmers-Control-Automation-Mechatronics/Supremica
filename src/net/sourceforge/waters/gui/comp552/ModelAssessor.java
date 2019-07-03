@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeControlLoopChecker;
@@ -91,8 +91,8 @@ import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -165,10 +165,10 @@ public class ModelAssessor
   //#########################################################################
   //# Constructor
   private ModelAssessor(final String config,
-                      final String classlist,
-                      final String inputdir,
-                      final String outputdir)
-    throws IOException, JAXBException, SAXException,
+                        final String classlist,
+                        final String inputdir,
+                        final String outputdir)
+    throws IOException, SAXException, ParserConfigurationException,
            WatersUnmarshalException, EvalException
   {
     mStudents = new LinkedList<Student>();
@@ -183,8 +183,8 @@ public class ModelAssessor
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    final JAXBModuleMarshaller marshaller =
-      new JAXBModuleMarshaller(factory, optable);
+    final SAXModuleMarshaller marshaller =
+      new SAXModuleMarshaller(factory, optable);
     mMarshaller = marshaller;
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(marshaller);

@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -103,15 +103,10 @@ public class MarshallingTools
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
       final ProxyMarshaller<ProductDESProxy> marshaller =
-        new JAXBProductDESMarshaller(factory);
+        new SAXProductDESMarshaller(factory);
       marshaller.marshal(des, file);
-    } catch (final JAXBException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final SAXException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final WatersMarshalException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final IOException exception) {
+    } catch (final SAXException | ParserConfigurationException |
+             WatersMarshalException | IOException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -181,15 +176,10 @@ public class MarshallingTools
       final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ProxyMarshaller<ModuleProxy> marshaller =
-        new JAXBModuleMarshaller(factory, optable);
+        new SAXModuleMarshaller(factory, optable);
       marshaller.marshal(module, file);
-    } catch (final JAXBException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final SAXException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final WatersMarshalException exception) {
-      throw new WatersRuntimeException(exception);
-    } catch (final IOException exception) {
+    } catch (final SAXException | ParserConfigurationException |
+             WatersMarshalException | IOException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -300,7 +290,7 @@ public class MarshallingTools
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       ProxyMarshaller<ProductDESProxy> desMarshaller;
-      desMarshaller = new JAXBProductDESMarshaller(desFactory);
+      desMarshaller = new SAXProductDESMarshaller(desFactory);
       final String fileName = file.getName();
       final String desExt = desMarshaller.getDefaultExtension();
       if (fileName.endsWith(desExt)) {
@@ -310,7 +300,7 @@ public class MarshallingTools
       final ModuleProxyFactory modFactory = ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
       final ProxyMarshaller<ModuleProxy> modMarshaller =
-        new JAXBModuleMarshaller(modFactory, optable);
+        new SAXModuleMarshaller(modFactory, optable);
       final String modExt = modMarshaller.getDefaultExtension();
       if (fileName.endsWith(modExt)) {
         saveModule(des, file);
@@ -320,7 +310,7 @@ public class MarshallingTools
       final File parent = file.getParentFile();
       final File desFile = new File(parent, desName);
       saveProductDES(des, desFile);
-    } catch (final JAXBException | SAXException exception) {
+    } catch (final SAXException | ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -341,13 +331,13 @@ public class MarshallingTools
     try {
       final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final JAXBModuleMarshaller marshaller =
-        new JAXBModuleMarshaller(factory, optable, false);
+      final SAXModuleMarshaller marshaller =
+        new SAXModuleMarshaller(factory, optable, false);
       final File file = new File(filename);
       final URI uri = file.toURI();
       return marshaller.unmarshal(uri);
-    } catch (final JAXBException | SAXException |
-                   WatersUnmarshalException | IOException exception) {
+    } catch (final SAXException | WatersUnmarshalException | IOException |
+             ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -367,8 +357,8 @@ public class MarshallingTools
       final ProductDESProxyFactory desFactory =
         ProductDESElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final JAXBModuleMarshaller marshaller =
-        new JAXBModuleMarshaller(moduleFactory, optable, false);
+      final SAXModuleMarshaller marshaller =
+        new SAXModuleMarshaller(moduleFactory, optable, false);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(marshaller);
       final File file = new File(filename);
@@ -376,9 +366,8 @@ public class MarshallingTools
       final ModuleCompiler compiler =
         new ModuleCompiler(docManager, desFactory, module);
       return compiler.compile();
-    } catch (final JAXBException | SAXException |
-                   WatersUnmarshalException | IOException |
-                   EvalException exception) {
+    } catch (final SAXException | WatersUnmarshalException | IOException |
+                   EvalException | ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
@@ -396,13 +385,13 @@ public class MarshallingTools
     try {
       final ProductDESProxyFactory factory =
         ProductDESElementFactory.getInstance();
-      final JAXBProductDESMarshaller marshaller =
-        new JAXBProductDESMarshaller(factory);
+      final SAXProductDESMarshaller marshaller =
+        new SAXProductDESMarshaller(factory);
       final File file = new File(filename);
       final URI uri = file.toURI();
       return marshaller.unmarshal(uri);
-    } catch (final JAXBException | SAXException |
-                   WatersUnmarshalException | IOException exception) {
+    } catch (final SAXException | WatersUnmarshalException |
+             IOException | ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }

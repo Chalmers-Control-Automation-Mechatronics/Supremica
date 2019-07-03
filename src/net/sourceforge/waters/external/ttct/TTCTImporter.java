@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.external.ttct;
 
-import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -54,9 +54,9 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -93,7 +93,7 @@ public class TTCTImporter
       final ProductDESImporter converter = new ProductDESImporter(modFactory);
       final ModuleProxy module = converter.importModule(des);
       final ProxyMarshaller<ModuleProxy> marshaller =
-        new JAXBModuleMarshaller(modFactory, opTable);
+        new SAXModuleMarshaller(modFactory, opTable);
       // TODO Set output file from command line
       final File outfile = new File("ttct.wmod");
       marshaller.marshal(module, outfile);

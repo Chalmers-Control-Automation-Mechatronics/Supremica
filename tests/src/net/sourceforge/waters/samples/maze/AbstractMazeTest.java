@@ -56,9 +56,9 @@ import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -521,9 +521,9 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
       ModuleElementFactory.getInstance();
     mProductDESFactory = ProductDESElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
-    mProductDESMarshaller = new JAXBProductDESMarshaller(mProductDESFactory);
-    mTraceMarshaller = new JAXBCounterExampleMarshaller(mProductDESFactory);
+    mModuleMarshaller = new SAXModuleMarshaller(moduleFactory, optable);
+    mProductDESMarshaller = new SAXProductDESMarshaller(mProductDESFactory);
+    mTraceMarshaller = new SAXCounterExampleMarshaller(mProductDESFactory);
     // mMazeCompiler.setUseLanguageInclusion(false);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
@@ -555,9 +555,9 @@ public abstract class AbstractMazeTest extends AbstractWatersTest
   private File mInputDirectory;
   private File mOutputDirectory;
   private ProductDESProxyFactory mProductDESFactory;
-  private JAXBModuleMarshaller mModuleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
-  private JAXBCounterExampleMarshaller mTraceMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
+  private SAXCounterExampleMarshaller mTraceMarshaller;
   private MazeCompiler mMazeCompiler;
   private DocumentManager mDocumentManager;
 

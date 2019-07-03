@@ -55,7 +55,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.SwingUtilities;
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.gui.about.AboutPanel;
@@ -108,7 +108,7 @@ public class IDE
   //#########################################################################
   //# Constructors
   public IDE()
-    throws JAXBException, SAXException
+    throws SAXException, ParserConfigurationException
   {
     // Instantiate all actions
     mObservers = new LinkedList<Observer>();

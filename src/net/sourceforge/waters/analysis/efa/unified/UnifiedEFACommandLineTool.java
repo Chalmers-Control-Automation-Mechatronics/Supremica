@@ -75,7 +75,7 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -201,8 +201,8 @@ public class UnifiedEFACommandLineTool
 
       final ValidUnmarshaller importer =
         new ValidUnmarshaller(moduleFactory, optable);
-      final JAXBModuleMarshaller moduleMarshaller =
-        new JAXBModuleMarshaller(moduleFactory, optable, false);
+      final SAXModuleMarshaller moduleMarshaller =
+        new SAXModuleMarshaller(moduleFactory, optable, false);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(moduleMarshaller);
       docManager.registerUnmarshaller(importer);

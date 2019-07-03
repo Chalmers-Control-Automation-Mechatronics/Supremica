@@ -50,8 +50,8 @@ import javax.swing.JOptionPane;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 // Waters importing
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -2206,7 +2206,8 @@ public class ActionMan
             final ModuleProxyFactory factory =
 	      ModuleElementFactory.getInstance();
             final OperatorTable optable = CompilerOperatorTable.getInstance();
-            final ProxyUnmarshaller<ModuleProxy> unMarshaller = new JAXBModuleMarshaller(factory, optable);
+            final ProxyUnmarshaller<ModuleProxy> unMarshaller =
+              new SAXModuleMarshaller(factory, optable);
 	    final DocumentManager manager = new DocumentManager();
 	    manager.registerUnmarshaller(unMarshaller);
             final ModuleProxy module = (ModuleProxy) manager.load(file);

@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxy;
@@ -189,7 +189,7 @@ public class UnifiedEFASynchronousProductBuilderTest
     mModuleFactory = ModuleElementFactory.getInstance();
     mOperatorTable = CompilerOperatorTable.getInstance();
     mModuleMarshaller =
-      new JAXBModuleMarshaller(mModuleFactory, mOperatorTable);
+      new SAXModuleMarshaller(mModuleFactory, mOperatorTable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -216,7 +216,7 @@ public class UnifiedEFASynchronousProductBuilderTest
   //# Data Members
   private ModuleProxyFactory mModuleFactory;
   private CompilerOperatorTable mOperatorTable;
-  private JAXBModuleMarshaller mModuleMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
 
   private IsomorphismChecker mIsomorphismChecker;

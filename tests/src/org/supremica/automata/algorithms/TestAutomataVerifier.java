@@ -58,9 +58,9 @@ import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -83,15 +83,16 @@ import org.supremica.testhelpers.TestFiles;
 public class TestAutomataVerifier
     extends TestCase
 {
-    public TestAutomataVerifier(String name)
+    public TestAutomataVerifier(final String name)
     {
-        super(name);  
+        super(name);
     }
-    
+
     /**
      * Sets up the test fixture.
      * Called before every test case method.
      */
+    @Override
     protected void setUp()
     throws Exception
     {
@@ -99,8 +100,8 @@ public class TestAutomataVerifier
         mDocumentManager = new DocumentManager();
         final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
-        final JAXBModuleMarshaller moduleMarshaller =
-            new JAXBModuleMarshaller(factory, opTable);
+        final SAXModuleMarshaller moduleMarshaller =
+            new SAXModuleMarshaller(factory, opTable);
         final ProxyUnmarshaller<Project> supremicaUnmarshaller =
             new SupremicaUnmarshaller(factory);
         final ProxyMarshaller<Project> supremicaMarshaller =
@@ -122,22 +123,23 @@ public class TestAutomataVerifier
         mDocumentManager.registerUnmarshaller(umdesUnmarshaller);
         mDocumentManager.registerUnmarshaller(adsUnmarshaller);
     }
-    
+
     /**
      * Tears down the test fixture.
      * Called after every test case method.
      */
+    @Override
     protected void tearDown()
     {
     }
-    
+
     /**
      * Assembles and returns a test suite
      * for all the test methods of this test case.
      */
     public static Test suite()
     {
-        TestSuite suite = new TestSuite(TestAutomataVerifier.class); 
+        final TestSuite suite = new TestSuite(TestAutomataVerifier.class);
         return suite;
     }
 
@@ -145,92 +147,92 @@ public class TestAutomataVerifier
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3));
-            SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-            VerificationOptions verificationOptions = new VerificationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3));
+            final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+            final VerificationOptions verificationOptions = new VerificationOptions();
             verificationOptions.setVerificationType(VerificationType.CONTROLLABILITY);
-            AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
+            final AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
                 synchronizationOptions, null);
             assertTrue(theVerifier.verify());
             // The same test again (hopefully)
             assertTrue(AutomataVerifier.verifyModularControllability(theProject));
             assertTrue(AutomataVerifier.verifyCompositionalControllability(theProject));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testModularUncontrollable()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Uncontrollable));
-            SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-            VerificationOptions verificationOptions = new VerificationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3Uncontrollable));
+            final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+            final VerificationOptions verificationOptions = new VerificationOptions();
             verificationOptions.setVerificationType(VerificationType.CONTROLLABILITY);
-            AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
+            final AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
                 synchronizationOptions, null);
             assertTrue(!theVerifier.verify());
             // The same test again (hopefully)
             assertTrue(!AutomataVerifier.verifyModularControllability(theProject));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testMonolithicNonblocking()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
+
             assertTrue(AutomataVerifier.verifyMonolithicNonblocking(theProject));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testMonolithicBlocking()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+
             assertTrue(!AutomataVerifier.verifyMonolithicNonblocking(theProject));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testModularNonblocking()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.SimpleManufacturingExample));
+
             VerificationOptions verificationOptions;
             SynchronizationOptions synchronizationOptions;
             MinimizationOptions minimizationOptions;
-            
+
             AutomataVerifier verifier;
-            
+
             verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
             synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
             minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();
@@ -238,24 +240,24 @@ public class TestAutomataVerifier
             minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
             verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
             assertTrue(verifier.verify());
-            
+
             minimizationOptions.setMinimizationStrategy(MinimizationStrategy.FewestTransitionsFirst);
             minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.MostLocal);
             verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
             assertTrue(verifier.verify());
-            
+
             minimizationOptions.setMinimizationStrategy(MinimizationStrategy.AtLeastOneLocal);
             minimizationOptions.setMinimizationHeuristic(MinimizationHeuristic.FewestAutomata);
             verifier = new AutomataVerifier(theProject, verificationOptions, synchronizationOptions, minimizationOptions);
             assertTrue(verifier.verify());
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     //Memory/time consuming test case
  /*   public void testCompositionalNonblockingArbiter()
     {
@@ -267,7 +269,7 @@ public class TestAutomataVerifier
             {
                 Arbiter arbiter = new Arbiter(i, false);
                 Project theProject = arbiter.getProject();
-                
+
                 assertTrue(AutomataVerifier.verifyCompositionalNonblocking(theProject));
             }
         }
@@ -277,87 +279,87 @@ public class TestAutomataVerifier
             assertTrue(false);
         }
     }*/
-    
+
     public void testCompositionalNonblocking()
     throws Exception
     {
-        DocumentProxy document = mDocumentManager.load(new File("./examples/waters/valid/bmw_fh/bmw_fh.wmod"));
-        ModuleProxy module = (ModuleProxy) document;
+        final DocumentProxy document = mDocumentManager.load(new File("./examples/waters/valid/bmw_fh/bmw_fh.wmod"));
+        final ModuleProxy module = (ModuleProxy) document;
 
-        ProjectBuildFromWaters builder = new ProjectBuildFromWaters(mDocumentManager);
-        Project project = builder.build(module);
-        
+        final ProjectBuildFromWaters builder = new ProjectBuildFromWaters(mDocumentManager);
+        final Project project = builder.build(module);
+
         assertTrue(AutomataVerifier.verifyCompositionalNonblocking(project));
     }
-    
+
     public void testCompositionalBlocking()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
-            
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.AutomaticCarParkGate));
+
             assertTrue(!AutomataVerifier.verifyCompositionalNonblocking(theProject));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testModularLanguageInclusion()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
-            SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-            VerificationOptions verificationOptions = new VerificationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageInclusion));
+            final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+            final VerificationOptions verificationOptions = new VerificationOptions();
             verificationOptions.setVerificationType(VerificationType.LANGUAGEINCLUSION);
-            AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
+            final AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
                 synchronizationOptions, null);
-            Automata inclusionAutomata = new Automata(theProject,true);
+            final Automata inclusionAutomata = new Automata(theProject,true);
             inclusionAutomata.removeAutomaton("sicherheit_vr3");
-            Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_vr3"));
+            final Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_vr3"));
             verificationOptions.setInclusionAutomata(inclusionAutomata);
             assertTrue(theVerifier.verify());
             // The same test again (hopefully)
             assertTrue(AutomataVerifier.verifyModularInclusion(inclusionAutomata, targetAutomata));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
     public void testModularLanguageExclusion()
     {
         try
         {
-            ProjectBuildFromXML builder = new ProjectBuildFromXML();
-            Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageExclusion));
-            SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
-            VerificationOptions verificationOptions = new VerificationOptions();
+            final ProjectBuildFromXML builder = new ProjectBuildFromXML();
+            final Project theProject = builder.build(TestFiles.getFile(TestFiles.Verriegel3LanguageExclusion));
+            final SynchronizationOptions synchronizationOptions = new SynchronizationOptions();
+            final VerificationOptions verificationOptions = new VerificationOptions();
             verificationOptions.setVerificationType(VerificationType.LANGUAGEINCLUSION);
-            AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
+            final AutomataVerifier theVerifier = new AutomataVerifier(theProject, verificationOptions,
                 synchronizationOptions, null);
-            Automata inclusionAutomata = new Automata(theProject,true);
+            final Automata inclusionAutomata = new Automata(theProject,true);
             inclusionAutomata.removeAutomaton("sicherheit_er");
-            Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_er"));
+            final Automata targetAutomata = new Automata(theProject.getAutomaton("sicherheit_er"));
             verificationOptions.setInclusionAutomata(inclusionAutomata);
             assertTrue(!theVerifier.verify());
             // The same test again (hopefully)
             assertTrue(!AutomataVerifier.verifyModularInclusion(inclusionAutomata, targetAutomata));
         }
-        catch (Exception ex)
+        catch (final Exception ex)
         {
             ex.printStackTrace();
             assertTrue(false);
         }
     }
-    
+
         /*
         public void testGrande()
         {
@@ -365,13 +367,13 @@ public class TestAutomataVerifier
                 {
                         ProjectBuildFromXml builder = new ProjectBuildFromXml();
                         Project theProject = builder.build(new java.io.File("/users/s2/flordal/AIP_minus_AS3_TU4.xml"));
-         
+
                         VerificationOptions verificationOptions;
                         SynchronizationOptions synchronizationOptions;
                         MinimizationOptions minimizationOptions;
-         
+
                         AutomataVerifier verifier;
-         
+
                         verificationOptions = VerificationOptions.getDefaultNonblockingOptions();
                         synchronizationOptions = SynchronizationOptions.getDefaultVerificationOptions();
                         minimizationOptions = MinimizationOptions.getDefaultNonblockingOptions();

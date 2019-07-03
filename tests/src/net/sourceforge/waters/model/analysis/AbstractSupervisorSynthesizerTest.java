@@ -62,7 +62,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXCounterExampleMarshaller;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
 import net.sourceforge.waters.xsd.base.ComponentKind;
@@ -123,7 +123,7 @@ public abstract class AbstractSupervisorSynthesizerTest
     mControllabilityChecker = new NativeControllabilityChecker(factory);
     mLanguageInclusionChecker = new NativeLanguageInclusionChecker(factory);
     mConflictChecker = new NativeConflictChecker(factory);
-    mTraceMarshaller = new JAXBCounterExampleMarshaller(factory);
+    mTraceMarshaller = new SAXCounterExampleMarshaller(factory);
     setNodeLimit();
   }
 
@@ -913,7 +913,7 @@ public abstract class AbstractSupervisorSynthesizerTest
   private ControllabilityChecker mControllabilityChecker;
   private LanguageInclusionChecker mLanguageInclusionChecker;
   private ConflictChecker mConflictChecker;
-  private JAXBCounterExampleMarshaller mTraceMarshaller;
+  private SAXCounterExampleMarshaller mTraceMarshaller;
   protected List<ParameterBindingProxy> mBindings;
 
 }

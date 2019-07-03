@@ -33,23 +33,23 @@
 
 package net.sourceforge.waters.model.des;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
 
-import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBCounterExampleMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBProductDESMarshaller;
+import net.sourceforge.waters.model.marshaller.AbstractXMLTest;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
-import net.sourceforge.waters.model.marshaller.WatersMarshalException;
+import net.sourceforge.waters.model.marshaller.SAXCounterExampleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXProductDESMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 
 
 public abstract class AbstractCounterExampleTest
-  extends AbstractJAXBTest<CounterExampleProxy>
+  extends AbstractXMLTest<CounterExampleProxy>
 {
 
   //#########################################################################
@@ -57,49 +57,135 @@ public abstract class AbstractCounterExampleTest
   public void testParse_emptytrace()
     throws Exception
   {
-    testParse("handwritten", "emptytrace");
+    final ProductDESProxy des = getProductDES("handwritten", "small_factory_2");
+    testParseCounterexample(des, "handwritten", "emptytrace");
   }
 
   public void testMarshal_emptytrace()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
-    testMarshal("handwritten", "emptytrace");
+    final ProductDESProxy des = getProductDES("handwritten", "small_factory_2");
+    testMarshalCounterexample(des, "handwritten", "emptytrace");
+  }
+
+  public void testFail_emptytrace()
+    throws Exception
+  {
+    try {
+      final ProductDESProxy des = getProductDES("handwritten", "machine");
+      testParseCounterexample(des, "handwritten", "emptytrace");
+      fail("Expected WatersUnmarshalException not caught!");
+    } catch (final WatersUnmarshalException exception) {
+      // OK
+    }
   }
 
   public void testParse_small_factory_2__uncont1()
     throws Exception
   {
-    testParse("handwritten", "small_factory_2-uncont1");
+    final ProductDESProxy des = getProductDES("handwritten", "small_factory_2");
+    testParseCounterexample(des, "handwritten", "small_factory_2-uncont1");
   }
 
   public void testMarshal_small_factory_2__uncont1()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
-    testMarshal("handwritten", "small_factory_2-uncont1");
+    final ProductDESProxy des = getProductDES("handwritten", "small_factory_2");
+    testMarshalCounterexample(des, "handwritten", "small_factory_2-uncont1");
   }
 
   public void testParse_loop()
     throws Exception
   {
-    testParse("tests", "nasty", "the_vicious_loop1");
+    testParseCounterexample("tests", "nasty", "the_vicious_loop1");
   }
 
   public void testMarshal_loop()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
-    testMarshal("tests", "nasty", "the_vicious_loop1");
+    testMarshalCounterexample("tests", "nasty", "the_vicious_loop1");
   }
 
   public void testParse_dual()
     throws Exception
   {
-    testParse("tests", "diagnosability", "notDiag_2");
+    testParseCounterexample("tests", "diagnosability", "notDiag_2");
   }
 
   public void testMarshal_dual()
-    throws WatersMarshalException, WatersUnmarshalException, IOException
+    throws Exception
   {
-    testMarshal("tests", "diagnosability", "notDiag_2");
+    testMarshalCounterexample("tests", "diagnosability", "notDiag_2");
+  }
+
+  @Override
+  public void testParseAll()
+  {
+  }
+
+  @Override
+  public void testMarshalAll()
+  {
+  }
+
+
+  //#########################################################################
+  //# Counterexample Test Framework
+  protected void testParseCounterexample(final String... path)
+    throws Exception
+  {
+    final ProductDESProxy des = getProductDES(path);
+    testParseCounterexample(des, path);
+
+  }
+
+  protected CounterExampleProxy testParseCounterexample
+    (final ProductDESProxy des, final String... path)
+    throws Exception
+  {
+    final File file = getInputFile(path);
+    final URI uri = file.toURI();
+    final CounterExampleProxy ce =
+      mCounterExampleMarshaller.unmarshal(uri, des);
+    checkIntegrity(ce);
+    checkPrint(ce);
+    return ce;
+  }
+
+  protected void testMarshalCounterexample(final String... path)
+    throws Exception
+  {
+    final ProductDESProxy des = getProductDES(path);
+    testMarshalCounterexample(des, path);
+  }
+
+  protected void testMarshalCounterexample
+    (final ProductDESProxy des, final String... path)
+    throws Exception
+  {
+    final File inFile = getInputFile(path);
+    final URI inURI = inFile.toURI();
+    final String name = inFile.getName();
+    final File outFile = new File(getOutputDirectory(), name);
+    final CounterExampleProxy inCE =
+      mCounterExampleMarshaller.unmarshal(inURI, des);
+    checkIntegrity(inCE);
+    mCounterExampleMarshaller.marshal(inCE, outFile);
+    final URI outURI = outFile.toURI();
+    final CounterExampleProxy outCE =
+      mCounterExampleMarshaller.unmarshal(outURI, des);
+    checkIntegrity(outCE);
+    assertProxyEquals("Structure changed after marshalling!", inCE, outCE);
+    assertProxyEquals("Structure changed after marshalling!", outCE, inCE);
+  }
+
+  protected ProductDESProxy getProductDES(final String... path)
+    throws WatersUnmarshalException, IOException
+  {
+    final String ext = mProductDESMarshaller.getDefaultExtension();
+    final File file = getInputFile(path, ext);
+    final URI uri = file.toURI();
+    return mProductDESMarshaller.unmarshal(uri);
   }
 
 
@@ -115,12 +201,6 @@ public abstract class AbstractCounterExampleTest
   protected ProxyUnmarshaller<CounterExampleProxy> getProxyUnmarshaller()
   {
     return mCounterExampleMarshaller;
-  }
-
-  @Override
-  protected DocumentManager getDocumentManager()
-  {
-    return mDocumentManager;
   }
 
   @Override
@@ -144,14 +224,9 @@ public abstract class AbstractCounterExampleTest
   {
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mCounterExampleMarshaller = new JAXBCounterExampleMarshaller(factory);
-    mProductDESMarshaller = new JAXBProductDESMarshaller(factory);
+    mCounterExampleMarshaller = new SAXCounterExampleMarshaller(factory);
+    mProductDESMarshaller = new SAXProductDESMarshaller(factory);
     final PrintWriter writer = new PrintWriter(System.out);
-    mDocumentManager = new DocumentManager();
-    mDocumentManager.registerMarshaller(mCounterExampleMarshaller);
-    mDocumentManager.registerUnmarshaller(mCounterExampleMarshaller);
-    mDocumentManager.registerMarshaller(mProductDESMarshaller);
-    mDocumentManager.registerUnmarshaller(mProductDESMarshaller);
     mPrinter = new ProductDESProxyPrinter(writer);
   }
 
@@ -161,7 +236,6 @@ public abstract class AbstractCounterExampleTest
   {
     mCounterExampleMarshaller = null;
     mProductDESMarshaller = null;
-    mDocumentManager = null;
     mPrinter = null;
     super.tearDown();
   }
@@ -174,9 +248,8 @@ public abstract class AbstractCounterExampleTest
 
   //#########################################################################
   //# Data Members
-  private JAXBCounterExampleMarshaller mCounterExampleMarshaller;
-  private JAXBProductDESMarshaller mProductDESMarshaller;
-  private DocumentManager mDocumentManager;
+  private SAXCounterExampleMarshaller mCounterExampleMarshaller;
+  private SAXProductDESMarshaller mProductDESMarshaller;
   private ProxyPrinter mPrinter;
 
 }

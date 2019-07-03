@@ -37,33 +37,24 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+
 import javax.swing.filechooser.FileFilter;
-import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.Source;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBDocumentImporter;
-import net.sourceforge.waters.model.marshaller.JAXBMarshaller;
-import net.sourceforge.waters.model.marshaller.JAXBModuleImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXDocumentImporter;
+import net.sourceforge.waters.model.marshaller.SAXModuleImporter;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 
-import net.sourceforge.waters.xsd.module.Module;
-
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -75,22 +66,16 @@ public class ValidUnmarshaller
   //# Constructor
   public ValidUnmarshaller(final ModuleProxyFactory factory,
                            final OperatorTable optable)
-    throws JAXBException, SAXException
+    throws SAXException, ParserConfigurationException
   {
-    final SchemaFactory schemafactory =
-      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    final URL url = JAXBMarshaller.class.getResource("waters-module.xsd");
-    final Schema schema = schemafactory.newSchema(url);
-    final JAXBContext context =
-      JAXBContext.newInstance("net.sourceforge.waters.xsd.module");
-    mUnmarshaller = context.createUnmarshaller();
-    mUnmarshaller.setSchema(schema);
-    mImporter = new JAXBModuleImporter(factory, optable);
+    mImporter = new SAXModuleImporter(factory, optable);
   }
 
 
   //#########################################################################
-  //# Access Methods
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
+  @Override
   public ModuleProxy unmarshal(URI uri)
     throws WatersUnmarshalException, IOException
   {
@@ -102,49 +87,40 @@ public class ValidUnmarshaller
         uri = new URI(newname);
       }
       final ValidTransformer transformer = new ValidTransformer(uri);
-      final Source source = transformer.getSource();
+      final InputSource source = transformer.getSource();
       transformer.start();
-      final Module module = (Module) mUnmarshaller.unmarshal(source);
-      final ModuleProxy modproxy = mImporter.importDocument(module, null);
-      return modproxy;
-    } catch (final JAXBException exception) {
+      mImporter.setURI(uri);
+      return mImporter.parse(source);
+    } catch (final SAXException | TransformerConfigurationException |
+             URISyntaxException | IOException exception) {
       throw new WatersUnmarshalException(uri, exception);
-    } catch (final TransformerConfigurationException exception) {
-      throw new WatersUnmarshalException(uri, exception);
-    } catch (final URISyntaxException exception) {
-      throw new WatersUnmarshalException(uri, exception);
-    } catch (final IOException exception) {
-      throw new WatersUnmarshalException(uri, exception);
+    } finally {
+      mImporter.setURI(null);
     }
   }
 
+  @Override
   public Class<ModuleProxy> getDocumentClass()
   {
     return ModuleProxy.class;
   }
 
+  @Override
   public String getDefaultExtension()
   {
     return EXT_VMOD;
   }
 
+  @Override
   public Collection<String> getSupportedExtensions()
   {
     return EXTENSIONS;
   }
 
+  @Override
   public Collection<FileFilter> getSupportedFileFilters()
   {
     return FILTERS;
-  }
-
-  public DocumentManager getDocumentManager()
-  {
-    return null;
-  }
-
-  public void setDocumentManager(final DocumentManager manager)
-  {
   }
 
 
@@ -155,6 +131,7 @@ public class ValidUnmarshaller
   {
     //#######################################################################
     //# Overrides for Abstract Baseclass javax.swing.filechooser.FileFilter
+    @Override
     public boolean accept(final File file)
     {
       if (file.isDirectory()) {
@@ -171,6 +148,7 @@ public class ValidUnmarshaller
       }
     }
 
+    @Override
     public String getDescription()
     {
       return DESCR_VMOD;
@@ -180,8 +158,7 @@ public class ValidUnmarshaller
 
   //#########################################################################
   //# Data Members
-  private final Unmarshaller mUnmarshaller;
-  private final JAXBDocumentImporter<ModuleProxy,Module> mImporter;
+  private final SAXDocumentImporter<ModuleProxy> mImporter;
 
   private static final Collection<String> EXTENSIONS;
   private static final Collection<FileFilter> FILTERS;

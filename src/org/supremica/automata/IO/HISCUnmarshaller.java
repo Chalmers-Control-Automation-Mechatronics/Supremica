@@ -14,11 +14,10 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
 
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
@@ -35,7 +34,7 @@ public class HISCUnmarshaller
     //#########################################################################
     //# Constructor
     public HISCUnmarshaller(final ModuleProxyFactory modfactory)
-    throws JAXBException, SAXException
+    throws SAXException
     {
         builder = new ProjectBuildFromHISC();
         mImporter = new ProductDESImporter(modfactory);
@@ -43,7 +42,9 @@ public class HISCUnmarshaller
 
 
     //#########################################################################
-    //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+    //# Interface
+    //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
+    @Override
     public ModuleProxy unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
     {
@@ -60,36 +61,31 @@ public class HISCUnmarshaller
         }
     }
 
+    @Override
     public Class<ModuleProxy> getDocumentClass()
     {
         return ModuleProxy.class;
     }
 
+    @Override
     public String getDefaultExtension()
     {
         return ".prj";
     }
 
+    @Override
     public Collection<String> getSupportedExtensions()
     {
         return Collections.singletonList(getDefaultExtension());
     }
 
+    @Override
     public Collection<FileFilter> getSupportedFileFilters()
     {
         final FileFilter filter = new StandardExtensionFileFilter("HISC Project files [*.prj]", getDefaultExtension());
         return Collections.singletonList(filter);
     }
 
-    public DocumentManager getDocumentManager()
-    {
-        return mImporter.getDocumentManager();
-    }
-
-    public void setDocumentManager(final DocumentManager manager)
-    {
-        mImporter.setDocumentManager(manager);
-    }
 
     //#########################################################################
     //# Data Members

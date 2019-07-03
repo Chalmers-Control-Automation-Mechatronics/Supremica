@@ -72,7 +72,7 @@ import java.util.StringTokenizer;
 
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
@@ -673,7 +673,8 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     public void writeToFile(final File file) {
         try {
-            final JAXBModuleMarshaller marshaller = new JAXBModuleMarshaller(factory, CompilerOperatorTable.getInstance());
+            final SAXModuleMarshaller marshaller =
+              new SAXModuleMarshaller(factory, CompilerOperatorTable.getInstance());
             marshaller.marshal(module, file);
         } catch (final Exception e) {
             System.err.println(e);

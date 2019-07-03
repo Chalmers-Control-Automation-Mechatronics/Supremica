@@ -49,7 +49,7 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.instance.InstantiationException;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.InstanceProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -356,7 +356,7 @@ public class UnifiedEFACompilerTest
     super.setUp();
     mModuleFactory = ModuleElementFactory.getInstance();
     final CompilerOperatorTable optable = CompilerOperatorTable.getInstance();
-    mModuleMarshaller = new JAXBModuleMarshaller(mModuleFactory, optable);
+    mModuleMarshaller = new SAXModuleMarshaller(mModuleFactory, optable);
     mDocumentManager = new DocumentManager();
     mDocumentManager.registerMarshaller(mModuleMarshaller);
     mDocumentManager.registerUnmarshaller(mModuleMarshaller);
@@ -377,7 +377,7 @@ public class UnifiedEFACompilerTest
   //#########################################################################
   //# Data Members
   private ModuleProxyFactory mModuleFactory;
-  private JAXBModuleMarshaller mModuleMarshaller;
+  private SAXModuleMarshaller mModuleMarshaller;
   private DocumentManager mDocumentManager;
 
   private UnifiedEFASystemImporter mImporter;

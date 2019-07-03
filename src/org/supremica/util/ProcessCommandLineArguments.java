@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.config.Version;
 import net.sourceforge.waters.external.valid.ValidUnmarshaller;
@@ -33,9 +33,9 @@ import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ComponentProxy;
 import net.sourceforge.waters.model.module.DefaultModuleProxyVisitor;
@@ -115,8 +115,8 @@ public class ProcessCommandLineArguments
             final ModuleProxyFactory factory =
               ModuleSubjectFactory.getInstance();
             final OperatorTable opTable = CompilerOperatorTable.getInstance();
-            final JAXBModuleMarshaller moduleMarshaller =
-              new JAXBModuleMarshaller(factory, opTable);
+            final SAXModuleMarshaller moduleMarshaller =
+              new SAXModuleMarshaller(factory, opTable);
             final ProxyUnmarshaller<Project> supremicaUnmarshaller =
               new SupremicaUnmarshaller(factory);
             final ProxyUnmarshaller<ModuleProxy> validUnmarshaller =
@@ -137,15 +137,9 @@ public class ProcessCommandLineArguments
             documentManager.registerUnmarshaller(adsUnmarshaller);
 
             importer = new ProductDESImporter(factory);
-          } catch (final SAXException ex) {
-            System.err
-              .println("SAXException when initialising document manager: "
-                       + ex);
-            return null;
-          } catch (final JAXBException ex) {
-            System.err
-              .println("JAXBException when initialising document manager: "
-                       + ex);
+          } catch (final SAXException | ParserConfigurationException exception) {
+            System.err.println("Exception when initialising document manager: " +
+                               exception);
             return null;
           }
 

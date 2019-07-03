@@ -160,7 +160,8 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
   @Override
   public ModuleProxy unmarshal(final URI uri) throws IOException,
       WatersUnmarshalException
@@ -194,18 +195,6 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
   public Collection<FileFilter> getSupportedFileFilters()
   {
     return FILTERS;
-  }
-
-  @Override
-  public DocumentManager getDocumentManager()
-  {
-    return mDocumentManager;
-  }
-
-  @Override
-  public void setDocumentManager(final DocumentManager manager)
-  {
-    mDocumentManager = manager;
   }
 
 
@@ -1527,7 +1516,7 @@ public class DESpotImporter implements CopyingProxyUnmarshaller<ModuleProxy>
 
   private File mOutputDir;
 
-  private DocumentManager mDocumentManager;
+  private final DocumentManager mDocumentManager;
 
 
   //#########################################################################

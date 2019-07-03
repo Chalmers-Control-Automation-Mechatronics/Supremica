@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -34,9 +34,9 @@ import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -45,11 +45,6 @@ import net.sourceforge.waters.subject.module.EventDeclSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
 import org.supremica.automata.ModularSupervisor;
@@ -83,6 +78,12 @@ import org.supremica.manufacturingTables.xsd.processeditor.ROP;
 import org.supremica.manufacturingTables.xsd.processeditor.Relation;
 import org.supremica.manufacturingTables.xsd.processeditor.RelationType;
 import org.supremica.manufacturingTables.xsd.processeditor.UpperIndicator;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
 
@@ -109,7 +110,7 @@ public class COPBuilder {
 	 * Constructor
 	 */
     public COPBuilder()
-    	throws JAXBException, SAXException
+    	throws SAXException, ParserConfigurationException
     {
         ropList = new ArrayList<ROP>();
         eopList = new LinkedList<EOP>();
@@ -126,8 +127,8 @@ public class COPBuilder {
         final ModuleProxyFactory factory = ModuleSubjectFactory.getInstance();
         final OperatorTable opTable = CompilerOperatorTable.getInstance();
 
-        final JAXBModuleMarshaller moduleMarshaller =
-            new JAXBModuleMarshaller(factory, opTable);
+        final SAXModuleMarshaller moduleMarshaller =
+            new SAXModuleMarshaller(factory, opTable);
         final ProxyUnmarshaller<Project> supremicaUnmarshaller =
             new SupremicaUnmarshaller(factory);
 

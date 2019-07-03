@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.GeometryProxy;
@@ -25,7 +25,7 @@ import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.AliasProxy;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
@@ -125,13 +125,16 @@ public class EFAToNuSMV {
     private final static String INDENT = "  ";
     //private final static CompilerOperatorTable compilerOpTable = CompilerOperatorTable.getInstance();
 
-    public static void main(final String[] args) throws JAXBException, SAXException, WatersUnmarshalException, IOException, URISyntaxException {
+    public static void main(final String[] args)
+      throws SAXException, ParserConfigurationException,
+             WatersUnmarshalException, IOException, URISyntaxException
+    {
         //String name = "";
         //ModuleSubjectFactory factory = ModuleSubjectFactory.getInstance();
 	//ModuleSubject module = new ModuleSubject(name, null);
         final ModuleProxyFactory moduleFactory      = ModuleElementFactory.getInstance();
         final OperatorTable optable                 = CompilerOperatorTable.getInstance();
-        final JAXBModuleMarshaller moduleMarshaller = new JAXBModuleMarshaller(moduleFactory, optable);
+        final SAXModuleMarshaller moduleMarshaller = new SAXModuleMarshaller(moduleFactory, optable);
         final ModuleProxy module                    = moduleMarshaller.unmarshal(new URI(args[0]));
 
         final PrintWriter pw = new PrintWriter(System.out);

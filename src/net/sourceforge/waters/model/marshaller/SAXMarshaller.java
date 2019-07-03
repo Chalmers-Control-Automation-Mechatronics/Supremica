@@ -35,26 +35,17 @@ package net.sourceforge.waters.model.marshaller;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 
 import javax.swing.filechooser.FileFilter;
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 
 /**
@@ -79,22 +70,13 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
 {
 
   //#########################################################################
-  //# Constructors
-  public SAXMarshaller(final String schemaName,
-                       final SAXDocumentImporter<D> importer,
+  //# Constructor
+  public SAXMarshaller(final SAXDocumentImporter<D> importer,
                        final StAXDocumentWriter writer)
     throws SAXException, ParserConfigurationException
   {
     mImporter = importer;
     mWriter = writer;
-    final SchemaFactory schemaFactory =
-      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-    final URL url = SAXMarshaller.class.getResource(schemaName);
-    final Schema schema = schemaFactory.newSchema(url);
-    final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-    parserFactory.setSchema(schema);
-    parserFactory.setNamespaceAware(true);
-    mParser = parserFactory.newSAXParser();
   }
 
 
@@ -159,24 +141,10 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   public D unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
   {
-    InputStream stream = null;
-    final URL url = uri.toURL();
     try {
-      stream = url.openStream();
-      final InputSource source = new InputSource(stream);
-      final XMLReader reader = mParser.getXMLReader();
-      mImporter.setURI(uri);
-      reader.setContentHandler(mImporter);
-      reader.setErrorHandler(mImporter);
-      reader.parse(source);
-      return mImporter.getParsedDocument();
+      return mImporter.parse(uri);
     } catch (final SAXException exception) {
       throw new WatersUnmarshalException(uri, exception);
-    } finally {
-      if (stream != null) {
-        stream.close();
-      }
-      mImporter.reset();
     }
   }
 
@@ -198,18 +166,6 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
     } catch (final XMLStreamException exception) {
       throw new WatersMarshalException(exception);
     }
-  }
-
-  // TODO Remove document manager
-  @Override
-  public DocumentManager getDocumentManager()
-  {
-    return null;
-  }
-
-  @Override
-  public void setDocumentManager(final DocumentManager manager)
-  {
   }
 
   @Override
@@ -236,20 +192,6 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
 
 
   //#########################################################################
-  //# Specific Access
-  /*
-  public void copyXMLFile(final File inFile, final File outFile)
-    throws WatersUnmarshalException, IOException,
-           WatersMarshalException, XMLStreamException
-  {
-    final URI uri = inFile.toURI();
-    final D doc = unmarshal(uri);
-    mWriter.marshal(doc, outFile);
-  }
-  */
-
-
-  //#########################################################################
   //# Auxiliary Methods
   SAXDocumentImporter<D> getImporter()
   {
@@ -257,15 +199,13 @@ public abstract class SAXMarshaller<D extends DocumentProxy>
   }
 
 
-
   //#########################################################################
-  //# Provided by Subclasses
+  //# Hooks
   public abstract String getDescription();
 
 
   //#########################################################################
   //# Data Members
-  private final SAXParser mParser;
   private final SAXDocumentImporter<D> mImporter;
   private final StAXDocumentWriter mWriter;
 

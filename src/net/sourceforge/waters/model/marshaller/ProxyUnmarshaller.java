@@ -36,6 +36,7 @@ package net.sourceforge.waters.model.marshaller;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+
 import javax.swing.filechooser.FileFilter;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
@@ -45,13 +46,13 @@ import net.sourceforge.waters.model.base.DocumentProxy;
  * <P>
  * The basic unmarshaller interface.
  * </P>
- * 
+ *
  * <P>
  * The ProxyUnmarshaller provides the basic means for the
  * {@link DocumentManager} to unmarshal, i.e., load documents from various file
  * formats.
  * </P>
- * 
+ *
  * @author Robi Malik
  */
 
@@ -62,7 +63,7 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
   // # Access Methods
   /**
    * Loads a document from a file.
-   * 
+   *
    * @param uri
    *          A URI specifying the location of the document to be retrieved.
    * @return The loaded document.
@@ -96,19 +97,5 @@ public interface ProxyUnmarshaller<D extends DocumentProxy>
    * Gets a list of file filters that may be handled by this marshaller.
    */
   public Collection<FileFilter> getSupportedFileFilters();
-
-  // #########################################################################
-  // # Entity Resolving
-  /**
-   * Gets the document manager used by this unmarshaller to resolve references
-   * to other files.
-   */
-  public DocumentManager getDocumentManager();
-
-  /**
-   * Sets a document manager to used by this unmarshaller to resolve references
-   * to other files.
-   */
-  public void setDocumentManager(DocumentManager manager);
 
 }

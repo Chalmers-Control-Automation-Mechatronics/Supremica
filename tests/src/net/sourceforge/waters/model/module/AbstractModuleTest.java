@@ -37,340 +37,141 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.marshaller.AbstractJAXBTest;
-import net.sourceforge.waters.model.marshaller.JAXBModuleMarshaller;
+import net.sourceforge.waters.model.marshaller.AbstractXMLTest;
 import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
+import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
 import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 
-public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
+public abstract class AbstractModuleTest
+  extends AbstractXMLTest<ModuleProxy>
 {
 
   //#########################################################################
-  //# Marshalling Test Cases
-  public void testMarshal_aip1sub1ld()
-    throws Exception
-  {
-    testMarshal("tests", "hisc", "aip1sub1ld");
-  }
-
-  public void testMarshal_buffer_sf1()
-    throws Exception
-  {
-    testMarshal("handwritten", "buffer_sf1");
-  }
-
-  public void testMarshal_colours()
-    throws Exception
-  {
-    testMarshal("tests/compiler/graph", "colours");
-  }
-
-  public void testMarshal_dosingtankEFA()
-    throws Exception
-  {
-    testMarshal("handwritten", "dosingtankEFA");
-  }
-
-  public void testMarshal_eventaliases()
-    throws Exception
-  {
-    testMarshal("tests", "nasty", "eventaliases");
-  }
-
-  public void testMarshal_machine()
-    throws Exception
-  {
-    testMarshal("handwritten", "machine");
-  }
-
-  public void testMarshal_marked_value()
-    throws Exception
-  {
-    testMarshal("tests", "nasty", "marked_value");
-  }
-
-  public void testMarshal_nodegroup1()
-    throws Exception
-  {
-    testMarshal("tests/compiler/groupnode", "nodegroup1");
-  }
-
-  public void testMarshal_nodegroup2()
-    throws Exception
-  {
-    testMarshal("tests/compiler/groupnode", "nodegroup2");
-  }
-
-  public void testMarshal_parManEg_I_mfb_highlevel()
-    throws Exception
-  {
-    testMarshal("tests", "hisc", "parManEg_I_mfb_highlevel");
-  }
-
-  public void testMarshal_parManEg_I_mfb_lowlevel()
-    throws Exception
-  {
-    testMarshal("tests", "hisc", "parManEg_I_mfb_lowlevel");
-  }
-
-  public void testMarshal_small_factory_2()
-    throws Exception
-  {
-    testMarshal("handwritten", "small_factory_2");
-  }
-
-  public void testMarshal_small_factory_n()
-    throws Exception
-  {
-    testMarshal("handwritten", "small_factory_n");
-  }
-
-  public void testMarshal_startgeo()
-    throws Exception
-  {
-    testMarshal("tests", "nasty", "startgeo");
-  }
-
-  public void testMarshal_tictactoe()
-    throws Exception
-  {
-    testMarshal("handwritten", "tictactoe");
-  }
-
-
-  //#########################################################################
-  //# Jar Test Cases
-  public void testJar_buffer_sf1()
-    throws Exception
-  {
-    testJar("handwritten", "buffer_sf1");
-  }
-
-  public void testJar_machine()
-    throws Exception
-  {
-    testJar("handwritten", "machine");
-  }
-
-  public void testJar_small_factory_2()
-    throws Exception
-  {
-    testJar("handwritten", "small_factory_2");
-  }
-
-  public void testJar_small_factory_n()
-    throws Exception
-  {
-    testJar("handwritten", "small_factory_n");
-  }
-
-  public void testJar_tictactoe()
-    throws Exception
-  {
-    testJar("handwritten", "tictactoe");
-  }
-
-
-  //#########################################################################
   //# Printing Test Cases
-  public void testParse_buffer_sf1()
+  public void testPrint_hisc0_high()
     throws Exception
   {
-    testParse("handwritten", "buffer_sf1");
+    testPrint("despot", "testHISC", "hisc0_high");
   }
 
-  public void testParse_colours()
+  public void testPrint_buffer_norm()
     throws Exception
   {
-    testParse("tests/compiler/graph", "colours");
+    testPrint("efa", "buffer_norm");
   }
 
-  public void testParse_machine()
+  public void testPrint_transferline_efa()
     throws Exception
   {
-    testParse("handwritten", "machine");
+    testPrint("efa", "transferline_efa");
   }
 
-  public void testParse_marked_value()
+  public void testPrint_buffer_sf1()
     throws Exception
   {
-    testParse("tests", "nasty", "marked_value");
+    testPrint("handwritten", "buffer_sf1");
   }
 
-  public void testParse_nodegroup1()
+  public void testPrint_cell()
     throws Exception
   {
-    testParse("tests/compiler/groupnode", "nodegroup1");
+    testPrint("handwritten", "cell");
   }
 
-  public void testParse_nodegroup2()
+  public void testPrint_machine()
     throws Exception
   {
-    testParse("tests/compiler/groupnode", "nodegroup2");
+    testPrint("handwritten", "machine");
   }
 
-  public void testParse_small_factory_2()
+  public void testPrint_sensoractuator1()
     throws Exception
   {
-    testParse("handwritten", "small_factory_2");
+    testPrint("handwritten", "sensoractuator1");
   }
 
-  public void testParse_small_factory_n()
+  public void testPrint_small_factory_2()
     throws Exception
   {
-    testParse("handwritten", "small_factory_n");
+    testPrint("handwritten", "small_factory_2");
   }
 
-  public void testParse_tictactoe()
+  public void testPrint_small_factory_n()
     throws Exception
   {
-    testParse("handwritten", "tictactoe");
+    testPrint("handwritten", "small_factory_n");
   }
 
-
-  //#########################################################################
-  //# Cloning Test Cases
-  public void testClone_buffer_sf1()
+  public void testPrint_tictactoe()
     throws Exception
   {
-    testClone("handwritten", "buffer_sf1");
+    testPrint("handwritten", "tictactoe");
   }
 
-  public void testClone_colours()
+  public void testPrint_tictactoe_incomplete()
     throws Exception
   {
-    testClone("tests/compiler/graph", "colours");
+    testPrint("handwritten", "tictactoe_incomplete");
   }
 
-  public void testClone_machine()
+  public void testPrint_error7_small()
     throws Exception
   {
-    testClone("handwritten", "machine");
+    testPrint("tests", "compiler", "efsm", "error7_small");
   }
 
-  public void testClone_nodegroup1()
+  public void testPrint_colours()
     throws Exception
   {
-    testClone("tests/compiler/groupnode", "nodegroup1");
+    testPrint("tests", "compiler", "graph", "colours");
   }
 
-  public void testClone_nodegroup2()
+  public void testPrint_nodegroup1()
     throws Exception
   {
-    testClone("tests/compiler/groupnode", "nodegroup2");
+    testPrint("tests", "compiler", "groupnode", "nodegroup1");
   }
 
-  public void testClone_small_factory_2()
+  public void testPrint_nodegroup2()
     throws Exception
   {
-    testClone("handwritten", "small_factory_2");
+    testPrint("tests", "compiler", "groupnode", "nodegroup2");
   }
 
-  public void testClone_small_factory_n()
+  public void testPrint_array2d()
     throws Exception
   {
-    testClone("handwritten", "small_factory_n");
+    testPrint("tests", "compiler", "instance", "array2d");
   }
 
-  public void testClone_startgeo()
+  public void testPrint_batch_tank_vout()
     throws Exception
   {
-    testClone("tests", "nasty", "startgeo");
+    testPrint("tests", "efa", "batch_tank_vout");
   }
 
-  public void testClone_tictactoe()
+  public void testPrint_eventaliases()
     throws Exception
   {
-    testClone("handwritten", "tictactoe");
+    testPrint("tests", "nasty", "eventaliases");
   }
 
-
-  //#########################################################################
-  //# Cross-Cloning Test Cases (subject->plain and vice versa)
-  public void testCrossClone_aip1sub1ld()
+  public void testPrint_marked_value()
     throws Exception
   {
-    testCrossClone("tests", "hisc", "aip1sub1ld");
-  }
-
-  public void testCrossClone_buffer_sf1()
-    throws Exception
-  {
-    testCrossClone("handwritten", "buffer_sf1");
-  }
-
-  public void testCrossClone_colours()
-    throws Exception
-  {
-    testCrossClone("tests/compiler/graph", "colours");
-  }
-
-  public void testCrossClone_machine()
-    throws Exception
-  {
-    testCrossClone("handwritten", "machine");
-  }
-
-  public void testCrossClone_nodegroup1()
-    throws Exception
-  {
-    testCrossClone("tests/compiler/groupnode", "nodegroup1");
-  }
-
-  public void testCrossClone_nodegroup2()
-    throws Exception
-  {
-    testCrossClone("tests/compiler/groupnode", "nodegroup2");
-  }
-
-  public void testCrossClone_parManEg_I_mfb_highlevel()
-    throws Exception
-  {
-    testCrossClone("tests", "hisc", "parManEg_I_mfb_highlevel");
-  }
-
-  public void testCrossClone_parManEg_I_mfb_lowlevel()
-    throws Exception
-  {
-    testCrossClone("tests", "hisc", "parManEg_I_mfb_lowlevel");
-  }
-
-  public void testCrossClone_small_factory_2()
-    throws Exception
-  {
-    testCrossClone("handwritten", "small_factory_2");
-  }
-
-  public void testCrossClone_small_factory_n()
-    throws Exception
-  {
-    testCrossClone("handwritten", "small_factory_n");
-  }
-
-  public void testCrossClone_startgeo()
-    throws Exception
-  {
-    testCrossClone("tests", "nasty", "startgeo");
-  }
-
-  public void testCrossClone_tictactoe()
-    throws Exception
-  {
-    testCrossClone("handwritten", "tictactoe");
+    testPrint("tests", "nasty", "marked_value");
   }
 
 
@@ -405,7 +206,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final ModuleProxy module = factory.createModuleProxy
       (modname, null, null, null, null, null, compList);
 
-    testHandcraft("handwritten", module);
+    testHandcraft(module, "handwritten");
   }
 
 
@@ -441,7 +242,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final ModuleProxy module = factory.createModuleProxy
       (modname, null, null, null, null, null, compList);
 
-    testHandcraft("handwritten", module);
+    testHandcraft(module, "handwritten");
   }
 
 
@@ -504,7 +305,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final ModuleProxy module = factory.createModuleProxy
       (modname, null, null, null, eventList, null, compList);
 
-    testHandcraft("handwritten", module);
+    testHandcraft(module, "handwritten");
   }
 
 
@@ -554,74 +355,395 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
     final ModuleProxy module = factory.createModuleProxy
       (modname, null, null, null, null, null, compList);
 
-    testHandcraft("tests", "nasty", module);
+    testHandcraft(module, "tests", "nasty");
   }
 
 
   //#########################################################################
-  //# Cross Cloning (only for modules so far)
-  protected ModuleProxy testCrossClone(final String name)
+  //# Jar Test Cases
+  public void testJar_buffer_sf1()
     throws Exception
   {
-    return testCrossClone(getWatersInputRoot(), name);
+    testJar("handwritten", "buffer_sf1");
   }
 
-  protected ModuleProxy testCrossClone(final String dirname, final String name)
+  public void testJar_machine()
     throws Exception
   {
-    final File dir = new File(getWatersInputRoot(), dirname);
-    return testCrossClone(dir, name);
+    testJar("handwritten", "machine");
   }
 
-  protected ModuleProxy testCrossClone(final String dirname1,
-                                       final String dirname2,
-                                       final String name)
+  public void testJar_small_factory_2()
     throws Exception
   {
-    final File dir1 = new File(getWatersInputRoot(), dirname1);
-    final File dir2 = new File(dir1, dirname2);
-    return testCrossClone(dir2, name);
+    testJar("handwritten", "small_factory_2");
   }
 
-  protected ModuleProxy testCrossClone(final File dir, final String name)
+  public void testJar_small_factory_n()
     throws Exception
   {
-    final ProxyUnmarshaller<ModuleProxy> unmarshaller = getProxyUnmarshaller();
-    final String extname = name + unmarshaller.getDefaultExtension();
-    final File filename = new File(dir, extname);
-    return testCrossClone(filename);
+    testJar("handwritten", "small_factory_n");
   }
 
-  protected ModuleProxy testCrossClone(final File filename)
+  public void testJar_tictactoe()
     throws Exception
   {
-    final ProxyUnmarshaller<ModuleProxy> unmarshaller =
-      getAlternateProxyUnmarshaller();
-    final ModuleProxyCloner cloner = getModuleProxyCloner();
-    final URI uri = filename.toURI();
-    final ModuleProxy module = unmarshaller.unmarshal(uri);
-    final ModuleProxy cloned = (ModuleProxy) cloner.getClone(module);
-    checkIntegrity(cloned);
-    assertModuleProxyEquals("Clone differs from original!", cloned, module);
-    return cloned;
+    testJar("handwritten", "tictactoe");
   }
 
 
   //#########################################################################
-  //# Simple Access
-  protected ModuleProxyCloner getModuleProxyCloner()
+  //# Marshalling Test Cases
+  public void testMarshal_hisc0_high()
+    throws Exception
   {
-    return mCloner;
+    testMarshal("despot", "testHISC", "hisc0_high");
   }
 
-  protected ProxyUnmarshaller<ModuleProxy> getAlternateProxyUnmarshaller()
+  public void testMarshal_buffer_norm()
+    throws Exception
   {
-    return mAltMarshaller;
+    testMarshal("efa", "buffer_norm");
+  }
+
+  public void testMarshal_transferline_efa()
+    throws Exception
+  {
+    testMarshal("efa", "transferline_efa");
+  }
+
+  public void testMarshal_buffer_sf1()
+    throws Exception
+  {
+    testMarshal("handwritten", "buffer_sf1");
+  }
+
+  public void testMarshal_cell()
+    throws Exception
+  {
+    testMarshal("handwritten", "cell");
+  }
+
+  public void testMarshal_machine()
+    throws Exception
+  {
+    testMarshal("handwritten", "machine");
+  }
+
+  public void testMarshal_sensoractuator1()
+    throws Exception
+  {
+    testMarshal("handwritten", "sensoractuator1");
+  }
+
+  public void testMarshal_small_factory_2()
+    throws Exception
+  {
+    testMarshal("handwritten", "small_factory_2");
+  }
+
+  public void testMarshal_small_factory_n()
+    throws Exception
+  {
+    testMarshal("handwritten", "small_factory_n");
+  }
+
+  public void testMarshal_tictactoe()
+    throws Exception
+  {
+    testMarshal("handwritten", "tictactoe");
+  }
+
+  public void testMarshal_tictactoe_incomplete()
+    throws Exception
+  {
+    testMarshal("handwritten", "tictactoe_incomplete");
+  }
+
+  public void testMarshal_error7_small()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "efsm", "error7_small");
+  }
+
+  public void testMarshal_colours()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "graph", "colours");
+  }
+
+  public void testMarshal_nodegroup1()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "groupnode", "nodegroup1");
+  }
+
+  public void testMarshal_nodegroup2()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "groupnode", "nodegroup2");
+  }
+
+  public void testMarshal_array2d()
+    throws Exception
+  {
+    testMarshal("tests", "compiler", "instance", "array2d");
+  }
+
+  public void testMarshal_batch_tank_vout()
+    throws Exception
+  {
+    testMarshal("tests", "efa", "batch_tank_vout");
+  }
+
+  public void testMarshal_eventaliases()
+    throws Exception
+  {
+    testMarshal("tests", "nasty", "eventaliases");
+  }
+
+  public void testMarshal_marked_value()
+    throws Exception
+  {
+    testMarshal("tests", "nasty", "marked_value");
   }
 
 
   //#########################################################################
-  //# Overrides for Abstract Base Class JAXBTestCase
+  //# Cloning Test Cases
+  public void testClone_hisc0_high()
+    throws Exception
+  {
+    testClone("despot", "testHISC", "hisc0_high");
+  }
+
+  public void testClone_buffer_norm()
+    throws Exception
+  {
+    testClone("efa", "buffer_norm");
+  }
+
+  public void testClone_transferline_efa()
+    throws Exception
+  {
+    testClone("efa", "transferline_efa");
+  }
+
+  public void testClone_buffer_sf1()
+    throws Exception
+  {
+    testClone("handwritten", "buffer_sf1");
+  }
+
+  public void testClone_cell()
+    throws Exception
+  {
+    testClone("handwritten", "cell");
+  }
+
+  public void testClone_machine()
+    throws Exception
+  {
+    testClone("handwritten", "machine");
+  }
+
+  public void testClone_sensoractuator1()
+    throws Exception
+  {
+    testClone("handwritten", "sensoractuator1");
+  }
+
+  public void testClone_small_factory_2()
+    throws Exception
+  {
+    testClone("handwritten", "small_factory_2");
+  }
+
+  public void testClone_small_factory_n()
+    throws Exception
+  {
+    testClone("handwritten", "small_factory_n");
+  }
+
+  public void testClone_tictactoe()
+    throws Exception
+  {
+    testClone("handwritten", "tictactoe");
+  }
+
+  public void testClone_tictactoe_incomplete()
+    throws Exception
+  {
+    testClone("handwritten", "tictactoe_incomplete");
+  }
+
+  public void testClone_error7_small()
+    throws Exception
+  {
+    testClone("tests", "compiler", "efsm", "error7_small");
+  }
+
+  public void testClone_colours()
+    throws Exception
+  {
+    testClone("tests", "compiler", "graph", "colours");
+  }
+
+  public void testClone_nodegroup1()
+    throws Exception
+  {
+    testClone("tests", "compiler", "groupnode", "nodegroup1");
+  }
+
+  public void testClone_nodegroup2()
+    throws Exception
+  {
+    testClone("tests", "compiler", "groupnode", "nodegroup2");
+  }
+
+  public void testClone_array2d()
+    throws Exception
+  {
+    testClone("tests", "compiler", "instance", "array2d");
+  }
+
+  public void testClone_batch_tank_vout()
+    throws Exception
+  {
+    testClone("tests", "efa", "batch_tank_vout");
+  }
+
+  public void testClone_eventaliases()
+    throws Exception
+  {
+    testClone("tests", "nasty", "eventaliases");
+  }
+
+  public void testClone_marked_value()
+    throws Exception
+  {
+    testClone("tests", "nasty", "marked_value");
+  }
+
+
+  public void testCrossClone_hisc0_high()
+    throws Exception
+  {
+    testCrossClone("despot", "testHISC", "hisc0_high");
+  }
+
+  public void testCrossClone_buffer_norm()
+    throws Exception
+  {
+    testCrossClone("efa", "buffer_norm");
+  }
+
+  public void testCrossClone_transferline_efa()
+    throws Exception
+  {
+    testCrossClone("efa", "transferline_efa");
+  }
+
+  public void testCrossClone_buffer_sf1()
+    throws Exception
+  {
+    testCrossClone("handwritten", "buffer_sf1");
+  }
+
+  public void testCrossClone_cell()
+    throws Exception
+  {
+    testCrossClone("handwritten", "cell");
+  }
+
+  public void testCrossClone_machine()
+    throws Exception
+  {
+    testCrossClone("handwritten", "machine");
+  }
+
+  public void testCrossClone_sensoractuator1()
+    throws Exception
+  {
+    testCrossClone("handwritten", "sensoractuator1");
+  }
+
+  public void testCrossClone_small_factory_2()
+    throws Exception
+  {
+    testCrossClone("handwritten", "small_factory_2");
+  }
+
+  public void testCrossClone_small_factory_n()
+    throws Exception
+  {
+    testCrossClone("handwritten", "small_factory_n");
+  }
+
+  public void testCrossClone_tictactoe()
+    throws Exception
+  {
+    testCrossClone("handwritten", "tictactoe");
+  }
+
+  public void testCrossClone_tictactoe_incomplete()
+    throws Exception
+  {
+    testCrossClone("handwritten", "tictactoe_incomplete");
+  }
+
+  public void testCrossClone_error7_small()
+    throws Exception
+  {
+    testCrossClone("tests", "compiler", "efsm", "error7_small");
+  }
+
+  public void testCrossClone_colours()
+    throws Exception
+  {
+    testCrossClone("tests", "compiler", "graph", "colours");
+  }
+
+  public void testCrossClone_nodegroup1()
+    throws Exception
+  {
+    testCrossClone("tests", "compiler", "groupnode", "nodegroup1");
+  }
+
+  public void testCrossClone_nodegroup2()
+    throws Exception
+  {
+    testCrossClone("tests", "compiler", "groupnode", "nodegroup2");
+  }
+
+  public void testCrossClone_array2d()
+    throws Exception
+  {
+    testCrossClone("tests", "compiler", "instance", "array2d");
+  }
+
+  public void testCrossClone_batch_tank_vout()
+    throws Exception
+  {
+    testCrossClone("tests", "efa", "batch_tank_vout");
+  }
+
+  public void testCrossClone_eventaliases()
+    throws Exception
+  {
+    testCrossClone("tests", "nasty", "eventaliases");
+  }
+
+  public void testCrossClone_marked_value()
+    throws Exception
+  {
+    testCrossClone("tests", "nasty", "marked_value");
+  }
+
+
+  //#########################################################################
+  //# Overrides for Abstract Base Class
+  //# net.sourceforge.waters.model.marshaller.AbstractXMLTest
   @Override
   protected ProxyMarshaller<ModuleProxy> getProxyMarshaller()
   {
@@ -655,11 +777,10 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   {
     super.setUp();
     final ModuleProxyFactory factory = getModuleProxyFactory();
-    final ModuleProxyFactory altfactory = getAlternateModuleProxyFactory();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
-    mCloner = new ModuleProxyCloner(factory);
-    mMarshaller = new JAXBModuleMarshaller(factory, optable);
-    mAltMarshaller = new JAXBModuleMarshaller(altfactory, optable);
+    mMarshaller = new SAXModuleMarshaller(factory, optable);
+    final ModuleProxyFactory altFactory = getAlternateModuleProxyFactory();
+    mAltMarshaller = new SAXModuleMarshaller(altFactory, optable);
     final PrintWriter writer = new PrintWriter(System.out);
     mPrinter = new ModuleProxyPrinter(writer);
   }
@@ -668,8 +789,7 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
   protected void tearDown()
     throws Exception
   {
-    mMarshaller = null;
-    mAltMarshaller = null;
+    mMarshaller = mAltMarshaller = null;
     mPrinter = null;
     super.tearDown();
   }
@@ -682,10 +802,20 @@ public abstract class AbstractModuleTest extends AbstractJAXBTest<ModuleProxy>
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private void testCrossClone(final String... path)
+    throws Exception
+  {
+    final ModuleProxyFactory factory = getModuleProxyFactory();
+    final ModuleProxyCloner cloner = factory.getCloner();
+    testCrossClone(mAltMarshaller, cloner, path);
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private ModuleProxyCloner mCloner;
-  private JAXBModuleMarshaller mMarshaller;
-  private JAXBModuleMarshaller mAltMarshaller;
+  private SAXModuleMarshaller mMarshaller;
+  private SAXModuleMarshaller mAltMarshaller;
   private ProxyPrinter mPrinter;
 
 }

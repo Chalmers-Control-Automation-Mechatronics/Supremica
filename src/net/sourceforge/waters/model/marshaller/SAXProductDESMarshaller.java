@@ -69,8 +69,7 @@ public class SAXProductDESMarshaller
   public SAXProductDESMarshaller(final ProductDESProxyFactory factory)
     throws SAXException, ParserConfigurationException
   {
-    super("waters-des.xsd",
-          new SAXProductDESImporter(factory),
+    super(new SAXProductDESImporter(factory),
           new StAXProductDESWriter());
   }
 

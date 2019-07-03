@@ -50,7 +50,7 @@ public class PlainModuleTest extends AbstractModuleTest
     return new TestSuite(PlainModuleTest.class);
   }
 
-  public static void main(String args[]) {
+  public static void main(final String args[]) {
     junit.textui.TestRunner.run(suite());
   }
 
@@ -58,11 +58,13 @@ public class PlainModuleTest extends AbstractModuleTest
   //#########################################################################
   //# Overrides for Abstract Base Class
   //# net.sourceforge.waters.model.module.ModuleTest
+  @Override
   protected ModuleProxyFactory getModuleProxyFactory()
   {
     return ModuleElementFactory.getInstance();
   }
 
+  @Override
   protected ModuleProxyFactory getAlternateModuleProxyFactory()
   {
     return ModuleSubjectFactory.getInstance();

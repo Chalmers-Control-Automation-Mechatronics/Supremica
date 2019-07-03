@@ -16,9 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import javax.swing.filechooser.FileFilter;
-import javax.xml.bind.JAXBException;
 
-import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.StandardExtensionFileFilter;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
@@ -35,14 +33,15 @@ public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
   //#########################################################################
   //# Constructor
   public SupremicaUnmarshaller(final ModuleProxyFactory modfactory)
-    throws JAXBException, SAXException
+    throws SAXException
   {
     builder = new ProjectBuildFromXML();
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.marshaller.ProxyUnmarshaller
+  //# Interface
+  //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<ModuleProxy>
   @Override
   public Project unmarshal(final URI uri)
     throws WatersUnmarshalException, IOException
@@ -96,18 +95,6 @@ public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
     return Collections.singletonList(filter);
   }
 
-  @Override
-  public DocumentManager getDocumentManager()
-  {
-    return mDocumentManager;
-  }
-
-  @Override
-  public void setDocumentManager(final DocumentManager manager)
-  {
-    mDocumentManager = manager;
-  }
-
 
   //#########################################################################
   //# Static Class Methods
@@ -129,5 +116,5 @@ public class SupremicaUnmarshaller implements ProxyUnmarshaller<Project>
   //#########################################################################
   //# Data Members
   private final ProjectBuildFromXML builder;
-  private DocumentManager mDocumentManager;
+
 }

@@ -37,6 +37,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -49,6 +51,7 @@ import net.sourceforge.waters.xsd.base.ComponentKind;
 import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 
@@ -58,8 +61,9 @@ public class SAXProductDESImporter
   //#########################################################################
   //# Constructors
   public SAXProductDESImporter(final ProductDESProxyFactory factory)
+    throws SAXException, ParserConfigurationException
   {
-    super(SchemaDES.NUMBER_OF_ELEMENTS);
+    super("waters-des.xsd", SchemaDES.NUMBER_OF_ELEMENTS);
     mFactory = factory;
 
     registerHandler(SchemaDES.ELEMENT_Automaton,

@@ -33,11 +33,21 @@
 
 package net.sourceforge.waters.model.marshaller;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import net.sourceforge.waters.model.base.DocumentProxy;
 import net.sourceforge.waters.model.base.DuplicateNameException;
@@ -51,9 +61,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 
@@ -63,9 +75,59 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
 
   //#########################################################################
   //# Constructors
-  SAXDocumentImporter(final int estimatedSize)
+  SAXDocumentImporter(final String schemaName,
+                      final int estimatedSize)
+    throws SAXException, ParserConfigurationException
   {
+    final SchemaFactory schemaFactory =
+      SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+    final URL url = SAXDocumentImporter.class.getResource(schemaName);
+    final Schema schema = schemaFactory.newSchema(url);
+    final SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+    parserFactory.setSchema(schema);
+    parserFactory.setNamespaceAware(true);
+    mParser = parserFactory.newSAXParser();
     mHandlerMap = new HashMap<>(estimatedSize);
+  }
+
+
+  //#########################################################################
+  //# Invocation
+  public D parse(final URI uri)
+    throws SAXException, IOException
+  {
+    InputStream stream = null;
+    final URL url = uri.toURL();
+    try {
+      setURI(uri);
+      stream = url.openStream();
+      final InputSource source = new InputSource(stream);
+      return parse(source);
+    } finally {
+      setURI(null);
+      if (stream != null) {
+        stream.close();
+      }
+    }
+  }
+
+  public D parse(final InputSource source)
+    throws SAXException, IOException
+  {
+    try {
+      final XMLReader reader = mParser.getXMLReader();
+      reader.setContentHandler(this);
+      reader.setErrorHandler(this);
+      reader.parse(source);
+      return getParsedDocument();
+    } finally {
+      reset();
+    }
+  }
+
+  public void setURI(final URI uri)
+  {
+    mURI = uri;
   }
 
 
@@ -93,11 +155,6 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
   void registerHandler(final String name, final SAXHandlerCreator<?> creator)
   {
     mHandlerMap.put(name, creator);
-  }
-
-  void setURI(final URI uri)
-  {
-    mURI = uri;
   }
 
   URI getURI()
@@ -813,8 +870,17 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
     //#######################################################################
     //# Parsing Support
     void put(final Map<String,String> map)
+      throws SAXParseException
     {
-      map.put(mName, mValue);
+      final String existing = map.put(mName, mValue);
+      if (existing != null) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Invalid XML content - " +
+                       "multiple values assigned to attribute '");
+        builder.append(mName);
+        builder.append("'.");
+        throw createSAXParseException(builder.toString());
+      }
     }
 
     //#######################################################################
@@ -911,6 +977,7 @@ public abstract class SAXDocumentImporter<D extends DocumentProxy>
 
   //#########################################################################
   //# Data Members
+  private final SAXParser mParser;
   private final Map<String,SAXHandlerCreator<?>> mHandlerMap;
 
   private boolean mImportingGeometry = true;

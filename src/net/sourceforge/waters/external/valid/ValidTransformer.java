@@ -38,15 +38,16 @@ import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URI;
+
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.URIResolver;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.xml.sax.InputSource;
 
 
@@ -81,14 +82,14 @@ class ValidTransformer
     mOutPipe = new PipedOutputStream();
 
     // Provide a SAXSource for the other end of the pipe
-    final PipedInputStream pinput = new PipedInputStream(mOutPipe);
-    final InputSource psource = new InputSource(pinput);
-    mSource = new SAXSource(psource);
+    final PipedInputStream pipedInput = new PipedInputStream(mOutPipe);
+    mSource = new InputSource(pipedInput);
   }
 
 
   //#########################################################################
   //# Thread Body
+  @Override
   public void run()
   {
     try {
@@ -106,6 +107,7 @@ class ValidTransformer
 
   //#########################################################################
   //# Interface javax.xml.transform.URIResolver
+  @Override
   public Source resolve(final String href, final String base)
     throws TransformerException
   {
@@ -122,7 +124,7 @@ class ValidTransformer
 
   //#########################################################################
   //# Accessing the Outputs
-  Source getSource()
+  InputSource getSource()
   {
     return mSource;
   }
@@ -155,7 +157,7 @@ class ValidTransformer
   private final Transformer mTransformer;
   private final InputPreprocessor mPreprocessor;
   private final PipedOutputStream mOutPipe;
-  private final Source mSource;
+  private final InputSource mSource;
 
   private Exception mException;
 
