@@ -39,7 +39,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.dialog.AutomatonSynthesizerDialog;
+import net.sourceforge.waters.gui.dialog.AutomatonConflictCheckDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 
 import org.supremica.gui.ide.IDE;
@@ -73,7 +73,7 @@ public class AnalyzerConflictCheckAction extends WatersAnalyzerAction
   {
     final IDE ide = getIDE();
     if (ide != null) {
-      new AutomatonSynthesizerDialog(getAnalyzerPanel());           //To be replaced with conflict dialog
+      new AutomatonConflictCheckDialog(getAnalyzerPanel());
     }
   }
 
