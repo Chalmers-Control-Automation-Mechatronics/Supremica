@@ -222,11 +222,14 @@ public class AutomatonConflictCheckDialog extends JDialog
 
   public void ParameterCommitDialog()
   {
+    @SuppressWarnings("unused")
     final Frame owner = (Frame) getOwner();;
     //final ConflictCheckPopUpDialog dialog;
 
     final ProductDESProxyFactory factory =    ProductDESElementFactory.getInstance();
-    final ProductDESProxy des =   AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
+    @SuppressWarnings("unused")
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
 
     final List<Parameter> parameters = mConflictCheck.getParameters();
     storeInDatabase();
@@ -321,6 +324,7 @@ public class AutomatonConflictCheckDialog extends JDialog
   //#########################################################################
   //# Data Members
   // Dialog state
+  @SuppressWarnings("unused")
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final List<AutomatonProxy> mAutomata;
 
@@ -333,7 +337,9 @@ public class AutomatonConflictCheckDialog extends JDialog
   // Analysis workers
   private ConflictChecker mConflictCheck;
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -4771975182146634793L;
+
 }
