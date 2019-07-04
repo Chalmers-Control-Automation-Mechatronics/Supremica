@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.model.des;
 
-import net.sourceforge.waters.xsd.des.ConflictKind;
-
 /**
  * <P>A counterexample that shows that a model is blocking or has a
  * deadlock.</P>

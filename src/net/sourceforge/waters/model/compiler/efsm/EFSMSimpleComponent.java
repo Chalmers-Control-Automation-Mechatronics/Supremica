@@ -43,12 +43,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

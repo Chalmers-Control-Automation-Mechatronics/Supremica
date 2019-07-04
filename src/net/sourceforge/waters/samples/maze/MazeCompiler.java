@@ -47,6 +47,8 @@ import java.util.Set;
 
 import javax.swing.filechooser.FileFilter;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.IndexedSet;
 import net.sourceforge.waters.model.base.IndexedTreeSet;
 import net.sourceforge.waters.model.base.Proxy;
@@ -68,8 +70,6 @@ import net.sourceforge.waters.model.module.PlainEventListProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class MazeCompiler implements CopyingProxyUnmarshaller<ModuleProxy>

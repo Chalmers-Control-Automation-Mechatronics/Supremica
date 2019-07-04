@@ -59,9 +59,9 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * efforts are made to distinguish between deadlock and livelock. If a
  * blocking model contains a state without any outgoing transitions, or
  * with only selfloops outgoing, a trace marked {@link
- * net.sourceforge.waters.xsd.des.ConflictKind#DEADLOCK DEADLOCK} leading
+ * net.sourceforge.waters.model.des.ConflictKind#DEADLOCK DEADLOCK} leading
  * to that state is returned; otherwise a shortest trace marked {@link
- * net.sourceforge.waters.xsd.des.ConflictKind#LIVELOCK LIVELOCK} leading
+ * net.sourceforge.waters.model.des.ConflictKind#LIVELOCK LIVELOCK} leading
  * to a non-coreachable state is returned.</P>
  *
  * <P><STRONG>Algorithm.</STRONG></P>

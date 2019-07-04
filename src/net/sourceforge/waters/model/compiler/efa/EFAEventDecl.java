@@ -40,9 +40,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

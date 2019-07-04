@@ -50,13 +50,13 @@ import net.sourceforge.waters.model.analysis.des.AbstractDeadlockChecker;
 import net.sourceforge.waters.model.analysis.des.DeadlockChecker;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

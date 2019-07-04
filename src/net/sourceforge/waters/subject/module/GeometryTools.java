@@ -55,9 +55,8 @@ import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PointGeometryProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.subject.base.ProxySubject;
-
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**

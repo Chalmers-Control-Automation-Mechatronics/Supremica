@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.DuplicateNameException;
 import net.sourceforge.waters.model.base.ImmutableOrderedSet;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -51,7 +52,6 @@ import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.plain.base.NamedElement;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**

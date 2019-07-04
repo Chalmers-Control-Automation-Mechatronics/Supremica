@@ -41,6 +41,7 @@ import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -54,7 +55,6 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.SchemaBase;
 import net.sourceforge.waters.xsd.SchemaDES;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 public class StAXProductDESWriter

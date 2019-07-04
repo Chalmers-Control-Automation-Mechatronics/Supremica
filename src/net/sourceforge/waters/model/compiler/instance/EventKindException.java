@@ -33,11 +33,10 @@
 
 package net.sourceforge.waters.model.compiler.instance;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class EventKindException extends EvalException {

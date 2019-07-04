@@ -37,13 +37,12 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 import net.sourceforge.waters.plain.base.NamedElement;
-
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

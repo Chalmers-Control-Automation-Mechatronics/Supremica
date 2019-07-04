@@ -40,11 +40,11 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 

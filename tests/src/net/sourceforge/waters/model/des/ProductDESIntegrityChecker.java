@@ -39,8 +39,8 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.marshaller.DocumentIntegrityChecker;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class ProductDESIntegrityChecker

@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.modular;
 
 import net.sourceforge.waters.plain.base.NamedElement;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxyVisitor;
 

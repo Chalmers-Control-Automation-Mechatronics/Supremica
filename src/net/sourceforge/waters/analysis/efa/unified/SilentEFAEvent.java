@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 
 /**

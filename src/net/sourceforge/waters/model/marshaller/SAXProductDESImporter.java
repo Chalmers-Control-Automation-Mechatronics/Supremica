@@ -39,6 +39,8 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -47,8 +49,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.xsd.SchemaBase;
 import net.sourceforge.waters.xsd.SchemaDES;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

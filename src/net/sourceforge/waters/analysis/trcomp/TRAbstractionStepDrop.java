@@ -41,7 +41,7 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 import org.apache.logging.log4j.Logger;
 

@@ -39,10 +39,10 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.apache.logging.log4j.LogManager;
 

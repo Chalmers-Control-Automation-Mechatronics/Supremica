@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
@@ -47,7 +48,6 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public abstract class AbstractControlLoopCheckerTest

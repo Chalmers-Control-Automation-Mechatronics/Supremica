@@ -38,10 +38,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ItemNotFoundException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 public interface ProductDESProxyFactory

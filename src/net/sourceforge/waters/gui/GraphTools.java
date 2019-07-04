@@ -50,6 +50,7 @@ import net.sourceforge.waters.model.module.GuardActionBlockProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.subject.base.IndexedSetSubject;
 import net.sourceforge.waters.subject.module.BoxGeometrySubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -63,7 +64,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**

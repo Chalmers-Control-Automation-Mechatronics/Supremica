@@ -37,8 +37,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 /**
  * <P>A finite-state machine.</P>

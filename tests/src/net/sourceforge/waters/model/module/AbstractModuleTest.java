@@ -42,6 +42,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.AbstractXMLTest;
@@ -50,8 +52,6 @@ import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.printer.ModuleProxyPrinter;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public abstract class AbstractModuleTest

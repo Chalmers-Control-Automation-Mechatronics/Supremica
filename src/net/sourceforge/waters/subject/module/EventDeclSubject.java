@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
@@ -50,6 +51,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.base.ArrayListSubject;
 import net.sourceforge.waters.subject.base.AttributeMapSubject;
@@ -60,9 +62,6 @@ import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
-
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**

@@ -35,6 +35,7 @@ package net.sourceforge.waters.model.compiler.efsm;
 
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -42,9 +43,8 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.model.module.QualifiedIdentifierProxy;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**

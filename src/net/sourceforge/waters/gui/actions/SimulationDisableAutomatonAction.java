@@ -42,9 +42,9 @@ import net.sourceforge.waters.gui.simulator.AutomatonStatus;
 import net.sourceforge.waters.gui.simulator.Simulation;
 import net.sourceforge.waters.gui.simulator.SimulatorPanel;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.IDE;
 

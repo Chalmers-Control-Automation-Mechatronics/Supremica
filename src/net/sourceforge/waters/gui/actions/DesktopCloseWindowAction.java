@@ -38,8 +38,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.gui.ide.IDE;
 

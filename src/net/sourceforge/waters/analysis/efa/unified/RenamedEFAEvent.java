@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.analysis.efa.unified;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

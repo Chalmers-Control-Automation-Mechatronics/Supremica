@@ -40,14 +40,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**

@@ -69,7 +69,7 @@ public interface StateProxy
    * DEFAULT_MARKING_NAME}. In multi-coloured models or Kripke-structures,
    * there may be more than one proposition associated with a state.
    * @return  An unmodifiable collection of events, which should all be of
-   *          type {@link net.sourceforge.waters.xsd.base.EventKind#PROPOSITION
+   *          type {@link net.sourceforge.waters.model.base.EventKind#PROPOSITION
    *          PROPOSITION}.
    */
   public Collection<EventProxy> getPropositions();

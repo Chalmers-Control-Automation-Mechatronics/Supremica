@@ -47,6 +47,7 @@ import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.subject.base.CloningGeometryListSubject;
 import net.sourceforge.waters.subject.base.GeometrySubject;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
@@ -56,8 +57,6 @@ import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.SimpleListSubject;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
-
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**

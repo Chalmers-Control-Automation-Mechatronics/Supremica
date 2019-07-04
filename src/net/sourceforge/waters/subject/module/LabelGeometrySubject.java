@@ -41,6 +41,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AnchorPosition;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
@@ -51,8 +52,6 @@ import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
-
-import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 
 /**

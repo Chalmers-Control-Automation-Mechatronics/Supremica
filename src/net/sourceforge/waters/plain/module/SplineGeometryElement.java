@@ -44,10 +44,9 @@ import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.plain.base.CloningGeometryListElement;
 import net.sourceforge.waters.plain.base.GeometryElement;
-
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 /**

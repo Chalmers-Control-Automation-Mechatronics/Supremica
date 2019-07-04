@@ -35,8 +35,8 @@ package net.sourceforge.waters.model.des;
 
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.NamedProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

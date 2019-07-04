@@ -15,7 +15,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFAComponent;
 import net.sourceforge.waters.analysis.efa.simple.SimpleEFASystem;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 import org.supremica.automata.algorithms.IISCT.SMTSolver.SolverException;
 

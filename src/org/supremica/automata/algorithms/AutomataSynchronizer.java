@@ -56,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.Abortable;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.subject.base.AbstractSubject;
@@ -64,7 +65,6 @@ import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GuardActionBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

@@ -39,14 +39,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.context.CompiledRange;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.printer.ProxyPrinter;
-
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 class CompiledSingleEvent implements CompiledEvent

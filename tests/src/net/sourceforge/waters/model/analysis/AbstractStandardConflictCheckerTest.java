@@ -39,12 +39,12 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public abstract class AbstractStandardConflictCheckerTest

@@ -70,11 +70,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -84,9 +87,6 @@ import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -522,7 +522,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
 
     public void addEvent(final String name)
     {
-        addEvent(name,EventKind.CONTROLLABLE.value());
+        addEvent(name,EventKind.CONTROLLABLE.toString());
     }
 
 
@@ -562,21 +562,21 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                   if(kind == null){
                       throw new NullPointerException("ExtendedFiniteAutomata.AddEvent(): Null kind name.");
                   }
-                  if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
+                  if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.toString())) {
                       event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
                       module.getEventDeclListModifiable().add((EventDeclSubject)event);
                       if(!eventIdToProxyMap.containsKey(name)){
                           controllableAlphabet.add(event);
                           eventIdToProxyMap.put(name, event);
                       }
-                  } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
+                  } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.toString())) {
                       event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
                       module.getEventDeclListModifiable().add((EventDeclSubject)event);
                       if(!eventIdToProxyMap.containsKey(name)){
                           uncontrollableAlphabet.add(event);
                           eventIdToProxyMap.put(name, event);
                       }
-                  } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
+                  } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.toString())){
                       event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
                       module.getEventDeclListModifiable().add((EventDeclSubject)event);
                       eventIdToProxyMap.put(name, event);
@@ -626,9 +626,9 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                 eventIdToProxyMap.put(event.getName(), event);
                 module.getEventDeclListModifiable().add((EventDeclSubject)event);
                 unionAlphabet.add(event);
-                if (event.getKind().value().equals("controllable") || event.getKind().equals(EventKind.CONTROLLABLE)) {
+                if (event.getKind().toString().equals("controllable") || event.getKind().equals(EventKind.CONTROLLABLE)) {
                     controllableAlphabet.add(event);
-                } else if (event.getKind().value().equals("uncontrollable") || event.getKind().equals(EventKind.UNCONTROLLABLE)) {
+                } else if (event.getKind().toString().equals("uncontrollable") || event.getKind().equals(EventKind.UNCONTROLLABLE)) {
                     uncontrollableAlphabet.add(event);
                 }
                 if(exAutomaton.getKind() == ComponentKind.PLANT){
@@ -637,7 +637,7 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
             }
         }
         if(!exAutomaton.getMarkedLocations().isEmpty()) {
-            addEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION.value());
+            addEvent(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION.toString());
         }
     }
 

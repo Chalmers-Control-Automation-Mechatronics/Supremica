@@ -43,15 +43,11 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.BinaryOperator;
 import net.sourceforge.waters.model.expr.UnaryOperator;
-
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.AnchorPosition;
-import net.sourceforge.waters.xsd.module.ScopeKind;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 
 public interface ModuleProxyFactory

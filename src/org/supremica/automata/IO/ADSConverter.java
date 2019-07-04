@@ -14,8 +14,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -106,9 +106,9 @@ public class ADSConverter {
             final boolean isObservable = (Integer.parseInt(event) == 1000)?false:true;
             String kind;
             if(isObservable)
-                kind = (Integer.parseInt(event)%2 != 0)?EventKind.CONTROLLABLE.value():EventKind.UNCONTROLLABLE.value();
+                kind = (Integer.parseInt(event)%2 != 0)?EventKind.CONTROLLABLE.toString():EventKind.UNCONTROLLABLE.toString();
             else
-                kind = EventKind.CONTROLLABLE.value();
+                kind = EventKind.CONTROLLABLE.toString();
 
             ex.addEvent(event, kind, isObservable);
             ex.addTransition(source, target, event, null, null);

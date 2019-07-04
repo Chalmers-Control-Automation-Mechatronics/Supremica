@@ -38,8 +38,6 @@ import java.awt.geom.Point2D;
 
 import net.sourceforge.waters.model.base.GeometryProxy;
 
-import net.sourceforge.waters.xsd.module.SplineKind;
-
 
 /**
  * <P>A geometry object representing the shape of a spline.</P>

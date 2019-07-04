@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.GraphProxy;
@@ -54,8 +55,6 @@ import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
-
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**

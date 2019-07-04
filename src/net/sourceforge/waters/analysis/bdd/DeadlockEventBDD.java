@@ -34,8 +34,9 @@
 package net.sourceforge.waters.analysis.bdd;
 
 import net.sf.javabdd.BDDFactory;
+
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

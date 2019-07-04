@@ -38,11 +38,11 @@ import java.awt.Font;
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.util.PropositionIcon.ColorInfo;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

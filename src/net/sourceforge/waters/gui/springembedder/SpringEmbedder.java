@@ -54,6 +54,7 @@ import net.sourceforge.waters.gui.renderer.LabelBlockProxyShape;
 import net.sourceforge.waters.gui.renderer.SimpleNodeProxyShape;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.module.HornerPolynomial;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.subject.module.EdgeSubject;
 import net.sourceforge.waters.subject.module.GeometryTools;
 import net.sourceforge.waters.subject.module.GraphSubject;
@@ -63,7 +64,6 @@ import net.sourceforge.waters.subject.module.LabelGeometrySubject;
 import net.sourceforge.waters.subject.module.NodeSubject;
 import net.sourceforge.waters.subject.module.PointGeometrySubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.properties.Config;
 

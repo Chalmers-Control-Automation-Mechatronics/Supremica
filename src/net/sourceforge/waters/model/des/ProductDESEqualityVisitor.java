@@ -41,11 +41,10 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.VisitorException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 
 public class ProductDESEqualityVisitor

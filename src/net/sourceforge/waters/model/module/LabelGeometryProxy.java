@@ -37,8 +37,6 @@ import java.awt.geom.Point2D;
 
 import net.sourceforge.waters.model.base.GeometryProxy;
 
-import net.sourceforge.waters.xsd.module.AnchorPosition;
-
 
 /**
  * <P>A geometry object representing a label position.</P>

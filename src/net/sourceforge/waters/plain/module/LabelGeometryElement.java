@@ -40,11 +40,10 @@ import java.awt.geom.Point2D;
 
 import net.sourceforge.waters.model.base.ProxyVisitor;
 import net.sourceforge.waters.model.base.VisitorException;
+import net.sourceforge.waters.model.module.AnchorPosition;
 import net.sourceforge.waters.model.module.LabelGeometryProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
 import net.sourceforge.waters.plain.base.GeometryElement;
-
-import net.sourceforge.waters.xsd.module.AnchorPosition;
 
 
 /**

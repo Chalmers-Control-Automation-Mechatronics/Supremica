@@ -678,7 +678,7 @@ public class ScheduleDialog
                                             new net.sourceforge.waters.subject.module.EventDeclSubject(nameident,
                                                                                                        event.getKind(),
                                                                                                        event.isObservable(),
-                                                                                                       net.sourceforge.waters.xsd.module.ScopeKind.LOCAL,
+                                                                                                       net.sourceforge.waters.model.module.ScopeKind.LOCAL,
                                                                                                        null, null, null);
                                     module.getEventDeclListModifiable().add(decl);
                                 }

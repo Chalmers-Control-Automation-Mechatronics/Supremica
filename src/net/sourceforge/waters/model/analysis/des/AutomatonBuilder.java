@@ -33,8 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**

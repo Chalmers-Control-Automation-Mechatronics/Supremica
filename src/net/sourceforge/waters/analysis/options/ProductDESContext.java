@@ -31,7 +31,6 @@
 //# exception.
 //###########################################################################
 
-
 package net.sourceforge.waters.analysis.options;
 
 import javax.swing.Icon;

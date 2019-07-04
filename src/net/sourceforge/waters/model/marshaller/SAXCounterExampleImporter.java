@@ -45,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
+import net.sourceforge.waters.model.des.ConflictKind;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -56,7 +57,6 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.xsd.SchemaDES;
-import net.sourceforge.waters.xsd.des.ConflictKind;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

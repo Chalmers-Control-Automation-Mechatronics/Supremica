@@ -44,7 +44,7 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.WatersHashSet;
 import net.sourceforge.waters.model.analysis.des.NondeterministicDESException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 
 /**

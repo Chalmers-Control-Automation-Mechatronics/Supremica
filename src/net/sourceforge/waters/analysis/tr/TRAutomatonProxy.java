@@ -48,6 +48,7 @@ import java.util.Set;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.ProxyVisitor;
@@ -62,7 +63,6 @@ import net.sourceforge.waters.model.des.TransitionProxy;
 import net.sourceforge.waters.model.printer.ProductDESProxyPrinter;
 import net.sourceforge.waters.plain.base.AbstractNamedElement;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 /**

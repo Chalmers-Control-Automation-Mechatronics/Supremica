@@ -38,6 +38,7 @@ import java.awt.geom.Point2D;
 import net.sourceforge.waters.gui.GraphEditorPanel;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.model.base.ProxyTools;
+import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.subject.base.AbstractSubject;
 import net.sourceforge.waters.subject.base.ListSubject;
 import net.sourceforge.waters.subject.module.EdgeSubject;
@@ -51,7 +52,6 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.module.SplineKind;
 
 import org.supremica.gui.ide.ModuleContainer;
 

@@ -45,14 +45,13 @@ import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.subject.base.ModelChangeEvent;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.base.RecursiveUndoInfo;
 import net.sourceforge.waters.subject.base.ReplacementUndoInfo;
 import net.sourceforge.waters.subject.base.Subject;
 import net.sourceforge.waters.subject.base.UndoInfo;
-
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 
 /**

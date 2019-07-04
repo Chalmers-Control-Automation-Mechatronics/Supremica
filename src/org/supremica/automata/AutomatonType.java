@@ -50,7 +50,8 @@
 package org.supremica.automata;
 
 import java.util.*;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+
+import net.sourceforge.waters.model.base.ComponentKind;
 
 public class AutomatonType
 {

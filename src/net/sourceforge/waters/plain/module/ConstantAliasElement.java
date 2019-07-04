@@ -42,8 +42,7 @@ import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleProxyVisitor;
-
-import net.sourceforge.waters.xsd.module.ScopeKind;
+import net.sourceforge.waters.model.module.ScopeKind;
 
 
 /**

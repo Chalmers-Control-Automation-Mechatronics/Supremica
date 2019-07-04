@@ -48,7 +48,7 @@ import net.sourceforge.waters.analysis.tr.PreTransitionBuffer;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 
 /**

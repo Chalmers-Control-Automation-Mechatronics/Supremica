@@ -38,9 +38,9 @@ import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Pair;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 public class EventMutableTreeNode extends DefaultMutableTreeNode implements SimulationObserver
 {

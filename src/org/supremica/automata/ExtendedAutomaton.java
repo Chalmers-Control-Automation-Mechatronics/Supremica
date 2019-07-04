@@ -66,6 +66,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.expr.ExpressionParser;
@@ -77,6 +79,7 @@ import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
@@ -92,9 +95,6 @@ import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleNodeSubject;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -577,17 +577,17 @@ public class ExtendedAutomaton {
         EventDeclProxy event = eventIdToProxyMap.get(name);
         if(event == null){
             final SimpleIdentifierProxy ident = factory.createSimpleIdentifierProxy(name);
-            if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.value())) {
+            if (kind.equalsIgnoreCase(EventKind.CONTROLLABLE.toString())) {
                 event = factory.createEventDeclProxy(ident, EventKind.CONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
                 alphabet.add(event);
                 eventIdToProxyMap.put(name, event);
                 controllableAlphabet.add(event);
-            } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.value())) {
+            } else if (kind.equalsIgnoreCase(EventKind.UNCONTROLLABLE.toString())) {
                 event = factory.createEventDeclProxy(ident,EventKind.UNCONTROLLABLE, observable, ScopeKind.LOCAL, null, null, null);
                 alphabet.add(event);
                 eventIdToProxyMap.put(name, event);
                 uncontrollableAlphabet.add(event);
-            } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.value())){
+            } else if (kind.equalsIgnoreCase(EventKind.PROPOSITION.toString())){
                 event = factory.createEventDeclProxy(ident, EventKind.PROPOSITION, observable, ScopeKind.LOCAL, null, null, null);
                 alphabet.add(event);
                 eventIdToProxyMap.put(name, event);

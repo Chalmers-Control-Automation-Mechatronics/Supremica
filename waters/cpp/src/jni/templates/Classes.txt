@@ -108,24 +108,12 @@ glue class TreeSet extends Set {
 
 
 //###########################################################################
-package net.sourceforge.waters.xsd.base;
+package net.sourceforge.waters.model.base;
 //###########################################################################
 
 enum class ComponentKind {PLANT, SPEC, PROPERTY, SUPERVISOR}
 
 enum class EventKind {PROPOSITION, UNCONTROLLABLE, CONTROLLABLE}
-
-
-//###########################################################################
-package net.sourceforge.waters.xsd.des;
-//###########################################################################
-
-enum class ConflictKind {CONFLICT, DEADLOCK, LIVELOCK}
-
-
-//###########################################################################
-package net.sourceforge.waters.model.base;
-//###########################################################################
 
 glue class NamedProxy {
   String getName();
@@ -136,6 +124,8 @@ glue class NamedProxy {
 //###########################################################################
 package net.sourceforge.waters.model.des;
 //###########################################################################
+
+enum class ConflictKind {CONFLICT, DEADLOCK, LIVELOCK}
 
 glue class EventProxy extends NamedProxy {
   glue EventKind getKind();

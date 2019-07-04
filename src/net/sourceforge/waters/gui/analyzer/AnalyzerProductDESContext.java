@@ -31,7 +31,6 @@
 //# exception.
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.analyzer;
 
 import java.util.Map;

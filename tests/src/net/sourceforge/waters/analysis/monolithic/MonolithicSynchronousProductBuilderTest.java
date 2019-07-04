@@ -40,11 +40,11 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class MonolithicSynchronousProductBuilderTest

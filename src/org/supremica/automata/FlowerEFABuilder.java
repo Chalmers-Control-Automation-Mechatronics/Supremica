@@ -12,13 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  *
@@ -603,10 +604,10 @@ public class FlowerEFABuilder {
                 if (exAutomata.getEventIdToProxyMap().get(event.getName()) == null) {
                     exAutomata.getEventIdToProxyMap().put(event.getName(), event);
                     exAutomata.unionAlphabet.add(event);
-                    if (event.getKind().value().equals("controllable") || 
+                    if (event.getKind().toString().equals("controllable") || 
                             event.getKind().equals(EventKind.CONTROLLABLE)) {
                         exAutomata.controllableAlphabet.add(event);
-                    } else if (event.getKind().value().equals("uncontrollable") || 
+                    } else if (event.getKind().toString().equals("uncontrollable") || 
                             event.getKind().equals(EventKind.UNCONTROLLABLE)) {
                         exAutomata.uncontrollableAlphabet.add(event);
                     }

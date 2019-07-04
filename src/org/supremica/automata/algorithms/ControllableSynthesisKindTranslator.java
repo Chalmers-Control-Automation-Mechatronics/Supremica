@@ -12,8 +12,8 @@ package org.supremica.automata.algorithms;
 import java.io.Serializable;
 
 import net.sourceforge.waters.model.analysis.des.AbstractKindTranslator;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

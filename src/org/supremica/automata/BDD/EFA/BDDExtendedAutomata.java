@@ -21,13 +21,13 @@ import net.sf.javabdd.BDDDomain;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.module.EdgeProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

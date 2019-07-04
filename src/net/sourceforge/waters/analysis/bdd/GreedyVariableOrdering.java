@@ -43,10 +43,10 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 
 class GreedyVariableOrdering

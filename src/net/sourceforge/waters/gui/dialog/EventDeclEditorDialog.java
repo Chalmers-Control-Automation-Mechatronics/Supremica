@@ -98,6 +98,7 @@ import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.NonTypingTable;
 import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ExpressionScanner;
 import net.sourceforge.waters.model.expr.Operator;
@@ -105,6 +106,7 @@ import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
+import net.sourceforge.waters.model.module.ScopeKind;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.ProxySubject;
 import net.sourceforge.waters.subject.module.ColorGeometrySubject;
@@ -114,8 +116,6 @@ import net.sourceforge.waters.subject.module.IndexedIdentifierSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
 
 import org.supremica.properties.Config;
 

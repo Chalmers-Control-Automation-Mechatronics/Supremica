@@ -37,12 +37,12 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

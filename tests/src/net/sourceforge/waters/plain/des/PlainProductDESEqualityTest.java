@@ -44,10 +44,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.model.base.AbstractEqualityVisitor;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESEqualityVisitor;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 public class PlainProductDESEqualityTest extends TestCase

@@ -31,7 +31,6 @@
 //# exception.
 //###########################################################################
 
-
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;

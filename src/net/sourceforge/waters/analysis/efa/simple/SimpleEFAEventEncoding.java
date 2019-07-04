@@ -40,9 +40,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  *

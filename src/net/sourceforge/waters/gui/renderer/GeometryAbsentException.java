@@ -34,9 +34,9 @@
 package net.sourceforge.waters.gui.renderer;
 
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.SimpleComponentProxy;
-import net.sourceforge.waters.xsd.base.ComponentKind;
 
 import org.supremica.properties.Config;
 

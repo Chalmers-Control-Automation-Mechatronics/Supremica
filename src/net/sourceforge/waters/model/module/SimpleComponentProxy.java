@@ -35,7 +35,7 @@ package net.sourceforge.waters.model.module;
 
 import java.util.Map;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
+import net.sourceforge.waters.model.base.ComponentKind;
 
 /**
  * <P>A component representing a single finite-state machine.</P>

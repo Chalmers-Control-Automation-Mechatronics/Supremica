@@ -47,7 +47,7 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 
 /**

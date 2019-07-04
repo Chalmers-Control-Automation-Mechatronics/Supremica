@@ -36,8 +36,7 @@ package net.sourceforge.waters.model.module;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.waters.xsd.base.EventKind;
-import net.sourceforge.waters.xsd.module.ScopeKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 
 /**

@@ -41,9 +41,9 @@ import net.sourceforge.waters.analysis.efa.base.AbstractEFASystem;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.subject.module.ModuleSubject;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 /**
  * A simple implementation of the abstract system {@link AbstractEFASystem}.

@@ -37,12 +37,12 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.compiler.context.CompilationInfo;
 import net.sourceforge.waters.model.compiler.efa.EFAEventNameBuilder;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.xsd.base.EventKind;
 
 
 /**

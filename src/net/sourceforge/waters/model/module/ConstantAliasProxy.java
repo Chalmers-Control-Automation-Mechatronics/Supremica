@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.model.module;
 
-import net.sourceforge.waters.xsd.module.ScopeKind;
-
-
 /**
  * <P>An alias representing a constant definition.</P>
  *

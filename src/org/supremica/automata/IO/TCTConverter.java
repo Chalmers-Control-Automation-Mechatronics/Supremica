@@ -10,8 +10,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashSet;
 
-import net.sourceforge.waters.xsd.base.ComponentKind;
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 import org.supremica.automata.ExtendedAutomaton;
 
@@ -161,7 +161,7 @@ public class TCTConverter {
                 kind = (e%2 != 0)?EventKind.CONTROLLABLE:EventKind.UNCONTROLLABLE;
             }
 
-            des.addEvent(Integer.toString(e), kind.value(), isObservable);
+            des.addEvent(Integer.toString(e), kind.toString(), isObservable);
         }
 
         for(final Integer[] tran : transitions){

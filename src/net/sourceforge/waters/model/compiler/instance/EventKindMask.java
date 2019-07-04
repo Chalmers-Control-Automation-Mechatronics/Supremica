@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.compiler.instance;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sourceforge.waters.xsd.base.EventKind;
+import net.sourceforge.waters.model.base.EventKind;
 
 
 class EventKindMask {
