@@ -35,7 +35,6 @@ package net.sourceforge.waters.gui.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -54,6 +53,8 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
+import org.supremica.gui.ide.IDE;
+
 
 /**
  * @author George Hewlett, Andrew Holland, Robi Malik
@@ -63,7 +64,7 @@ public abstract class WatersAnalyzeDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  public WatersAnalyzeDialog(final Frame owner,
+  public WatersAnalyzeDialog(final IDE owner,
                              final ProductDESProxy des)
   {
     super(owner);
@@ -102,6 +103,11 @@ public abstract class WatersAnalyzeDialog extends JDialog
 
   //#########################################################################
   //# Simple Access
+  protected IDE getIDE()
+  {
+    return (IDE) getOwner();
+  }
+
   protected ModelAnalyzer getModelAnalyzer()
   {
     return mAnalyzer;

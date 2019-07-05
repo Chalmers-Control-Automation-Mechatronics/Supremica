@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.dialog;
+package net.sourceforge.waters.gui.analyzer;
 
 import java.awt.Container;
 import java.awt.Frame;
@@ -52,8 +52,10 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.dialog.AutomatonNameInputParser;
+import net.sourceforge.waters.gui.dialog.ErrorLabel;
+import net.sourceforge.waters.gui.dialog.FormattedInputParser;
+import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
@@ -80,12 +82,12 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author George Hewlett, Carly Hona
  */
-public class AutomatonSynchronousProductDialog extends JDialog
+public class SynchronousProductDialog extends JDialog
 {
 
   //#######################################################################
   //# Constructor
-  public AutomatonSynchronousProductDialog(final WatersAnalyzerPanel panel)
+  public SynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
     setTitle("Synchronous product");

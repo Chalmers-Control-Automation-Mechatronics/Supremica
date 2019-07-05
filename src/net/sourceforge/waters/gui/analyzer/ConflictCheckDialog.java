@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.dialog;
+package net.sourceforge.waters.gui.analyzer;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -52,7 +52,6 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -69,12 +68,12 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author Brandon Bassett
  */
-public class AutomatonConflictCheckDialog extends JDialog
+public class ConflictCheckDialog extends JDialog
 {
 
   //#########################################################################
   //# Constructor
-  public AutomatonConflictCheckDialog(final WatersAnalyzerPanel panel)
+  public ConflictCheckDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
     setTitle("Supervisor synthesis");

@@ -34,27 +34,20 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JFrame;
 
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
-import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.dialog.WatersVerifyDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
@@ -187,15 +180,29 @@ public abstract class WatersAnalyzeAction
 
   //#########################################################################
   //# Inner Class AnalyzeDialog
-  private class AnalyzeDialog extends WatersAnalyzeDialog
+  private class AnalyzeDialog extends WatersVerifyDialog
   {
     //#######################################################################
     //# Constructor
-    public AnalyzeDialog(final JFrame owner,
+    public AnalyzeDialog(final IDE owner,
                          final ProductDESProxy des,
                          final ModelAnalyzer Verifier)
     {
       super(owner, des);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersVerifyDialog
+    @Override
+    protected String getFailureDescription()
+    {
+      return WatersAnalyzeAction.this.getFailureDescription();
+    }
+
+    @Override
+    protected String getSuccessDescription()
+    {
+      return WatersAnalyzeAction.this.getSuccessDescription();
     }
 
     //#######################################################################
@@ -207,72 +214,9 @@ public abstract class WatersAnalyzeAction
     }
 
     @Override
-    protected String getFailureText()
-    {
-      final ModelVerifier verifier = getModelVerifier();
-      final CounterExampleProxy counterExample = verifier.getCounterExample();
-      String text = null;
-      if (counterExample != null) {
-        text = counterExample.getComment();
-      }
-      if (text == null || text.length() == 0) {
-        final ProductDESProxy des = verifier.getModel();
-        final String name = des.getName();
-        text = "Model " + name + " " + getFailureDescription() + ".";
-      }
-      return text;
-    }
-
-    @Override
-    protected String getSuccessText()
-    {
-      final ModelAnalyzer analyzer = getModelAnalyzer();
-      final ProductDESProxy des = analyzer.getModel();
-      final String name = des.getName();
-      return "Model " + name + " " + getSuccessDescription() + ".";
-    }
-
-    @Override
     protected ModelAnalyzer createModelAnalyzer()
     {
       return WatersAnalyzeAction.this.createModelVerifier();
-    }
-
-    @Override
-    public void fail()
-    {
-      super.fail();
-      final ModelVerifier modelVerifier = getModelVerifier();
-      final CounterExampleProxy counterexample =
-        modelVerifier.getCounterExample();
-      if (counterexample != null) {
-        final JButton traceButton = new JButton("Show Trace");
-        traceButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e)
-          {
-            AnalyzeDialog.this.dispose();
-            final IDE ide = getIDE();
-            final ModuleContainer container =
-              (ModuleContainer) ide.getActiveDocumentContainer();
-            container.switchToTraceMode(counterexample);
-            final String comment = counterexample.getComment();
-            if (comment != null && comment.length() > 0) {
-              final Logger logger =
-                LogManager.getLogger(WatersAnalyzeAction.this.getClass());
-              logger.info(comment);
-            }
-          }
-        });
-        addButton(traceButton);
-      }
-    }
-
-    //#######################################################################
-    //# Simple Access
-    private ModelVerifier getModelVerifier()
-    {
-      return (ModelVerifier) getModelAnalyzer();
     }
 
     //#######################################################################

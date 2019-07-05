@@ -473,6 +473,7 @@ public class CompositionalAutomataSynthesizer
       final MonolithicSynchronousProductBuilder syncBuilder =
         getSynchronousProductBuilder();
       final ProductDESProxy des = createProductDESProxy(automata);
+      reportMonolithicAnalysis(des);
       syncBuilder.setModel(des);
       final int slimit = getMonolithicStateLimit();
       syncBuilder.setNodeLimit(slimit);

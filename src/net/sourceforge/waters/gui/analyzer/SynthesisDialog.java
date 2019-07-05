@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.dialog;
+package net.sourceforge.waters.gui.analyzer;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
@@ -53,8 +53,7 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -70,17 +69,20 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.supremica.gui.ide.IDE;
+
 /**
  * @author George Hewlett, Robi Malik, Brandon Bassett
  */
-public class AutomatonSynthesizerDialog extends JDialog
+public class SynthesisDialog extends JDialog
 {
 
   //#########################################################################
   //# Constructor
-  public AutomatonSynthesizerDialog(final WatersAnalyzerPanel panel)
+  public SynthesisDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
+
     setTitle("Supervisor synthesis");
     mAnalyzerPanel = panel;
     mAutomata = panel.getAutomataTable().getOperationArgument();
@@ -228,11 +230,9 @@ public class AutomatonSynthesizerDialog extends JDialog
 
   public void ParameterCommitDialog()
   {
-    final Frame owner = (Frame) getOwner();;
-    final SynthesisPopUpDialog dialog;
-
-    final ProductDESProxyFactory factory =    ProductDESElementFactory.getInstance();
-    final ProductDESProxy des =   AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
+    final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
 
     final List<Parameter> parameters = mSynthesizer.getParameters();
     storeInDatabase();
@@ -242,7 +242,8 @@ public class AutomatonSynthesizerDialog extends JDialog
     for(final Parameter current: parameters)
       current.commitValue();
 
-    dialog = new SynthesisPopUpDialog(owner, des);
+    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
+    final SynthesisPopUpDialog dialog = new SynthesisPopUpDialog(ide, des);
     dispose();
     dialog.setVisible(true);
   }
@@ -254,7 +255,7 @@ public class AutomatonSynthesizerDialog extends JDialog
   {
     //#######################################################################
     //# Constructor
-    public SynthesisPopUpDialog(final Frame owner,
+    public SynthesisPopUpDialog(final IDE owner,
                                 final ProductDESProxy des)
     {
       super(owner, des);

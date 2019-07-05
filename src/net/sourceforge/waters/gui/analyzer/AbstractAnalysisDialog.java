@@ -31,64 +31,18 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.dialog;
+package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
-
+import javax.swing.JDialog;
 
 /**
- * An input parser for automaton names, for use with a
- * {@link javax.swing.JFormattedTextField JFormattedTextField}. This parser
- * allows entry of structured identifiers, and checks in addition whether an
- * entered name is already used by a component in a given module context.
- *
- * @see SimpleExpressionCell
- * @author Robi Malik
+ * @author Brandon Bassett
  */
-
-public class AutomatonNameInputParser extends IdentifierInputParser
+public abstract class AbstractAnalysisDialog extends JDialog
 {
 
-
   //#########################################################################
-  //# Constructor
-  public AutomatonNameInputParser(final IdentifierProxy oldname,
-                           final WatersAnalyzerPanel panel,
-                           final ExpressionParser parser,
-                           final boolean nameChange)
-  {
-    super(oldname, parser);
-    mModel = panel.getAutomataTableModel();
-    mNameChange = nameChange;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.FormattedInputParser
-  @Override
-  public IdentifierProxy parse(final String text) throws ParseException
-  {
-    final IdentifierProxy ident = super.parse(text);
-    if (!mNameChange) {
-      mModel.checkNewAutomatonName(ident);
-    } else {
-      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-      if (!eq.equals(getOldIdentifier(), ident)) {
-        mModel.checkNewAutomatonName(ident);
-      }
-    }
-    return ident;
-  }
-
-
-  //#######################################################################
-  //# Data Members
-  private final AutomataTableModel mModel;
-  private final boolean mNameChange;
+  //# Class Constants
+  private static final long serialVersionUID = -3610355726871200803L;
 
 }
