@@ -33,16 +33,225 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
+import net.sourceforge.waters.gui.util.DialogCancelAction;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
 
 /**
  * @author Brandon Bassett
  */
 public abstract class AbstractAnalysisDialog extends JDialog
 {
+  //#########################################################################
+  //# Constructor
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel)
+  {
+    super((Frame) panel.getTopLevelAncestor());
+
+    mAnalyzerPanel = panel;
+    mAutomata = panel.getAutomataTable().getOperationArgument();
+
+    AllParams = new HashMap<Integer,Parameter>();
+    factory = ProductDESElementFactory.getInstance();
+    des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
+                                               mAutomata, factory);
+    generateAnalyzerCombobox();
+    generateGUI();
+    setLocationRelativeTo(panel.getTopLevelAncestor());
+    setVisible(true);
+  }
+
+  //#########################################################################
+  //# Using Parameter Classes
+
+  /**
+   * Generates the JComboBox that is at the top of the frame,
+   * stores the list of all available algorithms
+   */
+  public void generateAnalyzerCombobox()
+  {
+    final JPanel mSuperviserPanel = new JPanel(new GridLayout(0, 2));
+    final JLabel superviserComboboxLabel = new JLabel("Algorithms");
+    analyzerCombobox = new JComboBox<>();
+    populateAlgorithmComboBox();
+
+    //Testing
+    /*
+     * final ActionListener Print = new ActionListener() {
+     *
+     * @Override public void actionPerformed(final ActionEvent event) {
+     * storeInDatabase(); printMap(); } };
+     *
+     * final JButton print = new JButton("Print Database");
+     * print.addActionListener(Print);
+     */
+    mSuperviserPanel.add(superviserComboboxLabel);
+    mSuperviserPanel.add(analyzerCombobox);
+    add(mSuperviserPanel, BorderLayout.PAGE_START);
+  }
+
+  /**
+   * Class specific way to populate the comboBox that stores all the
+   * algorithms to be used leave empty if only one algorithm
+   */
+  abstract public void populateAlgorithmComboBox();
+
+  public void analysisChanged()
+  {
+      generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox.getSelectedItem());
+
+      final List<Parameter> newParams = mAnalyzer.getParameters();
+
+      storeInDatabase();
+      copyFromDatabase(newParams);
+      mScrollParametersPanel.replaceView(newParams, des);
+
+    //re-packing causes the frame to shrink/increase to preferred size
+    pack();
+  }
+
+  public void generateGUI()
+  {
+    final ActionListener analyzerChanged = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        analysisChanged();
+      }
+    };
+
+    analyzerCombobox.addActionListener(analyzerChanged);
+
+      generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox.getSelectedItem());
+      mScrollParametersPanel =  new ParameterJScrollPane(mAnalyzer.getParameters(), des);
+
+    // Buttons panel ...
+    final ActionListener commithandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        ParameterCommitDialog();
+      }
+    };
+
+    mButtonsPanel = new JPanel();
+    final JButton okButton = new JButton("OK");
+    okButton.setRequestFocusEnabled(false);
+    okButton.addActionListener(commithandler);
+    mButtonsPanel.add(okButton);
+    final Action cancelAction = DialogCancelAction.getInstance();
+    final JButton cancelButton = new JButton(cancelAction);
+    cancelButton.setRequestFocusEnabled(false);
+    mButtonsPanel.add(cancelButton);
+
+    final JRootPane root = getRootPane();
+    root.setDefaultButton(okButton);
+    DialogCancelAction.register(this);
+
+    //Finally, build the full dialog ...
+    add(mScrollParametersPanel, BorderLayout.CENTER);
+    add(mButtonsPanel, BorderLayout.PAGE_END);
+    pack();
+    setVisible(true);
+  }
+
+  /**
+   * Values stored in GUI Components are stored in corresponding parameter then added to the database
+   */
+  public void storeInDatabase()
+  {
+    mScrollParametersPanel.commit(); //All ParameterPanels save their stored value in their corresponding parameter
+    final List<Parameter> activeParameters =
+      mScrollParametersPanel.getParameters();
+
+    for (final Parameter p : activeParameters) { //overwrite stored parameters with new version
+      AllParams.put(p.getID(), p);
+    }
+  }
+
+  /**
+   *  updates the passed parameters to have same stored value as
+   *  corresponding one in database
+   * @param parametersToStore the list of parameters that are to be stored in the database of all parameters
+   */
+
+  public void copyFromDatabase(final List<Parameter> parametersToStore)
+  {
+    for (final Parameter current : parametersToStore)
+      current.updateFromParameter(AllParams.get(current.getID()));
+  }
+
+  public void printMap()
+  {
+    for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
+      entry.getValue().printValue();
+    }
+  }
+
+  /**
+   * @param loader the parameter to be turned into the desired subclass of ModelAnalyzer
+   */
+  abstract public void generateAnalyser(ModelAnalyzerFactoryLoader loader);
+
+  public void ParameterCommitDialog()
+  {
+    final List<Parameter> parameters = mAnalyzer.getParameters();
+    storeInDatabase();
+    copyFromDatabase(parameters);
+
+    //commit all of the values to the synthesizer
+    for (final Parameter current : parameters)
+      current.commitValue();
+
+    generateResultsDialog();
+  }
+
+  /**
+   * Generates the pop up dialog that shows the result of using the analyzer
+   */
+  public abstract void generateResultsDialog();
+
+  //#########################################################################
+  //# Data Members
+  protected ParameterJScrollPane mScrollParametersPanel;
+  protected final HashMap<Integer,Parameter> AllParams;
+  protected JPanel mButtonsPanel;
+  protected JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;
+  protected final List<AutomatonProxy> mAutomata;
+  protected final WatersAnalyzerPanel mAnalyzerPanel;
+  protected final ProductDESProxyFactory factory;
+  protected final ProductDESProxy des;
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -3610355726871200803L;
+  protected static final long serialVersionUID = -3610355726871200803L;
+
+  // Analysis workers
+  protected ModelAnalyzer mAnalyzer;
 
 }
