@@ -44,21 +44,8 @@
     <property name="waters.xml" location="${waters.dir}/xml"/>
     <property name="waters.xsd" location="${waters.xml}/xsd"/>
     <property name="waters.xsl" location="${waters.xml}/xsl"/>
-    <property name="waters.jaxbjar"
-              location="${waters.dir}/java/jar/waters_jaxb.jar"/>
     <property name="waters.jniglue.jar"
               location="${waters.dir}/java/jar/jniglue.jar"/>
-
-    <!-- JAXB -->
-    <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
-    <property name="jaxb-core.jar" location="${lib}/jaxb-core.jar"/>
-    <property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
-    
-    <path id="jaxb.classpath">
-        <pathelement location="${jaxb-api.jar}"/>
-        <pathelement location="${jaxb-core.jar}"/>
-        <pathelement location="${jaxb-impl.jar}"/>
-    </path>
 
     <!-- LOG4J2 -->
     <property name="log4j2.api.jar" value="log4j-api-2.9.0.jar"/>
@@ -103,7 +90,7 @@
         depends="clean,jar_supremica_lib-minimal,build-minimal,cpp_waters"
         description="Rebuilds the project from scratch."/>
 
-    <target name="initialize_jars" depends="-jar_waters_jaxb">  
+    <target name="initialize_jars" depends="-waters_xsd_constants">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
 
         <!-- Library for handling db in SOC -->
@@ -147,7 +134,6 @@
         <unjar src="${lib}/trove-3.0.3.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/manufacturingTables_jaxb.jar"
                dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
@@ -173,15 +159,11 @@
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 
-        <!-- JAXB -->
-        <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jaxb-core.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <!-- JUnit -->
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>
 
-    <target name="initialize_jars-minimal" depends="-jar_waters_jaxb">  
+    <target name="initialize_jars-minimal" depends="-waters_xsd_constants">  
         <!-- PLEASE ADD COMMENTS DESCRIBING THE DIFFERENT LIBRARIES. -->
 
         <!-- Library for handling db in SOC -->
@@ -225,7 +207,6 @@
         <unjar src="${lib}/trove-3.0.3.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${waters.jaxbjar}" dest="${lib}/${unjared}"/>
         <!-- <unjar src="${lib}/manufacturingTables_jaxb.jar" -->
                <!-- dest="${lib}/${unjared}"/> -->
         <!-- <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/> -->
@@ -251,10 +232,6 @@
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 
-        <!-- JAXB -->
-        <unjar src="${jaxb-api.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jaxb-core.jar}" dest="${lib}/${unjared}"/>
-        <unjar src="${jaxb-impl.jar}" dest="${lib}/${unjared}"/>
         <!-- JUnit -->
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>
@@ -533,8 +510,8 @@ Class-Path: ${manifest.pathlist}</echo>
         </jar>
     </target>
     
-    <target name="-jar_waters_jaxb">
-        <ant dir="${waters.dir}" target="jaxb-jar" inheritAll="false"/>
+    <target name="-waters_xsd_constants">
+        <ant dir="${waters.dir}" target="xsd-constants-generate" inheritAll="false"/>
     </target>
     
     <target name="build_rop_processeditor" description="builds rop processeditor">

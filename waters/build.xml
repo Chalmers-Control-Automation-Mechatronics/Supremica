@@ -12,23 +12,12 @@
 
   <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
-  <property name="jaxb-api.jar" location="${supremica.lib}/jaxb-api.jar"/>
-  <property name="jaxb-core.jar" location="${supremica.lib}/jaxb-core.jar"/>
-  <property name="jaxb-impl.jar" location="${supremica.lib}/jaxb-impl.jar"/>
-  <property name="jaxb-jxc.jar" location="${supremica.lib}/jaxb-jxc.jar"/>
-  <property name="jaxb-xjc.jar" location="${supremica.lib}/jaxb-xjc.jar"/>
   <property name="log4j-api.jar"
             location="${supremica.lib}/log4j-api-2.9.0.jar"/>
   <property name="log4j-core.jar"
             location="${supremica.lib}/log4j-core-2.9.0.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
-
-  <path id="jaxb.classpath">
-    <pathelement location="${jaxb-api.jar}"/>
-    <pathelement location="${jaxb-core.jar}"/>
-    <pathelement location="${jaxb-impl.jar}"/>
-  </path>
 
   <property name="bddlib" location="${supremica.root}/dist"/>
   <property name="classes" location="java/classes"/>
@@ -38,12 +27,14 @@
   <property name="waters.examples" location="${supremica.examples}/waters"/>
   <property name="jar" location="java/jar"/>
   <property name="javadoc" location="java/docs"/>
-  <property name="license.file" location="${supremica.src}/net/sourceforge/waters/config/header_waters.txt"/>
+  <property name="license.file"
+            location="${supremica.src}/net/sourceforge/waters/config/header_waters.txt"/>
   <property name="logs" location="logs"/>
   <property name="logs.reports" location="${logs}/reports"/>
   <property name="logs.results" location="${logs}/results"/>
   <property name="src" location="java/src"/>
-  <property name="src.xsd.constants" location="${src}/net/sourceforge/waters/xsd"/>
+  <property name="src.xsd.constants"
+            location="${supremica.src}/net/sourceforge/waters/xsd"/>
   <property name="tmp" location="tmp"/>
   <property name="xml" location="xml"/>
   <property name="xsd" location="${xml}/xsd"/>
@@ -51,7 +42,6 @@
 
   <property name="javah.dir" location="${cpp}/src/waters/javah"/>
   <property name="javah.file" location="${javah.dir}/Invocations.h"/>
-  <property name="jaxb.jar" location="${jar}/waters_jaxb.jar"/>
   <property name="jniglue.indir" location="${cpp}/src/jni/templates"/>
   <property name="jniglue.outdir" location="${cpp}/src/jni/glue"/>
   <property name="jniglue.jar" location="${jar}/jniglue.jar"/>
@@ -65,8 +55,6 @@
   <property name="waters552.jar" location="${jar}/waters552.jar"/>
 
   <path id="waters.compile.classpath">
-    <path refid="jaxb.classpath"/>
-    <pathelement location="${jaxb.jar}"/>
     <pathelement location="${javabdd.jar}"/>
     <pathelement location="${log4j-api.jar}"/>
     <pathelement location="${log4j-core.jar}"/>
@@ -88,59 +76,7 @@
     <mkdir dir="${jar}"/>
   </target>
 
-  <target name="jaxb-generate" depends="init">
-    <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-      <classpath>
-        <path refid="jaxb.classpath"/>
-        <pathelement location="${jaxb-xjc.jar}"/>
-      </classpath>
-    </taskdef>
-    <delete dir="${tmp}" quiet="true"/>
-    <mkdir dir="${tmp}"/>
-    <xjc destdir="${tmp}" extension="true" removeOldOutput="yes">
-      <schema dir="${xsd}" includes="waters-des.xsd waters-module.xsd"/>
-      <produces dir="${src}/net/sourceforge/waters/xsd/"
-                includes="base/* base/impl/* des/* des/impl/*
-                          module/* module/impl/*"/>
-    </xjc>
-    <!-- Remove "* <p>" lines from generated code - avoid javadoc warnings -->
-    <copy todir="${src}">
-      <fileset dir="${tmp}">
-        <include name="**/*.java"/>
-      </fileset>
-      <filterchain>
-        <linecontainsregexp negate="true">
-          <regexp pattern="^ *\* *&lt;p&gt; *$"/>
-        </linecontainsregexp>
-      </filterchain>
-    </copy>
-    <delete dir="${tmp}"/>
-  </target>
-
-  <target name="jaxb-compile" depends="jaxb-generate,xsd-constants-generate">
-    <mkdir dir="${waters.classes}"/>
-    <javac srcdir="${src}" destdir="${waters.classes}"
-           includes="net/sourceforge/waters/xsd/**/*.java"
-           debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
-           includeantruntime="false">
-      <classpath refid="jaxb.classpath"/>
-    </javac>
-  </target>
-
-  <target name="jaxb-jar" depends="jaxb-compile"
-          description="Create the waters_jaxb.jar archive.">
-    <jar jarfile="${jaxb.jar}">
-      <fileset dir="${waters.classes}">
-        <include name="net/sourceforge/waters/xsd/**/*.class"/>
-      </fileset>
-      <fileset dir="${src}">
-        <include name="net/sourceforge/waters/xsd/**/*.properties"/>
-        <include name="net/sourceforge/waters/xsd/**/*.ser"/>
-       </fileset>
-    </jar>
-  </target>
-
-  <target name="waters-compile" depends="jaxb-jar,xsd-constants-generate">
+  <target name="waters-compile" depends="xsd-constants-generate">
     <mkdir dir="${waters.classes}"/>
     <javac sourcepath="" srcdir="${supremica.src}" destdir="${waters.classes}" 
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
@@ -234,40 +170,44 @@
       <class name="net.sourceforge.waters.cpp.analysis.NativeWordSizeTest"/>
     </javah>
   </target>
-	
+        
   <target name="xsd-constants-generate">
     <mkdir dir="${waters.classes}"/>
-  	<javac srcdir="${src}" destdir="${waters.classes}" 
-  		   includes="net/sourceforge/waters/build/xml/**/*.java"
+    <javac srcdir="${src}" destdir="${waters.classes}" 
+           includes="net/sourceforge/waters/build/xml/**/*.java"
            debug="${debug}" debuglevel="${debuglevel}" optimize="${optimize}"
            includeantruntime="false"/>
-  	<java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
+    <mkdir dir="${src.xsd.constants}"/>
+    <java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
           fork="true" failonerror="true">
-  	  <classpath>
+      <classpath>
         <pathelement location="${waters.classes}"/>
       </classpath>
-  	  <arg file="${xsd}/waters-base.xsd"/>
-   	  <arg file="${src.xsd.constants}/SchemaBase.java"/>
-   	  <arg file="${license.file}"/>
-  	</java>
-  	<java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
+      <arg file="${xsd}/waters-base.xsd"/>
+      <arg file="${src.xsd.constants}/SchemaBase.java"/>
+      <arg file="${license.file}"/>
+      <arg file="${supremica.src}/net/sourceforge/waters/model/base"/>
+    </java>
+    <java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
           fork="true" failonerror="true">
-  	  <classpath>
+      <classpath>
         <pathelement location="${waters.classes}"/>
       </classpath>
-  	  <arg file="${xsd}/waters-des.xsd"/>
-   	  <arg file="${src.xsd.constants}/SchemaDES.java"/>
-   	  <arg file="${license.file}"/>
-  	</java>
-  	<java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
+      <arg file="${xsd}/waters-des.xsd"/>
+      <arg file="${src.xsd.constants}/SchemaDES.java"/>
+      <arg file="${license.file}"/>
+      <arg file="${supremica.src}/net/sourceforge/waters/model/des"/>
+    </java>
+    <java classname="net.sourceforge.waters.build.xml.SchemaNamesExtractor"
           fork="true" failonerror="true">
-  	  <classpath>
+      <classpath>
         <pathelement location="${waters.classes}"/>
       </classpath>
-  	  <arg file="${xsd}/waters-module.xsd"/>
-   	  <arg file="${src.xsd.constants}/SchemaModule.java"/>
-   	  <arg file="${license.file}"/>
-  	</java>
+      <arg file="${xsd}/waters-module.xsd"/>
+      <arg file="${src.xsd.constants}/SchemaModule.java"/>
+      <arg file="${license.file}"/>
+      <arg file="${supremica.src}/net/sourceforge/waters/model/module"/>
+    </java>
   </target>
 
   <target name="jniglue-compile">
@@ -420,7 +360,7 @@
   <target name="test" depends="runtest,test-report"
           description="Run the test cases."/>
 
-  <target name="doc" depends="jaxb-generate"
+  <target name="doc" depends="xsd-constants-generate"
           description="Generate Javadoc documentation.">
     <delete dir="${javadoc}"/>
     <mkdir dir="${javadoc}"/>
@@ -429,7 +369,6 @@
              additionalparam="-Xdoclint:all,-missing">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
-        <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
       </packageset>
       <packageset dir="${supremica.src}">
         <include name="net/sourceforge/waters/**"/>
@@ -450,7 +389,7 @@
     </javadoc>
   </target>
 
-  <target name="doc552" depends="jaxb-generate"
+  <target name="doc552" depends="xsd-constants-generate"
           description="Generate Javadoc documentation.">
     <delete dir="${javadoc552}"/>
     <mkdir dir="${javadoc552}/src"/>
@@ -480,7 +419,6 @@
              additionalparam="-Xdoclint:all,-missing">
       <packageset dir="${src}">
         <include name="net/sourceforge/waters/xsd/**/*"/>
-        <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
       </packageset>
       <packageset dir="${javadoc552}/src"/>
       <doctitle><![CDATA[<h1>Waters API Documentation</h1>]]></doctitle>
