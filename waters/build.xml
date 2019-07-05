@@ -107,7 +107,6 @@
         <include name="net/sourceforge/waters/**/*.xsl"/>
         <exclude name="net/sourceforge/waters/build/**"/>
         <exclude name="net/sourceforge/waters/gui/**"/>
-        <exclude name="net/sourceforge/waters/xsd/**"/>
         <include name="org/supremica/log/**"/>
       </fileset>
     </jar>
@@ -460,6 +459,7 @@
     <delete dir="${javadoc}"/>
     <delete dir="${javah.dir}"/>
     <delete dir="${jniglue.outdir}"/>
+    <delete dir="${src.xsd.constants}"/>
   </target>
 
 </project>
