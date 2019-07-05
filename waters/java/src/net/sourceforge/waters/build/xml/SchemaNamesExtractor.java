@@ -72,14 +72,16 @@ public class SchemaNamesExtractor
   public static void main(final String[] args)
   {
     try {
-      if (args.length != 3) {
+      if (args.length != 4) {
         System.err.println("USAGE");
         System.exit(1);
       }
       final File inputFile = new File(args[0]);
       final File outputFile = new File(args[1]);
       final File headerFile = new File(args[2]);
-      final SchemaNamesExtractor extractor = new SchemaNamesExtractor(headerFile);
+      final File coreDir = new File(args[3]);
+      final SchemaNamesExtractor extractor =
+        new SchemaNamesExtractor(headerFile, coreDir);
       extractor.processSchema(inputFile, outputFile);
     } catch (final Throwable exception) {
       System.err.println("FATAL - exception caught in main()!");
@@ -90,16 +92,19 @@ public class SchemaNamesExtractor
 
   //#########################################################################
   //# Constructors
-  private SchemaNamesExtractor(final File headerFile)
+  private SchemaNamesExtractor(final File headerFile, final File coreDir)
     throws ParserConfigurationException
   {
     final DocumentBuilderFactory docBuilderFactory =
       DocumentBuilderFactory.newInstance();
     docBuilderFactory.setNamespaceAware(true);
     mHeaderFile = headerFile;
+    mCoreClassDirectory = coreDir;
+    mCoreClassPackageName = getPackageName(coreDir);
     mBuilder = docBuilderFactory.newDocumentBuilder();
     mElements = new TreeSet<>();
     mAttributes = new TreeSet<>();
+    mEnumTypes = new TreeSet<>();
   }
 
 
@@ -114,6 +119,7 @@ public class SchemaNamesExtractor
     final Document domDocument = mBuilder.parse(stream);
     final Element root = domDocument.getDocumentElement();
     mTargetNameSpace = root.getAttribute("targetNamespace");
+
     final NodeList list = root.getElementsByTagNameNS(NAMESPACE, "*");
     for (int i = 0; i < list.getLength(); i++) {
       final Node node = list.item(i);
@@ -128,6 +134,12 @@ public class SchemaNamesExtractor
     mOutput.println();
     for (final AttributeInfo info : mAttributes) {
       info.print();
+    }
+    if (!mEnumTypes.isEmpty()) {
+      mOutput.println();
+      for (final EnumInfo enumInfo : mEnumTypes) {
+        enumInfo.printDefault();
+      }
     }
     writeTrailer();
   }
@@ -165,16 +177,42 @@ public class SchemaNamesExtractor
     if (defaultValue.length() == 0) {
       info = new AttributeInfo(name);
     } else {
-      final String type = attrib.getAttribute("type");
+      String type = attrib.getAttribute("type");
       if (type.equals("xs:boolean")) {
         info = new AttributeInfo(name, "boolean", defaultValue);
       } else if (type.equals("xs:int")) {
         info = new AttributeInfo(name, "int", defaultValue);
       } else {
         info = new AttributeInfo(name);
+        final int pos = type.lastIndexOf(':');
+        if (pos >= 0) {
+          type = type.substring(pos + 1);
+        }
+        registerEnum(type, defaultValue);
       }
     }
     mAttributes.add(info);
+  }
+
+  private void registerEnum(final String name, final String defaultValue)
+  {
+    EnumInfo enumInfo = null;
+    for (final EnumInfo info : mEnumTypes) {
+      if (info.getName().equals(name)) {
+        enumInfo = info;
+        break;
+      }
+    }
+    if (enumInfo == null) {
+      final File file = new File(mCoreClassDirectory, name + ".java");
+      if (file.exists()) {
+        enumInfo = new EnumInfo(name);
+        mEnumTypes.add(enumInfo);
+      }
+    }
+    if (enumInfo != null) {
+      enumInfo.provideDefaultValue(defaultValue);
+    }
   }
 
   private void splitOutputFile(final File outputFile)
@@ -187,12 +225,8 @@ public class SchemaNamesExtractor
       mClassName = fileName;
       fileName += ".java";
     }
-    File parent = outputFile.getParentFile();
-    mPackageName = parent.getName();
-    while (parent != null && !parent.getName().equals("net")) {
-      parent = parent.getParentFile();
-      mPackageName = parent.getName() + "." + mPackageName;
-    }
+    final File parent = outputFile.getParentFile();
+    mOutputPackageName = getPackageName(parent);
     if (parent == null) {
       System.err.println("FATAL: Output file " + outputFile +
                          " does not represent a Waters class!");
@@ -204,6 +238,16 @@ public class SchemaNamesExtractor
     } catch (final IOException exception) {
       reportFatalIOError("Can't open output file", outputFile, exception);
     }
+  }
+
+  private String getPackageName(File dir)
+  {
+    String packName = dir.getName();
+    while (dir != null && !dir.getName().equals("net")) {
+      dir = dir.getParentFile();
+      packName = dir.getName() + "." + packName;
+    }
+    return packName;
   }
 
   private void writeHeader()
@@ -234,9 +278,21 @@ public class SchemaNamesExtractor
 
     mOutput.println();
     mOutput.print("package ");
-    mOutput.print(mPackageName);
+    mOutput.print(mOutputPackageName);
     mOutput.println(';');
     mOutput.println();
+    boolean hasImport = false;
+    for (final EnumInfo enumInfo : mEnumTypes) {
+      if (enumInfo.hasPrintableDefault()) {
+        enumInfo.printImport();
+        hasImport = true;
+      }
+    }
+    if (hasImport) {
+      mOutput.println();
+    } else {
+      mEnumTypes.clear();
+    }
     mOutput.println();
     mOutput.print("public class ");
     mOutput.print(mClassName);
@@ -327,7 +383,7 @@ public class SchemaNamesExtractor
     }
 
     //#######################################################################
-    //# Output
+    //# Auxiliary Methods
     private void print()
     {
       writePrefixedStringDeclaration("ATTRIB", mName);
@@ -351,13 +407,94 @@ public class SchemaNamesExtractor
 
 
   //#########################################################################
+  //# Inner Class EnumInfo
+  private class EnumInfo implements Comparable<EnumInfo>
+  {
+    //#######################################################################
+    //# Constructors
+    private EnumInfo(final String name)
+    {
+      mName = name;
+      mDefaultValue = null;
+    }
+
+    //#######################################################################
+    //# Interface java.lang.Comparable<AttributeInfo>
+    @Override
+    public int compareTo(final EnumInfo info)
+    {
+      return mName.compareTo(info.mName);
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private String getName()
+    {
+      return mName;
+    }
+
+    private void provideDefaultValue(final String defaultValue)
+    {
+      if (mDefaultAmbiguous) {
+        // skip
+      } else if (mDefaultValue == null) {
+        mDefaultValue = defaultValue;
+      } else if (mDefaultValue.equals(defaultValue)) {
+        // skip
+      } else {
+        mDefaultAmbiguous = true;
+        mDefaultValue = null;
+      }
+    }
+
+    private boolean hasPrintableDefault()
+    {
+      return mDefaultValue != null && !mDefaultAmbiguous;
+    }
+
+    private void printImport()
+    {
+      mOutput.print("import ");
+      mOutput.print(mCoreClassPackageName);
+      mOutput.print('.');
+      mOutput.print(mName);
+      mOutput.println(';');
+    }
+
+    private void printDefault()
+    {
+      if (hasPrintableDefault()) {
+        mOutput.print("  public static final ");
+        mOutput.print(mName);
+        mOutput.print(" DEFAULT_");
+        mOutput.print(mName);
+        mOutput.print(" = ");
+        mOutput.print(mName);
+        mOutput.print('.');
+        mOutput.print(mDefaultValue);
+        mOutput.println(';');
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final String mName;
+    private String mDefaultValue;
+    private boolean mDefaultAmbiguous;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final File mHeaderFile;
+  private final File mCoreClassDirectory;
+  private final String mCoreClassPackageName;
   private final DocumentBuilder mBuilder;
   private final Collection<String> mElements;
   private final Collection<AttributeInfo> mAttributes;
+  private final Collection<EnumInfo> mEnumTypes;
 
-  private String mPackageName;
+  private String mOutputPackageName;
   private String mClassName;
   private PrintStream mOutput = System.out;
   private String mTargetNameSpace;

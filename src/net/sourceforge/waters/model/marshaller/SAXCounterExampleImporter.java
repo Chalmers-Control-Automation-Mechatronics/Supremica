@@ -353,7 +353,7 @@ public class SAXCounterExampleImporter
 
     //#######################################################################
     //# Data Members
-    private ConflictKind mKind = ConflictKind.CONFLICT;  // TODO use default
+    private ConflictKind mKind = SchemaDES.DEFAULT_ConflictKind;
   }
 
 

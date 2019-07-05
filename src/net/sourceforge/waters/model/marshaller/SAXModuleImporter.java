@@ -602,7 +602,7 @@ public class SAXModuleImporter
 
     //#######################################################################
     //# Data Members
-    private ScopeKind mScope = ScopeKind.LOCAL; // TODO use default
+    private ScopeKind mScope = SchemaModule.DEFAULT_ScopeKind;
     private SingletonHandler<SimpleExpressionProxy> mExpressionHandler = null;
   }
 
@@ -828,7 +828,7 @@ public class SAXModuleImporter
     //# Data Members
     private EventKind mKind = null;
     private boolean mObservable = SchemaModule.DEFAULT_Observable;
-    private ScopeKind mScope = ScopeKind.LOCAL; // TODO use default
+    private ScopeKind mScope = SchemaModule.DEFAULT_ScopeKind;
     private ListHandler<SimpleExpressionProxy> mRangeListHandler = null;
     private ColorGeometryProxyHandler mColorGeometryProxyHandler = null;
     private AttributeMapHandler mAttributeMapHandler = null;
@@ -1548,7 +1548,7 @@ public class SAXModuleImporter
     //#######################################################################
     //# Data Members
     private PointHandler mPointHandler = null;
-    private AnchorPosition mAnchor = AnchorPosition.SW; // TODO use default
+    private AnchorPosition mAnchor = SchemaModule.DEFAULT_AnchorPosition;
   }
 
 
@@ -2175,7 +2175,7 @@ public class SAXModuleImporter
     //# Data Members
     private final PointHandler mPointHandler;
     private final List<Point> mPoints;
-    private SplineKind mKind = SplineKind.INTERPOLATING; // TODO use default
+    private SplineKind mKind = SchemaModule.DEFAULT_SplineKind;
   }
 
 
