@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.io.File;
+
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -287,15 +289,15 @@ public abstract class AbstractTRDelegatingAnalyzer
   }
 
   @Override
-  public void setMonolithicDumpFileName(final String fileName)
+  public void setMonolithicDumpFile(final File file)
   {
-    mDelegate.setMonolithicDumpFileName(fileName);
+    mDelegate.setMonolithicDumpFile(file);
   }
 
   @Override
-  public String getMonolithicDumpFileName()
+  public File getMonolithicDumpFile()
   {
-    return mDelegate.getMonolithicDumpFileName();
+    return mDelegate.getMonolithicDumpFile();
   }
 
   @Override

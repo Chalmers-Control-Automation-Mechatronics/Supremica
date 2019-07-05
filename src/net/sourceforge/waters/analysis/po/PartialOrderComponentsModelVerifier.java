@@ -47,6 +47,8 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.BlockedArrayList;
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.WatersIntHeap;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -111,8 +113,30 @@ public abstract class PartialOrderComponentsModelVerifier
 
 
   //#########################################################################
-  //# Invocation
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    for (final Parameter param : list) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription
+          ("Maximum number of states that can be encountered before aborting");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription
+          ("Maximum number of transitions that can be explored before aborting");
+        break;
+      }
+    }
+    return list;
+  }
 
+
+  //#########################################################################
+  //# Invocation
   @Override
   public boolean run() throws AnalysisException
   {

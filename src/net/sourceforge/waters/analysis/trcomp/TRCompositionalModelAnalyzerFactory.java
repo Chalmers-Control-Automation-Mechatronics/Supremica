@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.io.File;
 import java.io.PrintStream;
 
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
@@ -659,7 +660,8 @@ public class TRCompositionalModelAnalyzerFactory
       final AbstractTRCompositionalAnalyzer composer =
         (AbstractTRCompositionalAnalyzer) analyzer;
       final String fileName = getValue();
-      composer.setMonolithicDumpFileName(fileName);
+      final File file = new File(fileName);
+      composer.setMonolithicDumpFile(file);
     }
   }
 

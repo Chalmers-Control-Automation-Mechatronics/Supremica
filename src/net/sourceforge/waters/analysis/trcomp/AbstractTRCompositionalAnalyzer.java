@@ -35,10 +35,12 @@ package net.sourceforge.waters.analysis.trcomp;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,12 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.FileParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -355,15 +363,15 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   @Override
-  public void setMonolithicDumpFileName(final String fileName)
+  public void setMonolithicDumpFile(final File file)
   {
-    mMonolithicDumpFileName = fileName;
+    mMonolithicDumpFile = file;
   }
 
   @Override
-  public String getMonolithicDumpFileName()
+  public File getMonolithicDumpFile()
   {
-    return mMonolithicDumpFileName;
+    return mMonolithicDumpFile;
   }
 
   @Override
@@ -376,6 +384,186 @@ public abstract class AbstractTRCompositionalAnalyzer
   public boolean isOutputCheckingEnabled()
   {
     return mOutputCheckingEnabled;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final Iterator<Parameter> iter = list.iterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        iter.remove();
+        break;
+      default:
+        break;
+      }
+    }
+
+    list.add(new EnumParameter<TRPreselectionHeuristic>
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
+        "Preselection method",
+        "Preselection heuristic to choose groups of automata to consider " +
+        "for composition.",
+        getPreselectionHeuristicFactory())
+      {
+        @Override
+        public void commitValue()
+        {
+          setPreselectionHeuristic(getValue());
+        }
+      });
+    list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
+       "Selection heuristic",
+       "Heuristic to choose the group of automata to compose and simplify " +
+         "from the options produced by the preselection method.",
+         getSelectionHeuristicFactory())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSelectionHeuristic(getValue());
+        }
+      });
+    list.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SimplifierCreator,
+       "Abstraction procedure",
+       "Abstraction procedure to simplify automata during compositional " +
+       "minimisation.",
+       getTRSimplifierFactory())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSimplifierCreator(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit,
+       "Internal state limit",
+       "The maximum number of states allowed for intermediate automata.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setInternalStateLimit(getValue());
+        }
+      });
+    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
+    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit,
+       "Internal transition limit",
+       "The maximum number of transitions allowed for intermediate automata.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setInternalTransitionLimit(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit,
+       "Monolithic state limit",
+       "The maximum number of states allowed during monolithic analysis " +
+       "attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setMonolithicStateLimit(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit,
+       "Monolithic transition limit",
+       "The maximum number of transitions allowed during monolithic " +
+       "analysis attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setMonolithicTransitionLimit(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled,
+       "Use blocked events",
+       "Detect and remove events known to be globablly disabled.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setBlockedEventsEnabled(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled,
+       "Use selfloop-only events",
+       "Detect events that are appear only as selfloop outside of the " +
+       "subsystem being abstracted, and use this information to help with " +
+       "minimisation.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setSelfloopOnlyEventsEnabled(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled,
+       "Use always enabled events",
+       "Detect events that are enabled in all states outside of the " +
+       "subsystem being abstracted, and use this information to help with " +
+       "minimisation.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setAlwaysEnabledEventsEnabled(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled,
+       "Use failing events",
+       "Detect events that only lead to blocking states and " +
+       "simplify automata based on this information.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setFailingEventsEnabled(getValue());
+        }
+      });
+    //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
+    list.add(new FileParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile,
+       "Dump file name",
+       "If set, any abstracted model will be written to this file " +
+       "before being sent for monolithic verification.")
+      {
+        @Override
+        public void commitValue()
+        {
+          setMonolithicDumpFile(getValue());
+        }
+      });
+    return list;
   }
 
 
@@ -1297,8 +1485,8 @@ public abstract class AbstractTRCompositionalAnalyzer
          code + " states.", automata.size(), estimate);
       logger.debug(msg);
     }
-    if (mMonolithicDumpFileName != null) {
-      MarshallingTools.saveProductDESorModule(des, mMonolithicDumpFileName);
+    if (mMonolithicDumpFile != null) {
+      MarshallingTools.saveProductDESorModule(des, mMonolithicDumpFile);
     }
   }
 
@@ -1617,7 +1805,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   private boolean mFailingEventsEnabled = false;
   private boolean mSelfloopOnlyEventsEnabled = false;
   private boolean mAlwaysEnabledEventsEnabled = false;
-  private String mMonolithicDumpFileName = null;
+  private File mMonolithicDumpFile = null;
   private boolean mOutputCheckingEnabled = false;
 
   // Tools

@@ -34,6 +34,7 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -140,36 +141,35 @@ public abstract class AbstractModelVerifier
     return new DefaultVerificationResult(this);
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
-    list.add(new BoolParameter
-             (ParameterIDs.ModelVerifier_CounterExampleEnabled,
-              "Counter Example Enabled",
-              "setCounterExampleEnabled",
-              true){
-               @Override
-               public void commitValue()
-               {
-                 setCounterExampleEnabled(getValue());
-               }
-             });
-    list.add(new BoolParameter
-             (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
-              "Short Counter Example Enabled",
-              "ShortCounterExampleRequested",
-              true){
-               @Override
-               public void commitValue()
-               {
-                 setShortCounterExampleRequested(getValue());
-               }
-             });
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+        param.setName("Compute counterexample");
+        param.setDescription("Computate a counterexample if model checking " +
+                             "gives a failed result.");
+        iter.add(new BoolParameter
+          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+           "Short counterexample",
+           "Try to compute a counterexample that is as short as possible.",
+           true)
+          {
+            @Override
+            public void commitValue()
+            {
+              setShortCounterExampleRequested(getValue());
+            }
+          });
+        break;
+      }
+    }
     return list;
   }
 

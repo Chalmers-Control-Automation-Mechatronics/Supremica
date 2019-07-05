@@ -204,7 +204,7 @@ public abstract class AbstractCompositionalSynthesizer
             }
           });
         break;
-      case ParameterIDs.AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking:
+      case ParameterIDs.ConflictChecker_ConfiguredDefaultMarking:
         iter.remove();
         break;
       default:

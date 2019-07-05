@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
+import java.util.List;
+import java.util.ListIterator;
+
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -91,6 +97,48 @@ public abstract class NativeModelVerifier
   public boolean isCounterExampleEnabled()
   {
     return isDetailedOutputEnabled();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+        param.setName("Compute counterexample");
+        param.setDescription("Computate a counterexample if model checking " +
+                             "gives a failed result.");
+        iter.add(new BoolParameter
+          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+           "Short counterexample",
+           "Try to compute a counterexample that is as short as possible.",
+           true)
+          {
+            @Override
+            public void commitValue()
+            {
+              setShortCounterExampleRequested(getValue());
+            }
+          });
+        break;
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription
+          ("Maximum number of states that can be encountered before aborting");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription
+          ("Maximum number of transitions that can be explored before aborting");
+        break;
+      }
+    }
+    return list;
   }
 
 

@@ -64,6 +64,10 @@ import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckResult;
 import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -240,6 +244,54 @@ public class TRCompositionalConflictChecker
   public ConflictChecker getMonolithicAnalyzer()
   {
     return (ConflictChecker) super.getMonolithicAnalyzer();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(0, new EventParameter
+      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking,
+       "Precondition marking",
+       "Precondition marking used for generalised conflict check",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredPreconditionMarking(getValue());
+        }
+      });
+    list.add(0, new EventParameter
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+       "Marking proposition",
+       "The model is considered as nonblocking, if it is always possible " +
+       "to reach a state marked by this proposition",
+       false)
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks,
+       "Prune deadlocks",
+       "Allow synchronous product construction to stop when encountering " +
+       "states that are a deadlock in one of the components.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setPruningDeadlocks(getValue());
+        }
+      });
+    return list;
   }
 
 

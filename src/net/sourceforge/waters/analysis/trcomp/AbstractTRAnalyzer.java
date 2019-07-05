@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.io.File;
+
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
@@ -334,13 +336,13 @@ public abstract class AbstractTRAnalyzer
    * verification. If set, any abstracted model will be written to this file
    * before being sent for monolithic verification.
    */
-  public abstract void setMonolithicDumpFileName(final String fileName);
+  public abstract void setMonolithicDumpFile(final File file);
 
   /**
    * Returns the file name abstracted models are written to.
-   * @see #setMonolithicDumpFileName(String) setMonolithicDumpFileName()
+   * @see #setMonolithicDumpFile(File) setMonolithicDumpFile()
    */
-  public abstract String getMonolithicDumpFileName();
+  public abstract File getMonolithicDumpFile();
 
   /**
    * Sets whether output checking is enabled.

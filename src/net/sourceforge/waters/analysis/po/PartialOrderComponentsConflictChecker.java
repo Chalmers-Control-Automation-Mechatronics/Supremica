@@ -162,36 +162,29 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
     mUsedMarking = null;
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
-    list.add(new EventParameter
-             (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
-              "ConfiguredDefaultMarking",
-              "The default (omega) marking to be used for conflict checks.", false){
-               @Override
-               public void commitValue()
-               {
-                  setConfiguredDefaultMarking(getValue());
-               }
-             });
-    /*
-    list.add(new EnumParameter<ConflictKind>
-    (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod,
-     "ConflictKind",  "",  ConflictKind.values()) {
-     @Override
-     public void commitValue()
-     {
-        setConflictResult(getValue());
-     }
-   });
-   */
+    list.add(0, new EventParameter
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+       "Marking proposition",
+       "The model is considered as nonblocking, if it is always possible " +
+       "to reach a state marked by this proposition",
+       false)
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
     return list;
   }
+
 
   //#########################################################################
   //# Auxiliary Methods

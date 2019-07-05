@@ -60,8 +60,6 @@ public class ParameterIDs
   //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer
   public static final int AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator = 500;
   public static final int AbstractCompositionalModelAnalyzer_BlockedEventsEnabled = 501;
-  public static final int AbstractCompositionalModelAnalyzer_ConfiguredDefaultMarking = 502;
-  public static final int AbstractCompositionalModelAnalyzer_ConfiguredPreconditionMarking = 503;
   public static final int AbstractCompositionalModelAnalyzer_FailingEventsEnabled = 504;
   public static final int AbstractCompositionalModelAnalyzer_InternalStateLimit = 505;
   public static final int AbstractCompositionalModelAnalyzer_InternalTransitionLimit = 506;
@@ -86,6 +84,7 @@ public class ParameterIDs
 
  //net.sourceforge.waters.model.analysis.ConflictChecker
   public static final int ConflictChecker_ConfiguredDefaultMarking = 700;
+  public static final int ConflictChecker_ConfiguredPreconditionMarking = 701;
 
   //net.sourceforge.waters.model.analysis.des.ModelVerifier
   public static final int ModelVerifier_CounterExampleEnabled = 800;
@@ -101,5 +100,14 @@ public class ParameterIDs
 
   //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelVerifier
   public static final int AbstractCompositionalModelVerifier_TraceCheckingEnabled = 1000;
+
+  //net.sourceforge.waters.cpp.analysis.NativeConflictChecker
+  public static final int NativeConflictChecker_ConflictCheckMode = 1100;
+
+  //net.sourceforge.waters.analysis.tr.AbstractTRCompositionalModelAnalyzer
+  public static final int AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic = 1200;
+  public static final int AbstractTRCompositionalModelAnalyzer_SelectionHeuristic = 1201;
+  public static final int AbstractTRCompositionalModelAnalyzer_SimplifierCreator = 1202;
+  public static final int AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled = 1203;
 
 }

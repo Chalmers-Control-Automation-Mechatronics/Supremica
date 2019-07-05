@@ -342,44 +342,41 @@ public abstract class AbstractCompositionalModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter
-      (ParameterIDs.ModelVerifier_CounterExampleEnabled,
-       "Compute counterexample",
-       "Enable computation of a counterexample if model checking " +
-       "gives a failed result.",
-       true)
-      {
-        @Override
-        public void commitValue()
-        {
-          setCounterExampleEnabled(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
-       "Short counterexample",
-       "Try to compute counterexamples that are as short as possible.",
-       true)
-      {
-        @Override
-        public void commitValue()
-        {
-          setShortCounterExampleRequested(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
-       "Counterexample debugging",
-       "When computing counterexamples, perform debug checks to ensure that " +
-       "the counterexample is accepted after every abstraction step",
-       false)
-      {
-        @Override
-        public void commitValue()
-        {
-          setTraceCheckingEnabled(getValue());
-        }
-      });
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+        param.setName("Compute counterexample");
+        param.setDescription("Computate a counterexample if model checking " +
+                             "gives a failed result.");
+        iter.add(new BoolParameter
+          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
+           "Short counterexample",
+           "Try to compute a counterexample that is as short as possible.",
+           true)
+          {
+            @Override
+            public void commitValue()
+            {
+              setShortCounterExampleRequested(getValue());
+            }
+          });
+        iter.add(new BoolParameter
+          (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
+           "Counterexample debugging",
+           "When computing counterexamples, perform debug checks to ensure " +
+           "that the counterexample is accepted after every abstraction step",
+           false)
+          {
+            @Override
+            public void commitValue()
+            {
+              setTraceCheckingEnabled(getValue());
+            }
+          });
+        break;
+      }
+    }
     return list;
   }
 

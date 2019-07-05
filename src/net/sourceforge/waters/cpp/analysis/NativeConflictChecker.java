@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
@@ -143,52 +149,6 @@ public class NativeConflictChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
-  @Override
-  public void setModel(final ProductDESProxy model)
-  {
-    super.setModel(model);
-    mUsedMarking = null;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
-  @Override
-  public void setConfiguredDefaultMarking(final EventProxy marking)
-  {
-    mMarking = marking;
-    mUsedMarking = null;
-    clearAnalysisResult();
-  }
-
-  @Override
-  public EventProxy getConfiguredDefaultMarking()
-  {
-    return mMarking;
-  }
-
-  @Override
-  public void setConfiguredPreconditionMarking(final EventProxy marking)
-  {
-    mPreconditionMarking = marking;
-    clearAnalysisResult();
-  }
-
-  @Override
-  public EventProxy getConfiguredPreconditionMarking()
-  {
-    return mPreconditionMarking;
-  }
-
-  @Override
-  public ConflictCounterExampleProxy getCounterExample()
-  {
-    return (ConflictCounterExampleProxy) super.getCounterExample();
-  }
-
-
-  //#########################################################################
   //# Specific Configuration
   /**
    * Sets the conflict check algorithm to be used.
@@ -259,6 +219,96 @@ public class NativeConflictChecker
     } else {
       return false;
     }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ConflictChecker
+  @Override
+  public void setConfiguredDefaultMarking(final EventProxy marking)
+  {
+    mMarking = marking;
+    mUsedMarking = null;
+    clearAnalysisResult();
+  }
+
+  @Override
+  public EventProxy getConfiguredDefaultMarking()
+  {
+    return mMarking;
+  }
+
+  @Override
+  public void setConfiguredPreconditionMarking(final EventProxy marking)
+  {
+    mPreconditionMarking = marking;
+    clearAnalysisResult();
+  }
+
+  @Override
+  public EventProxy getConfiguredPreconditionMarking()
+  {
+    return mPreconditionMarking;
+  }
+
+  @Override
+  public ConflictCounterExampleProxy getCounterExample()
+  {
+    return (ConflictCounterExampleProxy) super.getCounterExample();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
+  public void setModel(final ProductDESProxy model)
+  {
+    super.setModel(model);
+    mUsedMarking = null;
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(0, new EventParameter
+      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking,
+       "Precondition marking",
+       "Precondition marking used for generalised conflict check",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredPreconditionMarking(getValue());
+        }
+      });
+    list.add(0, new EventParameter
+       (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+        "Marking proposition",
+        "The model is considered as nonblocking, if it is always possible " +
+        "to reach a state marked by this proposition",
+        false)
+      {
+        @Override
+        public void commitValue()
+        {
+          setConfiguredDefaultMarking(getValue());
+        }
+      });
+    list.add(new EnumParameter<ConflictCheckMode>
+      (ParameterIDs.NativeConflictChecker_ConflictCheckMode,
+       "Conflict check mode",
+       "The algorithm used to store or explore the reverse transition relation",
+       ConflictCheckMode.values())
+      {
+        @Override
+        public void commitValue()
+        {
+          setConflictCheckMode(getValue());
+        }
+      });
+    return list;
   }
 
 
