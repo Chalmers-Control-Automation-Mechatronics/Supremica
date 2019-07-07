@@ -8,21 +8,22 @@
   <property name="xsd_iec61131" location="iec61131/xsd"/>  
   <property name="xsd_manufacturingTables" location="manufacturingTables/xsd"/>
 
-  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
-	<classpath>
-          <pathelement location="${lib}/jaxb-xjc.jar" />
-	  <pathelement location="${lib}/jaxb-api.jar" />
-	  <pathelement location="${lib}/jaxb-impl.jar" />
-	  <!--pathelement location="${lib}/jaxb-libs.jar" /-->
-	  <pathelement location="${lib}/jaxp.jar" />
-	  <!--pathelement location="${lib}/old_relaxngDatatype.jar" /-->
-	  <pathelement location="${lib}/xsdlib.jar" />
-         
-          <!-- New files due to the JAXB upgrade /-->        
-          <pathelement location="${lib}/activation.jar"/>
-          <pathelement location="${lib}/jsr173_1.0_api.jar"/>
+  <property name="jaxb-api.jar" location="${lib}/jaxb-api.jar"/>
+  <property name="jaxb-core.jar" location="${lib}/jaxb-core.jar"/>
+  <property name="jaxb-impl.jar" location="${lib}/jaxb-impl.jar"/>
+  <property name="jaxb-xjc.jar" location="${lib}/jaxb-xjc.jar"/>
 
-	</classpath>
+  <path id="jaxb.classpath">
+	<pathelement location="${jaxb-api.jar}"/>
+	<pathelement location="${jaxb-core.jar}"/>
+	<pathelement location="${jaxb-impl.jar}"/>
+  </path>
+
+  <taskdef name="xjc" classname="com.sun.tools.xjc.XJCTask">
+    <classpath>
+      <path refid="jaxb.classpath"/>
+      <pathelement location="${jaxb-xjc.jar}"/>
+    </classpath>
   </taskdef>
 
   <target name="gen_automation_objects" description="Generate Automation Objects JAXB classes.">

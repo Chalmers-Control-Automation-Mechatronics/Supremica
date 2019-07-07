@@ -66,6 +66,7 @@
         <include name="**/*.class"/>
     </patternset>
 
+	<!-- For propertycopy task: -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
             <pathelement location="${lib}/ant-contrib-1.0b3.jar"/>
@@ -159,7 +160,12 @@
 
         <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 
-        <!-- JUnit -->
+        <!-- JAXB (needed for ROP etc.) -->
+        <unjar src="${lib}/jaxb-api.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jaxb-core.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jaxb-impl.jar" dest="${lib}/${unjared}"/>
+
+    	<!-- JUnit -->
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>
 
