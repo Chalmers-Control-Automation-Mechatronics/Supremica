@@ -56,6 +56,9 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -182,11 +185,310 @@ public class CompositionalGeneralisedConflictChecker
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets the maximum number of states for an automaton being constructed by the
+   * synchronous product.
+   */
+  public void setInternalStepNodeLimit(final int limit)
+  {
+    mSyncProductNodeLimit = limit;
+  }
+
+  public int getInternalStepNodeLimit()
+  {
+    return mSyncProductNodeLimit;
+  }
+
+  /**
+   * Sets the maximum number of states for the final composed automaton which is
+   * passed to the monolithic conflict checker.
+   *
+   * @param limit
+   *          Maximum number of states for the automaton.
+   */
+  public void setFinalStepNodeLimit(final int limit)
+  {
+    mFinalStepNodeLimit = limit;
+  }
+
+  public int getFinalStepNodeLimit()
+  {
+    return mFinalStepNodeLimit;
+  }
+
+  @Override
+  public int getNodeLimit()
+  {
+    if (mFinalStepNodeLimit < mSyncProductNodeLimit) {
+      return mFinalStepNodeLimit;
+    } else {
+      return mFinalStepNodeLimit;
+    }
+  }
+
+  @Override
+  public void setNodeLimit(final int limit)
+  {
+    mFinalStepNodeLimit = limit;
+    mSyncProductNodeLimit = limit;
+  }
+
+  /**
+   * Sets the maximum number of Transition for an automaton being constructed by
+   * the synchronous product.
+   */
+  public void setInternalStepTransitionLimit(final int limit)
+  {
+    mSyncProductTransitionLimit = limit;
+  }
+
+  public int getInternalStepTransitionLimit()
+  {
+    return mSyncProductTransitionLimit;
+  }
+
+  /**
+   * Sets the maximum number of Transition for the final composed automaton
+   * which is passed to another conflict checker.
+   *
+   * @param limit
+   *          Maximum number of Transitions for the automaton.
+   */
+  public void setFinalStepTransitionLimit(final int limit)
+  {
+    mFinalStepTransitionLimit = limit;
+  }
+
+  public int getFinalStepTransitionLimit()
+  {
+    return mFinalStepTransitionLimit;
+  }
+
+  @Override
+  public int getTransitionLimit()
+  {
+    if (mFinalStepTransitionLimit < mSyncProductTransitionLimit) {
+      return mFinalStepTransitionLimit;
+    } else {
+      return mFinalStepTransitionLimit;
+    }
+  }
+
+  @Override
+  public void setTransitionLimit(final int limit)
+  {
+    mFinalStepTransitionLimit = limit;
+    mSyncProductTransitionLimit = limit;
+  }
+
+  public PreselectingHeuristic createHeuristicMinT()
+  {
+    return new HeuristicMinT();
+  }
+
+  public PreselectingHeuristic createHeuristicMinTa()
+  {
+    return new HeuristicMinTa();
+  }
+
+  public PreselectingHeuristic createHeuristicMaxS()
+  {
+    return new HeuristicMaxS();
+  }
+
+  public PreselectingHeuristic createHeuristicMustL()
+  {
+    return new HeuristicMustL();
+  }
+
+  public SelectingHeuristic createHeuristicMaxL()
+  {
+    return new HeuristicMaxL();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLa()
+  {
+    return new HeuristicMaxLa();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLt()
+  {
+    return new HeuristicMaxLt();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLOnTransitions()
+  {
+    return new HeuristicMaxLOnTransitions();
+  }
+
+  public SelectingHeuristic createHeuristicMaxC()
+  {
+    return new HeuristicMaxC();
+  }
+
+  public SelectingHeuristic createHeuristicMaxCt()
+  {
+    return new HeuristicMaxCt();
+  }
+
+  public SelectingHeuristic createHeuristicMaxCOnTransitions()
+  {
+    return new HeuristicMaxCOnTransitions();
+  }
+
+  public SelectingHeuristic createHeuristicMinS()
+  {
+    return new HeuristicMinS();
+  }
+
+  public SelectingHeuristic createHeuristicMinSCommon()
+  {
+    return new HeuristicMinSCommon();
+  }
+
+  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
+  {
+    mPreselectingHeuristic = heuristic;
+  }
+
+  /**
+   * The given heuristic is used first to select a candidate to compose.
+   */
+  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
+  {
+    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
+    mSelectingHeuristics.add(heuristic);
+    if (heuristic instanceof HeuristicMaxL) {
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxC) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMinS) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxLOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxCOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+    }
+    mSelectingHeuristics.add(new HeuristicDefault());
+  }
+
+  /**
+   * The first item in the list should be the first heuristic used to select a
+   * candidate to compose, the last item in the list should be the last option.
+   */
+  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
+  {
+    mSelectingHeuristics = heuristicList;
+    mSelectingHeuristics.add(new HeuristicDefault());
+  }
+
+  /**
+   * Sets the abstraction rules to apply and in which order.
+   *
+   * @param ruleList
+   *          Rules are applied in order from the first item in the list through
+   *          until the last.
+   */
+  public void setAbstractionRules(final List<AbstractionRule> ruleList)
+  {
+    mAbstractionRules = ruleList;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
   public boolean supportsNondeterminism()
   {
     return true;
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final Iterator<Parameter> iter = list.iterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelVerifier_ShortCounterExampleRequested:
+        iter.remove();
+        break;
+      default:
+        break;
+      }
+    }
+
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit,
+       "Internal state limit",
+       "The maximum number of states allowed for intermediate automata.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setInternalStepNodeLimit(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit,
+       "Internal transition limit",
+       "The maximum number of transitions allowed for intermediate automata.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setInternalStepTransitionLimit(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit,
+       "Monolithic state limit",
+       "The maximum number of states allowed during monolithic analysis " +
+       "attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setFinalStepNodeLimit(getValue());
+        }
+      });
+    list.add(new IntParameter
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit,
+       "Monolithic transition limit",
+       "The maximum number of transitions allowed during monolithic " +
+       "analysis attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      {
+        @Override
+        public void commitValue()
+        {
+          setFinalStepTransitionLimit(getValue());
+        }
+      });
+
+    return list;
   }
 
 
@@ -986,231 +1288,6 @@ public class CompositionalGeneralisedConflictChecker
   {
     return mPreselectingHeuristic.evaluate(model);
   }
-
-  /**
-   * Sets the maximum number of states for an automaton being constructed by the
-   * synchronous product.
-   */
-  public void setInternalStepNodeLimit(final int limit)
-  {
-    mSyncProductNodeLimit = limit;
-  }
-
-  public int getInternalStepNodeLimit()
-  {
-    return mSyncProductNodeLimit;
-  }
-
-  /**
-   * Sets the maximum number of states for the final composed automaton which is
-   * passed to the monolithic conflict checker.
-   *
-   * @param limit
-   *          Maximum number of states for the automaton.
-   */
-  public void setFinalStepNodeLimit(final int limit)
-  {
-    mFinalStepNodeLimit = limit;
-  }
-
-  public int getFinalStepNodeLimit()
-  {
-    return mFinalStepNodeLimit;
-  }
-
-  @Override
-  public int getNodeLimit()
-  {
-    if (mFinalStepNodeLimit < mSyncProductNodeLimit) {
-      return mFinalStepNodeLimit;
-    } else {
-      return mFinalStepNodeLimit;
-    }
-  }
-
-  @Override
-  public void setNodeLimit(final int limit)
-  {
-    mFinalStepNodeLimit = limit;
-    mSyncProductNodeLimit = limit;
-  }
-
-  /**
-   * Sets the maximum number of Transition for an automaton being constructed by
-   * the synchronous product.
-   */
-  public void setInternalStepTransitionLimit(final int limit)
-  {
-    mSyncProductTransitionLimit = limit;
-  }
-
-  public int getInternalStepTransitionLimit()
-  {
-    return mSyncProductTransitionLimit;
-  }
-
-  /**
-   * Sets the maximum number of Transition for the final composed automaton
-   * which is passed to another conflict checker.
-   *
-   * @param limit
-   *          Maximum number of Transitions for the automaton.
-   */
-  public void setFinalStepTransitionLimit(final int limit)
-  {
-    mFinalStepTransitionLimit = limit;
-  }
-
-  public int getFinalStepTransitionLimit()
-  {
-    return mFinalStepTransitionLimit;
-  }
-
-  @Override
-  public int getTransitionLimit()
-  {
-    if (mFinalStepTransitionLimit < mSyncProductTransitionLimit) {
-      return mFinalStepTransitionLimit;
-    } else {
-      return mFinalStepTransitionLimit;
-    }
-  }
-
-  @Override
-  public void setTransitionLimit(final int limit)
-  {
-    mFinalStepTransitionLimit = limit;
-    mSyncProductTransitionLimit = limit;
-  }
-
-  public PreselectingHeuristic createHeuristicMinT()
-  {
-    return new HeuristicMinT();
-  }
-
-  public PreselectingHeuristic createHeuristicMinTa()
-  {
-    return new HeuristicMinTa();
-  }
-
-  public PreselectingHeuristic createHeuristicMaxS()
-  {
-    return new HeuristicMaxS();
-  }
-
-  public PreselectingHeuristic createHeuristicMustL()
-  {
-    return new HeuristicMustL();
-  }
-
-  public SelectingHeuristic createHeuristicMaxL()
-  {
-    return new HeuristicMaxL();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLa()
-  {
-    return new HeuristicMaxLa();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLt()
-  {
-    return new HeuristicMaxLt();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLOnTransitions()
-  {
-    return new HeuristicMaxLOnTransitions();
-  }
-
-  public SelectingHeuristic createHeuristicMaxC()
-  {
-    return new HeuristicMaxC();
-  }
-
-  public SelectingHeuristic createHeuristicMaxCt()
-  {
-    return new HeuristicMaxCt();
-  }
-
-  public SelectingHeuristic createHeuristicMaxCOnTransitions()
-  {
-    return new HeuristicMaxCOnTransitions();
-  }
-
-  public SelectingHeuristic createHeuristicMinS()
-  {
-    return new HeuristicMinS();
-  }
-
-  public SelectingHeuristic createHeuristicMinSCommon()
-  {
-    return new HeuristicMinSCommon();
-  }
-
-  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
-  {
-    mPreselectingHeuristic = heuristic;
-  }
-
-  /**
-   * The given heuristic is used first to select a candidate to compose.
-   */
-  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
-  {
-    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
-    mSelectingHeuristics.add(heuristic);
-    if (heuristic instanceof HeuristicMaxL) {
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxC) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMinS) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxLOnTransitions) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxCOnTransitions) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-    }
-    mSelectingHeuristics.add(new HeuristicDefault());
-  }
-
-  /**
-   * The first item in the list should be the first heuristic used to select a
-   * candidate to compose, the last item in the list should be the last option.
-   */
-  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
-  {
-    mSelectingHeuristics = heuristicList;
-    mSelectingHeuristics.add(new HeuristicDefault());
-  }
-
-  /**
-   * Sets the abstraction rules to apply and in which order.
-   *
-   * @param ruleList
-   *          Rules are applied in order from the first item in the list through
-   *          until the last.
-   */
-  public void setAbstractionRules(final List<AbstractionRule> ruleList)
-  {
-    mAbstractionRules = ruleList;
-  }
-
 
   abstract class PreselectingHeuristic
   {
