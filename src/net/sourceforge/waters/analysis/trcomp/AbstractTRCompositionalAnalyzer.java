@@ -409,7 +409,7 @@ public abstract class AbstractTRCompositionalAnalyzer
     list.add(new EnumParameter<TRPreselectionHeuristic>
       (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
         "Preselection method",
-        "Preselection heuristic to choose groups of automata to consider " +
+        "Preselection heuristic to generate groups of automata to consider " +
         "for composition.",
         getPreselectionHeuristicFactory())
       {
@@ -423,8 +423,8 @@ public abstract class AbstractTRCompositionalAnalyzer
       (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
        "Selection heuristic",
        "Heuristic to choose the group of automata to compose and simplify " +
-         "from the options produced by the preselection method.",
-         getSelectionHeuristicFactory())
+       "from the options produced by the preselection method.",
+       getSelectionHeuristicFactory())
       {
         @Override
         public void commitValue()

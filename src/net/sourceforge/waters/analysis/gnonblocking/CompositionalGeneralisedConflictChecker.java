@@ -56,6 +56,7 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
@@ -63,7 +64,9 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -167,7 +170,7 @@ public class CompositionalGeneralisedConflictChecker
    *          state has a list of propositions attached to it; the conflict
    *          checker considers only those states as marked that are labelled by
    *          <CODE>marking</CODE>, i.e., their list of propositions must
-   *          contain this event(exactly the same object).
+   *          contain this event (exactly the same object).
    * @param preMarking
    *          The proposition event that defines which states have alpha
    *          (precondition) markings.
@@ -186,9 +189,170 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Configuration
+  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
+  {
+    mPreselectingHeuristic = heuristic;
+  }
+
+  public EnumFactory<PreselectingHeuristic> getPreselectingHeuristicFactory()
+  {
+    return
+      new ListedEnumFactory<PreselectingHeuristic>() {
+      {
+        register(createHeuristicMinT());
+        register(createHeuristicMinTa());
+        register(createHeuristicMaxS());
+        register(createHeuristicMustL(), true);
+      }
+    };
+  }
+
+  public PreselectingHeuristic createHeuristicMinT()
+  {
+    return new HeuristicMinT();
+  }
+
+  public PreselectingHeuristic createHeuristicMinTa()
+  {
+    return new HeuristicMinTa();
+  }
+
+  public PreselectingHeuristic createHeuristicMaxS()
+  {
+    return new HeuristicMaxS();
+  }
+
+  public PreselectingHeuristic createHeuristicMustL()
+  {
+    return new HeuristicMustL();
+  }
+
+
   /**
-   * Sets the maximum number of states for an automaton being constructed by the
-   * synchronous product.
+   * The given heuristic is used first to select a candidate to compose.
+   */
+  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
+  {
+    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
+    mSelectingHeuristics.add(heuristic);
+    if (heuristic instanceof HeuristicMaxL) {
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxC) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMinS) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxLOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
+    } else if (heuristic instanceof HeuristicMaxCOnTransitions) {
+      mSelectingHeuristics.add(new HeuristicMaxL());
+      mSelectingHeuristics.add(new HeuristicMaxC());
+      mSelectingHeuristics.add(new HeuristicMinS());
+      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
+    }
+    mSelectingHeuristics.add(new HeuristicDefault());
+  }
+
+  /**
+   * The first item in the list should be the first heuristic used to select a
+   * candidate to compose, the last item in the list should be the last option.
+   */
+  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
+  {
+    mSelectingHeuristics = heuristicList;
+    mSelectingHeuristics.add(new HeuristicDefault());
+  }
+
+  public EnumFactory<SelectingHeuristic> getSelectingHeuristicFactory()
+  {
+    return
+      new ListedEnumFactory<SelectingHeuristic>() {
+      {
+        register(createHeuristicMaxC());
+        register(createHeuristicMaxCOnTransitions());
+        register(createHeuristicMaxCt());
+        register(createHeuristicMaxL());
+        register(createHeuristicMaxLa());
+        register(createHeuristicMaxLOnTransitions());
+        register(createHeuristicMaxLt());
+        register(createHeuristicMinS(), true);
+        register(createHeuristicMinSCommon());
+      }
+    };
+  }
+
+  public SelectingHeuristic createHeuristicMaxL()
+  {
+    return new HeuristicMaxL();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLa()
+  {
+    return new HeuristicMaxLa();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLt()
+  {
+    return new HeuristicMaxLt();
+  }
+
+  public SelectingHeuristic createHeuristicMaxLOnTransitions()
+  {
+    return new HeuristicMaxLOnTransitions();
+  }
+
+  public SelectingHeuristic createHeuristicMaxC()
+  {
+    return new HeuristicMaxC();
+  }
+
+  public SelectingHeuristic createHeuristicMaxCt()
+  {
+    return new HeuristicMaxCt();
+  }
+
+  public SelectingHeuristic createHeuristicMaxCOnTransitions()
+  {
+    return new HeuristicMaxCOnTransitions();
+  }
+
+  public SelectingHeuristic createHeuristicMinS()
+  {
+    return new HeuristicMinS();
+  }
+
+  public SelectingHeuristic createHeuristicMinSCommon()
+  {
+    return new HeuristicMinSCommon();
+  }
+
+
+  /**
+   * Sets the abstraction rules to apply and in which order.
+   * @param ruleList
+   *          Rules are applied in order from the first item in the list through
+   *          until the last.
+   */
+  public void setAbstractionRules(final List<AbstractionRule> ruleList)
+  {
+    mAbstractionRules = ruleList;
+  }
+
+
+  /**
+   * Sets the maximum number of states for an automaton being constructed by
+   * the synchronous product.
    */
   public void setInternalStepNodeLimit(final int limit)
   {
@@ -282,134 +446,6 @@ public class CompositionalGeneralisedConflictChecker
     mSyncProductTransitionLimit = limit;
   }
 
-  public PreselectingHeuristic createHeuristicMinT()
-  {
-    return new HeuristicMinT();
-  }
-
-  public PreselectingHeuristic createHeuristicMinTa()
-  {
-    return new HeuristicMinTa();
-  }
-
-  public PreselectingHeuristic createHeuristicMaxS()
-  {
-    return new HeuristicMaxS();
-  }
-
-  public PreselectingHeuristic createHeuristicMustL()
-  {
-    return new HeuristicMustL();
-  }
-
-  public SelectingHeuristic createHeuristicMaxL()
-  {
-    return new HeuristicMaxL();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLa()
-  {
-    return new HeuristicMaxLa();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLt()
-  {
-    return new HeuristicMaxLt();
-  }
-
-  public SelectingHeuristic createHeuristicMaxLOnTransitions()
-  {
-    return new HeuristicMaxLOnTransitions();
-  }
-
-  public SelectingHeuristic createHeuristicMaxC()
-  {
-    return new HeuristicMaxC();
-  }
-
-  public SelectingHeuristic createHeuristicMaxCt()
-  {
-    return new HeuristicMaxCt();
-  }
-
-  public SelectingHeuristic createHeuristicMaxCOnTransitions()
-  {
-    return new HeuristicMaxCOnTransitions();
-  }
-
-  public SelectingHeuristic createHeuristicMinS()
-  {
-    return new HeuristicMinS();
-  }
-
-  public SelectingHeuristic createHeuristicMinSCommon()
-  {
-    return new HeuristicMinSCommon();
-  }
-
-  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
-  {
-    mPreselectingHeuristic = heuristic;
-  }
-
-  /**
-   * The given heuristic is used first to select a candidate to compose.
-   */
-  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
-  {
-    mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
-    mSelectingHeuristics.add(heuristic);
-    if (heuristic instanceof HeuristicMaxL) {
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxC) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMinS) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxLOnTransitions) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxCOnTransitions());
-    } else if (heuristic instanceof HeuristicMaxCOnTransitions) {
-      mSelectingHeuristics.add(new HeuristicMaxL());
-      mSelectingHeuristics.add(new HeuristicMaxC());
-      mSelectingHeuristics.add(new HeuristicMinS());
-      mSelectingHeuristics.add(new HeuristicMaxLOnTransitions());
-    }
-    mSelectingHeuristics.add(new HeuristicDefault());
-  }
-
-  /**
-   * The first item in the list should be the first heuristic used to select a
-   * candidate to compose, the last item in the list should be the last option.
-   */
-  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
-  {
-    mSelectingHeuristics = heuristicList;
-    mSelectingHeuristics.add(new HeuristicDefault());
-  }
-
-  /**
-   * Sets the abstraction rules to apply and in which order.
-   *
-   * @param ruleList
-   *          Rules are applied in order from the first item in the list through
-   *          until the last.
-   */
-  public void setAbstractionRules(final List<AbstractionRule> ruleList)
-  {
-    mAbstractionRules = ruleList;
-  }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -437,6 +473,32 @@ public class CompositionalGeneralisedConflictChecker
       }
     }
 
+    list.add(new EnumParameter<PreselectingHeuristic>
+      (ParameterIDs.CompositionalGeneralisedConflictChecker_PreselectingHeuristic,
+       "Preselection method",
+       "Preselection heuristic to generate groups of automata to consider " +
+       "for composition.",
+       getPreselectingHeuristicFactory())
+      {
+        @Override
+        public void commitValue()
+        {
+          setPreselectingHeuristic(getValue());
+        }
+      });
+    list.add(new EnumParameter<SelectingHeuristic>
+      (ParameterIDs.CompositionalGeneralisedConflictChecker_SelectingHeuristic,
+       "Selection heuristic",
+       "Heuristic to choose the group of automata to compose and simplify " +
+       "from the options produced by the preselection method.",
+       getSelectingHeuristicFactory())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSelectingHeuristic(getValue());
+        }
+      });
     list.add(new IntParameter
       (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit,
        "Internal state limit",
@@ -745,77 +807,6 @@ public class CompositionalGeneralisedConflictChecker
       }
     }
     return true;
-  }
-
-  /**
-   * Creates a hash set of events which are "non-alpha" events. An event e is
-   * non-alpha if there is one automaton such that every transition with event e
-   * has neither the source nor the target marked alpha.
-   * TODO On second thoughts, it may be just as reasonable to consider
-   * non-alpha events within candidates instead of globally. That is, an
-   * event e is non-alpha in candidate C if C contains an automaton with
-   * above property. Let us implement first whatever is easier.
-   */
-  @SuppressWarnings("unused")
-  private void findNonAlphaEvents(final List<AutomatonProxy> automata)
-  {
-    mNonAlphaEvents = new THashSet<EventProxy>();
-    // TODO Hmmm ... not quite correct ...
-    eventLoop: for (final EventProxy event : mEventsToAutomata.keySet()) {
-      for (final AutomatonProxy aut : automata) {
-        for (final TransitionProxy transition : aut.getTransitions()) {
-          if (transition.getEvent() == event) {
-            final StateProxy source = transition.getSource();
-            final StateProxy target = transition.getTarget();
-            if (!source.getPropositions()
-                .contains(getUsedPreconditionMarkingProposition())
-                && !target.getPropositions()
-                    .contains(getUsedPreconditionMarkingProposition())) {
-              continue eventLoop;
-              // Discards events from being non-alpha as soon as one
-              // transition is non-alpha. But this should help to make them
-              // non-alpha ???
-            }
-          }
-        }
-      }
-      mNonAlphaEvents.add(event);
-    }
-    // TODO How about using the following instead?
-    final EventProxy alpha = getUsedPreconditionMarkingProposition();
-    // Hash set to collect events found to be non-alpha in an automaton.
-    final Set<EventProxy> localNonAlphaEvents = new THashSet<EventProxy>();
-    autLoop:
-    for (final AutomatonProxy aut : automata) {
-      // Check that alphabet first ...
-      if (aut.getEvents().contains(alpha)) {
-        // First assume all events in this automaton are non-alpha ...
-        for (final EventProxy event : aut.getEvents()) {
-          if (event.getKind() != EventKind.PROPOSITION) {
-            localNonAlphaEvents.add(event);
-          }
-        }
-        // Events on transitions with alpha source or target are not non-alpha
-        // in this automaton ...
-        for (final TransitionProxy transition : aut.getTransitions()) {
-          final StateProxy source = transition.getSource();
-          final StateProxy target = transition.getTarget();
-          if (source.getPropositions().contains(alpha) ||
-              target.getPropositions().contains(alpha)) {
-            final EventProxy event = transition.getEvent();
-            localNonAlphaEvents.remove(event);
-            if (localNonAlphaEvents.isEmpty()) {
-              continue autLoop;
-            }
-          }
-        }
-        // Any remaining events are globally non-alpha, because we have found
-        // an automaton where all transitions have neither source nor target
-        // marked alpha.
-        mNonAlphaEvents.addAll(localNonAlphaEvents);
-        localNonAlphaEvents.clear();
-      }
-    }
   }
 
   private AutomatonProxy hideAndAbstract(final AutomatonProxy aut,
@@ -1289,6 +1280,24 @@ public class CompositionalGeneralisedConflictChecker
     return mPreselectingHeuristic.evaluate(model);
   }
 
+
+  //#########################################################################
+  //# Heuristics
+  private static String getHeuristicName(final Object heuristic)
+  {
+    final String KEY = "Heuristic";
+    final String clazzName = heuristic.getClass().getName();
+    final int pos = clazzName.lastIndexOf(KEY);
+    if (pos >= 0 && pos + KEY.length() < clazzName.length()) {
+      return clazzName.substring(pos + KEY.length());
+    } else {
+      return ProxyTools.getShortClassName(heuristic);
+    }
+  }
+
+
+  //#########################################################################
+  //# Preselecting Heuristics
   abstract class PreselectingHeuristic
   {
     /**
@@ -1296,9 +1305,7 @@ public class CompositionalGeneralisedConflictChecker
      * must not have been previously tried and marked as unsuccessful, must have
      * at least one local event and its automata must have at least one shared
      * event.
-     *
-     * @param candidate
-     *          The candidate to check.
+     * @param  candidate   The candidate to check.
      * @return True = valid, false = suppress candidate.
      */
     boolean validateCandidate(final Candidate candidate)
@@ -1346,6 +1353,14 @@ public class CompositionalGeneralisedConflictChecker
     }
 
     protected abstract List<Candidate> evaluate(final ProductDESProxy model);
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return getHeuristicName(this);
+    }
   }
 
 
@@ -1453,8 +1468,8 @@ public class CompositionalGeneralisedConflictChecker
     /**
      * The min or max of a collection.
      */
-    protected abstract AutomatonProxy getHeuristicProperty(
-                                                           final Collection<AutomatonProxy> automata);
+    protected abstract AutomatonProxy getHeuristicProperty
+      (final Collection<AutomatonProxy> automata);
 
   }
 
@@ -1574,6 +1589,8 @@ public class CompositionalGeneralisedConflictChecker
   }
 
 
+  //#########################################################################
+  //# Selecting Heuristics
   abstract class SelectingHeuristic
   {
     protected abstract double getHeuristicValue(Candidate candidate);
@@ -1661,7 +1678,14 @@ public class CompositionalGeneralisedConflictChecker
         }
       }
       return chosenCandidates;
+    }
 
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      return getHeuristicName(this);
     }
   }
 

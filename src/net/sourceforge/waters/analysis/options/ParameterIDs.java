@@ -110,4 +110,8 @@ public class ParameterIDs
   public static final int AbstractTRCompositionalModelAnalyzer_SimplifierCreator = 1202;
   public static final int AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled = 1203;
 
+  //net.sourceforge.waters.analysis.gnonblocking.CompositionalGeneralisedConflictChecker
+  public static final int CompositionalGeneralisedConflictChecker_PreselectingHeuristic = 1300;
+  public static final int CompositionalGeneralisedConflictChecker_SelectingHeuristic = 1301;
+
 }
