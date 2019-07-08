@@ -34,7 +34,6 @@
 <xs:schema
   targetNamespace="http://waters.sourceforge.net/xsd/des"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
   xmlns:B="http://waters.sourceforge.net/xsd/base"
   xmlns:D="http://waters.sourceforge.net/xsd/des"
   elementFormDefault="qualified"
@@ -73,11 +72,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:Event" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:Event" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -103,11 +98,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:EventRef" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:EventRef" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -132,11 +123,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:Automaton" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:Automaton" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -164,11 +151,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:State" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:State" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -180,11 +163,7 @@
     <xs:complexContent>
       <xs:extension base="B:NamedType">
         <xs:sequence>
-          <xs:element ref="D:EventRefList" minOccurs="0">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Propositions"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:EventRefList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="Initial" type="xs:boolean" default="false"/>
       </xs:extension>
@@ -197,11 +176,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:Transition" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:Transition" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -276,11 +251,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:Trace" minOccurs="1" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:Trace" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -307,11 +278,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:AutomatonRef" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:AutomatonRef" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -323,11 +290,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="D:FirstTraceStateTuple" minOccurs="0">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="InitialState"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="D:FirstTraceStateTuple" minOccurs="0"/>
           <xs:sequence maxOccurs="unbounded">
             <xs:element ref="D:EventRef"/>
             <xs:element ref="D:NextTraceStateTuple" minOccurs="0"/>
@@ -351,11 +314,7 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:element ref="D:TraceState" minOccurs="0" maxOccurs="unbounded">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="List"/>
-          </xs:appinfo></xs:annotation>
-        </xs:element>
+        <xs:element ref="D:TraceState" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>
@@ -389,9 +348,6 @@
 </xs:element>
 
 <xs:simpleType name="ConflictKind">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="CONFLICT"/>
     <xs:enumeration value="DEADLOCK"/>

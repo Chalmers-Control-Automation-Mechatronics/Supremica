@@ -34,7 +34,6 @@
 <xs:schema
   targetNamespace="http://waters.sourceforge.net/xsd/base"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
   xmlns:B="http://waters.sourceforge.net/xsd/base"
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"
@@ -70,9 +69,6 @@
 <!-- ==================================================================== -->
 
 <xs:simpleType name="EventKind">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="CONTROLLABLE"/>
     <xs:enumeration value="UNCONTROLLABLE"/>
@@ -81,9 +77,6 @@
 </xs:simpleType>
 
 <xs:simpleType name="ComponentKind">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="PLANT"/>
     <xs:enumeration value="SPEC"/>
@@ -102,11 +95,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="B:Attribute" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="B:Attribute" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>

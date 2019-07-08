@@ -34,7 +34,6 @@
 <xs:schema
   targetNamespace="http://waters.sourceforge.net/xsd/module"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
   xmlns:B="http://waters.sourceforge.net/xsd/base"
   xmlns:M="http://waters.sourceforge.net/xsd/module"
   elementFormDefault="qualified"
@@ -56,11 +55,7 @@
     <xs:complexContent>
       <xs:extension base="B:DocumentType">
         <xs:sequence>
-          <xs:element ref="M:Module" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:Module" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -93,9 +88,6 @@
 <!-- ==================================================================== -->
 
 <xs:simpleType name="ScopeKind">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="LOCAL"/>
     <xs:enumeration value="OPTIONAL_PARAMETER"/>
@@ -113,11 +105,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:ConstantAlias" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:ConstantAlias" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -142,11 +130,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:ArithmeticOrRangeExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Expression"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ArithmeticOrRangeExpression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -158,11 +142,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:EventAliasListEntry" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:EventAliasListEntry" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -181,11 +161,7 @@
     <xs:complexContent>
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
-          <xs:element ref="M:EventListExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Expression"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:EventListExpression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -214,11 +190,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:EventDecl" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:EventDecl" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -248,11 +220,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:RangeExpression" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Ranges"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:RangeExpression" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -289,11 +257,7 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:group ref="M:EventListEntry" minOccurs="0" maxOccurs="unbounded">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="List"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
+        <xs:group ref="M:EventListEntry" minOccurs="0" maxOccurs="unbounded"/>
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>
@@ -335,11 +299,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:ComponentListEntry" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ComponentListEntry" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -377,11 +337,7 @@
           <xs:element ref="M:VariableRange"/>
           <xs:element ref="M:VariableInitial"/>
           <xs:element ref="M:VariableMarking"
-		      minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="VariableMarkings"/>
-            </xs:appinfo></xs:annotation>
-	  </xs:element>
+		      minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="Deterministic" type="xs:boolean" default="true"/>
       </xs:extension>
@@ -394,11 +350,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:RangeExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Range"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:RangeExpression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -410,11 +362,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Predicate"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ArithmeticExpression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -426,11 +374,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="PropositionAndPredicate"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -443,11 +387,7 @@
       <xs:extension base="M:IdentifiedType">
         <xs:sequence>
           <xs:element ref="M:ParameterBinding"
-		      minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Bindings"/>
-            </xs:appinfo></xs:annotation>
-	  </xs:element>
+		      minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="ModuleName" type="xs:string" use="required"/>
       </xs:extension>
@@ -460,11 +400,7 @@
     <xs:complexContent>
       <xs:extension base="B:NamedType">
         <xs:sequence>
-          <xs:group ref="M:Expression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Expression"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:Expression"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -493,11 +429,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:LabelBlock" minOccurs="0">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="BlockedEvents"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:LabelBlock" minOccurs="0"/>
           <xs:element ref="M:NodeList" minOccurs="0"/>
           <xs:element ref="M:EdgeList" minOccurs="0"/>
         </xs:sequence>
@@ -512,11 +444,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:group ref="M:NodeListEntry" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:NodeListEntry" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -528,11 +456,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:Edge" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:Edge" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -550,11 +474,7 @@
   <xs:complexContent>
     <xs:extension base="B:NamedType">
       <xs:sequence>
-        <xs:element ref="M:EventList" minOccurs="0">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Propositions"/>
-          </xs:appinfo></xs:annotation>
-        </xs:element>
+        <xs:element ref="M:EventList" minOccurs="0"/>
         <xs:element ref="B:AttributeMap" minOccurs="0"/>
       </xs:sequence>
     </xs:extension>
@@ -581,11 +501,7 @@
     <xs:complexContent>
       <xs:extension base="M:NodeType">
         <xs:sequence>
-          <xs:element ref="M:NodeRef" minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Nodes"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:NodeRef" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element ref="M:BoxGeometry" minOccurs="0"/>
         </xs:sequence>
       </xs:extension>
@@ -650,11 +566,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-	  <xs:group ref="M:SimpleExpression" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+	  <xs:group ref="M:SimpleExpression" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -666,11 +578,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:BinaryExpression" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="List"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:BinaryExpression" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -727,11 +635,7 @@
     <xs:complexContent>
       <xs:extension base="B:ElementType">
         <xs:sequence>
-          <xs:element ref="M:Point" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Points"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+          <xs:element ref="M:Point" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute
           name="Kind" type="M:SplineKind" default="INTERPOLATING"/>
@@ -777,9 +681,6 @@
 </xs:element>
 
 <xs:simpleType name="AnchorPosition">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="NW"/>
     <xs:enumeration value="N"/>
@@ -794,9 +695,6 @@
 </xs:simpleType>
 
 <xs:simpleType name="SplineKind">
-  <xs:annotation><xs:appinfo>
-    <jaxb:typesafeEnumClass/>
-  </xs:appinfo></xs:annotation>
   <xs:restriction base="xs:string">
     <xs:enumeration value="INTERPOLATING"/>
     <xs:enumeration value="BEZIER"/>
@@ -903,11 +801,7 @@
       <xs:extension base="M:IdentifierType">
         <xs:sequence>
           <xs:group ref="M:ArithmeticExpression"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Indexes"/>
-            </xs:appinfo></xs:annotation>
-	  </xs:group>
+                    minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="Name" type="xs:string" use="required"/>
       </xs:extension>
@@ -920,11 +814,7 @@
     <xs:complexContent>
       <xs:extension base="M:IdentifierType">
         <xs:sequence>
-          <xs:group ref="M:Identifier" minOccurs="2" maxOccurs="2">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Identifiers"/>
-            </xs:appinfo></xs:annotation>
-	  </xs:group>
+          <xs:group ref="M:Identifier" minOccurs="2" maxOccurs="2"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -946,11 +836,7 @@
     <xs:complexContent>
       <xs:extension base="M:SimpleExpressionType">
         <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="SubTerm"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ArithmeticExpression"/>
         </xs:sequence>
         <xs:attribute name="Operator" type="M:UnaryOperator" use="required"/>
       </xs:extension>
@@ -963,11 +849,7 @@
     <xs:complexContent>
       <xs:extension base="M:SimpleExpressionType">
         <xs:sequence>
-          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Subterms"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+          <xs:group ref="M:ArithmeticExpression" minOccurs="2" maxOccurs="2"/>
         </xs:sequence>
         <xs:attribute name="Operator" type="M:BinaryOperator" use="required"/>
       </xs:extension>
@@ -981,11 +863,7 @@
       <xs:extension base="M:SimpleExpressionType">
         <xs:sequence>
           <xs:group ref="M:ArithmeticExpression"
-                    minOccurs="1" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Arguments"/>
-            </xs:appinfo></xs:annotation>
-          </xs:group>
+                    minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="FunctionName" type="xs:string" use="required"/>
       </xs:extension>
@@ -999,11 +877,7 @@
       <xs:extension base="M:SimpleExpressionType">
         <xs:sequence>
           <xs:element ref="M:SimpleIdentifier"
-                      minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation><xs:appinfo>
-              <jaxb:property name="Items"/>
-            </xs:appinfo></xs:annotation>
-          </xs:element>
+                      minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
       </xs:extension>
     </xs:complexContent>
@@ -1052,23 +926,7 @@
   <xs:complexContent>
     <xs:extension base="B:NamedType">
       <xs:sequence>
-        <xs:group ref="M:ArithmeticOrRangeExpression" maxOccurs="2">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="RangeAndGuard"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
-        <!--
-        <xs:group ref="M:RangeExpression">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Range"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
-        <xs:group ref="M:ArithmeticExpression" minOccurs="0">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Guard"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
-        -->
+        <xs:group ref="M:ArithmeticOrRangeExpression" maxOccurs="2"/>
       </xs:sequence>
     </xs:extension>
   </xs:complexContent>
@@ -1078,11 +936,7 @@
   <xs:complexContent>
     <xs:extension base="B:ElementType">
       <xs:sequence>
-        <xs:group ref="M:Identifier" minOccurs="0">
-          <xs:annotation><xs:appinfo>
-            <jaxb:property name="Identifier"/>
-          </xs:appinfo></xs:annotation>
-        </xs:group>
+        <xs:group ref="M:Identifier" minOccurs="0"/>
       </xs:sequence>
       <xs:attribute name="Name" type="xs:string"/>
     </xs:extension>
