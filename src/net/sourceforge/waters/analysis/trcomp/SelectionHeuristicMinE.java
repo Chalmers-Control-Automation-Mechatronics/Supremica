@@ -42,7 +42,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 
 /**
  * <P>The <STRONG>MinE</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * compositional model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinE</STRONG> selection heuristic gives preference to
  * candidate with the smallest number of events after composition and
@@ -65,9 +65,9 @@ public class SelectionHeuristicMinE
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }

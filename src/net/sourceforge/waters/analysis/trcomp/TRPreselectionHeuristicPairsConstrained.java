@@ -53,7 +53,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 /**
  * An abstract superclass to compute pairing heuristics for compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.
  * This class supports heuristics such as <STRONG>MinT</STRONG>
  * ({@link TRPreselectionHeuristicMinT}) where one automaton is chosen and
  * all other automata are paired with it.

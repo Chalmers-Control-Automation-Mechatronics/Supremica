@@ -136,7 +136,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 class TRCompositionalOnePropertyChecker
-  extends AbstractTRCompositionalVerifier
+  extends AbstractTRCompositionalModelVerifier
   implements LanguageInclusionChecker
 {
 
@@ -458,7 +458,7 @@ class TRCompositionalOnePropertyChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       final ChainTRSimplifier chain = analyzer.startAbstractionChain();
       // startAbstractionChain() adds a SpecialEventsTRSimplifier.

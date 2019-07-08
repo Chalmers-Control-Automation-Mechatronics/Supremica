@@ -98,7 +98,7 @@ class TRAbstractionStepMonolithic
 
   @Override
   public void expandTrace(final TRTraceProxy trace,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
   {
     trace.widenAndAppend(mTraceExtension);
   }
@@ -109,7 +109,7 @@ class TRAbstractionStepMonolithic
   static TRTraceProxy createTraceExtension
     (final CounterExampleProxy counter,
      final Collection<TRAbstractionStep> preds,
-     final AbstractTRCompositionalAnalyzer analyzer)
+     final AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisException
   {
     final ProductDESProxy des = counter.getProductDES();

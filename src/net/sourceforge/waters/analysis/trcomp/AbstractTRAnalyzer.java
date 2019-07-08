@@ -57,7 +57,7 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  * <P>This class almost only contains abstract methods, which describe the
  * interface of all compositional analysers. It is subclassed in two different
  * ways, depending on whether the compositional algorithm is implemented
- * directly ({@link AbstractTRCompositionalAnalyzer}) or by delegation
+ * directly ({@link AbstractTRCompositionalModelAnalyzer}) or by delegation
  * ({@link AbstractTRDelegatingAnalyzer}).</P>
  *
  * @author Robi Malik
@@ -367,7 +367,7 @@ public abstract class AbstractTRAnalyzer
    * the analyser that performs the actual compositional minimisation task,
    * which may this analyser itself or its delegate.
    */
-  protected abstract AbstractTRCompositionalAnalyzer getCompositionalAnalyzer();
+  protected abstract AbstractTRCompositionalModelAnalyzer getCompositionalAnalyzer();
 
   /**
    * Gets the preferred input configuration for transition relations.

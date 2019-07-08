@@ -48,7 +48,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 /**
  * <P>The <STRONG>Pairs</STRONG> preselection heuristic used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>Pairs</STRONG> preselection heuristic forms one candidate
  * for each pair of two automata that share at least one event.</P>

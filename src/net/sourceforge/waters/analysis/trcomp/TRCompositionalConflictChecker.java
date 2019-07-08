@@ -125,7 +125,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class TRCompositionalConflictChecker
-  extends AbstractTRCompositionalVerifier
+  extends AbstractTRCompositionalModelVerifier
   implements ConflictChecker
 {
 
@@ -805,7 +805,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -840,7 +840,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -875,7 +875,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -911,7 +911,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -946,7 +946,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -982,7 +982,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -1019,7 +1019,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -1056,7 +1056,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -1094,7 +1094,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
       throws AnalysisConfigurationException
     {
       final TRCompositionalConflictChecker checker =
@@ -1128,7 +1128,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
@@ -1162,7 +1162,7 @@ public class TRCompositionalConflictChecker
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;

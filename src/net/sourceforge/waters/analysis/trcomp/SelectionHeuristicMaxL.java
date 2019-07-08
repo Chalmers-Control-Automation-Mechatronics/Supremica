@@ -42,7 +42,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 
 /**
  * <P>The <STRONG>MaxL</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * compositional model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MaxL</STRONG> selection heuristic gives preference to
  * candidate with the highest proportion of local events over its total
@@ -68,9 +68,9 @@ public class SelectionHeuristicMaxL
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }

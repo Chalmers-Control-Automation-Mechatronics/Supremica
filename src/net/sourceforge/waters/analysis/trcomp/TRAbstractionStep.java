@@ -77,7 +77,7 @@ abstract class TRAbstractionStep
     throws AnalysisException;
 
   abstract void expandTrace(TRTraceProxy trace,
-                            AbstractTRCompositionalAnalyzer analyzer)
+                            AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisException;
 
 

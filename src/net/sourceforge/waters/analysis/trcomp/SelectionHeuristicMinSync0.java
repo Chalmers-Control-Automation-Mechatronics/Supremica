@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  * <P>An abstract base class to implement the <STRONG>MinSync</STRONG> and
  * <STRONG>MinSync</STRONG><SUP>&alpha;</SUP> candidate selection heuristics
  * for compositional model analysers of type {@link
- * AbstractTRCompositionalAnalyzer}.</P>
+ * AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>This base class contains support for heuristics that use a synchronous
  * product builder, and for accessing overflow candidates cached by the
@@ -99,7 +99,7 @@ abstract class SelectionHeuristicMinSync0
   public void setContext(final Object context)
   {
     super.setContext(context);
-    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
+    mAnalyzer = (AbstractTRCompositionalModelAnalyzer) context;
     if (context != null) {
       mSynchronousProductBuilder =
         mAnalyzer.createSynchronousProductBuilder();
@@ -112,7 +112,7 @@ abstract class SelectionHeuristicMinSync0
 
   //#########################################################################
   //# Simple Access
-  AbstractTRCompositionalAnalyzer getAnalyzer()
+  AbstractTRCompositionalModelAnalyzer getAnalyzer()
   {
     return mAnalyzer;
   }
@@ -140,7 +140,7 @@ abstract class SelectionHeuristicMinSync0
 
   //#########################################################################
   //# Data Members
-  private AbstractTRCompositionalAnalyzer mAnalyzer;
+  private AbstractTRCompositionalModelAnalyzer mAnalyzer;
   private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
 
 }

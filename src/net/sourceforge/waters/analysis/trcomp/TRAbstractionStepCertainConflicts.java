@@ -135,7 +135,7 @@ class TRAbstractionStepCertainConflicts
 
   @Override
   public void expandTrace(final TRTraceProxy trace,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisException
   {
     final long start = System.currentTimeMillis();

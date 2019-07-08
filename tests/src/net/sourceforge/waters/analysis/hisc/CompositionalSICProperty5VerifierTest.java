@@ -36,7 +36,7 @@ package net.sourceforge.waters.analysis.hisc;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.trcomp.AbstractTRCompositionalAnalyzer;
+import net.sourceforge.waters.analysis.trcomp.AbstractTRCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.trcomp.TRCompositionalConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -71,8 +71,8 @@ public class CompositionalSICProperty5VerifierTest
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
     checker.setSimplifierCreator(TRCompositionalConflictChecker.GNBw);
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MinT);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MaxL);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_MinT);
+    checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MaxL);
     checker.setInternalStateLimit(5000);
     checker.setInternalTransitionLimit(100000);
     checker.setBlockedEventsEnabled(true);

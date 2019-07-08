@@ -49,10 +49,10 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  * work by delegation.</P>
  *
  * <P>A delegating model analyser performs some model transformations on its
- * input, and passes one or more transformed to another compositional model
- * analyser (the delegate), which does the actual work. The results (e.g.,
- * counterexamples) obtained from the delegate may have to be transformed
- * back to match the original input.</P>
+ * input, and passes one or more transformed models to another compositional
+ * model analyser (the delegate), which does the actual work. The results
+ * (e.g., counterexamples) obtained from the delegate may have to be
+ * transformed back to match the original input.</P>
  *
  * <P>This abstract base class implements the delegation mechanism by
  * passing on most configuration options to the delegate.</P>
@@ -313,7 +313,7 @@ public abstract class AbstractTRDelegatingAnalyzer
   }
 
   @Override
-  protected AbstractTRCompositionalAnalyzer getCompositionalAnalyzer()
+  protected AbstractTRCompositionalModelAnalyzer getCompositionalAnalyzer()
   {
     return mDelegate.getCompositionalAnalyzer();
   }

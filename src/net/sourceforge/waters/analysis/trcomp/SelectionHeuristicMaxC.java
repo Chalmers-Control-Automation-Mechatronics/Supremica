@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 /**
  * <P>The <STRONG>MaxC</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * compositional model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MaxC</STRONG> selection heuristic gives preference to
  * candidate with the highest proportion of common events (i.e., events shared
@@ -71,9 +71,9 @@ public class SelectionHeuristicMaxC
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MinE,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }

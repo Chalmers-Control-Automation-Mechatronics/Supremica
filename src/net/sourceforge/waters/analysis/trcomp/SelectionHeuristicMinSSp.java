@@ -43,7 +43,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 /**
  * <P>The <STRONG>MinSSp</STRONG> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * compositional model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinSSp</STRONG>  estimates the number of states of the
  * abstracted synchronous composition of candidates and chooses the candidate
@@ -82,10 +82,10 @@ public class SelectionHeuristicMinSSp
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MinS,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }

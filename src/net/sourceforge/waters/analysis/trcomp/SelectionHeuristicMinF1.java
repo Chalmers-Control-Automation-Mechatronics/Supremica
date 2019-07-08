@@ -40,7 +40,7 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 
 /**
  * <P>The <STRONG>MinF</STRONG><sub>1</sub> candidate selection heuristic for
- * compositional model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * compositional model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinF</STRONG><sub>1</sub> selection heuristic gives
  * preference to candidate with the smallest frontier, i.e., the smallest
@@ -59,7 +59,7 @@ public class SelectionHeuristicMinF1
   @Override
   public void setContext(final Object context)
   {
-    mAnalyzer = (AbstractTRCompositionalAnalyzer) context;
+    mAnalyzer = (AbstractTRCompositionalModelAnalyzer) context;
   }
 
   @Override
@@ -68,10 +68,10 @@ public class SelectionHeuristicMinF1
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MinSync,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE
+      AbstractTRCompositionalModelAnalyzer.SEL_MinSync,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }
@@ -86,6 +86,6 @@ public class SelectionHeuristicMinF1
 
   //#########################################################################
   //# Data Members
-  private AbstractTRCompositionalAnalyzer mAnalyzer;
+  private AbstractTRCompositionalModelAnalyzer mAnalyzer;
 
 }

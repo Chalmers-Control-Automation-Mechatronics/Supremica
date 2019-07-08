@@ -171,7 +171,7 @@ class TRAbstractionStepPartition
 
   @Override
   public void expandTrace(final TRTraceProxy trace,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisException
   {
     final TRAutomatonProxy aut = mPredecessor.getOutputAutomaton
@@ -221,10 +221,10 @@ class TRAbstractionStepPartition
    * <UL>
    * <LI>Trace expansion may end prematurely if a deadlock state is reached.
    * Here, a deadlock state is a state not marked with the accepting
-   * proposition ({@link AbstractTRCompositionalAnalyzer#DEFAULT_MARKING})
+   * proposition ({@link AbstractTRCompositionalModelAnalyzer#DEFAULT_MARKING})
    * and without outgoing transitions. In the case of generalised nonblocking,
    * the deadlock state must also be marked with the precondition marking
-   * ({@link AbstractTRCompositionalAnalyzer#PRECONDITION_MARKING}).
+   * ({@link AbstractTRCompositionalModelAnalyzer#PRECONDITION_MARKING}).
    * If a deadlock state is encountered during the search, expansion stops
    * immediately, possibly returning a concrete trace that does not accept
    * all the events found in the abstract trace. This is to support selfloop
@@ -242,7 +242,7 @@ class TRAbstractionStepPartition
    * </UL>
    * <P>These special conditions only apply when the invoking model verifier
    * uses a default marking ({@link
-   * AbstractTRCompositionalAnalyzer#getUsedDefaultMarking()}),
+   * AbstractTRCompositionalModelAnalyzer#getUsedDefaultMarking()}),
    * i.e., not for language inclusion checks.</P>
    *
    * @author Robi Malik
@@ -253,7 +253,7 @@ class TRAbstractionStepPartition
     //# Constructor
     private TraceExpander(final TRTraceProxy trace,
                           final ListBufferTransitionRelation rel,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
        throws EventNotFoundException
     {
       mAnalyzer = analyzer;
@@ -288,7 +288,7 @@ class TRAbstractionStepPartition
       }
       mHasDeadlockState = false;
       if (analyzer.getUsedDefaultMarking() != null &&
-          rel.isPropositionUsed(AbstractTRCompositionalAnalyzer.DEFAULT_MARKING)) {
+          rel.isPropositionUsed(AbstractTRCompositionalModelAnalyzer.DEFAULT_MARKING)) {
         for (int s = 0; s < rel.getNumberOfStates(); s++) {
           if (rel.isReachable(s) && isDeadlockState(s)) {
             mHasDeadlockState = true;
@@ -398,7 +398,7 @@ class TRAbstractionStepPartition
     {
       return
         mInputTransitionRelation.isDeadlockState
-          (state, AbstractTRCompositionalAnalyzer.DEFAULT_MARKING) &&
+          (state, AbstractTRCompositionalModelAnalyzer.DEFAULT_MARKING) &&
         isRelevantPreconditionMarkedState(state);
     }
 
@@ -408,7 +408,7 @@ class TRAbstractionStepPartition
         return mRelevantPreconditionMarkings.get(state);
       } else {
         return mInputTransitionRelation.isMarked
-          (state, AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
+          (state, AbstractTRCompositionalModelAnalyzer.PRECONDITION_MARKING);
       }
     }
 
@@ -488,7 +488,7 @@ class TRAbstractionStepPartition
 
     //#######################################################################
     //# Data Members
-    private final AbstractTRCompositionalAnalyzer mAnalyzer;
+    private final AbstractTRCompositionalModelAnalyzer mAnalyzer;
     /**
      * The automaton before abstraction.
      */

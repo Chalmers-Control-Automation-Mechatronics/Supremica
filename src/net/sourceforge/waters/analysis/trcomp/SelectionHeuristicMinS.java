@@ -44,7 +44,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 /**
  * <P>The <STRONG>MinS</STRONG> and <STRONG>MinS</STRONG><SUP>&alpha;</SUP>
  * candidate selection heuristics for compositional model analysers of type
- * {@link AbstractTRCompositionalAnalyzer}.</P>
+ * {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinS</STRONG> heuristic estimates the number of states of the
  * abstracted synchronous composition of candidates and chooses the candidate
@@ -105,9 +105,9 @@ public class SelectionHeuristicMinS
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }

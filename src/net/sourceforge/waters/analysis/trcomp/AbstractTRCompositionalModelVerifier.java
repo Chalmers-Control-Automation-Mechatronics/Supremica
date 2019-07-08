@@ -55,20 +55,20 @@ import org.apache.logging.log4j.Logger;
 /**
  * A general compositional model verifier to be subclassed for different
  * algorithms. This class extends the abstract compositional model analyser
- * class ({@link AbstractTRCompositionalAnalyzer} to implement the
+ * class ({@link AbstractTRCompositionalModelAnalyzer} to implement the
  * {@link ModelVerifier} interface and provide counterexample support.
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractTRCompositionalVerifier
-  extends AbstractTRCompositionalAnalyzer
+public abstract class AbstractTRCompositionalModelVerifier
+  extends AbstractTRCompositionalModelAnalyzer
   implements ModelVerifier
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractTRCompositionalVerifier(final ProductDESProxy model,
+  public AbstractTRCompositionalModelVerifier(final ProductDESProxy model,
                                          final KindTranslator translator,
                                          final ModelVerifier mono)
   {

@@ -52,7 +52,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * <P>The <STRONG>MinSync</STRONG> candidate selection heuristic for
  * compositional model analysers of type {@link
- * AbstractTRCompositionalAnalyzer}.</P>
+ * AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinSync</STRONG> heuristic computes the number of states
  * of the synchronous composition of each candidate and gives preference to
@@ -91,14 +91,14 @@ public class SelectionHeuristicMinSync
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] array = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS
     };
     final ChainSelectionHeuristic<TRCandidate> chain =
       new ChainSelectionHeuristic<TRCandidate>(array);
-    chain.setPreOrder(AbstractTRCompositionalAnalyzer.SEL_MinS0);
+    chain.setPreOrder(AbstractTRCompositionalModelAnalyzer.SEL_MinS0);
     return chain;
   }
 
@@ -108,7 +108,7 @@ public class SelectionHeuristicMinSync
     if (isOverflowCandidate(candidate)) {
       return Double.POSITIVE_INFINITY;
     }
-    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    final AbstractTRCompositionalModelAnalyzer analyzer = getAnalyzer();
     final TRAbstractSynchronousProductBuilder syncBuilder =
       getSynchronousProductBuilder();
     try {
@@ -151,7 +151,7 @@ public class SelectionHeuristicMinSync
   protected void reset()
   {
     super.reset();
-    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    final AbstractTRCompositionalModelAnalyzer analyzer = getAnalyzer();
     mStateLimit = analyzer.getInternalStateLimit();
   }
 

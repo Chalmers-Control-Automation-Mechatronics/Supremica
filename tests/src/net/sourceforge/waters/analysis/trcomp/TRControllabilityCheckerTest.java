@@ -68,8 +68,8 @@ public class TRControllabilityCheckerTest
     (final ProductDESProxyFactory factory)
   {
     final TRControllabilityChecker checker = new TRControllabilityChecker();
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_MustSp);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSSp);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_MustSp);
+    checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MinSSp);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

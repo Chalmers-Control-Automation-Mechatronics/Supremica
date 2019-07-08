@@ -39,7 +39,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 /**
  * <P>The <STRONG>MaxT</STRONG> preselection heuristic used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MaxT</STRONG> preselection identifies the automaton with
  * the most transitions and forms pairs consisting of this automaton

@@ -43,7 +43,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 /**
  * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP><SUB>0</SUB> candidate
  * selection heuristic for compositional model analysers of type {@link
- * AbstractTRCompositionalAnalyzer}.</P>
+ * AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinS</STRONG><SUP>&alpha;</SUP> heuristic is of interest
  * when verifying the generalised nonblocking property. It estimates the
@@ -69,10 +69,10 @@ public class SelectionHeuristicMinS0a
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] chain = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MinS,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE
     };
     return new ChainSelectionHeuristic<TRCandidate>(chain);
   }
@@ -80,7 +80,7 @@ public class SelectionHeuristicMinS0a
   @Override
   public double getHeuristicValue(final TRCandidate candidate)
   {
-    final int alpha = AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING;
+    final int alpha = AbstractTRCompositionalModelAnalyzer.PRECONDITION_MARKING;
     double result = 1.0;
     for (final TRAutomatonProxy aut : candidate.getAutomata()) {
       final ListBufferTransitionRelation rel = aut.getTransitionRelation();

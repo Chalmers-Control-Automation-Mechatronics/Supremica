@@ -120,16 +120,16 @@ import org.apache.logging.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class AbstractTRCompositionalAnalyzer
+public abstract class AbstractTRCompositionalModelAnalyzer
   extends AbstractTRAnalyzer
   implements ModelAnalyzer
 {
 
   //#########################################################################
   //# Constructors
-  public AbstractTRCompositionalAnalyzer(final ProductDESProxy model,
-                                         final KindTranslator translator,
-                                         final ModelAnalyzer mono)
+  public AbstractTRCompositionalModelAnalyzer(final ProductDESProxy model,
+                                              final KindTranslator translator,
+                                              final ModelAnalyzer mono)
   {
     super(model, translator);
     mTRSimplifierCreator = getTRSimplifierFactory().getDefaultValue();
@@ -897,7 +897,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   }
 
   @Override
-  protected AbstractTRCompositionalAnalyzer getCompositionalAnalyzer()
+  protected AbstractTRCompositionalModelAnalyzer getCompositionalAnalyzer()
   {
     return this;
   }
@@ -1508,7 +1508,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       return analyzer.createObservationEquivalenceChain
         (ObservationEquivalenceTRSimplifier.
@@ -1532,7 +1532,7 @@ public abstract class AbstractTRCompositionalAnalyzer
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       return analyzer.createObservationEquivalenceChain
         (ObservationEquivalenceTRSimplifier.

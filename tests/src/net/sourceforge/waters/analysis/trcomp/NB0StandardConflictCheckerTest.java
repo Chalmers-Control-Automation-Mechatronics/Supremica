@@ -71,8 +71,8 @@ public class NB0StandardConflictCheckerTest
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
     checker.setSimplifierCreator(TRCompositionalConflictChecker.NB0);
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_Pairs);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinF1);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_Pairs);
+    checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MinF1);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * <P>The <STRONG>MinSync</STRONG><SUP>&alpha;</SUP> candidate selection
  * heuristic for compositional model analysers of type {@link
- * AbstractTRCompositionalAnalyzer}.</P>
+ * AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinSync</STRONG><SUP>&alpha;</SUP> heuristic computes the
  * synchronous composition of each candidate and gives preference to the
@@ -86,14 +86,14 @@ public class SelectionHeuristicMinSyncA
     @SuppressWarnings("unchecked")
     final SelectionHeuristic<TRCandidate>[] array = new SelectionHeuristic[] {
       this,
-      AbstractTRCompositionalAnalyzer.SEL_MaxL,
-      AbstractTRCompositionalAnalyzer.SEL_MaxC,
-      AbstractTRCompositionalAnalyzer.SEL_MinE,
-      AbstractTRCompositionalAnalyzer.SEL_MinS
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxL,
+      AbstractTRCompositionalModelAnalyzer.SEL_MaxC,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinE,
+      AbstractTRCompositionalModelAnalyzer.SEL_MinS
     };
     final ChainSelectionHeuristic<TRCandidate> chain =
       new ChainSelectionHeuristic<TRCandidate>(array);
-    chain.setPreOrder(AbstractTRCompositionalAnalyzer.SEL_MinS0a);
+    chain.setPreOrder(AbstractTRCompositionalModelAnalyzer.SEL_MinS0a);
     return chain;
   }
 
@@ -103,7 +103,7 @@ public class SelectionHeuristicMinSyncA
     if (isOverflowCandidate(candidate)) {
       return Double.POSITIVE_INFINITY;
     }
-    final AbstractTRCompositionalAnalyzer analyzer = getAnalyzer();
+    final AbstractTRCompositionalModelAnalyzer analyzer = getAnalyzer();
     final TRAbstractSynchronousProductBuilder syncBuilder =
       getSynchronousProductBuilder();
     try {
@@ -159,7 +159,7 @@ public class SelectionHeuristicMinSyncA
     if (mMarkingInfo == null) {
       final EventEncoding enc = syncBuilder.getEventEncoding();
       final EventProxy prop = enc.getProposition
-        (AbstractTRCompositionalAnalyzer.PRECONDITION_MARKING);
+        (AbstractTRCompositionalModelAnalyzer.PRECONDITION_MARKING);
       mMarkingInfo = syncBuilder.getMarkingInfo(prop);
     }
     if (mMarkingInfo.isMarkedStateDecoded(decoded)) {

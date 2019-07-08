@@ -70,8 +70,8 @@ public class GNBwGeneralisedConflictCheckerTest
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
     checker.setSimplifierCreator(TRCompositionalConflictChecker.GNBw);
-    checker.setPreselectionHeuristic(AbstractTRCompositionalAnalyzer.PRESEL_Pairs);
-    checker.setSelectionHeuristic(AbstractTRCompositionalAnalyzer.SEL_MinSyncA);
+    checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_Pairs);
+    checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MinSyncA);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

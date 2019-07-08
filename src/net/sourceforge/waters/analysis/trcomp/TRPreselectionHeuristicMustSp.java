@@ -47,7 +47,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * <P>The <STRONG>MustSp</STRONG> preselection heuristic used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MustSp</STRONG> preselection heuristic forms two candidates
  * for each event: the first contains all automata where the event is not

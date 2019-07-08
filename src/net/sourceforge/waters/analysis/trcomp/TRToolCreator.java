@@ -44,7 +44,7 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
  *
  * <P>The tool creator has a type argument that represents the type of tool
  * it creates, e.g., {@link TransitionRelationSimplifier}.
- * Its {@link #create(AbstractTRCompositionalAnalyzer) create()} method is
+ * Its {@link #create(AbstractTRCompositionalModelAnalyzer) create()} method is
  * invoked during initialisation of the model analyser to create the tool in
  * the correct context. In addition, the tool creator has a name, so it can
  * be added to a {@link ListedEnumFactory} to implement command line
@@ -52,7 +52,7 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
  *
  * @author Robi Malik
  *
- * @see AbstractTRCompositionalAnalyzer
+ * @see AbstractTRCompositionalModelAnalyzer
  */
 
 public abstract class TRToolCreator<T>
@@ -88,7 +88,7 @@ public abstract class TRToolCreator<T>
   /**
    * Creates a tool to be used by the given model analyser.
    */
-  public abstract T create(AbstractTRCompositionalAnalyzer analyzer)
+  public abstract T create(AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisConfigurationException;
 
 

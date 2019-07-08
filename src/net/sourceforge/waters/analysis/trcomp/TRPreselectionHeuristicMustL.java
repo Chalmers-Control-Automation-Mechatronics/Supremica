@@ -46,7 +46,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 /**
  * <P>The <STRONG>MustL</STRONG> preselection heuristic used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MustL</STRONG> preselection heuristic forms one candidate
  * for each event, which contains all automata using that event.</P>

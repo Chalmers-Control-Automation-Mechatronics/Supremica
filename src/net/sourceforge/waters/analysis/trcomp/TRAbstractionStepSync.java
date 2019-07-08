@@ -156,7 +156,7 @@ class TRAbstractionStepSync
 
   @Override
   public void expandTrace(final TRTraceProxy trace,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
     throws AnalysisException
   {
     // Ensure mDumpStateIndex and mStateMap are available ...

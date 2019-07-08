@@ -124,7 +124,7 @@ class TRAbstractionStepDrop
 
   @Override
   public void expandTrace(final TRTraceProxy trace,
-                          final AbstractTRCompositionalAnalyzer analyzer)
+                          final AbstractTRCompositionalModelAnalyzer analyzer)
   {
     final int numSteps = trace.getNumberOfSteps();
     final int[] states = new int[numSteps];

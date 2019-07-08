@@ -65,7 +65,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Roger Su
  */
 public class TRCompositionalStateCounter
-  extends AbstractTRCompositionalAnalyzer
+  extends AbstractTRCompositionalModelAnalyzer
   implements StateCounter
 {
   //#########################################################################
@@ -199,7 +199,7 @@ public class TRCompositionalStateCounter
   {
     @Override
     public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalAnalyzer analyzer)
+      (final AbstractTRCompositionalModelAnalyzer analyzer)
         throws AnalysisConfigurationException
     {
       // Configuration

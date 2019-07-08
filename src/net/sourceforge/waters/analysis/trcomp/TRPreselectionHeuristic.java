@@ -51,7 +51,7 @@ import net.sourceforge.waters.model.base.ProxyTools;
 
 /**
  * <P>The interface for all preselection heuristics used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <I>preselection heuristic</I> implements the first step of candidate
  * selection, where several groups of automata to be considered for
@@ -76,7 +76,7 @@ public abstract class TRPreselectionHeuristic
    * This method is called when a heuristic is registered with a model
    * analyser to pass that model analyser as a context into the heuristic.
    */
-  public void setContext(final AbstractTRCompositionalAnalyzer analyzer)
+  public void setContext(final AbstractTRCompositionalModelAnalyzer analyzer)
   {
     mAutomataLimit = analyzer.getMonolithicAutomataLimit();
   }

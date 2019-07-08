@@ -39,7 +39,7 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 
 /**
  * <P>The <STRONG>MinT</STRONG> preselection heuristic used by compositional
- * model analysers of type {@link AbstractTRCompositionalAnalyzer}.</P>
+ * model analysers of type {@link AbstractTRCompositionalModelAnalyzer}.</P>
  *
  * <P>The <STRONG>MinT</STRONG> preselection identifies the automaton with
  * the fewest transitions and forms pairs consisting of this automaton

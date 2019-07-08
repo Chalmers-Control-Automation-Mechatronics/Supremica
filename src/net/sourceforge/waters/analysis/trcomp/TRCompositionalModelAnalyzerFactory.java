@@ -159,8 +159,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
         factory = composer.getTRSimplifierFactory();
       final TRToolCreator<TransitionRelationSimplifier> creator =
@@ -179,8 +179,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
         factory = composer.getTRSimplifierFactory();
       factory.dumpEnumeration(stream, INDENT);
@@ -209,8 +209,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicStateLimit(limit);
     }
   }
@@ -236,8 +236,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       composer.setInternalStateLimit(limit);
     }
   }
@@ -264,8 +264,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicTransitionLimit(limit);
     }
   }
@@ -292,8 +292,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final int limit = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       composer.setInternalTransitionLimit(limit);
     }
   }
@@ -318,8 +318,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
     {
       final String name = getValue();
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<TRPreselectionHeuristic> factory =
         composer.getPreselectionHeuristicFactory();
       final TRPreselectionHeuristic heu = factory.getEnumValue(name);
@@ -337,8 +337,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<TRPreselectionHeuristic> factory =
         composer.getPreselectionHeuristicFactory();
       factory.dumpEnumeration(stream, INDENT);
@@ -364,8 +364,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<SelectionHeuristic<TRCandidate>> factory =
         composer.getSelectionHeuristicFactory();
       final String name = getValue();
@@ -403,8 +403,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void dump(final PrintStream stream, final Object analyzer)
     {
       super.dump(stream, analyzer);
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final EnumFactory<SelectionHeuristic<TRCandidate>> factory =
         composer.getSelectionHeuristicFactory();
       factory.dumpEnumeration(stream, INDENT);
@@ -431,8 +431,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setBlockedEventsEnabled(enable);
       composer.setFailingEventsEnabled(enable);
@@ -460,8 +460,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setBlockedEventsEnabled(enable);
     }
@@ -486,8 +486,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setFailingEventsEnabled(enable);
     }
@@ -513,8 +513,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setSelfloopOnlyEventsEnabled(enable);
     }
@@ -540,8 +540,8 @@ public class TRCompositionalModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final boolean enable = getValue();
       composer.setAlwaysEnabledEventsEnabled(enable);
     }
@@ -603,8 +603,8 @@ public class TRCompositionalModelAnalyzerFactory
       final ModelAnalyzer modelAnalyzer = (ModelAnalyzer) analyzer;
       final ModelAnalyzer secondaryAnalyzer =
         createSecondaryAnalyzer(modelAnalyzer);
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       composer.setMonolithicAnalyzer(secondaryAnalyzer);
     }
   }
@@ -630,8 +630,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
       throws AnalysisConfigurationException
     {
-      final AbstractTRCompositionalAnalyzer compositional =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer compositional =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       compositional.setOutputCheckingEnabled(true);
     }
   }
@@ -657,8 +657,8 @@ public class TRCompositionalModelAnalyzerFactory
     public void configureAnalyzer(final Object analyzer)
       throws AnalysisConfigurationException
     {
-      final AbstractTRCompositionalAnalyzer composer =
-        (AbstractTRCompositionalAnalyzer) analyzer;
+      final AbstractTRCompositionalModelAnalyzer composer =
+        (AbstractTRCompositionalModelAnalyzer) analyzer;
       final String fileName = getValue();
       final File file = new File(fileName);
       composer.setMonolithicDumpFile(file);
