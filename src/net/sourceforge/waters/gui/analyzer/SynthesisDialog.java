@@ -61,6 +61,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
   public SynthesisDialog(final WatersAnalyzerPanel panel)
   {
     super(panel);
+    //super(panel, new MonolithicSynthesizer(ProductDESElementFactory.getInstance()));
     setTitle("Supervisor synthesis");
   }
 

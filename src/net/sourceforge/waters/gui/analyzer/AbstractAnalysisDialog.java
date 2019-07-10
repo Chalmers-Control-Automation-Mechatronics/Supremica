@@ -63,18 +63,26 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
+ * Abstract class that auto-generates a GUI that is based on the provided algorithm(s) getParameters method
+ * where one is provided on creation or populateAlgorithmComboBox() uses a class specific
+ * list of algorithms
+ *
  * @author Brandon Bassett
  */
 public abstract class AbstractAnalysisDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
+  /**
+   * Used when using the JComboBOx to switch between multiple algorithms,
+   * generateAnalyzerCombobox() populates JComboBox
+   */
   public AbstractAnalysisDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
 
     mAnalyzerPanel = panel;
-    mAutomata = panel.getAutomataTable().getOperationArgument();
+    mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
@@ -82,7 +90,28 @@ public abstract class AbstractAnalysisDialog extends JDialog
                                                mAutomata, factory);
     generateAnalyzerCombobox();
     generateGUI();
-    setLocationRelativeTo(panel.getTopLevelAncestor());
+    setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
+    setVisible(true);
+  }
+
+  /**
+   * Used when only using one algorithm, generateAnalyzerCombobox() not used
+   */
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer)
+  {
+    super((Frame) panel.getTopLevelAncestor());
+
+    mAnalyzerPanel = panel;
+    mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
+
+    AllParams = new HashMap<Integer,Parameter>();
+    factory = ProductDESElementFactory.getInstance();
+    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(),
+                                               mAutomata, factory);
+
+    mAnalyzer = analyzer;
+    generateGUI();
+    setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
     setVisible(true);
   }
 
@@ -90,8 +119,8 @@ public abstract class AbstractAnalysisDialog extends JDialog
   //# Using Parameter Classes
 
   /**
-   * Generates the JComboBox that is at the top of the frame,
-   * stores the list of all available algorithms
+   * Generates the JComboBox that is at the top of the frame, stores the list
+   * of all available algorithms only if more than one algorithms are to be used
    */
   public void generateAnalyzerCombobox()
   {
@@ -110,33 +139,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
      * final JButton print = new JButton("Print Database");
      * print.addActionListener(Print);
      */
-    mSuperviserPanel.add(superviserComboboxLabel);
-    mSuperviserPanel.add(analyzerCombobox);
-    add(mSuperviserPanel, BorderLayout.PAGE_START);
-  }
 
-  /**
-   * Class specific way to populate the comboBox that stores all the
-   * algorithms to be used leave empty if only one algorithm
-   */
-  abstract public void populateAlgorithmComboBox();
-
-  public void analysisChanged()
-  {
-      generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox.getSelectedItem());
-
-      final List<Parameter> newParams = mAnalyzer.getParameters();
-
-      storeInDatabase();
-      copyFromDatabase(newParams);
-      mScrollParametersPanel.replaceView(newParams, des);
-
-    //re-packing causes the frame to shrink/increase to preferred size
-    pack();
-  }
-
-  public void generateGUI()
-  {
     final ActionListener analyzerChanged = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -147,8 +150,40 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     analyzerCombobox.addActionListener(analyzerChanged);
 
+    mSuperviserPanel.add(superviserComboboxLabel);
+    mSuperviserPanel.add(analyzerCombobox);
+    add(mSuperviserPanel, BorderLayout.PAGE_START);
+  }
+
+  /**
+   * Class specific way to populate the comboBox that stores all the
+   * algorithms to be used, leave empty if only one algorithm which
+   * must be supplied on construction
+   */
+  abstract public void populateAlgorithmComboBox();
+
+  public void analysisChanged()
+  {
+    generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox
+      .getSelectedItem());
+
+    final List<Parameter> newParams = mAnalyzer.getParameters();
+
+    storeInDatabase();
+    copyFromDatabase(newParams);
+    mScrollParametersPanel.replaceView(newParams, des);
+
+    //re-packing causes the frame to shrink/increase to preferred size
+    pack();
+  }
+
+  public void generateGUI()
+  {
+    //ModelAnalyzer not supplied on construction, JComboBox being used
+    if(mAnalyzer == null)
       generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox.getSelectedItem());
-      mScrollParametersPanel =  new ParameterJScrollPane(mAnalyzer.getParameters(), des);
+
+    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), des);
 
     // Buttons panel ...
     final ActionListener commithandler = new ActionListener() {
@@ -181,7 +216,8 @@ public abstract class AbstractAnalysisDialog extends JDialog
   }
 
   /**
-   * Values stored in GUI Components are stored in corresponding parameter then added to the database
+   * Values stored in GUI Components are stored in corresponding parameter
+   * then added to the database
    */
   public void storeInDatabase()
   {
@@ -195,9 +231,12 @@ public abstract class AbstractAnalysisDialog extends JDialog
   }
 
   /**
-   *  updates the passed parameters to have same stored value as
-   *  corresponding one in database
-   * @param parametersToStore the list of parameters that are to be stored in the database of all parameters
+   * updates the passed parameters to have same stored value as corresponding
+   * one in database
+   *
+   * @param parametersToStore
+   *          the list of parameters that are to be stored in the database of
+   *          all parameters
    */
 
   public void copyFromDatabase(final List<Parameter> parametersToStore)
@@ -214,7 +253,11 @@ public abstract class AbstractAnalysisDialog extends JDialog
   }
 
   /**
-   * @param loader the parameter to be turned into the desired subclass of ModelAnalyzer
+   * Converts "ModelAnalyzer mAnalyzer" to the desired subclass
+   *
+   * @param loader
+   *          the parameter to be turned into the desired subclass of
+   *          ModelAnalyzer
    */
   abstract public void generateAnalyser(ModelAnalyzerFactoryLoader loader);
 

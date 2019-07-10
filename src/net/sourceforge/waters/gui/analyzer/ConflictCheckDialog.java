@@ -52,9 +52,11 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
+import net.sourceforge.waters.gui.dialog.WatersVerifyDialog;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
@@ -64,6 +66,8 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import org.supremica.gui.ide.IDE;
 
 /**
  * @author Brandon Bassett
@@ -221,15 +225,6 @@ public class ConflictCheckDialog extends JDialog
 
   public void ParameterCommitDialog()
   {
-    @SuppressWarnings("unused")
-    final Frame owner = (Frame) getOwner();;
-    //final ConflictCheckPopUpDialog dialog;
-
-    final ProductDESProxyFactory factory =    ProductDESElementFactory.getInstance();
-    @SuppressWarnings("unused")
-    final ProductDESProxy des =
-      AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
-
     final List<Parameter> parameters = mConflictCheck.getParameters();
     storeInDatabase();
     copyFromDatabase(parameters);
@@ -238,74 +233,44 @@ public class ConflictCheckDialog extends JDialog
     for(final Parameter current: parameters)
       current.commitValue();
 
-   // dialog = new ConflictCheckPopUpDialog(owner, des);
+    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
+    final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
+
+    final ConflictCheckPopUpDialog dialog = new ConflictCheckPopUpDialog(ide, des);
     dispose();
-    //dialog.setVisible(true);
+    dialog.setVisible(true);
   }
 
-/*
   //#########################################################################
   //# Inner Class AnalyzerDialog
-  private class ConflictCheckPopUpDialog extends WatersAnalyzeDialog
+  private class ConflictCheckPopUpDialog extends WatersVerifyDialog
   {
     //#######################################################################
     //# Constructor
-    public ConflictCheckPopUpDialog(final Frame owner,
+    public ConflictCheckPopUpDialog(final IDE owner,
                                 final ProductDESProxy des)
     {
       super(owner, des);
     }
 
-    //#######################################################################
-    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
     @Override
-    public void succeed()
+    protected String getFailureDescription()
     {
-      super.succeed();
-      final VerificationResult result = mConflictCheck.getAnalysisResult();
-      result.isSatisfied();
+      return "is blocking";
+    }
 
-      final Collection<? extends AutomatonProxy> supervisors =
-        result.getComputedAutomata();
-      if (supervisors != null) {
-        final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
-        model.insertRows(supervisors);
-      }
+    @Override
+    protected String getSuccessDescription()
+    {
+      return "is non-blocking";
     }
 
     @Override
     protected String getAnalysisName()
     {
       return "Conflict Check";
-    }
-
-    @Override
-    protected String getFailureText()
-    {
-      return "Synthesis failed. There is no solution to the control problem.";
-    }
-
-    @Override
-    protected String getSuccessText()
-    {
-      final VerificationResult result = mConflictCheck.getAnalysisResult();
-      final Collection<? extends AutomatonProxy> supervisors =
-        result.getComputedAutomata();
-      if (supervisors == null) {
-        return "Synthesis successful. " +
-               "A supervisor exists, but it has not been constructed.";
-      } else {
-        final int size = supervisors.size();
-        switch (size) {
-        case 0:
-          return "The system already satisfies all control objectives. " +
-                 "No supervisor is needed.";
-        case 1:
-          return "Successfully synthesised a supervisor.";
-        default:
-          return "Successfully synthesised " + size + " supervisor components.";
-        }
-      }
     }
 
     @Override
@@ -317,13 +282,12 @@ public class ConflictCheckDialog extends JDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
-  }*/
 
+  }
 
   //#########################################################################
   //# Data Members
   // Dialog state
-  @SuppressWarnings("unused")
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final List<AutomatonProxy> mAutomata;
 
@@ -335,7 +299,6 @@ public class ConflictCheckDialog extends JDialog
 
   // Analysis workers
   private ConflictChecker mConflictCheck;
-
 
   //#########################################################################
   //# Class Constants
