@@ -654,6 +654,9 @@ public class CompositionalGeneralisedConflictChecker
   public boolean run() throws AnalysisException
   {
     setUp();
+    if (setUpUsedDefaultMarking() == mUsedPreconditionMarking) {
+      return setSatisfiedResult();
+    }
     try {
       final ProductDESProxyFactory factory = getFactory();
       ProductDESProxy model = getModel();
