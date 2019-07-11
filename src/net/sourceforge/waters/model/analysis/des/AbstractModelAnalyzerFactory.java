@@ -167,6 +167,14 @@ public abstract class AbstractModelAnalyzerFactory
   }
 
   @Override
+  public SynchronousProductBuilder createSynchronousProductBuilder
+    (final ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException
+  {
+    throw createUnsupportedOperationException("synchronous product");
+  }
+
+  @Override
   public SupervisorSynthesizer createSupervisorSynthesizer
     (final ProductDESProxyFactory factory)
     throws AnalysisConfigurationException

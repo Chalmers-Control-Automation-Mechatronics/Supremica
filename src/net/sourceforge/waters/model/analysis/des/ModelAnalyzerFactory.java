@@ -95,6 +95,13 @@ public interface ModelAnalyzerFactory
     throws AnalysisConfigurationException;
 
   /**
+   * Creates a synchronous product builder.
+   */
+  public SynchronousProductBuilder createSynchronousProductBuilder
+    (ProductDESProxyFactory factory)
+    throws AnalysisConfigurationException;
+
+  /**
    * Creates a supervisor synthesiser.
    */
   public SupervisorSynthesizer createSupervisorSynthesizer

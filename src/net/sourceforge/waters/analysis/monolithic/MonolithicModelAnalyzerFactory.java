@@ -124,6 +124,13 @@ public class MonolithicModelAnalyzerFactory
   }
 
   @Override
+  public MonolithicSynchronousProductBuilder createSynchronousProductBuilder
+    (final ProductDESProxyFactory factory)
+  {
+    return new MonolithicSynchronousProductBuilder(factory);
+  }
+
+  @Override
   public MonolithicSynthesizer createSupervisorSynthesizer
     (final ProductDESProxyFactory factory)
   {
