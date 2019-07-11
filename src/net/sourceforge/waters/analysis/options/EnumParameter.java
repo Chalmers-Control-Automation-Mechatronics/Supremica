@@ -80,6 +80,10 @@ public class EnumParameter<T> extends Parameter
   {
     this(id, name, description, factory.getEnumConstants());
   }
+  // TODO We need to be able to set a default value, which may be different
+  // from the first list item. If the EnumFactory is used, use its method
+  // getDefaultValue(); otherwise it should be possible to set the default
+  // through an (optional) constructor argument.
 
 
   //#########################################################################
@@ -123,12 +127,6 @@ public class EnumParameter<T> extends Parameter
     comboBox.setSelectedItem(mValue);
   }
 
-
-  //#########################################################################
-  //# Data Members
-  private List<? extends T> mList;
-  private T mValue;
-
   @SuppressWarnings("unchecked")
   @Override
   public void updateFromParameter(final Parameter p)
@@ -141,4 +139,11 @@ public class EnumParameter<T> extends Parameter
   {
     System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private List<? extends T> mList;
+  private T mValue;
+
 }

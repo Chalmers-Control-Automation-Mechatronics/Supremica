@@ -40,6 +40,7 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -47,13 +48,33 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+
+/**
+ * A configurable parameter to pass a proposition event ({@link EventProxy})
+ * to a {@link ModelAnalyzer}.
+ *
+ * @author Brandon Bassett
+ */
+
 public class EventParameter extends Parameter
 {
-  public EventParameter(final int id, final String name, final String description, final boolean allowNull)
+  // TODO Three options are needed (use EventParameterType):
+  // 1 - Null is not allowed, and the default is :accepting if available,
+  //     otherwise the first proposition in the model. (If there is no
+  //     proposition in the model, use null as the only option.)
+  // 2 - Null is allowed and the default is :accepting if available,
+  //     otherwise the first proposition in the model, or null if
+  //     there is not proposition in the model. (Unlike case 1,
+  //     null is also an option if there are propositions in the model.)
+  // 3 - Null is allowed and is the default.
+  public EventParameter(final int id,
+                        final String name,
+                        final String description,
+                        final boolean allowNull)
   {
     super(id, name, description);
     mValue = null;
-    allowNullEvent = allowNull;
+    mAllowNullEvent = allowNull;
   }
 
   @Override
@@ -66,7 +87,7 @@ public class EventParameter extends Parameter
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
     //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
-    if(allowNullEvent)
+    if(mAllowNullEvent)
       propositions.add(noEvent);
 
     for(final EventProxy event: model.getEvents()) {
@@ -126,6 +147,6 @@ public class EventParameter extends Parameter
   //#########################################################################
   //# Data Members
   private EventProxy mValue;
-  private final boolean allowNullEvent;
+  private final boolean mAllowNullEvent;
 
 }

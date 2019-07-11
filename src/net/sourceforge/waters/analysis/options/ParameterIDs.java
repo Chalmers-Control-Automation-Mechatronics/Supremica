@@ -120,7 +120,6 @@ public class ParameterIDs
   //net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder
   public static final int MonolithicSynchronousProductBuilder_PruningDeadlocks = 1500;
   public static final int MonolithicSynchronousProductBuilder_RemovingSelfloops = 1501;
-  public static final int MonolithicSynchronousProductBuilder_StateCallback = 1501;
 
   //net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
   public static final int TRAbstractSynchronousProductBuilder_CountingStates = 1601;
@@ -129,4 +128,10 @@ public class ParameterIDs
   //net.sourceforge.waters.analysis.monolithic.TRAbstractModelAnalyzer
   public static final int TRAbstractModelAnalyzer_PruningDeadLocks = 1700;
 
+  //org.supremica.automata.waters.SupremicaModelAnalyzer
+  public static final int SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant = 5000;
+
+  //org.supremica.automata.waters.SupremicaSynthesizer
+  public static final int SupremicaSynthesizer_ShortStateNames = 5100;
+  public static final int SupremicaSynthesizer_Purging = 5101;
 }

@@ -264,7 +264,7 @@ public class ConflictCheckDialog extends JDialog
     @Override
     protected String getSuccessDescription()
     {
-      return "is non-blocking";
+      return "is nonblocking";
     }
 
     @Override

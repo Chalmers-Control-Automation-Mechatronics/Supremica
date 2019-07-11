@@ -51,7 +51,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.gui.dialog.AutomatonNameInputParser;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.FormattedInputParser;
@@ -61,6 +60,7 @@ import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -310,7 +310,7 @@ public class SynchronousProductDialog extends JDialog
         final String msg = exception.getMessage();
         logger.error(msg);
       }
-      final TRSynchronousProductResult result = builder.getAnalysisResult();
+      final AutomatonResult result = builder.getAnalysisResult();
       final AutomatonProxy aut = result.getComputedProxy();
       final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
       model.insertRow(aut);

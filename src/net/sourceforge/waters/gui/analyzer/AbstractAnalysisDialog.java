@@ -260,6 +260,13 @@ public abstract class AbstractAnalysisDialog extends JDialog
    *          ModelAnalyzer
    */
   abstract public void generateAnalyser(ModelAnalyzerFactoryLoader loader);
+  // TODO protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory analyzerFactory,
+  //                                                      ProductDESProxyFactory desFactory);
+  // TODO protected ModelAnalyzer getAnalyzer() { return mAnalyzer; }
+  // TODO This can be overridden in a subclass if a more specific type is needed:
+  // @Override
+  // protected SupervisorSynthesizer getAnalyzer()
+  // { return (SupervisorSynthesizer) super.getAnalyzer(); }
 
   public void ParameterCommitDialog()
   {
@@ -278,23 +285,25 @@ public abstract class AbstractAnalysisDialog extends JDialog
    * Generates the pop up dialog that shows the result of using the analyzer
    */
   public abstract void generateResultsDialog();
+  // TODO even better:
+  // protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide, ProductDESProxy des);
+
 
   //#########################################################################
   //# Data Members
-  protected ParameterJScrollPane mScrollParametersPanel;
-  protected final HashMap<Integer,Parameter> AllParams;
-  protected JPanel mButtonsPanel;
-  protected JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;
-  protected final List<AutomatonProxy> mAutomata;
-  protected final WatersAnalyzerPanel mAnalyzerPanel;
-  protected final ProductDESProxyFactory factory;
-  protected final ProductDESProxy des;
+  private ParameterJScrollPane mScrollParametersPanel;
+  final HashMap<Integer,Parameter> AllParams;  // TODO private
+  private JPanel mButtonsPanel;
+  JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;  // TODO private
+  private final List<AutomatonProxy> mAutomata;
+  final WatersAnalyzerPanel mAnalyzerPanel;  // TODO private
+  private final ProductDESProxyFactory factory;
+  final ProductDESProxy des;  // TODO private
+  ModelAnalyzer mAnalyzer;  // TODO private
+
 
   //#########################################################################
   //# Class Constants
-  protected static final long serialVersionUID = -3610355726871200803L;
-
-  // Analysis workers
-  protected ModelAnalyzer mAnalyzer;
+  private static final long serialVersionUID = -3610355726871200803L;
 
 }

@@ -51,7 +51,7 @@ import org.apache.logging.log4j.Logger;
 import org.supremica.gui.ide.IDE;
 
 /**
- * @author George Hewlett, Robi Malik, Brandon Bassett
+ * @author Brandon Bassett, Robi Malik
  */
 public class SynthesisDialog extends AbstractAnalysisDialog
 {
@@ -65,9 +65,10 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     setTitle("Supervisor synthesis");
   }
 
-//#######################################################################
-  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
 
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  // TODO Move to superclass
   @Override
   public void populateAlgorithmComboBox()
   {
@@ -107,6 +108,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     dispose();
     dialog.setVisible(true);
   }
+
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
@@ -180,6 +182,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
   }
+
 
   //#########################################################################
   //# Class Constants
