@@ -34,7 +34,11 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -115,6 +119,28 @@ public abstract class AbstractAutomatonBuilder
   public AutomatonResult getAnalysisResult()
   {
     return (AutomatonResult) super.getAnalysisResult();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(new EnumParameter<ComponentKind>(ParameterIDs.AutomatonBuilder_ComponentKind,
+                                            "Component Kind",
+                                            "The component kind to be given to the output automaton",
+                                            ComponentKind.values()) {
+        @Override
+        public void commitValue()
+        {
+          setOutputKind(getValue());
+        }
+      });
+
+    return list;
   }
 
 

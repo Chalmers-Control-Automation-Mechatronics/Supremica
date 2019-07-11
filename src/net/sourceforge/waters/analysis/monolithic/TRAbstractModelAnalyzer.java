@@ -46,6 +46,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -103,6 +106,47 @@ public abstract class TRAbstractModelAnalyzer
                                  final KindTranslator translator)
   {
     super(model, ProductDESElementFactory.getInstance(), translator);
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+/*
+    list.add(new EnumParameter<EventEncoding>
+    (ParameterIDs.AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
+     "Abstraction procedure",
+     "Abstraction procedure to simplify automata during compositional " +
+     "minimisation.",
+     EventEncoding.class.getEnumConstants())
+    {
+      @Override
+      public void commitValue()
+      {
+        setEventEncoding(getValue());
+      }
+    });
+*/
+
+    list.add(new BoolParameter
+             (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks,
+              "Pruning Deadlocks",
+              "Pruning Deadlocks ",
+              true)
+             {
+               @Override
+               public void commitValue()
+               {
+                 setPruningDeadlocks(getValue());
+               }
+             });
+
+
+    return list;
   }
 
 

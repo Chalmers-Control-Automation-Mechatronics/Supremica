@@ -48,8 +48,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -115,14 +115,15 @@ public class PanelTest_V2
     for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
       try {
 
-        final ConflictChecker s = dir.getModelAnalyzerFactory()
-          .createConflictChecker(ProductDESElementFactory.getInstance());
+        final SynchronousProductBuilder s = dir.getModelAnalyzerFactory()
+          .createSynchronousProductBuilder(ProductDESElementFactory.getInstance());
+
 
         if (s != null)
         {
           superviserCombobox.addItem(dir);
 
-          //System.out.println(s);
+          //System.out.println(s);          // what classes are being called
 
           //database of parameters
           for(final Parameter p : s.getParameters()) {
@@ -150,7 +151,7 @@ public class PanelTest_V2
         try {
 
           final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
-            .createConflictChecker(ProductDESElementFactory.getInstance()).getParameters();
+            .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
           mScrollParametersPanel.replaceView(newParams, des);
@@ -171,7 +172,7 @@ public class PanelTest_V2
 
     try {
       mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createConflictChecker(ProductDESElementFactory.getInstance()).getParameters(),des);
+                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(),des);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }
@@ -212,10 +213,10 @@ public class PanelTest_V2
 
    public static void createSynthesizer(final ModelAnalyzerFactoryLoader synth ) {
 
-    ConflictChecker sythesizer;
+    SynchronousProductBuilder sythesizer;
     try {
       sythesizer = synth.getModelAnalyzerFactory()
-                            .createConflictChecker(ProductDESElementFactory.getInstance());
+                            .createSynchronousProductBuilder(ProductDESElementFactory.getInstance());
 
       final List<Parameter> parameters = sythesizer.getParameters();
       storeInDatabase();

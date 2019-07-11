@@ -52,6 +52,10 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -256,6 +260,73 @@ public class MonolithicSynchronousProductBuilder
   public SynchronousProductResult getAnalysisResult()
   {
     return (SynchronousProductResult) super.getAnalysisResult();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    // setPropositions(final Collection<EventProxy> props)
+
+    list.add(new StringParameter
+             (ParameterIDs.ModelBuilder_OutputName,
+              "Supervisor name prefix",
+              "Name or name prefix for synthesised supervisors.",
+              "sup")
+             {
+               @Override
+               public void commitValue()
+               {
+                 setOutputName(getValue());
+               }
+             });
+
+    list.add(new BoolParameter(ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks,
+                               "Prune deadlocks","Allow synchronous product construction to stop when encountering " +
+                                 "states that are a deadlock in one of the components.",
+                                 true) {
+      @Override
+      public void commitValue()
+      {
+        setPruningDeadlocks(getValue());
+      }
+    });
+
+    list.add(new BoolParameter
+             (ParameterIDs.MonolithicSynchronousProductBuilder_RemovingSelfloops,
+              "Removing Selfloops",
+              "Sets whether redundant selfloops are to be removed.",
+              true)
+             {
+               @Override
+               public void commitValue()
+               {
+                 setRemovingSelfloops(getValue());
+               }
+             });
+/*
+    //Unneeded ??
+    list.add(new EnumParameter<StateCallback>
+    (ParameterIDs.MonolithicSynchronousProductBuilder_StateCallback,
+     "Abstraction procedure",
+     "Abstraction procedure to simplify automata during compositional " +
+     "minimisation.",
+     StateCallback.class.getEnumConstants())
+    {
+      @Override
+      public void commitValue()
+      {
+        setStateCallback(getValue());
+      }
+    });
+*/
+
+
+    return list;
   }
 
 
