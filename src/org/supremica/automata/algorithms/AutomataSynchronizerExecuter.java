@@ -983,9 +983,12 @@ public final class AutomataSynchronizerExecuter
                         sb.append(stateTable[j][currState[j]].getName());
                         sb.append(options.getStateNameSeparator());
                     }
-
-                    // Remove last separator string element
-                    sb.setLength(sb.length() - options.getStateNameSeparator().length());
+                    if (sb.length() == 0) {
+                      sb.append("q0");
+                    } else {
+                      // Remove last separator string element
+                      sb.setLength(sb.length() - options.getStateNameSeparator().length());
+                    }
 
                     // Create state
                     newState = new CompositeState(sb.toString(), currState, helper);

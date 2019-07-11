@@ -58,6 +58,8 @@
 
 package org.supremica.automata.IO;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +67,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.DuplicateNameException;
@@ -118,16 +121,65 @@ public class AutomataToWaters
     mMarkedAndForbiddenPropositions.add(mForbiddenProposition);
   }
 
+  public AutomataToWaters(final ProductDESProxyFactory factory,
+                          final ProductDESProxy context,
+                          EventProxy defaultMarking)
+  {
+    mFactory = factory;
+    EventProxy forbiddenMarking = null;
+    final Collection<EventProxy> events = context.getEvents();
+    final int numEvents = events.size();
+    mEventList = new ArrayList<EventProxy>(numEvents);
+    mEventMap = new HashMap<String,EventProxy>(numEvents);
+    for (final EventProxy event : events) {
+      final String name = event.getName();
+      if (event.getKind() == EventKind.PROPOSITION) {
+        if (name.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
+          if (defaultMarking == null) {
+            defaultMarking = event;
+          }
+        } else if (name.equals(EventDeclProxy.DEFAULT_FORBIDDEN_NAME)) {
+          forbiddenMarking = event;
+        }
+      }
+      mEventList.add(event);
+      mEventMap.put(name, event);
+    }
+    mMarkedProposition = defaultMarking;
+    mForbiddenProposition = forbiddenMarking;
+    mMarkedPropositions = Collections.singletonList(mMarkedProposition);
+    mForbiddenPropositions = Collections.singletonList(mForbiddenProposition);
+    mMarkedAndForbiddenPropositions = new ArrayList<EventProxy>(2);
+    mMarkedAndForbiddenPropositions.add(mMarkedProposition);
+    mMarkedAndForbiddenPropositions.add(mForbiddenProposition);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setSuppressesRedundantSelfloops(final boolean suppress)
+  {
+    mSuppressesRedundantSelfloops = suppress;
+  }
+
+  public boolean getSuppressesRedundantMarkingSelfloops()
+  {
+    return mSuppressesRedundantSelfloops;
+  }
+
 
   //#########################################################################
   //# Invocation
   public ProductDESProxy convertAutomata(final Automata automata)
   {
+    final boolean shared = mEventMap != null;
     try {
-      mEventList = new ArrayList<EventProxy>();
-      mEventMap = new HashMap<String,EventProxy>();
-      mEventList.add(mMarkedProposition);
-      mEventMap.put(mMarkedProposition.getName(), mMarkedProposition);
+      if (!shared) {
+        mEventList = new ArrayList<EventProxy>();
+        mEventMap = new HashMap<String,EventProxy>();
+        mEventList.add(mMarkedProposition);
+        mEventMap.put(mMarkedProposition.getName(), mMarkedProposition);
+      }
       final String name = automata.getName();
       final String comment = automata.getComment();
       final int numAutomata = automata.size();
@@ -141,8 +193,10 @@ public class AutomataToWaters
       return mFactory.createProductDESProxy(name, comment, null,
                                             mEventList, proxies);
     } finally {
-      mEventList = null;
-      mEventMap = null;
+      if (!shared) {
+        mEventList = null;
+        mEventMap = null;
+      }
     }
   }
 
@@ -152,37 +206,26 @@ public class AutomataToWaters
     try {
       final String aname = aut.getName();
       final ComponentKind akind = aut.getKind();
-      final Alphabet alphabet = aut.getAlphabet();
-      final int numEvents = alphabet.size();
-      final List<EventProxy> events = new ArrayList<EventProxy>(numEvents + 2);
       if (!shared) {
-        mEventMap = new HashMap<String,EventProxy>(numEvents);
-        mEventList = new ArrayList<EventProxy>(numEvents);
+        final Alphabet alphabet = aut.getAlphabet();
+        final int numEvents = alphabet.size();
+        mEventMap = new HashMap<>(numEvents);
+        mEventList = new ArrayList<>(numEvents);
       }
-      for (final LabeledEvent label : alphabet) {
-        final String ename = label.getName();
-        final EventKind ekind = label.getKind();
-        final boolean observable = label.isObservable();
-        final EventProxy eproxy = createEvent(ename, ekind, observable);
-        events.add(eproxy);
-      }
-      events.add(mMarkedProposition);
-      boolean usesForbidden = false;
+      final List<EventProxy> events = getNonRedundantAlphabet(aut);
+      final Set<EventProxy> eventSet = new THashSet<>(events);
+      final boolean marking = eventSet.contains(mMarkedProposition);
       final int numStates = aut.nbrOfStates();
       final Map<State,StateProxy> stateMap =
         new HashMap<State,StateProxy>(numStates);
       final List<StateProxy> states = new ArrayList<StateProxy>(numStates);
-      for (final State state: aut) {
-        final String sname = state.getName();
+      for (final State state : aut) {
+        final String name = state.getName();
         final boolean init = state.isInitial();
-        final boolean marked = state.isAccepting();
+        final boolean marked = marking && state.isAccepting();
         final boolean forbidden = state.isForbidden();
-        if (forbidden && !usesForbidden) {
-          events.add(mForbiddenProposition);
-          usesForbidden = true;
-        }
         final Collection<EventProxy> props = getPropositions(marked, forbidden);
-        final StateProxy sproxy = mFactory.createStateProxy(sname, init, props);
+        final StateProxy sproxy = mFactory.createStateProxy(name, init, props);
         states.add(sproxy);
         stateMap.put(state, sproxy);
       }
@@ -196,11 +239,13 @@ public class AutomataToWaters
           final LabeledEvent label = arc.getEvent();
           final String ename = label.getName();
           final EventProxy event = mEventMap.get(ename);
-          final State target = arc.getToState();
-          final StateProxy tproxy = stateMap.get(target);
-          final TransitionProxy trans =
-            mFactory.createTransitionProxy(sproxy, event, tproxy);
-          transitions.add(trans);
+          if (eventSet.contains(event)) {
+            final State target = arc.getToState();
+            final StateProxy tproxy = stateMap.get(target);
+            final TransitionProxy trans =
+              mFactory.createTransitionProxy(sproxy, event, tproxy);
+            transitions.add(trans);
+          }
         }
       }
       return mFactory.createAutomatonProxy(aname, akind,
@@ -227,8 +272,7 @@ public class AutomataToWaters
       mEventMap.put(name, event);
       mEventList.add(event);
       return event;
-    } else if (found.getKind() == kind &&
-        found.isObservable() == observable) {
+    } else if (found.getKind() == kind && found.isObservable() == observable) {
       return found;
     } else {
       final String msg = "Inconsistent occurrences of event '" + name + "'!";
@@ -254,6 +298,60 @@ public class AutomataToWaters
     }
   }
 
+  private List<EventProxy> getNonRedundantAlphabet(final Automaton aut)
+  {
+    final Alphabet alphabet = aut.getAlphabet();
+    final int numEvents = alphabet.size();
+    final List<EventProxy> events = new ArrayList<>(numEvents);
+    for (final LabeledEvent label : alphabet) {
+      final String name = label.getName();
+      final EventKind kind = label.getKind();
+      final boolean observable = label.isObservable();
+      final EventProxy event = createEvent(name, kind, observable);
+      events.add(event);
+    }
+    if (mSuppressesRedundantSelfloops) {
+      boolean marking = false;
+      boolean forbidden = false;
+      final Collection<EventProxy> selfloopOnlyEvents = new THashSet<>(events);
+      for (final State state : aut) {
+        marking |= !state.isAccepting();
+        forbidden |= state.isForbidden();
+        if (!selfloopOnlyEvents.isEmpty()) {
+          final Collection<EventProxy> disabledEvents = new THashSet<>(events);
+          final Iterator<Arc> iter = state.outgoingArcsIterator();
+          while (iter.hasNext()) {
+            final Arc arc = iter.next();
+            final LabeledEvent label = arc.getEvent();
+            final String name = label.getName();
+            final EventProxy event = mEventMap.get(name);
+            disabledEvents.remove(event);
+            if (arc.getToState() != state) {
+              selfloopOnlyEvents.remove(event);
+            }
+          }
+          selfloopOnlyEvents.removeAll(disabledEvents);
+        }
+      }
+      events.removeAll(selfloopOnlyEvents);
+      if (marking) {
+        events.add(mMarkedProposition);
+      }
+      if (forbidden) {
+        events.add(mForbiddenProposition);
+      }
+    } else {
+      events.add(mMarkedProposition);
+      for (final State state : aut) {
+        if (state.isForbidden()) {
+          events.add(mForbiddenProposition);
+          break;
+        }
+      }
+    }
+    return events;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -263,6 +361,8 @@ public class AutomataToWaters
   private final Collection<EventProxy> mMarkedPropositions;
   private final Collection<EventProxy> mForbiddenPropositions;
   private final Collection<EventProxy> mMarkedAndForbiddenPropositions;
+
+  private boolean mSuppressesRedundantSelfloops = false;
 
   private List<EventProxy> mEventList;
   private Map<String,EventProxy> mEventMap;

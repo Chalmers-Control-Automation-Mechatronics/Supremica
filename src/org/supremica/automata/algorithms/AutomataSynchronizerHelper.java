@@ -492,8 +492,12 @@ public class AutomataSynchronizerHelper
 
 	public void addStatus(final int[] state)
 	{
-		final int[][] stateStatusTable = theAutomataIndexForm.getStateStatusTable();
-		int tmpStatus = stateStatusTable[0][state[0]];
+      final int[][] stateStatusTable = theAutomataIndexForm.getStateStatusTable();
+      int tmpStatus;
+	  if (stateStatusTable.length == 0) {
+	    tmpStatus = 3; // initial + accepting
+	  } else {
+		tmpStatus = stateStatusTable[0][state[0]];
 		boolean forbidden = AutomataIndexFormHelper.isForbidden(tmpStatus);
 		int currStatus;
 
@@ -516,8 +520,8 @@ public class AutomataSynchronizerHelper
 		{
 			tmpStatus |= (1 << 2);
 		}
-
-		state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END]
+	  }
+	  state[state.length - AutomataIndexFormHelper.STATE_STATUS_FROM_END]
 			= tmpStatus;
 	}
 

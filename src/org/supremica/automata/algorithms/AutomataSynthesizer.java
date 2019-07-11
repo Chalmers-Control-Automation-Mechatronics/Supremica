@@ -66,6 +66,7 @@ import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SynthesisKindTranslator;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.base.EventKind;
@@ -264,19 +265,19 @@ public class AutomataSynthesizer
              synthesizerOptions.getSynthesisType();
            switch (synthesisType) {
            case NONBLOCKING:
-             translator = ControllableSynthesisKindTranslator.getInstance();
+             translator = SynthesisKindTranslator.getInstanceWithoutControllability();
              marking = null;
              break;
            case CONTROLLABLE:
              theAutomata = new Automata(theAutomata);
-             translator = IdenticalKindTranslator.getInstance();
+             translator = SynthesisKindTranslator.getInstanceWithControllability();
              marking =
                factory.createEventProxy(":none", EventKind.PROPOSITION);
              break;
            case NONBLOCKING_CONTROLLABLE:
            case NONBLOCKING_CONTROLLABLE_NORMAL:
              theAutomata = new Automata(theAutomata);
-             translator = IdenticalKindTranslator.getInstance();
+             translator = SynthesisKindTranslator.getInstanceWithControllability();
              marking = null;
              break;
            default:

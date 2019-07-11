@@ -62,6 +62,14 @@ public class EnumParameter<T> extends Parameter
   public EnumParameter(final int id,
                        final String name,
                        final String description,
+                       final List<? extends T> data)
+  {
+    this(id, name, description, data, data.get(0));
+  }
+
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
                        final List<? extends T> data,
                        final T defaultValue)
   {
@@ -72,6 +80,14 @@ public class EnumParameter<T> extends Parameter
       mValue = defaultValue;
     else
       mValue = data.get(0);
+  }
+
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
+                       final T[] data)
+  {
+    this(id, name, description, Arrays.asList(data));
   }
 
   public EnumParameter(final int id,

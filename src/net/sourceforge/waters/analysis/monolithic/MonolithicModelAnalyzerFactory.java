@@ -42,7 +42,8 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
- * A factory interface for all types of model verifiers.
+ * A model analyser factory that produces basic monolithic implementations
+ * of all analysis algorithms.
  *
  * @author Robi Malik
  */

@@ -180,7 +180,9 @@ public class AutomataSynchronizer
             comment.append(currAutomaton.getName());
             comment.append(syncOptions.getAutomatonNameSeparator());
         }
-        comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
+        if (comment.length() > 0) {
+          comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
+        }
         try
 		{
 			synchHelper.addState(initialState);

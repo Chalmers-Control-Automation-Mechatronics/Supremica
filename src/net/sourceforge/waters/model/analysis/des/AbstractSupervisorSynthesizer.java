@@ -46,9 +46,8 @@ import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.SynthesisKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -207,7 +206,7 @@ public abstract class AbstractSupervisorSynthesizer
    list.add(0, new BoolParameter
      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis,
       "Nonblocking supervisor",
-      "Synthesise a supervisor that is nonblocking supervisor with respect " +
+      "Synthesise a supervisor that is nonblocking with respect " +
       "to the configured marking proposition.",
       isNonblockingSynthesis())
      {
@@ -227,8 +226,8 @@ public abstract class AbstractSupervisorSynthesizer
        public void commitValue()
        {
          final KindTranslator translator = getValue() ?
-           IdenticalKindTranslator.getInstance() :
-           ConflictKindTranslator.getInstanceControllable();
+           SynthesisKindTranslator.getInstanceWithControllability() :
+           SynthesisKindTranslator.getInstanceWithoutControllability();
          setKindTranslator(translator);
        }
      });
@@ -236,7 +235,7 @@ public abstract class AbstractSupervisorSynthesizer
       (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
        "Supervisor reduction",
        "Method of supervisor reduction to be used after synthesis",
-       DefaultSupervisorReductionFactory.class.getEnumConstants(), null)
+       DefaultSupervisorReductionFactory.class.getEnumConstants())
       {
         @Override
         public void commitValue()

@@ -17,15 +17,6 @@ import org.supremica.gui.ExecutionDialogMode;
 import org.supremica.properties.Config;
 
 
-// This one is used for doMonolithic to return two values
-class MonolithicReturnValue
-{
-    public Automaton automaton;
-    public boolean didSomething;
-    public Alphabet disabledUncontrollableEvents;    // see AutomatonSynthesizer
-}
-
-
 public class MonolithicAutomataSynthesizer implements Abortable {
 	/**
 	 * This method synchronises the given automata, and calculates the forbidden

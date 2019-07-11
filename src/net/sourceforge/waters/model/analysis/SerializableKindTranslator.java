@@ -49,7 +49,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 /**
  * <P>A serialisable kind translator used for language inclusion checking.</P>
  *
- * <P>Not all kind translator implemenations can be serialisable. This
+ * <P>Not all kind translator implementations can be serialisable. This
  * helper class can be used to obtain a serialisable kind translator for a
  * given model from a non-serialisable kind translator.</P>
  *
@@ -142,6 +142,7 @@ public class SerializableKindTranslator
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+  @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
     final String name = aut.getName();
@@ -152,6 +153,7 @@ public class SerializableKindTranslator
     }
   }
 
+  @Override
   public EventKind getEventKind(final EventProxy event)
   {
     final String name = event.getName();
