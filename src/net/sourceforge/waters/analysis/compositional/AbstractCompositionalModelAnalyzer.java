@@ -57,6 +57,7 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.FileParameter;
 import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -649,7 +650,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     list.add(new EventParameter
       (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
        "Marking proposition",
-       "The proposition to identify marked states for the nonblocking property.", false)
+       "The proposition to identify marked states for the nonblocking property.", EventParameterType.PREVENT_NULL)
       {
         @Override
         public void commitValue()

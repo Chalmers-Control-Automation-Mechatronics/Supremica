@@ -70,11 +70,11 @@ public class EventParameter extends Parameter
   public EventParameter(final int id,
                         final String name,
                         final String description,
-                        final boolean allowNull)
+                        final EventParameterType type)
   {
     super(id, name, description);
     mValue = null;
-    mAllowNullEvent = allowNull;
+    mNullOptions = type;
   }
 
   @Override
@@ -87,9 +87,6 @@ public class EventParameter extends Parameter
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
     //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
-    if(mAllowNullEvent)
-      propositions.add(noEvent);
-
     for(final EventProxy event: model.getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
         propositions.add(event);
@@ -99,11 +96,38 @@ public class EventParameter extends Parameter
       }
     }
 
-    Collections.sort(propositions);
-
-    //:accepting no in alphabet, default to null event
-    if(mValue == null)
+    // 1 - Null is not allowed, and the default is :accepting if available,
+    //     otherwise the first proposition in the model. (If there is no
+    //     proposition in the model, use null as the only option.)
+    if(mNullOptions == EventParameterType.PREVENT_NULL) {
+      //:accepting not available
+      if(mValue == null) {
+        if(propositions.size() > 0)
+          mValue = propositions.get(0);
+        else {
+          propositions.add(noEvent);
+          mValue = noEvent;
+        }
+      }
+    }
+    // 2 - Null is allowed and the default is :accepting if available,
+    //     otherwise the first proposition in the model, or null if
+    //     there is no proposition in the model. (Unlike case 1,
+    //     null is also an option if there are propositions in the model.)
+    else if(mNullOptions == EventParameterType.ALLOW_NULL) {
+      propositions.add(noEvent);
+      //:accepting not available
+      if(mValue == null) {
+          mValue = propositions.get(0);
+      }
+    }
+    // 3 - Null is allowed and is the default.
+    else if(mNullOptions == EventParameterType.DEFAULT_NULL){
+      propositions.add(noEvent);
       mValue = noEvent;
+    }
+
+    Collections.sort(propositions);
 
     final JComboBox<EventProxy> ret = new JComboBox<>(propositions.toArray(new EventProxy[propositions.size()]));
     ret.setSelectedItem(mValue);
@@ -147,6 +171,6 @@ public class EventParameter extends Parameter
   //#########################################################################
   //# Data Members
   private EventProxy mValue;
-  private final boolean mAllowNullEvent;
+  private final EventParameterType mNullOptions;
 
 }

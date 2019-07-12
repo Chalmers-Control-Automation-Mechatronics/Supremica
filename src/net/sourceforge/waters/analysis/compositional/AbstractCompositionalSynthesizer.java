@@ -44,6 +44,7 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -215,7 +216,7 @@ public abstract class AbstractCompositionalSynthesizer
       (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
        "Marking proposition",
        "If synthesising a nonblocking supervisor, it will be nonblocking " +
-       "with respect to this proposition.", false)
+       "with respect to this proposition.", EventParameterType.DEFAULT_NULL)
       {
         @Override
         public void commitValue()

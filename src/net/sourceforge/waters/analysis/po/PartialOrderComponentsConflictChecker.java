@@ -41,6 +41,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.monolithic.StateHashSet;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -174,7 +175,7 @@ extends PartialOrderComponentsModelVerifier implements ConflictChecker
        "Marking proposition",
        "The model is considered as nonblocking, if it is always possible " +
        "to reach a state marked by this proposition",
-       false)
+       EventParameterType.PREVENT_NULL)
       {
         @Override
         public void commitValue()

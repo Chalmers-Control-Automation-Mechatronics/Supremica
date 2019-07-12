@@ -66,6 +66,7 @@ import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBu
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -257,7 +258,7 @@ public class TRCompositionalConflictChecker
       (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking,
        "Precondition marking",
        "Precondition marking used for generalised conflict check",
-       true)
+       EventParameterType.PREVENT_NULL)
       {
         @Override
         public void commitValue()
@@ -270,7 +271,7 @@ public class TRCompositionalConflictChecker
        "Marking proposition",
        "The model is considered as nonblocking, if it is always possible " +
        "to reach a state marked by this proposition",
-       false)
+       EventParameterType.PREVENT_NULL)
       {
         @Override
         public void commitValue()
