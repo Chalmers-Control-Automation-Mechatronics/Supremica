@@ -39,7 +39,6 @@ import java.io.PrintStream;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
@@ -137,13 +136,6 @@ public class TRCompositionalModelAnalyzerFactory
     (final ProductDESProxyFactory factory)
   {
     return new TRCompositionalStateCounter();
-  }
-
-  @Override
-  public TRSynchronousProductBuilder createSynchronousProductBuilder
-    (final ProductDESProxyFactory factory)
-  {
-    return new TRSynchronousProductBuilder();
   }
 
 

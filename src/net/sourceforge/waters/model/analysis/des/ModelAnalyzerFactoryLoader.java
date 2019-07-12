@@ -56,7 +56,8 @@ public enum ModelAnalyzerFactoryLoader
   Native("net.sourceforge.waters.cpp.analysis.NativeModelVerifierFactory"),
   PartialOrder("net.sourceforge.waters.analysis.po.PartialOrderModelVerifierFactory"),
   Supremica("org.supremica.automata.waters.SupremicaModelAnalyzerFactory"),
-  TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory");
+  TRCompositional("net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory"),
+  TRMonolithic("net.sourceforge.waters.analysis.monolithic.TRMonolithicModelAnalyzerFactory");
 
 
   //#########################################################################
