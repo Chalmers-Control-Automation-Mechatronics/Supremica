@@ -153,7 +153,6 @@ public abstract class TRAbstractSynchronousProductBuilder
     return config;
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
   @Override
@@ -205,26 +204,13 @@ public abstract class TRAbstractSynchronousProductBuilder
     list.add(new EnumParameter<ComponentKind>(ParameterIDs.AutomatonBuilder_ComponentKind,
                                             "Component Kind",
                                             "The component kind to be given to the output automaton",
-                                            ComponentKind.values()) {
-        @Override
+                                            ComponentKind.values(), null) {
+      @Override
         public void commitValue()
         {
           setOutputKind(getValue());
         }
       });
-
-    list.add(new StringParameter
-             (ParameterIDs.ModelBuilder_OutputName,
-              "Supervisor name prefix",
-              "Name or name prefix for synthesised supervisors.",
-              "sup")
-             {
-               @Override
-               public void commitValue()
-               {
-                 setOutputName(getValue());
-               }
-             });
 
     list.add(new BoolParameter
              (ParameterIDs.TRAbstractSynchronousProductBuilder_RemovingSelfloops,

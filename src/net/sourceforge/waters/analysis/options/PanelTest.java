@@ -44,9 +44,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -56,14 +54,8 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
-import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
-import net.sourceforge.waters.analysis.compositional.ModularAndCompositionalSynthesizer;
-import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
@@ -326,164 +318,4 @@ public class PanelTest
 
     return null;
   }
-
-  public static List<Parameter> fakeSupervizerSynthesizer()
-  {
-    /*
-     * setConfiguredDefaultMarking(EventProxy marking)
-     * setNondeterminismEnabled(boolean enable);
-     * setSupervisorLocalizationEnabled(final boolean enable);
-     * setSupervisorReductionFactory(final SupervisorReductionFactory
-     * factory);
-     */
-
-    /*
-     * mAutomata = panel.getAutomataTable().getOperationArgument(); final
-     * ProductDESProxy des =
-     * AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-     * mAutomata, factory);
-     *
-     * final List<EventProxy> test = new ArrayList<>(des.getEvents()); final
-     * Vector<EventProxy> testVector = new Vector<> (test); mEventProxy = new
-     * JComboBox<>(testVector); list.add(new
-     * EnumParameter<EventProxy>(4,"ConfiguredDefaultMarking",
-     * "ConfiguredDefaultMarking", des.getEvents()));
-     */
-
-    final List<Parameter> list = new ArrayList<Parameter>();
-    final Set<String> set = new HashSet<String>();
-    set.add("1");
-    set.add("2");
-    set.add("3");
-    set.add("4");
-    final List<EventProxy> events = new ArrayList<>(des.getEvents());
-    list.add(new EnumParameter<EventProxy>(5, "ConfiguredDefaultMarking", "ConfiguredDefaultMarking", events));
-    list.add(new BoolParameter(1, "NonDeterminismEnabled", "Turn on or off",
-                               true));
-    list.add(new BoolParameter(3, "SuperviserLocalisationEnabled",
-                               "Turn on or off", true));
-
-    list
-      .add(new EnumParameter<SupervisorReductionFactory>(4,
-                                                         "SuperviserReductionFactory",
-                                                         "SuperviserReductionFactory",
-                                                         DefaultSupervisorReductionFactory.class
-                                                           .getEnumConstants()));
-    return list;
-  }
-
-  public static List<Parameter> fakeModularAndCompositionalSynthesizer()
-  {
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.addAll(fakeModelAnalyzer());
-    //list.addAll(fakeSupervizerSynthesizer());
-
-    final ProductDESProxyFactory factory =
-      ProductDESElementFactory.getInstance();
-    final ModularAndCompositionalSynthesizer mds =
-      new ModularAndCompositionalSynthesizer(factory);
-    ModularAndCompositionalSynthesizer.class.getEnumConstants();
-    mds.getConfiguredDefaultMarking();
-
-    /*
-     * ConfiguredDefaultMarking(EventProxy) InternalStateLimit(int)
-     * MonolithicStateLimit(int) MonolithicTransitionLimit(int)
-     * NondeterminismEnabled(boolean) PreselectingMethod(PreselectingMethod)
-     * RemovesUnnecessarySupervisors(boolean)
-     * setSelectionHeuristic(SelectionHeuristicCreator)
-     * setSupervisorLocalizationEnabled(boolean)
-     * setSupervisorReductionFactory(SupervisorReductionFactory)
-     */
-    return list;
-  }
-
-  public static List<Parameter> fakeMonolithic()
-  {
-    /*
-     * setNonblockingSupported(boolean)
-     */
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.addAll(fakeModelAnalyzer()); //Parameters from a parent
-    list.addAll(fakeSupervizerSynthesizer());
-    list.addAll(fakeAbstractModelBuilder());
-    list.add(new StringParameter(2, "OutputName", "OutputName for file")); // OutputName     StringParameter
-    return list;
-  }
-
-  public static List<Parameter> fakeAbstractModelBuilder()
-  {
-    /*
-     * setOutputName(String)
-     */
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.add(new BoolParameter(0, "NonBlockingSupported", "Turn on or off",
-                               true)); // NonBlockingSupported    BoolParameter
-    return list;
-  }
-
-  public static List<Parameter> fakeModelAnalyzer()
-  {
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.add(new IntParameter(10, "TransitionLimit", "TransitionLimit", 0,
-                              100, 100)); // TransitionLimit IntParameter
-    list.add(new IntParameter(11, "NodeLimit", "NodeLimit", 0, 100, 100)); //NodeLimit    IntParameter
-    list.add(new BoolParameter(12, "DetailedOutputEnabled",
-                               "DetailedOutputEnabled", true)); //DetailedOutputEnabled   BoolParameter
-    return list;
-  }
-
-  public static List<Parameter> fakeAbstractCompositionalModelAnalyzer()
-  {
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.addAll(fakeModelAnalyzer()); //Parameters from a parent
-    list.addAll(fakeSupervizerSynthesizer());
-    list.add(new BoolParameter(40, "UsingSpecialEvents", "UsingSpecialEvents",
-                               true)); // UsingSpecialEvents  boolean BoolParameter
-    list.add(new IntParameter(41, "UpperInternalStateLimit",
-                              "UpperInternalStateLimit", 0, 100, 100)); // UpperInternalStateLimit int   IntParameter
-    list.add(new BoolParameter(42, "SubumptionEnabled", "SubumptionEnabled",
-                               true)); // SubumptionEnabled   boolean     BoolParameter
-    list.add(new BoolParameter(43, "SelfLoopOnlyEnabled",
-                               "SelfLoopOnlyEnabled", true)); // SelfLoopOnlyEnabled boolean     BoolParameter
-    list.add(new BoolParameter(45, "PruningDeadlocks", "PruningDeadlocks",
-                               true)); //PruningDeadlocks    boolean     BoolParameter
-    list.add(new StringParameter(2, "OutputName", "OutputName for file")); // OutputName  String     StringParameter
-    list.add(new IntParameter(49, "MonolithicTransitionLimit",
-                              "MonolithicTransitionLimit", 0, 100, 100)); // MonolithicTransitionLimit   int    IntParameter
-    list.add(new IntParameter(50, "MonolithicStateLimit",
-                              "MonolithicStateLimit", 0, 100, 100)); // MonolithicStateLimit    int    IntParameter
-    list.add(new StringParameter(51, "MonolithicDumpFileName",
-                                 "MonolithicDumpFileName for file")); // MonolithicDumpFileName  String     StringParameter
-    list.add(new IntParameter(52, "LowerInternalStateLimit",
-                              "LowerInternalStateLimit", 0, 100, 100)); // LowerInternalStateLimit int    IntParameter
-    list.add(new IntParameter(53, "InternalTransitionLimit",
-                              "InternalTransitionLimit", 0, 100, 100)); // InternalTransitionLimit int    IntParameter
-    list.add(new BoolParameter(54, "FailingEventsEnabled",
-                               "FailingEventsEnabled", true)); // FailingEventsEnabled    boolean     BoolParameter
-    list.add(new BoolParameter(55, "BlockedEventsEnabled",
-                               "BlockedEventsEnabled", true)); // BlockedEventsEnabled    boolean     BoolParameter
-    // list.add(new EnumParameter(56, "AbstractionProcedureCreator", "AbstractionProcedureCreator", ?); //  AbstractionProcedureCreator AbstractionProcedureCreator     EnumParameter
-
-    // MonolithicAnalyzer  ModelAnalyzer       DialogParameter
-    list
-      .add(new EnumParameter<SelectionHeuristicCreator>(44,
-                                                        "SelectionHeuristic",
-                                                        "SelectionHeuristic",
-                                                        CompositionalSelectionHeuristicFactory
-                                                          .getInstance()
-                                                          .getEnumConstants())); // SelectionHeuristic  SelectionHeuristicCreator       EnumParameter
-    // list.add(new EnumParameter(46, "PreselectingMethod", "PreselectingMethod", ?); // PreselectingMethod  PreselectingMethod      EnumParameter
-    return list;
-  }
-
-  public static List<Parameter> fakeCompositionAutomataSynthesizer()
-  {
-    final List<Parameter> list = new ArrayList<Parameter>();
-    list.addAll(fakeAbstractCompositionalModelAnalyzer()); //Parameters from a parent
-    list.add(new StringParameter(100, "SuperviserNamePrefix",
-                                 "SuperviserNamePrefix for file")); //SuperviserNamePrefix    StringParameter
-    //list.add(new BoolParameter(98, "SuperviserLocalisationEnabled", "SuperviserLocalisationEnabled", true));           // SuperviserLocalisationEnabled    null
-    return list;
-  }
-
 }

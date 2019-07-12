@@ -300,7 +300,7 @@ public class NativeConflictChecker
       (ParameterIDs.NativeConflictChecker_ConflictCheckMode,
        "Conflict check mode",
        "The algorithm used to store or explore the reverse transition relation",
-       ConflictCheckMode.values())
+       ConflictCheckMode.values(), ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS)
       {
         @Override
         public void commitValue()
@@ -310,7 +310,6 @@ public class NativeConflictChecker
       });
     return list;
   }
-
 
   //#########################################################################
   //# Auxiliary Methods

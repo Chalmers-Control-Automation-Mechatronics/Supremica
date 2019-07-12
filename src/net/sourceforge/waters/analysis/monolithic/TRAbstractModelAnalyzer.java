@@ -116,22 +116,6 @@ public abstract class TRAbstractModelAnalyzer
   {
     final List<Parameter> list = super.getParameters();
 
-/*
-    list.add(new EnumParameter<EventEncoding>
-    (ParameterIDs.AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
-     "Abstraction procedure",
-     "Abstraction procedure to simplify automata during compositional " +
-     "minimisation.",
-     EventEncoding.class.getEnumConstants())
-    {
-      @Override
-      public void commitValue()
-      {
-        setEventEncoding(getValue());
-      }
-    });
-*/
-
     list.add(new BoolParameter
              (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks,
               "Pruning Deadlocks",
@@ -145,10 +129,8 @@ public abstract class TRAbstractModelAnalyzer
                }
              });
 
-
     return list;
   }
-
 
   //#########################################################################
   //# Configuration

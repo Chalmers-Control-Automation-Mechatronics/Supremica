@@ -270,8 +270,6 @@ public class MonolithicSynchronousProductBuilder
   {
     final List<Parameter> list = super.getParameters();
 
-    // setPropositions(final Collection<EventProxy> props)
-
     list.add(new StringParameter
              (ParameterIDs.ModelBuilder_OutputName,
               "Supervisor name prefix",
@@ -308,27 +306,8 @@ public class MonolithicSynchronousProductBuilder
                  setRemovingSelfloops(getValue());
                }
              });
-/*
-    //Unneeded ??
-    list.add(new EnumParameter<StateCallback>
-    (ParameterIDs.MonolithicSynchronousProductBuilder_StateCallback,
-     "Abstraction procedure",
-     "Abstraction procedure to simplify automata during compositional " +
-     "minimisation.",
-     StateCallback.class.getEnumConstants())
-    {
-      @Override
-      public void commitValue()
-      {
-        setStateCallback(getValue());
-      }
-    });
-*/
-
-
     return list;
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser

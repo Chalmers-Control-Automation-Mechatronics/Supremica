@@ -288,7 +288,7 @@ public abstract class BDDModelVerifier
           (ParameterIDs.BDDModelVerifier_BDDPackage,
            "BDD package",
            "The BDD package used when running the algorithm",
-           BDDPackage.values())
+           BDDPackage.values(), null)
           {
             @Override
             public void commitValue()
@@ -322,7 +322,7 @@ public abstract class BDDModelVerifier
        "Transition partitioning strategy",
        "The method used to split the transition relation BDD into " +
        "disjunctive components",
-       TransitionPartitioningStrategy.values())
+       TransitionPartitioningStrategy.values(), null)
       {
         @Override
         public void commitValue()
@@ -347,7 +347,7 @@ public abstract class BDDModelVerifier
       (ParameterIDs.BDDModelVerifier_VariableOrdering,
        "Initial variable ordering",
        "The strategy to determine the initial ordering of the BDD variables",
-       VariableOrdering.values())
+       VariableOrdering.values(), null)
       {
         @Override
         public void commitValue()

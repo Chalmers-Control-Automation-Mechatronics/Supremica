@@ -55,22 +55,32 @@ public class EnumParameter<T> extends Parameter
 
   //#########################################################################
   //# Constructors
+
+  //BUG: If created in two different classes with same ID, the default value of the last added to
+  // the database is used,
+
   public EnumParameter(final int id,
                        final String name,
                        final String description,
-                       final List<? extends T> data)
+                       final List<? extends T> data,
+                       final T defaultValue)
   {
     super(id, name, description);
     mList = data;
-    mValue = mList.get(0);
+    //If no default provided, use first item
+    if(defaultValue != null)
+      mValue = defaultValue;
+    else
+      mValue = data.get(0);
   }
 
   public EnumParameter(final int id,
                        final String name,
                        final String description,
-                       final T[] data)
+                       final T[] data,
+                       final T defaultValue)
   {
-    this(id, name, description, Arrays.asList(data));
+    this(id, name, description, Arrays.asList(data), defaultValue);
   }
 
   public EnumParameter(final int id,
@@ -78,13 +88,8 @@ public class EnumParameter<T> extends Parameter
                        final String description,
                        final EnumFactory<? extends T> factory)
   {
-    this(id, name, description, factory.getEnumConstants());
+    this(id, name, description, factory.getEnumConstants(), factory.getDefaultValue());
   }
-  // TODO We need to be able to set a default value, which may be different
-  // from the first list item. If the EnumFactory is used, use its method
-  // getDefaultValue(); otherwise it should be possible to set the default
-  // through an (optional) constructor argument.
-
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Parameter
@@ -113,8 +118,6 @@ public class EnumParameter<T> extends Parameter
   {
     final Component comp = panel.getEntryComponent();
     final JComboBox<T> comboBox = (JComboBox<T>) comp;
-  //  final int index = comboBox.getSelectedIndex();
-  //  mValue = comboBox.getItemAt(index);
     mValue = (T) comboBox.getSelectedItem();
   }
 
@@ -140,10 +143,8 @@ public class EnumParameter<T> extends Parameter
     System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
-
   //#########################################################################
   //# Data Members
   private List<? extends T> mList;
   private T mValue;
-
 }

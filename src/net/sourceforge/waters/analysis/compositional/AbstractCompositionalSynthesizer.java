@@ -255,7 +255,7 @@ public abstract class AbstractCompositionalSynthesizer
       (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
        "Supervisor reduction",
        "Method of supervisor reduction to be used after synthesis",
-       DefaultSupervisorReductionFactory.class.getEnumConstants())
+       DefaultSupervisorReductionFactory.class.getEnumConstants(), null)
       {
         @Override
         public void commitValue()

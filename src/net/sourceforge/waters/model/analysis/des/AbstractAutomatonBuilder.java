@@ -132,7 +132,7 @@ public abstract class AbstractAutomatonBuilder
     list.add(new EnumParameter<ComponentKind>(ParameterIDs.AutomatonBuilder_ComponentKind,
                                             "Component Kind",
                                             "The component kind to be given to the output automaton",
-                                            ComponentKind.values()) {
+                                            ComponentKind.values(), null) {
         @Override
         public void commitValue()
         {
