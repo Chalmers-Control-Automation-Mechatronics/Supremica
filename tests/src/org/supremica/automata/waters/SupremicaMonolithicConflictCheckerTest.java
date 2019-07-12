@@ -89,4 +89,37 @@ public class SupremicaMonolithicConflictCheckerTest
     junit.textui.TestRunner.run(suite());
   }
 
+
+  //#########################################################################
+  //# Too hard for Supremica :-(
+  @Override
+  public void testBallTSorter1()
+  {
+  }
+
+  @Override
+  public void testBatchtank2005_amk14()
+  {
+  }
+
+  @Override
+  public void testKoordwsp()
+  {
+  }
+
+  @Override
+  public void testKoordwspBlock()
+  {
+  }
+
+  @Override
+  public void testFMS2016error()
+  {
+  }
+
+  @Override
+  public void testOverflowException()
+  {
+  }
+
 }

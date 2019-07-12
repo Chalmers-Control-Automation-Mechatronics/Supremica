@@ -144,11 +144,11 @@ public class AutomataSynchronizer
     }
 
     /**
-     * Initializes the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
+     * Initialises the AutomataSynchronizerExecuter:s based on the AutomataSynchronizerHelper.
      */
     private void initialize()
     {
-        // Allocate and initialize the synchronizationExecuters
+        // Allocate and initialise the synchronizationExecuters
         final int nbrOfExecuters = syncOptions.getNbrOfExecuters();
         synchronizationExecuters = new ArrayList<AutomataSynchronizerExecuter>(nbrOfExecuters);
         for (int i = 0; i < nbrOfExecuters; i++)
@@ -162,23 +162,25 @@ public class AutomataSynchronizer
 
     public void execute()
     {
-        State currInitialState;
         final int[] initialState = AutomataIndexFormHelper.createState(theAutomata.size());
 
         // Build the initial state - and the comment
         final Iterator<Automaton> autIt = theAutomata.iterator();
         final StringBuilder comment = new StringBuilder();
 
-        // Set an apropriate comment on the automaton
+        // Set an appropriate comment on the automaton
         while (autIt.hasNext())
         {
             final Automaton currAutomaton = autIt.next();
-
-            currInitialState = currAutomaton.getInitialState();
-            initialState[indexMap.getAutomatonIndex(currAutomaton)] = indexMap.getStateIndex(currAutomaton, currInitialState);
-
-            comment.append(currAutomaton.getName());
-            comment.append(syncOptions.getAutomatonNameSeparator());
+            final State currInitialState = currAutomaton.getInitialState();
+            if (currInitialState == null) {
+              return;
+            } else {
+              initialState[indexMap.getAutomatonIndex(currAutomaton)] =
+                indexMap.getStateIndex(currAutomaton, currInitialState);
+              comment.append(currAutomaton.getName());
+              comment.append(syncOptions.getAutomatonNameSeparator());
+            }
         }
         if (comment.length() > 0) {
           comment.delete(comment.length() - syncOptions.getAutomatonNameSeparator().length(), comment.length());
@@ -193,7 +195,7 @@ public class AutomataSynchronizer
 		}
         synchHelper.addComment(comment.toString());
 
-        // Start all the synchronization executers and wait for completetion
+        // Start all the synchronisation executers and wait for completion
         for (final AutomataSynchronizerExecuter synchExecuter : synchronizationExecuters)
         {
             synchExecuter.start();

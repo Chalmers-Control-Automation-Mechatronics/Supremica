@@ -183,22 +183,22 @@ public  class SupremicaMonolithicVerifier
   }
 
   @Override
-  public void setNodeLimit(final int limit)
-  {
-    super.setNodeLimit(limit);
-    mVerificationOptions.setReachabilityStateLimit(limit);
-  }
-
-  @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
     final ListIterator<Parameter> iter = list.listIterator();
     while (iter.hasNext()) {
       final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
         param.setName("Print counterexample");
         param.setDescription("Show trace to bad state as info in log.");
+        break;
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        iter.remove();
+        break;
+      default:
         break;
       }
     }
