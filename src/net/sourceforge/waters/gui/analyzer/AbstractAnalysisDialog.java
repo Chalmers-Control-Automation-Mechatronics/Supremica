@@ -52,14 +52,18 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
+import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -127,7 +131,19 @@ public abstract class AbstractAnalysisDialog extends JDialog
     final JPanel mSuperviserPanel = new JPanel(new GridLayout(0, 2));
     final JLabel superviserComboboxLabel = new JLabel("Algorithms");
     analyzerCombobox = new JComboBox<>();
-    populateAlgorithmComboBox();
+
+    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
+      try {
+        final ModelAnalyzer s = createAnalyzer(dir.getModelAnalyzerFactory(), factory);
+
+        if (s != null){
+          analyzerCombobox.addItem(dir);
+          //Store new parameter in database
+          for(final Parameter p : s.getParameters())
+            AllParams.put(p.getID(),p);
+        }
+      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError exception) {     }
+    }
 
     //Testing
     /*
@@ -155,17 +171,15 @@ public abstract class AbstractAnalysisDialog extends JDialog
     add(mSuperviserPanel, BorderLayout.PAGE_START);
   }
 
-  /**
-   * Class specific way to populate the comboBox that stores all the
-   * algorithms to be used, leave empty if only one algorithm which
-   * must be supplied on construction
-   */
-  abstract public void populateAlgorithmComboBox();
-
   public void analysisChanged()
   {
-    generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox
-      .getSelectedItem());
+    try {
+      mAnalyzer =
+        createAnalyzer(((ModelAnalyzerFactoryLoader) analyzerCombobox
+          .getSelectedItem()).getModelAnalyzerFactory(), factory);
+    } catch (final ClassNotFoundException exception) {
+      exception.printStackTrace();
+    }
 
     final List<Parameter> newParams = mAnalyzer.getParameters();
 
@@ -180,8 +194,13 @@ public abstract class AbstractAnalysisDialog extends JDialog
   public void generateGUI()
   {
     //ModelAnalyzer not supplied on construction, JComboBox being used
-    if(mAnalyzer == null)
-      generateAnalyser((ModelAnalyzerFactoryLoader) analyzerCombobox.getSelectedItem());
+    if (mAnalyzer == null) {
+      try {
+        mAnalyzer =
+          createAnalyzer(((ModelAnalyzerFactoryLoader) analyzerCombobox
+            .getSelectedItem()).getModelAnalyzerFactory(), factory);
+      } catch (final ClassNotFoundException exception) {      }
+    }
 
     mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), des);
 
@@ -238,7 +257,6 @@ public abstract class AbstractAnalysisDialog extends JDialog
    *          the list of parameters that are to be stored in the database of
    *          all parameters
    */
-
   public void copyFromDatabase(final List<Parameter> parametersToStore)
   {
     for (final Parameter current : parametersToStore)
@@ -253,20 +271,21 @@ public abstract class AbstractAnalysisDialog extends JDialog
   }
 
   /**
-   * Converts "ModelAnalyzer mAnalyzer" to the desired subclass
-   *
-   * @param loader
-   *          the parameter to be turned into the desired subclass of
-   *          ModelAnalyzer
+   * Class specific way to generate a modelAnalyzer
    */
-  abstract public void generateAnalyser(ModelAnalyzerFactoryLoader loader);
-  // TODO protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory analyzerFactory,
-  //                                                      ProductDESProxyFactory desFactory);
-  // TODO protected ModelAnalyzer getAnalyzer() { return mAnalyzer; }
-  // TODO This can be overridden in a subclass if a more specific type is needed:
-  // @Override
-  // protected SupervisorSynthesizer getAnalyzer()
-  // { return (SupervisorSynthesizer) super.getAnalyzer(); }
+  protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory analyzerFactory,
+                                                        ProductDESProxyFactory desFactory);
+
+
+  protected ModelAnalyzer getAnalyzer()
+  {
+    return mAnalyzer;
+  }
+
+  protected WatersAnalyzerPanel getWatersAnalyzerPanel()
+  {
+    return mAnalyzerPanel;
+  }
 
   public void ParameterCommitDialog()
   {
@@ -278,28 +297,29 @@ public abstract class AbstractAnalysisDialog extends JDialog
     for (final Parameter current : parameters)
       current.commitValue();
 
-    generateResultsDialog();
+    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
+    final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
+    dispose();
+    dialog.setVisible(true);
+
   }
 
   /**
    * Generates the pop up dialog that shows the result of using the analyzer
    */
-  public abstract void generateResultsDialog();
-  // TODO even better:
-  // protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide, ProductDESProxy des);
-
+  protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide, ProductDESProxy des);
 
   //#########################################################################
   //# Data Members
   private ParameterJScrollPane mScrollParametersPanel;
-  final HashMap<Integer,Parameter> AllParams;  // TODO private
+  private final HashMap<Integer,Parameter> AllParams;
   private JPanel mButtonsPanel;
-  JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;  // TODO private
+  private JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;
   private final List<AutomatonProxy> mAutomata;
-  final WatersAnalyzerPanel mAnalyzerPanel;  // TODO private
+  private final WatersAnalyzerPanel mAnalyzerPanel;
   private final ProductDESProxyFactory factory;
-  final ProductDESProxy des;  // TODO private
-  ModelAnalyzer mAnalyzer;  // TODO private
+  private final ProductDESProxy des;
+  private ModelAnalyzer mAnalyzer;
 
 
   //#########################################################################

@@ -35,18 +35,15 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.gui.ide.IDE;
 
@@ -65,50 +62,31 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     setTitle("Supervisor synthesis");
   }
 
-
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
-  // TODO Move to superclass
   @Override
-  public void populateAlgorithmComboBox()
-  {
-    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
-      try {
-        final ModelAnalyzer s = dir.getModelAnalyzerFactory().createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
-
-        if (s != null){
-          analyzerCombobox.addItem(dir);
-          //Store new parameter in database
-          for(final Parameter p : s.getParameters())
-            AllParams.put(p.getID(),p);
-        }
-      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
-        | AnalysisConfigurationException exception) {     }
-    }
-  }
-
-  @Override
-  public void generateAnalyser(final ModelAnalyzerFactoryLoader loader)
+  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
+                                         final ProductDESProxyFactory desFactory)
   {
     try {
-      mAnalyzer = loader.getModelAnalyzerFactory()
-        .createSupervisorSynthesizer(ProductDESElementFactory.getInstance());
-    }
-    catch (AnalysisConfigurationException | ClassNotFoundException exception) {
-      final Logger logger = LogManager.getLogger();
-      logger.error(exception.getMessage());
-    }
+      return analyzerFactory.createSupervisorSynthesizer(desFactory);
+    } catch (final AnalysisConfigurationException exception) {   }
+
+    return null;
   }
 
   @Override
-  public void generateResultsDialog()
+  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
+                                                    final ProductDESProxy des)
   {
-    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
-    final SynthesisPopUpDialog dialog = new SynthesisPopUpDialog(ide, des);
-    dispose();
-    dialog.setVisible(true);
+    return new SynthesisPopUpDialog(ide, des);
   }
 
+   @Override
+   protected SupervisorSynthesizer getAnalyzer()
+   {
+     return (SupervisorSynthesizer) super.getAnalyzer();
+   }
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
@@ -128,11 +106,11 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     public void succeed()
     {
       super.succeed();
-      final ProductDESResult result = (ProductDESResult) mAnalyzer.getAnalysisResult();
+      final ProductDESResult result = getAnalyzer().getAnalysisResult();
       final Collection<? extends AutomatonProxy> supervisors =
         result.getComputedAutomata();
       if (supervisors != null) {
-        final AutomataTableModel model = mAnalyzerPanel.getAutomataTableModel();
+        final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
         model.insertRows(supervisors);
       }
     }
@@ -152,7 +130,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     @Override
     protected String getSuccessText()
     {
-      final ProductDESResult result = (ProductDESResult) mAnalyzer.getAnalysisResult();
+      final ProductDESResult result =  getAnalyzer().getAnalysisResult();
       final Collection<? extends AutomatonProxy> supervisors =
         result.getComputedAutomata();
       if (supervisors == null) {
@@ -175,7 +153,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     @Override
     protected ModelAnalyzer createModelAnalyzer()
     {
-      return mAnalyzer;
+      return getAnalyzer();
     }
 
     //#######################################################################
@@ -183,10 +161,8 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     private static final long serialVersionUID = 6159733639861131531L;
   }
 
-
   //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = 6159733639861131531L;
-
 
 }
