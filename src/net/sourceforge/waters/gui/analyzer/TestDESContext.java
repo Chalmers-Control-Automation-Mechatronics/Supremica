@@ -1,4 +1,4 @@
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.gui.analyzer;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.swing.Icon;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
@@ -27,9 +28,8 @@ import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
-import org.supremica.gui.ide.ModuleContainer;
-
 import org.xml.sax.SAXException;
+
 
 public class TestDESContext implements ProductDESContext
 {
@@ -37,22 +37,21 @@ public class TestDESContext implements ProductDESContext
   //# Constructor
   public TestDESContext()
   {
-    mModuleContainer = null;
   }
 
+
   //#########################################################################
-  //# Constructors
+  //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
   @Override
   public ProductDESProxy getProductDES()
   {
-    return des;
+    return mProductDESProxy;
   }
 
   @Override
   public Icon getEventIcon(final EventProxy event)
   {
-    final Map<Object,SourceInfo> infoMap = compiler.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(event);
+    final SourceInfo info = mSourceInfoMap.get(event);
     if (info == null) {
       return null;
     }
@@ -61,34 +60,43 @@ public class TestDESContext implements ProductDESContext
       return null;
     }
     final EventDeclProxy decl = (EventDeclProxy) proxy;
-    final ModuleContext context = mModuleContainer.getModuleContext();
-    return context.getIcon(decl);
+    return mModuleContext.getIcon(decl);
   }
 
-  public void loadAndCompileModule(final String filename)
+
+  //#########################################################################
+  //# Auxiliary Methods
+  void loadAndCompileModule(final String filename)
   {
     try {
-      final ModuleProxyFactory moduleFactory = ModuleElementFactory.getInstance();
-      final ProductDESProxyFactory desFactory = ProductDESElementFactory.getInstance();
+      final ModuleProxyFactory moduleFactory =
+        ModuleElementFactory.getInstance();
+      final ProductDESProxyFactory desFactory =
+        ProductDESElementFactory.getInstance();
       final OperatorTable optable = CompilerOperatorTable.getInstance();
-      final SAXModuleMarshaller marshaller = new SAXModuleMarshaller(moduleFactory, optable, false);
+      final SAXModuleMarshaller marshaller =
+        new SAXModuleMarshaller(moduleFactory, optable, false);
       final DocumentManager docManager = new DocumentManager();
       docManager.registerUnmarshaller(marshaller);
       final File file = new File(filename);
       final ModuleProxy module = (ModuleProxy) docManager.load(file);
-
-      compiler = new ModuleCompiler(docManager, desFactory, module);
-      des = compiler.compile();
-
+      mModuleContext = new ModuleContext(module);
+      final ModuleCompiler compiler =
+        new ModuleCompiler(docManager, desFactory, module);
+      compiler.setSourceInfoEnabled(true);
+      mProductDESProxy = compiler.compile();
+      mSourceInfoMap = compiler.getSourceInfoMap();
     } catch (final SAXException | WatersUnmarshalException | IOException |
                    EvalException | ParserConfigurationException exception) {
       throw new WatersRuntimeException(exception);
     }
   }
 
+
   //#########################################################################
-  //# Constructors
-  private final ModuleContainer mModuleContainer;
-  private ProductDESProxy des;
-  private ModuleCompiler compiler;
+  //# Data Members
+  private ModuleContext mModuleContext;
+  private ProductDESProxy mProductDESProxy;
+  private Map<Object,SourceInfo> mSourceInfoMap;
+
 }
