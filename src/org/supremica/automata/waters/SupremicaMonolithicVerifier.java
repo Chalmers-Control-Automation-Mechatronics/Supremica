@@ -107,6 +107,22 @@ public  class SupremicaMonolithicVerifier
 
 
   //#########################################################################
+  //# Overrides for
+  //# org.supremica.automata.waters.SupremicaModelAnalyzer
+  @Override
+  public void setSynchronisingOnUnobservableEvents(final boolean sync)
+  {
+    mSynchronizationOptions.setUnobsEventsSynch(sync);
+  }
+
+  @Override
+  public boolean isSynchronisingOnUnobservableEvents()
+  {
+    return mSynchronizationOptions.getUnobsEventsSynch();
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.analysis.ModelVerifier
   @Override
   public void setCounterExampleEnabled(final boolean enable)
@@ -158,7 +174,7 @@ public  class SupremicaMonolithicVerifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.ModelVerifier
+  //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
   public void setDetailedOutputEnabled(final boolean enable)
   {
@@ -173,9 +189,6 @@ public  class SupremicaMonolithicVerifier
     mVerificationOptions.setReachabilityStateLimit(limit);
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
   public List<Parameter> getParameters()
   {
@@ -183,19 +196,9 @@ public  class SupremicaMonolithicVerifier
     final ListIterator<Parameter> iter = list.listIterator();
     while (iter.hasNext()) {
       final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
         param.setName("Print counterexample");
-        param.setDescription("Show trace to bad state in log.");
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
-        iter.remove();
-        break;
-      default:
+        param.setDescription("Show trace to bad state as info in log.");
         break;
       }
     }
@@ -204,7 +207,20 @@ public  class SupremicaMonolithicVerifier
 
 
   //#########################################################################
-  //# Invocation
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer
+  /**
+   * Returns whether or not this model analyser supports nondeterministic
+   * automata.
+   * @return <CODE>false</CODE> as Supremica's verification does not support
+   *         nondeterminism.
+   */
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return false;
+  }
+
   @Override
   public boolean run() throws AnalysisException
   {
@@ -225,7 +241,10 @@ public  class SupremicaMonolithicVerifier
       return satisfied;
     } catch (final OutOfMemoryError error) {
       System.gc();
-      throw new OverflowException(error);
+      final AnalysisException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }
@@ -237,7 +256,7 @@ public  class SupremicaMonolithicVerifier
   private final VerificationOptions mVerificationOptions =
     new VerificationOptions();
   private final SynchronizationOptions mSynchronizationOptions =
-    SynchronizationOptions.getDefaultSynthesisOptions();
+    SynchronizationOptions.getDefaultVerificationOptions();
   private final MinimizationOptions mMinimizationOptions =
     MinimizationOptions.getDefaultVerificationOptions();
 

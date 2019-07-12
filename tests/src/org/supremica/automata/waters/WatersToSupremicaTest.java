@@ -164,7 +164,7 @@ public class WatersToSupremicaTest
     mExporter = new ProjectBuildFromWaters(null);
     mExporter.setIncludesProperties(true);
     mImporter = new AutomataToWaters(mFactory);
-    mImporter.setSuppressesRedundantSelfloops(true);
+    mImporter.setSuppressingRedundantSelfloops(true);
     mIntegrityChecker = ProductDESIntegrityChecker.getInstance();
   }
 

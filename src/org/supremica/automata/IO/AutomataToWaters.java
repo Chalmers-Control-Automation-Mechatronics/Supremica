@@ -145,8 +145,15 @@ public class AutomataToWaters
       mEventList.add(event);
       mEventMap.put(name, event);
     }
-    mMarkedProposition = defaultMarking;
-    mForbiddenProposition = forbiddenMarking;
+    mUsingFakeMarking = defaultMarking == null;
+    mMarkedProposition = mUsingFakeMarking ?
+      factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME,
+                               EventKind.PROPOSITION) :
+      defaultMarking;
+    mForbiddenProposition = forbiddenMarking == null ?
+      factory.createEventProxy(EventDeclProxy.DEFAULT_FORBIDDEN_NAME,
+                               EventKind.PROPOSITION) :
+      forbiddenMarking;
     mMarkedPropositions = Collections.singletonList(mMarkedProposition);
     mForbiddenPropositions = Collections.singletonList(mForbiddenProposition);
     mMarkedAndForbiddenPropositions = new ArrayList<EventProxy>(2);
@@ -157,14 +164,14 @@ public class AutomataToWaters
 
   //#########################################################################
   //# Configuration
-  public void setSuppressesRedundantSelfloops(final boolean suppress)
+  public void setSuppressingRedundantSelfloops(final boolean suppress)
   {
-    mSuppressesRedundantSelfloops = suppress;
+    mSuppressingRedundantSelfloops = suppress;
   }
 
-  public boolean getSuppressesRedundantMarkingSelfloops()
+  public boolean isSuppressingRedundantMarkingSelfloops()
   {
-    return mSuppressesRedundantSelfloops;
+    return mSuppressingRedundantSelfloops;
   }
 
 
@@ -308,10 +315,11 @@ public class AutomataToWaters
       final EventProxy event = createEvent(name, kind, observable);
       events.add(event);
     }
-    if (mSuppressesRedundantSelfloops) {
+    if (mSuppressingRedundantSelfloops || mUsingFakeMarking) {
       boolean marking = false;
       boolean forbidden = false;
-      final Collection<EventProxy> selfloopOnlyEvents = new THashSet<>(events);
+      final Collection<EventProxy> selfloopOnlyEvents =
+        mSuppressingRedundantSelfloops ? new THashSet<>(events) : Collections.emptyList();
       for (final State state : aut) {
         marking |= !state.isAccepting();
         forbidden |= state.isForbidden();
@@ -378,7 +386,8 @@ public class AutomataToWaters
   private final Collection<EventProxy> mForbiddenPropositions;
   private final Collection<EventProxy> mMarkedAndForbiddenPropositions;
 
-  private boolean mSuppressesRedundantSelfloops = false;
+  private boolean mSuppressingRedundantSelfloops = false;
+  private boolean mUsingFakeMarking = false;
 
   private List<EventProxy> mEventList;
   private Map<String,EventProxy> mEventMap;

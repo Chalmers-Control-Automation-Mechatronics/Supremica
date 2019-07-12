@@ -50,6 +50,11 @@
 
 package org.supremica.automata.waters;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
@@ -156,6 +161,56 @@ public abstract class SupremicaModelAnalyzer
     return mProjectBuilder.isEnsuringUncontrollablesInPlant();
   }
 
+  /**
+   * Sets whether synchronisation is also performed on unobservable events.
+   * If set, unobservable events are treated as ordinary events in
+   * synchronous composition, otherwise they are considered as local events
+   * that are executed by each component separately.
+   */
+  public abstract void setSynchronisingOnUnobservableEvents(final boolean sync);
+
+  /**
+   * Returns whether synchronisation is also performed on unobservable events.
+   * @see #setSynchronisingOnUnobservableEvents(boolean)
+   */
+  public abstract boolean isSynchronisingOnUnobservableEvents();
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    for (final Parameter param : list) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription("Maximum number of states before aborting.");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription("Maximum number of transitions before aborting.");
+        break;
+      default:
+        break;
+      }
+    }
+    list.add(new BoolParameter
+      (ParameterIDs.SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents,
+       "Synchronise on unobservable events",
+       "If checked, treat unoberservable as shared events in synchronisation, " +
+       "otherwise allow them to be executed independently by each component.",
+       isSynchronisingOnUnobservableEvents())
+      {
+        @Override
+        public void commitValue()
+        {
+          setSynchronisingOnUnobservableEvents(getValue());
+        }
+      });
+    return list;
+  }
+
 
   //#########################################################################
   //# Overrides for
@@ -167,18 +222,9 @@ public abstract class SupremicaModelAnalyzer
     mProjectBuilder.setKindTranslator(translator);
   }
 
-  /**
-   * Returns whether or not this model analyser supports nondeterministic
-   * automata.
-   * @return <CODE>false</CODE> as Supremica's algorithms do not
-   *         support nondeterminism.
-   */
-  @Override
-  public boolean supportsNondeterminism()
-  {
-    return false;
-  }
 
+  //#########################################################################
+  //# Invocation
   @Override
   protected void setUp()
     throws AnalysisException

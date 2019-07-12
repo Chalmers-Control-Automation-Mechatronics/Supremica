@@ -62,6 +62,7 @@ import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
@@ -183,6 +184,25 @@ public  class SupremicaMonolithicSynthesizer
   }
 
   /**
+   * Sets a string to separate state tuple components when using long
+   * state names.
+   */
+  public void setStateNameSeparator(final String sep)
+  {
+    mSynchronizationOptions.setStateNameSeparator(sep);
+  }
+
+  /**
+   * Returns the string to separate state tuple components when using long
+   * state names.
+   * @see #setStateNameSeparator(String)
+   */
+  public String getStateNameSeparator()
+  {
+    return mSynchronizationOptions.getStateNameSeparator();
+  }
+
+  /**
    * Returns how state names in the synchronous product are generated.
    * @see #setUsingShortStateNames(boolean)
    */
@@ -208,6 +228,22 @@ public  class SupremicaMonolithicSynthesizer
   public boolean isPurging()
   {
     return mSynthesizerOptions.doPurge();
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# org.supremica.automata.waters.SupremicaModelAnalyzer
+  @Override
+  public void setSynchronisingOnUnobservableEvents(final boolean sync)
+  {
+    mSynchronizationOptions.setUnobsEventsSynch(sync);
+  }
+
+  @Override
+  public boolean isSynchronisingOnUnobservableEvents()
+  {
+    return mSynchronizationOptions.getUnobsEventsSynch();
   }
 
 
@@ -338,21 +374,11 @@ public  class SupremicaMonolithicSynthesizer
   {
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
                              "exists.");
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
         break;
       }
     }
@@ -405,10 +431,22 @@ public  class SupremicaMonolithicSynthesizer
           setSupervisorReductionFactory(getValue());
         }
       });
+    list.add(new StringParameter
+      (ParameterIDs.ModelBuilder_OutputName,
+       "Output name",
+       "Name of the synthesised supervisor automaton.",
+       getOutputName())
+      {
+        @Override
+        public void commitValue()
+        {
+          setOutputName(getValue());
+        }
+      });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynthesizer_ShortStateNames,
+      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames,
        "Short state names",
-       "Use short state names when generating automata.",
+       "Use short state instead of detailed state tuple information.",
        isUsingShortStateNames())
       {
         @Override
@@ -417,10 +455,22 @@ public  class SupremicaMonolithicSynthesizer
           setUsingShortStateNames(getValue());
         }
       });
+    list.add(new StringParameter
+      (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator,
+       "State name separator",
+       "Separator for state tuple components when using long state names.",
+       getStateNameSeparator())
+      {
+        @Override
+        public void commitValue()
+        {
+          setStateNameSeparator(getValue());
+        }
+      });
     list.add(new BoolParameter
       (ParameterIDs.SupremicaSynthesizer_Purging,
        "Purge result",
-       "Remove unreachable states from synthesised supervisors.",
+       "Remove unreachable states from the synthesised supervisor.",
        isPurging())
       {
         @Override
@@ -449,6 +499,22 @@ public  class SupremicaMonolithicSynthesizer
   public ProductDESResult createAnalysisResult()
   {
     return new DefaultProductDESResult(this);
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer
+  /**
+   * Returns whether or not this model analyser supports nondeterministic
+   * automata.
+   * @return <CODE>false</CODE> as Supremica's synthesis does not
+   *         support nondeterminism.
+   */
+  @Override
+  public boolean supportsNondeterminism()
+  {
+    return false;
   }
 
 
@@ -502,12 +568,13 @@ public  class SupremicaMonolithicSynthesizer
 
       if (isDetailedOutputEnabled()) {
         checkAbort();
+        aut.setName(mOutputName);
         final ProductDESProxyFactory factory = getFactory();
         final ProductDESProxy model = getModel();
         final EventProxy defaultMarking = getConfiguredDefaultMarking();
         final AutomataToWaters importer =
           new AutomataToWaters(factory, model, defaultMarking);
-        importer.setSuppressesRedundantSelfloops(true);
+        importer.setSuppressingRedundantSelfloops(true);
         final AutomatonProxy sup = importer.convertAutomaton(aut);
         final Collection<AutomatonProxy> sups = Collections.singletonList(sup);
         final String name = getOutputName();
@@ -519,7 +586,10 @@ public  class SupremicaMonolithicSynthesizer
       return setBooleanResult(true);
     } catch (final OutOfMemoryError error) {
       System.gc();
-      throw new OverflowException(error);
+      final AnalysisException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
     } finally {
       tearDown();
     }

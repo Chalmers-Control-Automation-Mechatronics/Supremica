@@ -43,69 +43,46 @@
  *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
  *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ *  suffered by Licensee from the use of this oftware.
  *
  *  Supremica is owned and represented by KA.
  */
 
 package org.supremica.automata.waters;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.analysis.AbstractSynchronousProductBuilderTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-/**
- * A model analyser factory that produces model analysers that invoke
- * Supremica's monolithic algorithms.
- *
- * @author Robi Malik
- */
-
-public class SupremicaModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class SupremicaSynchronousProductBuilderTest
+  extends AbstractSynchronousProductBuilderTest
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static SupremicaModelAnalyzerFactory getInstance()
-  {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final SupremicaModelAnalyzerFactory INSTANCE =
-      new SupremicaModelAnalyzerFactory();
-  }
-
-
-  //#########################################################################
-  //# Constructors
-  private SupremicaModelAnalyzerFactory()
-  {
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
+  //# To be Provided by Subclasses
   @Override
-  public SupremicaMonolithicConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicConflictChecker(factory);
-  }
-
-  @Override
-  public SupremicaMonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicSynthesizer(factory);
-  }
-
-  @Override
-  public SupremicaSynchronousProductBuilder createSynchronousProductBuilder
+  protected SupremicaSynchronousProductBuilder createAutomatonBuilder
     (final ProductDESProxyFactory factory)
   {
     return new SupremicaSynchronousProductBuilder(factory);
+  }
+
+
+  //#########################################################################
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
+  {
+    final TestSuite testSuite =
+      new TestSuite(SupremicaSynchronousProductBuilderTest.class);
+    return testSuite;
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
   }
 
 }

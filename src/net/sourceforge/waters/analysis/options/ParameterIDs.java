@@ -131,7 +131,14 @@ public class ParameterIDs
   //org.supremica.automata.waters.SupremicaModelAnalyzer
   public static final int SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant = 5000;
 
+  //org.supremica.automata.waters.SupremicaSynchronousProductBuilder
+  public static final int SupremicaSynchronousProductBuilder_ShortStateNames = 5100;
+  public static final int SupremicaSynchronousProductBuilder_StateNameSeparator = 5101;
+  public static final int SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden = 5102;
+  public static final int SupremicaSynchronousProductBuilder_ExpandingForbiddenStates = 5103;
+  public static final int SupremicaSynchronousProductBuilder_RememberingDisabledEvents = 5104;
+  public static final int SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents = 5105;
+
   //org.supremica.automata.waters.SupremicaSynthesizer
-  public static final int SupremicaSynthesizer_ShortStateNames = 5100;
-  public static final int SupremicaSynthesizer_Purging = 5101;
+  public static final int SupremicaSynthesizer_Purging = 5200;
 }

@@ -146,7 +146,7 @@ class SynchronizationDialogAdvancedPanel
 
 		/*
 		 * This setting gets its default value from what is set in the Config dialog
-		 * Changing it on the SynchroniziationOptions dialog holds only for the current invokation.
+		 * Changing it on the SynchroniziationOptions dialog holds only for the current invocation.
 		 * (and this is the way it should work for all settings on the dialogs)
 		*/
 		this.unobsEventsSyncBox = new JCheckBox(Config.SYNC_UNOBS_EVENTS_SYNC.getComment());
