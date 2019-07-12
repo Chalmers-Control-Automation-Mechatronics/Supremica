@@ -196,42 +196,44 @@ public abstract class AbstractModelAnalyzer
   {
     final List<Parameter> list = new LinkedList<>();
     list.add(new BoolParameter
-               (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled,
-                "Detailed output",
-                "Compute full output, e.g., synthesised supervisor automata or " +
-                "counterexample.",
-                true){
-                 @Override
-                 public void commitValue()
-                 {
-                   setDetailedOutputEnabled(getValue());
-                 }
-               });
-    //setKindTranslator(KindTranslator translator)
+      (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled,
+       "Detailed output",
+       "Compute full output, e.g., synthesised supervisor automata or " +
+       "counterexample.",
+       true)
+      {
+        @Override
+        public void commitValue()
+        {
+          setDetailedOutputEnabled(getValue());
+        }
+      });
     list.add(new IntParameter
-               (ParameterIDs.ModelAnalyzer_NodeLimit,
-                "Node limit",
-                "The maximum number of nodes the analyser is allowed to keep " +
-                "in memory at any one time.",
-                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
-                 @Override
-                 public void commitValue()
-                 {
-                   setNodeLimit(getValue());
-                 }
-               });
+      (ParameterIDs.ModelAnalyzer_NodeLimit,
+       "Node limit",
+       "The maximum number of nodes the analyser is allowed to keep " +
+       "in memory at any one time.",
+       0, Integer.MAX_VALUE, getNodeLimit())
+      {
+        @Override
+        public void commitValue()
+        {
+          setNodeLimit(getValue());
+        }
+      });
     list.add(new IntParameter
-               (ParameterIDs.ModelAnalyzer_TransitionLimit,
-                "Transition limit",
-                "The maximum number of transitions the analyser is allowed to " +
-                "keep in memory at any one time.",
-                0, Integer.MAX_VALUE, Integer.MAX_VALUE){
-                 @Override
-                 public void commitValue()
-                 {
-                   setTransitionLimit(getValue());
-                 }
-               });
+      (ParameterIDs.ModelAnalyzer_TransitionLimit,
+       "Transition limit",
+       "The maximum number of transitions the analyser is allowed to " +
+       "keep in memory at any one time.",
+       0, Integer.MAX_VALUE, getTransitionLimit())
+      {
+        @Override
+        public void commitValue()
+        {
+          setTransitionLimit(getValue());
+        }
+      });
     return list;
   }
 

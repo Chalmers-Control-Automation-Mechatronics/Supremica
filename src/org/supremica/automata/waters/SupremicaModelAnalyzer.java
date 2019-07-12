@@ -86,11 +86,12 @@ public abstract class SupremicaModelAnalyzer
   //# Constructor
   public SupremicaModelAnalyzer(final ProductDESProxy model,
                                 final ProductDESProxyFactory factory,
-                                final KindTranslator translator)
+                                final KindTranslator translator,
+                                final boolean ensuringUncontrollablesInPlant)
   {
     super(model, factory, translator);
     mProjectBuilder.setKindTranslator(translator);
-    mProjectBuilder.setEnsuringUncontrollablesInPlant(true);
+    mProjectBuilder.setEnsuringUncontrollablesInPlant(ensuringUncontrollablesInPlant);
   }
 
 

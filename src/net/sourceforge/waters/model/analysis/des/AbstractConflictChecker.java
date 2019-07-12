@@ -150,7 +150,7 @@ public abstract class AbstractConflictChecker
       (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking,
        "Precondition marking",
        "Precondition marking used for generalised conflict check",
-       EventParameterType.PREVENT_NULL)
+       EventParameterType.ALLOW_NULL)
       {
         @Override
         public void commitValue()

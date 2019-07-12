@@ -177,11 +177,9 @@ public class AutomataToWaters
       if (!shared) {
         mEventList = new ArrayList<EventProxy>();
         mEventMap = new HashMap<String,EventProxy>();
-        mEventList.add(mMarkedProposition);
-        mEventMap.put(mMarkedProposition.getName(), mMarkedProposition);
       }
       final String name = automata.getName();
-      final String comment = automata.getComment();
+      final String comment = automata.getCommentOrNull();
       final int numAutomata = automata.size();
       final List<AutomatonProxy> proxies =
         new ArrayList<AutomatonProxy>(numAutomata);
@@ -335,21 +333,39 @@ public class AutomataToWaters
       }
       events.removeAll(selfloopOnlyEvents);
       if (marking) {
+        registerMarkedProposition();
         events.add(mMarkedProposition);
       }
       if (forbidden) {
+        registerForbiddenProposition();
         events.add(mForbiddenProposition);
       }
     } else {
+      registerMarkedProposition();
       events.add(mMarkedProposition);
       for (final State state : aut) {
         if (state.isForbidden()) {
+          registerForbiddenProposition();
           events.add(mForbiddenProposition);
           break;
         }
       }
     }
     return events;
+  }
+
+  private void registerMarkedProposition()
+  {
+    if (mEventMap.put(mMarkedProposition.getName(), mMarkedProposition) == null) {
+      mEventList.add(0, mMarkedProposition);
+    }
+  }
+
+  private void registerForbiddenProposition()
+  {
+    if (mEventMap.put(mForbiddenProposition.getName(), mForbiddenProposition) == null) {
+      mEventList.add(mForbiddenProposition);
+    }
   }
 
 

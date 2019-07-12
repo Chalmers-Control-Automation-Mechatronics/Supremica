@@ -1064,6 +1064,11 @@ public class Automata
         return comment;
     }
 
+    public String getCommentOrNull()
+    {
+      return comment;
+    }
+
     public void clear()
     {
         setName(DEFAULT_NAME);

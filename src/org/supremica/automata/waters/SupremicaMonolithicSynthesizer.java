@@ -116,7 +116,7 @@ public  class SupremicaMonolithicSynthesizer
                                         final ProductDESProxyFactory factory)
   {
     super(model, factory,
-          SynthesisKindTranslator.getInstanceWithControllability());
+          SynthesisKindTranslator.getInstanceWithControllability(), true);
   }
 
 
@@ -517,6 +517,9 @@ public  class SupremicaMonolithicSynthesizer
         watersResult.setComputedProductDES(supDES);
       }
       return setBooleanResult(true);
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      throw new OverflowException(error);
     } finally {
       tearDown();
     }

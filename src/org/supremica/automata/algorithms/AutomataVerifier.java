@@ -1395,11 +1395,11 @@ public class AutomataVerifier
         // Mark all states in all automata
         //** This is not good! Must save and restore the marked states!! //MF
         final java.util.List<net.sourceforge.waters.model.base.Pair<Automaton, java.util.List<State>>> mstate_list = new LinkedList<>();
-        
+
         for (final Automaton automaton : theAutomata)
         {
             final java.util.List<State> mstates = new java.util.LinkedList<>();
-            final net.sourceforge.waters.model.base.Pair<Automaton, java.util.List<State>> pair = 
+            final net.sourceforge.waters.model.base.Pair<Automaton, java.util.List<State>> pair =
                     new net.sourceforge.waters.model.base.Pair<>(automaton, mstates);
             mstate_list.add(pair);
             // automaton.setAllStatesAccepting();
@@ -1431,7 +1431,7 @@ public class AutomataVerifier
         MinimizationHelper.plantify(theAutomata);
 
         // Verify nonblocking (yep, that's right)
-        //** That's fine, but we need to talk to the user of controllability 
+        //** That's fine, but we need to talk to the user of controllability
         //** when that is what we are verifying //MF
         return compositionalNonblockingVerification();
     }
