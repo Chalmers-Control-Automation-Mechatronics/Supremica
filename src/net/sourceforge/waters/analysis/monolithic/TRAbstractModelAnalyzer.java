@@ -108,29 +108,6 @@ public abstract class TRAbstractModelAnalyzer
     super(model, ProductDESElementFactory.getInstance(), translator);
   }
 
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-
-    list.add(new BoolParameter
-             (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks,
-              "Pruning Deadlocks",
-              "Pruning Deadlocks ",
-              true)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setPruningDeadlocks(getValue());
-               }
-             });
-
-    return list;
-  }
 
   //#########################################################################
   //# Configuration
@@ -256,7 +233,7 @@ public abstract class TRAbstractModelAnalyzer
    * Returns whether deadlock states are pruned.
    * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
    */
-  public boolean getPruningDeadlocks()
+  public boolean isPruningDeadlocks()
   {
     return mPruningDeadlocks;
   }
@@ -293,6 +270,39 @@ public abstract class TRAbstractModelAnalyzer
   public boolean supportsNondeterminism()
   {
     return true;
+  }
+
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    for (final Parameter param : list) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription("Maximum number of states before aborting.");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription("Maximum number of transitions before aborting.");
+        break;
+      default:
+        break;
+      }
+    }
+    list.add(new BoolParameter
+      (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks,
+       "Prune deadlocks",
+       "Stop synchronous product construction when encountering " +
+       "states that are a deadlock in one of the components.",
+       isPruningDeadlocks())
+      {
+        @Override
+        public void commitValue()
+        {
+          setPruningDeadlocks(getValue());
+        }
+      });
+    return list;
   }
 
 

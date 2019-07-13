@@ -62,6 +62,20 @@ public interface SynchronousProductBuilder
   //#########################################################################
   //# Parameterisation
   /**
+   * Sets whether redundant selfloops are to be removed.
+   * If enabled, events that appear as selfloops on all states except dump
+   * states and nowhere else are removed from the output, and markings
+   * that appear on all states are also removed.
+   */
+  public void setRemovingSelfloops(final boolean removing);
+
+  /**
+   * Returns whether selfloops are removed.
+   * @see #setRemovingSelfloops(boolean) setRemovingSelfloops()
+   */
+  public boolean isRemovingSelfloops();
+
+  /**
    * Defines the set of propositions to be retained in the synchronous
    * product. If specified, only the events from the given proposition set
    * will be copied to the output automaton, all others will be ignored.

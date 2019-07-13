@@ -115,15 +115,13 @@ public class ParameterIDs
   public static final int CompositionalGeneralisedConflictChecker_SelectingHeuristic = 1301;
 
   //net.sourceforge.waters.model.analysis.des.AutomatonBuilder
-  public static final int AutomatonBuilder_ComponentKind = 1400;
+  public static final int AutomatonBuilder_OutputKind = 1400;
+
+  //net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder
+  public static final int SynchronousProductBuilder_RemovingSelfloops = 1500;
 
   //net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder
-  public static final int MonolithicSynchronousProductBuilder_PruningDeadlocks = 1500;
-  public static final int MonolithicSynchronousProductBuilder_RemovingSelfloops = 1501;
-
-  //net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder
-  public static final int TRAbstractSynchronousProductBuilder_CountingStates = 1601;
-  public static final int TRAbstractSynchronousProductBuilder_RemovingSelfloops = 1602;
+  public static final int MonolithicSynchronousProductBuilder_PruningDeadlocks = 1600;
 
   //net.sourceforge.waters.analysis.monolithic.TRAbstractModelAnalyzer
   public static final int TRAbstractModelAnalyzer_PruningDeadLocks = 1700;

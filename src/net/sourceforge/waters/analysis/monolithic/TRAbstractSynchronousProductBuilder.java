@@ -37,6 +37,7 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
@@ -100,26 +101,6 @@ public abstract class TRAbstractSynchronousProductBuilder
   //#########################################################################
   //# Configuration
   /**
-   * Sets whether redundant selfloops are to be removed.
-   * If enabled, events that appear as selfloops on all states except dump
-   * states and nowhere else are removed from the output, and markings
-   * that appear on all states are also removed.
-   */
-  public void setRemovingSelfloops(final boolean removing)
-  {
-    mRemovingSelfloops = removing;
-  }
-
-  /**
-   * Returns whether selfloops are removed.
-   * @see #setRemovingSelfloops(boolean) setRemovingSelfloops()
-   */
-  public boolean getRemovingSelfloops()
-  {
-    return mRemovingSelfloops;
-  }
-
-  /**
    * Sets whether the synchronous product builder is used for state
    * counting.
    * <p>
@@ -153,6 +134,22 @@ public abstract class TRAbstractSynchronousProductBuilder
     return config;
   }
 
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  @Override
+  public void setRemovingSelfloops(final boolean removing)
+  {
+    mRemovingSelfloops = removing;
+  }
+
+  @Override
+  public boolean isRemovingSelfloops()
+  {
+    return mRemovingSelfloops;
+  }
+
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelBuilder
   @Override
@@ -169,63 +166,61 @@ public abstract class TRAbstractSynchronousProductBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
-    list.add(new StringParameter
-             (ParameterIDs.ModelBuilder_OutputName,
-              "Supervisor name prefix",
-              "Name or name prefix for synthesised supervisors.",
-              "sup")
-             {
-               @Override
-               public void commitValue()
-               {
-                 setOutputName(getValue());
-               }
-             });
-
-    list.add(new BoolParameter
-             (ParameterIDs.TRAbstractSynchronousProductBuilder_CountingStates,
-              "CountingStates",
-              "CountingStates",
-              true)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setCountingStates(getValue());
-               }
-             });
-
-    list.add(new EnumParameter<ComponentKind>(ParameterIDs.AutomatonBuilder_ComponentKind,
-                                            "Component Kind",
-                                            "The component kind to be given to the output automaton",
-                                            ComponentKind.values(), null) {
-      @Override
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+        param.setName("Build automaton model");
+        param.setDescription("Disable this to suppress the creation of a " +
+                             "synchronous product automaton, and only run " +
+                             "for statistics.");
+      } else if (param.getID() == ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks) {
+        iter.previous();
+        break;
+      }
+    }
+    iter.add(new StringParameter
+      (ParameterIDs.ModelBuilder_OutputName,
+       "Output name",
+       "Name of the generated synchronous product automaton.",
+       getOutputName())
+      {
+        @Override
+        public void commitValue()
+        {
+          setOutputName(getValue());
+        }
+      });
+    iter.add(new EnumParameter<ComponentKind>
+      (ParameterIDs.AutomatonBuilder_OutputKind,
+       "Output kind",
+       "Type of the generated synchronous product automaton.",
+       ComponentKind.values())
+      {
+        @Override
         public void commitValue()
         {
           setOutputKind(getValue());
         }
       });
-
-    list.add(new BoolParameter
-             (ParameterIDs.TRAbstractSynchronousProductBuilder_RemovingSelfloops,
-              "Removing Selfloops",
-              "Sets whether redundant selfloops are to be removed.",
-              true)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setRemovingSelfloops(getValue());
-               }
-             });
-
-  return list;
+    iter.add(new BoolParameter
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
+       "Remove Selfloops",
+       "Remove events that appear only as selfloop on every state," +
+       "as well as propositions that appear on all states, from the result.",
+       isRemovingSelfloops())
+      {
+        @Override
+        public void commitValue()
+        {
+          setRemovingSelfloops(getValue());
+        }
+      });
+    return list;
   }
 
 
@@ -449,9 +444,9 @@ public abstract class TRAbstractSynchronousProductBuilder
       }
       mPreTransitionBuffer.addOutgoingTransitions(rel);
       // Handle the self loops.
-      if (getRemovingSelfloops()) {
+      if (isRemovingSelfloops()) {
         rel.removeTauSelfLoops();
-        if (getPruningDeadlocks() && hasProps) {
+        if (isPruningDeadlocks() && hasProps) {
           removeSelfloopsConsideringDeadlocks(rel);
         } else {
           rel.removeProperSelfLoopEvents();
@@ -546,7 +541,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       return;
     }
     final MarkingInfo marking = getMarkingInfo(prop);
-    if (marking.isTrivial() && getRemovingSelfloops()) {
+    if (marking.isTrivial() && isRemovingSelfloops()) {
       outputRel.setPropositionUsed(globalP, false);
       return;
     }
@@ -562,7 +557,7 @@ public abstract class TRAbstractSynchronousProductBuilder
         }
       }
     }
-    if (allMarked && getRemovingSelfloops()) {
+    if (allMarked && isRemovingSelfloops()) {
       outputRel.setPropositionUsed(globalP, false);
     }
   }

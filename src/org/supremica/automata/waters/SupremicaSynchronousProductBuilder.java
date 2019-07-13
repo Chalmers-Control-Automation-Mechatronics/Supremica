@@ -266,6 +266,18 @@ public  class SupremicaSynchronousProductBuilder
   }
 
   @Override
+  public void setRemovingSelfloops(final boolean removing)
+  {
+    mRemovingSelfloops = removing;
+  }
+
+  @Override
+  public boolean isRemovingSelfloops()
+  {
+    return mRemovingSelfloops;
+  }
+
+  @Override
   public void setPropositions(final Collection<EventProxy> props)
   {
     switch (props.size()) {
@@ -366,7 +378,7 @@ public  class SupremicaSynchronousProductBuilder
         break;
       }
     }
-    list.add(0, new EventParameter
+    list.add(new EventParameter
       (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
        "Marking proposition",
        "The proposition that defines states as marked in the synchronous " +
@@ -392,7 +404,7 @@ public  class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new EnumParameter<ComponentKind>
-      (ParameterIDs.AutomatonBuilder_ComponentKind,
+      (ParameterIDs.AutomatonBuilder_OutputKind,
        "Output kind",
        "Type of the generated synchronous product automaton.",
        ComponentKind.values())
@@ -425,6 +437,19 @@ public  class SupremicaSynchronousProductBuilder
         public void commitValue()
         {
           setStateNameSeparator(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
+       "Remove Selfloops",
+       "Remove events that appear only as selfloop on every state," +
+       "as well as propositions that appear on all states, from the result.",
+       isRemovingSelfloops())
+      {
+        @Override
+        public void commitValue()
+        {
+          setRemovingSelfloops(getValue());
         }
       });
     list.add(new BoolParameter
@@ -540,6 +565,7 @@ public  class SupremicaSynchronousProductBuilder
         final EventProxy defaultMarking = getConfiguredDefaultMarking();
         final AutomataToWaters importer =
           new AutomataToWaters(factory, model, defaultMarking);
+        importer.setSuppressingRedundantSelfloops(mRemovingSelfloops);
         final Automaton aut = synchronizer.getAutomaton();
         aut.setName(mOutputName);
         if (mOutputKind != null) {
@@ -591,6 +617,7 @@ public  class SupremicaSynchronousProductBuilder
   //# Data Members
   private String mOutputName = "sync";
   private ComponentKind mOutputKind = null;
+  private boolean mRemovingSelfloops = false;
   private boolean mUncontrollablesInPlantRequested = true;
   private final SynchronizationOptions mSynchronizationOptions =
     SynchronizationOptions.getDefaultSynchronizationOptions();

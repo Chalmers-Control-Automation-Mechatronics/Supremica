@@ -55,7 +55,6 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -186,26 +185,6 @@ public class MonolithicSynchronousProductBuilder
   }
 
   /**
-   * Sets whether redundant selfloops are to be removed.
-   * If enabled, events that appear as selfloops on all states except dump
-   * states and nowhere else are removed from the output, and markings
-   * that appear on all states are also removed.
-   */
-  public void setRemovingSelfloops(final boolean removing)
-  {
-    mRemovingSelfloops = removing;
-  }
-
-  /**
-   * Returns whether selfloops are removed.
-   * @see #setRemovingSelfloops(boolean) setRemovingSelfloops()
-   */
-  public boolean getRemovingSelfloops()
-  {
-    return mRemovingSelfloops;
-  }
-
-  /**
    * Sets whether deadlock states are pruned. If enabled, the synchronous
    * product builder checks for deadlock states in the input automata, i.e.,
    * for states that are not marked by any of the configured propositions,
@@ -223,7 +202,7 @@ public class MonolithicSynchronousProductBuilder
    * Returns whether deadlock states are pruned.
    * @see #setPruningDeadlocks(boolean) setPruningDeadlocks()
    */
-  public boolean getPruningDeadlocks()
+  public boolean isPruningDeadlocks()
   {
     return mPruningDeadlocks;
   }
@@ -231,6 +210,18 @@ public class MonolithicSynchronousProductBuilder
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.SynchronousProductBuilder
+  @Override
+  public void setRemovingSelfloops(final boolean removing)
+  {
+    mRemovingSelfloops = removing;
+  }
+
+  @Override
+  public boolean isRemovingSelfloops()
+  {
+    return mRemovingSelfloops;
+  }
+
   @Override
   public Collection<EventProxy> getPropositions()
   {
@@ -262,52 +253,55 @@ public class MonolithicSynchronousProductBuilder
     return (SynchronousProductResult) super.getAnalysisResult();
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
-    list.add(new StringParameter
-             (ParameterIDs.ModelBuilder_OutputName,
-              "Supervisor name prefix",
-              "Name or name prefix for synthesised supervisors.",
-              "sup")
-             {
-               @Override
-               public void commitValue()
-               {
-                 setOutputName(getValue());
-               }
-             });
-
-    list.add(new BoolParameter(ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks,
-                               "Prune deadlocks","Allow synchronous product construction to stop when encountering " +
-                                 "states that are a deadlock in one of the components.",
-                                 true) {
-      @Override
-      public void commitValue()
-      {
-        setPruningDeadlocks(getValue());
+    for (final Parameter param : list) {
+      switch (param.getID()) {
+      case ParameterIDs.ModelAnalyzer_NodeLimit:
+        param.setName("State limit");
+        param.setDescription("Maximum number of states before aborting.");
+        break;
+      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+        param.setDescription("Maximum number of transitions before aborting.");
+        break;
+      default:
+        break;
       }
-    });
-
+    }
     list.add(new BoolParameter
-             (ParameterIDs.MonolithicSynchronousProductBuilder_RemovingSelfloops,
-              "Removing Selfloops",
-              "Sets whether redundant selfloops are to be removed.",
-              true)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setRemovingSelfloops(getValue());
-               }
-             });
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
+       "Remove Selfloops",
+       "Remove events that appear only as selfloop on every state," +
+       "as well as propositions that appear on all states, from the result.",
+       isRemovingSelfloops())
+      {
+        @Override
+        public void commitValue()
+        {
+          setRemovingSelfloops(getValue());
+        }
+      });
+    list.add(new BoolParameter
+      (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks,
+       "Prune deadlocks",
+       "Stop synchronous product construction when encountering " +
+       "states that are a deadlock in one of the components.",
+       isPruningDeadlocks())
+      {
+        @Override
+        public void commitValue()
+        {
+          setPruningDeadlocks(getValue());
+        }
+      });
     return list;
   }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -1212,7 +1206,7 @@ public class MonolithicSynchronousProductBuilder
   private Collection<EventProxy> mConfiguredPropositions;
   private StateCallback mStateCallback;
   private Collection<MaskingPair> mMaskingPairs;
-  private boolean mRemovingSelfloops;
+  private boolean mRemovingSelfloops = false;
   private boolean mPruningDeadlocks;
 
   private int mNumAutomata;

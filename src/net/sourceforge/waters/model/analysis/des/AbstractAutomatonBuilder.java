@@ -39,6 +39,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -121,25 +122,45 @@ public abstract class AbstractAutomatonBuilder
     return (AutomatonResult) super.getAnalysisResult();
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-
   @Override
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-
-    list.add(new EnumParameter<ComponentKind>(ParameterIDs.AutomatonBuilder_ComponentKind,
-                                            "Component Kind",
-                                            "The component kind to be given to the output automaton",
-                                            ComponentKind.values(), null) {
+    for (final Parameter param : list) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+        param.setName("Build automaton model");
+        param.setDescription("Disable this to suppress the creation of an " +
+                             "output automaton, and only run for statistics.");
+        break;
+      }
+    }
+    list.add(new StringParameter
+      (ParameterIDs.ModelBuilder_OutputName,
+       "Output name",
+       "Name of the generated automaton.",
+       getOutputName())
+      {
+        @Override
+        public void commitValue()
+        {
+          setOutputName(getValue());
+        }
+      });
+    list.add(new EnumParameter<ComponentKind>
+      (ParameterIDs.AutomatonBuilder_OutputKind,
+       "Output kind",
+       "Type of the generated automaton.",
+       ComponentKind.values())
+      {
         @Override
         public void commitValue()
         {
           setOutputKind(getValue());
         }
       });
-
     return list;
   }
 

@@ -488,7 +488,7 @@ public abstract class AbstractCompositionalModelAnalyzer
    */
   public boolean isPruningDeadlocks()
   {
-    return mSynchronousProductBuilder.getPruningDeadlocks();
+    return mSynchronousProductBuilder.isPruningDeadlocks();
   }
 
   public int getInternalStateLimit()
