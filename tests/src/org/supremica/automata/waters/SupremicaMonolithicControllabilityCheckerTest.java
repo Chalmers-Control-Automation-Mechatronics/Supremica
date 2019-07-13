@@ -53,23 +53,23 @@ package org.supremica.automata.waters;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.AbstractControllabilityCheckerTest;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class SupremicaMonolithicConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+public class SupremicaMonolithicControllabilityCheckerTest
+  extends AbstractControllabilityCheckerTest
 {
 
   //#########################################################################
   //# To be Provided by Subclasses
   @Override
-  protected ConflictChecker createModelVerifier
+  protected ControllabilityChecker createModelVerifier
     (final ProductDESProxyFactory factory)
   {
-    final SupremicaMonolithicConflictChecker checker =
-      new SupremicaMonolithicConflictChecker(factory);
+    final SupremicaMonolithicControllabilityChecker checker =
+      new SupremicaMonolithicControllabilityChecker(factory);
     checker.setDetailedOutputEnabled(false);
     checker.setSynchronisingOnUnobservableEvents(true);
     return checker;
@@ -81,7 +81,7 @@ public class SupremicaMonolithicConflictCheckerTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(SupremicaMonolithicConflictCheckerTest.class);
+      new TestSuite(SupremicaMonolithicControllabilityCheckerTest.class);
     return testSuite;
   }
 
@@ -93,31 +93,6 @@ public class SupremicaMonolithicConflictCheckerTest
 
   //#########################################################################
   //# Too hard for Supremica :-(
-  @Override
-  public void testBallTSorter1()
-  {
-  }
-
-  @Override
-  public void testBatchtank2005_amk14()
-  {
-  }
-
-  @Override
-  public void testKoordwsp()
-  {
-  }
-
-  @Override
-  public void testKoordwspBlock()
-  {
-  }
-
-  @Override
-  public void testFMS2016error()
-  {
-  }
-
   @Override
   public void testOverflowException()
   {

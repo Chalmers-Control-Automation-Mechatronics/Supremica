@@ -240,7 +240,7 @@ public class AutomataSynchronizerHelper
 	}
 
 	/**
-	 * Initializes the helper for a new run. Generates a new initial state and
+	 * Initialises the helper for a new run. Generates a new initial state and
 	 * adds it to the queue.
 	 */
 	public void initialize()
@@ -261,6 +261,9 @@ public class AutomataSynchronizerHelper
 		{
 			final Automaton currAutomaton = autIt.next();
 			final State currInitialState = currAutomaton.getInitialState();
+			if (currInitialState == null) {
+			  return;
+			}
 			initialState[theAutomataIndexForm.getAutomataIndexMap().getAutomatonIndex(
 				currAutomaton)] = theAutomataIndexForm.getAutomataIndexMap()
 				.getStateIndex(currAutomaton, currInitialState);

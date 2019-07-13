@@ -50,77 +50,84 @@
 
 package org.supremica.automata.waters;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import java.util.List;
 
-import net.sourceforge.waters.model.analysis.AbstractStandardConflictCheckerTest;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
+import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+
+import org.supremica.automata.algorithms.VerificationType;
 
 
-public class SupremicaMonolithicConflictCheckerTest
-  extends AbstractStandardConflictCheckerTest
+/**
+ * <P>A wrapper to invoke Supremica's monolithic controllability check
+ * algorithm through the {@link ControllabilityChecker} interface of
+ * Waters.</P>
+ *
+ * @author Robi Malik
+ */
+
+public  class SupremicaMonolithicControllabilityChecker
+  extends SupremicaMonolithicVerifier
+  implements ControllabilityChecker
 {
 
   //#########################################################################
-  //# To be Provided by Subclasses
-  @Override
-  protected ConflictChecker createModelVerifier
+  //# Constructors
+  public SupremicaMonolithicControllabilityChecker
     (final ProductDESProxyFactory factory)
   {
-    final SupremicaMonolithicConflictChecker checker =
-      new SupremicaMonolithicConflictChecker(factory);
-    checker.setDetailedOutputEnabled(false);
-    checker.setSynchronisingOnUnobservableEvents(true);
-    return checker;
+    this(null, factory);
+  }
+
+  public SupremicaMonolithicControllabilityChecker
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory)
+  {
+    super(model, factory, VerificationType.CONTROLLABILITY, true);
   }
 
 
   //#########################################################################
-  //# Entry points in junit.framework.TestCase
-  public static Test suite()
+  //# Interface net.sourceforge.waters.analysis.SafetyVerifier
+  @Override
+  public SafetyCounterExampleProxy getCounterExample()
   {
-    final TestSuite testSuite =
-      new TestSuite(SupremicaMonolithicConflictCheckerTest.class);
-    return testSuite;
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
-  public static void main(final String[] args)
+  @Override
+  public ControllabilityDiagnostics getDiagnostics()
   {
-    junit.textui.TestRunner.run(suite());
+    return ControllabilityDiagnostics.getInstance();
   }
 
 
   //#########################################################################
-  //# Too hard for Supremica :-(
+  //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
-  public void testBallTSorter1()
+  public List<Parameter> getParameters()
   {
-  }
-
-  @Override
-  public void testBatchtank2005_amk14()
-  {
-  }
-
-  @Override
-  public void testKoordwsp()
-  {
-  }
-
-  @Override
-  public void testKoordwspBlock()
-  {
-  }
-
-  @Override
-  public void testFMS2016error()
-  {
-  }
-
-  @Override
-  public void testOverflowException()
-  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new BoolParameter
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
+       "Add uncontrollables to plant",
+       "Treat uncontrollable events that appear in specifications " +
+       "but not in plants as always enabled.",
+       isEnsuringUncontrollablesInPlant())
+      {
+        @Override
+        public void commitValue()
+        {
+          setEnsuringUncontrollablesInPlant(getValue());
+        }
+      });
+    return list;
   }
 
 }
