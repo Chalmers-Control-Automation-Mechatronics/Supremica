@@ -36,13 +36,13 @@ package net.sourceforge.waters.model.analysis;
 import java.util.LinkedList;
 import java.util.List;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.ParameterBindingProxy;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 
 public abstract class AbstractStateCounterTest
@@ -130,7 +130,15 @@ public abstract class AbstractStateCounterTest
       testTransferline__1();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
-      // O.K.
+      final OverflowKind kind = exception.getOverflowKind();
+      assertTrue("Unexpected overflow kind!",
+                 kind == OverflowKind.STATE || kind == OverflowKind.NODE);
+      final AnalysisResult result = mStateCounter.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 

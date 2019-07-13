@@ -40,6 +40,7 @@ import java.util.List;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
@@ -75,58 +76,66 @@ public class OneUncontrollableChecker
 
   //#########################################################################
   //# Invocation
+  @Override
   public boolean run()
     throws AnalysisException
   {
-    setUp();
-    mStates = 0;
-    final List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
-    for (final EventProxy event : getModel().getEvents()) {
-      if (getKindTranslator().getEventKind(event) ==
+    try {
+      setUp();
+      mStates = 0;
+      final List<EventProxy> uncontrollables = new ArrayList<EventProxy>();
+      for (final EventProxy event : getModel().getEvents()) {
+        if (getKindTranslator().getEventKind(event) ==
           EventKind.UNCONTROLLABLE) {
-        uncontrollables.add(event);
-      }
-    }
-    Collections.sort(uncontrollables);
-    for (final EventProxy event : uncontrollables) {
-      mChecker.setModel(getModel());
-      mChecker.setKindTranslator(new KindTranslator()
-      {
-        public EventKind getEventKind(final EventProxy e)
-        {
-          return e.equals(event) ? EventKind.UNCONTROLLABLE
-                                 : EventKind.CONTROLLABLE;
+          uncontrollables.add(event);
         }
-
-        public ComponentKind getComponentKind(final AutomatonProxy a)
+      }
+      Collections.sort(uncontrollables);
+      for (final EventProxy event : uncontrollables) {
+        mChecker.setModel(getModel());
+        mChecker.setKindTranslator(new KindTranslator()
         {
-          if (getKindTranslator().getComponentKind(a) == ComponentKind.SPEC) {
-            if (!a.getEvents().contains(event)) {
-              return ComponentKind.PLANT;
-            }
+          @Override
+          public EventKind getEventKind(final EventProxy e)
+          {
+            return e.equals(event) ? EventKind.UNCONTROLLABLE
+              : EventKind.CONTROLLABLE;
           }
-          return getKindTranslator().getComponentKind(a);
+
+          @Override
+          public ComponentKind getComponentKind(final AutomatonProxy a)
+          {
+            if (getKindTranslator().getComponentKind(a) == ComponentKind.SPEC) {
+              if (!a.getEvents().contains(event)) {
+                return ComponentKind.PLANT;
+              }
+            }
+            return getKindTranslator().getComponentKind(a);
+          }
+        });
+        mChecker.setNodeLimit(getNodeLimit()/* - mStates*/);
+        if (!mChecker.run()) {
+          mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+          return setFailedResult(mChecker.getCounterExample());
         }
-      });
-      mChecker.setNodeLimit(getNodeLimit()/* - mStates*/);
-      if (!mChecker.run()) {
-        // System.out.println(event.getName() + " uncontrollable");
         mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
-        setFailedResult(mChecker.getCounterExample());
-        return false;
       }
-      // System.out.println(event.getName() + " succeeded in " +
-      //                    mChecker.getAnalysisResult().
-      //                    getTotalNumberOfStates());
-      mStates += mChecker.getAnalysisResult().getTotalNumberOfStates();
+      return setSatisfiedResult();
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      final AnalysisException exception = new OverflowException(error);
+      throw setExceptionResult(exception);
+    } catch (final AnalysisException exception) {
+      throw setExceptionResult(exception);
+    } finally {
+      tearDown();
     }
-    setSatisfiedResult();
-    return true;
   }
 
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  @Override
   public boolean supportsNondeterminism()
   {
     return false;

@@ -110,6 +110,9 @@ public abstract class AbstractStandardConflictCheckerTest
       testCell();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
+      final OverflowKind kind = exception.getOverflowKind();
+      assertTrue("Unexpected overflow kind!",
+                 kind == OverflowKind.STATE || kind == OverflowKind.NODE);
       final ModelVerifier verifier = getModelVerifier();
       final AnalysisResult result = verifier.getAnalysisResult();
       assertNotNull("Got NULL analysis result after exception!", result);

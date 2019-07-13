@@ -172,13 +172,20 @@ public abstract class AbstractSupervisorSynthesizerTest
   public void testOverflowException()
     throws Exception
   {
+    final SupervisorSynthesizer synthesizer = getSynthesizer();
     try {
-      final SupervisorSynthesizer synthesizer = getSynthesizer();
       synthesizer.setNodeLimit(2);
       testSmallFactory2();
       fail("Expected overflow not caught!");
     } catch (final OverflowException exception) {
-      // O.K.
+      assertEquals("Unexpected overflow kind!",
+                   OverflowKind.STATE, exception.getOverflowKind());
+      final AnalysisResult result = synthesizer.getAnalysisResult();
+      assertNotNull("Got NULL analysis result after exception!", result);
+      assertNotNull("No exception in analysis result after caught exception!",
+                    result.getException());
+      assertSame("Unexpected exception in analysis result!",
+                 exception, result.getException());
     }
   }
 
