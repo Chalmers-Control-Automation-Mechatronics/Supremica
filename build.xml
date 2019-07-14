@@ -65,7 +65,10 @@
         <include name="**/*.class"/>
     </patternset>
 
-	<!-- For propertycopy task: -->
+    <!-- JUnit -->
+    <property name="junit.maxmemory" value="2048m"/>
+
+    <!-- For propertycopy task: -->
     <taskdef resource="net/sf/antcontrib/antlib.xml">
         <classpath>
             <pathelement location="${lib}/ant-contrib-1.0b3.jar"/>
@@ -371,8 +374,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="-jar_supremica"
             depends="compile_supremica,downloads_supremica,copy_watersxmlfiles_into_build,version">
         <jar jarfile="${dist}/Supremica.jar" manifest="${build}/manifest.txt"> 
-            <fileset dir="${build}"
-                     excludes="net/sourceforge/waters/analysis/comp552/"/>
+            <fileset dir="${build}"/>
             <fileset dir="${images}"/>
             <fileset dir="${examples}" includes="includeInJarFile/"/>
             <fileset dir="${animations}"/>
@@ -616,11 +618,9 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
 
     <target name="-run_tests" depends="-jar_supremica,-jar_supremica_tests">
+        <delete dir="${logs.results}"/>
         <mkdir dir="${logs.results}"/>
-        <delete>
-            <fileset dir="${logs.results}" includes="**/log4j.log"/>
-        </delete>
-        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -629,11 +629,12 @@ Class-Path: ${manifest.pathlist}</echo>
                     <exclude name="org/supremica/testhelpers/**/*.java"/>
                     <exclude name="**/TestPackage*.java"/>
                     <exclude name="**/Abstract*.java"/>
-                    <exclude name="**/Native*.java"/>
                     <exclude name="**/Large*.java"/>
-                    <exclude name="net/sourceforge/waters/analysis/comp552/**/*.java"/>
+		    <exclude name="net/sourceforge/waters/analysis/**/*HeuristicTest.java"/>
+		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicCliqueBasedSupervisorReductionTest.java"/>
+		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSupervisorLocalizationTest.java"/>
+		    <exclude name="net/sourceforge/waters/analysis/monolithic/MonolithicSynthesizerNormalityTest.java"/>
                     <exclude name="net/sourceforge/waters/analysis/distributed/**/*.java"/>
-                    <exclude name="net/sourceforge/waters/analysis/modular/**/*.java"/>
                 </fileset>
             </batchtest>
             <classpath>
@@ -654,7 +655,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="-run_tests_short"
             depends="-jar_supremica,-jar_supremica_tests">
         <mkdir dir="${logs.results}"/>
-        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -686,7 +687,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}/algorithms/minimization" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="2048m">
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -759,7 +760,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -790,7 +791,7 @@ Class-Path: ${manifest.pathlist}</echo>
         <delete>
             <fileset dir="${logs.results}" includes="**/log4j.log"/>
         </delete>
-        <junit printsummary="on" fork="true" maxmemory="2048m" haltonfailure="false">
+        <junit printsummary="on" fork="true" maxmemory="${junit.maxmemory}" haltonfailure="false">
             <formatter type="xml"/>
             <batchtest todir="${logs.results}">
                 <fileset dir="${testssrc}">
@@ -833,7 +834,7 @@ Class-Path: ${manifest.pathlist}</echo>
     <target name="test_min" depends="-run_test_minimization,test_report"/>
     
     <target name="test_short" depends="-run_tests_short,test_report"
-     description="Runs unit tests and produces a test report. This is a shorter test that should take less than a minute."/>
+     description="Runs unit tests and produces a test report. This is a shorter est that should take less than a minute."/>
      
     <target name="test_bdd" depends="compile_supremica,-startfiles_supremica" 
             description="Run BDD specific tests, requires the BDD library for your architecture to be accessible">
