@@ -95,6 +95,13 @@ public class SupremicaModelAnalyzerFactory
   }
 
   @Override
+  public SupremicaMonolithicControllabilityChecker createControllabilityChecker
+    (final ProductDESProxyFactory factory)
+  {
+    return new SupremicaMonolithicControllabilityChecker(factory);
+  }
+
+  @Override
   public SupremicaMonolithicSynthesizer createSupervisorSynthesizer
     (final ProductDESProxyFactory factory)
   {
