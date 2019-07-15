@@ -137,6 +137,13 @@ public abstract class AbstractLanguageInclusionCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testEmptyPlantAndProp() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "empty_plant_and_prop.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testEmptyProp() throws Exception
   {
     final ProductDESProxy des =

@@ -622,16 +622,8 @@ public abstract class BDDModelVerifier
     if (mLevels != null) {
       return mLevels.get(0);
     }
-    final BDD initial = mBDDFactory.one();
-    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
-      checkAbort();
-      final BDD autInit = createInitialStateBDD(autBDD);
-      if (autInit == null) {
-        return null;
-      }
-      initial.andWith(autInit);
-    }
-    if (withLevels) {
+    final BDD initial = createInitialStateBDD();
+    if (withLevels && initial != null) {
       mLevels = new ArrayList<BDD>();
       mLevels.add(initial.id());
     }
@@ -639,11 +631,26 @@ public abstract class BDDModelVerifier
     return initial;
   }
 
+  BDD createInitialStateBDD()
+    throws AnalysisException
+  {
+    final BDD initial = mBDDFactory.one();
+    for (final AutomatonBDD autBDD : mAutomatonBDDs) {
+      checkAbort();
+      final BDD autInit = createInitialStateBDD(autBDD);
+      if (autInit == null) {
+        setSatisfiedResult();
+        return null;
+      }
+      initial.andWith(autInit);
+    }
+    return initial;
+  }
+
   BDD createInitialStateBDD(final AutomatonBDD autBDD)
   {
     final BDD bdd = autBDD.createInitialStateBDD(mBDDFactory);
     if (bdd.isZero()) {
-      setSatisfiedResult();
       return null;
     } else {
       mIsFullyDeterministic &= autBDD.isDeterministic(null);

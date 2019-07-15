@@ -56,6 +56,7 @@ import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -322,22 +323,7 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
-  @Override
-  protected void setUp()
-    throws AnalysisException
-  {
-    mAbstractionSteps = new ArrayList<AbstractionStep>();
-    super.setUp();
-  }
-
-  @Override
-  protected void tearDown()
-  {
-    super.tearDown();
-    mAbstractionSteps = null;
-  }
-
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
   public List<Parameter> getParameters()
   {
@@ -382,7 +368,38 @@ public abstract class AbstractCompositionalModelVerifier
 
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.model.AbstractModelAnalyser
+  @Override
+  protected void setUp()
+    throws AnalysisException
+  {
+    mAbstractionSteps = new ArrayList<AbstractionStep>();
+    super.setUp();
+  }
+
+  @Override
+  protected void tearDown()
+  {
+    super.tearDown();
+    mAbstractionSteps = null;
+  }
+
+
+  //#########################################################################
   //# Hooks
+  @Override
+  protected void initialiseEventsToAutomata()
+    throws AnalysisException
+  {
+    super.initialiseEventsToAutomata();
+    for (final AutomatonProxy aut : getCurrentAutomata()) {
+      if (AutomatonTools.getFirstInitialState(aut) == null) {
+        setSatisfiedResult();
+        break;
+      }
+    }
+  }
+
   @Override
   protected ModelVerifier getCurrentMonolithicAnalyzer()
   {

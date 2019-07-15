@@ -375,7 +375,7 @@ public class ProjectBuildFromWaters
       } else {
         recordUncontrollableEvent(currWatersEvent, compKind);
         final LabeledEvent currSupremicaEvent =
-          new LabeledEvent(currWatersEvent);
+          new LabeledEvent(currWatersEvent, eventKind);
         currSupremicaAlphabet.addEvent(currSupremicaEvent);
       }
     }
@@ -438,7 +438,7 @@ public class ProjectBuildFromWaters
     for (final EventProxy event : events) {
       final EventKind kind = mKindTranslator.getEventKind(event);
       if (kind != EventKind.PROPOSITION) {
-        final LabeledEvent label = new LabeledEvent(event);
+        final LabeledEvent label = new LabeledEvent(event, kind);
         alphabet.addEvent(label);
       }
     }
@@ -613,21 +613,21 @@ public class ProjectBuildFromWaters
       return null;
     }
     Collections.sort(events);
-    final Automaton supAut = new Automaton(EXTRA_UNCONTROLLABLES);
-    supAut.setType(AutomatonType.PLANT);
+    final Automaton aut = new Automaton(EXTRA_UNCONTROLLABLES);
+    aut.setType(AutomatonType.PLANT);
     final State state = new State(STATE0);
     state.setInitial(true);
     state.setAccepting(true);
-    supAut.addState(state);
-    final Alphabet alphabet = supAut.getAlphabet();
+    aut.addState(state);
+    final Alphabet alphabet = aut.getAlphabet();
     for (final EventProxy watersEvent : events) {
-      final LabeledEvent supEvent = new LabeledEvent(watersEvent);
+      final LabeledEvent supEvent =
+        new LabeledEvent(watersEvent, EventKind.UNCONTROLLABLE);
       alphabet.addEvent(supEvent);
       final Arc arc = new Arc(state, state, supEvent);
-      supAut.addArc(arc);
+      aut.addArc(arc);
     }
-
-    return supAut;
+    return aut;
   }
 
 

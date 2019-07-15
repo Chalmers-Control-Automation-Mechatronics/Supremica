@@ -97,7 +97,7 @@ import org.supremica.properties.Config;
  * @author Robi Malik
  */
 
-public  class SupremicaSynchronousProductBuilder
+public class SupremicaSynchronousProductBuilder
   extends SupremicaModelAnalyzer
   implements SynchronousProductBuilder
 {
