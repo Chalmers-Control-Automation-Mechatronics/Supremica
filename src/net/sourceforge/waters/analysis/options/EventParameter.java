@@ -43,7 +43,6 @@ import javax.swing.JComboBox;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -78,7 +77,7 @@ public class EventParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESProxy model)
+  public Component createComponent(final ProductDESContext model)
   {
 
     final List<EventProxy> propositions = new ArrayList<>();
@@ -87,7 +86,7 @@ public class EventParameter extends Parameter
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
     //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
-    for(final EventProxy event: model.getEvents()) {
+    for(final EventProxy event: model.getProductDES().getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
         propositions.add(event);
         //if :accepting exists and this is first creation

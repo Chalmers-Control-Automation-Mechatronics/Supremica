@@ -80,6 +80,7 @@ public class ConflictCheckDialog extends JDialog
   public ConflictCheckDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
+    DESContext = new AnalyzerProductDESContext(panel);
     setTitle("Supervisor synthesis");
     mAnalyzerPanel = panel;
     mAutomata = panel.getAutomataTable().getOperationArgument();
@@ -90,6 +91,7 @@ public class ConflictCheckDialog extends JDialog
 
   //#########################################################################
   //# Using Parameter Classes
+  @SuppressWarnings("unused")
   public void generateGUI() {
 
     final JPanel mConflictCheckPanel = new JPanel(new GridLayout(0,2));
@@ -144,7 +146,7 @@ public class ConflictCheckDialog extends JDialog
 
           storeInDatabase();
           copyFromDatabase(newParams);
-          mScrollParametersPanel.replaceView(newParams, des);
+          mScrollParametersPanel.replaceView(newParams, DESContext);
         } catch (AnalysisConfigurationException |
                  ClassNotFoundException exception) {
           final Logger logger = LogManager.getLogger();
@@ -163,7 +165,7 @@ public class ConflictCheckDialog extends JDialog
     try {
       mConflictCheck = first.getModelAnalyzerFactory()
         .createConflictChecker(ProductDESElementFactory.getInstance());
-      mScrollParametersPanel = new ParameterJScrollPane(mConflictCheck.getParameters(),des);
+      mScrollParametersPanel = new ParameterJScrollPane(mConflictCheck.getParameters(), DESContext);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }
@@ -296,6 +298,7 @@ public class ConflictCheckDialog extends JDialog
   private HashMap<Integer,Parameter> AllParams;
   private JPanel mButtonsPanel;
   private JComboBox<ModelAnalyzerFactoryLoader> conflictCheckCombobox;
+  private final AnalyzerProductDESContext DESContext;
 
   // Analysis workers
   private ConflictChecker mConflictCheck;

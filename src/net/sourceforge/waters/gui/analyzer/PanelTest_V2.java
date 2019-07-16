@@ -66,6 +66,7 @@ public class PanelTest_V2
 
   static ParameterJScrollPane mScrollParametersPanel;
   static HashMap<Integer,Parameter> AllParams = new HashMap<Integer,Parameter>();
+  static TestDESContext DESContext = new TestDESContext();
 
   public static void main(final String[] args)
   {
@@ -156,7 +157,7 @@ public class PanelTest_V2
             .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
-          mScrollParametersPanel.replaceView(newParams, des);
+          mScrollParametersPanel.replaceView(newParams, DESContext);
         } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
 
           exception.printStackTrace();
@@ -174,7 +175,7 @@ public class PanelTest_V2
 
     try {
       mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(),des);
+                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(), DESContext);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }

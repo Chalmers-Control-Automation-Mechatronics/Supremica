@@ -42,7 +42,6 @@ import javax.swing.JComboBox;
 
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -110,7 +109,7 @@ public class EnumParameter<T> extends Parameter
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Parameter
   @Override
-  public Component createComponent(final ProductDESProxy model)
+  public Component createComponent(final ProductDESContext model)
   {
     final Vector<T> vector = new Vector<> (mList);
     final JComboBox<T> ret = new JComboBox<>(vector);

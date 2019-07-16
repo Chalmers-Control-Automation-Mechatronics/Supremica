@@ -44,7 +44,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 
@@ -80,7 +79,7 @@ public class IntParameter extends Parameter {
     }
 
     @Override
-    public Component createComponent(final ProductDESProxy model) {
+    public Component createComponent(final ProductDESContext model) {
 
     final JFormattedTextField ret = new JFormattedTextField();
 

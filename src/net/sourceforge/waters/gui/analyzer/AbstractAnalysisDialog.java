@@ -58,7 +58,6 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -81,17 +80,17 @@ public abstract class AbstractAnalysisDialog extends JDialog
    * Used when using the JComboBOx to switch between multiple algorithms,
    * generateAnalyzerCombobox() populates JComboBox
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final AnalyzerProductDESContext model)
   {
     super((Frame) panel.getTopLevelAncestor());
 
+    DESContext = model;
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
-    des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
-                                               mAutomata, factory);
+    // des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
     generateAnalyzerCombobox();
     generateGUI();
     setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
@@ -101,17 +100,17 @@ public abstract class AbstractAnalysisDialog extends JDialog
   /**
    * Used when only using one algorithm, generateAnalyzerCombobox() not used
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer, final AnalyzerProductDESContext model)
   {
     super((Frame) panel.getTopLevelAncestor());
 
+    DESContext = model;
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
-    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(),
-                                               mAutomata, factory);
+    //des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
 
     mAnalyzer = analyzer;
     generateGUI();
@@ -185,7 +184,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     storeInDatabase();
     copyFromDatabase(newParams);
-    mScrollParametersPanel.replaceView(newParams, des);
+    mScrollParametersPanel.replaceView(newParams, DESContext);
 
     //re-packing causes the frame to shrink/increase to preferred size
     pack();
@@ -202,7 +201,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
       } catch (final ClassNotFoundException exception) {      }
     }
 
-    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), des);
+    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), DESContext);
 
     // Buttons panel ...
     final ActionListener commithandler = new ActionListener() {
@@ -298,7 +297,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
       current.commitValue();
 
     final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
-    final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
+    final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, DESContext.getProductDES());
     dispose();
     dialog.setVisible(true);
 
@@ -318,9 +317,9 @@ public abstract class AbstractAnalysisDialog extends JDialog
   private final List<AutomatonProxy> mAutomata;
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final ProductDESProxyFactory factory;
-  private final ProductDESProxy des;
+  //private final ProductDESProxy des;
   private ModelAnalyzer mAnalyzer;
-
+  private final AnalyzerProductDESContext DESContext;
 
   //#########################################################################
   //# Class Constants
