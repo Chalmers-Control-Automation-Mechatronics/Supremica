@@ -56,13 +56,13 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
-
 public class PanelTest_V2
 {
   static String bfactory = "big_factory/bfactory.wmod";
   static String car_fh = "car_fh/car_fh.wmod";
+  static String fileInput = "examples/includeInJarFile/ModuleExamples/"  + car_fh;
 
-  final static ProductDESProxy des = MarshallingTools.loadAndCompileModule("examples/includeInJarFile/ModuleExamples/" + car_fh);
+  final static ProductDESProxy des = MarshallingTools.loadAndCompileModule(fileInput);
 
   static ParameterJScrollPane mScrollParametersPanel;
   static HashMap<Integer,Parameter> AllParams = new HashMap<Integer,Parameter>();
@@ -70,6 +70,9 @@ public class PanelTest_V2
 
   public static void main(final String[] args)
   {
+    DESContext.loadAndCompileModule(fileInput);
+
+
     final JFrame frame = new JFrame("Test");
     final JPanel mSuperviserPanel = new JPanel();
     final JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox =

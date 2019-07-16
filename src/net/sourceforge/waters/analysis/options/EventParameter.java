@@ -38,7 +38,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.EventKind;
@@ -57,15 +61,6 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 public class EventParameter extends Parameter
 {
-  // TODO Three options are needed (use EventParameterType):
-  // 1 - Null is not allowed, and the default is :accepting if available,
-  //     otherwise the first proposition in the model. (If there is no
-  //     proposition in the model, use null as the only option.)
-  // 2 - Null is allowed and the default is :accepting if available,
-  //     otherwise the first proposition in the model, or null if
-  //     there is not proposition in the model. (Unlike case 1,
-  //     null is also an option if there are propositions in the model.)
-  // 3 - Null is allowed and is the default.
   public EventParameter(final int id,
                         final String name,
                         final String description,
@@ -79,8 +74,8 @@ public class EventParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESContext model)
   {
-
     final List<EventProxy> propositions = new ArrayList<>();
+    DESContext = model;
 
     final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
@@ -129,6 +124,8 @@ public class EventParameter extends Parameter
     Collections.sort(propositions);
 
     final JComboBox<EventProxy> ret = new JComboBox<>(propositions.toArray(new EventProxy[propositions.size()]));
+    final EventProxyRenderer renderer= new EventProxyRenderer();
+    ret.setRenderer(renderer);
     ret.setSelectedItem(mValue);
     return ret;
   }
@@ -143,7 +140,6 @@ public class EventParameter extends Parameter
   }
 
   public EventProxy getValue() { return mValue; }
-
 
   @SuppressWarnings("unchecked")
   @Override
@@ -166,10 +162,54 @@ public class EventParameter extends Parameter
     System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
+  //#########################################################################
+  //# Private Class
+
+  class EventProxyRenderer extends JLabel implements ListCellRenderer<EventProxy>
+  {
+    private static final long serialVersionUID = 1L;
+
+    public EventProxyRenderer()
+    {
+      setOpaque(true);
+      setHorizontalAlignment(CENTER);
+      setVerticalAlignment(CENTER);
+    }
+
+    @Override
+    public Component getListCellRendererComponent(final JList<? extends EventProxy> list,
+                                                  final EventProxy value, final int index,
+                                                  final boolean isSelected,
+                                                  final boolean cellHasFocus)
+    {
+
+      //Highlight when hover over
+      if (isSelected) {
+        setBackground(list.getSelectionBackground());
+        setForeground(list.getSelectionForeground());
+      } else {
+        setBackground(list.getBackground());
+        setForeground(list.getForeground());
+      }
+
+      //Set the icon and text.  If icon null, show name.
+      final Icon icon = DESContext.getEventIcon(value);
+      setIcon(icon);
+      if (icon != null) {
+        setText(value.getName());
+      } else {
+        setText(value.getName());
+      }
+
+      return this;
+    }
+  }
 
   //#########################################################################
   //# Data Members
   private EventProxy mValue;
   private final EventParameterType mNullOptions;
+  private ProductDESContext DESContext;
+
 
 }
