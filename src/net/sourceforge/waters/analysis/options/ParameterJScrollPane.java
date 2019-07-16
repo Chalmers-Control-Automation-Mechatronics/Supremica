@@ -41,25 +41,23 @@ import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 public class ParameterJScrollPane extends JScrollPane
 {
 
 
   //#########################################################################
   //# Constructors
-  public ParameterJScrollPane(final List<Parameter> p, final ProductDESProxy model)
+  public ParameterJScrollPane(final List<Parameter> p, final ProductDESContext model)
   {
     generateViewPort(p, model);
   }
 
-  public void replaceView(final List<Parameter> newParams, final ProductDESProxy model)
+  public void replaceView(final List<Parameter> newParams, final ProductDESContext model)
   {
     generateViewPort(newParams, model);
   }
 
-  private void generateViewPort(final List<Parameter> parameters, final ProductDESProxy model) {
+  private void generateViewPort(final List<Parameter> parameters, final ProductDESContext model) {
 
     final JPanel newView = new JPanel();
     final List<ParameterPanel> newParametersPanels = new ArrayList<ParameterPanel>();

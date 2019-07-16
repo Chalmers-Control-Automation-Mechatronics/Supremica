@@ -137,7 +137,7 @@ public class PanelTest
     final List<ParameterPanel> alg1Panels = new ArrayList<ParameterPanel>();
 
     for (int i = 0; i < alg1.size(); i++) {
-      alg1Panels.add(new ParameterPanel(alg1.get(i),des));
+      alg1Panels.add(new ParameterPanel(alg1.get(i), null));
     }
 
     //final List<Parameter> alg2 = fakeCompositionAutomataSynthesizer();
@@ -146,7 +146,7 @@ public class PanelTest
     final List<ParameterPanel> alg2Panels = new ArrayList<ParameterPanel>();
 
     for (int i = 0; i < alg2.size(); i++) {
-      alg2Panels.add(new ParameterPanel(alg2.get(i),des));
+      alg2Panels.add(new ParameterPanel(alg2.get(i), null));
     }
 
     final ActionListener updateParameters = new ActionListener() {

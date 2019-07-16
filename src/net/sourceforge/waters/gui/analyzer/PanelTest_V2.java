@@ -52,8 +52,6 @@ import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
@@ -61,14 +59,19 @@ public class PanelTest_V2
 {
   static String bfactory = "big_factory/bfactory.wmod";
   static String car_fh = "car_fh/car_fh.wmod";
+  static String color = "other/colours.wmod";
+  static String inputFile = "examples/includeInJarFile/ModuleExamples/" + car_fh;
 
-  final static ProductDESProxy des = MarshallingTools.loadAndCompileModule("examples/includeInJarFile/ModuleExamples/" + car_fh);
+ // final static ProductDESProxy des = MarshallingTools.loadAndCompileModule(inputFile);
 
   static ParameterJScrollPane mScrollParametersPanel;
   static HashMap<Integer,Parameter> AllParams = new HashMap<Integer,Parameter>();
+  final static TestDESContext DESContext = new TestDESContext();
 
   public static void main(final String[] args)
   {
+    DESContext.loadAndCompileModule(inputFile);
+
     final JFrame frame = new JFrame("Test");
     final JPanel mSuperviserPanel = new JPanel();
     final JComboBox<ModelAnalyzerFactoryLoader> superviserCombobox =
@@ -156,7 +159,7 @@ public class PanelTest_V2
             .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
-          mScrollParametersPanel.replaceView(newParams, des);
+          mScrollParametersPanel.replaceView(newParams, DESContext);
         } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
 
           exception.printStackTrace();
@@ -174,7 +177,7 @@ public class PanelTest_V2
 
     try {
       mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(),des);
+                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(), DESContext);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }

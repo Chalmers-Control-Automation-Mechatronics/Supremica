@@ -38,7 +38,6 @@ import java.awt.Component;
 import javax.swing.JCheckBox;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -58,7 +57,7 @@ public class BoolParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESProxy model)
+  public Component createComponent(final ProductDESContext model)
   {
     return new JCheckBox("", mValue);
   }

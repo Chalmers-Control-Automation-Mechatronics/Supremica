@@ -47,8 +47,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import net.sourceforge.waters.model.des.ProductDESProxy;
-
 
 public class FileParameter extends Parameter
 {
@@ -63,7 +61,7 @@ public class FileParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESProxy model)
+  public Component createComponent(final ProductDESContext model)
   {
     final JPanel panel = new JPanel();
     final JButton button = new JButton("...");
