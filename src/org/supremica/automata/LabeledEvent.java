@@ -121,29 +121,33 @@ public class LabeledEvent
 
     public LabeledEvent(final EventProxy e)
     {
-        label = e.getName();
-        final EventKind watersKind = e.getKind();
-        if (watersKind == EventKind.CONTROLLABLE)
-        {
-            controllable = true;
-        }
-        if (watersKind == EventKind.UNCONTROLLABLE)
-        {
-            controllable = false;
-        }
-        if (watersKind == EventKind.PROPOSITION)
-        {
-            proposition = true;
-        }
+        this(e, e.getKind());
+    }
 
+    public LabeledEvent(final EventProxy e, final EventKind watersKind)
+    {
+        label = e.getName();
+        switch (watersKind) {
+        case CONTROLLABLE:
+            controllable = true;
+            break;
+        case UNCONTROLLABLE:
+            controllable = false;
+            break;
+        case PROPOSITION:
+            proposition = true;
+            break;
+        }
         observable = e.isObservable();
     }
 
+    @Override
     public LabeledEvent clone()
     {
         return new LabeledEvent(this);
     }
 
+    @Override
     public String toString()
     {
         return "'" + label + "'";
@@ -174,6 +178,7 @@ public class LabeledEvent
         this.controllable = controllable;
     }
 
+    @Override
     public boolean isObservable()
     {
         return observable;
@@ -254,6 +259,7 @@ public class LabeledEvent
         return expansionPriority;
     }
 
+    @Override
     public boolean equals(final Object other)
     {
         if (other instanceof LabeledEvent)
@@ -268,6 +274,7 @@ public class LabeledEvent
         return this.label.equals(label);
     }
 
+    @Override
     public int hashCode()
     {
         return label.hashCode();
@@ -289,6 +296,7 @@ public class LabeledEvent
                 return label.compareTo(((LabeledEvent) event).label);
         }
  */
+    @Override
     public int compareTo(final NamedProxy event)
     {
         return label.compareTo(((LabeledEvent) event).label);
@@ -315,21 +323,25 @@ public class LabeledEvent
 
     //#########################################################################
     //# Interface net.sourceforge.waters.model.base.Proxy
+    @Override
     public Class<EventProxy> getProxyInterface()
     {
         return EventProxy.class;
     }
 
+    @Override
     public boolean refequals(final NamedProxy partner)
     {
         return getName().equals(partner.getName());
     }
 
+    @Override
     public int refHashCode()
     {
         return getName().hashCode();
     }
 
+    @Override
     public Object acceptVisitor(final ProxyVisitor visitor)
         throws VisitorException
     {
@@ -341,6 +353,7 @@ public class LabeledEvent
 
     //#########################################################################
     //# Interface net.sourceforge.waters.model.base.NamedProxy
+    @Override
     public String getName()
     {
         return getLabel();
@@ -350,6 +363,7 @@ public class LabeledEvent
     //#########################################################################
     //# Interface net.sourceforge.waters.model.des.EventProxy
     //# (Some EventProxy methods are defined above.)
+    @Override
     public EventKind getKind()
     {
         if (proposition)
@@ -363,6 +377,7 @@ public class LabeledEvent
         return EventKind.UNCONTROLLABLE;
     }
 
+    @Override
     public Map<String,String> getAttributes()
     {
       return Collections.emptyMap();

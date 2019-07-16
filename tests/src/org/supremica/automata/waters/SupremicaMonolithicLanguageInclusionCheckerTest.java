@@ -43,83 +43,55 @@
  *  IT IS PROVIDED "AS IS" WITHOUT EXPRESS OR IMPLIED WARRANTY.
  *
  *  Supremica or KA shall not be liable for any damages
- *  suffered by Licensee from the use of this software.
+ *  suffered by Licensee from the use of this oftware.
  *
  *  Supremica is owned and represented by KA.
  */
 
 package org.supremica.automata.waters;
 
-import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
+import net.sourceforge.waters.model.analysis.AbstractLanguageInclusionCheckerTest;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-/**
- * A model analyser factory that produces model analysers that invoke
- * Supremica's monolithic algorithms.
- *
- * @author Robi Malik
- */
-
-public class SupremicaModelAnalyzerFactory
-  extends AbstractModelAnalyzerFactory
+public class SupremicaMonolithicLanguageInclusionCheckerTest
+  extends AbstractLanguageInclusionCheckerTest
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static SupremicaModelAnalyzerFactory getInstance()
+  //# To be Provided by Subclasses
+  @Override
+  protected LanguageInclusionChecker createModelVerifier
+    (final ProductDESProxyFactory factory)
   {
-    return SingletonHolder.INSTANCE;
-  }
-
-  private static class SingletonHolder {
-    private static final SupremicaModelAnalyzerFactory INSTANCE =
-      new SupremicaModelAnalyzerFactory();
+    final SupremicaMonolithicLanguageInclusionChecker checker =
+      new SupremicaMonolithicLanguageInclusionChecker(factory);
+    checker.setDetailedOutputEnabled(false);
+    checker.setSynchronisingOnUnobservableEvents(true);
+    return checker;
   }
 
 
   //#########################################################################
-  //# Constructors
-  private SupremicaModelAnalyzerFactory()
+  //# Entry points in junit.framework.TestCase
+  public static Test suite()
   {
+    final TestSuite testSuite =
+      new TestSuite(SupremicaMonolithicLanguageInclusionCheckerTest.class);
+    return testSuite;
+  }
+
+  public static void main(final String[] args)
+  {
+    junit.textui.TestRunner.run(suite());
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
-  @Override
-  public SupremicaMonolithicConflictChecker createConflictChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicConflictChecker(factory);
-  }
-
-  @Override
-  public SupremicaMonolithicControllabilityChecker createControllabilityChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicControllabilityChecker(factory);
-  }
-
-  @Override
-  public SupremicaMonolithicLanguageInclusionChecker createLanguageInclusionChecker
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicLanguageInclusionChecker(factory);
-  }
-
-  @Override
-  public SupremicaMonolithicSynthesizer createSupervisorSynthesizer
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaMonolithicSynthesizer(factory);
-  }
-
-  @Override
-  public SupremicaSynchronousProductBuilder createSynchronousProductBuilder
-    (final ProductDESProxyFactory factory)
-  {
-    return new SupremicaSynchronousProductBuilder(factory);
-  }
+  //# Too hard for Supremica :-(
 
 }

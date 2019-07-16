@@ -39,7 +39,6 @@ import gnu.trove.set.hash.THashSet;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -47,12 +46,9 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
@@ -180,8 +176,7 @@ public class CompositionalSafetyVerifier
     final int numEvents = events.size();
     mPropertyEventsMap = new TObjectByteHashMap<EventProxy>(numEvents);
     for (final AutomatonProxy aut : automata) {
-      if (translator.getComponentKind(aut) == ComponentKind.SPEC &&
-          !isTrivialProperty(aut)) {
+      if (translator.getComponentKind(aut) == ComponentKind.SPEC) {
         mProperties.add(aut);
         final Collection<EventProxy> local = aut.getEvents();
         final int numLocal = local.size();
@@ -255,8 +250,6 @@ public class CompositionalSafetyVerifier
         final AutomatonProxy newAut = removeEvents(aut, removed, stateMap);
         if (newAut == aut) {
           continue;
-        } else if (isTrivialProperty(newAut)) {
-          iter.remove();
         } else {
           step.addAutomatonPair(newAut, aut, stateMap);
           iter.set(newAut);
@@ -356,32 +349,6 @@ public class CompositionalSafetyVerifier
   byte getPropertyStatus(final EventProxy event)
   {
     return mPropertyEventsMap.get(event);
-  }
-
-  private boolean isTrivialProperty(final AutomatonProxy aut)
-    throws OverflowException
-  {
-    final KindTranslator translator = getKindTranslator();
-    final Collection<EventProxy> filter = Collections.emptyList();
-    final EventEncoding enc =
-      new EventEncoding(aut, translator,
-                        filter, EventEncoding.FILTER_PROPOSITIONS);
-    final ListBufferTransitionRelation rel = new ListBufferTransitionRelation
-      (aut, enc, ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    rel.checkReachability();
-    final int numStates = rel.getNumberOfStates();
-    final int numEvents = rel.getNumberOfProperEvents();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    for (int s = 0; s < numStates; s++) {
-      if (rel.isReachable(s)) {
-        for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-          if (!iter.advance()) {
-            return false;
-          }
-        }
-      }
-    }
-    return false;
   }
 
 

@@ -101,7 +101,7 @@ import org.supremica.automata.algorithms.SynthesizerOptions;
  * @author Robi Malik
  */
 
-public  class SupremicaMonolithicSynthesizer
+public class SupremicaMonolithicSynthesizer
   extends SupremicaModelAnalyzer
   implements SupervisorSynthesizer
 {

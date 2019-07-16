@@ -52,62 +52,69 @@ package org.supremica.automata.waters;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
+import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
-import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
-import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
+import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
 
+import org.supremica.automata.Automaton;
 import org.supremica.automata.algorithms.VerificationType;
 
 
 /**
- * <P>A wrapper to invoke Supremica's monolithic conflict check algorithm
- * through the {@link ConflictChecker} interface of Waters.</P>
+ * <P>A wrapper to invoke a language inclusion check using Supremica's
+ * monolithic controllability check algorithm through the {@link
+ * LanguageInclusionChecker} interface of Waters.</P>
+ *
+ * <P>The language inclusion check is mapped to a controllability check
+ * using a {@link LanguageInclusionKindTranslator}, so that Supremica
+ * recognises properties consistently to the Waters language inclusion
+ * check.</P>
  *
  * @author Robi Malik
  */
 
-public class SupremicaMonolithicConflictChecker
+public class SupremicaMonolithicLanguageInclusionChecker
   extends SupremicaMonolithicVerifier
-  implements ConflictChecker
+  implements LanguageInclusionChecker
 {
 
   //#########################################################################
   //# Constructors
-  public SupremicaMonolithicConflictChecker(final ProductDESProxyFactory factory)
+  public SupremicaMonolithicLanguageInclusionChecker
+    (final ProductDESProxyFactory factory)
   {
     this(null, factory);
   }
 
-  public SupremicaMonolithicConflictChecker(final ProductDESProxy model,
-                                            final ProductDESProxyFactory factory)
+  public SupremicaMonolithicLanguageInclusionChecker
+    (final ProductDESProxy model,
+     final ProductDESProxyFactory factory)
   {
-    super(model, factory, VerificationType.NONBLOCKING, false);
+    super(model, factory,
+          LanguageInclusionKindTranslator.getInstance(),
+          VerificationType.CONTROLLABILITY, true);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.ConflictChecker
+  //# Interface net.sourceforge.waters.analysis.SafetyVerifier
   @Override
-  public void setConfiguredPreconditionMarking(final EventProxy marking)
+  public SafetyCounterExampleProxy getCounterExample()
   {
+    return (SafetyCounterExampleProxy) super.getCounterExample();
   }
 
   @Override
-  public EventProxy getConfiguredPreconditionMarking()
+  public LanguageInclusionDiagnostics getDiagnostics()
   {
-    return null;
-  }
-
-  @Override
-  public ConflictCounterExampleProxy getCounterExample()
-  {
-    return (ConflictCounterExampleProxy) super.getCounterExample();
+    return LanguageInclusionDiagnostics.getInstance();
   }
 
 
@@ -117,20 +124,49 @@ public class SupremicaMonolithicConflictChecker
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
-       "Marking proposition",
-       "The model is considered as nonblocking, if it is always possible " +
-       "to reach a state marked by this proposition.",
-        EventParameterType.PREVENT_NULL)
+    list.add(new BoolParameter
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
+       "Add uncontrollables to plant",
+       "Treat events that appear in properties but not in the system " +
+       "as always enabled.",
+       isEnsuringUncontrollablesInPlant())
       {
         @Override
         public void commitValue()
         {
-          setConfiguredDefaultMarking(getValue());
+          setEnsuringUncontrollablesInPlant(getValue());
         }
       });
     return list;
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer
+  @Override
+  public void setUp()
+    throws AnalysisException
+  {
+    super.setUp();
+    boolean specEmpty = false;
+    for (final Automaton aut : getSupremicaAutomata()) {
+      if (aut.getInitialState() == null) {
+        switch (aut.getKind()) {
+        case PLANT:
+          setBooleanResult(true);
+          return;
+        case SPEC:
+          specEmpty = true;
+          break;
+        default:
+          break;
+        }
+      }
+    }
+    if (specEmpty) {
+      setBooleanResult(false);
+    }
   }
 
 }

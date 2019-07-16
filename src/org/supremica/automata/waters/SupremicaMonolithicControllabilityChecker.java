@@ -72,7 +72,7 @@ import org.supremica.automata.algorithms.VerificationType;
  * @author Robi Malik
  */
 
-public  class SupremicaMonolithicControllabilityChecker
+public class SupremicaMonolithicControllabilityChecker
   extends SupremicaMonolithicVerifier
   implements ControllabilityChecker
 {

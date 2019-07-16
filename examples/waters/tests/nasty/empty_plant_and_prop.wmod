@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="empty_plant_and_prop">
+<B:Comment>A test that involves a plant and a property without any states.
+This model should pass a language inclusion check, because the plant language is empty and hence subset of any property, including the empty language.</B:Comment>
+<EventDeclList>
+<EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+</EventDeclList>
+<ComponentList>
+<SimpleComponent Kind="PLANT" Name="plant">
+<Graph Deterministic="false">
+</Graph>
+</SimpleComponent>
+<SimpleComponent Kind="PROPERTY" Name="prop">
+<Graph Deterministic="false">
+</Graph>
+</SimpleComponent>
+</ComponentList>
+</Module>

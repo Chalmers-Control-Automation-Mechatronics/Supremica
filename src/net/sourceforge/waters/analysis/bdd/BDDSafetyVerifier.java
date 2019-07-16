@@ -46,6 +46,7 @@ import net.sf.javabdd.BDDFactory;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
@@ -230,7 +231,7 @@ public class BDDSafetyVerifier
 
 
   //#########################################################################
-  //# Algorithm Implementation
+  //# Overrides for net.sourceforge.waters.analysis.bdd.BDDModelVerifier
   @Override
   void createAutomatonBDDs()
     throws AnalysisAbortException, OverflowException
@@ -309,38 +310,46 @@ public class BDDSafetyVerifier
   }
 
   @Override
-  BDD createInitialStateBDD(final AutomatonBDD autBDD)
+  BDD createInitialStateBDD()
+    throws AnalysisException
   {
     final BDDFactory bddFactory = getBDDFactory();
-    final BDD autinit = autBDD.createInitialStateBDD(bddFactory);
-    if (autinit.isZero()) {
-      final VerificationResult result = getAnalysisResult();
-      final KindTranslator translator = getKindTranslator();
-      if (result.isFinished() && result.isSatisfied()) {
-        // result is already set
-      } else if (autBDD.getKind() == ComponentKind.PLANT ||
-                 translator.getEventKind(KindTranslator.INIT) ==
-                 EventKind.CONTROLLABLE) {
-        result.setSatisfied(true);
+    final BDD initial = bddFactory.one();
+    AutomatonBDD emptySpecBDD = null;
+    for (final AutomatonBDD autBDD : getAutomatonBDDs()) {
+      checkAbort();
+      final BDD autInit = createInitialStateBDD(autBDD);
+      if (autInit == null) {
+        final KindTranslator translator = getKindTranslator();
+        if (autBDD.getKind() == ComponentKind.PLANT ||
+            translator.getEventKind(LanguageInclusionKindTranslator.INIT) ==
+            EventKind.CONTROLLABLE) {
+          setSatisfiedResult();
+          return null;
+        } else {
+          emptySpecBDD = autBDD;
+        }
       } else {
-        final ProductDESProxyFactory desFactory = getFactory();
-        final String tracename = getTraceName();
-        final AutomatonProxy aut = autBDD.getAutomaton();
-        final String comment = getTraceComment(null, aut, null);
-        final ProductDESProxy model = getModel();
-        final List<AutomatonProxy> automata = getAutomata();
-        final TraceStepProxy step = desFactory.createTraceStepProxy(null);
-        final List<TraceStepProxy> steps = Collections.singletonList(step);
-        final TraceProxy trace = desFactory.createTraceProxy(steps);
-        final SafetyCounterExampleProxy counterexample =
-          desFactory.createSafetyCounterExampleProxy
-          (tracename, comment, null, model, automata, trace);
-        result.setCounterExample(counterexample);
+        initial.andWith(autInit);
       }
-      return null;
-    } else {
-      return autinit;
     }
+    if (emptySpecBDD != null) {
+      final ProductDESProxyFactory desFactory = getFactory();
+      final String tracename = getTraceName();
+      final AutomatonProxy aut = emptySpecBDD.getAutomaton();
+      final String comment = getTraceComment(null, aut, null);
+      final ProductDESProxy model = getModel();
+      final List<AutomatonProxy> automata = getAutomata();
+      final TraceStepProxy step = desFactory.createTraceStepProxy(null);
+      final List<TraceStepProxy> steps = Collections.singletonList(step);
+      final TraceProxy trace = desFactory.createTraceProxy(steps);
+      final SafetyCounterExampleProxy counterexample =
+        desFactory.createSafetyCounterExampleProxy
+        (tracename, comment, null, model, automata, trace);
+      setFailedResult(counterexample);
+      return null;
+    }
+    return initial;
   }
 
   @Override
@@ -389,7 +398,7 @@ public class BDDSafetyVerifier
     steps.add(step);
     final ProductDESProxy des = getModel();
     final String traceName = getTraceName();
-    // TODO String comment = getTraceComment(mBadEvent, null, null);
+    // TODO String comment = getTraceComment(mBadEvent, ?, ?);
     final List<AutomatonProxy> automata = getAutomata();
     final TraceProxy trace = desFactory.createTraceProxy(steps);
     final SafetyCounterExampleProxy counterexample =

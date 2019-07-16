@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
+import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.PropertySuppressionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -96,9 +97,18 @@ public  class SupremicaMonolithicVerifier
                                      final VerificationType type,
                                      final boolean ensuringUncontrollablesInPlant)
   {
-    super(model, factory,
-          PropertySuppressionKindTranslator.getInstance(),
-          ensuringUncontrollablesInPlant);
+    this(model, factory,
+         PropertySuppressionKindTranslator.getInstance(),
+         type, ensuringUncontrollablesInPlant);
+  }
+
+  public SupremicaMonolithicVerifier(final ProductDESProxy model,
+                                     final ProductDESProxyFactory factory,
+                                     final KindTranslator translator,
+                                     final VerificationType type,
+                                     final boolean ensuringUncontrollablesInPlant)
+  {
+    super(model, factory, translator, ensuringUncontrollablesInPlant);
     mVerificationOptions.setVerificationType(type);
     mVerificationOptions.setAlgorithmType(VerificationAlgorithm.MONOLITHIC);
     mVerificationOptions.setShowBadTrace(isDetailedOutputEnabled());
@@ -226,13 +236,16 @@ public  class SupremicaMonolithicVerifier
   {
     try {
       setUp();
+      final AnalysisResult result = getAnalysisResult();
+      if (result.isFinished()) {
+        return result.isSatisfied();
+      }
       final Automata automata = getSupremicaAutomata();
       final AutomataVerifier verifier =
         new AutomataVerifier(automata, mVerificationOptions,
                              mSynchronizationOptions, mMinimizationOptions);
       setSupremicaTask(verifier);
       final boolean satisfied = verifier.verify();
-      final AnalysisResult result = getAnalysisResult();
       result.setSatisfied(satisfied);
       final AutomataSynchronizerHelperStatistics stats =
         verifier.getHelper().getHelperData();
