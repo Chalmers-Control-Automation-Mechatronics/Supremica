@@ -39,12 +39,14 @@ import java.awt.Component;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.sourceforge.waters.model.des.ProductDESProxy;
+
 public class ParameterPanel extends JPanel
 {
   private static final long serialVersionUID = 1L;
   private final Parameter mParameter;
 
-  public ParameterPanel(final Parameter param, final ProductDESContext model)
+  public ParameterPanel(final Parameter param, final ProductDESProxy model)
   {
     setLayout(new BorderLayout());
     mParameter = param;

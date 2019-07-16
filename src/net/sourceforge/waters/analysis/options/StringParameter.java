@@ -38,6 +38,7 @@ import java.awt.Component;
 import javax.swing.JTextField;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -74,7 +75,7 @@ public class StringParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESContext model)
+  public Component createComponent(final ProductDESProxy model)
   {
     final JTextField ret = new JTextField();
     ret.setText(mValue);

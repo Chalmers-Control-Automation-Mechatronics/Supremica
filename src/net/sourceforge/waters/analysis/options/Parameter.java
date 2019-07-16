@@ -39,6 +39,7 @@ import java.awt.Component;
 import javax.swing.JLabel;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
 /**
@@ -103,7 +104,7 @@ public abstract class Parameter
     return new JLabel(mName);
   }
 
-  public abstract Component createComponent(ProductDESContext model);
+  public abstract Component createComponent(ProductDESProxy model);
 
   public abstract void updateFromGUI(ParameterPanel panel);
 

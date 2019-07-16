@@ -80,7 +80,6 @@ public class ConflictCheckDialog extends JDialog
   public ConflictCheckDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
-    DESContext =  new AnalyzerProductDESContext(panel);
     setTitle("Supervisor synthesis");
     mAnalyzerPanel = panel;
     mAutomata = panel.getAutomataTable().getOperationArgument();
@@ -129,7 +128,6 @@ public class ConflictCheckDialog extends JDialog
     //mConflictPanel.add(print);
 
     final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
-    @SuppressWarnings("unused")
     final ProductDESProxy des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer",   mAutomata, factory);
 
     final ActionListener conflictCheckChanged = new ActionListener() {
@@ -146,7 +144,7 @@ public class ConflictCheckDialog extends JDialog
 
           storeInDatabase();
           copyFromDatabase(newParams);
-          mScrollParametersPanel.replaceView(newParams, DESContext);
+          mScrollParametersPanel.replaceView(newParams, des);
         } catch (AnalysisConfigurationException |
                  ClassNotFoundException exception) {
           final Logger logger = LogManager.getLogger();
@@ -165,7 +163,7 @@ public class ConflictCheckDialog extends JDialog
     try {
       mConflictCheck = first.getModelAnalyzerFactory()
         .createConflictChecker(ProductDESElementFactory.getInstance());
-      mScrollParametersPanel = new ParameterJScrollPane(mConflictCheck.getParameters(),DESContext);
+      mScrollParametersPanel = new ParameterJScrollPane(mConflictCheck.getParameters(),des);
     } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
       exception.printStackTrace();
     }
@@ -298,7 +296,6 @@ public class ConflictCheckDialog extends JDialog
   private HashMap<Integer,Parameter> AllParams;
   private JPanel mButtonsPanel;
   private JComboBox<ModelAnalyzerFactoryLoader> conflictCheckCombobox;
-  private final AnalyzerProductDESContext DESContext;
 
   // Analysis workers
   private ConflictChecker mConflictCheck;

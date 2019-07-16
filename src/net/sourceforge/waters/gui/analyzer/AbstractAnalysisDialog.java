@@ -52,7 +52,6 @@ import javax.swing.JRootPane;
 
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
-import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -82,11 +81,10 @@ public abstract class AbstractAnalysisDialog extends JDialog
    * Used when using the JComboBOx to switch between multiple algorithms,
    * generateAnalyzerCombobox() populates JComboBox
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ProductDESContext model)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
 
-    DESContext = model;
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
 
@@ -103,11 +101,10 @@ public abstract class AbstractAnalysisDialog extends JDialog
   /**
    * Used when only using one algorithm, generateAnalyzerCombobox() not used
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer, final ProductDESContext model)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer)
   {
     super((Frame) panel.getTopLevelAncestor());
 
-    DESContext = model;
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
 
@@ -188,7 +185,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     storeInDatabase();
     copyFromDatabase(newParams);
-    mScrollParametersPanel.replaceView(newParams, DESContext);
+    mScrollParametersPanel.replaceView(newParams, des);
 
     //re-packing causes the frame to shrink/increase to preferred size
     pack();
@@ -205,7 +202,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
       } catch (final ClassNotFoundException exception) {      }
     }
 
-    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), DESContext);
+    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), des);
 
     // Buttons panel ...
     final ActionListener commithandler = new ActionListener() {
@@ -323,7 +320,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
   private final ProductDESProxyFactory factory;
   private final ProductDESProxy des;
   private ModelAnalyzer mAnalyzer;
-  private final ProductDESContext DESContext;
+
 
   //#########################################################################
   //# Class Constants

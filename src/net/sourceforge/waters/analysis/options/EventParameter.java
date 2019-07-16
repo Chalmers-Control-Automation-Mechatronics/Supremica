@@ -43,6 +43,7 @@ import javax.swing.JComboBox;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -57,6 +58,15 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 public class EventParameter extends Parameter
 {
+  // TODO Three options are needed (use EventParameterType):
+  // 1 - Null is not allowed, and the default is :accepting if available,
+  //     otherwise the first proposition in the model. (If there is no
+  //     proposition in the model, use null as the only option.)
+  // 2 - Null is allowed and the default is :accepting if available,
+  //     otherwise the first proposition in the model, or null if
+  //     there is not proposition in the model. (Unlike case 1,
+  //     null is also an option if there are propositions in the model.)
+  // 3 - Null is allowed and is the default.
   public EventParameter(final int id,
                         final String name,
                         final String description,
@@ -68,7 +78,7 @@ public class EventParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESContext model)
+  public Component createComponent(final ProductDESProxy model)
   {
 
     final List<EventProxy> propositions = new ArrayList<>();
@@ -77,7 +87,7 @@ public class EventParameter extends Parameter
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
     //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
-    for(final EventProxy event: model.getProductDES().getEvents()) {
+    for(final EventProxy event: model.getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
         propositions.add(event);
         //if :accepting exists and this is first creation
