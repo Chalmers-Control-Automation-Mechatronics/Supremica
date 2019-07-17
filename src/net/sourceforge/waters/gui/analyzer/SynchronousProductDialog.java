@@ -33,72 +33,77 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.awt.Container;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.List;
-
-import javax.swing.Action;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-
-import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
-import net.sourceforge.waters.gui.dialog.AutomatonNameInputParser;
-import net.sourceforge.waters.gui.dialog.ErrorLabel;
-import net.sourceforge.waters.gui.dialog.FormattedInputParser;
-import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
-import net.sourceforge.waters.gui.util.DialogCancelAction;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
-import net.sourceforge.waters.gui.util.IconRadioButton;
-import net.sourceforge.waters.gui.util.RaisedDialogPanel;
+import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.OperatorTable;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.supremica.gui.ide.IDE;
+
 
 /**
- * @author George Hewlett, Carly Hona
+ * @author George Hewlett, Carly Hona, Brandon Bassett
  */
-public class SynchronousProductDialog extends JDialog
+public class SynchronousProductDialog extends AbstractAnalysisDialog
 {
 
   //#######################################################################
   //# Constructor
   public SynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
-    super((Frame) panel.getTopLevelAncestor());
+    super(panel, new AnalyzerProductDESContext(panel));
     setTitle("Synchronous product");
-    mAnalyzerPanel = panel;
-    mAutomata = panel.getAutomataTable().getOperationArgument();
-    createComponents();
-    layoutComponents();
-    setLocationRelativeTo(panel.getTopLevelAncestor());
-    mNameInput.requestFocusInWindow();
-    setVisible(true);
-    setMinimumSize(getSize());
+    //setMinimumSize(getSize());
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+
+  @Override
+  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
+                                         final ProductDESProxyFactory desFactory)
+  {
+    try {
+      return analyzerFactory.createSynchronousProductBuilder(desFactory);
+    } catch (final AnalysisConfigurationException exception) {   }
+
+    return null;
+  }
+
+  @Override
+  protected SynchronousProductBuilder getAnalyzer()
+  {
+    return (SynchronousProductBuilder) super.getAnalyzer();
+  }
+
+  @Override
+  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
+                                                    final ProductDESProxy des)
+  {
+    //final SynchronousProductBuilder builder = getAnalyzer();
+    getAnalyzer().setModel(des);
+    try {
+      getAnalyzer().run();
+    } catch (final AnalysisException exception) {
+      final Logger logger = LogManager.getLogger();
+      final String msg = exception.getMessage();
+      logger.error(msg);
+    }
+    final AutomatonResult result = getAnalyzer().getAnalysisResult();
+    final AutomatonProxy aut = result.getComputedProxy();
+    final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+    model.insertRow(aut);
+
+    return null;
   }
 
 
@@ -107,6 +112,7 @@ public class SynchronousProductDialog extends JDialog
   /**
    * Initialise buttons and components.
    */
+  /*
   private void createComponents()
   {
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
@@ -184,87 +190,8 @@ public class SynchronousProductDialog extends JDialog
     final JRootPane root = getRootPane();
     root.setDefaultButton(okButton);
     DialogCancelAction.register(this);
-  }
+  }*/
 
-  /**
-   * Fill the panels and layout all buttons and components. It is assumed that
-   * all needed components have been created by a call to
-   * {@link #createComponents()} before.
-   */
-  private void layoutComponents()
-  {
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
-    constraints.insets = INSETS;
-
-    // First, layout the main panel ...
-    final GridBagLayout mainlayout = new GridBagLayout();
-    mMainPanel.setLayout(mainlayout);
-    // mNameLabel
-    constraints.gridx = 0;
-    constraints.gridy = 0;
-    constraints.weightx = 0.0;
-    constraints.anchor = GridBagConstraints.WEST;
-    mainlayout.setConstraints(mNameLabel, constraints);
-    mMainPanel.add(mNameLabel);
-    // mNameInput
-    mNameInput.setColumns(20);
-    constraints.gridx++;
-    constraints.gridwidth = 2;
-    constraints.weightx = 3.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    mainlayout.setConstraints(mNameInput, constraints);
-    mMainPanel.add(mNameInput);
-    // mKindLabel
-    constraints.gridx = 0;
-    constraints.gridy++;
-    constraints.gridwidth = 1;
-    constraints.weightx = 0.0;
-    constraints.fill = GridBagConstraints.NONE;
-    mainlayout.setConstraints(mKindLabel, constraints);
-    mMainPanel.add(mKindLabel);
-    // mPlantButton
-    constraints.gridx++;
-    constraints.weightx = 1.0;
-    mainlayout.setConstraints(mPlantButton, constraints);
-    mMainPanel.add(mPlantButton);
-    // mSpecButton
-    constraints.gridx++;
-    mainlayout.setConstraints(mSpecButton, constraints);
-    mMainPanel.add(mSpecButton);
-    // mPropertyButton
-    constraints.gridx--;
-    constraints.gridy++;
-    mainlayout.setConstraints(mPropertyButton, constraints);
-    mMainPanel.add(mPropertyButton);
-    // mSupervisorButton
-    constraints.gridx++;
-    mainlayout.setConstraints(mSupervisorButton, constraints);
-    mMainPanel.add(mSupervisorButton);
-
-    // Finally, build the full dialog ...
-    final Container contents = getContentPane();
-    final GridBagLayout layout = new GridBagLayout();
-    contents.setLayout(layout);
-    constraints.gridx = 0;
-    constraints.gridy = GridBagConstraints.RELATIVE;
-    constraints.gridwidth = GridBagConstraints.REMAINDER;
-    constraints.weightx = 1.0;
-    constraints.weighty = 1.0;
-    constraints.fill = GridBagConstraints.BOTH;
-    constraints.insets = new Insets(0, 0, 0, 0);
-    layout.setConstraints(mMainPanel, constraints);
-    contents.add(mMainPanel);
-
-    constraints.weighty = 0.0;
-    constraints.fill = GridBagConstraints.HORIZONTAL;
-    layout.setConstraints(mErrorPanel, constraints);
-    contents.add(mErrorPanel);
-    layout.setConstraints(mButtonsPanel, constraints);
-    contents.add(mButtonsPanel);
-    pack();
-  }
 
 
   //#########################################################################
@@ -273,6 +200,7 @@ public class SynchronousProductDialog extends JDialog
    * Commits the contents of this dialog to the model. This method is attached
    * to the action listener of the 'OK' button of the event editor dialog.
    */
+/*
   public void commitDialog()
   {
     final ProductDESProxyFactory factory =
@@ -299,10 +227,9 @@ public class SynchronousProductDialog extends JDialog
       final ProductDESProxy des =
         AutomatonTools.createProductDESProxy("synchronousForAnalyzer",
                                              mAutomata, factory);
-      final TRSynchronousProductBuilder builder =
-        new TRSynchronousProductBuilder(des);
-      builder.setOutputName(name);
-      builder.setOutputKind(kind);
+      final TRSynchronousProductBuilder builder = new TRSynchronousProductBuilder(des);
+      //builder.setOutputName(name);
+      //builder.setOutputKind(kind);
       try {
         builder.run();
       } catch (final AnalysisException exception) {
@@ -318,7 +245,7 @@ public class SynchronousProductDialog extends JDialog
       // Close the dialog
       dispose();
     }
-  }
+  }*/
 
 
   //#########################################################################
@@ -332,6 +259,7 @@ public class SynchronousProductDialog extends JDialog
    *         been found to contain invalid information, <CODE>false</CODE>
    *         otherwise.
    */
+  /*
   private boolean isInputLocked()
   {
     return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
@@ -385,16 +313,17 @@ public class SynchronousProductDialog extends JDialog
     } else {
       return ComponentKind.SUPERVISOR;
     }
-  }
+  }*/
 
 
   //#########################################################################
   //# Data Members
   // Dialog state
-  private final WatersAnalyzerPanel mAnalyzerPanel;
-  private final List<AutomatonProxy> mAutomata;
+  //private final WatersAnalyzerPanel mAnalyzerPanel;
+  //private final List<AutomatonProxy> mAutomata;
 
   // Swing components
+  /*
   private JPanel mMainPanel;
   private JLabel mNameLabel;
   private SimpleExpressionCell mNameInput;
@@ -407,12 +336,12 @@ public class SynchronousProductDialog extends JDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
-
+*/
 
   //#########################################################################
   //# Class Constants
+  @SuppressWarnings("javadoc")
   private static final long serialVersionUID = 6159733639861131531L;
-  private static final Insets INSETS = new Insets(2, 4, 2, 4);
-  private static final String DEFAULT_NAME = "sync";
-
+ // private static final Insets INSETS = new Insets(2, 4, 2, 4);
+  //private static final String DEFAULT_NAME = "sync";
 }

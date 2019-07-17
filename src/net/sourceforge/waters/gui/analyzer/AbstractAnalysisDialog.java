@@ -58,6 +58,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -90,7 +91,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
-    // des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
+    des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
     generateAnalyzerCombobox();
     generateGUI();
     setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
@@ -110,7 +111,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
-    //des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
+    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
 
     mAnalyzer = analyzer;
     generateGUI();
@@ -297,10 +298,10 @@ public abstract class AbstractAnalysisDialog extends JDialog
       current.commitValue();
 
     final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
-    final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, DESContext.getProductDES());
+    final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
     dispose();
-    dialog.setVisible(true);
-
+    if(dialog != null)
+      dialog.setVisible(true);
   }
 
   /**
@@ -317,7 +318,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
   private final List<AutomatonProxy> mAutomata;
   private final WatersAnalyzerPanel mAnalyzerPanel;
   private final ProductDESProxyFactory factory;
-  //private final ProductDESProxy des;
+  private final ProductDESProxy des;
   private ModelAnalyzer mAnalyzer;
   private final AnalyzerProductDESContext DESContext;
 
