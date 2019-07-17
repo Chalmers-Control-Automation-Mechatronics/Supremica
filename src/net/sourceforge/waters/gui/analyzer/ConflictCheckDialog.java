@@ -33,217 +33,56 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JRootPane;
-
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
+import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerifyDialog;
-import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.AutomatonTools;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-import net.sourceforge.waters.plain.des.ProductDESElementFactory;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import org.supremica.gui.ide.IDE;
 
 /**
  * @author Brandon Bassett
  */
-public class ConflictCheckDialog extends JDialog
+public class ConflictCheckDialog extends AbstractAnalysisDialog
 {
 
   //#########################################################################
   //# Constructor
   public ConflictCheckDialog(final WatersAnalyzerPanel panel)
   {
-    super((Frame) panel.getTopLevelAncestor());
-    DESContext = new AnalyzerProductDESContext(panel);
-    setTitle("Supervisor synthesis");
-    mAnalyzerPanel = panel;
-    mAutomata = panel.getAutomataTable().getOperationArgument();
-    generateGUI();
-    setLocationRelativeTo(panel.getTopLevelAncestor());
-    setVisible(true);
+    super(panel, new AnalyzerProductDESContext(panel));
+    setTitle("Conflict Check");
   }
 
   //#########################################################################
-  //# Using Parameter Classes
-  @SuppressWarnings("unused")
-  public void generateGUI() {
-
-    final JPanel mConflictCheckPanel = new JPanel(new GridLayout(0,2));
-    conflictCheckCombobox = new JComboBox<>();
-    final JLabel conflictCheckComboboxLabel = new JLabel("Algorithms");
-    AllParams = new HashMap<Integer,Parameter>();
-
-    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
-      try {
-        final ConflictChecker s = dir.getModelAnalyzerFactory().createConflictChecker(ProductDESElementFactory.getInstance());
-
-        if (s != null){
-          conflictCheckCombobox.addItem(dir);
-          //database of parameters
-          for(final Parameter p : s.getParameters())
-            AllParams.put(p.getID(),p);
-        }
-      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
-        | AnalysisConfigurationException exception) {     }
-    }
-
-    final ActionListener Print = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        storeInDatabase();
-        printMap();
-      }
-    };
-
-    final JButton print = new JButton("Print Database");
-    print.addActionListener(Print);
-
-    mConflictCheckPanel.add(conflictCheckComboboxLabel);
-    mConflictCheckPanel.add(conflictCheckCombobox);
-    //mConflictPanel.add(print);
-
-    final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
-    final ProductDESProxy des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer",   mAutomata, factory);
-
-    final ActionListener conflictCheckChanged = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-        final ModelAnalyzerFactoryLoader tmp =
-          (ModelAnalyzerFactoryLoader) conflictCheckCombobox.getSelectedItem();
-
-        try {
-          mConflictCheck = tmp.getModelAnalyzerFactory()
-            .createConflictChecker(ProductDESElementFactory.getInstance());
-          final List<Parameter> newParams = mConflictCheck.getParameters();
-
-          storeInDatabase();
-          copyFromDatabase(newParams);
-          mScrollParametersPanel.replaceView(newParams, DESContext);
-        } catch (AnalysisConfigurationException |
-                 ClassNotFoundException exception) {
-          final Logger logger = LogManager.getLogger();
-          logger.error(exception.getMessage());
-        }
-        //re-packing causes the frame to shrink/increase to preferred size
-        pack();
-      }
-    };
-
-    conflictCheckCombobox.addActionListener(conflictCheckChanged);
-
-    // superviserCombobox should have at least one item
-    final ModelAnalyzerFactoryLoader first = (ModelAnalyzerFactoryLoader) conflictCheckCombobox.getSelectedItem();
-
-    try {
-      mConflictCheck = first.getModelAnalyzerFactory()
-        .createConflictChecker(ProductDESElementFactory.getInstance());
-      mScrollParametersPanel = new ParameterJScrollPane(mConflictCheck.getParameters(), DESContext);
-    } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
-      exception.printStackTrace();
-    }
-
-    // Buttons panel ...
-    final ActionListener commithandler = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent event)
-      {
-       ParameterCommitDialog();
-      }
-    };
-
-    mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
-    final Action cancelAction = DialogCancelAction.getInstance();
-    final JButton cancelButton = new JButton(cancelAction);
-    cancelButton.setRequestFocusEnabled(false);
-    mButtonsPanel.add(cancelButton);
-
-    final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
-    DialogCancelAction.register(this);
-
-    //Finally, build the full dialog ...
-    add(mConflictCheckPanel, BorderLayout.PAGE_START);
-    add(mScrollParametersPanel, BorderLayout.CENTER);
-    add(mButtonsPanel, BorderLayout.PAGE_END);
-    pack();
-    setVisible(true);
-  }
-
-  //Values stored in GUI Components are stored in corresponding parameter then added to the database
-  public void storeInDatabase() {
-
-    mScrollParametersPanel.commit();       //All ParameterPanels save their stored value in their corresponding parameter
-    final List<Parameter> activeParameters =  mScrollParametersPanel.getParameters();
-
-    for(final Parameter p: activeParameters) {  //overwrite stored parameters with new version
-      AllParams.put(p.getID(), p);
-    }
-  }
-
-  // updates the passed parameters to have same stored value as
-  // corresponding one in database
-  public void copyFromDatabase(final List<Parameter> newParams) {
-    for(final Parameter current: newParams)
-      current.updateFromParameter(AllParams.get(current.getID()));
-  }
-
-  public void printMap() {
-    for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
-      entry.getValue().printValue();
-    }
-  }
-
-  public void ParameterCommitDialog()
+  //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
+  @Override
+  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
+                                         final ProductDESProxyFactory desFactory)
   {
-    final List<Parameter> parameters = mConflictCheck.getParameters();
-    storeInDatabase();
-    copyFromDatabase(parameters);
+    try {
+      return analyzerFactory.createConflictChecker(desFactory);
+    } catch (final AnalysisConfigurationException exception) {   }
 
-    //commit all of the values to the synthesizer
-    for(final Parameter current: parameters)
-      current.commitValue();
-
-    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
-    final ProductDESProxyFactory factory =  ProductDESElementFactory.getInstance();
-    final ProductDESProxy des =
-      AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
-
-    final ConflictCheckPopUpDialog dialog = new ConflictCheckPopUpDialog(ide, des);
-    dispose();
-    dialog.setVisible(true);
+    return null;
   }
+
+  @Override
+  protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
+                                                    final ProductDESProxy des)
+  {
+    return new ConflictCheckPopUpDialog(ide, des);
+  }
+
+   @Override
+   protected ConflictChecker getAnalyzer()
+   {
+     return (ConflictChecker) super.getAnalyzer();
+   }
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
@@ -278,7 +117,7 @@ public class ConflictCheckDialog extends JDialog
     @Override
     protected ModelAnalyzer createModelAnalyzer()
     {
-      return mConflictCheck;
+      return getAnalyzer();
     }
 
     //#######################################################################
@@ -288,23 +127,6 @@ public class ConflictCheckDialog extends JDialog
   }
 
   //#########################################################################
-  //# Data Members
-  // Dialog state
-  private final WatersAnalyzerPanel mAnalyzerPanel;
-  private final List<AutomatonProxy> mAutomata;
-
-  //Parameter Components
-  private ParameterJScrollPane mScrollParametersPanel;
-  private HashMap<Integer,Parameter> AllParams;
-  private JPanel mButtonsPanel;
-  private JComboBox<ModelAnalyzerFactoryLoader> conflictCheckCombobox;
-  private final AnalyzerProductDESContext DESContext;
-
-  // Analysis workers
-  private ConflictChecker mConflictCheck;
-
-  //#########################################################################
   //# Class Constants
   private static final long serialVersionUID = -4771975182146634793L;
-
 }
