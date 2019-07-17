@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.ComponentKindParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -183,7 +183,7 @@ public abstract class TRAbstractSynchronousProductBuilder
         break;
       }
     }
-    iter.add(new StringParameter
+    list.add(new StringParameter
       (ParameterIDs.ModelBuilder_OutputName,
        "Output name",
        "Name of the generated synchronous product automaton.",
@@ -195,19 +195,19 @@ public abstract class TRAbstractSynchronousProductBuilder
           setOutputName(getValue());
         }
       });
-    iter.add(new EnumParameter<ComponentKind>
-      (ParameterIDs.AutomatonBuilder_OutputKind,
-       "Output kind",
-       "Type of the generated synchronous product automaton.",
-       ComponentKind.values())
+    list.add(new ComponentKindParameter
+    (ParameterIDs.AutomatonBuilder_OutputKind,
+     "Output kind",
+     "Type of the generated automaton.",
+     ComponentKind.values())
+    {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setOutputKind(getValue());
-        }
-      });
-    iter.add(new BoolParameter
+        setOutputKind(getValue());
+      }
+    });
+    list.add(new BoolParameter
       (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
        "Remove Selfloops",
        "Remove events that appear only as selfloop on every state," +

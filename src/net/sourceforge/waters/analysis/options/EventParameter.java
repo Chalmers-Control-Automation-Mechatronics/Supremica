@@ -165,7 +165,7 @@ public class EventParameter extends Parameter
   //#########################################################################
   //# Private Class
 
-  class EventProxyRenderer extends JLabel implements ListCellRenderer<EventProxy>
+  private class EventProxyRenderer extends JLabel implements ListCellRenderer<EventProxy>
   {
     private static final long serialVersionUID = 1L;
 

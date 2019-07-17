@@ -55,7 +55,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.ComponentKindParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -403,7 +403,7 @@ public class SupremicaSynchronousProductBuilder
           setOutputName(getValue());
         }
       });
-    list.add(new EnumParameter<ComponentKind>
+    list.add(new ComponentKindParameter
       (ParameterIDs.AutomatonBuilder_OutputKind,
        "Output kind",
        "Type of the generated synchronous product automaton.",

@@ -36,7 +36,7 @@ package net.sourceforge.waters.model.analysis.des;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.ComponentKindParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -149,18 +149,18 @@ public abstract class AbstractAutomatonBuilder
           setOutputName(getValue());
         }
       });
-    list.add(new EnumParameter<ComponentKind>
-      (ParameterIDs.AutomatonBuilder_OutputKind,
-       "Output kind",
-       "Type of the generated automaton.",
-       ComponentKind.values())
+    list.add(new ComponentKindParameter
+    (ParameterIDs.AutomatonBuilder_OutputKind,
+     "Output kind",
+     "Type of the generated automaton.",
+     ComponentKind.values())
+    {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setOutputKind(getValue());
-        }
-      });
+        setOutputKind(getValue());
+      }
+    });
     return list;
   }
 
