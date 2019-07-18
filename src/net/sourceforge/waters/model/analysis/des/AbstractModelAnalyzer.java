@@ -196,11 +196,7 @@ public abstract class AbstractModelAnalyzer
   {
     final List<Parameter> list = new LinkedList<>();
     list.add(new BoolParameter
-      (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled,
-       "Detailed output",
-       "Compute full output, e.g., synthesised supervisor automata or " +
-       "counterexample.",
-       true)
+      (ParameterIDs.ModelAnalyzer_BoolParameter_DetailedOutputEnabled)
       {
         @Override
         public void commitValue()
@@ -209,11 +205,7 @@ public abstract class AbstractModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_NodeLimit,
-       "Node limit",
-       "The maximum number of nodes the analyser is allowed to keep " +
-       "in memory at any one time.",
-       0, Integer.MAX_VALUE, getNodeLimit())
+      (ParameterIDs.ModelAnalyzer_IntParameter_NodeLimit)
       {
         @Override
         public void commitValue()
@@ -222,11 +214,7 @@ public abstract class AbstractModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_TransitionLimit,
-       "Transition limit",
-       "The maximum number of transitions the analyser is allowed to " +
-       "keep in memory at any one time.",
-       0, Integer.MAX_VALUE, getTransitionLimit())
+      (ParameterIDs.ModelAnalyzer_IntParameter_TransitionLimit)
       {
         @Override
         public void commitValue()

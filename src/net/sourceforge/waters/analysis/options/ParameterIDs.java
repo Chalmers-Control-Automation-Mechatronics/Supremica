@@ -37,9 +37,31 @@ public class ParameterIDs
 {
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
   public static final int ModelAnalyzer_DetailedOutputEnabled = 0;
-  public static final int ModelAnalyzer_KindTranslator = 1;
+  public static final int ModelAnalyzer_KindTranslator = 1;                     //Unused
   public static final int ModelAnalyzer_NodeLimit = 2;
   public static final int ModelAnalyzer_TransitionLimit = 3;
+
+
+  public static final BoolParameter ModelAnalyzer_BoolParameter_DetailedOutputEnabled = new BoolParameter
+    (ModelAnalyzer_DetailedOutputEnabled,
+     "Detailed output",
+     "Compute full output, e.g., synthesised supervisor automata or " +
+     "counterexample.",
+     true);
+
+  public static final IntParameter ModelAnalyzer_IntParameter_NodeLimit = new IntParameter
+    (ModelAnalyzer_NodeLimit,
+     "Node limit",
+     "The maximum number of nodes the analyser is allowed to keep " +
+     "in memory at any one time.",
+     0, Integer.MAX_VALUE, Integer.MAX_VALUE); //how to getNodeLimit()
+
+   public static final IntParameter ModelAnalyzer_IntParameter_TransitionLimit =   new IntParameter
+     (ModelAnalyzer_TransitionLimit,
+      "Transition limit",
+      "The maximum number of transitions the analyser is allowed to " +
+      "keep in memory at any one time.",
+      0, Integer.MAX_VALUE, Integer.MAX_VALUE); //how to getTransitionLimit()
 
   //net.sourceforge.waters.model.analysis.ModelBuilder
   public static final int ModelBuilder_OutputName = 100;

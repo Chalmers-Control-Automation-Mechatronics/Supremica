@@ -62,6 +62,10 @@ public class IntParameter extends Parameter {
     NumberFormat format;
     String alphabet;
 
+    public IntParameter(final IntParameter template) {
+        this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), template.getValue());
+    }
+
     public IntParameter(final int id, final String name, final String description,
                         final int min, final int max, final int defValue) {
         super(id, name, description);
@@ -127,6 +131,14 @@ public class IntParameter extends Parameter {
     public int getValue() {
         return mValue;
     }
+
+    public int getMin() {
+      return mMin;
+  }
+
+    public int getMax() {
+      return mMax;
+  }
 
     //Sets the text of the textField to the desired value, empty string if value is Integer.MAX_VALUE
     private void setTextField(final JFormattedTextField ret, final int value) {

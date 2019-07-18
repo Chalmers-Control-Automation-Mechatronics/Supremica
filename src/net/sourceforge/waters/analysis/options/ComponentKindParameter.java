@@ -35,6 +35,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
     ret.setSelectedItem(mValue);
 
     //Using IconAndFontLoader causes ant initialize to fail
+    //Use IconAndFontLoader in DESContext
 
     //final ComponentKindRenderer renderer= new ComponentKindRenderer();
     //ret.setRenderer(renderer);
