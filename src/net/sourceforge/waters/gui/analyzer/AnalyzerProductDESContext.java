@@ -39,6 +39,8 @@ import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -84,9 +86,27 @@ public class AnalyzerProductDESContext
     return context.getIcon(decl);
   }
 
+  @Override
+  public Icon getComponentKindIcon(final ComponentKind kind)
+  {
+    if(kind == ComponentKind.PLANT) {
+      return IconAndFontLoader.ICON_PLANT;
+    }
+    else if(kind == ComponentKind.PROPERTY) {
+      return IconAndFontLoader.ICON_PROPERTY;
+    }
+    else if(kind == ComponentKind.SPEC) {
+      return IconAndFontLoader.ICON_SPEC;
+    }
+    else if(kind == ComponentKind.SUPERVISOR) {
+      return IconAndFontLoader.ICON_SUPERVISOR;
+    }
+    else {
+      return null;
+    }
+  }
 
   //#########################################################################
   //# Constructors
   private final ModuleContainer mModuleContainer;
-
 }

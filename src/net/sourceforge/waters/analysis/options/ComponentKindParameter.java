@@ -4,7 +4,11 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.Icon;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 
@@ -34,11 +38,10 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
     final JComboBox<ComponentKind> ret = new JComboBox<>(vector);
     ret.setSelectedItem(mValue);
 
-    //Using IconAndFontLoader causes ant initialize to fail
-    //Use IconAndFontLoader in DESContext
+    DESContext = model;
 
-    //final ComponentKindRenderer renderer= new ComponentKindRenderer();
-    //ret.setRenderer(renderer);
+    final ComponentKindRenderer renderer= new ComponentKindRenderer();
+    ret.setRenderer(renderer);
     return ret;
   }
 
@@ -49,8 +52,12 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
   }
 
   //#########################################################################
+  //# Data Variables
+  ProductDESContext DESContext;
+
+  //#########################################################################
   //# Private Class
-  /*
+
   private class ComponentKindRenderer extends JLabel implements ListCellRenderer<ComponentKind>
   {
     private static final long serialVersionUID = 1L;
@@ -78,21 +85,11 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
       }
 
       //Set the icon and text
-      if(value == ComponentKind.PLANT) {
-        setIcon(IconAndFontLoader.ICON_PLANT);
-        setText(ComponentKind.PLANT.toString());
-      }
-      else if(value == ComponentKind.PROPERTY) {
-        setIcon(IconAndFontLoader.ICON_PROPERTY);
-        setText(ComponentKind.PROPERTY.toString());
-      }
-      else if(value == ComponentKind.SPEC) {
-        setIcon(IconAndFontLoader.ICON_SPEC);
-        setText(ComponentKind.SPEC.toString());
-      }
-      else if(value == ComponentKind.SUPERVISOR) {
-        setIcon(IconAndFontLoader.ICON_SUPERVISOR);
-        setText(ComponentKind.SUPERVISOR.toString());
+      final Icon image = DESContext.getComponentKindIcon(value);
+
+      if(image != null) {
+        setIcon(image);
+        setText(value.toString());
       }
       else {
         setIcon(null);
@@ -101,5 +98,5 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
 
       return this;
     }
-  }*/
+  }
 }

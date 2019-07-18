@@ -9,6 +9,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.ModuleContext;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
@@ -39,7 +41,6 @@ public class TestDESContext implements ProductDESContext
   {
   }
 
-
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
   @Override
@@ -62,7 +63,6 @@ public class TestDESContext implements ProductDESContext
     final EventDeclProxy decl = (EventDeclProxy) proxy;
     return mModuleContext.getIcon(decl);
   }
-
 
   //#########################################################################
   //# Auxiliary Methods
@@ -92,11 +92,29 @@ public class TestDESContext implements ProductDESContext
     }
   }
 
+  @Override
+  public Icon getComponentKindIcon(final ComponentKind kind)
+  {
+    if(kind == ComponentKind.PLANT) {
+      return IconAndFontLoader.ICON_PLANT;
+    }
+    else if(kind == ComponentKind.PROPERTY) {
+      return IconAndFontLoader.ICON_PROPERTY;
+    }
+    else if(kind == ComponentKind.SPEC) {
+      return IconAndFontLoader.ICON_SPEC;
+    }
+    else if(kind == ComponentKind.SUPERVISOR) {
+      return IconAndFontLoader.ICON_SUPERVISOR;
+    }
+    else {
+      return null;
+    }
+  }
 
   //#########################################################################
   //# Data Members
   private ModuleContext mModuleContext;
   private ProductDESProxy mProductDESProxy;
   private Map<Object,SourceInfo> mSourceInfoMap;
-
 }

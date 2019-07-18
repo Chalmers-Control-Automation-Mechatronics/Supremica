@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.options;
 
 import javax.swing.Icon;
 
+import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -44,4 +45,6 @@ public interface ProductDESContext
   public ProductDESProxy getProductDES();
 
   public Icon getEventIcon(EventProxy event);
+
+  public Icon getComponentKindIcon(ComponentKind kind);
 }
