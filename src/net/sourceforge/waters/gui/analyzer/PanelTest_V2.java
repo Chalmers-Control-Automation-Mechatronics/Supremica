@@ -50,9 +50,11 @@ import javax.swing.JPanel;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.model.marshaller.MarshallingTools;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
@@ -71,7 +73,6 @@ public class PanelTest_V2
   public static void main(final String[] args)
   {
     DESContext.loadAndCompileModule(fileInput);
-
 
     final JFrame frame = new JFrame("Test");
     final JPanel mSuperviserPanel = new JPanel();
@@ -121,8 +122,7 @@ public class PanelTest_V2
     for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
       try {
 
-        final SynchronousProductBuilder s = dir.getModelAnalyzerFactory()
-          .createSynchronousProductBuilder(ProductDESElementFactory.getInstance());
+        final ModelAnalyzer s = createAnalyzer(dir.getModelAnalyzerFactory(), ProductDESElementFactory.getInstance());
 
 
         if (s != null)
@@ -138,7 +138,7 @@ public class PanelTest_V2
 
         }
       } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError
-        | AnalysisConfigurationException exception) {
+         exception) {
 
       }
     }
@@ -156,14 +156,11 @@ public class PanelTest_V2
 
         try {
 
-          final List<Parameter> newParams = tmp.getModelAnalyzerFactory()
-            .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters();
+          final List<Parameter> newParams = createAnalyzer(tmp.getModelAnalyzerFactory(), ProductDESElementFactory.getInstance()).getParameters();
           storeInDatabase();
           copyFromDatabase(newParams);
           mScrollParametersPanel.replaceView(newParams, DESContext);
-        } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
-
-          exception.printStackTrace();
+        } catch (final ClassNotFoundException exception) {
         }
 
         //re-packing causes the frame to shrink/increase to preferred size
@@ -177,9 +174,8 @@ public class PanelTest_V2
     final ModelAnalyzerFactoryLoader first = (ModelAnalyzerFactoryLoader) superviserCombobox.getSelectedItem();
 
     try {
-      mScrollParametersPanel = new ParameterJScrollPane(first.getModelAnalyzerFactory()
-                                                        .createSynchronousProductBuilder(ProductDESElementFactory.getInstance()).getParameters(), DESContext);
-    } catch (AnalysisConfigurationException  | ClassNotFoundException exception) {
+      mScrollParametersPanel = new ParameterJScrollPane(createAnalyzer(first.getModelAnalyzerFactory(), ProductDESElementFactory.getInstance()).getParameters(), DESContext);
+    } catch (final ClassNotFoundException exception) {
       exception.printStackTrace();
     }
     //Finally, build the full dialog ...
@@ -195,6 +191,16 @@ public class PanelTest_V2
     for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
       entry.getValue().printValue();
     }
+  }
+
+  protected static ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
+                                         final ProductDESProxyFactory desFactory)
+  {
+    try {
+      return analyzerFactory.createConflictChecker(desFactory);
+    } catch (final AnalysisConfigurationException exception) {   }
+
+    return null;
   }
 
   //Values stored in GUI Components are stored in corresponding parameter then added to the database
@@ -219,22 +225,21 @@ public class PanelTest_V2
 
    public static void createSynthesizer(final ModelAnalyzerFactoryLoader synth ) {
 
-    SynchronousProductBuilder sythesizer;
     try {
-      sythesizer = synth.getModelAnalyzerFactory()
-                            .createSynchronousProductBuilder(ProductDESElementFactory.getInstance());
+      final ModelAnalyzer sythesizer = createAnalyzer(synth.getModelAnalyzerFactory(), ProductDESElementFactory.getInstance());
 
       final List<Parameter> parameters = sythesizer.getParameters();
       storeInDatabase();
       copyFromDatabase(parameters);
 
-      //System.out.println(sythesizer);
+      System.out.println(sythesizer);
 
       for(final Parameter current: parameters)
         current.commitValue();
 
-    } catch (AnalysisConfigurationException | ClassNotFoundException exception) {
+    } catch ( final ClassNotFoundException exception) {
       exception.printStackTrace();
     }
   }
+
 }
