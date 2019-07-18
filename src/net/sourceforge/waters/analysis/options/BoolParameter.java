@@ -47,8 +47,6 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  */
 public class BoolParameter extends Parameter
 {
-  private boolean mValue;
-
   public BoolParameter(final BoolParameter template)
   {
    this(template.getID(), template.getName(), template.getDescription(), template.getValue());
@@ -84,7 +82,7 @@ public class BoolParameter extends Parameter
     mValue = checkBox.isSelected();
   }
 
-  //Updates a ParameterPanels component with parameter value
+
   @Override
   public void displayInGUI(final ParameterPanel panel)
   {
@@ -100,8 +98,12 @@ public class BoolParameter extends Parameter
   }
 
   @Override
-  public void printValue()
+  public String toString()
   {
-      System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+      return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
+
+  //#########################################################################
+  //# Data Members
+  private boolean mValue;
 }

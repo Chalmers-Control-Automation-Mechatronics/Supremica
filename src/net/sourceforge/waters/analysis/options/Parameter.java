@@ -94,7 +94,8 @@ public abstract class Parameter
 
   public abstract void updateFromParameter(Parameter p);
 
-  public abstract void printValue();
+  @Override
+  public abstract String toString();
 
   //#########################################################################
   //# GUI
@@ -107,7 +108,8 @@ public abstract class Parameter
 
   public abstract void updateFromGUI(ParameterPanel panel);
 
-  public abstract void displayInGUI(ParameterPanel panel);
+  //To be removed
+  public void displayInGUI(final ParameterPanel panel) {}
 
 
   //#########################################################################

@@ -189,7 +189,7 @@ public class PanelTest_V2
 
   public static void printMap() {
     for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
-      entry.getValue().printValue();
+      System.out.println(entry.getValue().toString());
     }
   }
 
@@ -197,7 +197,7 @@ public class PanelTest_V2
                                          final ProductDESProxyFactory desFactory)
   {
     try {
-      return analyzerFactory.createConflictChecker(desFactory);
+      return analyzerFactory.createSupervisorSynthesizer(desFactory);
     } catch (final AnalysisConfigurationException exception) {   }
 
     return null;
@@ -217,10 +217,8 @@ public class PanelTest_V2
   // updates the passed parameters to have same stored value as
   // corresponding one in database
   public static void copyFromDatabase(final List<Parameter> newParams) {
-
     for(final Parameter current: newParams)
       current.updateFromParameter(AllParams.get(current.getID()));
-
   }
 
    public static void createSynthesizer(final ModelAnalyzerFactoryLoader synth ) {

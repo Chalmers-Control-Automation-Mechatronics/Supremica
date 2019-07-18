@@ -46,21 +46,12 @@ import javax.swing.JOptionPane;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
-
 /**
  * A configurable parameter of a {@link ModelAnalyzer} of <CODE>int</CODE> type.
  *
  * @author Brandon Bassett
  */
-
 public class IntParameter extends Parameter {
-
-    private final int mMin;
-    private final int mMax;
-    private int mValue;
-    private final int defaultValue;
-    NumberFormat format;
-    String alphabet;
 
     public IntParameter(final IntParameter template) {
         this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), template.getValue());
@@ -178,8 +169,17 @@ public class IntParameter extends Parameter {
     }
 
     @Override
-    public void printValue()
+    public String toString()
     {
-      System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+      return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
     }
+
+    //#########################################################################
+    //# Data Members
+    private final int mMin;
+    private final int mMax;
+    private int mValue;
+    private final int defaultValue;
+    private final NumberFormat format;
+    private String alphabet;
 }

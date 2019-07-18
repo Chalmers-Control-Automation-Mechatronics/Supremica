@@ -47,8 +47,11 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  */
 public class StringParameter extends Parameter
 {
-
-  private String mValue;
+  public StringParameter(final StringParameter template)
+  {
+    super(template.getID(), template.getName(), template.getDescription());
+    mValue = template.getValue();
+  }
 
   public StringParameter(final int id, final String name,
                          final String description, final String value)
@@ -105,8 +108,12 @@ public class StringParameter extends Parameter
   }
 
   @Override
-  public void printValue()
+  public String toString()
   {
-    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+    return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
+
+  //#########################################################################
+  //# Data Members
+  private String mValue;
 }

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import net.sourceforge.waters.model.base.ComponentKind;
+
 public class ParameterIDs
 {
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
@@ -138,6 +140,12 @@ public class ParameterIDs
 
   //net.sourceforge.waters.model.analysis.des.AutomatonBuilder
   public static final int AutomatonBuilder_OutputKind = 1400;
+
+  public static final ComponentKindParameter AutomatonBuilder_ComponentKindParameter_OutputKind = new ComponentKindParameter
+    (AutomatonBuilder_OutputKind,
+     "Output kind",
+     "Type of the generated automaton.",
+     ComponentKind.values());
 
   //net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder
   public static final int SynchronousProductBuilder_RemovingSelfloops = 1500;

@@ -41,9 +41,6 @@ import javax.swing.JPanel;
 
 public class ParameterPanel extends JPanel
 {
-  private static final long serialVersionUID = 1L;
-  private final Parameter mParameter;
-
   public ParameterPanel(final Parameter param, final ProductDESContext model)
   {
     setLayout(new BorderLayout());
@@ -54,7 +51,10 @@ public class ParameterPanel extends JPanel
     toolTip(getComponents());
   }
 
-  //Recursively sets tooltip for components
+  /**
+   * Recursively sets tooltip for components
+   * @param StoredComponents is the array of components to have their toolTip set
+   */
   public void toolTip(final Component[] StoredComponents) {
 
     for (final Component component : StoredComponents)
@@ -65,12 +65,16 @@ public class ParameterPanel extends JPanel
         ((JComponent) component).setToolTipText(mParameter.getDescription());
   }
 
-  //Updates parameter with itself
+  /**
+   * Updates stored parameter with itself
+   */
   public void commitParameter()
   {
     mParameter.updateFromGUI(this);
   }
+
   //Updates parameter and itself with other panel
+  //no longer used, to be removed
   public void copyFromPanel(final ParameterPanel panel)
   {
     mParameter.updateFromGUI(panel);
@@ -86,4 +90,9 @@ public class ParameterPanel extends JPanel
   {
     return getComponents()[1];
   }
+
+  //#########################################################################
+  //# Data Members
+  private static final long serialVersionUID = 1L;
+  private final Parameter mParameter;
 }

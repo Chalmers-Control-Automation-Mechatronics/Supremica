@@ -51,19 +51,15 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  */
 public class EnumParameter<T> extends Parameter
 {
-
   //#########################################################################
   //# Constructors
 
   //BUG: If created in two different classes with same ID, the default value of the last added to
   // the database is used,
 
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final List<? extends T> data)
+  public EnumParameter(final EnumParameter<T> template)
   {
-    this(id, name, description, data, data.get(0));
+    this(template.getID(), template.getName(), template.getDescription(), template.getList(), template.getValue());
   }
 
   public EnumParameter(final int id,
@@ -74,11 +70,15 @@ public class EnumParameter<T> extends Parameter
   {
     super(id, name, description);
     mList = data;
-    //If no default provided, use first item
-    if(defaultValue != null)
-      mValue = defaultValue;
-    else
-      mValue = data.get(0);
+    mValue = defaultValue;
+  }
+
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description,
+                       final List<? extends T> data)
+  {
+    this(id, name, description, data, data.get(0));
   }
 
   public EnumParameter(final int id,
@@ -122,6 +122,11 @@ public class EnumParameter<T> extends Parameter
     return  mValue;
   }
 
+  public List<? extends T> getList()
+  {
+    return  mList;
+  }
+
   public void setValue(final T value)
   {
     mValue = value;
@@ -153,9 +158,9 @@ public class EnumParameter<T> extends Parameter
   }
 
   @Override
-  public void printValue()
+  public String toString()
   {
-    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+    return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
   //#########################################################################

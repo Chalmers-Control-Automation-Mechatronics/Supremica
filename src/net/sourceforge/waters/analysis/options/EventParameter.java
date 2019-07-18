@@ -61,6 +61,11 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 public class EventParameter extends Parameter
 {
+  public EventParameter(final EventParameter template)
+  {
+   this(template.getID(), template.getName(), template.getDescription(), template.getNullOptions());
+  }
+
   public EventParameter(final int id,
                         final String name,
                         final String description,
@@ -79,7 +84,6 @@ public class EventParameter extends Parameter
 
     final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
-    //final EventProxy accepting = factory.createEventProxy(EventDeclProxy.DEFAULT_MARKING_NAME, EventKind.PROPOSITION);
 
     for(final EventProxy event: model.getProductDES().getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
@@ -156,10 +160,14 @@ public class EventParameter extends Parameter
     mValue = ((EventParameter) p).getValue();
   }
 
+  public EventParameterType getNullOptions() {
+    return mNullOptions;
+  }
+
   @Override
-  public void printValue()
+  public String toString()
   {
-    System.out.println("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+    return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
   //#########################################################################
@@ -210,6 +218,4 @@ public class EventParameter extends Parameter
   private EventProxy mValue;
   private final EventParameterType mNullOptions;
   private ProductDESContext DESContext;
-
-
 }

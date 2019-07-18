@@ -10,15 +10,22 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.ComponentKind;
 
 /**
- * A configurable parameter of a {@link ComponentKind}.
+ * A configurable parameter of a {@link ModelAnalyzer} of <CODE>ComponentKind</CODE> type.
  *
  * @author Brandon Bassett
  */
 public class ComponentKindParameter extends EnumParameter<ComponentKind>
 {
+  public ComponentKindParameter(final ComponentKindParameter template)
+  {
+    //template already has null added to list
+    super(template);
+  }
+
   public ComponentKindParameter(final int id,
                        final String name,
                        final String description,
@@ -53,7 +60,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
 
   //#########################################################################
   //# Data Variables
-  ProductDESContext DESContext;
+  private ProductDESContext DESContext;
 
   //#########################################################################
   //# Private Class

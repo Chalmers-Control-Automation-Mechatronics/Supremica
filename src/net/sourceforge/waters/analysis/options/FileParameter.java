@@ -47,17 +47,24 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
+/**
+ * A configurable parameter of a {@link ModelAnalyzer} of <CODE>file</CODE> type.
+ *
+ * @author Brandon Bassett
+ */
 public class FileParameter extends Parameter
 {
-  File mValue;
-  JFileChooser jfc;
+  public FileParameter(final FileParameter template)
+  {
+    super(template.getID(), template.getName(), template.getDescription());
+  }
 
   public FileParameter(final int id, final String name,
                        final String description)
   {
     super(id, name, description);
-    mValue = null;
   }
 
   @Override
@@ -109,6 +116,8 @@ public class FileParameter extends Parameter
       @Override
       public void actionPerformed(final ActionEvent event)
       {
+        JFileChooser jfc;
+
         //Go to parent directory, text field set to file name
         if (mValue != null) {
           jfc = new JFileChooser(mValue.getParent());
@@ -144,9 +153,9 @@ public class FileParameter extends Parameter
   }
 
   @Override
-  public void displayInGUI(final ParameterPanel panel)
+  public void updateFromParameter(final Parameter p)
   {
-    // TODO Auto-generated method stub
+    mValue = ((FileParameter) p).getValue();
   }
 
   public File getValue()
@@ -155,16 +164,12 @@ public class FileParameter extends Parameter
   }
 
   @Override
-  public void updateFromParameter(final Parameter p)
+  public String toString()
   {
-    mValue = ((FileParameter) p).getValue();
+    return ("ID: " + getID() + " Name: " + getName() + " Value: " + getValue());
   }
 
-  @Override
-  public void printValue()
-  {
-    System.out.println("ID: " + getID() + " Name: " + getName() + " Value: "
-                       + getValue());
-  }
-
+  //#########################################################################
+  //# Data Members
+  private File mValue;
 }

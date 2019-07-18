@@ -196,10 +196,7 @@ public abstract class TRAbstractSynchronousProductBuilder
         }
       });
     list.add(new ComponentKindParameter
-    (ParameterIDs.AutomatonBuilder_OutputKind,
-     "Output kind",
-     "Type of the generated automaton.",
-     ComponentKind.values())
+    (ParameterIDs.AutomatonBuilder_ComponentKindParameter_OutputKind)
     {
       @Override
       public void commitValue()

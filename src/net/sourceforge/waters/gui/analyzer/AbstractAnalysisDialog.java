@@ -267,7 +267,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
   public void printMap()
   {
     for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
-      entry.getValue().printValue();
+      System.out.println(entry.getValue().toString());
     }
   }
 
