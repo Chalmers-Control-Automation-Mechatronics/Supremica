@@ -59,7 +59,6 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -383,10 +382,7 @@ public class SupremicaMonolithicSynthesizer
       }
     }
     list.add(0, new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-       "Marking proposition",
-       "If synthesising a nonblocking supervisor, it will be nonblocking " +
-       "with respect to this proposition.", EventParameterType.ALLOW_NULL)
+      (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -395,11 +391,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis,
-       "Nonblocking supervisor",
-       "Synthesise a supervisor that is nonblocking with respect " +
-       "to the configured marking proposition.",
-       isNonblockingSynthesis())
+      (ParameterIDs.SupervisorSynthesizer_BoolParameter_NonblockingSynthesis)
       {
         @Override
         public void commitValue()
@@ -408,10 +400,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis,
-       "Controllable supervisor",
-       "Synthesise a controllable supervisor.",
-       isControllableSynthesis())
+      (ParameterIDs.SupervisorSynthesizer_BoolParameter_ControllableSynthesis)
       {
         @Override
         public void commitValue()
@@ -420,10 +409,8 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-       "Supervisor reduction",
-       "Method of supervisor reduction to be used after synthesis.",
-       SupremicaSupervisorReductionFactory.class.getEnumConstants())
+      (ParameterIDs.SupervisorSynthesizer_Supremica_EnumParameter_SupervisorReductionFactory,
+        getSupervisorReductionFactory().getClass().getEnumConstants())
       {
         @Override
         public void commitValue()

@@ -57,6 +57,10 @@ public class IntParameter extends Parameter {
         this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), template.getValue());
     }
 
+    public IntParameter(final IntParameter template, final int defValue) {
+      this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), defValue);
+  }
+
     public IntParameter(final int id, final String name, final String description,
                         final int min, final int max, final int defValue) {
         super(id, name, description);

@@ -54,12 +54,47 @@ public class EnumParameter<T> extends Parameter
   //#########################################################################
   //# Constructors
 
-  //BUG: If created in two different classes with same ID, the default value of the last added to
-  // the database is used,
-
   public EnumParameter(final EnumParameter<T> template)
   {
     this(template.getID(), template.getName(), template.getDescription(), template.getList(), template.getValue());
+  }
+
+  public EnumParameter(final EnumParameter<T> template,
+                       final List<? extends T> data,
+                       final T defaultValue)
+  {
+    this(template.getID(), template.getName(), template.getDescription(), data, defaultValue);
+  }
+
+  public EnumParameter(final EnumParameter<T> template,
+                       final List<? extends T> data)
+  {
+    this(template.getID(), template.getName(), template.getDescription(), data);
+  }
+
+  public EnumParameter(final EnumParameter<T> template,
+                       final T[] data)
+  {
+    this(template.getID(), template.getName(), template.getDescription(), data);
+  }
+
+  public EnumParameter(final EnumParameter<T> template,
+                       final T[] data,
+                       final T defaultValue)
+  {
+    this(template.getID(), template.getName(), template.getDescription(), data, defaultValue);
+  }
+
+  public EnumParameter(final EnumParameter<T> template, final EnumFactory<? extends T> factory)
+  {
+    this(template.getID(), template.getName(), template.getDescription(), factory);
+  }
+
+  public EnumParameter(final int id,
+                       final String name,
+                       final String description)
+  {
+    super(id, name, description);
   }
 
   public EnumParameter(final int id,

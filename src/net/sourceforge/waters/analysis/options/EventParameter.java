@@ -202,8 +202,8 @@ public class EventParameter extends Parameter
 
       //Set the icon and text.  If icon null, show name.
       final Icon icon = DESContext.getEventIcon(value);
-      setIcon(icon);
       if (icon != null) {
+        setIcon(icon);
         setText(value.getName());
       } else {
         setText(value.getName());

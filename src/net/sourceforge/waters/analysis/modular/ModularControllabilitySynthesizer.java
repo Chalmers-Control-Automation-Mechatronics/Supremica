@@ -188,10 +188,7 @@ public class ModularControllabilitySynthesizer
       }
     }
     list.add(new BoolParameter
-      (ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors,
-       "Remove unnecessary supervisors",
-       "Check whether new superivsors impose additional constraints over " +
-       "those previously computed, and remove those that do not.", true)
+      (ParameterIDs.ModularControllabilitySynthesizer_BoolParameter_RemovesUnnecessarySupervisors)
       {
         @Override
         public void commitValue()

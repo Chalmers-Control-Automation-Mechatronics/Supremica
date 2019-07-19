@@ -298,10 +298,7 @@ public class NativeConflictChecker
         }
       });
     list.add(new EnumParameter<ConflictCheckMode>
-      (ParameterIDs.NativeConflictChecker_ConflictCheckMode,
-       "Conflict check mode",
-       "The algorithm used to store or explore the reverse transition relation",
-       ConflictCheckMode.values(), ConflictCheckMode.COMPUTED_BACKWARDS_TRANSITIONS)
+      (ParameterIDs.NativeConflictChecker_EnumParameter_ConflictCheckMode)
       {
         @Override
         public void commitValue()

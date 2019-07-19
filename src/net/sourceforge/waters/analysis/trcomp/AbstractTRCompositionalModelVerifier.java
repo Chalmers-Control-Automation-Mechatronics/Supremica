@@ -147,10 +147,7 @@ public abstract class AbstractTRCompositionalModelVerifier
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");
         iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
-           "Short counterexample",
-           "Try to compute a counterexample that is as short as possible.",
-           true)
+          (ParameterIDs.ModelVerifier_BoolParameter_ShortCounterExampleRequested)
           {
             @Override
             public void commitValue()
@@ -159,11 +156,7 @@ public abstract class AbstractTRCompositionalModelVerifier
             }
           });
         iter.add(new BoolParameter
-          (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled,
-           "Counterexample debugging",
-           "When computing counterexamples, perform debug checks to ensure " +
-           "that the counterexample is accepted after every abstraction step",
-           false)
+          (ParameterIDs.AbstractCompositionalModelVerifier_BoolParameter_TraceCheckingEnabled)
           {
             @Override
             public void commitValue()

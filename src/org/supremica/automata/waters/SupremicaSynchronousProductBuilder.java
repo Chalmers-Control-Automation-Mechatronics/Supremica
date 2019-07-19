@@ -57,7 +57,6 @@ import java.util.List;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.ComponentKindParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -379,11 +378,7 @@ public class SupremicaSynchronousProductBuilder
       }
     }
     list.add(new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-       "Marking proposition",
-       "The proposition that defines states as marked in the synchronous " +
-       "product. Other propositions are ignored.",
-       EventParameterType.ALLOW_NULL)
+      (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()

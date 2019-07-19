@@ -285,10 +285,7 @@ public abstract class BDDModelVerifier
           ("Maximum number of BDD nodes allowed before aborting");
         iter.previous();
         iter.add(new EnumParameter<BDDPackage>
-          (ParameterIDs.BDDModelVerifier_BDDPackage,
-           "BDD package",
-           "The BDD package used when running the algorithm",
-           BDDPackage.values(), null)
+          (ParameterIDs.BDDModelVerifier_EnumParameter_BDDPackage)
           {
             @Override
             public void commitValue()
@@ -306,10 +303,7 @@ public abstract class BDDModelVerifier
       }
     }
     list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_InitialSize,
-       "Initial BDD table size",
-       "The initial number of BDD nodes to be supported by the BDD package",
-       0, Integer.MAX_VALUE, 50000)
+      (ParameterIDs.BDDModelVerifier_IntParameter_InitialSize)
       {
         @Override
         public void commitValue()
@@ -318,11 +312,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new EnumParameter<TransitionPartitioningStrategy>
-      (ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy,
-       "Transition partitioning strategy",
-       "The method used to split the transition relation BDD into " +
-       "disjunctive components",
-       TransitionPartitioningStrategy.values(), null)
+      (ParameterIDs.BDDModelVerifier_EnumParameter_TransactionPartitioningStrategy)
       {
         @Override
         public void commitValue()
@@ -331,11 +321,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_PartitionSizeLimit,
-       "Partition size limit",
-       "The maximum number of BDD nodes allowed in a transition relation BDD " +
-       "before it is split when partitioning",
-       0, Integer.MAX_VALUE, 10000)
+      (ParameterIDs.BDDModelVerifier_IntParameter_PartitionSizeLimit)
       {
         @Override
         public void commitValue()
@@ -344,10 +330,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new EnumParameter<VariableOrdering>
-      (ParameterIDs.BDDModelVerifier_VariableOrdering,
-       "Initial variable ordering",
-       "The strategy to determine the initial ordering of the BDD variables",
-       VariableOrdering.values(), null)
+      (ParameterIDs.BDDModelVerifier_EnumParameter_VariableOrdering)
       {
         @Override
         public void commitValue()
@@ -356,10 +339,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.BDDModelVerifier_ReorderingEnabled,
-       "Dynamic variable reordering",
-       "Try to improve the BDD variable ordering between iterations",
-       false)
+      (ParameterIDs.BDDModelVerifier_BoolParameter_ReorderingEnabled)
       {
         @Override
         public void commitValue()
@@ -377,7 +357,6 @@ public abstract class BDDModelVerifier
   {
     return mNumAutomata;
   }
-
 
   //#########################################################################
   //# Overrides for Algorithms

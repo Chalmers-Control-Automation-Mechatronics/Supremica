@@ -41,7 +41,6 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -192,10 +191,7 @@ public abstract class AbstractSupervisorSynthesizer
      }
     }
    list.add(0, new EventParameter
-     (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking,
-      "Marking proposition",
-      "If synthesising a nonblocking supervisor, it will be nonblocking " +
-      "with respect to this proposition.", EventParameterType.PREVENT_NULL)
+     (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
      {
        @Override
        public void commitValue()
@@ -204,11 +200,7 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis,
-      "Nonblocking supervisor",
-      "Synthesise a supervisor that is nonblocking with respect " +
-      "to the configured marking proposition.",
-      isNonblockingSynthesis())
+     (ParameterIDs.SupervisorSynthesizer_BoolParameter_NonblockingSynthesis)
      {
        @Override
        public void commitValue()
@@ -217,10 +209,7 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis,
-      "Controllable supervisor",
-      "Synthesise a controllable supervisor.",
-      true)
+     (ParameterIDs.SupervisorSynthesizer_BoolParameter_ControllableSynthesis)
      {
        @Override
        public void commitValue()
@@ -232,10 +221,8 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-       "Supervisor reduction",
-       "Method of supervisor reduction to be used after synthesis",
-       DefaultSupervisorReductionFactory.class.getEnumConstants())
+      (ParameterIDs.SupervisorSynthesizer_EnumParameter_SupervisorReductionFactory,
+        DefaultSupervisorReductionFactory.class.getEnumConstants())
       {
         @Override
         public void commitValue()
@@ -244,11 +231,7 @@ public abstract class AbstractSupervisorSynthesizer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
-       "Localize supervisors",
-       "If using supervisor reduction, create a separate supervisor " +
-       "for each controllable event that needs to be disabled.",
-       true)
+      (ParameterIDs.SupervisorSynthesizer_BoolParameter_SupervisorLocalisationEnabled)
       {
         @Override
         public void commitValue()

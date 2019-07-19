@@ -23,7 +23,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
   public ComponentKindParameter(final ComponentKindParameter template)
   {
     //template already has null added to list
-    super(template);
+    super(template, template.getList());
   }
 
   public ComponentKindParameter(final int id,

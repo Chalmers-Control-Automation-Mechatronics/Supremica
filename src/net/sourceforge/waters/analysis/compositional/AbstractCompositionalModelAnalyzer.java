@@ -659,10 +659,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<PreselectingMethod>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod,
-        "Preselection method",
-        "Preselection heuristic to choose groups of automata to consider " +
-        "for composition.",
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_PreselectingMethod,
         getPreselectingMethodFactory())
       {
         @Override
@@ -672,10 +669,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<SelectionHeuristicCreator>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelectionHeurisitc,
-       "Selection heuristic",
-       "Heuristic to choose the group of automata to compose and simplify " +
-         "from the options produced by the preselection method.",
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_SelectionHeurisitc,
          getSelectionHeuristicFactory())
       {
         @Override
@@ -685,11 +679,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled,
-       "Use subumption test",
-       "Suppress candidate groups of automata that are supersets of " +
-       "other candidates.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_SubumptionEnabled)
       {
         @Override
         public void commitValue()
@@ -698,10 +688,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<AbstractionProcedureCreator>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
-       "Abstraction procedure",
-       "Abstraction procedure to simplify automata during compositional " +
-       "minimisation.",
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_AbstractionProcedureCreator,
        getAbstractionProcedureFactory())
       {
         @Override
@@ -711,10 +698,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit,
-       "Internal state limit",
-       "The maximum number of states allowed for intermediate automata.",
-       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalStateLimit)
       {
         @Override
         public void commitValue()
@@ -725,10 +709,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit,
-       "Internal transition limit",
-       "The maximum number of transitions allowed for intermediate automata.",
-       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -737,11 +718,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit,
-       "Monolithic state limit",
-       "The maximum number of states allowed during monolithic analysis " +
-       "attempts.",
-       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicStatelimit)
       {
         @Override
         public void commitValue()
@@ -750,11 +727,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit,
-       "Monolithic transition limit",
-       "The maximum number of transitions allowed during monolithic " +
-       "analysis attempts.",
-       0, Integer.MAX_VALUE, Integer.MAX_VALUE)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -763,10 +736,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled,
-       "Use blocked events",
-       "Detect and remove events known to be globablly disabled.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_BlockedEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -775,12 +745,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled,
-       "Use selfloop-only events",
-       "Detect events that are appear only as selfloop outside of the " +
-       "subsystem being abstracted, and use this information to help with " +
-       "minimisation.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_SelfLoopOnlyEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -789,11 +754,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled,
-       "Use failing events",
-       "Detect events that only lead to blocking states and " +
-       "simplify automata based on this information.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_FailingEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -802,11 +763,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks,
-       "Prune deadlocks",
-       "Allow synchronous product construction to stop when encountering " +
-       "states that are a deadlock in one of the components.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_PruningDeadlocks)
       {
         @Override
         public void commitValue()
@@ -816,10 +773,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       });
     //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
     list.add(new FileParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile,
-       "Dump file name",
-       "If set, any abstracted model will be written to this file " +
-       "before being sent for monolithic verification.")
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_FileParameter_MonolithicDumpFile)
       {
         @Override
         public void commitValue()

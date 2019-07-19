@@ -115,10 +115,7 @@ public abstract class NativeModelVerifier
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");
         iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested,
-           "Short counterexample",
-           "Try to compute a counterexample that is as short as possible.",
-           true)
+          (ParameterIDs.ModelVerifier_BoolParameter_ShortCounterExampleRequested)
           {
             @Override
             public void commitValue()

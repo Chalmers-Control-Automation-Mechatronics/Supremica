@@ -280,11 +280,7 @@ public class TRCompositionalConflictChecker
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks,
-       "Prune deadlocks",
-       "Allow synchronous product construction to stop when encountering " +
-       "states that are a deadlock in one of the components.",
-       true)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_PruningDeadlocks)
       {
         @Override
         public void commitValue()
