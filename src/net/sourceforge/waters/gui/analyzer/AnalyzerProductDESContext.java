@@ -89,6 +89,8 @@ public class AnalyzerProductDESContext
   @Override
   public Icon getComponentKindIcon(final ComponentKind kind)
   {
+    // TODO Better use ModuleContext.getComponentKindIcon()
+    // TODO Also use ModuleContext.getComponentKindToolTip() to get a nicer text
     if(kind == ComponentKind.PLANT) {
       return IconAndFontLoader.ICON_PLANT;
     }
@@ -105,6 +107,7 @@ public class AnalyzerProductDESContext
       return null;
     }
   }
+
 
   //#########################################################################
   //# Constructors

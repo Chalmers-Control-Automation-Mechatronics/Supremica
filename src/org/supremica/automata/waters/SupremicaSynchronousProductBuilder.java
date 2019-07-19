@@ -369,7 +369,7 @@ public class SupremicaSynchronousProductBuilder
   {
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
         param.setName("Build automaton model");
         param.setDescription("Disable this to suppress the creation of a " +
                              "synchronous product automaton, and only run " +

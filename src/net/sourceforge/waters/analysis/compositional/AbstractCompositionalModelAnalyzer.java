@@ -648,7 +648,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     list.add(new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
        "Marking proposition",
        "The proposition to identify marked states for the nonblocking property.", EventParameterType.PREVENT_NULL)
       {

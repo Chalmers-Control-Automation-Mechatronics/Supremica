@@ -63,7 +63,7 @@ public class EventParameter extends Parameter
 {
   public EventParameter(final EventParameter template)
   {
-   this(template.getID(), template.getName(), template.getDescription(), template.getNullOptions());
+    this(template.getID(), template.getName(), template.getDescription(), template.getNullOptions());
   }
 
   public EventParameter(final int id,
@@ -77,15 +77,17 @@ public class EventParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESContext model)
+  public Component createComponent(final ProductDESContext context)
   {
+    // TODO handle the case that there are no propositions in the model.
+    // TODO If noEvent is selected, pass null to the model analyser.
     final List<EventProxy> propositions = new ArrayList<>();
-    DESContext = model;
+    mDESContext = context;
 
     final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
 
-    for(final EventProxy event: model.getProductDES().getEvents()) {
+    for(final EventProxy event: context.getProductDES().getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
         propositions.add(event);
         //if :accepting exists and this is first creation
@@ -170,14 +172,13 @@ public class EventParameter extends Parameter
     return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
+
   //#########################################################################
-  //# Private Class
-
-  private class EventProxyRenderer extends JLabel implements ListCellRenderer<EventProxy>
+  //# Inner Class EventProxyRenderer
+  private class EventProxyRenderer extends JLabel
+    implements ListCellRenderer<EventProxy>
   {
-    private static final long serialVersionUID = 1L;
-
-    public EventProxyRenderer()
+     public EventProxyRenderer()
     {
       setOpaque(true);
       setHorizontalAlignment(CENTER);
@@ -190,7 +191,6 @@ public class EventParameter extends Parameter
                                                   final boolean isSelected,
                                                   final boolean cellHasFocus)
     {
-
       //Highlight when hover over
       if (isSelected) {
         setBackground(list.getSelectionBackground());
@@ -199,23 +199,26 @@ public class EventParameter extends Parameter
         setBackground(list.getBackground());
         setForeground(list.getForeground());
       }
-
       //Set the icon and text.  If icon null, show name.
-      final Icon icon = DESContext.getEventIcon(value);
+      final Icon icon = mDESContext.getEventIcon(value);
+      setIcon(icon);
+      // TODO What is the point of the if statement?
       if (icon != null) {
-        setIcon(icon);
         setText(value.getName());
       } else {
         setText(value.getName());
       }
-
       return this;
     }
+
+    private static final long serialVersionUID = -5976102332552680659L;
   }
+
 
   //#########################################################################
   //# Data Members
   private EventProxy mValue;
   private final EventParameterType mNullOptions;
-  private ProductDESContext DESContext;
+  private ProductDESContext mDESContext;
+
 }

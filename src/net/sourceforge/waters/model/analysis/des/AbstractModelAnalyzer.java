@@ -196,7 +196,7 @@ public abstract class AbstractModelAnalyzer
   {
     final List<Parameter> list = new LinkedList<>();
     list.add(new BoolParameter
-      (ParameterIDs.ModelAnalyzer_BoolParameter_DetailedOutputEnabled)
+      (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled)
       {
         @Override
         public void commitValue()

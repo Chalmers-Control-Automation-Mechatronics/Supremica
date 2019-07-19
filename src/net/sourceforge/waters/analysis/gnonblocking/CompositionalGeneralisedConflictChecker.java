@@ -1286,7 +1286,7 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Preselecting Heuristics
-  abstract class PreselectingHeuristic
+  public abstract class PreselectingHeuristic
   {
     /**
      * Checks if a candidate is valid. To satisfy being a valid candidate it

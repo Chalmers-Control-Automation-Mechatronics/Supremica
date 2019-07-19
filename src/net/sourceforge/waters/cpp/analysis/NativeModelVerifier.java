@@ -110,7 +110,7 @@ public abstract class NativeModelVerifier
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
         param.setName("Compute counterexample");
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");

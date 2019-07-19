@@ -161,7 +161,7 @@ public abstract class AbstractSupervisorSynthesizer
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +

@@ -173,7 +173,7 @@ public abstract class TRAbstractSynchronousProductBuilder
     final ListIterator<Parameter> iter = list.listIterator();
     while (iter.hasNext()) {
       final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
         param.setName("Build automaton model");
         param.setDescription("Disable this to suppress the creation of a " +
                              "synchronous product automaton, and only run " +

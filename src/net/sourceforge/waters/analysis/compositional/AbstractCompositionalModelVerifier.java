@@ -331,7 +331,7 @@ public abstract class AbstractCompositionalModelVerifier
     final ListIterator<Parameter> iter = list.listIterator();
     while (iter.hasNext()) {
       final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
         param.setName("Compute counterexample");
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");

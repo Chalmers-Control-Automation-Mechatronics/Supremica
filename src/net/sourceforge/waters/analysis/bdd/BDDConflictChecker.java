@@ -194,7 +194,7 @@ public class BDDConflictChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking,
+      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking_ID,
        "Precondition marking",
        "Precondition marking used for generalised conflict check",
        EventParameterType.PREVENT_NULL)
@@ -206,7 +206,7 @@ public class BDDConflictChecker
         }
       });
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking,
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
        "Marking proposition",
        "The model is considered as nonblocking, if it is always possible " +
        "to reach a state marked by this proposition",

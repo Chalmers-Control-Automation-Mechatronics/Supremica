@@ -130,7 +130,7 @@ public abstract class AbstractAutomatonBuilder
   {
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled) {
+      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
         param.setName("Build automaton model");
         param.setDescription("Disable this to suppress the creation of an " +
                              "output automaton, and only run for statistics.");

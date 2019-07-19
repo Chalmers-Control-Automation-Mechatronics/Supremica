@@ -51,27 +51,29 @@ import net.sourceforge.waters.model.base.ComponentKind;
 public class ParameterIDs
 {
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
-  public static final int ModelAnalyzer_DetailedOutputEnabled = 0;
+  public static final int ModelAnalyzer_DetailedOutputEnabled_ID = 0;
   public static final int ModelAnalyzer_KindTranslator = 1;                     //Unused
   public static final int ModelAnalyzer_NodeLimit = 2;
   public static final int ModelAnalyzer_TransitionLimit = 3;
 
+  public static final BoolParameter ModelAnalyzer_DetailedOutputEnabled =
+    new BoolParameter
+     (ModelAnalyzer_DetailedOutputEnabled_ID,
+      "Detailed output",
+      "Compute full output, e.g., synthesised supervisor automata or " +
+      "counterexample.",
+      true);
 
-  public static final BoolParameter ModelAnalyzer_BoolParameter_DetailedOutputEnabled = new BoolParameter
-    (ModelAnalyzer_DetailedOutputEnabled,
-     "Detailed output",
-     "Compute full output, e.g., synthesised supervisor automata or " +
-     "counterexample.",
-     true);
+  public static final IntParameter ModelAnalyzer_IntParameter_NodeLimit =
+    new IntParameter
+     (ModelAnalyzer_NodeLimit,
+      "Node limit",
+      "The maximum number of nodes the analyser is allowed to keep " +
+      "in memory at any one time.",
+      0, Integer.MAX_VALUE, Integer.MAX_VALUE); //how to getNodeLimit()
 
-  public static final IntParameter ModelAnalyzer_IntParameter_NodeLimit = new IntParameter
-    (ModelAnalyzer_NodeLimit,
-     "Node limit",
-     "The maximum number of nodes the analyser is allowed to keep " +
-     "in memory at any one time.",
-     0, Integer.MAX_VALUE, Integer.MAX_VALUE);
-
-   public static final IntParameter ModelAnalyzer_IntParameter_TransitionLimit =   new IntParameter
+  public static final IntParameter ModelAnalyzer_IntParameter_TransitionLimit =
+    new IntParameter
      (ModelAnalyzer_TransitionLimit,
       "Transition limit",
       "The maximum number of transitions the analyser is allowed to " +
@@ -115,7 +117,7 @@ public class ParameterIDs
                        "Marking proposition",
                        "If synthesising a nonblocking supervisor, it will be nonblocking "
                                               + "with respect to this proposition.",
-                       EventParameterType.DEFAULT_NULL);
+                       EventParameterType.ALLOW_NULL);
 
 
   public static final BoolParameter SupervisorSynthesizer_BoolParameter_SupervisorLocalisationEnabled =   new BoolParameter
@@ -258,8 +260,22 @@ public static BoolParameter AbstractCompositionalModelAnalyzer_BoolParameter_Sub
    "those previously computed, and remove those that do not.", true);
 
  //net.sourceforge.waters.model.analysis.ConflictChecker
-  public static final int ConflictChecker_ConfiguredDefaultMarking = 700;
-  public static final int ConflictChecker_ConfiguredPreconditionMarking = 701;
+  public static final int ConflictChecker_ConfiguredDefaultMarking_ID = 700;
+  public static final int ConflictChecker_ConfiguredPreconditionMarking_ID = 701;
+
+
+  public static final EventParameter ConflictChecker_ConfiguredDefaultMarking =
+    new EventParameter(ConflictChecker_ConfiguredDefaultMarking_ID,
+                       "Marking proposition",
+                       "If synthesising a nonblocking supervisor, it will be nonblocking "
+                                              + "with respect to this proposition.",
+                       EventParameterType.PREVENT_NULL);
+  public static final EventParameter ConflictChecker_ConfiguredPreconditionMarking =
+    new EventParameter(ConflictChecker_ConfiguredPreconditionMarking_ID,
+                       "Marking proposition",
+                       "If synthesising a nonblocking supervisor, it will be nonblocking "
+                                              + "with respect to this proposition.",
+                       EventParameterType.DEFAULT_NULL);
 
   //net.sourceforge.waters.model.analysis.des.ModelVerifier
   public static final int ModelVerifier_CounterExampleEnabled = 800;                //unused

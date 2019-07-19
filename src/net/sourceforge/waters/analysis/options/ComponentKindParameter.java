@@ -2,7 +2,6 @@ package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
 import java.util.ArrayList;
-import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.JComboBox;
@@ -14,10 +13,12 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.ComponentKind;
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of <CODE>ComponentKind</CODE> type.
+ * A configurable parameter of a {@link ModelAnalyzer} of
+ * <CODE>ComponentKind</CODE> type.
  *
  * @author Brandon Bassett
  */
+
 public class ComponentKindParameter extends EnumParameter<ComponentKind>
 {
   public ComponentKindParameter(final ComponentKindParameter template)
@@ -26,50 +27,40 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
     super(template, template.getList());
   }
 
+  // TODO We do not need the 4th argument, which is always the same.
   public ComponentKindParameter(final int id,
-                       final String name,
-                       final String description,
-                       final ComponentKind[] data)
+                                final String name,
+                                final String description,
+                                final ComponentKind[] data)
   {
-    super(id, name, description, data, data[0]);
-
+    super(id, name, description, ComponentKind.values());
     final ArrayList<ComponentKind> tmp = new ArrayList<>(mList);
+    // TODO Do not allow null, but calculate a default value like George did
+    // in the (now commented) method SynchronousProductDialog.getKind().
     tmp.add(null);
     mList = tmp;
   }
 
   @Override
-  public Component createComponent(final ProductDESContext model)
+  public Component createComponent(final ProductDESContext context)
   {
-    final Vector<ComponentKind> vector = new Vector<> (mList);
-    final JComboBox<ComponentKind> ret = new JComboBox<>(vector);
-    ret.setSelectedItem(mValue);
-
-    DESContext = model;
-
+    mDESContext = context;
+    @SuppressWarnings("unchecked")
+    final
+    JComboBox<ComponentKind> comboBox =
+      (JComboBox<ComponentKind>) super.createComponent(context);
     final ComponentKindRenderer renderer= new ComponentKindRenderer();
-    ret.setRenderer(renderer);
-    return ret;
+    comboBox.setRenderer(renderer);
+    return comboBox;
   }
 
-  @Override
-  public void updateFromParameter(final Parameter p)
-  {
-    mValue = ((ComponentKindParameter) p).getValue();
-  }
 
   //#########################################################################
-  //# Data Variables
-  private ProductDESContext DESContext;
-
-  //#########################################################################
-  //# Private Class
-
-  private class ComponentKindRenderer extends JLabel implements ListCellRenderer<ComponentKind>
+  //# Inner Class ComponentKindRenderer
+  private class ComponentKindRenderer extends JLabel
+    implements ListCellRenderer<ComponentKind>
   {
-    private static final long serialVersionUID = 1L;
-
-    public ComponentKindRenderer()
+    private ComponentKindRenderer()
     {
       setOpaque(true);
       setHorizontalAlignment(CENTER);
@@ -90,20 +81,24 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
         setBackground(list.getBackground());
         setForeground(list.getForeground());
       }
-
       //Set the icon and text
-      final Icon image = DESContext.getComponentKindIcon(value);
-
+      final Icon image = mDESContext.getComponentKindIcon(value);
       if(image != null) {
         setIcon(image);
         setText(value.toString());
-      }
-      else {
+      } else {
         setIcon(null);
         setText("null");
       }
-
       return this;
     }
+
+    private static final long serialVersionUID = 3036791589875590296L;
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private ProductDESContext mDESContext;
+
 }

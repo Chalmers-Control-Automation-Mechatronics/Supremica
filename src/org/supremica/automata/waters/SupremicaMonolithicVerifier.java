@@ -200,7 +200,7 @@ public  class SupremicaMonolithicVerifier
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
         param.setName("Print counterexample");
         param.setDescription("Show trace to bad state as info in log.");
         break;

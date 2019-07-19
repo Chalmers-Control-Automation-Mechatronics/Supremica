@@ -186,7 +186,7 @@ public abstract class AbstractCompositionalSynthesizer
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled:
+      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
         param.setName("Create supervisor automata");
         param.setDescription("Disable this to suppress the creation of supervisor " +
                              "automata, and only determine whether a supervisor " +
@@ -201,7 +201,7 @@ public abstract class AbstractCompositionalSynthesizer
             }
           });
         break;
-      case ParameterIDs.ConflictChecker_ConfiguredDefaultMarking:
+      case ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID:
         iter.remove();
         break;
       default:
