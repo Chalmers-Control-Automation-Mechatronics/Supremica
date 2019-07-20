@@ -262,11 +262,11 @@ public class MonolithicSynchronousProductBuilder
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
         param.setName("State limit");
         param.setDescription("Maximum number of states before aborting.");
         break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         param.setDescription("Maximum number of transitions before aborting.");
         break;
       default:
@@ -274,11 +274,7 @@ public class MonolithicSynchronousProductBuilder
       }
     }
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
-       "Remove Selfloops",
-       "Remove events that appear only as selfloop on every state," +
-       "as well as propositions that appear on all states, from the result.",
-       isRemovingSelfloops())
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
       {
         @Override
         public void commitValue()
@@ -287,11 +283,7 @@ public class MonolithicSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks,
-       "Prune deadlocks",
-       "Stop synchronous product construction when encountering " +
-       "states that are a deadlock in one of the components.",
-       isPruningDeadlocks())
+      (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks)
       {
         @Override
         public void commitValue()

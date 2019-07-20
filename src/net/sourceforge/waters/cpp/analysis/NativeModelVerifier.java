@@ -115,7 +115,7 @@ public abstract class NativeModelVerifier
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");
         iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_BoolParameter_ShortCounterExampleRequested)
+          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested)
           {
             @Override
             public void commitValue()
@@ -124,12 +124,12 @@ public abstract class NativeModelVerifier
             }
           });
         break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
         param.setName("State limit");
         param.setDescription
           ("Maximum number of states that can be encountered before aborting");
         break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         param.setDescription
           ("Maximum number of transitions that can be explored before aborting");
         break;

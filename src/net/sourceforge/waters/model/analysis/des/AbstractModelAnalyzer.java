@@ -205,7 +205,7 @@ public abstract class AbstractModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_IntParameter_NodeLimit, getNodeLimit())
+      (ParameterIDs.ModelAnalyzer_NodeLimit, getNodeLimit())
       {
         @Override
         public void commitValue()
@@ -214,7 +214,7 @@ public abstract class AbstractModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_IntParameter_TransitionLimit, getTransitionLimit())
+      (ParameterIDs.ModelAnalyzer_TransitionLimit, getTransitionLimit())
       {
         @Override
         public void commitValue()

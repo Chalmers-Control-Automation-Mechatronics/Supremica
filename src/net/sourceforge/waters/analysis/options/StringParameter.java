@@ -53,6 +53,12 @@ public class StringParameter extends Parameter
     mValue = template.getValue();
   }
 
+  public StringParameter(final StringParameter template, final String value)
+  {
+    super(template.getID(), template.getName(), template.getDescription());
+    mValue = value;
+  }
+
   public StringParameter(final int id, final String name,
                          final String description, final String value)
   {

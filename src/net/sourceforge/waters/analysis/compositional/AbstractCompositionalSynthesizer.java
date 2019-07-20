@@ -192,7 +192,7 @@ public abstract class AbstractCompositionalSynthesizer
                              "automata, and only determine whether a supervisor " +
                              "exists.");
         iter.add(new StringParameter
-          (ParameterIDs.ModelBuilder_StringParameter_OutputName)
+          (ParameterIDs.ModelBuilder_OutputName)
           {
             @Override
             public void commitValue()
@@ -209,7 +209,7 @@ public abstract class AbstractCompositionalSynthesizer
       }
     }
     list.add(0, new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
+      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -218,7 +218,7 @@ public abstract class AbstractCompositionalSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_BoolParameter_NonblockingSynthesis)
+      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
       {
         @Override
         public void commitValue()
@@ -227,7 +227,7 @@ public abstract class AbstractCompositionalSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_BoolParameter_ControllableSynthesis)
+      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
       {
         @Override
         public void commitValue()
@@ -239,7 +239,7 @@ public abstract class AbstractCompositionalSynthesizer
         }
       });
     list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_EnumParameter_SupervisorReductionFactory,
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
         DefaultSupervisorReductionFactory.class.getEnumConstants())
       {
         @Override

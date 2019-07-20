@@ -378,7 +378,7 @@ public class SupremicaSynchronousProductBuilder
       }
     }
     list.add(new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
+      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -387,10 +387,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName,
-       "Output name",
-       "Name of the generated synchronous product automaton.",
-       getOutputName())
+      (ParameterIDs.ModelBuilder_OutputName)
       {
         @Override
         public void commitValue()
@@ -399,10 +396,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new ComponentKindParameter
-      (ParameterIDs.AutomatonBuilder_OutputKind,
-       "Output kind",
-       "Type of the generated synchronous product automaton.",
-       ComponentKind.values())
+      (ParameterIDs.AutomatonBuilder_OutputKind)
       {
         @Override
         public void commitValue()
@@ -411,10 +405,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames,
-       "Short state names",
-       "Use short state instead of detailed state tuple information.",
-       isUsingShortStateNames())
+      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames)
       {
         @Override
         public void commitValue()
@@ -424,8 +415,6 @@ public class SupremicaSynchronousProductBuilder
       });
     list.add(new StringParameter
       (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator,
-       "State name separator",
-       "Separator for state tuple components when using long state names.",
        getStateNameSeparator())
       {
         @Override
@@ -435,11 +424,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
-       "Remove Selfloops",
-       "Remove events that appear only as selfloop on every state," +
-       "as well as propositions that appear on all states, from the result.",
-       isRemovingSelfloops())
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
       {
         @Override
         public void commitValue()
@@ -448,10 +433,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden,
-       "Forbid uncontrollable states",
-       "Mark uncontrollable states as forbidden in the synchronous composition.",
-       isMarkingUncontrollableStatesAsForbidden())
+      (ParameterIDs.SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden)
       {
         @Override
         public void commitValue()
@@ -460,11 +442,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ExpandingForbiddenStates,
-       "Expand forbidden states",
-       "If checked, transitions from forbidden states are examined. " +
-       "Otherwise forbidden states are considered terminal.",
-       isExpandingForbiddenStates())
+      (ParameterIDs.SupremicaSynchronousProductBuilder_ExpandingForbiddenStates)
       {
         @Override
         public void commitValue()
@@ -473,11 +451,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_RememberingDisabledEvents,
-       "Remember disabled events",
-       "Add transitions to a 'dump' state for all events enabled in the plant " +
-       "but disabled by a specification.",
-       isRememberingDisabledEvents())
+      (ParameterIDs.SupremicaSynchronousProductBuilder_RememberingDisabledEvents)
       {
         @Override
         public void commitValue()
@@ -486,11 +460,7 @@ public class SupremicaSynchronousProductBuilder
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
-       "Add uncontrollables to plant",
-       "Treat uncontrollable events that appear in specifications but " +
-       "not in plants as always enabled for the purpose of controllability.",
-       isEnsuringUncontrollablesInPlant())
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
       {
         @Override
         public void commitValue()

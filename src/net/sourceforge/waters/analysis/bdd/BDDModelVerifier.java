@@ -279,13 +279,13 @@ public abstract class BDDModelVerifier
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
         param.setName("BDD node limit");
         param.setDescription
           ("Maximum number of BDD nodes allowed before aborting");
         iter.previous();
         iter.add(new EnumParameter<BDDPackage>
-          (ParameterIDs.BDDModelVerifier_EnumParameter_BDDPackage)
+          (ParameterIDs.BDDModelVerifier_BDDPackage)
           {
             @Override
             public void commitValue()
@@ -295,7 +295,7 @@ public abstract class BDDModelVerifier
           });
         iter.next();
         break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         iter.remove();
         break;
       default:
@@ -303,7 +303,7 @@ public abstract class BDDModelVerifier
       }
     }
     list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_IntParameter_InitialSize)
+      (ParameterIDs.BDDModelVerifier_InitialSize)
       {
         @Override
         public void commitValue()
@@ -312,7 +312,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new EnumParameter<TransitionPartitioningStrategy>
-      (ParameterIDs.BDDModelVerifier_EnumParameter_TransactionPartitioningStrategy)
+      (ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy)
       {
         @Override
         public void commitValue()
@@ -321,7 +321,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_IntParameter_PartitionSizeLimit)
+      (ParameterIDs.BDDModelVerifier_PartitionSizeLimit)
       {
         @Override
         public void commitValue()
@@ -330,7 +330,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new EnumParameter<VariableOrdering>
-      (ParameterIDs.BDDModelVerifier_EnumParameter_VariableOrdering)
+      (ParameterIDs.BDDModelVerifier_VariableOrdering)
       {
         @Override
         public void commitValue()
@@ -339,7 +339,7 @@ public abstract class BDDModelVerifier
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.BDDModelVerifier_BoolParameter_ReorderingEnabled)
+      (ParameterIDs.BDDModelVerifier_ReorderingEnabled)
       {
         @Override
         public void commitValue()

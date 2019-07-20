@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
@@ -147,10 +146,7 @@ public abstract class AbstractConflictChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking_ID,
-       "Precondition marking",
-       "Precondition marking used for generalised conflict check",
-       EventParameterType.DEFAULT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking)
       {
         @Override
         public void commitValue()
@@ -159,11 +155,7 @@ public abstract class AbstractConflictChecker
         }
       });
    list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
-       "Marking proposition",
-       "The model is considered as nonblocking, if it is always possible " +
-       "to reach a state marked by this proposition",
-        EventParameterType.PREVENT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()

@@ -57,7 +57,6 @@ import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBu
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.FileParameter;
 import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -638,8 +637,8 @@ public abstract class AbstractCompositionalModelAnalyzer
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         iter.remove();
         break;
       default:
@@ -648,9 +647,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     }
 
     list.add(new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
-       "Marking proposition",
-       "The proposition to identify marked states for the nonblocking property.", EventParameterType.PREVENT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -659,7 +656,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<PreselectingMethod>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_PreselectingMethod,
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod,
         getPreselectingMethodFactory())
       {
         @Override
@@ -669,7 +666,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<SelectionHeuristicCreator>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_SelectionHeurisitc,
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelectionHeurisitc,
          getSelectionHeuristicFactory())
       {
         @Override
@@ -679,7 +676,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_SubumptionEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled)
       {
         @Override
         public void commitValue()
@@ -688,7 +685,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<AbstractionProcedureCreator>
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_EnumParameter_AbstractionProcedureCreator,
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
        getAbstractionProcedureFactory())
       {
         @Override
@@ -698,7 +695,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalStateLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
       {
         @Override
         public void commitValue()
@@ -709,7 +706,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -718,7 +715,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicStatelimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
       {
         @Override
         public void commitValue()
@@ -727,7 +724,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -736,7 +733,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_BlockedEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -745,7 +742,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_SelfLoopOnlyEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -754,7 +751,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_FailingEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -763,7 +760,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_PruningDeadlocks)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks)
       {
         @Override
         public void commitValue()
@@ -773,7 +770,7 @@ public abstract class AbstractCompositionalModelAnalyzer
       });
     //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
     list.add(new FileParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_FileParameter_MonolithicDumpFile)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile)
       {
         @Override
         public void commitValue()

@@ -397,8 +397,8 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         iter.remove();
         break;
       default:
@@ -407,7 +407,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     }
 
     list.add(new EnumParameter<TRPreselectionHeuristic>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_EnumParameter_PreselectionHeuristic,
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
         getPreselectionHeuristicFactory())
       {
         @Override
@@ -417,7 +417,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_EnumParameter_SelectionHeuristic,
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
        getSelectionHeuristicFactory())
       {
         @Override
@@ -427,7 +427,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_EnumParameter_SimplifierCreator,
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SimplifierCreator,
        getTRSimplifierFactory())
       {
         @Override
@@ -437,7 +437,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalStateLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
       {
         @Override
         public void commitValue()
@@ -448,7 +448,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
     // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -457,7 +457,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicStatelimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
       {
         @Override
         public void commitValue()
@@ -466,7 +466,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -475,7 +475,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_BlockedEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -484,7 +484,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_SelfLoopOnlyEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -493,7 +493,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_BoolParameter_AlwaysEnabledEventsEnabled)
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -502,7 +502,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_FailingEventsEnabled)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled)
       {
         @Override
         public void commitValue()
@@ -512,7 +512,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       });
     //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
     list.add(new FileParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_FileParameter_MonolithicDumpFile)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile)
       {
         @Override
         public void commitValue()

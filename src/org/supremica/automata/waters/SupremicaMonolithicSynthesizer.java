@@ -382,7 +382,7 @@ public class SupremicaMonolithicSynthesizer
       }
     }
     list.add(0, new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
+      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -391,7 +391,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_BoolParameter_NonblockingSynthesis)
+      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
       {
         @Override
         public void commitValue()
@@ -400,7 +400,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_BoolParameter_ControllableSynthesis)
+      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
       {
         @Override
         public void commitValue()
@@ -409,7 +409,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_Supremica_EnumParameter_SupervisorReductionFactory,
+      (ParameterIDs.SupervisorSynthesizer_Supremica_SupervisorReductionFactory,
         getSupervisorReductionFactory().getClass().getEnumConstants())
       {
         @Override
@@ -419,10 +419,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName,
-       "Output name",
-       "Name of the synthesised supervisor automaton.",
-       getOutputName())
+      (ParameterIDs.ModelBuilder_OutputName)
       {
         @Override
         public void commitValue()
@@ -431,10 +428,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames,
-       "Short state names",
-       "Use short state instead of detailed state tuple information.",
-       isUsingShortStateNames())
+      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames)
       {
         @Override
         public void commitValue()
@@ -444,8 +438,6 @@ public class SupremicaMonolithicSynthesizer
       });
     list.add(new StringParameter
       (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator,
-       "State name separator",
-       "Separator for state tuple components when using long state names.",
        getStateNameSeparator())
       {
         @Override
@@ -455,10 +447,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynthesizer_Purging,
-       "Purge result",
-       "Remove unreachable states from the synthesised supervisor.",
-       isPurging())
+      (ParameterIDs.SupremicaSynthesizer_Purging)
       {
         @Override
         public void commitValue()
@@ -467,11 +456,7 @@ public class SupremicaMonolithicSynthesizer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
-       "Add uncontrollables to plant",
-       "Treat uncontrollable events that appear in specifications " +
-       "but not in plants as always enabled.",
-       isEnsuringUncontrollablesInPlant())
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
       {
         @Override
         public void commitValue()

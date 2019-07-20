@@ -53,7 +53,6 @@ package org.supremica.automata.waters;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -118,11 +117,7 @@ public class SupremicaMonolithicConflictChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
-       "Marking proposition",
-       "The model is considered as nonblocking, if it is always possible " +
-       "to reach a state marked by this proposition.",
-        EventParameterType.PREVENT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()

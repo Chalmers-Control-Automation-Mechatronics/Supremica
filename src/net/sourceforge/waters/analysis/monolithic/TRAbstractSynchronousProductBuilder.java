@@ -178,16 +178,13 @@ public abstract class TRAbstractSynchronousProductBuilder
         param.setDescription("Disable this to suppress the creation of a " +
                              "synchronous product automaton, and only run " +
                              "for statistics.");
-      } else if (param.getID() == ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks) {
+      } else if (param.getID() == ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks_ID) {
         iter.previous();
         break;
       }
     }
     list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName,
-       "Output name",
-       "Name of the generated synchronous product automaton.",
-       getOutputName())
+      (ParameterIDs.ModelBuilder_OutputName)
       {
         @Override
         public void commitValue()
@@ -196,7 +193,7 @@ public abstract class TRAbstractSynchronousProductBuilder
         }
       });
     list.add(new ComponentKindParameter
-    (ParameterIDs.AutomatonBuilder_ComponentKindParameter_OutputKind)
+    (ParameterIDs.AutomatonBuilder_OutputKind)
     {
       @Override
       public void commitValue()
@@ -205,11 +202,7 @@ public abstract class TRAbstractSynchronousProductBuilder
       }
     });
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops,
-       "Remove Selfloops",
-       "Remove events that appear only as selfloop on every state," +
-       "as well as propositions that appear on all states, from the result.",
-       isRemovingSelfloops())
+      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
       {
         @Override
         public void commitValue()

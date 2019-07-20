@@ -278,11 +278,11 @@ public abstract class TRAbstractModelAnalyzer
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
         param.setName("State limit");
         param.setDescription("Maximum number of states before aborting.");
         break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         param.setDescription("Maximum number of transitions before aborting.");
         break;
       default:
@@ -290,11 +290,7 @@ public abstract class TRAbstractModelAnalyzer
       }
     }
     list.add(new BoolParameter
-      (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks,
-       "Prune deadlocks",
-       "Stop synchronous product construction when encountering " +
-       "states that are a deadlock in one of the components.",
-       isPruningDeadlocks())
+      (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks)
       {
         @Override
         public void commitValue()

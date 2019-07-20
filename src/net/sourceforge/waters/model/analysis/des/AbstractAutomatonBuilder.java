@@ -138,10 +138,7 @@ public abstract class AbstractAutomatonBuilder
       }
     }
     list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName,
-       "Output name",
-       "Name of the generated automaton.",
-       getOutputName())
+      (ParameterIDs.ModelBuilder_OutputName)
       {
         @Override
         public void commitValue()
@@ -150,10 +147,7 @@ public abstract class AbstractAutomatonBuilder
         }
       });
     list.add(new ComponentKindParameter
-    (ParameterIDs.AutomatonBuilder_OutputKind,
-     "Output kind",
-     "Type of the generated automaton.",
-     ComponentKind.values())
+    (ParameterIDs.AutomatonBuilder_OutputKind)
     {
       @Override
       public void commitValue()

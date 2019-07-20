@@ -147,7 +147,7 @@ public abstract class AbstractTRCompositionalModelVerifier
         param.setDescription("Computate a counterexample if model checking " +
                              "gives a failed result.");
         iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_BoolParameter_ShortCounterExampleRequested)
+          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested)
           {
             @Override
             public void commitValue()
@@ -156,7 +156,7 @@ public abstract class AbstractTRCompositionalModelVerifier
             }
           });
         iter.add(new BoolParameter
-          (ParameterIDs.AbstractCompositionalModelVerifier_BoolParameter_TraceCheckingEnabled)
+          (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled)
           {
             @Override
             public void commitValue()

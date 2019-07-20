@@ -178,7 +178,7 @@ public class ModularControllabilitySynthesizer
     final List<Parameter> list = super.getParameters();
     for (final Parameter param : list) {
       if (param.getID() ==
-          ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
+          ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis_ID) {
         param.setName("Locally nonblocking supervisors");
         param.setDescription
           ("Attempt to synthesise nonblocking supervisors each time a " +
@@ -188,7 +188,7 @@ public class ModularControllabilitySynthesizer
       }
     }
     list.add(new BoolParameter
-      (ParameterIDs.ModularControllabilitySynthesizer_BoolParameter_RemovesUnnecessarySupervisors)
+      (ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors)
       {
         @Override
         public void commitValue()

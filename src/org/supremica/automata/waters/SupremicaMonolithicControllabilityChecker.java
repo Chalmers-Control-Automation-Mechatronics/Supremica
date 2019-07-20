@@ -115,11 +115,7 @@ public class SupremicaMonolithicControllabilityChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
-       "Add uncontrollables to plant",
-       "Treat uncontrollable events that appear in specifications " +
-       "but not in plants as always enabled.",
-       isEnsuringUncontrollablesInPlant())
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
       {
         @Override
         public void commitValue()

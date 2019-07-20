@@ -125,11 +125,7 @@ public class SupremicaMonolithicLanguageInclusionChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant,
-       "Add uncontrollables to plant",
-       "Treat events that appear in properties but not in the system " +
-       "as always enabled.",
-       isEnsuringUncontrollablesInPlant())
+      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
       {
         @Override
         public void commitValue()

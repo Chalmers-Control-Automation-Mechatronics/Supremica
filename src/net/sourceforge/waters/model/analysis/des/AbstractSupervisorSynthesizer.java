@@ -167,10 +167,7 @@ public abstract class AbstractSupervisorSynthesizer
                              "automata, and only determine whether a supervisor " +
                              "exists.");
         iter.add(new StringParameter
-          (ParameterIDs.ModelBuilder_OutputName,
-           "Supervisor name prefix",
-           "Name or name prefix for synthesised supervisors.",
-           "sup")
+          (ParameterIDs.ModelBuilder_OutputName)
           {
             @Override
             public void commitValue()
@@ -179,11 +176,11 @@ public abstract class AbstractSupervisorSynthesizer
             }
           });
         break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
         param.setName("State limit");
         param.setDescription("Maximum number of states before aborting.");
         break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         param.setDescription("Maximum number of transitions before aborting.");
         break;
       default:
@@ -191,7 +188,7 @@ public abstract class AbstractSupervisorSynthesizer
      }
     }
    list.add(0, new EventParameter
-     (ParameterIDs.SupervisorSynthesizer_EventParameter_ConfiguredDefaultMarking)
+     (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
      {
        @Override
        public void commitValue()
@@ -200,7 +197,7 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_BoolParameter_NonblockingSynthesis)
+     (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
      {
        @Override
        public void commitValue()
@@ -209,7 +206,7 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_BoolParameter_ControllableSynthesis)
+     (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
      {
        @Override
        public void commitValue()
@@ -221,7 +218,7 @@ public abstract class AbstractSupervisorSynthesizer
        }
      });
    list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_EnumParameter_SupervisorReductionFactory,
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
         DefaultSupervisorReductionFactory.class.getEnumConstants())
       {
         @Override
@@ -231,7 +228,7 @@ public abstract class AbstractSupervisorSynthesizer
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_BoolParameter_SupervisorLocalisationEnabled)
+      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled)
       {
         @Override
         public void commitValue()

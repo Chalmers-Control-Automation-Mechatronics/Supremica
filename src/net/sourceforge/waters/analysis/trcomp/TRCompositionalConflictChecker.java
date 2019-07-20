@@ -66,7 +66,6 @@ import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBu
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.EventParameterType;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -255,10 +254,7 @@ public class TRCompositionalConflictChecker
   {
     final List<Parameter> list = super.getParameters();
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking_ID,
-       "Precondition marking",
-       "Precondition marking used for generalised conflict check",
-       EventParameterType.PREVENT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking)
       {
         @Override
         public void commitValue()
@@ -267,11 +263,7 @@ public class TRCompositionalConflictChecker
         }
       });
     list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID,
-       "Marking proposition",
-       "The model is considered as nonblocking, if it is always possible " +
-       "to reach a state marked by this proposition",
-       EventParameterType.PREVENT_NULL)
+      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking)
       {
         @Override
         public void commitValue()
@@ -280,7 +272,7 @@ public class TRCompositionalConflictChecker
         }
       });
     list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BoolParameter_PruningDeadlocks)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks)
       {
         @Override
         public void commitValue()

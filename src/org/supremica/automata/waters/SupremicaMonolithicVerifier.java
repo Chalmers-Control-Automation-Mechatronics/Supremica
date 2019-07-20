@@ -204,8 +204,8 @@ public  class SupremicaMonolithicVerifier
         param.setName("Print counterexample");
         param.setDescription("Show trace to bad state as info in log.");
         break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
         iter.remove();
         break;
       default:

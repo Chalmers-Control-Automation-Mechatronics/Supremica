@@ -463,9 +463,9 @@ public class CompositionalGeneralisedConflictChecker
     while (iter.hasNext()) {
       final Parameter param = iter.next();
       switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit:
-      case ParameterIDs.ModelVerifier_ShortCounterExampleRequested:
+      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
+      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
+      case ParameterIDs.ModelVerifier_ShortCounterExampleRequested_ID:
         iter.remove();
         break;
       default:
@@ -475,9 +475,6 @@ public class CompositionalGeneralisedConflictChecker
 
     list.add(new EnumParameter<PreselectingHeuristic>
       (ParameterIDs.CompositionalGeneralisedConflictChecker_PreselectingHeuristic,
-       "Preselection method",
-       "Preselection heuristic to generate groups of automata to consider " +
-       "for composition.",
        getPreselectingHeuristicFactory())
       {
         @Override
@@ -488,9 +485,6 @@ public class CompositionalGeneralisedConflictChecker
       });
     list.add(new EnumParameter<SelectingHeuristic>
       (ParameterIDs.CompositionalGeneralisedConflictChecker_SelectingHeuristic,
-       "Selection heuristic",
-       "Heuristic to choose the group of automata to compose and simplify " +
-       "from the options produced by the preselection method.",
        getSelectingHeuristicFactory())
       {
         @Override
@@ -500,7 +494,7 @@ public class CompositionalGeneralisedConflictChecker
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalStateLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
       {
         @Override
         public void commitValue()
@@ -509,7 +503,7 @@ public class CompositionalGeneralisedConflictChecker
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_InternalTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -518,7 +512,7 @@ public class CompositionalGeneralisedConflictChecker
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicStatelimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
       {
         @Override
         public void commitValue()
@@ -527,7 +521,7 @@ public class CompositionalGeneralisedConflictChecker
         }
       });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_IntParameter_MonolithicTransitionLimit)
+      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
       {
         @Override
         public void commitValue()
@@ -1579,7 +1573,7 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Selecting Heuristics
-  abstract class SelectingHeuristic
+  public abstract class SelectingHeuristic
   {
     protected abstract double getHeuristicValue(Candidate candidate);
 
