@@ -1,9 +1,7 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
-import java.util.ArrayList;
 
-import javax.swing.Icon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -11,6 +9,7 @@ import javax.swing.ListCellRenderer;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 /**
  * A configurable parameter of a {@link ModelAnalyzer} of
@@ -23,35 +22,63 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
 {
   public ComponentKindParameter(final ComponentKindParameter template)
   {
-    //template already has null added to list
-    super(template, template.getList());
+     super(template, template.getList());
+     initialGeneration = true;
   }
 
-  // TODO We do not need the 4th argument, which is always the same.
   public ComponentKindParameter(final int id,
                                 final String name,
-                                final String description,
-                                final ComponentKind[] data)
+                                final String description)
   {
     super(id, name, description, ComponentKind.values());
-    final ArrayList<ComponentKind> tmp = new ArrayList<>(mList);
-    // TODO Do not allow null, but calculate a default value like George did
-    // in the (now commented) method SynchronousProductDialog.getKind().
-    tmp.add(null);
-    mList = tmp;
+    initialGeneration = true;
   }
 
   @Override
   public Component createComponent(final ProductDESContext context)
   {
     mDESContext = context;
+    if(initialGeneration)
+      mValue = getKind();
     @SuppressWarnings("unchecked")
     final
     JComboBox<ComponentKind> comboBox =
       (JComboBox<ComponentKind>) super.createComponent(context);
     final ComponentKindRenderer renderer= new ComponentKindRenderer();
     comboBox.setRenderer(renderer);
+
     return comboBox;
+  }
+
+  private ComponentKind getKind()
+  {
+    int plantCount = 0;
+    int propCount = 0;
+    int specCount = 0;
+    for (final AutomatonProxy aut : mDESContext.getActiveAutomata()) {
+      switch (aut.getKind()) {
+      case PLANT:
+        plantCount++;
+        break;
+      case PROPERTY:
+        propCount++;
+        break;
+      case SPEC:
+        specCount++;
+        break;
+      case SUPERVISOR:
+        break;
+      }
+    }
+    if (plantCount > 0) {
+      return ComponentKind.PLANT;
+    } else if (propCount > 0) {
+      return ComponentKind.PROPERTY;
+    } else if (specCount > 0) {
+      return ComponentKind.SPEC;
+    } else {
+      return ComponentKind.SUPERVISOR;
+    }
   }
 
 
@@ -82,23 +109,18 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
         setForeground(list.getForeground());
       }
       //Set the icon and text
-      final Icon image = mDESContext.getComponentKindIcon(value);
-      if(image != null) {
-        setIcon(image);
-        setText(value.toString());
-      } else {
-        setIcon(null);
-        setText("null");
-      }
+      setIcon(mDESContext.getComponentKindIcon(value));
+      setText(mDESContext.getComponentKindText(value));
+
       return this;
     }
 
     private static final long serialVersionUID = 3036791589875590296L;
   }
 
-
   //#########################################################################
   //# Data Members
   private ProductDESContext mDESContext;
+  private final boolean initialGeneration;
 
 }

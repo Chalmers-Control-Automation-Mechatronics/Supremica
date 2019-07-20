@@ -79,16 +79,16 @@ public class EventParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESContext context)
   {
-    // TODO handle the case that there are no propositions in the model.
-    // TODO If noEvent is selected, pass null to the model analyser.
     final List<EventProxy> propositions = new ArrayList<>();
     mDESContext = context;
+    boolean noPropositions = true;
 
     final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
     final EventProxy noEvent = factory.createEventProxy("(none)", EventKind.PROPOSITION);
 
     for(final EventProxy event: context.getProductDES().getEvents()) {
       if(event.getKind() == EventKind.PROPOSITION) {
+        noPropositions = false;
         propositions.add(event);
         //if :accepting exists and this is first creation
         if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue == null)
@@ -96,35 +96,42 @@ public class EventParameter extends Parameter
       }
     }
 
-    // 1 - Null is not allowed, and the default is :accepting if available,
-    //     otherwise the first proposition in the model. (If there is no
-    //     proposition in the model, use null as the only option.)
-    if(mNullOptions == EventParameterType.PREVENT_NULL) {
-      //:accepting not available
-      if(mValue == null) {
-        if(propositions.size() > 0)
-          mValue = propositions.get(0);
-        else {
-          propositions.add(noEvent);
-          mValue = noEvent;
-        }
-      }
-    }
-    // 2 - Null is allowed and the default is :accepting if available,
-    //     otherwise the first proposition in the model, or null if
-    //     there is no proposition in the model. (Unlike case 1,
-    //     null is also an option if there are propositions in the model.)
-    else if(mNullOptions == EventParameterType.ALLOW_NULL) {
-      propositions.add(noEvent);
-      //:accepting not available
-      if(mValue == null) {
-          mValue = propositions.get(0);
-      }
-    }
-    // 3 - Null is allowed and is the default.
-    else if(mNullOptions == EventParameterType.DEFAULT_NULL){
+    //handle the case that there are no propositions in the model.
+    if(noPropositions) {
       propositions.add(noEvent);
       mValue = noEvent;
+    }
+    else {
+      // 1 - Null is not allowed, and the default is :accepting if available,
+      //     otherwise the first proposition in the model. (If there is no
+      //     proposition in the model, use null as the only option.)
+      if (mNullOptions == EventParameterType.PREVENT_NULL) {
+        //:accepting not available
+        if (mValue == null) {
+          if (propositions.size() > 0)
+            mValue = propositions.get(0);
+          else {
+            propositions.add(noEvent);
+            mValue = noEvent;
+          }
+        }
+      }
+      // 2 - Null is allowed and the default is :accepting if available,
+      //     otherwise the first proposition in the model, or null if
+      //     there is no proposition in the model. (Unlike case 1,
+      //     null is also an option if there are propositions in the model.)
+      else if (mNullOptions == EventParameterType.ALLOW_NULL) {
+        propositions.add(noEvent);
+        //:accepting not available
+        if (mValue == null) {
+          mValue = propositions.get(0);
+        }
+      }
+      // 3 - Null is allowed and is the default.
+      else if (mNullOptions == EventParameterType.DEFAULT_NULL) {
+        propositions.add(noEvent);
+        mValue = noEvent;
+      }
     }
 
     Collections.sort(propositions);
@@ -145,7 +152,13 @@ public class EventParameter extends Parameter
     mValue = (EventProxy) comboBox.getSelectedItem();
   }
 
-  public EventProxy getValue() { return mValue; }
+  public EventProxy getValue() {
+    //If noEvent is selected, pass null to the model analyser.
+    //if(mValue.getName() == "(none)")
+    // return null;
+
+    return mValue;
+    }
 
   @SuppressWarnings("unchecked")
   @Override
@@ -202,12 +215,8 @@ public class EventParameter extends Parameter
       //Set the icon and text.  If icon null, show name.
       final Icon icon = mDESContext.getEventIcon(value);
       setIcon(icon);
-      // TODO What is the point of the if statement?
-      if (icon != null) {
-        setText(value.getName());
-      } else {
-        setText(value.getName());
-      }
+      setText(value.getName());
+
       return this;
     }
 

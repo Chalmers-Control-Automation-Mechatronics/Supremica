@@ -33,9 +33,12 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import java.util.List;
+
 import javax.swing.Icon;
 
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -44,7 +47,11 @@ public interface ProductDESContext
 {
   public ProductDESProxy getProductDES();
 
+  public List<AutomatonProxy> getActiveAutomata();
+
   public Icon getEventIcon(EventProxy event);
 
   public Icon getComponentKindIcon(ComponentKind kind);
+
+  public String getComponentKindText(final ComponentKind kind);
 }

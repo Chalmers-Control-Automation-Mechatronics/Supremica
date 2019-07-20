@@ -2,6 +2,8 @@ package net.sourceforge.waters.gui.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -9,13 +11,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.CompilerOperatorTable;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -47,6 +49,13 @@ public class TestDESContext implements ProductDESContext
   public ProductDESProxy getProductDES()
   {
     return mProductDESProxy;
+  }
+
+  @Override
+  public List<AutomatonProxy> getActiveAutomata()
+  {
+    return new ArrayList<AutomatonProxy>(mProductDESProxy.getAutomata());
+
   }
 
   @Override
@@ -95,21 +104,13 @@ public class TestDESContext implements ProductDESContext
   @Override
   public Icon getComponentKindIcon(final ComponentKind kind)
   {
-    if(kind == ComponentKind.PLANT) {
-      return IconAndFontLoader.ICON_PLANT;
-    }
-    else if(kind == ComponentKind.PROPERTY) {
-      return IconAndFontLoader.ICON_PROPERTY;
-    }
-    else if(kind == ComponentKind.SPEC) {
-      return IconAndFontLoader.ICON_SPEC;
-    }
-    else if(kind == ComponentKind.SUPERVISOR) {
-      return IconAndFontLoader.ICON_SUPERVISOR;
-    }
-    else {
-      return null;
-    }
+    return ModuleContext.getComponentKindIcon(kind);
+  }
+
+  @Override
+  public String getComponentKindText(final ComponentKind kind)
+  {
+    return ModuleContext.getComponentKindToolTip(kind);
   }
 
   //#########################################################################

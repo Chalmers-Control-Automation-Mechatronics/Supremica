@@ -33,16 +33,17 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.ProductDESContext;
 import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -59,6 +60,7 @@ public class AnalyzerProductDESContext
   public AnalyzerProductDESContext(final WatersAnalyzerPanel panel)
   {
     mModuleContainer = panel.getModuleContainer();
+    mAnalyzerPanel = panel;
   }
 
   //#########################################################################
@@ -67,6 +69,12 @@ public class AnalyzerProductDESContext
   public ProductDESProxy getProductDES()
   {
     return mModuleContainer.getCompiledDES();
+  }
+
+  @Override
+  public List<AutomatonProxy> getActiveAutomata()
+  {
+    return mAnalyzerPanel.getAutomataTable().getOperationArgument();
   }
 
   @Override
@@ -89,27 +97,18 @@ public class AnalyzerProductDESContext
   @Override
   public Icon getComponentKindIcon(final ComponentKind kind)
   {
-    // TODO Better use ModuleContext.getComponentKindIcon()
-    // TODO Also use ModuleContext.getComponentKindToolTip() to get a nicer text
-    if(kind == ComponentKind.PLANT) {
-      return IconAndFontLoader.ICON_PLANT;
-    }
-    else if(kind == ComponentKind.PROPERTY) {
-      return IconAndFontLoader.ICON_PROPERTY;
-    }
-    else if(kind == ComponentKind.SPEC) {
-      return IconAndFontLoader.ICON_SPEC;
-    }
-    else if(kind == ComponentKind.SUPERVISOR) {
-      return IconAndFontLoader.ICON_SUPERVISOR;
-    }
-    else {
-      return null;
-    }
+    return ModuleContext.getComponentKindIcon(kind);
   }
 
+  @Override
+  public String getComponentKindText(final ComponentKind kind)
+  {
+    return ModuleContext.getComponentKindToolTip(kind);
+  }
 
   //#########################################################################
   //# Constructors
   private final ModuleContainer mModuleContainer;
+  private final WatersAnalyzerPanel mAnalyzerPanel;
+
 }

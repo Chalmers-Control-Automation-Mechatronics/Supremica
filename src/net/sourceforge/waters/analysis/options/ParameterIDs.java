@@ -47,7 +47,6 @@ import net.sourceforge.waters.analysis.trcomp.TRCandidate;
 import net.sourceforge.waters.analysis.trcomp.TRPreselectionHeuristic;
 import net.sourceforge.waters.analysis.trcomp.TRToolCreator;
 import net.sourceforge.waters.cpp.analysis.ConflictCheckMode;
-import net.sourceforge.waters.model.base.ComponentKind;
 
 public class ParameterIDs
 {
@@ -409,8 +408,7 @@ public static final BoolParameter AbstractCompositionalModelAnalyzer_SubumptionE
   public static final ComponentKindParameter AutomatonBuilder_OutputKind = new ComponentKindParameter
     (AutomatonBuilder_OutputKind_ID,
      "Output kind",
-     "Type of the generated automaton.",
-     ComponentKind.values());
+     "Type of the generated automaton.");
 
   //net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder
   public static final int SynchronousProductBuilder_RemovingSelfloops_ID = 1500;

@@ -106,6 +106,10 @@ public abstract class Parameter
 
   public abstract Component createComponent(ProductDESContext model);
 
+  /**
+   * Updates parameter value using the component stored in the passed panel
+   * Used when committing a parameter from panel
+   */
   public abstract void updateFromGUI(ParameterPanel panel);
 
   //To be removed

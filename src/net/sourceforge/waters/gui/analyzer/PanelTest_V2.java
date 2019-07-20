@@ -197,7 +197,7 @@ public class PanelTest_V2
                                          final ProductDESProxyFactory desFactory)
   {
     try {
-      return analyzerFactory.createSupervisorSynthesizer(desFactory);
+      return analyzerFactory.createSynchronousProductBuilder(desFactory);
     } catch (final AnalysisConfigurationException exception) {   }
 
     return null;
@@ -230,7 +230,7 @@ public class PanelTest_V2
       storeInDatabase();
       copyFromDatabase(parameters);
 
-      System.out.println(sythesizer);
+      //System.out.println(sythesizer);
 
       for(final Parameter current: parameters)
         current.commitValue();
