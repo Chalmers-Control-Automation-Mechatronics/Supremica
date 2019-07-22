@@ -182,28 +182,12 @@ public abstract class SupremicaModelAnalyzer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
+    list.add(new BoolParameter(ParameterIDs.SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents) {
+      @Override
+      public void commitValue() {
+        setSynchronisingOnUnobservableEvents(getValue());
       }
-    }
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents)
-      {
-        @Override
-        public void commitValue()
-        {
-          setSynchronisingOnUnobservableEvents(getValue());
-        }
-      });
+    });
     return list;
   }
 

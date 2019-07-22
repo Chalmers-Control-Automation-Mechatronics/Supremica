@@ -51,6 +51,9 @@ import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -263,6 +266,32 @@ public class CompositionalAutomataSynthesizer
   public boolean isSupervisorLocalizationEnabled()
   {
     return false;
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.isSameParameter
+           (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
+        iter.add(new EnumParameter<AbstractionProcedureCreator>
+            (ParameterIDs.CompositionalAutomataSynthesizer_AbstractionProcedureCreator) {
+          @Override
+          public void commitValue()
+          {
+            setAbstractionProcedureCreator(getValue());
+          }
+        });
+       break;
+      }
+    }
+    return list;
   }
 
 

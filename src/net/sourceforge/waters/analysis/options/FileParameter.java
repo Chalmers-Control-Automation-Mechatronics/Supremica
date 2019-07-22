@@ -61,11 +61,11 @@ public class FileParameter extends Parameter
     super(template.getID(), template.getName(), template.getDescription());
   }
 
-  public FileParameter(final int id, final String name,
-                       final String description)
+  FileParameter(final int id, final String name, final String description)
   {
     super(id, name, description);
   }
+
 
   @Override
   public Component createComponent(final ProductDESContext model)

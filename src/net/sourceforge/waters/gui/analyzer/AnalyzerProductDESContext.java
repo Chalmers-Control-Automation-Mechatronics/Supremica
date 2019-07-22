@@ -63,8 +63,9 @@ public class AnalyzerProductDESContext
     mAnalyzerPanel = panel;
   }
 
+
   //#########################################################################
-  //# Constructors
+  //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
   @Override
   public ProductDESProxy getProductDES()
   {
@@ -105,6 +106,7 @@ public class AnalyzerProductDESContext
   {
     return ModuleContext.getComponentKindToolTip(kind);
   }
+
 
   //#########################################################################
   //# Constructors

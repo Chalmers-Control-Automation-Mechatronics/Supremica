@@ -46,7 +46,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.DefaultEventStatusProvider;
@@ -86,24 +86,24 @@ import net.sourceforge.waters.plain.des.ProductDESElementFactory;
  * @author Robi Malik
  */
 
-public abstract class TRAbstractModelAnalyzer
+public abstract class AbstractTRMonolithicModelAnalyzer
   extends AbstractModelAnalyzer
 {
 
   //#########################################################################
   //# Constructors
-  public TRAbstractModelAnalyzer()
+  public AbstractTRMonolithicModelAnalyzer()
   {
     this(null);
   }
 
-  public TRAbstractModelAnalyzer(final ProductDESProxy model)
+  public AbstractTRMonolithicModelAnalyzer(final ProductDESProxy model)
   {
     this(model, IdenticalKindTranslator.getInstance());
   }
 
-  public TRAbstractModelAnalyzer(final ProductDESProxy model,
-                                 final KindTranslator translator)
+  public AbstractTRMonolithicModelAnalyzer(final ProductDESProxy model,
+                                           final KindTranslator translator)
   {
     super(model, ProductDESElementFactory.getInstance(), translator);
   }
@@ -276,28 +276,18 @@ public abstract class TRAbstractModelAnalyzer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
       }
-    }
-    list.add(new BoolParameter
-      (ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks)
-      {
-        @Override
-        public void commitValue()
-        {
-          setPruningDeadlocks(getValue());
-        }
-      });
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
     return list;
   }
 
@@ -1033,7 +1023,7 @@ public abstract class TRAbstractModelAnalyzer
      final int event,
      final int[] encodedTarget,
      final boolean suppressedSelfloop,
-     final TRAbstractModelAnalyzer builder)
+     final AbstractTRMonolithicModelAnalyzer builder)
     throws OverflowException
   {
     if (updateSequence != null) {
@@ -1050,7 +1040,7 @@ public abstract class TRAbstractModelAnalyzer
      final int event,
      final int[] decodedTarget,
      final boolean suppressedSelfloop,
-     final TRAbstractModelAnalyzer builder)
+     final AbstractTRMonolithicModelAnalyzer builder)
     throws OverflowException
   {
     if (updateSequence != null) {
@@ -1146,7 +1136,7 @@ public abstract class TRAbstractModelAnalyzer
   public interface StateCallback
   {
     /**
-     * This method is called by the {@link TRAbstractModelAnalyzer}
+     * This method is called by the {@link AbstractTRMonolithicModelAnalyzer}
      * before adding a new state to the synchronous product state space.
      * @param  tuple    Integer array representing state codes of a new
      *                  state tuple.
@@ -1574,21 +1564,21 @@ public abstract class TRAbstractModelAnalyzer
 
     public void createSuccessorStatesEncoded
       (final int[] encodedTarget,
-       final TRAbstractModelAnalyzer builder)
+       final AbstractTRMonolithicModelAnalyzer builder)
       throws OverflowException
     {
       final boolean selfloopOnly = EventStatus.isSelfloopOnlyEvent(mStatus);
-      TRAbstractModelAnalyzer.createSuccessorStatesEncoded
+      AbstractTRMonolithicModelAnalyzer.createSuccessorStatesEncoded
         (mUpdateSequence, mOutputCode, encodedTarget, selfloopOnly, builder);
     }
 
     public void createSuccessorStatesDecoded
       (final int[] decodedTarget,
-       final TRAbstractModelAnalyzer builder)
+       final AbstractTRMonolithicModelAnalyzer builder)
       throws OverflowException
     {
       final boolean selfloopOnly = EventStatus.isSelfloopOnlyEvent(mStatus);
-      TRAbstractModelAnalyzer.createSuccessorStatesDecoded
+      AbstractTRMonolithicModelAnalyzer.createSuccessorStatesDecoded
         (mUpdateSequence, mOutputCode, decodedTarget, selfloopOnly, builder);
     }
 
@@ -1769,7 +1759,7 @@ public abstract class TRAbstractModelAnalyzer
       (final int event,
        final int[] encodedTarget,
        final boolean suppressedSelfloop,
-       final TRAbstractModelAnalyzer builder)
+       final AbstractTRMonolithicModelAnalyzer builder)
       throws OverflowException
     {
       final int source = mTransitionIterator.getCurrentSourceState();
@@ -1780,7 +1770,7 @@ public abstract class TRAbstractModelAnalyzer
         } else {
           builder.mStateTupleEncoding.set
             (encodedTarget, mAutomatonIndex, target);
-          TRAbstractModelAnalyzer.createSuccessorStatesEncoded
+          AbstractTRMonolithicModelAnalyzer.createSuccessorStatesEncoded
             (mNextUpdate, event, encodedTarget,
              suppressedSelfloop && source == target, builder);
         }
@@ -1794,7 +1784,7 @@ public abstract class TRAbstractModelAnalyzer
           } else {
             builder.mStateTupleEncoding.set
               (encodedTarget, mAutomatonIndex, target);
-            TRAbstractModelAnalyzer.createSuccessorStatesEncoded
+            AbstractTRMonolithicModelAnalyzer.createSuccessorStatesEncoded
               (mNextUpdate, event, encodedTarget,
                suppressedSelfloop && source == target, builder);
           }
@@ -1806,7 +1796,7 @@ public abstract class TRAbstractModelAnalyzer
       (final int event,
        final int[] decodedTarget,
        final boolean suppressedSelfloop,
-       final TRAbstractModelAnalyzer builder)
+       final AbstractTRMonolithicModelAnalyzer builder)
       throws OverflowException
     {
       final int source = mTransitionIterator.getCurrentSourceState();
@@ -1816,7 +1806,7 @@ public abstract class TRAbstractModelAnalyzer
           builder.createDeadlockTransition(event);
         } else {
           decodedTarget[mAutomatonIndex] = target;
-          TRAbstractModelAnalyzer.createSuccessorStatesDecoded
+          AbstractTRMonolithicModelAnalyzer.createSuccessorStatesDecoded
             (mNextUpdate, event, decodedTarget,
              suppressedSelfloop && source == target, builder);
         }
@@ -1829,7 +1819,7 @@ public abstract class TRAbstractModelAnalyzer
             break;
           } else {
             decodedTarget[mAutomatonIndex] = target;
-            TRAbstractModelAnalyzer.createSuccessorStatesDecoded
+            AbstractTRMonolithicModelAnalyzer.createSuccessorStatesDecoded
               (mNextUpdate, event, decodedTarget,
                suppressedSelfloop && source == target, builder);
           }

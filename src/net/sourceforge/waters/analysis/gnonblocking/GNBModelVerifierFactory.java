@@ -35,6 +35,7 @@ package net.sourceforge.waters.analysis.gnonblocking;
 
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
+import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -252,24 +253,19 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final String name = getValue();
       if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
           (CompositionalGeneralisedConflictChecker) analyzer;
-        CompositionalGeneralisedConflictChecker.PreselectingHeuristic heuristic = null;
-        if (name.equalsIgnoreCase("minT")) {
-          heuristic = composer.createHeuristicMinT();
-        } else if (name.equalsIgnoreCase("minTa")) {
-          heuristic = composer.createHeuristicMinTa();
-        } else if (name.equalsIgnoreCase("maxS")) {
-          heuristic = composer.createHeuristicMaxS();
-        } else if (name.equalsIgnoreCase("mustL")) {
-          heuristic = composer.createHeuristicMustL();
-        } else {
-          fail("Unknown Preselecting heuristic '" + name +
-               "'! Choose from the following : minT, minTa, maxS, mustL.");
+        final String name = getValue();
+        final EnumFactory<PreselectingHeuristicFactory> factory =
+          PreselectingHeuristicFactory.getInstance();
+        final PreselectingHeuristicFactory creator = factory.getEnumValue(name);
+        if (creator == null) {
+          System.err.println("Bad value for " + getName() + " option!");
+          factory.dumpEnumeration(System.err, 0);
+          System.exit(1);
         }
-        composer.setPreselectingHeuristic(heuristic);
+        composer.setPreselectingHeuristicFactory(creator);
       }
     }
   }
@@ -293,22 +289,19 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
     @Override
     public void configureAnalyzer(final Object analyzer)
     {
-      final String name = getValue();
       if (analyzer instanceof CompositionalGeneralisedConflictChecker) {
         final CompositionalGeneralisedConflictChecker composer =
           (CompositionalGeneralisedConflictChecker) analyzer;
-        CompositionalGeneralisedConflictChecker.SelectingHeuristic heuristic = null;
-        if (name.equalsIgnoreCase("maxl")) {
-          heuristic = composer.createHeuristicMaxL();
-        } else if (name.equalsIgnoreCase("maxc")) {
-          heuristic = composer.createHeuristicMaxC();
-        } else if (name.equalsIgnoreCase("minS")) {
-          heuristic = composer.createHeuristicMinS();
-        } else {
-          fail("Unknown heuristic '" + name +
-               "'! Choose from the following : 1)maxl 2)maxc 3)mins.");
+        final String name = getValue();
+        final EnumFactory<SelectingHeuristicFactory> factory =
+          SelectingHeuristicFactory.getInstance();
+        final SelectingHeuristicFactory creator = factory.getEnumValue(name);
+        if (creator == null) {
+          System.err.println("Bad value for " + getName() + " option!");
+          factory.dumpEnumeration(System.err, 0);
+          System.exit(1);
         }
-        composer.setSelectingHeuristic(heuristic);
+        composer.setSelectingHeuristicFactory(creator);
       }
     }
   }

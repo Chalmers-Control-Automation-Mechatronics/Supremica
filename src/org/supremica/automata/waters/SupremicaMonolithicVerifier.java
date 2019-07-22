@@ -51,8 +51,8 @@
 package org.supremica.automata.waters;
 
 import java.util.List;
-import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -196,22 +196,13 @@ public  class SupremicaMonolithicVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
-        param.setName("Print counterexample");
-        param.setDescription("Show trace to bad state as info in log.");
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        iter.remove();
-        break;
-      default:
-        break;
+    list.add(new BoolParameter(ParameterIDs.SupremicaMonolithicVerifier_DetailedOutputEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setDetailedOutputEnabled(getValue());
       }
-    }
+    });
     return list;
   }
 

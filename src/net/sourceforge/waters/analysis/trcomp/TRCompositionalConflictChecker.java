@@ -39,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.ActiveEventsTRSimplifier;
@@ -62,9 +63,10 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckResult;
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
@@ -220,6 +222,12 @@ public class TRCompositionalConflictChecker
   public EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
     getTRSimplifierFactory()
   {
+    return getTRSimplifierFactoryStatic();
+  }
+
+  public static EnumFactory<TRToolCreator<TransitionRelationSimplifier>>
+    getTRSimplifierFactoryStatic()
+  {
     return
       new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
       {
@@ -253,6 +261,20 @@ public class TRCompositionalConflictChecker
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.isSameParameter
+           (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic)) {
+        iter.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+            (ParameterIDs.TRCompositionalConflictChecker_SimplifierCreator) {
+          @Override
+          public void commitValue() {
+            setSimplifierCreator(getValue());
+          }
+        });
+      }
+    }
     list.add(0, new EventParameter
       (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking)
       {
@@ -464,10 +486,10 @@ public class TRCompositionalConflictChecker
   }
 
   @Override
-  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  protected AbstractTRSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
-    final TRAbstractSynchronousProductBuilder builder =
+    final AbstractTRSynchronousProductBuilder builder =
       new TRSynchronousProductBuilder();
     builder.setDetailedOutputEnabled(true);
     builder.setKindTranslator(translator);

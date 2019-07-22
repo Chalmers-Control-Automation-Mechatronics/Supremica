@@ -40,8 +40,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -362,6 +366,58 @@ public class CompositionalConflictChecker
         (CompositionalSafetyVerifier) mCompositionalSafetyVerifier;
       safetyVerifier.setInternalTransitionLimit(limit);
     }
+  }
+
+  public static PreselectingMethodFactory getPreselectingMethodFactoryStatic()
+  {
+    return new PreselectingMethodFactory();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.isSameParameter
+           (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod)) {
+        iter.remove();
+        iter.add(new EnumParameter<PreselectingMethod>
+            (ParameterIDs.CompositionalConflictChecker_PreselectingMethod) {
+          @Override
+          public void commitValue()
+          {
+            setPreselectingMethod(getValue());
+          }
+        });
+      } else if (param.isSameParameter
+           (ParameterIDs.AbstractCompositionalModelAnalyzer_SelectionHeuristic)) {
+        iter.remove();
+        iter.add(new EnumParameter<SelectionHeuristicCreator>
+            (ParameterIDs.CompositionalConflictChecker_SelectionHeuristic) {
+          @Override
+          public void commitValue()
+          {
+            setSelectionHeuristic(getValue());
+          }
+        });
+      } else if (param.isSameParameter
+           (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
+        iter.add(new EnumParameter<AbstractionProcedureCreator>
+            (ParameterIDs.CompositionalConflictChecker_AbstractionProcedureCreator) {
+          @Override
+          public void commitValue()
+          {
+            setAbstractionProcedureCreator(getValue());
+          }
+        });
+      }
+    }
+    return list;
   }
 
 

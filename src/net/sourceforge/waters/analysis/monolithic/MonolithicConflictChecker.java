@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
@@ -161,21 +162,18 @@ public class MonolithicConflictChecker extends AbstractConflictChecker
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("State limit");
-        param.setDescription
-          ("Maximum number of states that can be encountered before aborting");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        param.setDescription
-          ("Maximum number of transitions that can be explored before aborting");
-        break;
-      default:
-        break;
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
       }
-    }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
     return list;
   }
 

@@ -37,7 +37,6 @@ import gnu.trove.set.hash.TIntHashSet;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.ComponentKindParameter;
@@ -74,23 +73,23 @@ import org.apache.logging.log4j.Logger;
  * @author Robi Malik
  */
 
-public abstract class TRAbstractSynchronousProductBuilder
-  extends TRAbstractModelAnalyzer
+public abstract class AbstractTRSynchronousProductBuilder
+  extends AbstractTRMonolithicModelAnalyzer
   implements SynchronousProductBuilder
 {
 
   //#########################################################################
   //# Constructors
-  public TRAbstractSynchronousProductBuilder()
+  public AbstractTRSynchronousProductBuilder()
   {
   }
 
-  public TRAbstractSynchronousProductBuilder(final ProductDESProxy model)
+  public AbstractTRSynchronousProductBuilder(final ProductDESProxy model)
   {
     super(model);
   }
 
-  public TRAbstractSynchronousProductBuilder
+  public AbstractTRSynchronousProductBuilder
     (final ProductDESProxy model,
      final KindTranslator translator)
   {
@@ -170,46 +169,41 @@ public abstract class TRAbstractSynchronousProductBuilder
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
-        param.setName("Build automaton model");
-        param.setDescription("Disable this to suppress the creation of a " +
-                             "synchronous product automaton, and only run " +
-                             "for statistics.");
-      } else if (param.getID() == ParameterIDs.TRAbstractModelAnalyzer_PruningDeadLocks_ID) {
-        iter.previous();
-        break;
-      }
-    }
-    list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName)
-      {
-        @Override
-        public void commitValue()
-        {
-          setOutputName(getValue());
-        }
-      });
-    list.add(new ComponentKindParameter
-    (ParameterIDs.AutomatonBuilder_OutputKind)
-    {
+    list.add(0, new ComponentKindParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputKind) {
       @Override
-      public void commitValue()
-      {
+      public void commitValue() {
         setOutputKind(getValue());
       }
     });
+    list.add(0, new StringParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(0, new BoolParameter
+        (ParameterIDs.SynchronousProductBuilder_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
-      {
-        @Override
-        public void commitValue()
-        {
-          setRemovingSelfloops(getValue());
-        }
-      });
+        (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops) {
+      @Override
+      public void commitValue() {
+        setRemovingSelfloops(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks) {
+      @Override
+      public void commitValue() {
+        setPruningDeadlocks(getValue());
+      }
+    });
     return list;
   }
 

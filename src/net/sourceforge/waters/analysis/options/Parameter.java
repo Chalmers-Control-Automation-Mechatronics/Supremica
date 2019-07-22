@@ -51,17 +51,13 @@ public abstract class Parameter
 
   //#########################################################################
   //# Constructors
-  public Parameter(final int id, final String name)
-  {
-    this(id, name, null);
-  }
-
-  public Parameter(final int id, final String name, final String description)
+  protected Parameter(final int id, final String name, final String description)
   {
     mID = id;
     mName = name;
     mDescription = description;
   }
+
 
   //#########################################################################
   //# Simple Access
@@ -70,14 +66,14 @@ public abstract class Parameter
     return mID;
   }
 
+  public boolean isSameParameter(final Parameter param)
+  {
+    return mID == param.mID;
+  }
+
   public String getName()
   {
     return mName;
-  }
-
-  public void setName(final String name)
-  {
-    mName = name;
   }
 
   public String getDescription()
@@ -85,17 +81,12 @@ public abstract class Parameter
     return mDescription;
   }
 
-  public void setDescription(final String description)
+  public void commitValue()
   {
-    mDescription = description;
   }
-
-  public void commitValue()  {  }
 
   public abstract void updateFromParameter(Parameter p);
 
-  @Override
-  public abstract String toString();
 
   //#########################################################################
   //# GUI
@@ -119,7 +110,7 @@ public abstract class Parameter
   //#########################################################################
   //# Data Members
   private final int mID;
-  private String mName;
-  private String mDescription;
+  private final String mName;
+  private final String mDescription;
 
 }

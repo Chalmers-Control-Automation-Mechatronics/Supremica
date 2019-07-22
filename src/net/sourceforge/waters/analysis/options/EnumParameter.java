@@ -53,93 +53,65 @@ public class EnumParameter<T> extends Parameter
 {
   //#########################################################################
   //# Constructors
-
   public EnumParameter(final EnumParameter<T> template)
   {
-    this(template.getID(), template.getName(), template.getDescription(), template.getList(), template.getValue());
+    this(template.getID(), template.getName(),
+         template.getDescription(), template.getList(), template.getValue());
   }
 
-  public EnumParameter(final EnumParameter<T> template,
-                       final List<? extends T> data,
-                       final T defaultValue)
-  {
-    this(template.getID(), template.getName(), template.getDescription(), data, defaultValue);
-  }
-
-  public EnumParameter(final EnumParameter<T> template,
-                       final List<? extends T> data)
-  {
-    this(template.getID(), template.getName(), template.getDescription(), data);
-  }
-
-  public EnumParameter(final EnumParameter<T> template,
-                       final T[] data)
-  {
-    this(template.getID(), template.getName(), template.getDescription(), data);
-  }
-
-  public EnumParameter(final EnumParameter<T> template,
-                       final T[] data,
-                       final T defaultValue)
-  {
-    this(template.getID(), template.getName(), template.getDescription(), data, defaultValue);
-  }
-
-  public EnumParameter(final EnumParameter<T> template, final EnumFactory<? extends T> factory)
-  {
-    this(template.getID(), template.getName(), template.getDescription(), factory);
-  }
-
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description)
-  {
-    super(id, name, description);
-  }
-
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final List<? extends T> data,
-                       final T defaultValue)
+  EnumParameter(final int id,
+                final String name,
+                final String description,
+                final List<? extends T> data,
+                final T defaultValue)
   {
     super(id, name, description);
     mList = data;
     mValue = defaultValue;
   }
 
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final List<? extends T> data)
+  EnumParameter(final int id,
+                final String name,
+                final String description,
+                final T[] data)
   {
-    this(id, name, description, data, data.get(0));
+    this(id, name, description, data, data[0]);
   }
 
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final T[] data)
-  {
-    this(id, name, description, Arrays.asList(data));
-  }
-
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final T[] data,
-                       final T defaultValue)
+  EnumParameter(final int id,
+                final String name,
+                final String description,
+                final T[] data,
+                final T defaultValue)
   {
     this(id, name, description, Arrays.asList(data), defaultValue);
   }
 
-  public EnumParameter(final int id,
-                       final String name,
-                       final String description,
-                       final EnumFactory<? extends T> factory)
+  EnumParameter(final int id,
+                final String name,
+                final String description,
+                final EnumFactory<? extends T> factory)
   {
-    this(id, name, description, factory.getEnumConstants(), factory.getDefaultValue());
+    this(id, name, description,
+         factory.getEnumConstants(), factory.getDefaultValue());
   }
+
+  EnumParameter(final int id,
+                final String name,
+                final String description)
+  {
+    super(id, name, description);
+    mList = null;
+    mValue = null;
+  }
+
+  EnumParameter(final int id,
+                final EnumParameter<T> template,
+                final EnumFactory<? extends T> factory)
+  {
+    this(id, template.getName(), template.getDescription(), factory);
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Parameter
@@ -154,12 +126,12 @@ public class EnumParameter<T> extends Parameter
 
   public T getValue()
   {
-    return  mValue;
+    return mValue;
   }
 
   public List<? extends T> getList()
   {
-    return  mList;
+    return mList;
   }
 
   public void setValue(final T value)
@@ -198,8 +170,10 @@ public class EnumParameter<T> extends Parameter
     return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
   }
 
+
   //#########################################################################
   //# Data Members
+  // TODO Make these private
   protected List<? extends T> mList;
   protected T mValue;
 }

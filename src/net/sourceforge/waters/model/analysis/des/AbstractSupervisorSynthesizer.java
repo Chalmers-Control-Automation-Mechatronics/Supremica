@@ -34,19 +34,20 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SynthesisKindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -157,85 +158,65 @@ public abstract class AbstractSupervisorSynthesizer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        iter.add(new StringParameter
-          (ParameterIDs.ModelBuilder_OutputName)
-          {
-            @Override
-            public void commitValue()
-            {
-              setOutputName(getValue());
-            }
-          });
-        break;
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
-     }
-    }
-   list.add(0, new EventParameter
-     (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
-     {
-       @Override
-       public void commitValue()
-       {
-         setConfiguredDefaultMarking(getValue());
-       }
-     });
-   list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
-     {
-       @Override
-       public void commitValue()
-       {
-         setNonblockingSynthesis(getValue());
-       }
-     });
-   list.add(0, new BoolParameter
-     (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
-     {
-       @Override
-       public void commitValue()
-       {
-         final KindTranslator translator = getValue() ?
-           SynthesisKindTranslator.getInstanceWithControllability() :
-           SynthesisKindTranslator.getInstanceWithoutControllability();
-         setKindTranslator(translator);
-       }
-     });
-   list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-        DefaultSupervisorReductionFactory.class.getEnumConstants())
+    list.add(0, new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
+      @Override
+      public void commitValue() {
+        setConfiguredDefaultMarking(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
+      @Override
+      public void commitValue() {
+        setNonblockingSynthesis(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_ControllableSynthesis) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorReductionFactory(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorLocalizationEnabled(getValue());
-        }
-      });
+        final KindTranslator translator = getValue() ?
+          IdenticalKindTranslator.getInstance() :
+            ConflictKindTranslator.getInstanceControllable();
+          setKindTranslator(translator);
+      }
+    });
+    list.add(0, new StringParameter(ParameterIDs.SupervisorSynthesizer_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
+    list.add(new EnumParameter<SupervisorReductionFactory>
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory) {
+      @Override
+      public void commitValue() {
+        setSupervisorReductionFactory(getValue());
+      }
+    });
+    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled) {
+      @Override
+      public void commitValue() {
+        setSupervisorLocalizationEnabled(getValue());
+      }
+    });
     return list;
   }
 

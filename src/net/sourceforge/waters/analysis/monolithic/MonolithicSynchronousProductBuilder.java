@@ -53,8 +53,11 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.ComponentKindParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.StringParameter;
 import net.sourceforge.waters.analysis.tr.IntArrayHashingStrategy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -260,37 +263,53 @@ public class MonolithicSynchronousProductBuilder
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("State limit");
-        param.setDescription("Maximum number of states before aborting.");
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        param.setDescription("Maximum number of transitions before aborting.");
-        break;
-      default:
-        break;
+    list.add(new BoolParameter
+        (ParameterIDs.SynchronousProductBuilder_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
       }
-    }
+    });
+    list.add(new StringParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(new ComponentKindParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputKind) {
+      @Override
+      public void commitValue() {
+        setOutputKind(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
-      {
-        @Override
-        public void commitValue()
-        {
-          setRemovingSelfloops(getValue());
-        }
-      });
+        (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops) {
+      @Override
+      public void commitValue() {
+        setRemovingSelfloops(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks)
-      {
-        @Override
-        public void commitValue()
-        {
-          setPruningDeadlocks(getValue());
-        }
-      });
+        (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks) {
+      @Override
+      public void commitValue() {
+        setPruningDeadlocks(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
     return list;
   }
 

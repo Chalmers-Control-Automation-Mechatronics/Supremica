@@ -55,13 +55,14 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
+import net.sourceforge.waters.analysis.options.SupremicaSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
@@ -372,98 +373,86 @@ public class SupremicaMonolithicSynthesizer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        break;
-      }
-    }
     list.add(0, new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
-      {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
+        (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
+      @Override
+      public void commitValue() {
+        setConfiguredDefaultMarking(getValue());
+      }
+    });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
-      {
-        @Override
-        public void commitValue()
-        {
-          setNonblockingSynthesis(getValue());
-        }
-      });
+        (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
+      @Override
+      public void commitValue() {
+        setNonblockingSynthesis(getValue());
+      }
+    });
     list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
-      {
-        @Override
-        public void commitValue()
-        {
-          setControllableSynthesis(getValue());
-        }
-      });
+        (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis) {
+      @Override
+      public void commitValue() {
+        setControllableSynthesis(getValue());
+      }
+    });
+    list.add(0, new BoolParameter
+        (ParameterIDs.SupervisorSynthesizer_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
+    list.add(new StringParameter(ParameterIDs.SupervisorSynthesizer_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames) {
+      @Override
+      public void commitValue() {
+        setUsingShortStateNames(getValue());
+      }
+    });
+    list.add(new StringParameter
+        (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator) {
+      @Override
+      public void commitValue() {
+        setStateNameSeparator(getValue());
+      }
+    });
+    list.add(new BoolParameter(ParameterIDs.SupremicaSynthesizer_Purging) {
+      @Override
+      public void commitValue() {
+        setNonblockingSynthesis(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant) {
+      @Override
+      public void commitValue() {
+        setEnsuringUncontrollablesInPlant(getValue());
+      }
+    });
     list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_Supremica_SupervisorReductionFactory,
-        getSupervisorReductionFactory().getClass().getEnumConstants())
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorReductionFactory(getValue());
-        }
-      });
-    list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName)
-      {
-        @Override
-        public void commitValue()
-        {
-          setOutputName(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames)
-      {
-        @Override
-        public void commitValue()
-        {
-          setUsingShortStateNames(getValue());
-        }
-      });
-    list.add(new StringParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator,
-       getStateNameSeparator())
-      {
-        @Override
-        public void commitValue()
-        {
-          setStateNameSeparator(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynthesizer_Purging)
-      {
-        @Override
-        public void commitValue()
-        {
-          setNonblockingSynthesis(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
-      {
-        @Override
-        public void commitValue()
-        {
-          setEnsuringUncontrollablesInPlant(getValue());
-        }
-      });
+        (ParameterIDs.SupremicaSynthesizer_SupervisorReductionFactory) {
+      @Override
+      public void commitValue() {
+        setSupervisorReductionFactory(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
     return list;
   }
 
@@ -576,52 +565,6 @@ public class SupremicaMonolithicSynthesizer
       result.setNumberOfStates(mHelperStatistics.getNumberOfReachableStates());
       result.setNumberOfTransitions(mHelperStatistics.getNumberOfExaminedTransitions());
     }
-  }
-
-
-  //#########################################################################
-  //# Inner Class SupremicaSupervisorReductionFactory
-  private static enum SupremicaSupervisorReductionFactory
-    implements SupervisorReductionFactory
-  {
-    //#######################################################################
-    //# Enumeration
-    OFF("Off"),
-    DET_MINSTATE("Deterministic min-state");
-
-    //#######################################################################
-    //# Constructor
-    private SupremicaSupervisorReductionFactory(final String name)
-    {
-      mName = name;
-    }
-
-    //#######################################################################
-    //# Overrides for java.lang.Object
-    @Override
-    public String toString()
-    {
-      return mName;
-    }
-
-    //#######################################################################
-    //# Interface
-    //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
-    @Override
-    public SupervisorReductionSimplifier createSimplifier()
-    {
-      return null;
-    }
-
-    @Override
-    public boolean isSupervisedEventRequired()
-    {
-      return false;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private String mName;
   }
 
 

@@ -139,34 +139,27 @@ public abstract class AbstractTRCompositionalModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
-        param.setName("Compute counterexample");
-        param.setDescription("Computate a counterexample if model checking " +
-                             "gives a failed result.");
-        iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested)
-          {
-            @Override
-            public void commitValue()
-            {
-              setShortCounterExampleRequested(getValue());
-            }
-          });
-        iter.add(new BoolParameter
-          (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled)
-          {
-            @Override
-            public void commitValue()
-            {
-              setOutputCheckingEnabled(getValue());
-            }
-          });
-        break;
+    list.add(0, new BoolParameter(ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setOutputCheckingEnabled(getValue());
       }
-    }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+      @Override
+      public void commitValue()
+      {
+        setShortCounterExampleRequested(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
     return list;
   }
 

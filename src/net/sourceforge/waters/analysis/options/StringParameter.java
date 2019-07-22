@@ -49,27 +49,15 @@ public class StringParameter extends Parameter
 {
   public StringParameter(final StringParameter template)
   {
-    super(template.getID(), template.getName(), template.getDescription());
-    mValue = template.getValue();
+    this(template.getID(), template.getName(),
+         template.getDescription(), template.getValue());
   }
 
-  public StringParameter(final StringParameter template, final String value)
-  {
-    super(template.getID(), template.getName(), template.getDescription());
-    mValue = value;
-  }
-
-  public StringParameter(final int id, final String name,
-                         final String description, final String value)
+  StringParameter(final int id, final String name,
+                  final String description, final String value)
   {
     super(id, name, description);
     mValue = value;
-  }
-
-  public StringParameter(final int id, final String name,
-                         final String description)
-  {
-    this(id, name, description, "");
   }
 
   public String getValue()

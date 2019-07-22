@@ -22,7 +22,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
 {
   public ComponentKindParameter(final ComponentKindParameter template)
   {
-     super(template, template.getList());
+     super(template);
      initialGeneration = true;
   }
 

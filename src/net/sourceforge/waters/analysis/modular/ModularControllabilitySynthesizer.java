@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
@@ -150,18 +151,18 @@ public class ModularControllabilitySynthesizer
    * constraints over those previously computed, and removes those that do
    * not.
    */
-  public void setRemovesUnnecessarySupervisors(final boolean removes)
+  public void setRemovingUnnecessarySupervisors(final boolean remove)
   {
-    mRemovesUnnecessarySupervisors = removes;
+    mRemovingUnnecessarySupervisors = remove;
   }
 
   /**
    * returns whether unnecessary supervisors are removed during synthesis.
-   * @see #setRemovesUnnecessarySupervisors(boolean)
+   * @see #setRemovingUnnecessarySupervisors(boolean)
    */
-  public boolean getRemovesUnnecessarySupervisors()
+  public boolean isRemovingUnnecessarySupervisors()
   {
-    return mRemovesUnnecessarySupervisors;
+    return mRemovingUnnecessarySupervisors;
   }
 
   public Collection<EventProxy> getDisabledEvents()
@@ -176,26 +177,26 @@ public class ModularControllabilitySynthesizer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      if (param.getID() ==
-          ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis_ID) {
-        param.setName("Locally nonblocking supervisors");
-        param.setDescription
-          ("Attempt to synthesise nonblocking supervisors each time a " +
-           "subsystem is sent for monolithic synthesis. While this may help " +
-           "to remove some blocking states, it does not ensure a globally " +
-           "nonblocking supervisor.");
+    final ListIterator<Parameter> iter = list.listIterator();
+    while (iter.hasNext()) {
+      final Parameter param = iter.next();
+      if (param.isSameParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)) {
+        iter.remove();
+        iter.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_NonblockingSynthesis) {
+          @Override
+          public void commitValue() {
+            setNonblockingSynthesis(getValue());
+          }
+        });
+        break;
       }
     }
-    list.add(new BoolParameter
-      (ParameterIDs.ModularControllabilitySynthesizer_RemovesUnnecessarySupervisors)
-      {
-        @Override
-        public void commitValue()
-        {
-          setRemovesUnnecessarySupervisors(getValue());
-        }
-      });
+    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors) {
+      @Override
+      public void commitValue() {
+        setRemovingUnnecessarySupervisors(getValue());
+      }
+    });
     return list;
   }
 
@@ -402,7 +403,7 @@ public class ModularControllabilitySynthesizer
       }
 
       // 4. Remove unnecessary supervisors
-      if (isDetailedOutputEnabled() && mRemovesUnnecessarySupervisors) {
+      if (isDetailedOutputEnabled() && mRemovingUnnecessarySupervisors) {
         final ControllabilityCheckKindTranslator controllabilityTranslator =
           new ControllabilityCheckKindTranslator(supervisors);
         mModularControllabilityChecker.setKindTranslator(controllabilityTranslator);
@@ -641,7 +642,7 @@ public class ModularControllabilitySynthesizer
   //# Data Members
   // Configuration options
   private boolean mIncludesAllAutomata = false;
-  private boolean mRemovesUnnecessarySupervisors = false;
+  private boolean mRemovingUnnecessarySupervisors = false;
 
   // Additional results
   private Collection<EventProxy> mDisabledEvents;

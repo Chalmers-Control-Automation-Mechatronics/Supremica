@@ -275,78 +275,48 @@ public abstract class BDDModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-        param.setName("BDD node limit");
-        param.setDescription
-          ("Maximum number of BDD nodes allowed before aborting");
-        iter.previous();
-        iter.add(new EnumParameter<BDDPackage>
-          (ParameterIDs.BDDModelVerifier_BDDPackage)
-          {
-            @Override
-            public void commitValue()
-            {
-              setBDDPackage(getValue());
-            }
-          });
-        iter.next();
-        break;
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        iter.remove();
-        break;
-      default:
-        break;
+    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_InitialSize) {
+      @Override
+      public void commitValue()
+      {
+        setInitialSize(getValue());
       }
-    }
-    list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_InitialSize)
+    });
+    list.add(new EnumParameter<TransitionPartitioningStrategy>(ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setInitialSize(getValue());
-        }
-      });
-    list.add(new EnumParameter<TransitionPartitioningStrategy>
-      (ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy)
+        setTransitionPartitioningStrategy(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_PartitionSizeLimit) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setTransitionPartitioningStrategy(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.BDDModelVerifier_PartitionSizeLimit)
+        setPartitioningSizeLimit(getValue());
+      }
+    });
+    list.add(new EnumParameter<VariableOrdering>(ParameterIDs.BDDModelVerifier_VariableOrdering) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setPartitioningSizeLimit(getValue());
-        }
-      });
-    list.add(new EnumParameter<VariableOrdering>
-      (ParameterIDs.BDDModelVerifier_VariableOrdering)
+        setVariableOrdering(getValue());
+      }
+    });
+    list.add(new BoolParameter(ParameterIDs.BDDModelVerifier_ReorderingEnabled) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setVariableOrdering(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.BDDModelVerifier_ReorderingEnabled)
+        setReorderingEnabled(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_NodeLimit) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setReorderingEnabled(getValue());
-        }
-      });
+        setNodeLimit(getValue());
+      }
+    });
     return list;
   }
 

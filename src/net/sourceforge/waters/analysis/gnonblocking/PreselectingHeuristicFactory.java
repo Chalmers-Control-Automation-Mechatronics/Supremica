@@ -31,40 +31,85 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.monolithic;
+package net.sourceforge.waters.analysis.gnonblocking;
 
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 
 
 /**
- * A Java implementation of the monolithic synchronous product algorithm,
- * based on {@link ListBufferTransitionRelation} as automaton representation.
+ * Enumeration of preselecting heuristics for
+ * {@link CompositionalGeneralisedConflictChecker} to facilitate configuration
+ * through {@link net.sourceforge.waters.analysis.options.Parameter
+ * Parameter} interface.
  *
  * @author Robi Malik
  */
 
-public class TRSynchronousProductBuilder
-  extends AbstractTRSynchronousProductBuilder
+public enum PreselectingHeuristicFactory
 {
 
   //#########################################################################
-  //# Constructors
-  public TRSynchronousProductBuilder()
+  //# Enumeration
+  MaxS {
+    @Override
+    CompositionalGeneralisedConflictChecker.PreselectingHeuristic
+      create(final CompositionalGeneralisedConflictChecker checker)
+    {
+      return checker.createHeuristicMaxS();
+    }
+  },
+  MinT {
+    @Override
+    CompositionalGeneralisedConflictChecker.PreselectingHeuristic
+      create(final CompositionalGeneralisedConflictChecker checker)
+    {
+      return checker.createHeuristicMinT();
+    }
+  },
+  MinTa {
+    @Override
+    CompositionalGeneralisedConflictChecker.PreselectingHeuristic
+      create(final CompositionalGeneralisedConflictChecker checker)
+    {
+      return checker.createHeuristicMinTa();
+    }
+  },
+  MustL {
+    @Override
+    CompositionalGeneralisedConflictChecker.PreselectingHeuristic
+      create(final CompositionalGeneralisedConflictChecker checker)
+    {
+      return checker.createHeuristicMustL();
+    }
+  };
+
+
+  //#########################################################################
+  //# Abstract Method
+  abstract CompositionalGeneralisedConflictChecker.PreselectingHeuristic
+    create(CompositionalGeneralisedConflictChecker checker);
+
+
+  //#########################################################################
+  //# Access as net.sourceforge.waters.model.analysis.EnumFactory
+  public static EnumFactory<PreselectingHeuristicFactory> getInstance()
   {
+    return ListedFactory.INSTANCE;
   }
 
-  public TRSynchronousProductBuilder(final ProductDESProxy model)
+  private static class ListedFactory
+    extends ListedEnumFactory<PreselectingHeuristicFactory>
   {
-    super(model);
-  }
+    private ListedFactory()
+    {
+      register(MaxS);
+      register(MinT);
+      register(MinTa);
+      register(MustL, true);
+    }
 
-  public TRSynchronousProductBuilder
-    (final ProductDESProxy model,
-     final KindTranslator translator)
-  {
-    super(model, translator);
+    private static final ListedFactory INSTANCE = new ListedFactory();
   }
 
 }

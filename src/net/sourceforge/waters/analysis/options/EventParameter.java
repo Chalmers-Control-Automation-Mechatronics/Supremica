@@ -63,13 +63,14 @@ public class EventParameter extends Parameter
 {
   public EventParameter(final EventParameter template)
   {
-    this(template.getID(), template.getName(), template.getDescription(), template.getNullOptions());
+    this(template.getID(), template.getName(),
+         template.getDescription(), template.getNullOptions());
   }
 
-  public EventParameter(final int id,
-                        final String name,
-                        final String description,
-                        final EventParameterType type)
+  EventParameter(final int id,
+                 final String name,
+                 final String description,
+                 final EventParameterType type)
   {
     super(id, name, description);
     mValue = null;
@@ -152,13 +153,14 @@ public class EventParameter extends Parameter
     mValue = (EventProxy) comboBox.getSelectedItem();
   }
 
-  public EventProxy getValue() {
-    //If noEvent is selected, pass null to the model analyser.
+  public EventProxy getValue()
+  {
+    // TODO If noEvent is selected, pass null to the model analyser.
     //if(mValue.getName() == "(none)")
+    //if (mValue == noEvent)
     // return null;
-
     return mValue;
-    }
+  }
 
   @SuppressWarnings("unchecked")
   @Override

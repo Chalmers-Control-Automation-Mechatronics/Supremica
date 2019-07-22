@@ -123,11 +123,11 @@ public abstract class CompositionalConflictCheckerExperiments extends
   {
     // sets correct preselecting heuristic
     if (mPreselecting.equals("mint")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMinT());
+      mVerifier.setPreselectingHeuristicFactory(PreselectingHeuristicFactory.MinT);
     } else if (mPreselecting.equals("maxs")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMaxS());
+      mVerifier.setPreselectingHeuristicFactory(PreselectingHeuristicFactory.MaxS);
     } else if (mPreselecting.equals("mustl")) {
-      mVerifier.setPreselectingHeuristic(mVerifier.createHeuristicMustL());
+      mVerifier.setPreselectingHeuristicFactory(PreselectingHeuristicFactory.MustL);
     } else {
       System.err
           .println("Error: Preselecting Heuristic not specified correctly, it must be one of: mint, maxs, mustl");
@@ -138,23 +138,19 @@ public abstract class CompositionalConflictCheckerExperiments extends
   {
     // sets correct selecting heuristic
     if (mSelecting.equals("maxl")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxL());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MaxL);
     } else if (mSelecting.equals("maxlt")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxLt());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MaxLt);
     } else if (mSelecting.equals("maxc")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxC());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MaxC);
     } else if (mSelecting.equals("maxct")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMaxCt());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MaxCt);
     } else if (mSelecting.equals("mins")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinS());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MinS);
     } else if (mSelecting.equals("minsc")) {
-      mVerifier.setSelectingHeuristic(mVerifier.createHeuristicMinSCommon());
-    } else if (mSelecting.equals("maxlt")) {
-      mVerifier.setSelectingHeuristic(mVerifier
-          .createHeuristicMaxLOnTransitions());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MinSCommon);
     } else if (mSelecting.equals("maxlc")) {
-      mVerifier.setSelectingHeuristic(mVerifier
-          .createHeuristicMaxCOnTransitions());
+      mVerifier.setSelectingHeuristicFactory(SelectingHeuristicFactory.MaxLOnTransitions);
     } else {
       System.err
           .println("Error: Selecting Heuristic not specified correctly, it must be one of: maxl, maxlt, maxc, maxct, mins");
@@ -302,7 +298,7 @@ public abstract class CompositionalConflictCheckerExperiments extends
       mPrintWriter.println(name + "," + e.getMessage());
     } finally {
       mStats =
-          (CompositionalGeneralisedConflictCheckerVerificationResult) mVerifier
+          mVerifier
               .getAnalysisResult();
       mPrintWriter.print(name);
       mPrintWriter.print(',');

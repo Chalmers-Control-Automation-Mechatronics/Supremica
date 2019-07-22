@@ -38,7 +38,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -69,7 +69,7 @@ class TRAbstractionStepSync
   TRAbstractionStepSync(final List<TRAbstractionStep> preds,
                         final EventEncoding enc,
                         final ProductDESProxyFactory factory,
-                        final TRAbstractSynchronousProductBuilder builder,
+                        final AbstractTRSynchronousProductBuilder builder,
                         final TRSynchronousProductResult result)
   {
     super(result.getComputedAutomaton().getName());
@@ -411,7 +411,7 @@ class TRAbstractionStepSync
   private final List<TRAbstractionStep> mPredecessors;
   private final EventEncoding mEventEncoding;
   private final ProductDESProxyFactory mFactory;
-  private final TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
+  private final AbstractTRSynchronousProductBuilder mSynchronousProductBuilder;
 
   private int mDumpStateIndex;
   private TRSynchronousProductStateMap mStateMap;

@@ -37,9 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ListIterator;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
@@ -182,73 +180,47 @@ public abstract class AbstractCompositionalSynthesizer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID:
-        param.setName("Create supervisor automata");
-        param.setDescription("Disable this to suppress the creation of supervisor " +
-                             "automata, and only determine whether a supervisor " +
-                             "exists.");
-        iter.add(new StringParameter
-          (ParameterIDs.ModelBuilder_OutputName)
-          {
-            @Override
-            public void commitValue()
-            {
-              setOutputName(getValue());
-            }
-          });
-        break;
-      case ParameterIDs.ConflictChecker_ConfiguredDefaultMarking_ID:
-        iter.remove();
-        break;
-      default:
-        break;
+    list.add(0, new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
+      @Override
+      public void commitValue() {
+        setConfiguredDefaultMarking(getValue());
       }
-    }
-    list.add(0, new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
+      @Override
+      public void commitValue() {
+        setNonblockingSynthesis(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_ControllableSynthesis) {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
-    list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)
-      {
-        @Override
-        public void commitValue()
-        {
-          setNonblockingSynthesis(getValue());
-        }
-      });
-    list.add(0, new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_ControllableSynthesis)
-      {
-        @Override
-        public void commitValue()
-        {
-          final KindTranslator translator = getValue() ?
-            IdenticalKindTranslator.getInstance() :
+        final KindTranslator translator = getValue() ?
+          IdenticalKindTranslator.getInstance() :
             ConflictKindTranslator.getInstanceControllable();
           setKindTranslator(translator);
-        }
-      });
-    list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory,
-        DefaultSupervisorReductionFactory.class.getEnumConstants())
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorReductionFactory(getValue());
-        }
-      });
-    /* Supervisor localisation not yet implemented ...
+      }
+    });
+    list.add(0, new StringParameter(ParameterIDs.SupervisorSynthesizer_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
+    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory) {
+      @Override
+      public void commitValue() {
+        setSupervisorReductionFactory(getValue());
+      }
+    });
+   /* Supervisor localisation not yet implemented ...
     list.add(new BoolParameter
       (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
        "Localize supervisors",

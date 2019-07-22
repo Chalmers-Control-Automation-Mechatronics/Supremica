@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
 import net.sourceforge.waters.analysis.options.BoolParameter;
@@ -193,6 +192,11 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   @Override
   public EnumFactory<TRPreselectionHeuristic> getPreselectionHeuristicFactory()
   {
+    return getPreselectionHeuristicFactoryStatic();
+  }
+
+  public static EnumFactory<TRPreselectionHeuristic> getPreselectionHeuristicFactoryStatic()
+  {
     return
       new ListedEnumFactory<TRPreselectionHeuristic>() {
       {
@@ -221,6 +225,11 @@ public abstract class AbstractTRCompositionalModelAnalyzer
 
   @Override
   public EnumFactory<SelectionHeuristic<TRCandidate>> getSelectionHeuristicFactory()
+  {
+    return getSelectionHeuristicFactoryStatic();
+  }
+
+  public static EnumFactory<SelectionHeuristic<TRCandidate>> getSelectionHeuristicFactoryStatic()
   {
     return
       new ListedEnumFactory<SelectionHeuristic<TRCandidate>>() {
@@ -393,47 +402,18 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final Iterator<Parameter> iter = list.iterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-        iter.remove();
-        break;
-      default:
-        break;
-      }
-    }
-
     list.add(new EnumParameter<TRPreselectionHeuristic>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
-        getPreselectionHeuristicFactory())
-      {
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic) {
         @Override
-        public void commitValue()
-        {
+        public void commitValue() {
           setPreselectionHeuristic(getValue());
         }
       });
     list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
-       getSelectionHeuristicFactory())
-      {
+      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic) {
         @Override
-        public void commitValue()
-        {
+        public void commitValue() {
           setSelectionHeuristic(getValue());
-        }
-      });
-    list.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SimplifierCreator,
-       getTRSimplifierFactory())
-      {
-        @Override
-        public void commitValue()
-        {
-          setSimplifierCreator(getValue());
         }
       });
     list.add(new IntParameter
@@ -800,11 +780,11 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     return false;
   }
 
-  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  protected AbstractTRSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
     final KindTranslator eventOnly = new EventOnlyKindTranslator(translator);
-    final TRAbstractSynchronousProductBuilder builder =
+    final AbstractTRSynchronousProductBuilder builder =
       new TRSynchronousProductBuilder();
     builder.setDetailedOutputEnabled(true);
     builder.setKindTranslator(eventOnly);
@@ -1771,7 +1751,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   private SpecialEventsFinder mSpecialEventsFinder;
   private TRToolCreator<TransitionRelationSimplifier> mTRSimplifierCreator;
   private TransitionRelationSimplifier mTRSimplifier;
-  private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
+  private AbstractTRSynchronousProductBuilder mSynchronousProductBuilder;
   private ModelAnalyzer mMonolithicAnalyzer;
 
   // Data Structures

@@ -51,7 +51,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  */
 
 public abstract class TRAbstractModelVerifier
-  extends TRAbstractModelAnalyzer
+  extends AbstractTRMonolithicModelAnalyzer
   implements ModelVerifier
 {
 

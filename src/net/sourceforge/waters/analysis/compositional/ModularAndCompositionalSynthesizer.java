@@ -180,12 +180,12 @@ public class ModularAndCompositionalSynthesizer
 
   public void setRemovesUnnecessarySupervisors(final boolean removes)
   {
-    mModularSynthesizer.setRemovesUnnecessarySupervisors(removes);
+    mModularSynthesizer.setRemovingUnnecessarySupervisors(removes);
   }
 
   public boolean getRemovesUnnecessarySupervisors()
   {
-    return mModularSynthesizer.getRemovesUnnecessarySupervisors();
+    return mModularSynthesizer.isRemovingUnnecessarySupervisors();
   }
 
 

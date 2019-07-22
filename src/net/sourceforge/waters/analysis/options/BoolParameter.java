@@ -49,11 +49,12 @@ public class BoolParameter extends Parameter
 {
   public BoolParameter(final BoolParameter template)
   {
-   this(template.getID(), template.getName(), template.getDescription(), template.getValue());
+   this(template.getID(), template.getName(),
+        template.getDescription(), template.getValue());
   }
 
-  public BoolParameter(final int id, final String name,
-                       final String description, final boolean value)
+  BoolParameter(final int id, final String name,
+                final String description, final boolean value)
   {
     super(id, name, description);
     mValue = value;

@@ -64,9 +64,7 @@ import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
@@ -189,22 +187,14 @@ public class CompositionalGeneralisedConflictChecker
 
   //#########################################################################
   //# Configuration
-  public void setPreselectingHeuristic(final PreselectingHeuristic heuristic)
+  public void setPreselectingHeuristicFactory(final PreselectingHeuristicFactory factory)
   {
-    mPreselectingHeuristic = heuristic;
+    mPreselectingHeuristicFactory = factory;
   }
 
-  public EnumFactory<PreselectingHeuristic> getPreselectingHeuristicFactory()
+  public PreselectingHeuristicFactory getPreselectingHeuristicFactory()
   {
-    return
-      new ListedEnumFactory<PreselectingHeuristic>() {
-      {
-        register(createHeuristicMinT());
-        register(createHeuristicMinTa());
-        register(createHeuristicMaxS());
-        register(createHeuristicMustL(), true);
-      }
-    };
+    return mPreselectingHeuristicFactory;
   }
 
   public PreselectingHeuristic createHeuristicMinT()
@@ -228,10 +218,20 @@ public class CompositionalGeneralisedConflictChecker
   }
 
 
+  public void setSelectingHeuristicFactory(final SelectingHeuristicFactory factory)
+  {
+    mSelectingHeuristicFactory = factory;
+  }
+
+  public SelectingHeuristicFactory getSelectingHeuristicFactory()
+  {
+    return mSelectingHeuristicFactory;
+  }
+
   /**
    * The given heuristic is used first to select a candidate to compose.
    */
-  public void setSelectingHeuristic(final SelectingHeuristic heuristic)
+  private void setSelectingHeuristics(final SelectingHeuristic heuristic)
   {
     mSelectingHeuristics = new ArrayList<SelectingHeuristic>(4);
     mSelectingHeuristics.add(heuristic);
@@ -268,28 +268,10 @@ public class CompositionalGeneralisedConflictChecker
    * The first item in the list should be the first heuristic used to select a
    * candidate to compose, the last item in the list should be the last option.
    */
-  public void setSelectingHeuristic(final List<SelectingHeuristic> heuristicList)
+  public void setSelectingHeuristics(final List<SelectingHeuristic> heuristicList)
   {
     mSelectingHeuristics = heuristicList;
     mSelectingHeuristics.add(new HeuristicDefault());
-  }
-
-  public EnumFactory<SelectingHeuristic> getSelectingHeuristicFactory()
-  {
-    return
-      new ListedEnumFactory<SelectingHeuristic>() {
-      {
-        register(createHeuristicMaxC());
-        register(createHeuristicMaxCOnTransitions());
-        register(createHeuristicMaxCt());
-        register(createHeuristicMaxL());
-        register(createHeuristicMaxLa());
-        register(createHeuristicMaxLOnTransitions());
-        register(createHeuristicMaxLt());
-        register(createHeuristicMinS(), true);
-        register(createHeuristicMinSCommon());
-      }
-    };
   }
 
   public SelectingHeuristic createHeuristicMaxL()
@@ -459,79 +441,53 @@ public class CompositionalGeneralisedConflictChecker
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final Iterator<Parameter> iter = list.iterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      switch (param.getID()) {
-      case ParameterIDs.ModelAnalyzer_NodeLimit_ID:
-      case ParameterIDs.ModelAnalyzer_TransitionLimit_ID:
-      case ParameterIDs.ModelVerifier_ShortCounterExampleRequested_ID:
-        iter.remove();
-        break;
-      default:
-        break;
+    list.add(new EnumParameter<PreselectingHeuristicFactory>
+        (ParameterIDs.CompositionalGeneralisedConflictChecker_PreselectingHeuristic) {
+      @Override
+      public void commitValue() {
+        setPreselectingHeuristicFactory(getValue());
       }
-    }
-
-    list.add(new EnumParameter<PreselectingHeuristic>
-      (ParameterIDs.CompositionalGeneralisedConflictChecker_PreselectingHeuristic,
-       getPreselectingHeuristicFactory())
-      {
-        @Override
-        public void commitValue()
-        {
-          setPreselectingHeuristic(getValue());
-        }
-      });
-    list.add(new EnumParameter<SelectingHeuristic>
-      (ParameterIDs.CompositionalGeneralisedConflictChecker_SelectingHeuristic,
-       getSelectingHeuristicFactory())
-      {
-        @Override
-        public void commitValue()
-        {
-          setSelectingHeuristic(getValue());
-        }
-      });
+    });
+    list.add(new EnumParameter<SelectingHeuristicFactory>
+        (ParameterIDs.CompositionalGeneralisedConflictChecker_SelectingHeuristic) {
+      @Override
+      public void commitValue() {
+        setSelectingHeuristicFactory(getValue());
+      }
+    });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setInternalStepNodeLimit(getValue());
-        }
-      });
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit) {
+      @Override
+      public void commitValue() {
+        setInternalStepNodeLimit(getValue());
+      }
+    });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setInternalStepTransitionLimit(getValue());
-        }
-      });
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit) {
+      @Override
+      public void commitValue() {
+        setInternalStepTransitionLimit(getValue());
+      }
+    });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
+    {
+      @Override
+      public void commitValue()
       {
-        @Override
-        public void commitValue()
-        {
-          setFinalStepNodeLimit(getValue());
-        }
-      });
+        setFinalStepNodeLimit(getValue());
+      }
+    });
     list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setFinalStepTransitionLimit(getValue());
-        }
-      });
-
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit) {
+      @Override
+      public void commitValue() {
+        setFinalStepTransitionLimit(getValue());
+      }
+    });
     return list;
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.model.analysis.AbstractModelAnalyser
@@ -733,6 +689,7 @@ public class CompositionalGeneralisedConflictChecker
           .setConfiguredPreconditionMarking(getUsedPreconditionMarkingProposition());
       checker.setNodeLimit(mFinalStepNodeLimit);
       checker.setTransitionLimit(mFinalStepTransitionLimit);
+      checker.setShortCounterExampleRequested(isShortCounterExampleRequested());
       final boolean result = checker.run();
       mComposedModelNumberOfStates =
           checker.getAnalysisResult().getTotalNumberOfStates();
@@ -915,17 +872,13 @@ public class CompositionalGeneralisedConflictChecker
     mNonAlphaEvents = new THashSet<EventProxy>();
     mUnsuccessfulCandidates = new THashSet<Candidate>();
     mTrivialAbstractedAutomata = new THashSet<AutomatonProxy>();
-    if (mPreselectingHeuristic == null) {
-      final PreselectingHeuristic defaultHeuristic = new HeuristicMinT();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMinTa();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMaxS();
-      // final PreselectingHeuristic defaultHeuristic = new HeuristicMustL();
-      setPreselectingHeuristic(defaultHeuristic);
-    }
+
+    mPreselectingHeuristic = mPreselectingHeuristicFactory.create(this);
     if (mSelectingHeuristics == null) {
-      final SelectingHeuristic defaultHeuristic = new HeuristicMaxL();
-      setSelectingHeuristic(defaultHeuristic);
+      final SelectingHeuristic first = mSelectingHeuristicFactory.create(this);
+      setSelectingHeuristics(first);
     }
+
     // reset statistics
     mSuccessfulCompositionCount = 0;
     mUnsuccessfulCompositionCount = 0;
@@ -3447,6 +3400,11 @@ public class CompositionalGeneralisedConflictChecker
   private EventProxy mUsedPreconditionMarking;
 
   // configuration
+  private PreselectingHeuristicFactory mPreselectingHeuristicFactory =
+    PreselectingHeuristicFactory.getInstance().getDefaultValue();
+  private SelectingHeuristicFactory mSelectingHeuristicFactory =
+    SelectingHeuristicFactory.getInstance().getDefaultValue();
+
   private PreselectingHeuristic mPreselectingHeuristic;
   private List<SelectingHeuristic> mSelectingHeuristics;
   private List<AbstractionRule> mAbstractionRules;

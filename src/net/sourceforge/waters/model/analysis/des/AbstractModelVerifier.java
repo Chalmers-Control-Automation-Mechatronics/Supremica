@@ -34,7 +34,6 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -148,25 +147,20 @@ public abstract class AbstractModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
-    while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
-        param.setName("Compute counterexample");
-        param.setDescription("Computate a counterexample if model checking " +
-                             "gives a failed result.");
-        iter.add(new BoolParameter
-          (ParameterIDs.ModelVerifier_ShortCounterExampleRequested)
-          {
-            @Override
-            public void commitValue()
-            {
-              setShortCounterExampleRequested(getValue());
-            }
-          });
-        break;
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+      @Override
+      public void commitValue()
+      {
+        setShortCounterExampleRequested(getValue());
       }
-    }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
     return list;
   }
 

@@ -57,6 +57,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.ComponentKindParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -368,106 +369,95 @@ public class SupremicaSynchronousProductBuilder
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    for (final Parameter param : list) {
-      if (param.getID() == ParameterIDs.ModelAnalyzer_DetailedOutputEnabled_ID) {
-        param.setName("Build automaton model");
-        param.setDescription("Disable this to suppress the creation of a " +
-                             "synchronous product automaton, and only run " +
-                             "for statistics.");
-        break;
+    list.add(0, new StringParameter
+        (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator) {
+      @Override
+      public void commitValue() {
+        setStateNameSeparator(getValue());
       }
-    }
-    list.add(new EventParameter
-      (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking)
-      {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
-    list.add(new StringParameter
-      (ParameterIDs.ModelBuilder_OutputName)
-      {
-        @Override
-        public void commitValue()
-        {
-          setOutputName(getValue());
-        }
-      });
-    list.add(new ComponentKindParameter
-      (ParameterIDs.AutomatonBuilder_OutputKind)
-      {
-        @Override
-        public void commitValue()
-        {
-          setOutputKind(getValue());
-        }
-      });
+    });
+    list.add(0, new BoolParameter
+        (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames) {
+      @Override
+      public void commitValue() {
+        setUsingShortStateNames(getValue());
+      }
+    });
+    list.add(0, new EventParameter
+        (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
+      @Override
+      public void commitValue() {
+        setConfiguredDefaultMarking(getValue());
+      }
+    });
+    list.add(0, new ComponentKindParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputKind) {
+      @Override
+      public void commitValue() {
+        setOutputKind(getValue());
+      }
+    });
+    list.add(0, new StringParameter
+        (ParameterIDs.SynchronousProductBuilder_OutputName) {
+      @Override
+      public void commitValue() {
+        setOutputName(getValue());
+      }
+    });
+    list.add(0, new BoolParameter
+        (ParameterIDs.SynchronousProductBuilder_DetailedOutputEnabled) {
+      @Override
+      public void commitValue() {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames)
-      {
-        @Override
-        public void commitValue()
-        {
-          setUsingShortStateNames(getValue());
-        }
-      });
-    list.add(new StringParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator,
-       getStateNameSeparator())
-      {
-        @Override
-        public void commitValue()
-        {
-          setStateNameSeparator(getValue());
-        }
-      });
+        (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops) {
+      @Override
+      public void commitValue() {
+        setRemovingSelfloops(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops)
-      {
-        @Override
-        public void commitValue()
-        {
-          setRemovingSelfloops(getValue());
-        }
-      });
+        (ParameterIDs.SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden) {
+      @Override
+      public void commitValue() {
+        setMarkingUncontrollableStatesAsForbidden(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden)
-      {
-        @Override
-        public void commitValue()
-        {
-          setMarkingUncontrollableStatesAsForbidden(getValue());
-        }
-      });
+        (ParameterIDs.SupremicaSynchronousProductBuilder_ExpandingForbiddenStates) {
+      @Override
+      public void commitValue() {
+        setExpandingForbiddenStates(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_ExpandingForbiddenStates)
-      {
-        @Override
-        public void commitValue()
-        {
-          setExpandingForbiddenStates(getValue());
-        }
-      });
+        (ParameterIDs.SupremicaSynchronousProductBuilder_RememberingDisabledEvents) {
+      @Override
+      public void commitValue() {
+        setRememberingDisabledEvents(getValue());
+      }
+    });
     list.add(new BoolParameter
-      (ParameterIDs.SupremicaSynchronousProductBuilder_RememberingDisabledEvents)
-      {
-        @Override
-        public void commitValue()
-        {
-          setRememberingDisabledEvents(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
-      {
-        @Override
-        public void commitValue()
-        {
-          setEnsuringUncontrollablesInPlant(getValue());
-        }
-      });
+        (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant) {
+      @Override
+      public void commitValue() {
+        setEnsuringUncontrollablesInPlant(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
     return list;
   }
 

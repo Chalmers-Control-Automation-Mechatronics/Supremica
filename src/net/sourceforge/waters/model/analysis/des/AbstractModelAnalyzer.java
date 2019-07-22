@@ -37,10 +37,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -194,35 +191,7 @@ public abstract class AbstractModelAnalyzer
   @Override
   public List<Parameter> getParameters()
   {
-    final List<Parameter> list = new LinkedList<>();
-    list.add(new BoolParameter
-      (ParameterIDs.ModelAnalyzer_DetailedOutputEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setDetailedOutputEnabled(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_NodeLimit, getNodeLimit())
-      {
-        @Override
-        public void commitValue()
-        {
-          setNodeLimit(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.ModelAnalyzer_TransitionLimit, getTransitionLimit())
-      {
-        @Override
-        public void commitValue()
-        {
-          setTransitionLimit(getValue());
-        }
-      });
-    return list;
+    return new LinkedList<>();
   }
 
 

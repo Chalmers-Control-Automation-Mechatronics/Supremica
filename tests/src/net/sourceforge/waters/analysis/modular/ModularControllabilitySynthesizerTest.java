@@ -58,7 +58,7 @@ public class ModularControllabilitySynthesizerTest
     synthesizer.setSupervisorReductionFactory
       (DefaultSupervisorReductionFactory.OFF);
     synthesizer.setSupervisorLocalizationEnabled(false);
-    synthesizer.setRemovesUnnecessarySupervisors(false);
+    synthesizer.setRemovingUnnecessarySupervisors(false);
     return synthesizer;
   }
 

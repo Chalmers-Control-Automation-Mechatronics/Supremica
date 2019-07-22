@@ -46,7 +46,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  * A synchronous product result record returned by transition-relation
  * based synchronous product builders.
  *
- * @see TRAbstractSynchronousProductBuilder
+ * @see AbstractTRSynchronousProductBuilder
  * @author Robi Malik
  */
 

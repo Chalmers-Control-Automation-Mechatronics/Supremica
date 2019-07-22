@@ -41,7 +41,7 @@ import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -119,10 +119,10 @@ public class TRCompositionalStateCounter
   }
 
   @Override
-  protected TRAbstractSynchronousProductBuilder createSynchronousProductBuilder()
+  protected AbstractTRSynchronousProductBuilder createSynchronousProductBuilder()
   {
     final KindTranslator translator = getKindTranslator();
-    final TRAbstractSynchronousProductBuilder syncBuilder = new TRSynchronousProductBuilder();
+    final AbstractTRSynchronousProductBuilder syncBuilder = new TRSynchronousProductBuilder();
     syncBuilder.setCountingStates(true);
     syncBuilder.setDetailedOutputEnabled(false);
     syncBuilder.setKindTranslator(translator);

@@ -62,13 +62,13 @@ public abstract class AbstractTRSynchronousProductBuilderTest
   //# Overrides for abstract base class
   //# net.sourceforge.waters.analysis.AbstractAutomatonBuilderTest
   @Override
-  protected abstract TRAbstractSynchronousProductBuilder
+  protected abstract AbstractTRSynchronousProductBuilder
     createAutomatonBuilder(final ProductDESProxyFactory factory);
 
   @Override
-  protected TRAbstractSynchronousProductBuilder getAutomatonBuilder()
+  protected AbstractTRSynchronousProductBuilder getAutomatonBuilder()
   {
-    return (TRAbstractSynchronousProductBuilder) super.getAutomatonBuilder();
+    return (AbstractTRSynchronousProductBuilder) super.getAutomatonBuilder();
   }
 
   @Override
@@ -76,7 +76,7 @@ public abstract class AbstractTRSynchronousProductBuilderTest
     throws AnalysisException
   {
     super.configureAutomatonBuilder(des);
-    final TRAbstractSynchronousProductBuilder builder = getAutomatonBuilder();
+    final AbstractTRSynchronousProductBuilder builder = getAutomatonBuilder();
     builder.setPruningDeadlocks(mPruningDeadlocks);
     final Collection<EventProxy> events = des.getEvents();
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
@@ -195,7 +195,7 @@ public abstract class AbstractTRSynchronousProductBuilderTest
     automata.add(autB);
     final ProductDESProxy input =
       factory.createProductDESProxy("unused_prop", events, automata);
-    final TRAbstractSynchronousProductBuilder builder = getAutomatonBuilder();
+    final AbstractTRSynchronousProductBuilder builder = getAutomatonBuilder();
     builder.setModel(input);
     final KindTranslator translator = IdenticalKindTranslator.getInstance();
     final EventEncoding enc = new EventEncoding();

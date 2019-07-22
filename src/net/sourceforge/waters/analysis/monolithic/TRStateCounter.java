@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
  */
 
 public class TRStateCounter
-  extends TRAbstractModelAnalyzer
+  extends AbstractTRMonolithicModelAnalyzer
   implements StateCounter
 {
 

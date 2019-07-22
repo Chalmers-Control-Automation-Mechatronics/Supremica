@@ -60,7 +60,7 @@ import gnu.trove.set.hash.TIntHashSet;
  */
 
 public class TRReducingSynchronousProductBuilder
-  extends TRAbstractSynchronousProductBuilder
+  extends AbstractTRSynchronousProductBuilder
 {
 
   //#########################################################################

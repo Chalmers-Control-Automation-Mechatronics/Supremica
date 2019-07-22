@@ -36,7 +36,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -109,7 +109,7 @@ public class SelectionHeuristicMinSync
       return Double.POSITIVE_INFINITY;
     }
     final AbstractTRCompositionalModelAnalyzer analyzer = getAnalyzer();
-    final TRAbstractSynchronousProductBuilder syncBuilder =
+    final AbstractTRSynchronousProductBuilder syncBuilder =
       getSynchronousProductBuilder();
     try {
       final ProductDESProxyFactory factory = analyzer.getFactory();

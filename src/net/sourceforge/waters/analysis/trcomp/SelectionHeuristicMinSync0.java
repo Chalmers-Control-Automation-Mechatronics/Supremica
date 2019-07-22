@@ -36,7 +36,7 @@ package net.sourceforge.waters.analysis.trcomp;
 import java.util.Collection;
 
 import net.sourceforge.waters.analysis.compositional.NumericSelectionHeuristic;
-import net.sourceforge.waters.analysis.monolithic.TRAbstractSynchronousProductBuilder;
+import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
@@ -117,7 +117,7 @@ abstract class SelectionHeuristicMinSync0
     return mAnalyzer;
   }
 
-  TRAbstractSynchronousProductBuilder getSynchronousProductBuilder()
+  AbstractTRSynchronousProductBuilder getSynchronousProductBuilder()
   {
     return mSynchronousProductBuilder;
   }
@@ -141,6 +141,6 @@ abstract class SelectionHeuristicMinSync0
   //#########################################################################
   //# Data Members
   private AbstractTRCompositionalModelAnalyzer mAnalyzer;
-  private TRAbstractSynchronousProductBuilder mSynchronousProductBuilder;
+  private AbstractTRSynchronousProductBuilder mSynchronousProductBuilder;
 
 }

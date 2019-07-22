@@ -51,41 +51,46 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *
  * @author Brandon Bassett
  */
-public class IntParameter extends Parameter {
-
-    public IntParameter(final IntParameter template) {
-        this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), template.getValue());
-    }
-
-    public IntParameter(final IntParameter template, final int defValue) {
-      this(template.getID(), template.getName(), template.getDescription(), template.getMin(), template.getMax(), defValue);
+public class IntParameter extends Parameter
+{
+  //#########################################################################
+  //# Constructors
+  public IntParameter(final IntParameter template)
+  {
+    this(template.getID(), template.getName(),
+         template.getDescription(), template.getMin(),
+         template.getMax(), template.getValue());
   }
 
-    public IntParameter(final int id, final String name, final String description,
-                        final int min, final int max, final int defValue) {
-        super(id, name, description);
-        mMin = min;
-        mMax = max;
-        defaultValue = defValue;
-        mValue = defValue;
-        format = NumberFormat.getIntegerInstance();
-        format.setGroupingUsed(false);
-
-        if(min < 0)
-          alphabet = "-?[0-9]+";
-        else
-          alphabet = "[0-9]+";
+  IntParameter(final int id, final String name, final String description,
+               final int min, final int max, final int defValue)
+  {
+    super(id, name, description);
+    mMin = min;
+    mMax = max;
+    defaultValue = defValue;
+    mValue = defValue;
+    mFormat = NumberFormat.getIntegerInstance();
+    mFormat.setGroupingUsed(false);
+    if(min < 0) {
+      mAlphabet = "-?[0-9]+";
+    } else {
+      mAlphabet = "[0-9]+";
     }
+  }
 
-    @Override
-    public Component createComponent(final ProductDESContext model) {
 
+  //#########################################################################
+  //# Overrides for ney.sourceforge.waters.analysis.options.Parameter
+  @Override
+  public Component createComponent(final ProductDESContext model)
+  {
     final JFormattedTextField ret = new JFormattedTextField();
-
     setTextField(ret, mValue);
-
     ret.setColumns(10);
 
+    // TODO Not FocusListener but DocumentFilter to prevent illegal characters.
+    //      (see https://coderanch.com/t/345628/java/DocumentFilter)
     ret.addFocusListener(new FocusListener(){
       @Override
       public void focusGained(final FocusEvent e){}
@@ -93,16 +98,16 @@ public class IntParameter extends Parameter {
       @Override
       public void focusLost(final FocusEvent e){
         //Input matches alphabet
-        if (ret.getText().matches(alphabet)) {
+        if (ret.getText().matches(mAlphabet)) {
           try {
-            final Number tmp = format.parse(ret.getText());
+            final Number tmp = mFormat.parse(ret.getText());
             //value not in range
             if (tmp.longValue() < mMin || tmp.longValue() > mMax) {
               JOptionPane
-                .showMessageDialog(new JFrame(),
-                                   "Value must be a number between " + mMin
-                                                 + "-" + mMax
-                                                 + "\nSetting value to default.");
+              .showMessageDialog(new JFrame(),
+                                 "Value must be a number between " + mMin
+                                 + "-" + mMax
+                                 + "\nSetting value to default.");
               setTextField(ret, defaultValue);
             }
           } catch (final ParseException exception) {
@@ -112,78 +117,79 @@ public class IntParameter extends Parameter {
         //Input doesn't match alphabet and isn't empty
         else if (!ret.getText().equals("")){
           JOptionPane
-            .showMessageDialog(new JFrame(),
-                               "Invalid Input. Value must be a number between " + mMin
-                                             + "-" + mMax + ". "
-                                             + "\nSetting value to default.");
+          .showMessageDialog(new JFrame(),
+                             "Invalid Input. Value must be a number between " + mMin
+                             + "-" + mMax + ". "
+                             + "\nSetting value to default.");
           setTextField(ret, defaultValue);
         }
       }
     });
-    	return ret;
-    }
-
-    public int getValue() {
-        return mValue;
-    }
-
-    public int getMin() {
-      return mMin;
+    return ret;
   }
 
-    public int getMax() {
-      return mMax;
+  public int getValue() {
+    return mValue;
   }
 
-    //Sets the text of the textField to the desired value, empty string if value is Integer.MAX_VALUE
-    private void setTextField(final JFormattedTextField ret, final int value) {
-      if (value == Integer.MAX_VALUE)
-        ret.setText("");
-      else
-        ret.setText(String.valueOf(value));
-    }
+  public int getMin() {
+    return mMin;
+  }
 
-    //Updates parameter value using the component stored in the passed panel
-    //Used when commit a parameter from panel
-    @Override
-    public void updateFromGUI(final ParameterPanel panel)
-    {
-      final Component comp = panel.getEntryComponent();
-      final JFormattedTextField textField = (JFormattedTextField) comp;
-      //empty field default to max
-      if(textField.getText().equals(""))
-        mValue = Integer.MAX_VALUE;
-      else
-        mValue = Integer.parseInt(textField.getText());
-    }
+  public int getMax() {
+    return mMax;
+  }
 
-    //Updates a ParameterPanels component with parameter value
-    @Override
-    public void displayInGUI(final ParameterPanel panel)
-    {
-      final Component comp = panel.getEntryComponent();
-      final JFormattedTextField textField = (JFormattedTextField) comp;
-      setTextField(textField, mValue);
-    }
+  //Sets the text of the textField to the desired value, empty string if value is Integer.MAX_VALUE
+  private void setTextField(final JFormattedTextField ret, final int value) {
+    if (value == Integer.MAX_VALUE)
+      ret.setText("");
+    else
+      ret.setText(String.valueOf(value));
+  }
 
-    @Override
-    public void updateFromParameter(final Parameter p)
-    {
-      mValue = ((IntParameter) p).getValue();
-    }
+  //Updates parameter value using the component stored in the passed panel
+  //Used when commit a parameter from panel
+  @Override
+  public void updateFromGUI(final ParameterPanel panel)
+  {
+    final Component comp = panel.getEntryComponent();
+    final JFormattedTextField textField = (JFormattedTextField) comp;
+    //empty field default to max
+    if(textField.getText().equals(""))
+      mValue = Integer.MAX_VALUE;
+    else
+      mValue = Integer.parseInt(textField.getText());
+  }
 
-    @Override
-    public String toString()
-    {
-      return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
-    }
+  //Updates a ParameterPanels component with parameter value
+  @Override
+  public void displayInGUI(final ParameterPanel panel)
+  {
+    final Component comp = panel.getEntryComponent();
+    final JFormattedTextField textField = (JFormattedTextField) comp;
+    setTextField(textField, mValue);
+  }
 
-    //#########################################################################
-    //# Data Members
-    private final int mMin;
-    private final int mMax;
-    private int mValue;
-    private final int defaultValue;
-    private final NumberFormat format;
-    private String alphabet;
+  @Override
+  public void updateFromParameter(final Parameter p)
+  {
+    mValue = ((IntParameter) p).getValue();
+  }
+
+  @Override
+  public String toString()
+  {
+    return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final int mMin;
+  private final int mMax;
+  private int mValue;
+  private final int defaultValue;
+  private final NumberFormat mFormat;
+  private String mAlphabet;
 }
