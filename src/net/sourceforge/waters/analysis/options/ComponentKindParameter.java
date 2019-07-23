@@ -23,7 +23,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
   public ComponentKindParameter(final ComponentKindParameter template)
   {
      super(template);
-     initialGeneration = true;
+     mValue = null;
   }
 
   public ComponentKindParameter(final int id,
@@ -31,15 +31,16 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
                                 final String description)
   {
     super(id, name, description, ComponentKind.values());
-    initialGeneration = true;
+    mValue = null;
   }
 
   @Override
   public Component createComponent(final ProductDESContext context)
   {
     mDESContext = context;
-    if(initialGeneration)
+    if(mValue == null) {
       mValue = getKind();
+    }
     @SuppressWarnings("unchecked")
     final
     JComboBox<ComponentKind> comboBox =
@@ -121,6 +122,5 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
   //#########################################################################
   //# Data Members
   private ProductDESContext mDESContext;
-  private final boolean initialGeneration;
 
 }

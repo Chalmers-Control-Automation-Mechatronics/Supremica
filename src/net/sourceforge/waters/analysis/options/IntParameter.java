@@ -37,11 +37,10 @@ import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.text.NumberFormat;
-import java.text.ParseException;
 
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
@@ -51,7 +50,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *
  * @author Brandon Bassett
  */
-public class IntParameter extends Parameter
+public class IntParameter extends AbstractTextFieldParameter
 {
   //#########################################################################
   //# Constructors
@@ -85,48 +84,60 @@ public class IntParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESContext model)
   {
-    final JFormattedTextField ret = new JFormattedTextField();
-    setTextField(ret, mValue);
-    ret.setColumns(10);
+    final JTextField textField = (JTextField) super.createComponent(model);
 
-    // TODO Not FocusListener but DocumentFilter to prevent illegal characters.
-    //      (see https://coderanch.com/t/345628/java/DocumentFilter)
-    ret.addFocusListener(new FocusListener(){
+    setTextField(textField, mValue);
+    textField.addFocusListener(new FocusListener() {
       @Override
       public void focusGained(final FocusEvent e){}
 
       @Override
-      public void focusLost(final FocusEvent e){
-        //Input matches alphabet
-        if (ret.getText().matches(mAlphabet)) {
-          try {
-            final Number tmp = mFormat.parse(ret.getText());
-            //value not in range
-            if (tmp.longValue() < mMin || tmp.longValue() > mMax) {
-              JOptionPane
-              .showMessageDialog(new JFrame(),
-                                 "Value must be a number between " + mMin
-                                 + "-" + mMax
-                                 + "\nSetting value to default.");
-              setTextField(ret, defaultValue);
-            }
-          } catch (final ParseException exception) {
-            exception.printStackTrace();
-          }
-        }
-        //Input doesn't match alphabet and isn't empty
-        else if (!ret.getText().equals("")){
+      public void focusLost(final FocusEvent e)
+      {
+        if(textField.getText().equals("-")) {
           JOptionPane
           .showMessageDialog(new JFrame(),
-                             "Invalid Input. Value must be a number between " + mMin
-                             + "-" + mMax + ". "
-                             + "\nSetting value to default.");
-          setTextField(ret, defaultValue);
+                             "Value must be a number between " + mMin
+                                           + "-" + mMax
+                                           + "\nSetting value to default.");
+        setTextField(textField, defaultValue);
         }
       }
     });
-    return ret;
+
+    return textField;
   }
+
+  @Override
+  protected boolean testAlphabet(final String text) {
+
+      if (text.length() == 1 && text.equals("-") && mAlphabet.substring(0,1).contains("-")) {
+        return true;
+      }
+      else if(text.isEmpty()) {
+        return true;
+      }
+      else if (text.matches(mAlphabet)) {
+        try {
+          final Integer tmp = Integer.parseInt(text);
+          if (tmp < mMin || tmp > mMax) {
+            JOptionPane
+              .showMessageDialog(new JFrame(),
+                                 "Value must be a number between " + "(" +  mMin + ")"
+                                               + " - "  + "(" + mMax + ")" );
+            return false;
+          }
+        } catch (final NumberFormatException exception) {
+          JOptionPane
+          .showMessageDialog(new JFrame(),
+                             "Value must be a number between " + "(" +  mMin + ")"
+                                           + " - "  + "(" + mMax + ")" );
+          return false;
+        }
+        return true;
+      }
+     return false;
+ }
 
   public int getValue() {
     return mValue;
@@ -141,7 +152,7 @@ public class IntParameter extends Parameter
   }
 
   //Sets the text of the textField to the desired value, empty string if value is Integer.MAX_VALUE
-  private void setTextField(final JFormattedTextField ret, final int value) {
+  private void setTextField(final JTextField ret, final int value) {
     if (value == Integer.MAX_VALUE)
       ret.setText("");
     else
@@ -154,7 +165,7 @@ public class IntParameter extends Parameter
   public void updateFromGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
-    final JFormattedTextField textField = (JFormattedTextField) comp;
+    final JTextField textField = (JTextField) comp;
     //empty field default to max
     if(textField.getText().equals(""))
       mValue = Integer.MAX_VALUE;
@@ -167,7 +178,7 @@ public class IntParameter extends Parameter
   public void displayInGUI(final ParameterPanel panel)
   {
     final Component comp = panel.getEntryComponent();
-    final JFormattedTextField textField = (JFormattedTextField) comp;
+    final JTextField textField = (JTextField) comp;
     setTextField(textField, mValue);
   }
 

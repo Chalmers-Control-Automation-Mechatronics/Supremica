@@ -93,16 +93,15 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     getAnalyzer().setModel(des);
     try {
       getAnalyzer().run();
+      final AutomatonResult result = getAnalyzer().getAnalysisResult();
+      final AutomatonProxy aut = result.getComputedProxy();
+      final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+      model.insertRow(aut);
     } catch (final AnalysisException exception) {
       final Logger logger = LogManager.getLogger();
       final String msg = exception.getMessage();
       logger.error(msg);
     }
-    final AutomatonResult result = getAnalyzer().getAnalysisResult();
-    final AutomatonProxy aut = result.getComputedProxy();
-    final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
-    model.insertRow(aut);
-
     return null;
   }
 
