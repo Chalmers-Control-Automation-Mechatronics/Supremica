@@ -54,12 +54,12 @@ import org.supremica.gui.ide.ModuleContainer;
  * @author Robi Malik
  */
 
-public abstract class WatersVerifyDialog extends WatersAnalyzeDialog
+public abstract class WatersVerificationDialog extends WatersAnalyzeDialog
 {
 
   //#########################################################################
   //# Constructor
-  public WatersVerifyDialog(final IDE owner,
+  public WatersVerificationDialog(final IDE owner,
                             final ProductDESProxy des)
   {
     super(owner, des);
@@ -122,7 +122,7 @@ public abstract class WatersVerifyDialog extends WatersAnalyzeDialog
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          WatersVerifyDialog.this.dispose();
+          WatersVerificationDialog.this.dispose();
           final IDE ide = getIDE();
           final ModuleContainer container =
             (ModuleContainer) ide.getActiveDocumentContainer();

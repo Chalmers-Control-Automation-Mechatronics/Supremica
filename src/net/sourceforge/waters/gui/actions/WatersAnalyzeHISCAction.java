@@ -61,7 +61,7 @@ import org.supremica.gui.ide.ModuleContainer;
  */
 
 public abstract class WatersAnalyzeHISCAction
-  extends WatersAnalyzeAction
+  extends WatersVerificationAction
 {
 
   //#########################################################################

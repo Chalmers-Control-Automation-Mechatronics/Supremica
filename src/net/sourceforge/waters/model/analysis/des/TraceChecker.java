@@ -60,13 +60,21 @@ import net.sourceforge.waters.model.des.StateProxy;
 import net.sourceforge.waters.model.des.TraceProxy;
 import net.sourceforge.waters.model.des.TraceStepProxy;
 import net.sourceforge.waters.model.des.TransitionProxy;
+import net.sourceforge.waters.model.marshaller.CounterExampleSaturator;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
+
 /**
- * A debugging tool.
- * This class contains static methods to check whether a counterexample
+ * <P>A debugging tool.</P>
+ *
+ * <P>This class contains static methods to check whether a counterexample
  * (for a deterministic or nondeterministic model) is accepted by its
- * automata.
+ * automata, and whether a counterexample computed by verification algorithm
+ * refutes the property that was verified.</P>
+ *
+ * <P>Failures are reporting by throwing an {@link AssertionError},
+ * making this an ideal tool for use in unit tests. An alternative for
+ * easier use in the IDE is provided by the {@link CounterExampleSaturator}.</P>
  *
  * @author Robi Malik
  */
@@ -323,7 +331,7 @@ public class TraceChecker
    * @param  translator Kind translator used for filtering propositions when
    *                    creating language inclusion model.
    * @throws AssertionError to indicate that something is wrong with the
-   *                        trace.
+   *                    counterexample.
    */
   public static void checkConflictCounterExample
     (final ConflictCounterExampleProxy counter,

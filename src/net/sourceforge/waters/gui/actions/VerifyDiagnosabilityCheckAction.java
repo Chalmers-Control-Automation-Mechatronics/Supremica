@@ -50,7 +50,7 @@ import org.supremica.gui.ide.IDE;
  * @author Robi Malik
  */
 
-public class VerifyDiagnosabilityCheckAction extends WatersAnalyzeAction
+public class VerifyDiagnosabilityCheckAction extends WatersVerificationAction
 {
 
   //#########################################################################

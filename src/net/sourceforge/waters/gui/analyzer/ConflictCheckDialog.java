@@ -34,7 +34,7 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
-import net.sourceforge.waters.gui.dialog.WatersVerifyDialog;
+import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -86,7 +86,7 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
-  private class ConflictCheckPopUpDialog extends WatersVerifyDialog
+  private class ConflictCheckPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor

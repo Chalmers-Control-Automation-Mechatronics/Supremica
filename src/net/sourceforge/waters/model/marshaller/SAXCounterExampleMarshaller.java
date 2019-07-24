@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.model.marshaller;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -93,6 +94,34 @@ public class SAXCounterExampleMarshaller
   {
     super(new SAXCounterExampleImporter(factory),
           new StAXProductDESWriter());
+    mSaturator = new CounterExampleSaturator(factory);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  /**
+   * Sets whether counterexample saturation is performed.
+   * @param  sat  If <CODE>false</CODE> (the default), counterexamples
+   *              are unchanged when reading and writing to and from files.
+   *              If <CODE>true</CODE>, counterexamples are written to files
+   *              in desaturated form, including only the state information
+   *              needed to resolve nondeterminism, and they are saturated to
+   *              include full state information after reading from a file.
+   * @see CounterExampleSaturator
+   */
+  public void setSaturating(final boolean sat)
+  {
+    mSaturating = sat;
+  }
+
+  /**
+   * Returns whether counterexample saturation is performed.
+   * @see #setSaturating(boolean)
+   */
+  public boolean isSaturating()
+  {
+    return mSaturating;
   }
 
 
@@ -109,7 +138,8 @@ public class SAXCounterExampleMarshaller
    *                  has failed for some reason. This exception is also
    *                  thrown if the counterexample file mentions the names
    *                  of automata, events, or states that do not exist in
-   *                  the given product DES.
+   *                  the given product DES, or if the counterexample fails
+   *                  to be accepted by all automata in the given product DES.
    */
   public CounterExampleProxy unmarshal(final URI uri,
                                        final ProductDESProxy des)
@@ -119,7 +149,16 @@ public class SAXCounterExampleMarshaller
       (SAXCounterExampleImporter) getImporter();
     try {
       importer.setProductDES(des);
-      return unmarshal(uri);
+      CounterExampleProxy cex = unmarshal(uri);
+      if (mSaturating) {
+        cex = mSaturator.saturate(cex);
+        cex.setLocation(uri);
+      } else {
+        mSaturator.check(cex);
+      }
+      return cex;
+    } catch (final CounterExampleValidationException exception) {
+      throw new WatersUnmarshalException(exception);
     } finally {
       importer.setProductDES(null);
     }
@@ -130,6 +169,20 @@ public class SAXCounterExampleMarshaller
   //# Interfaces
   //# net.sourceforge.waters.model.marshaller.ProxyMarshaller<CounterExampleProxy>
   //# net.sourceforge.waters.model.marshaller.ProxyUnmarshaller<CounterExampleProxy>
+  @Override
+  public void marshal(CounterExampleProxy cex, final File filename)
+    throws WatersMarshalException, IOException
+  {
+    if (mSaturating) {
+      try {
+        cex = mSaturator.desaturate(cex);
+      } catch (final CounterExampleValidationException exception) {
+        throw new WatersMarshalException(exception);
+      }
+    }
+    super.marshal(cex, filename);
+  }
+
   @Override
   public String getDefaultExtension()
   {
@@ -151,5 +204,12 @@ public class SAXCounterExampleMarshaller
   {
       return "Waters trace files [*.wtra]";
   }
+
+
+  //#########################################################################
+  //# Data Members
+  private final CounterExampleSaturator mSaturator;
+
+  private boolean mSaturating = false;
 
 }

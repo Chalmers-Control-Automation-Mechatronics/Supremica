@@ -31,49 +31,38 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.model.marshaller;
 
-import net.sourceforge.waters.analysis.sd.SDPlantCompletenessChecker;
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-import org.supremica.gui.ide.IDE;
+import net.sourceforge.waters.model.base.ModelException;
+import net.sourceforge.waters.model.des.CounterExampleProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
 
-public class VerifySDPlantCompletenessAction extends WatersVerificationAction
+/**
+ * An exception thrown by a {@link CounterExampleSaturator} to indicate
+ * that a {@link CounterExampleProxy} is not accepted by its
+ * {@link ProductDESProxy}.
+ *
+ * @author Robi Malik
+ */
+
+public class CounterExampleValidationException extends ModelException
 {
 
-  protected VerifySDPlantCompletenessAction(final IDE ide)
+  //#########################################################################
+  //# Constructor
+  /**
+   * Constructs a new exception with the specified detail message.
+   * @param  builder  StringBuilder containing message.
+   */
+  public CounterExampleValidationException(final StringBuilder builder)
   {
-    super(ide);
+    super(builder.toString());
   }
 
-  protected String getCheckName()
-  {
-    return "Plant Completeness";
-  }
 
-  protected String getFailureDescription()
-  {
-    return "does not satisfy Plant Completeness";
-  }
+  //#########################################################################
+  //# Static Class Variables
+  private static final long serialVersionUID = -8339037606054488124L;
 
-  protected ModelVerifier createModelVerifier
-    (final ModelAnalyzerFactory factory,
-     final ProductDESProxyFactory desFactory) throws AnalysisConfigurationException
-  {  final ControllabilityChecker checker=
-  factory.createControllabilityChecker(desFactory);
-
-     return new SDPlantCompletenessChecker(desFactory,checker);
-  }
-
-  protected String getSuccessDescription()
-  {
-    return "satisfies Plant Completeness";
-  }
-
-  private static final long serialVersionUID = -1008097797553564719L;
 }

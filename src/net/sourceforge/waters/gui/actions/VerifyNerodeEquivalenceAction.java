@@ -42,7 +42,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class VerifyNerodeEquivalenceAction extends WatersAnalyzeAction
+public class VerifyNerodeEquivalenceAction extends WatersVerificationAction
 {
 
   protected VerifyNerodeEquivalenceAction(final IDE ide)

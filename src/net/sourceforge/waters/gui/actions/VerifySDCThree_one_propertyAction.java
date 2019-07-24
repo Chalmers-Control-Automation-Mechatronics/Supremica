@@ -43,7 +43,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 
-public class VerifySDCThree_one_propertyAction extends WatersAnalyzeAction
+public class VerifySDCThree_one_propertyAction extends WatersVerificationAction
 {
 
   protected VerifySDCThree_one_propertyAction(final IDE ide)

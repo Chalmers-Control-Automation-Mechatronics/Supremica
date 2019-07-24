@@ -64,7 +64,7 @@ import org.supremica.gui.ide.IDE;
 import org.supremica.gui.ide.ModuleContainer;
 
 
-public class VerifyLanguageInclusionAction extends WatersAnalyzeAction
+public class VerifyLanguageInclusionAction extends WatersVerificationAction
                                             implements ModelObserver
 {
   //#########################################################################

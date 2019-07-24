@@ -38,7 +38,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
-import net.sourceforge.waters.gui.dialog.WatersVerifyDialog;
+import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -60,14 +60,14 @@ import org.supremica.properties.SupremicaPropertyChangeListener;
  * @author Andrew Holland, Robi Malik
  */
 
-public abstract class WatersAnalyzeAction
+public abstract class WatersVerificationAction
   extends WatersAction
   implements SupremicaPropertyChangeListener, CompilationObserver
 {
 
   //#########################################################################
   //# Constructor
-  protected WatersAnalyzeAction(final IDE ide)
+  protected WatersVerificationAction(final IDE ide)
   {
     super(ide);
     ide.attach(this);
@@ -96,8 +96,8 @@ public abstract class WatersAnalyzeAction
   {
     final IDE ide = getIDE();
     @SuppressWarnings("unused")
-    final AnalyzeDialog dialog =
-      new AnalyzeDialog(ide, compiledDES, createModelVerifier());
+    final VerificationDialog dialog =
+      new VerificationDialog(ide, compiledDES, createModelVerifier());
   }
 
   @Override
@@ -179,14 +179,14 @@ public abstract class WatersAnalyzeAction
 
 
   //#########################################################################
-  //# Inner Class AnalyzeDialog
-  private class AnalyzeDialog extends WatersVerifyDialog
+  //# Inner Class VerificationDialog
+  private class VerificationDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
-    public AnalyzeDialog(final IDE owner,
-                         final ProductDESProxy des,
-                         final ModelAnalyzer Verifier)
+    public VerificationDialog(final IDE owner,
+                              final ProductDESProxy des,
+                              final ModelAnalyzer Verifier)
     {
       super(owner, des);
     }
@@ -196,13 +196,13 @@ public abstract class WatersAnalyzeAction
     @Override
     protected String getFailureDescription()
     {
-      return WatersAnalyzeAction.this.getFailureDescription();
+      return WatersVerificationAction.this.getFailureDescription();
     }
 
     @Override
     protected String getSuccessDescription()
     {
-      return WatersAnalyzeAction.this.getSuccessDescription();
+      return WatersVerificationAction.this.getSuccessDescription();
     }
 
     //#######################################################################
@@ -210,13 +210,13 @@ public abstract class WatersAnalyzeAction
     @Override
     protected String getAnalysisName()
     {
-      return WatersAnalyzeAction.this.getCheckName() + " check";
+      return WatersVerificationAction.this.getCheckName() + " check";
     }
 
     @Override
     protected ModelAnalyzer createModelAnalyzer()
     {
-      return WatersAnalyzeAction.this.createModelVerifier();
+      return WatersVerificationAction.this.createModelVerifier();
     }
 
     //#######################################################################

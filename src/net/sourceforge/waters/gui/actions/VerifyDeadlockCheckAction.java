@@ -47,7 +47,7 @@ import org.supremica.gui.ide.IDE;
  * @author Hani al-Bahri
  */
 
-public class VerifyDeadlockCheckAction extends WatersAnalyzeAction
+public class VerifyDeadlockCheckAction extends WatersVerificationAction
 {
 
   //#########################################################################

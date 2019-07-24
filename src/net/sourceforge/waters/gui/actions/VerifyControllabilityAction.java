@@ -48,7 +48,7 @@ import org.supremica.gui.ide.IDE;
  * @author Robi Malik
  */
 
-public class VerifyControllabilityAction extends WatersAnalyzeAction
+public class VerifyControllabilityAction extends WatersVerificationAction
 {
 
   //#########################################################################

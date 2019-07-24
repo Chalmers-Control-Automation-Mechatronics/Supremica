@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.supremica.gui.ide.IDE;
 
 public class VerifyConflictCheckAction
-extends WatersAnalyzeAction
+extends WatersVerificationAction
 {
   protected VerifyConflictCheckAction(final IDE ide)
   {

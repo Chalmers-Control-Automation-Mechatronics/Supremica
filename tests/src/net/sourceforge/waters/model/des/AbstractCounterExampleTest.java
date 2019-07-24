@@ -225,6 +225,7 @@ public abstract class AbstractCounterExampleTest
     super.setUp();
     final ProductDESProxyFactory factory = getProductDESProxyFactory();
     mCounterExampleMarshaller = new SAXCounterExampleMarshaller(factory);
+    mCounterExampleMarshaller.setSaturating(true);
     mProductDESMarshaller = new SAXProductDESMarshaller(factory);
     final PrintWriter writer = new PrintWriter(System.out);
     mPrinter = new ProductDESProxyPrinter(writer);
