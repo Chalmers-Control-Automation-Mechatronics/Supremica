@@ -40,6 +40,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.ComponentKindParameter;
+import net.sourceforge.waters.analysis.options.JListParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.options.StringParameter;
@@ -204,6 +205,7 @@ public abstract class AbstractTRSynchronousProductBuilder
         setPruningDeadlocks(getValue());
       }
     });
+    list.add(new JListParameter<ComponentKind>(ParameterIDs.testJListParam) { });
     return list;
   }
 

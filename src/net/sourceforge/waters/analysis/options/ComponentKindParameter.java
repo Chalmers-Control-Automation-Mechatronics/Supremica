@@ -23,7 +23,7 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
   public ComponentKindParameter(final ComponentKindParameter template)
   {
      super(template);
-     mValue = null;
+     setValue(null);
   }
 
   public ComponentKindParameter(final int id,
@@ -31,15 +31,15 @@ public class ComponentKindParameter extends EnumParameter<ComponentKind>
                                 final String description)
   {
     super(id, name, description, ComponentKind.values());
-    mValue = null;
+    setValue(null);
   }
 
   @Override
   public Component createComponent(final ProductDESContext context)
   {
     mDESContext = context;
-    if(mValue == null) {
-      mValue = getKind();
+    if(getValue() == null) {
+      setValue(getKind());
     }
     @SuppressWarnings("unchecked")
     final
