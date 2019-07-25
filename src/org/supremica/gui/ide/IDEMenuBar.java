@@ -618,7 +618,6 @@ public class IDEMenuBar
         if (menu.getMenuComponentCount() > 0) {
           menu.addSeparator();
         }
-        menu.addSeparator();
         menu.add(actions.simulatorLaunchAnimatorAction);
         menu.add(actions.simulatorLaunchSimulatorAction);
         menu.add(actions.simulatorClearSimulationData);

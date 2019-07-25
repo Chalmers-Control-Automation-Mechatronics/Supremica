@@ -106,6 +106,7 @@
         <unjar src="${lib}/scenebeans.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/natutil.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/scenebeansXmlCompability.jar" dest="${lib}/${unjared}"/>
+        <unjar src="${lib}/jel.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/BCEL.jar" dest="${lib}/${unjared}"/>
     	<!-- JacoZoom -->
         <unjar src="${lib}/ctrlmngr.jar" dest="${lib}/${unjared}"/>     
