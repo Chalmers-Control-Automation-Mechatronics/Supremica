@@ -106,8 +106,6 @@ public final class Config
     //   GENERAL
     //   GENERAL_LOG
     //   GENERAL_FILE
-    //   GENERAL_COMM
-    //   GENERAL_SOFTPLC
     //   GUI
     //   GUI_EDITOR
     //   GUI_ANALYZER
@@ -184,13 +182,6 @@ public final class Config
     public static final BooleanProperty FILE_ALLOW_IMPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowImport", true, "Allow user to import file");
     public static final BooleanProperty FILE_ALLOW_EXPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowExport", true, "Allow user to export file");
     public static final BooleanProperty FILE_ALLOW_QUIT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowQuit", true, "Allow user to quit Supremica");
-
-    // GENERAL_SOFTPLC
-    public static final BooleanProperty INCLUDE_SOFTPLC = new BooleanProperty(PropertyType.GENERAL_SOFTPLC, "includeSoftPLC", false, "Include soft PLC");
-    public static final IntegerProperty SOFTPLC_CYCLE_TIME =
-      new IntegerProperty(PropertyType.GENERAL_SOFTPLC, "softplcCycleTime", 40,
-                          "SoftPLC Cycle time (ms)", true, 1);
-    public static final ObjectProperty<String> SOFTPLC_INTERFACES = new ObjectProperty<String>(PropertyType.GENERAL_SOFTPLC, "softplcInterfaces", "org.supremica.softplc.Simulator.BTSim", "Default interface");
 
     // GUI
     public static IntegerProperty GUI_IDE_WIDTH =

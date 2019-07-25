@@ -564,32 +564,6 @@ public class MainMenuBar
         menuToolsCodeGeneration.setText("Code Generation");
         menuTools.add(menuToolsCodeGeneration);
 
-        final JMenuItem menuToolsCodeGenerationIL = new JMenuItem();
-
-        menuToolsCodeGenerationIL.setText("IEC-61131 Instruction List...");
-        menuToolsCodeGeneration.add(menuToolsCodeGenerationIL);
-        menuToolsCodeGenerationIL.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                ActionMan.ProjectTo1131IL(ActionMan.getGui());
-            }
-        });
-
-        final JMenuItem menuToolsCodeGeneration1131ST = new JMenuItem();
-
-        menuToolsCodeGeneration1131ST.setText("IEC-61131 Structured Text...");
-        menuToolsCodeGeneration.add(menuToolsCodeGeneration1131ST);
-        menuToolsCodeGeneration1131ST.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                ActionMan.ProjectTo1131ST(ActionMan.getGui());
-            }
-        });
-
         final JMenuItem menuToolsCodeGenerationIEC61499 = new JMenuItem();
 
         menuToolsCodeGenerationIEC61499.setText("IEC-61499 Function Blocks...");
@@ -600,32 +574,6 @@ public class MainMenuBar
             public void actionPerformed(final ActionEvent e)
             {
                 ActionMan.ProjectToIEC61499(ActionMan.getGui());
-            }
-        });
-
-        final JMenuItem menuToolsCodeGenerationControlBuilderIL = new JMenuItem();
-
-        menuToolsCodeGenerationControlBuilderIL.setText("ABB Control Builder Instruction List...");
-        menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderIL);
-        menuToolsCodeGenerationControlBuilderIL.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                ActionMan.ProjectToControlBuilderIL(ActionMan.getGui());
-            }
-        });
-
-        final JMenuItem menuToolsCodeGenerationControlBuilderST = new JMenuItem();
-
-        menuToolsCodeGenerationControlBuilderST.setText("ABB Control Builder Structured Text...");
-        menuToolsCodeGeneration.add(menuToolsCodeGenerationControlBuilderST);
-        menuToolsCodeGenerationControlBuilderST.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                ActionMan.ProjectToControlBuilderST(ActionMan.getGui());
             }
         });
 
@@ -665,19 +613,6 @@ public class MainMenuBar
             public void actionPerformed(final ActionEvent e)
             {
                 ActionMan.AutomataToSattLineSFCForBallProcess(ActionMan.getGui());
-            }
-        });
-
-        final JMenuItem menuToolsCodeGenerationBC = new JMenuItem();
-
-        menuToolsCodeGenerationBC.setText("Java Bytecode...");
-        menuToolsCodeGeneration.add(menuToolsCodeGenerationBC);
-        menuToolsCodeGenerationBC.addActionListener(new ActionListener()
-        {
-            @Override
-            public void actionPerformed(final ActionEvent e)
-            {
-                ActionMan.AutomataToJavaBytecode(ActionMan.getGui());
             }
         });
 
@@ -732,25 +667,6 @@ public class MainMenuBar
                 ActionMan.AutomataToSMV(ActionMan.getGui());
             }
         });
-
-        // Tools.SoftPLC
-        if (Config.INCLUDE_SOFTPLC.isTrue())
-        {
-
-            // Tools.RunSimulation
-            final JMenuItem run_simulation = new JMenuItem();
-
-            run_simulation.setText("Run SoftPLC Simulation...");
-            menuTools.add(run_simulation);
-            run_simulation.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.runSoftPLCSimulation(ActionMan.getGui());
-                }
-            });
-        }
 
                 /*
                 // Tools.CodeGeneration

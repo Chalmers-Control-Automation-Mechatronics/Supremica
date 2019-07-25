@@ -423,7 +423,7 @@ public class IDEMenuBar
     if (Config.GUI_ANALYZER_INCLUDE_SEAMLESS_SYNTHESIS.isTrue()) {
       final Actions actions = getActions();
       final JMenu menu = new JMenu("Analyze");
-      menu.setMnemonic(KeyEvent.VK_Z);
+      menu.setMnemonic(KeyEvent.VK_Z);  // ALT-A - create automaton?
       menu.add(actions.editorSynthesizerAction.getMenuItem());
       addProperty(Config.TUM_EXTERNAL_ON);
       if (Config.TUM_EXTERNAL_ON.isTrue()) {
@@ -632,7 +632,6 @@ public class IDEMenuBar
 
   private void createExamplesMenu()
   {
-    addProperty(Config.TUM_EXTERNAL_ON);
     final Actions actions = getActions();
     final ExampleTemplates exTempl = ExampleTemplates.getRefreshedInstance();
     if (!exTempl.isEmpty()) {

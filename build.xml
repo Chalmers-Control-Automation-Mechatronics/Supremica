@@ -9,11 +9,9 @@
 
     <property name="src" value="src"/>
     <property name="testssrc" value="tests/src"/>
-    <property name="runtimesoftplcsrc" value="runtime/softplc/src"/>
     <property name="build" value="build"/>
     <property name="platform" value="platform"/>
     <property name="testsbuild" value="tests/build"/>
-    <property name="runtimesoftplcbuild" value="runtime/softplc/build"/>
     <property name="dist"  value="dist"/>
     <property name="doc" value="doc"/>
     <property name="examples" value="examples"/>
@@ -21,13 +19,10 @@
     <property name="images" value="images"/>
     <property name="animations" value="animations"/>
     <property name="userinterfaces" value="userinterfaces"/>
-    <property name="help" value="help"/>
     <property name="lib" value="lib"/>
     <property name="unjared" value="unjared"/>
     <property name="tools" value="tools"/>
      
-    <property name="resources" value="resources"/>
-    
     <property name="supremica_basepackage" value="org.supremica"/>
     <property name="supremica_basedir" value="org/supremica"/>
     
@@ -131,7 +126,6 @@
         <unjar src="${lib}/trove-3.0.3.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>
@@ -152,11 +146,6 @@
         <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
                dest="${lib}/${unjared}"/>
 
-        <!-- JAXB (needed for ROP etc.) -->
-        <unjar src="${lib}/jaxb-api.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jaxb-core.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/jaxb-impl.jar" dest="${lib}/${unjared}"/>
-
     	<!-- JUnit -->
         <unjar src="${lib}/junit.jar" dest="${lib}/${unjared}"/>
     </target>
@@ -173,15 +162,13 @@
         <delete dir="${dist}"/>
         <mkdir dir="${dist}"/>
         <delete dir="${src}/org/w3"/>
-        <mkdir dir="${src}/org/w3"/>
+        <delete dir="${src}/org/supremica/manufacturingtables"/>
         <delete dir="${doc}/api"/>
         <mkdir dir="${doc}/api"/>
         <delete dir="${lib}/${unjared}"/>
         <mkdir dir="${lib}/${unjared}"/>
-        <delete dir="${resources}"/>
-        <mkdir dir="${resources}"/>
-        <delete dir="${lib}/${unjared}/META-INF"/>
         <mkdir dir="${lib}/${unjared}/META-INF"/>
+        <delete dir="resources"/>
         <ant dir="${waters.dir}" target="clean" inheritAll="false"/>
     </target>
     
@@ -233,24 +220,7 @@
             <classpath refid="supremica.classpath"/>    
         </javac>
     </target>
-    
-    <target name="compile_genericPLCProgramDescription_jaxb">
-        <javac
-            srcdir="${src}"
-            destdir="${build}"
-            classpath="${lib}/${unjared}"
-            includeJavaRuntime="yes"
-            deprecation="false"
-            verbose="false"
-            nowarn="true"
-            includes="${supremica_basedir}/external/genericPLCProgramDescription/xsd/**"                
-            source="1.8"
-            encoding="ISO-8859-15"
-            includeantruntime="false"
-        />
-    </target>
-
-    
+        
     <!-- Compile:
 *       Reuses existing class files, but recompiles those
 *       source files that have changed.
@@ -294,22 +264,6 @@
         </javac>
     </target>
     
-    <!-- Compile:
-*       Reuses existing class files, but recompiles those
-*       source files that have changed.
-    -->
-    <target name="compile_runtime_softplc">
-        <javac
-            srcdir="${runtimesoftplcsrc}"
-            destdir="${runtimesoftplcbuild}"
-            includeJavaRuntime="yes"
-            deprecation="false"
-            verbose="false"
-            encoding="ISO-8859-15"
-            includeantruntime="false">
-        </javac>
-    </target>
-        
     <target name="build" depends="compile,-jar_supremica,-startfiles_supremica" description=
             "Recompiles only the files that have changed, then packages all files into a jar file.">
     </target>
@@ -358,7 +312,6 @@ Class-Path: ${manifest.pathlist}</echo>
             <fileset dir="${examples}" includes="includeInJarFile/"/>
             <fileset dir="${animations}"/>
             <fileset dir="${userinterfaces}"/>  
-            <fileset dir="${runtimesoftplcbuild}"/>
         </jar>
     </target>
     
@@ -458,29 +411,11 @@ Class-Path: ${manifest.pathlist}</echo>
       </copy>
     </target>
 
-    <target name="jar_genericPLCProgramDescription_jaxb" depends="compile_genericPLCProgramDescription_jaxb">
-        <jar jarfile="${lib}/genericPLCProgramDescription_jaxb.jar"> 
-            <fileset dir="${build}/">
-                <include name="org/supremica/external/genericPLCProgramDescription/xsd/**"/>
-            </fileset>
-        </jar>
-        <delete>
-            <fileset dir="${lib}">
-                <include name="org/supremica/external/genericPLCProgramDescription/xsd/**"/>
-            </fileset>
-        </delete>
-        <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
-    </target>
-
     <target name="-startfiles_local_supremica">
         <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/verifyRACLocal.cmd" perm="644"/>
         <copy file="${templates}/verifyRAC.cmd" todir="${dist}"/>
         <chmod file="${dist}/verifyRAC.cmd" perm="644"/>
-        <copy file="${templates}/loadGenericPLCProgramDescriptionLocal.cmd" todir="${dist}"/>
-        <chmod file="${dist}/loadGenericPLCProgramDescriptionLocal.cmd" perm="644"/>
-        <copy file="${templates}/loadGenericPLCProgramDescription.cmd" todir="${dist}"/>
-        <chmod file="${dist}/loadGenericPLCProgramDescription.cmd" perm="644"/>
         <!--
         <copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/IDELocal.cmd" perm="644"/>
@@ -823,7 +758,6 @@ Class-Path: ${manifest.pathlist}</echo>
                 <include name="net/sourceforge/waters/**/*"/>
                 <exclude name="org/supremica/functionblocks/xsd/*/impl/**"/>
                 <exclude name="net/sourceforge/waters/xsd/*/impl/**"/>
-                <exclude name="org/supremica/softplc/**"/>
             </packageset>       
             <link href="${java17.api.url}"
                   offline="true" packagelistLoc="${docsrc}/offline/j2sdk"/>

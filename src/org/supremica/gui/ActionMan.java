@@ -52,7 +52,6 @@ import net.sourceforge.waters.model.expr.OperatorTable;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.model.marshaller.ProxyUnmarshaller;
 import net.sourceforge.waters.model.marshaller.SAXModuleMarshaller;
-// Waters importing
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
@@ -67,10 +66,7 @@ import org.supremica.automata.Project;
 import org.supremica.automata.IO.AutomataSSPCExporter;
 import org.supremica.automata.IO.AutomataToC;
 import org.supremica.automata.IO.AutomataToCommunicationGraph;
-import org.supremica.automata.IO.AutomataToControlBuilderIL;
 import org.supremica.automata.IO.AutomataToControlBuilderSFC;
-import org.supremica.automata.IO.AutomataToControlBuilderST;
-import org.supremica.automata.IO.AutomataToIEC1131;
 import org.supremica.automata.IO.AutomataToIEC61499;
 import org.supremica.automata.IO.AutomataToJava;
 import org.supremica.automata.IO.AutomataToNQC;
@@ -112,7 +108,6 @@ import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.templates.TemplateItem;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
-//import org.supremica.gui.animators.tsim.*;
 import org.supremica.gui.automataExplorer.AutomataExplorer;
 import org.supremica.gui.examplegenerator.TestCasesDialog;
 import org.supremica.gui.ide.actions.IDEAction;
@@ -2848,128 +2843,6 @@ public class ActionMan
         }
     }
 
-    // Generate ABB Control Builder IL
-    public static void ProjectToControlBuilderIL(final Gui gui)
-    {
-        final Project selectedProject = gui.getSelectedProject();
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
-
-        if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-        {
-            final File currFile = fileExporter.getSelectedFile();
-
-            if (currFile != null)
-            {
-                if (!currFile.isDirectory())
-                {
-                    final String pathName = currFile.getAbsolutePath();
-                    String prefixName = null;
-                    String filename = currFile.getName();
-
-                    if (pathName.endsWith(".prj"))
-                    {
-                        prefixName = pathName.substring(0, pathName.length() - 4);
-                        filename = filename.substring(0, filename.length() - 4);
-                    }
-                    else
-                    {
-                        prefixName = pathName;
-                    }
-
-                    final File appFile = new File(prefixName + ".app");
-                    final File prjFile = new File(prefixName + ".prj");
-
-                    try
-                    {
-                        final AutomataToControlBuilderIL exporter = new AutomataToControlBuilderIL(selectedProject);
-
-                        exporter.serializeApp(appFile, filename);
-                        exporter.serializePrj(prjFile, filename);
-                    }
-                    catch (final Exception ex)
-                    {
-                        logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
-                        logger.debug(ex.getStackTrace());
-
-                        return;
-                    }
-
-                    logger.info("ABB Control Builder IL files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
-                }
-            }
-        }
-    }
-
-    /**
-     * Generate ABB Control Builder ST
-     */
-    public static void ProjectToControlBuilderST(final Gui gui)
-    {
-        final Project selectedProject = gui.getSelectedProject();
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final JFileChooser fileExporter = FileDialogs.getPRJFileExporter();
-
-        if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-        {
-            final File currFile = fileExporter.getSelectedFile();
-
-            if (currFile != null)
-            {
-                if (!currFile.isDirectory())
-                {
-                    final String pathName = currFile.getAbsolutePath();
-                    String prefixName = null;
-                    String filename = currFile.getName();
-
-                    if (pathName.endsWith(".prj"))
-                    {
-                        prefixName = pathName.substring(0, pathName.length() - 4);
-                        filename = filename.substring(0, filename.length() - 4);
-                    }
-                    else
-                    {
-                        prefixName = pathName;
-                    }
-
-                    final File appFile = new File(prefixName + ".app");
-                    final File prjFile = new File(prefixName + ".prj");
-
-                    try
-                    {
-                        final AutomataToControlBuilderST exporter = new AutomataToControlBuilderST(selectedProject);
-
-                        exporter.serializeApp(appFile, filename);
-                        exporter.serializePrj(prjFile, filename);
-                    }
-                    catch (final Exception ex)
-                    {
-                        logger.error("Exception while generating Control Builder code to files " + prefixName + "{\".prj\", \".app\"}");
-                        logger.debug(ex.getStackTrace());
-
-                        return;
-                    }
-
-                    logger.info("ABB Control Builder ST files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
-                }
-            }
-        }
-    }
-
     /**
      * Generate C-code
      */
@@ -3243,164 +3116,6 @@ public class ActionMan
     }
 
     /**
-     * Generate 1131 Structured Text
-     */
-    public static void ProjectTo1131ST(final Gui gui)
-    {
-        // Automata selectedProject = gui.getselectedProject();
-        final Project selectedProject = gui.getSelectedProject();
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final JFileChooser fileExporter = FileDialogs.getSTFileExporter();
-
-        if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-        {
-            final File currFile = fileExporter.getSelectedFile();
-
-            if (currFile != null)
-            {
-                if (!currFile.isDirectory())
-                {
-                    try
-                    {
-                        final AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-                        final PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
-
-                        exporter.serializeStructuredText(theWriter);
-                        theWriter.close();
-                    }
-                    catch (final Exception ex)
-                    {
-                        logger.error("Exception while generating 1131 Structured text code to file " + currFile.getAbsolutePath());
-                        logger.debug(ex.getMessage());
-                        logger.debug(ex.getStackTrace());
-
-                        return;
-                    }
-
-                    logger.info("IEC-61131 ST file successfully generated at " + currFile.getAbsolutePath());
-                }
-            }
-        }
-    }
-
-    /**
-     * Generate 1131 Instruction List
-     */
-    public static void ProjectTo1131IL(final Gui gui)
-    {
-        //Automata selectedProject = gui.getselectedProject();
-        final Project selectedProject = gui.getSelectedProject();
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        if (!selectedProject.validExecutionParameters())
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "The project has illegal execution parameters", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final JFileChooser fileExporter = FileDialogs.getILFileExporter();
-
-        if (fileExporter.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-        {
-            final File currFile = fileExporter.getSelectedFile();
-
-            if (currFile != null)
-            {
-                if (!currFile.isDirectory())
-                {
-                    try
-                    {
-                        final AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-                        final PrintWriter theWriter = new PrintWriter(new FileWriter(currFile));
-
-                        exporter.serializeInstructionList(theWriter);
-                        theWriter.close();
-                    }
-                    catch (final Exception ex)
-                    {
-                        logger.error("Exception while generating 1131 Instruction list code to file " + currFile.getAbsolutePath());
-                        logger.debug(ex.getMessage());
-                        logger.debug(ex.getStackTrace());
-
-                        return;
-                    }
-
-                    logger.info("IEC-61131 IL file successfully generated at " + currFile.getAbsolutePath());
-                }
-            }
-        }
-    }
-
-    // Generate Java Bytecode
-    public static void AutomataToJavaBytecode(final Gui gui)
-    {
-        final Project selectedProject = gui.getSelectedProject();
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final JFileChooser outputDir = new JFileChooser();
-
-        outputDir.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-        if (outputDir.showSaveDialog(gui.getComponent()) == JFileChooser.APPROVE_OPTION)
-        {
-            final File currFile = outputDir.getSelectedFile();
-
-            if (currFile != null)
-            {
-                if (currFile.isDirectory())
-                {
-                    try
-                    {
-                        final File tmpFile = File.createTempFile("softplc", ".il");
-
-                        tmpFile.deleteOnExit();
-
-                        final AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-                        final PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-
-                        exporter.serializeInstructionList(theWriter);
-                        theWriter.close();
-                        new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), currFile.getAbsolutePath());
-                    }
-                    catch (final Exception ex)
-                    {
-                        logger.error("Exception while generating Java Bytecode to file " + currFile.getAbsolutePath());
-                        logger.debug(ex.getStackTrace());
-
-                        return;
-                    }
-
-                    logger.info("Java Bytecode file successfully generated at " + currFile.getAbsolutePath());
-                }
-                else
-                {
-                    logger.info("Select a directory to export bytecode to.");
-                }
-            }
-        }
-    }
-
-    /**
      * Method for quick evaluation without generating a new action class.
      */
     public static void testMethod(final Gui gui)
@@ -3425,58 +3140,6 @@ public class ActionMan
         {
             logger.error("Test failed: " + ex);
         }
-    }
-
-    /**
-     * Run simulation
-     */
-    public static void runSoftPLCSimulation(final Gui gui)
-    {
-        final Project selectedProject = gui.getSelectedProject();
-        File tmpdir;
-
-        if (selectedProject.size() < 1)
-        {
-            JOptionPane.showMessageDialog(gui.getComponent(), "At least one automaton must be selected!", "Alert", JOptionPane.ERROR_MESSAGE);
-
-            return;
-        }
-
-        final SoftplcSimulationDialog d = new SoftplcSimulationDialog(null, "Run Simulation...", true);
-
-        if (!d.showDialog())
-        {
-            return;
-        }
-
-        System.out.println(d.getIOInterface().getPath());
-
-        try
-        {
-            final File tmpFile = File.createTempFile("softplc", ".il");
-
-            tmpFile.deleteOnExit();
-
-            final AutomataToIEC1131 exporter = new AutomataToIEC1131(selectedProject);
-            final PrintWriter theWriter = new PrintWriter(new FileWriter(tmpFile));
-
-            exporter.serializeInstructionList(theWriter);
-            theWriter.close();
-
-            tmpdir = org.supremica.softplc.Utils.TempFileUtils.createTempDir("softplc");
-
-            new org.supremica.softplc.CompILer.ilc(tmpFile.getAbsolutePath(), tmpdir.getAbsolutePath());
-            new org.supremica.softplc.RunTime.Shell("org.supremica.softplc.Simulator.BTSim", tmpdir.getCanonicalPath(), "AutomaticallyGeneratedProgram");
-        }
-        catch (final Exception ex)
-        {
-            logger.error("Exception while generating Java Bytecode to file");
-            logger.debug(ex.getStackTrace());
-
-            return;
-        }
-
-        logger.info("Java Bytecode file successfully generated");
     }
 
 

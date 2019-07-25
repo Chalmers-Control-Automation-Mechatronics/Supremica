@@ -59,8 +59,6 @@ public enum PropertyType
     GENERAL,
     GENERAL_LOG,
     GENERAL_FILE,
-    GENERAL_COMM,
-    GENERAL_SOFTPLC,
     GUI,
     GUI_EDITOR,
     GUI_ANALYZER,
