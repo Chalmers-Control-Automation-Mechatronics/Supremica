@@ -120,7 +120,6 @@
         <!-- <unjar src="${lib}/xalan.jar" dest="${lib}/${unjared}"/>-->
         <unjar src="${lib}/xmlBlaster.jar" dest="${lib}/${unjared}"/>   
         <unjar src="${lib}/xtdash.jar" dest="${lib}/${unjared}"/>       
-        <unjar src="${lib}/jgrafchart.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>     
         <!-- Libraries for IEC61499 Fuber runtime support in Supremica. -->
         <!--   Maintained by: cengic@chalmers.se -->
@@ -154,8 +153,6 @@
         <!-- Tools for Adobe PostScript. -->
         <unjar src="${lib}/xmlgraphics-commons-1.4.jar"
                dest="${lib}/${unjared}"/>
-
-        <unjar src="${lib}/jgrafchartresources.jar" dest="${resources}"/>
 
         <!-- JAXB (needed for ROP etc.) -->
         <unjar src="${lib}/jaxb-api.jar" dest="${lib}/${unjared}"/>

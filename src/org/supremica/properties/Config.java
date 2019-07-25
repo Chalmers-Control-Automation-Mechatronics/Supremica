@@ -211,9 +211,7 @@ public final class Config
                           false);
 
     public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
-    public static final BooleanProperty INCLUDE_JGRAFCHART = new BooleanProperty(PropertyType.GUI, "includeJGrafchart", false, "Include JGrafchart");
     public static final BooleanProperty INCLUDE_SOCEDITOR = new BooleanProperty(PropertyType.GUI, "includeSOCEditor", true, "Include SOC editor");
-    public static final BooleanProperty INCLUDE_SHOE_FACTORY = new BooleanProperty(PropertyType.GUI, "includeShoeFactory", false, "Include Shoe factory simulation");
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");

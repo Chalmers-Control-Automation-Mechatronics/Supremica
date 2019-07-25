@@ -35,10 +35,22 @@
 
 package org.supremica.gui;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Insets;
+
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
+
+import org.supremica.gui.useractions.CopyAction;
+import org.supremica.gui.useractions.DeleteAction;
+import org.supremica.gui.useractions.MoveAutomataAction;
+import org.supremica.gui.useractions.OpenAction;
+import org.supremica.gui.useractions.PreferencesAction;
+import org.supremica.gui.useractions.SaveAction;
+import org.supremica.gui.useractions.SaveAsAction;
+import org.supremica.gui.useractions.StatusAction;
+import org.supremica.gui.useractions.ViewAction;
 import org.supremica.properties.Config;
-import org.supremica.gui.useractions.*;
 
 public class MainToolBar
 	extends JToolBar
@@ -64,7 +76,7 @@ public class MainToolBar
 
 	private static final Insets theInsets = new Insets(0, 0, 0, 0);
 
-	public MainToolBar(Supremica supremica)
+	public MainToolBar(final Supremica supremica)
 	{
 		MainToolBar.supremica = supremica;
 
@@ -99,13 +111,6 @@ public class MainToolBar
 		add(moveAutomataToBottomAction);
 		addSeparator();
 
-		if (Config.INCLUDE_JGRAFCHART.isTrue())
-		{
-			add(ActionMan.openJGrafchartAction);
-			add(ActionMan.updateFromJGrafchartAction);
-			addSeparator();
-		}
-
 		add(preferencesAction);
 		addSeparator();
 
@@ -116,9 +121,10 @@ public class MainToolBar
 	/**
 	 * Set the button margin
 	 */
-	public JButton add(Action theAction)
+	@Override
+  public JButton add(final Action theAction)
 	{
-		JButton theButton = super.add(theAction);
+		final JButton theButton = super.add(theAction);
 
 		theButton.setMargin(theInsets);
 

@@ -64,7 +64,6 @@ import org.supremica.properties.Config;
 import org.supremica.util.ResourceClassLoader;
 import org.supremica.util.SupremicaException;
 
-import grafchart.sfc.JGrafchartSupremicaEditor;
 import org.swixml.SwingEngine;
 
 
@@ -76,7 +75,7 @@ public class VisualProject
     extends Project
 {
     private static final long serialVersionUID = 1L;
-    private static Logger logger = LogManager.getLogger(VisualProject.class);
+    private static final Logger logger = LogManager.getLogger(VisualProject.class);
 
     private Automata selectedAutomata = null;
     private ActionAndControlViewer theActionAndControlViewer = null;    // Lazy construction
@@ -84,7 +83,6 @@ public class VisualProject
     private SwingEngine theSwingEngine = null;    // Lazy construction
     private Container theUserInterface = null;    // Lazy construction
     private SimulatorExecuter theSimulator = null;    // Lazy construction
-    private JGrafchartSupremicaEditor theJGrafchartEditor = null;    // Lazy construction
     private final HashMap<String, AutomatonViewer> theAutomatonViewerContainer = new HashMap<String, AutomatonViewer>();
     private final HashMap<String, AutomatonExplorer> theAutomatonExplorerContainer = new HashMap<String, AutomatonExplorer>();
 //	private HashMap theAutomatonFrameContainer = new HashMap();
@@ -504,27 +502,6 @@ public class VisualProject
                                 return theSimulator;
                 }
  */
-
-    public JGrafchartSupremicaEditor getJGrafchartEditor()
-    {
-        if (theJGrafchartEditor == null)
-        {
-            final String[] args = new String[1];
-
-            args[0] = "";
-
-            final JGrafchartSupremicaEditor theEditor = new JGrafchartSupremicaEditor(args);
-
-            grafchart.sfc.Editor.singleton = theEditor;
-            theJGrafchartEditor = theEditor;
-
-            //theRecipeEditor = org.supremica.gui.recipeEditor.RecipeEditor.createEditor(this);
-        }
-
-        theJGrafchartEditor.setVisible(true);
-
-        return theJGrafchartEditor;
-    }
 
     public void clearSimulationData()
     {

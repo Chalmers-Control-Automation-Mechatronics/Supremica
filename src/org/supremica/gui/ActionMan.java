@@ -110,10 +110,6 @@ import org.supremica.automata.algorithms.VerificationOptions;
 import org.supremica.automata.algorithms.VerificationType;
 import org.supremica.automata.algorithms.minimization.MinimizationOptions;
 import org.supremica.automata.templates.TemplateItem;
-import org.supremica.external.shoefactory.Configurator.Configit;
-import org.supremica.external.shoefactory.Configurator.ConfigitDEMO;
-//import org.supremica.external.robotCoordination.*;
-import org.supremica.external.shoefactory.plantBuilder.Plant;
 import org.supremica.gui.animators.scenebeans.AnimationItem;
 import org.supremica.gui.animators.scenebeans.Animator;
 //import org.supremica.gui.animators.tsim.*;
@@ -124,11 +120,9 @@ import org.supremica.gui.simulator.SimulatorExecuter;
 import org.supremica.gui.texteditor.TextFrame;
 import org.supremica.gui.useractions.HelpAction;
 import org.supremica.gui.useractions.OpenAction;
-import org.supremica.gui.useractions.OpenJGrafchartAction;
 import org.supremica.gui.useractions.SaveAction;
 import org.supremica.gui.useractions.SaveAsAction;
 import org.supremica.gui.useractions.SynthesizeAction;
-import org.supremica.gui.useractions.UpdateFromJGrafchartAction;
 import org.supremica.properties.Config;
 import org.supremica.properties.SupremicaProperties;
 
@@ -182,8 +176,6 @@ public class ActionMan
     public static final SaveAction saveAction = new SaveAction();
     public static final SaveAsAction saveAsAction = new SaveAsAction();
     public static final SynthesizeAction synthesizeAction = new SynthesizeAction();
-    public static final OpenJGrafchartAction openJGrafchartAction = new OpenJGrafchartAction();
-    public static final UpdateFromJGrafchartAction updateFromJGrafchartAction = new UpdateFromJGrafchartAction();
 
     public static Gui getGui()
     {
@@ -2853,79 +2845,6 @@ public class ActionMan
                     logger.info("ABB Control Builder SFC files successfully generated at " + prefixName + "{\".prj\", \".app\"}");
                 }
             }
-        }
-    }
-
-    //open JgrafchartEditor
-    public static void openJGrafchartEditor(final Gui gui)
-    {
-        try
-        {
-            final VisualProjectContainer projectContainer = gui.getVisualProjectContainer();
-            final VisualProject theProject = projectContainer.getActiveProject();
-
-            theProject.getJGrafchartEditor();
-        }
-        catch (final Exception ex)
-        {
-            logger.error("Exception while getting JGrafchart Editor");
-            logger.debug(ex.getStackTrace());
-
-            return;
-        }
-    }
-
-    //shoeFactory - Config
-    public static void shoeFactoryConfigurator()
-    {
-        final Configit con = new Configit(gui);
-
-        con.setLocationRelativeTo(null);
-        con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        try
-        {
-            con.setVisible(true);
-        }
-        catch (final Exception ex)
-        {
-            logger.error("shoeFactoryConfigurator: " + ex.getMessage());
-        }
-    }
-
-    // shoeFactory - build plant
-    public static void shoeFactoryBuildPlant(final Gui gui)
-    {
-
-        //Project selectedProject = gui.getSelectedProject();
-        final Plant newPlant = new Plant();
-        final Project newProject = newPlant.getPlant();
-
-        try
-        {
-            gui.addProject(newProject);
-        }
-        catch (final Exception ex)
-        {
-            logger.error("shoeFactoryBuildPlant: " + ex.getMessage());
-        }
-    }
-
-    //shoeFactory - build SFC
-    public static void shoeFactoryConfiguratorDEMO()
-    {
-        final ConfigitDEMO con = new ConfigitDEMO(gui);
-
-        con.setLocationRelativeTo(null);
-        con.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        try
-        {
-            con.setVisible(true);
-        }
-        catch (final Exception ex)
-        {
-            logger.error("shoeFactoryConfigurator: " + ex.getMessage());
         }
     }
 
