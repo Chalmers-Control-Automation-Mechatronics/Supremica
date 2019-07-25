@@ -51,26 +51,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
-import net.sourceforge.waters.gui.actions.VerifyConflictCheckAction;
-import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
-import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
-import net.sourceforge.waters.gui.actions.VerifyDeadlockCheckAction;
-import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityCheckAction;
-import net.sourceforge.waters.gui.actions.VerifyHISCCPControllabilityAction;
-import net.sourceforge.waters.gui.actions.VerifyHISCCPInterfaceConsistencyAction;
-import net.sourceforge.waters.gui.actions.VerifyLanguageInclusionAction;
-import net.sourceforge.waters.gui.actions.VerifyNerodeEquivalenceAction;
-import net.sourceforge.waters.gui.actions.VerifyProperTimeBehaviorAction;
-import net.sourceforge.waters.gui.actions.VerifySDActivityLoopAction;
-import net.sourceforge.waters.gui.actions.VerifySDCFourPropertyAction;
-import net.sourceforge.waters.gui.actions.VerifySDCThree_one_propertyAction;
-import net.sourceforge.waters.gui.actions.VerifySDCTwoApropertyAction;
-import net.sourceforge.waters.gui.actions.VerifySDCTwoBPropertyAction;
-import net.sourceforge.waters.gui.actions.VerifySDControllabilityAction;
-import net.sourceforge.waters.gui.actions.VerifySDPlantCompletenessAction;
-import net.sourceforge.waters.gui.actions.VerifySDSingularPropertyAction;
-import net.sourceforge.waters.gui.actions.VerifySICProperty5Action;
-import net.sourceforge.waters.gui.actions.VerifySICProperty6Action;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
@@ -106,6 +86,26 @@ import net.sourceforge.waters.gui.actions.SimulationResetAction;
 import net.sourceforge.waters.gui.actions.SimulationShowAllAction;
 import net.sourceforge.waters.gui.actions.SimulationStepAction;
 import net.sourceforge.waters.gui.actions.SimulationStepBackAction;
+import net.sourceforge.waters.gui.actions.VerifyConflictCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyControlLoopAction;
+import net.sourceforge.waters.gui.actions.VerifyControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifyDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyDiagnosabilityCheckAction;
+import net.sourceforge.waters.gui.actions.VerifyHISCCPControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifyHISCCPInterfaceConsistencyAction;
+import net.sourceforge.waters.gui.actions.VerifyLanguageInclusionAction;
+import net.sourceforge.waters.gui.actions.VerifyNerodeEquivalenceAction;
+import net.sourceforge.waters.gui.actions.VerifyProperTimeBehaviorAction;
+import net.sourceforge.waters.gui.actions.VerifySDActivityLoopAction;
+import net.sourceforge.waters.gui.actions.VerifySDCFourPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCThree_one_propertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCTwoApropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDCTwoBPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySDControllabilityAction;
+import net.sourceforge.waters.gui.actions.VerifySDPlantCompletenessAction;
+import net.sourceforge.waters.gui.actions.VerifySDSingularPropertyAction;
+import net.sourceforge.waters.gui.actions.VerifySICProperty5Action;
+import net.sourceforge.waters.gui.actions.VerifySICProperty6Action;
 import net.sourceforge.waters.gui.actions.WatersAction;
 import net.sourceforge.waters.gui.actions.WatersActionManager;
 import net.sourceforge.waters.gui.actions.WatersRedoAction;
@@ -613,13 +613,6 @@ public class IDEMenuBar
     }
     addProperty(Config.INCLUDE_EXTERNALTOOLS);
     if (Config.INCLUDE_EXTERNALTOOLS.isTrue()) {
-      addProperty(Config.INCLUDE_SOCEDITOR);
-      if (Config.INCLUDE_SOCEDITOR.isTrue()) {
-        if (menu.getMenuComponentCount() > 0) {
-          menu.addSeparator();
-        }
-        menu.add(actions.toolsSOCEditorAction.getMenuItem());
-      }
       addProperty(Config.INCLUDE_ANIMATOR);
       if (Config.INCLUDE_ANIMATOR.isTrue()) {
         if (menu.getMenuComponentCount() > 0) {

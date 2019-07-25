@@ -201,9 +201,6 @@ public class Actions extends WatersActionManager
     // Examples Actions
     public IDEAction toolsTestCasesAction = new ToolsTestCasesAction(mIDEActions);
 
-    // Tools Actions
-    public IDEAction toolsSOCEditorAction = new ToolsSOCEditorAction(mIDEActions);
-
     // Help Actions
     public IDEAction helpWebAction = new HelpWebAction(mIDEActions);
 

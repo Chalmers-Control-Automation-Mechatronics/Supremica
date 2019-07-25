@@ -131,8 +131,6 @@
         <unjar src="${lib}/trove-3.0.3.jar" dest="${lib}/${unjared}"/>
         <!-- Library for handling BDDs. -->
         <unjar src="${lib}/javabdd-2.0.jar" dest="${lib}/${unjared}"/>
-        <unjar src="${lib}/manufacturingTables_jaxb.jar"
-               dest="${lib}/${unjared}"/>
         <unjar src="${lib}/genericPLCProgramDescription_jaxb.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/itext.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/fsa2sat-1.0.jar" dest="${lib}/${unjared}"/>
@@ -218,7 +216,7 @@
         </copy>
     </target>
     
-    <target name="compile" depends="compile_manufacturingTables_jaxb,compile_supremica,compile_supremica_tests"/>
+    <target name="compile" depends="compile_supremica,compile_supremica_tests"/>
     
     <target name="compile_supremica" depends="-startfiles_local_supremica">
         <javac debug="on"
@@ -236,22 +234,6 @@
         </javac>
     </target>
     
-    <target name="compile_manufacturingTables_jaxb" depends="build_rop_processeditor">
-        <javac
-            srcdir="${src}"
-            destdir="${build}"
-            classpath="${lib}/${unjared}"
-            includeJavaRuntime="yes"
-            deprecation="false"
-            verbose="false"
-            nowarn="true"
-            includes="${supremica_basedir}/manufacturingTables/xsd/**"          
-            source="1.8"
-            encoding="ISO-8859-15"
-            includeantruntime="false"
-        />
-    </target>
-
     <target name="compile_genericPLCProgramDescription_jaxb">
         <javac
             srcdir="${src}"
@@ -392,14 +374,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <ant dir="${waters.dir}" target="xsd-constants-generate" inheritAll="false"/>
     </target>
     
-    <target name="build_rop_processeditor" description="builds rop processeditor">
-        <ant dir="schema/" target="gen_manufacturingtables_rop_processeditor" inheritAll="false"/>
-        <ant dir="schema/" target="gen_manufacturingtables_il" inheritAll="false"/>
-        <ant dir="schema/" target="gen_manufacturingtables_pr" inheritAll="false"/>
-        <ant dir="schema/" target="gen_manufacturingtables_vr" inheritAll="false"/>
-        <ant dir="schema/" target="gen_manufacturingtables_eop" inheritAll="false"/>
-    </target>
-
     <target name="detect_arch"
             description="Forces call to ArchitectureDetector to recreate arch.properties file.">
         <ant dir="${waters.dir}" target="jniglue-jar" inheritAll="false"/>
@@ -484,20 +458,6 @@ Class-Path: ${manifest.pathlist}</echo>
       </copy>
     </target>
 
-    <target name="-jar_manufacturingTables_jaxb" depends="compile_manufacturingTables_jaxb">
-        <jar jarfile="${lib}/manufacturingTables_jaxb.jar"> 
-            <fileset dir="${build}/">
-                <include name="org/supremica/manufacturingTables/xsd/**"/>
-            </fileset>
-        </jar>
-        <delete>
-            <fileset dir="${lib}">
-                <include name="org/supremica/manufacturingTables/xsd/**"/>
-            </fileset>
-        </delete>
-        <unjar src="${lib}/manufacturingTables_jaxb.jar" dest="${lib}/${unjared}"/>
-    </target>
-
     <target name="jar_genericPLCProgramDescription_jaxb" depends="compile_genericPLCProgramDescription_jaxb">
         <jar jarfile="${lib}/genericPLCProgramDescription_jaxb.jar"> 
             <fileset dir="${build}/">
@@ -522,10 +482,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/loadGenericPLCProgramDescription.cmd" todir="${dist}"/>
         <chmod file="${dist}/loadGenericPLCProgramDescription.cmd" perm="644"/>
         <!--
-        <copy file="${templates}/manufacturingTablesTestLocal" todir="${dist}"/>
-        <chmod file="${dist}/manufacturingTablesTestLocal" perm="644"/>
-        <copy file="${templates}/manufacturingTablesTestLocal.cmd" todir="${dist}"/>
-        <chmod file="${dist}/manufacturingTablesTestLocal.cmd" perm="644"/>
         <copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/IDELocal.cmd" perm="644"/>
         <copy file="${templates}/IDELocal" todir="${dist}"/>    
@@ -575,10 +531,6 @@ Class-Path: ${manifest.pathlist}</echo>
         <copy file="${templates}/demo_d.cmd" todir="${dist}"/>
         <chmod file="${dist}/demo_d.cmd" perm="644"/>
         <!--
-        <copy file="${templates}/manufacturingTablesTest" todir="${dist}"/>
-        <chmod file="${dist}/manufacturingTablesTest" perm="755"/>
-        <copy file="${templates}/manufacturingTablesTest.cmd" todir="${dist}"/>
-        <chmod file="${dist}/manufacturingTablesTest.cmd" perm="755"/>
         <copy file="${templates}/SupremicaProfiling.cmd" todir="${dist}"/>
         <chmod file="${dist}/SupremicaProfiling.cmd" perm="644"/>
         <copy file="${templates}/SupremicaProfiling" todir="${dist}"/>  
