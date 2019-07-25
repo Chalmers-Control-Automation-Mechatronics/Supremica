@@ -31,10 +31,6 @@ public abstract class AbstractTextFieldParameter extends Parameter
 
   private class InputFilter extends DocumentFilter {
 
-    private boolean test(final String text) {
-      return testAlphabet(text);
-    }
-
     @Override
     public void replace(final FilterBypass fb, final int offset, final int length, final String text,
           final AttributeSet attrs) throws BadLocationException {
@@ -44,7 +40,7 @@ public abstract class AbstractTextFieldParameter extends Parameter
        sb.append(doc.getText(0, doc.getLength()));
        sb.replace(offset, offset + length, text);
 
-       if (test(sb.toString())) {
+       if (testAlphabet(sb.toString())) {
           super.replace(fb, offset, length, text, attrs);
        } else {
           // warn the user and don't allow the insert

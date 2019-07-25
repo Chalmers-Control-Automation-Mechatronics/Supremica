@@ -44,6 +44,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
@@ -417,6 +418,12 @@ public class CompositionalConflictChecker
         });
       }
     }
+    list.add(0, new EventParameter(ParameterIDs.ConflictChecker_ConfiguredDefaultMarking) {
+      @Override
+      public void commitValue() {
+        setConfiguredDefaultMarking(getValue());
+      }
+    });
     return list;
   }
 

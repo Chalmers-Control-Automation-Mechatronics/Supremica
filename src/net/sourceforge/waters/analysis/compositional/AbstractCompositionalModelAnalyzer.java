@@ -56,7 +56,6 @@ import java.util.Set;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.FileParameter;
 import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -638,12 +637,6 @@ public abstract class AbstractCompositionalModelAnalyzer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    list.add(new EventParameter(ParameterIDs.ConflictChecker_ConfiguredDefaultMarking) {
-      @Override
-      public void commitValue() {
-        setConfiguredDefaultMarking(getValue());
-      }
-    });
     list.add(new EnumParameter<PreselectingMethod>(ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod) {
       @Override
       public void commitValue() {
