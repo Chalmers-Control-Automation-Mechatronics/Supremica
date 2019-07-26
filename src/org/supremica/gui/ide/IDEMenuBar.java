@@ -63,6 +63,7 @@ import net.sourceforge.waters.gui.actions.IDECopyAction;
 import net.sourceforge.waters.gui.actions.IDECutAction;
 import net.sourceforge.waters.gui.actions.IDEDeleteAction;
 import net.sourceforge.waters.gui.actions.IDEDeselectAllAction;
+import net.sourceforge.waters.gui.actions.IDEHelpAction;
 import net.sourceforge.waters.gui.actions.IDEPasteAction;
 import net.sourceforge.waters.gui.actions.IDEPropertiesAction;
 import net.sourceforge.waters.gui.actions.IDESelectAllAction;
@@ -728,6 +729,8 @@ public class IDEMenuBar
     final Action about = actions.getAction(IDEAboutAction.class);
     menu.add(about);
     menu.add(actions.helpWebAction.getMenuItem());
+    final Action help = actions.getAction(IDEHelpAction.class);
+    menu.add(help);
     add(menu);
   }
 

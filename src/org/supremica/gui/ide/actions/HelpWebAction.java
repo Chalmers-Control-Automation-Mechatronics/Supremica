@@ -54,7 +54,7 @@ public class HelpWebAction
 	{
 		super(actionList);
 
-		putValue(Action.NAME, "Supremica Website...");
+		putValue(Action.NAME, "Supremica Website ...");
 		putValue(Action.SHORT_DESCRIPTION, "Supremica on the Web");
 		putValue(Action.SMALL_ICON, new ImageIcon(IDE.class.getResource("/toolbarButtonGraphics/development/WebComponent16.gif")));
 	}
