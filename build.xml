@@ -133,10 +133,6 @@
         <unjar src="${lib}/help.jar" dest="${lib}/${unjared}"/>
         <unjar src="${lib}/jhall.jar" dest="${lib}/${unjared}"/>
 
-        <!-- Used by org.supremica.properties.LocalSystem but easy to
-             replace -->
-        <unjar src="${lib}/sysutils.jar" dest="${lib}/${unjared}"/>
-
         <!-- Used by org.supremica.automata.BDD.ReduceBDDVars, which is
              unused -->
         <unjar src="${lib}/javailp-1.2.jar" dest="${lib}/${unjared}"/>

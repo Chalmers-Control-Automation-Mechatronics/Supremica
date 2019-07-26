@@ -175,8 +175,8 @@ public final class Config
                           false, "Capture stderr (System.err.println) in GUI ");
 
     // GENERAL_FILE
-    public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", LocalSystem.getHomeDirectory(), "Default file open path");
-    public static final ObjectProperty<String> FILE_SAVE_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileSavePath", LocalSystem.getHomeDirectory(), "Default file save path");
+    public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", System.getProperty("user.home"), "Default file open path");
+    public static final ObjectProperty<String> FILE_SAVE_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileSavePath", System.getProperty("user.home"), "Default file save path");
     public static final BooleanProperty FILE_ALLOW_OPEN = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowOpen", true, "Allow user to open file");
     public static final BooleanProperty FILE_ALLOW_SAVE = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowSave", true, "Allow user to save file");
     public static final BooleanProperty FILE_ALLOW_IMPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowImport", true, "Allow user to import file");
