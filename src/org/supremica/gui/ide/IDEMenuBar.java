@@ -52,6 +52,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -490,6 +491,8 @@ public class IDEMenuBar
     menu.add(synth);
     final Action conflict = actions.getAction(AnalyzerConflictCheckAction.class);
     menu.add(conflict);
+    final Action control = actions.getAction(AnalyzerControlLoopCheckAction.class);
+    menu.add(control);
     add(menu);
   }
 

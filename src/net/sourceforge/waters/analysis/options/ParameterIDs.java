@@ -63,8 +63,8 @@ public class ParameterIDs
 {
 
   public static final JListParameter<ComponentKind> testJListParam = new JListParameter<ComponentKind>(9000,
-    "Output kind",
-    "Type of the generated synchronous product automaton.", ComponentKind.values(), ComponentKind.SPEC);
+    "JListParam Test",
+    "", ComponentKind.values(), ComponentKind.SPEC);
 
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
   private static final int ModelAnalyzer_DetailedOutputEnabled_ID = 0;
