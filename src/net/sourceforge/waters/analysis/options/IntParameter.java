@@ -94,13 +94,28 @@ public class IntParameter extends AbstractTextFieldParameter
       @Override
       public void focusLost(final FocusEvent e)
       {
-        if(textField.getText().equals("-")) {
-          JOptionPane
-          .showMessageDialog(new JFrame(),
-                             "Value must be a number between " + mMin
-                                           + "-" + mMax
-                                           + "\nSetting value to default.");
-        setTextField(textField, defaultValue);
+        //very valid integer if there is text
+        if (!textField.getText().isEmpty()) {
+          try {
+            final Integer tmp = Integer.parseInt(textField.getText());
+            if (tmp < mMin || tmp > mMax) {
+              JOptionPane
+                .showMessageDialog(new JFrame(),
+                                   "Integer outside of range." + "\n"
+                                                 + "Value must be a number between "
+                                                 + "(" + mMin + ")" + " - "
+                                                 + "(" + mMax + ")");
+              setTextField(textField, defaultValue);
+            }
+          } catch (final NumberFormatException exception) {
+            JOptionPane
+              .showMessageDialog(new JFrame(),
+                                 "Input is not a valid Integer." + "\n"
+                                               + "Value must be a number between "
+                                               + "(" + mMin + ")" + " - "
+                                               + "(" + mMax + ")");
+            setTextField(textField, defaultValue);
+          }
         }
       }
     });
@@ -111,6 +126,9 @@ public class IntParameter extends AbstractTextFieldParameter
   @Override
   protected boolean testAlphabet(final String text) {
 
+    //only verify in alphabet
+
+      //special case where minimum is negative
       if (text.length() == 1 && text.equals("-") && mAlphabet.substring(0,1).contains("-")) {
         return true;
       }
@@ -118,22 +136,6 @@ public class IntParameter extends AbstractTextFieldParameter
         return true;
       }
       else if (text.matches(mAlphabet)) {
-        try {
-          final Integer tmp = Integer.parseInt(text);
-          if (tmp < mMin || tmp > mMax) {
-            JOptionPane
-              .showMessageDialog(new JFrame(),
-                                 "Value must be a number between " + "(" +  mMin + ")"
-                                               + " - "  + "(" + mMax + ")" );
-            return false;
-          }
-        } catch (final NumberFormatException exception) {
-          JOptionPane
-          .showMessageDialog(new JFrame(),
-                             "Value must be a number between " + "(" +  mMin + ")"
-                                           + " - "  + "(" + mMax + ")" );
-          return false;
-        }
         return true;
       }
      return false;

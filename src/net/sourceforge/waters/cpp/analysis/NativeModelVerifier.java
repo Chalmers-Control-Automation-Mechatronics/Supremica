@@ -132,6 +132,13 @@ public abstract class NativeModelVerifier
         setTransitionLimit(getValue());
       }
     });
+    list.add(new BoolParameter(ParameterIDs.NativeModelVerifier_EventTreeEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setEventTreeEnabled(getValue());
+      }
+    });
     return list;
   }
 

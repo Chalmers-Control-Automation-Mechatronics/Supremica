@@ -43,6 +43,10 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -223,6 +227,39 @@ public class ModularControlLoopChecker
     } finally {
       tearDown();
     }
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
+    list.add(new EnumParameter<AutomataGroup.SelectVersion>(ParameterIDs.ModularControlLoopChecker_SelectVersion) {
+      @Override
+      public void commitValue() {
+        setSelectVersion(getValue());
+      }
+    });
+    list.add(new EnumParameter<AutomataGroup.MergeVersion>(ParameterIDs.ModularControlLoopChecker_MergeVersion) {
+      @Override
+      public void commitValue() {
+        setMergeVersion(getValue());
+      }
+    });
+    return list;
   }
 
 

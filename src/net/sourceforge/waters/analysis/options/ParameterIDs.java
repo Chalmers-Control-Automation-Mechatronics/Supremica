@@ -51,6 +51,7 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.gnonblocking.PreselectingHeuristicFactory;
 import net.sourceforge.waters.analysis.gnonblocking.SelectingHeuristicFactory;
+import net.sourceforge.waters.analysis.modular.AutomataGroup;
 import net.sourceforge.waters.analysis.trcomp.AbstractTRCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.trcomp.TRCandidate;
 import net.sourceforge.waters.analysis.trcomp.TRCompositionalConflictChecker;
@@ -685,5 +686,35 @@ public class ParameterIDs
        "Print counterexample",
        "Show trace to bad state as info in log.",
        false);
+
+  //net.sourceforge.waters.analysis.monolithic.MonolithicControlLoopChecker
+
+  //net.sourceforge.waters.cpp.analysis.NativeModelVerifier
+  private static final int NativeModelVerifier_EventTreeEnabled_ID = 5400;
+
+  public static final BoolParameter NativeModelVerifier_EventTreeEnabled =
+    new BoolParameter
+      (NativeModelVerifier_EventTreeEnabled_ID,
+       "Event Tree Enabled",
+       "",
+       true);
+
+  //net.sourceforge.waters.analysis.modular.ModularControlLoopChecker
+  private static final int ModularControlLoopChecker_MergeVersion_ID = 5500;
+  private static final int ModularControlLoopChecker_SelectVersion_ID = 5500;
+
+  public static final EnumParameter<AutomataGroup.MergeVersion> ModularControlLoopChecker_MergeVersion =
+    new EnumParameter<AutomataGroup.MergeVersion>
+     (ModularControlLoopChecker_MergeVersion_ID,
+      "Merge Version",
+      "",
+      AutomataGroup.MergeVersion.values());
+
+  public static final EnumParameter<AutomataGroup.SelectVersion> ModularControlLoopChecker_SelectVersion =
+    new EnumParameter<AutomataGroup.SelectVersion>
+     (ModularControlLoopChecker_SelectVersion_ID,
+      "Select Version",
+      "",
+      AutomataGroup.SelectVersion.values());
 
 }

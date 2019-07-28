@@ -43,25 +43,7 @@ public abstract class AbstractTextFieldParameter extends Parameter
        if (testAlphabet(sb.toString())) {
           super.replace(fb, offset, length, text, attrs);
        } else {
-          // warn the user and don't allow the insert
-         //System.out.println("Bad Replace " + text);
        }
     }
-    /*
-    @Override
-    public void remove(final FilterBypass fb, final int offset, final int length)
-          throws BadLocationException {
-       final Document doc = fb.getDocument();
-       final StringBuilder sb = new StringBuilder();
-       sb.append(doc.getText(0, doc.getLength()));
-       sb.delete(offset, offset + length);
-
-       if (test(sb.toString())) {
-          super.remove(fb, offset, length);
-       } else {
-          // warn the user and don't allow the insert
-         System.out.println("3");
-       }
-    }*/
  }
 }
