@@ -50,7 +50,6 @@ import org.supremica.gui.useractions.SaveAction;
 import org.supremica.gui.useractions.SaveAsAction;
 import org.supremica.gui.useractions.StatusAction;
 import org.supremica.gui.useractions.ViewAction;
-import org.supremica.properties.Config;
 
 public class MainToolBar
 	extends JToolBar
@@ -86,17 +85,10 @@ public class MainToolBar
 
 	private void initToolBar()
 	{
-		if (Config.FILE_ALLOW_OPEN.isTrue())
-		{
-			add(openAction);
-		}
-
-		if (Config.FILE_ALLOW_SAVE.isTrue())
-		{
-			add(saveAction);
-			add(saveAsAction);
-			addSeparator();
-		}
+	    add(openAction);
+	    add(saveAction);
+	    add(saveAsAction);
+	    addSeparator();
 
 		add(deleteAction);
 		add(copyAction);

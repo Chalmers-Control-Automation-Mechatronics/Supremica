@@ -142,7 +142,6 @@ public final class Config
                            "Java Look&Feel (requires restart)");
     public static final ObjectProperty<String> GENERAL_STATE_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateSeparator", ".", "State separator character");
     public static final ObjectProperty<String> GENERAL_STATELABEL_SEPARATOR  = new ObjectProperty<String>(PropertyType.GENERAL, "generalStateLabelSeparator", ",", "State label separator character");
-    public static final BooleanProperty GENERAL_USE_SECURITY = new BooleanProperty(PropertyType.GENERAL, "generalUseSecurity", false, "Use file security");
     public static final BooleanProperty GENERAL_STUDENT_VERSION =
       new BooleanProperty(PropertyType.GENERAL, "generalStudentVersion",
                           false, "Student version", false);
@@ -177,11 +176,6 @@ public final class Config
     // GENERAL_FILE
     public static final ObjectProperty<String> FILE_OPEN_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileOpenPath", System.getProperty("user.home"), "Default file open path");
     public static final ObjectProperty<String> FILE_SAVE_PATH = new ObjectProperty<String>(PropertyType.GENERAL_FILE, "fileSavePath", System.getProperty("user.home"), "Default file save path");
-    public static final BooleanProperty FILE_ALLOW_OPEN = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowOpen", true, "Allow user to open file");
-    public static final BooleanProperty FILE_ALLOW_SAVE = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowSave", true, "Allow user to save file");
-    public static final BooleanProperty FILE_ALLOW_IMPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowImport", true, "Allow user to import file");
-    public static final BooleanProperty FILE_ALLOW_EXPORT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowExport", true, "Allow user to export file");
-    public static final BooleanProperty FILE_ALLOW_QUIT = new BooleanProperty(PropertyType.GENERAL_FILE, "fileAllowQuit", true, "Allow user to quit Supremica");
 
     // GUI
     public static IntegerProperty GUI_IDE_WIDTH =
@@ -305,9 +299,7 @@ public final class Config
                           "Use Waters Analyzer");
 
     // GUI_SIMULATOR
-    public static final BooleanProperty INCLUDE_ANIMATOR =
-      new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false,
-                          "Include 2D Graphical Animator");
+    public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
     public static final IntegerProperty SIMULATION_CYCLE_TIME =
       new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime",

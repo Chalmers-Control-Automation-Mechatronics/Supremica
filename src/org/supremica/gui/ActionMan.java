@@ -1848,17 +1848,13 @@ public class ActionMan
     // File.Close action performed
     public static void fileClose(final Gui gui)
     {
-        if (Config.FILE_ALLOW_QUIT.isTrue())
+        try
         {
-            try
-            {
-                SupremicaProperties.saveProperties();
-            }
-            catch(final Exception e)
-            {
-            }
+          SupremicaProperties.saveProperties();
         }
-
+        catch(final Exception e)
+        {
+        }
         gui.close();
     }
 

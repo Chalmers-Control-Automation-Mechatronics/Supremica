@@ -160,67 +160,51 @@ public class MainMenuBar
             }
         }
 
-        if (Config.FILE_ALLOW_OPEN.isTrue())
+        // File.Open
+        final JMenuItem menuFileOpen = new SupremicaMenuItem(ActionMan.openAction);
+        menuFile.add(menuFileOpen);
+
+        // File.Save
+        final JMenuItem menuFileSave = new SupremicaMenuItem(ActionMan.saveAction);
+        menuFile.add(menuFileSave);
+
+        // File.SaveAs
+        final JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction);
+        menuFile.add(menuFileSaveAs);
+
+        menuFile.addSeparator();
+        separatorNeeded = false;
+
+        // File.Import
+        final JMenu menuFileImport = new JMenu("Import");
+        menuFileImport.setMnemonic(KeyEvent.VK_I);
+        menuFileImport.setToolTipText("Import file");
+        menuFile.add(menuFileImport);
+
+        // File.Import.Waters
+        final JMenuItem menuFileImportWaters = new JMenuItem("From Waters...");
+        menuFileImport.add(menuFileImportWaters);
+        menuFileImportWaters.addActionListener(new ActionListener()
         {
-            // File.Open
-            final JMenuItem menuFileOpen = new SupremicaMenuItem(ActionMan.openAction);
-            menuFile.add(menuFileOpen);
-
-            separatorNeeded = true;
-        }
-
-        if (Config.FILE_ALLOW_SAVE.isTrue())
+          @Override
+          public void actionPerformed(final ActionEvent e)
+          {
+            ActionMan.fileImportWaters(ActionMan.getGui());
+          }
+        });
+        // File.Import.UMDES
+        final JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
+        menuFileImport.add(menuFileImportUMDES);
+        menuFileImportUMDES.addActionListener(new ActionListener()
         {
-            // File.Save
-            final JMenuItem menuFileSave = new SupremicaMenuItem(ActionMan.saveAction);
-            menuFile.add(menuFileSave);
+          @Override
+          public void actionPerformed(final ActionEvent e)
+          {
+            ActionMan.fileImportUMDES(ActionMan.getGui());
+          }
+        });
 
-            // File.SaveAs
-            final JMenuItem menuFileSaveAs = new SupremicaMenuItem(ActionMan.saveAsAction);
-            menuFile.add(menuFileSaveAs);
-
-            separatorNeeded = true;
-        }
-
-        if (separatorNeeded)
-        {
-            menuFile.addSeparator();
-
-            separatorNeeded = false;
-        }
-
-        if (Config.FILE_ALLOW_IMPORT.isTrue())
-        {
-            // File.Import
-            final JMenu menuFileImport = new JMenu("Import");
-            menuFileImport.setMnemonic(KeyEvent.VK_I);
-            menuFileImport.setToolTipText("Import file");
-            menuFile.add(menuFileImport);
-
-            // File.Import.Waters
-            final JMenuItem menuFileImportWaters = new JMenuItem("From Waters...");
-            menuFileImport.add(menuFileImportWaters);
-            menuFileImportWaters.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.fileImportWaters(ActionMan.getGui());
-                }
-            });
-            // File.Import.UMDES
-            final JMenuItem menuFileImportUMDES = new JMenuItem("From UMDES...");
-            menuFileImport.add(menuFileImportUMDES);
-            menuFileImportUMDES.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.fileImportUMDES(ActionMan.getGui());
-                }
-            });
-
-            /*
+        /*
                         // File.Import.HYB (the file format of Balemi's tool)
                         JMenuItem menuFileImportHYB = new JMenuItem("From HYB...");
                         menuFileImport.add(menuFileImportHYB);
@@ -231,21 +215,21 @@ public class MainMenuBar
                         ActionMan.fileImportHYB(ActionMan.getGui());
                         }
                         });
-             */
+         */
 
-            // File.Import.HISC
-            final JMenuItem menuFileImportHISC = new JMenuItem("From HISC...");
-            menuFileImport.add(menuFileImportHISC);
-            menuFileImportHISC.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.fileImportHISC(ActionMan.getGui());
-                }
-            });
+        // File.Import.HISC
+        final JMenuItem menuFileImportHISC = new JMenuItem("From HISC...");
+        menuFileImport.add(menuFileImportHISC);
+        menuFileImportHISC.addActionListener(new ActionListener()
+        {
+          @Override
+          public void actionPerformed(final ActionEvent e)
+          {
+            ActionMan.fileImportHISC(ActionMan.getGui());
+          }
+        });
 
-                        /*
+        /*
                         //File.Import.RobotCoordination
                         JMenuItem menuFileImportRobotCoordination = new JMenuItem("From Robot Coordinator...");
                         menuFileImport.add(menuFileImportRobotCoordination);
@@ -256,8 +240,7 @@ public class MainMenuBar
                         ActionMan.fileImportRobotCoordination(ActionMan.getGui());
                         }
                     });
-                         */
-        }
+         */
 
                 /*
                 // if (SupremicaProperties.generalUseRobotCoordinationABB())
@@ -279,6 +262,7 @@ public class MainMenuBar
                 }
                  */
 
+        /*
         if (false && Config.FILE_ALLOW_EXPORT.isTrue())
         {
             // File.Export
@@ -321,6 +305,7 @@ public class MainMenuBar
                 }
             });
         }
+        */
 
         if (separatorNeeded)
         {
@@ -336,8 +321,8 @@ public class MainMenuBar
             separatorNeeded = false;
         }
 
-        if (Config.FILE_ALLOW_QUIT.isTrue())
-        {
+        // if (Config.FILE_ALLOW_QUIT.isTrue())
+        //{
 
             // File.Exit
             final JMenuItem menuFileExit = new JMenuItem();
@@ -352,6 +337,7 @@ public class MainMenuBar
                     ActionMan.fileExit(ActionMan.getGui());
                 }
             });
+        /*
         }
         else
         {
@@ -370,6 +356,7 @@ public class MainMenuBar
                 }
             });
         }
+        */
 
         // Project
         final JMenu menuProject = new JMenu();

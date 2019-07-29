@@ -397,24 +397,22 @@ class MainPopupMenu
 
         // JMenuItem saveAsItem = new JMenuItem("Save As...");
         // menuHandler.add(saveAsItem, 1);
-        if (Config.FILE_ALLOW_EXPORT.isTrue())
-        {
-            // This is how it would be done with an export command object
-            // JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
-            // menuHandler.add(exportItem, 1);
-            final JMenuItem exportItem = new JMenuItem("Export...");
 
-            menuHandler.add(exportItem, 1);
-            exportItem.addActionListener(new ActionListener()
-            {
-                @Override
-                public void actionPerformed(final ActionEvent e)
-                {
-                    ActionMan.automataExport(getGui());
-                    getGui().repaint();
-                }
-            });
-        }
+        // This is how it would be done with an export command object
+        // JMenuItem exportItem = new SupremicaMenuItem(ActionMan.exportItem);
+        // menuHandler.add(exportItem, 1);
+        final JMenuItem exportItem = new JMenuItem("Export...");
+
+        menuHandler.add(exportItem, 1);
+        exportItem.addActionListener(new ActionListener()
+        {
+          @Override
+          public void actionPerformed(final ActionEvent e)
+          {
+            ActionMan.automataExport(getGui());
+            getGui().repaint();
+          }
+        });
 
         // --------------------------------------------------------------
         // ***************** UNDER DEVELOPMENT MENUES ARE ADDED HERE:
