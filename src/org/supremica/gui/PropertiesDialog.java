@@ -41,7 +41,6 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -115,10 +114,11 @@ extends JDialog
       fillPropertyPanel(type, panel);
       // Add panel to tabbed pane (only add nonempty panels)
       if (panel.getComponentCount() > 0) {
-        mTabbedPane.add(type.toString(), panel);
+        mTabbedPane.add(type.getTitle(), panel);
       }
     }
-    setLocationAndSize();
+    setSize(DEFAULT_DIALOG_SIZE);
+    setLocationRelativeTo(owner);
     //pack();
     addWindowListener(new WindowAdapter()
     {
@@ -173,15 +173,6 @@ extends JDialog
 
   //#######################################################################
   //# Auxiliary Methods
-  private void setLocationAndSize()
-  {
-    final Rectangle bounds = getOwner().getBounds();
-    final int x = bounds.x + (bounds.width - DEFAULT_DIALOG_SIZE.width) / 2;
-    final int y = bounds.y + (bounds.height - DEFAULT_DIALOG_SIZE.height) / 2;
-    setLocation(x, y);
-    setSize(DEFAULT_DIALOG_SIZE);
-  }
-
   /**
    * Set all properties in Config to the current values in this dialog.
    */

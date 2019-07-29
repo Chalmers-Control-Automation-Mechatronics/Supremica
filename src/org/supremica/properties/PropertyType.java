@@ -56,30 +56,65 @@ package org.supremica.properties;
  */
 public enum PropertyType
 {
-    GENERAL,
-    GENERAL_LOG,
-    GENERAL_FILE,
-    GUI,
-    GUI_EDITOR,
-    GUI_ANALYZER,
-    GUI_SIMULATOR,
-    GUI_DOT,
-    ALGORITHMS,
-    ALGORITHMS_SYNCHRONIZATION,
-    ALGORITHMS_VERIFICATION,
-    ALGORITHMS_SYNTHESIS,
-    ALGORITHMS_MINIMIZATION,
-    ALGORITHMS_BDD,
-    ALGORITHMS_HMI,
-    MISC;
+  //#########################################################################
+  //# Enumeration
+  GENERAL,
+  GENERAL_LOG,
+  GENERAL_FILE,
+  GUI("gui.compiler"),
+  GUI_EDITOR,
+  GUI_ANALYZER,
+  GUI_SIMULATOR,
+  GUI_DOT,
+  ALGORITHMS,
+  ALGORITHMS_SYNCHRONIZATION,
+  ALGORITHMS_VERIFICATION,
+  ALGORITHMS_SYNTHESIS,
+  ALGORITHMS_MINIMIZATION,
+  ALGORITHMS_BDD,
+  ALGORITHMS_HMI,
+  MISC;
 
-    /**
-     * Override of toString-method, transforms identifier into lowercase and uses
-     * "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
-     */
-    @Override
-    public String toString()
-    {
-        return super.toString().toLowerCase().replace('_','.');
+
+  //#########################################################################
+  //# Constructors
+  private PropertyType()
+  {
+    mTitle = null;
+  }
+
+  private PropertyType(final String name)
+  {
+    mTitle = name;
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getTitle()
+  {
+    if (mTitle == null) {
+      return toString();
+    } else {
+      return mTitle;
     }
+  }
+
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
+  /**
+   * Override of toString-method, transforms identifier into lowercase and
+   * uses "." instead of "_", so, for example, "GUI_DOT" becomes "gui.dot".
+   */
+  @Override
+  public String toString()
+  {
+    return super.toString().toLowerCase().replace('_', '.');
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final String mTitle;
 }
