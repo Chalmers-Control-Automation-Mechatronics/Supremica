@@ -7,11 +7,6 @@ the help system in github.com account for more information.
 To compile and run Supremica you need Java 1.8 or higher
 and ANT.
 
-From 2001-09-27 JGrafChart is included. JGrafChart is a Grafcet/SFC 
-modelling tool. JGrafChart is developed by Karl-Erik Arzen, at Lund
-Institute of Technology, Sweden. Karl-Erik can be reached at
-karlerik@control.lth.se.
-
 From 2005-02-17 Waters is included. Waters includes the graphical
 editor and simulator for automata. Waters is developed by Robi Malik,
 at the University of Waikato, New Zealand.  Robi can be reached at
