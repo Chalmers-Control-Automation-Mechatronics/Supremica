@@ -26,14 +26,6 @@ A short tutorial on how to compile and run Supremica is following.
 
     > git clone git@github.com:Chalmers-Control-Automation-Mechatronics/Supremica.git
 
-    If you have licensed version of JGo and/or JGo Layout then
-    copy the licensed jar files to lib/licensed
-    The two files should be named JGo.jar and JGoLayout.jar, respectively.
-    Note, if you do not have licensed versions of JGo then the trial version
-    will be used. The repository contains the trial JGo files, but not the
-    licensed files. This implies that you have to manually update the
-    licensed files when there is a new version.
-    
     If you have got a C++ compiler and want to compile the C++ sources of
     the Waters libraries, you need to configure it first. Enter the
     subdirectory waters/ inside the project directory, and copy the file

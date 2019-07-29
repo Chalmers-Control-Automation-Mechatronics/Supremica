@@ -90,7 +90,7 @@ import org.supremica.util.BDD.Options;
  * Without the option, the properties are initialised to their hard-coded
  * default values. When the properties dialog is opened, it allows the user
  * to change all registered properties, and they are automatically saved to
- * the properties file (if set) when they dialog is closed.</P>
+ * the properties file (if set) when the dialog is closed.</P>
  *
  * <P>The default for the properties file is <CODE>.supremica</CODE> in the
  * Supremica source directory, when launched from Eclipse. When launched
