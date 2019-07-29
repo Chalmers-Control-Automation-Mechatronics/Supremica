@@ -136,14 +136,61 @@ public class ModularControlLoopChecker
 
   //#########################################################################
   //# Configuration
+  /**
+   * Sets the heuristic to determine which components to include in
+   * subsequent verification attempts based on the counterexample from the
+   * previous attempt.
+   */
   public void setMergeVersion(final AutomataGroup.MergeVersion m)
   {
     AutomataGroup.setMergeVersion(m);
   }
 
+  /**
+   * Gets the heuristic to determine which components to include in
+   * subsequent verification attempts based on the counterexample from the
+   * previous attempt.
+   * @see #setMergeVersion(AutomataGroup.MergeVersion)
+   */
+  public AutomataGroup.MergeVersion getMergeVersion()
+  {
+    return AutomataGroup.getMergeVersion();
+  }
+
   public void setSelectVersion(final AutomataGroup.SelectVersion s)
   {
     AutomataGroup.setSelectVersion(s);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new EnumParameter<AutomataGroup.MergeVersion>
+        (ParameterIDs.ModularControlLoopChecker_MergeVersion) {
+      @Override
+      public void commitValue() {
+        setMergeVersion(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.ModularControlLoopChecker_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.ModularControlLoopChecker_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
+    return list;
   }
 
 
@@ -227,39 +274,6 @@ public class ModularControlLoopChecker
     } finally {
       tearDown();
     }
-  }
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
-      @Override
-      public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
-    list.add(new EnumParameter<AutomataGroup.SelectVersion>(ParameterIDs.ModularControlLoopChecker_SelectVersion) {
-      @Override
-      public void commitValue() {
-        setSelectVersion(getValue());
-      }
-    });
-    list.add(new EnumParameter<AutomataGroup.MergeVersion>(ParameterIDs.ModularControlLoopChecker_MergeVersion) {
-      @Override
-      public void commitValue() {
-        setMergeVersion(getValue());
-      }
-    });
-    return list;
   }
 
 

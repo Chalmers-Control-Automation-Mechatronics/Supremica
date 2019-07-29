@@ -102,6 +102,12 @@ public class AutomataGroup
   {
     MERGE_VERSION = newVersion;
   }
+
+  public static MergeVersion getMergeVersion()
+  {
+    return MERGE_VERSION;
+  }
+
   public static void setSelectVersion(final SelectVersion selectVersion)
   {
     SELECT_VERSION = selectVersion;
@@ -437,9 +443,9 @@ public class AutomataGroup
    * It is TRUE when nothing has changed, and FALSE otherwise*/
   boolean mValidStats;
 
+
   //#########################################################################
   //# Constant Values
-
   /**
    * 0 = One
    * 1 = MinAutomata
@@ -452,13 +458,13 @@ public class AutomataGroup
    * 8 = RelMaxCommonEvents
    * 9 = MinStates
    */
-  private static MergeVersion MERGE_VERSION = MergeVersion.EarlyNotAccept;
+  private static MergeVersion MERGE_VERSION = MergeVersion.MaxCommonEvents;
 
   private static SelectVersion SELECT_VERSION = SelectVersion.Naive;
 
+
   //##################################################################
   //# Enumerations
-
   public enum MergeVersion {
     One,
     MinAutomata,
@@ -470,7 +476,8 @@ public class AutomataGroup
     MinNewEvents,
     RelMaxCommonEvents,
     MinStates
-    }
+  }
+
   public enum SelectVersion {
     Naive
   }

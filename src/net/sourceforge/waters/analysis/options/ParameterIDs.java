@@ -459,8 +459,20 @@ public class ParameterIDs
        false);
 
 
+  //net.sourceforge.waters.cpp.analysis.NativeModelAnalyzer
+  private static final int NativeModelAnalyzer_EventTreeEnabled_ID = 1100;
+
+  public static final BoolParameter NativeModelAnalyzer_EventTreeEnabled =
+    new BoolParameter
+      (NativeModelAnalyzer_EventTreeEnabled_ID,
+       "Use branching program",
+       "Compile the event enablement condition into a branching program " +
+       "to speed up synchronous product computation.",
+       true);
+
+
   //net.sourceforge.waters.cpp.analysis.NativeConflictChecker
-  private static final int NativeConflictChecker_ConflictCheckMode_ID = 1100;
+  private static final int NativeConflictChecker_ConflictCheckMode_ID = 1150;
 
   public static final EnumParameter<ConflictCheckMode> NativeConflictChecker_ConflictCheckMode =
     new EnumParameter<ConflictCheckMode>
@@ -669,7 +681,8 @@ public class ParameterIDs
        "Remove unreachable states from the synthesised supervisor.",
        true);
 
-  public static final EnumParameter<SupervisorReductionFactory> SupremicaSynthesizer_SupervisorReductionFactory =
+  public static final EnumParameter<SupervisorReductionFactory>
+    SupremicaSynthesizer_SupervisorReductionFactory =
     new EnumParameter<SupervisorReductionFactory>
      (SupremicaSynthesizer_SupervisorReductionFactory_ID,
       "Supervisor reduction",
@@ -689,28 +702,43 @@ public class ParameterIDs
 
   //net.sourceforge.waters.analysis.monolithic.MonolithicControlLoopChecker
 
-  //net.sourceforge.waters.cpp.analysis.NativeModelVerifier
-  private static final int NativeModelVerifier_EventTreeEnabled_ID = 5400;
-
-  public static final BoolParameter NativeModelVerifier_EventTreeEnabled =
-    new BoolParameter
-      (NativeModelVerifier_EventTreeEnabled_ID,
-       "Event Tree Enabled",
-       "",
-       true);
 
   //net.sourceforge.waters.analysis.modular.ModularControlLoopChecker
-  private static final int ModularControlLoopChecker_MergeVersion_ID = 5500;
-  private static final int ModularControlLoopChecker_SelectVersion_ID = 5500;
+  private static final int ModularControlLoopChecker_NodeLimit_ID = 5500;
+  private static final int ModularControlLoopChecker_TransitionLimit_ID = 5501;
+  private static final int ModularControlLoopChecker_MergeVersion_ID = 5502;
+  private static final int ModularControlLoopChecker_SelectVersion_ID = 5503;
 
-  public static final EnumParameter<AutomataGroup.MergeVersion> ModularControlLoopChecker_MergeVersion =
+  public static final IntParameter ModularControlLoopChecker_NodeLimit =
+    new IntParameter
+      (ModularControlLoopChecker_NodeLimit_ID,
+       "State limit",
+       "The maximum number of states allowed for intermediate verification " +
+       "attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+  public static final IntParameter ModularControlLoopChecker_TransitionLimit =
+    new IntParameter
+      (ModularControlLoopChecker_TransitionLimit_ID,
+       "Transition limit",
+       "The maximum number of transitions allowed for intermediate " +
+       "verification attempts.",
+       0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+
+  public static final EnumParameter<AutomataGroup.MergeVersion>
+    ModularControlLoopChecker_MergeVersion =
     new EnumParameter<AutomataGroup.MergeVersion>
      (ModularControlLoopChecker_MergeVersion_ID,
-      "Merge Version",
-      "",
-      AutomataGroup.MergeVersion.values());
+      "Selection heuristic",
+      "The heuristic to determine which components to include in " +
+      "subsequent verification attempts based on the counterexample from " +
+      "the previous attempt.",
+      AutomataGroup.MergeVersion.values(),
+      AutomataGroup.MergeVersion.MaxCommonEvents);
 
-  public static final EnumParameter<AutomataGroup.SelectVersion> ModularControlLoopChecker_SelectVersion =
+  // Not used:
+  public static final EnumParameter<AutomataGroup.SelectVersion>
+    ModularControlLoopChecker_SelectVersion =
     new EnumParameter<AutomataGroup.SelectVersion>
      (ModularControlLoopChecker_SelectVersion_ID,
       "Select Version",

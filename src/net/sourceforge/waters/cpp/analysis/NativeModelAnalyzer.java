@@ -34,7 +34,12 @@
 package net.sourceforge.waters.cpp.analysis;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -80,6 +85,29 @@ public abstract class NativeModelAnalyzer
 
 
   //#########################################################################
+  //# Configuration
+  /**
+   * Sets whether the event enablement condition is to be compiled into
+   * a branching program to speed up synchronous product computation.
+   * This option is enabled by default.
+   */
+  public void setEventTreeEnabled(final boolean enable)
+  {
+    mEventTreeEnabled = enable;
+  }
+
+  /**
+   * Returns whether the event enablement condition is compiled into
+   * a branching program to speed up synchronous product computation.
+   * @see #setEventTreeEnabled(boolean)
+   */
+  public boolean isEventTreeEnabled()
+  {
+    return mEventTreeEnabled;
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
   public void setDetailedOutputEnabled(final boolean enable)
@@ -100,22 +128,34 @@ public abstract class NativeModelAnalyzer
   }
 
   @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new BoolParameter(ParameterIDs.NativeModelAnalyzer_EventTreeEnabled) {
+      @Override
+      public void commitValue() {
+        setEventTreeEnabled(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue() {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue() {
+        setTransitionLimit(getValue());
+      }
+    });
+    return list;
+  }
+
+  @Override
   public NativeVerificationResult createAnalysisResult()
   {
     return new NativeVerificationResult(this);
-  }
-
-
-  //#########################################################################
-  //# Configuration
-  public void setEventTreeEnabled(final boolean enable)
-  {
-    mEventTreeEnabled = enable;
-  }
-
-  public boolean isEventTreeEnabled()
-  {
-    return mEventTreeEnabled;
   }
 
 

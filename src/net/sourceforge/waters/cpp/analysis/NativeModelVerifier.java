@@ -36,7 +36,6 @@ package net.sourceforge.waters.cpp.analysis;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -106,37 +105,18 @@ public abstract class NativeModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
       @Override
       public void commitValue()
       {
         setShortCounterExampleRequested(getValue());
       }
     });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
-      @Override
-      public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.NativeModelVerifier_EventTreeEnabled) {
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
       @Override
       public void commitValue()
       {
-        setEventTreeEnabled(getValue());
+        setDetailedOutputEnabled(getValue());
       }
     });
     return list;
