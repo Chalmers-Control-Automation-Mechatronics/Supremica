@@ -201,7 +201,6 @@ public final class Config
                           "Whether or not the IDE opens as a maximised window",
                           false);
 
-    public static final BooleanProperty INCLUDE_EXTERNALTOOLS = new BooleanProperty(PropertyType.GUI, "includeExternalTools", true, "Include external tools");
     public static final BooleanProperty INCLUDE_INSTANTION =
       new BooleanProperty(PropertyType.GUI, "includeInstantiation", true,
 			  "Enable instantiation and other advanced features");
@@ -306,10 +305,9 @@ public final class Config
                           "Use Waters Analyzer");
 
     // GUI_SIMULATOR
-    public static final BooleanProperty INCLUDE_WATERS_SIMULATOR =
-      new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeWatersSimulator",
-                          true, "Include Waters Simulator");
-    public static final BooleanProperty INCLUDE_ANIMATOR = new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false, "Include 2D Graphical Animator");
+    public static final BooleanProperty INCLUDE_ANIMATOR =
+      new BooleanProperty(PropertyType.GUI_SIMULATOR, "includeAnimator", false,
+                          "Include 2D Graphical Animator");
     public static final BooleanProperty SIMULATION_IS_EXTERNAL = new BooleanProperty(PropertyType.GUI_SIMULATOR, "simulationIsExternal", false, "External simulation process");
     public static final IntegerProperty SIMULATION_CYCLE_TIME =
       new IntegerProperty(PropertyType.GUI_SIMULATOR, "simulationCycleTime",

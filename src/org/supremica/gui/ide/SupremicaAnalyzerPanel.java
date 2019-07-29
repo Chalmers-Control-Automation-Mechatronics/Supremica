@@ -110,6 +110,9 @@ public class SupremicaAnalyzerPanel
     public void createPanelSpecificMenus(final IDEMenuBar menuBar)
     {
       menuBar.createSupremicaAnalyzeMenu();
+      if (mVisualProject.hasAnimation()) {
+        menuBar.createSupremicaToolsMenu();
+      }
     }
 
 

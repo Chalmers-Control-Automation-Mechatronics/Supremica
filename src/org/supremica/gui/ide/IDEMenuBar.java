@@ -129,6 +129,7 @@ import org.supremica.gui.ide.actions.OpenAction;
 import org.supremica.gui.ide.actions.OpenRASAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
+import org.supremica.gui.simulator.ExternalEventExecuter;
 import org.supremica.properties.Config;
 import org.supremica.properties.Property;
 import org.supremica.properties.SupremicaPropertyChangeEvent;
@@ -445,6 +446,24 @@ public class IDEMenuBar
     }
   }
 
+  public void createEditorToolsMenu()
+  {
+    final Actions actions = getActions();
+    final JMenu menu = new JMenu("Tools");
+    menu.setMnemonic(KeyEvent.VK_T);
+    final Action layout = actions.getAction(GraphLayoutAction.class);
+    menu.add(layout);
+    addProperty(Config.INCLUDE_INSTANTION);
+    if (Config.INCLUDE_INSTANTION.isTrue()) {
+      final Action instantiation =
+        actions.getAction(InstantiateModuleAction.class);
+      menu.add(instantiation);
+      final Action recompile = actions.getAction(RecompileAction.class);
+      menu.add(recompile);
+    }
+    add(menu);
+  }
+
   public void createSupremicaAnalyzeMenu()
   {
     final Actions actions = getActions();
@@ -478,6 +497,26 @@ public class IDEMenuBar
     menu.add(actions.analyzerRenameAction.getMenuItem());
     menu.add(actions.analyzerSendToEditorAction.getMenuItem());
     add(menu);
+  }
+
+  public void createSupremicaToolsMenu()
+  {
+    addProperty(Config.INCLUDE_ANIMATOR);
+    if (Config.INCLUDE_ANIMATOR.isTrue()) {
+      final Actions actions = getActions();
+      final JMenu menu = new JMenu("Tools");
+      menu.setMnemonic(KeyEvent.VK_T);
+      menu.add(actions.simulatorLaunchAnimatorAction);
+      try {
+        if (ExternalEventExecuter.isLibraryLoadable()) {
+          menu.add(actions.simulatorLaunchSimulatorAction);
+        }
+      } catch (final UnsatisfiedLinkError | NoClassDefFoundError error) {
+        // skip
+      }
+      menu.add(actions.simulatorClearSimulationData);
+      add(menu);
+    }
   }
 
   public void createWatersAnalyzeMenu()
@@ -601,38 +640,6 @@ public class IDEMenuBar
     add(menu);
   }
 
-  private void createToolsMenu()
-  {
-    final Actions actions = getActions();
-    final JMenu menu = new JMenu("Tools");
-    final MainPanel panel = getActivePanel();
-    if (panel != null && panel instanceof EditorPanel) {
-      final Action layout = actions.getAction(GraphLayoutAction.class);
-      menu.add(layout);
-      final Action instantiation =
-        actions.getAction(InstantiateModuleAction.class);
-      menu.add(instantiation);
-      final Action recompile = actions.getAction(RecompileAction.class);
-      menu.add(recompile);
-    }
-    addProperty(Config.INCLUDE_EXTERNALTOOLS);
-    if (Config.INCLUDE_EXTERNALTOOLS.isTrue()) {
-      addProperty(Config.INCLUDE_ANIMATOR);
-      if (Config.INCLUDE_ANIMATOR.isTrue()) {
-        if (menu.getMenuComponentCount() > 0) {
-          menu.addSeparator();
-        }
-        menu.add(actions.simulatorLaunchAnimatorAction);
-        menu.add(actions.simulatorLaunchSimulatorAction);
-        menu.add(actions.simulatorClearSimulationData);
-      }
-    }
-    if (menu.getMenuComponentCount() > 0) {
-      menu.setMnemonic(KeyEvent.VK_T);
-      add(menu);
-    }
-  }
-
   private void createExamplesMenu()
   {
     final Actions actions = getActions();
@@ -754,7 +761,6 @@ public class IDEMenuBar
     if (panel != null) {
       panel.createPanelSpecificMenus(this);
     }
-    createToolsMenu();
     createExamplesMenu();
     createModulesMenu();
     createConfigureMenu();

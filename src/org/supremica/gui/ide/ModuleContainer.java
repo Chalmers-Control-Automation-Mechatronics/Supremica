@@ -112,13 +112,7 @@ public class ModuleContainer
     mEditorPanel = new EditorPanel(this, "Editor");
     mSimulatorPanel = new SimulatorPanel(this, "Simulator");
     mTabPanel.add(mEditorPanel);
-    mSimulatorPropertyChangeListener =
-      new SimulatorPropertyChangeListener();
-    Config.INCLUDE_WATERS_SIMULATOR.addPropertyChangeListener
-      (mSimulatorPropertyChangeListener);
-    if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
-      mTabPanel.add(mSimulatorPanel);
-    }
+    mTabPanel.add(mSimulatorPanel);
     mWatersAnalyzerPropertyChangeListener =
       new WatersAnalyzerPropertyChangeListener();
     Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
@@ -183,8 +177,6 @@ public class ModuleContainer
   public void close()
   {
     mEditorPanel.close();
-    Config.INCLUDE_WATERS_SIMULATOR.removePropertyChangeListener
-      (mSimulatorPropertyChangeListener);
     Config.INCLUDE_WATERS_ANALYZER.removePropertyChangeListener
       (mWatersAnalyzerPropertyChangeListener);
     mBackgroundCompiler.terminate();
@@ -538,24 +530,6 @@ public class ModuleContainer
 
 
   //#########################################################################
-  //# Inner Class SimulatorPropertyChangeListener
-  private class SimulatorPropertyChangeListener
-      implements SupremicaPropertyChangeListener
-  {
-
-    @Override
-    public void propertyChanged(final SupremicaPropertyChangeEvent event)
-    {
-      if (Config.INCLUDE_WATERS_SIMULATOR.isTrue()) {
-        mTabPanel.add(mSimulatorPanel, 1);
-      } else {
-        mTabPanel.remove(mSimulatorPanel);
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Inner Class WatersAnalyzerPropertyChangeListener
   private class WatersAnalyzerPropertyChangeListener
       implements SupremicaPropertyChangeListener
@@ -726,7 +700,6 @@ public class ModuleContainer
   private final UpdateGraphPanelVisitor mUpdateGraphPanelVisitor =
     new UpdateGraphPanelVisitor();
 
-  private final SupremicaPropertyChangeListener mSimulatorPropertyChangeListener;
   private final SupremicaPropertyChangeListener mWatersAnalyzerPropertyChangeListener;
   private final WatersUndoManager mUndoManager = new WatersUndoManager();
   private int mUndoIndex = 0;

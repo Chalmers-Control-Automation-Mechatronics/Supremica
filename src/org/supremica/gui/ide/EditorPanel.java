@@ -141,6 +141,7 @@ public class EditorPanel
     menuBar.createCreateMenu();
     menuBar.createVerifyMenu();
     menuBar.createEditorAnalyzeMenu();
+    menuBar.createEditorToolsMenu();
   }
 
 
