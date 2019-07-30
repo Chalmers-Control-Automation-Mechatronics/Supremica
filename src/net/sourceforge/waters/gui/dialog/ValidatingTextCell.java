@@ -47,6 +47,7 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.ErrorDisplay;
+import net.sourceforge.waters.gui.transfer.Defocusable;
 
 
 /**
@@ -76,6 +77,7 @@ import net.sourceforge.waters.gui.ErrorDisplay;
 
 public abstract class ValidatingTextCell<T>
   extends JFormattedTextField
+  implements Defocusable
 {
 
   //#########################################################################
@@ -112,6 +114,26 @@ public abstract class ValidatingTextCell<T>
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.gui.transfer.Defocusable
+  /**
+   * Checks whether the current cell input is valid.
+   * This method calls the cell's input parser to perform input validation.
+   * @return <CODE>true</CODE> if the cell contents have been found to be
+   *         valid and keyboard focus can be transferred to another
+   *         component.
+   */
+  @Override
+  public boolean shouldYieldFocus()
+  {
+    if (isEnabled()) {
+      return mVerifier.shouldYieldFocus(this);
+    } else {
+      return true;
+    }
+  }
+
+
+  //#########################################################################
   //# Simple Access
   /**
    * Sets whether the cell allows empty input.
@@ -132,25 +154,6 @@ public abstract class ValidatingTextCell<T>
   public boolean isNullAllowed()
   {
     return mNullAllowed;
-  }
-
-
-  //#########################################################################
-  //# Input Verification
-  /**
-   * Checks whether the current cell input is valid.
-   * This method calls the cell's input parser to perform input validation.
-   * @return <CODE>true</CODE> if the cell contents have been found to be
-   *         valid and keyboard focus can be transferred to another
-   *         component.
-   */
-  public boolean shouldYieldFocus()
-  {
-    if (isEnabled()) {
-      return mVerifier.shouldYieldFocus(this);
-    } else {
-      return true;
-    }
   }
 
   /**

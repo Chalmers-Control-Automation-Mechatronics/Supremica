@@ -57,6 +57,7 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -73,6 +74,8 @@ import net.sourceforge.waters.subject.module.ConstantAliasSubject;
 import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -388,9 +391,9 @@ public class ConstantAliasEditorDialog
    */
   private boolean isInputLocked()
   {
-    return
-      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus() ||
-      mExpressionInput.isFocusOwner() && !mExpressionInput.shouldYieldFocus();
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
   private SimpleExpressionSubject makeUnique

@@ -54,6 +54,8 @@ import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
 import net.sourceforge.waters.gui.observer.Subject;
 
+import org.supremica.gui.ide.IDE;
+
 
 /**
  * <P>An auxiliary class to detect which component has the keyboard focus,
@@ -73,6 +75,10 @@ import net.sourceforge.waters.gui.observer.Subject;
  * <LI>Swing components that are subclass of {@link JTextComponent}, in
  *     order and support standard cut, copy, and paste of text.</LI>
  * </UL>
+ *
+ * <P>The focus tracker is initialised on construction of the {@link IDE},
+ * and the application-wide instance can be retrieved by the {@link
+ * IDE#getFocusTracker() getFocusTracker()} method.</P>
  *
  * @author Robi Malik
  */
@@ -253,6 +259,34 @@ public class FocusTracker
           component.requestFocusInWindow();
         }
       });
+    }
+  }
+
+  /**
+   * Checks whether it is safe to commit the currently edited text field
+   * in the given frame. If this method returns <CODE>false</CODE>, the text
+   * field that owns the keyboard focus cannot commit its contents, and
+   * shifting the focus to another component is to be avoided. In this case,
+   * the method may have displayed an error message as side effect.
+   * @param  frame  The component (usually a dialog) trying to commit its
+   *                contents.
+   * @return <CODE>false</CODE> if the component currently owning the keyboard
+   *         focus is a descendant of <CODE>frame</CODE> and is a {@link
+   *         JTextComponent} that implements the {@link Defocusable} interface,
+   *         and its {@link Defocusable#shouldYieldFocus() shouldYieldFocus()}
+   *         method has returned <CODE>false</CODE>;
+   *         <CODE>true</CODE> otherwise.
+   */
+  public boolean shouldYieldFocus(final Component frame)
+  {
+    if (mSwingSelectionOwner == null) {
+      return true;
+    } else if (mSwingSelectionOwner instanceof Defocusable &&
+               SwingUtilities.isDescendingFrom(mSwingSelectionOwner, frame)) {
+      final Defocusable defocusable = (Defocusable) mSwingSelectionOwner;
+      return defocusable.shouldYieldFocus();
+    } else {
+      return true;
     }
   }
 

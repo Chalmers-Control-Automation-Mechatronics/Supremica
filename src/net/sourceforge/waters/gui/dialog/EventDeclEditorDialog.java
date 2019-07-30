@@ -216,7 +216,7 @@ public class EventDeclEditorDialog
   {
     final EventDeclSubject template =
       mEventDecl == null ? TEMPLATE : mEventDecl;
-    ActionListener commithandler = null;
+    ActionListener commitHandler = null;
     if (mNamePanel == null) {
       // Initialising for the first time. Everything needs to be done.
       // Name panel, basic part ...
@@ -226,7 +226,7 @@ public class EventDeclEditorDialog
       final FormattedInputHandler<SimpleIdentifierProxy> parser =
         new EventNameInputHandler();
       mNameInput = new SimpleExpressionInputCell(template.getIdentifier(), parser);
-      commithandler = new ActionListener() {
+      commitHandler = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent event)
           {
@@ -234,7 +234,7 @@ public class EventDeclEditorDialog
             fireActionPerformed(event);
           }
         };
-      mNameInput.addActionListener(commithandler);
+      mNameInput.addActionListener(commitHandler);
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
       mControllableButton =
@@ -279,7 +279,7 @@ public class EventDeclEditorDialog
       mButtonsPanel = new JPanel();
       final JButton okButton = new JButton("OK");
       okButton.setRequestFocusEnabled(false);
-      okButton.addActionListener(commithandler);
+      okButton.addActionListener(commitHandler);
       mButtonsPanel.add(okButton);
       final Action cancelAction = DialogCancelAction.getInstance();
       final JButton cancelButton = new JButton(cancelAction);

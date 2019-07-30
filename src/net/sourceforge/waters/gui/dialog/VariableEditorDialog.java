@@ -87,6 +87,7 @@ import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -111,6 +112,8 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 import net.sourceforge.waters.subject.module.VariableComponentSubject;
 import net.sourceforge.waters.subject.module.VariableMarkingSubject;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -710,20 +713,18 @@ public class VariableEditorDialog
   //#########################################################################
   //# Auxiliary Methods
   /**
-   * Checks whether it is unsafe the current input to commit the currently
-   * edited text field. If this method returns <CODE>true</CODE>, it is
-   * unsafe to commit the current dialog contents, and shifting the focus
-   * is to be avoided.
+   * Checks whether it is unsafe to commit the currently edited text field.
+   * If this method returns <CODE>true</CODE>, it is unsafe to commit the
+   * current dialog contents, and shifting the focus is to be avoided.
    * @return <CODE>true</CODE> if the component currently owning the focus
    *         is to be parsed and has been found to contain invalid information,
    *         <CODE>false</CODE> otherwise.
    */
   private boolean isInputLocked()
   {
-    return
-      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus() ||
-      mTypeInput.isFocusOwner() && !mTypeInput.shouldYieldFocus() ||
-      mInitialInput.isFocusOwner() && !mInitialInput.shouldYieldFocus();
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
 

@@ -31,66 +31,22 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.marshaller;
-
-import java.io.File;
-import java.io.IOException;
-
-import javax.swing.filechooser.FileFilter;
-
-import net.sourceforge.waters.model.base.DocumentProxy;
-
+package net.sourceforge.waters.gui.transfer;
 
 /**
- * <P>
- * The basic marshaller interface.
- * </P>
- *
- * <P>
- * The ProxyMarshaller provides the basic means for the {@link DocumentManager}
- * to marshal, i.e., save documents in various file formats.
- * </P>
- *
  * @author Robi Malik
  */
 
-public interface ProxyMarshaller<D extends DocumentProxy>
+public interface Defocusable
 {
-
-  // #########################################################################
-  // # Access Methods
   /**
-   * Writes a document to a file.
-   *
-   * @param filename
-   *          The name of the file to be written.
-   * @param docproxy
-   *          The document to be written.
-   * @throws WatersMarshalException
-   *           to indicate a failure while writing the data structures.
-   * @throws IOException
-   *           to indicate that the output file could not be opened or written.
+   * Checks whether this component has valid input and is ready to yield
+   * focus. This method typically call parsers. It may have side effects
+   * to display error messages.
+   * @return <CODE>true</CODE> if the cell contents have been found to be
+   *         valid and keyboard focus can be transferred to another
+   *         component.
    */
-  public void marshal(final D docproxy, final File filename)
-      throws WatersMarshalException, IOException;
-
-  // #########################################################################
-  // # Type Information
-  /**
-   * Gets the class of documents handled by this marshaller.
-   */
-  public Class<D> getDocumentClass();
-
-  /**
-   * Gets a default extension for the files written by this marshaller.
-   */
-  public String getDefaultExtension();
-
-  /**
-   * Gets a file filter that accepts the files with default extension.
-   * Only one file filter is created, and this method ensures that the same
-   * object is returned by each call.
-   */
-  public FileFilter getDefaultFileFilter();
+  public boolean shouldYieldFocus();
 
 }
