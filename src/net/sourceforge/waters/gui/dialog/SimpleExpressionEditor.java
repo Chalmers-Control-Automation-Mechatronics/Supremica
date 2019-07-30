@@ -56,8 +56,8 @@ public class SimpleExpressionEditor
   public SimpleExpressionEditor(final int mask,
                                 final ExpressionParser parser)
   {
-    super(new SimpleExpressionCell(mask, parser));
-    final SimpleExpressionCell cell = getComponent();
+    super(new SimpleExpressionInputCell(mask, parser));
+    final SimpleExpressionInputCell cell = getComponent();
     cell.addFocusListener(this);
   }
 
@@ -66,8 +66,8 @@ public class SimpleExpressionEditor
                                 final ExpressionParser parser,
                                 final ErrorDisplay display)
   {
-    super(new SimpleExpressionCell(mask, parser));
-    final SimpleExpressionCell cell = getComponent();
+    super(new SimpleExpressionInputCell(mask, parser));
+    final SimpleExpressionInputCell cell = getComponent();
     cell.setErrorDisplay(display);
     cell.addFocusListener(this);
   }
@@ -77,31 +77,31 @@ public class SimpleExpressionEditor
   //# Simple Access
   public void setAllowNull(final boolean allow)
   {
-    final SimpleExpressionCell cell = getComponent();
-    cell.setAllowNull(allow);
+    final SimpleExpressionInputCell cell = getComponent();
+    cell.setNullAllowed(allow);
   }
 
   public void setToolTipText(final String tooltip)
   {
-    final SimpleExpressionCell cell = getComponent();
+    final SimpleExpressionInputCell cell = getComponent();
     cell.setToolTipText(tooltip);
   }
 
   public void addFocusListener(final FocusListener listener)
   {
-    final SimpleExpressionCell cell = getComponent();
+    final SimpleExpressionInputCell cell = getComponent();
     cell.addFocusListener(listener);
   }
 
 
   //#########################################################################
   //# Overrides for base class javax.swing.DefaultCellEditor
-  public SimpleExpressionCell getTableCellEditorComponent
+  public SimpleExpressionInputCell getTableCellEditorComponent
     (final JTable table, final Object value, final boolean isSelected,
      final int row, final int column)
   {
-    final SimpleExpressionCell textfield =
-      (SimpleExpressionCell) super.getTableCellEditorComponent
+    final SimpleExpressionInputCell textfield =
+      (SimpleExpressionInputCell) super.getTableCellEditorComponent
         (table, value, isSelected, row, column);
     textfield.setValue(value);
     return textfield;
@@ -109,19 +109,19 @@ public class SimpleExpressionEditor
 
   public Object getCellEditorValue()
   {
-    final SimpleExpressionCell textfield = getComponent();
+    final SimpleExpressionInputCell textfield = getComponent();
     return textfield.getValue();
   }
 
   public boolean stopCellEditing()
   {
-    final SimpleExpressionCell textfield = getComponent();
+    final SimpleExpressionInputCell textfield = getComponent();
     return textfield.shouldYieldFocus() && super.stopCellEditing();
   }
 
-  public SimpleExpressionCell getComponent()
+  public SimpleExpressionInputCell getComponent()
   {
-    return (SimpleExpressionCell) super.getComponent();
+    return (SimpleExpressionInputCell) super.getComponent();
   }
 
 
@@ -146,7 +146,7 @@ public class SimpleExpressionEditor
       if (!stopCellEditing()) {
         cancelCellEditing();
       }
-      final SimpleExpressionCell textfield = getComponent();
+      final SimpleExpressionInputCell textfield = getComponent();
       textfield.clearErrorMessage();
     }
   }

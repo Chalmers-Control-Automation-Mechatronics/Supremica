@@ -33,67 +33,65 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import javax.swing.text.DocumentFilter;
+
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
-/**
- * An input parser for automaton names, for use with a
- * {@link javax.swing.JFormattedTextField JFormattedTextField}. This parser
- * allows entry of structured identifiers, and checks in addition whether an
- * entered name is already used by a component in a given module context.
- *
- * @see SimpleExpressionInputCell
- * @author Robi Malik
- */
-
-public class AutomatonNameInputParser extends IdentifierInputHandler
+public abstract class AbstractSimpleExpressionInputHandler
+  <E extends SimpleExpressionProxy>
+  implements FormattedInputHandler<E>
 {
 
-
   //#########################################################################
-  //# Constructor
-  public AutomatonNameInputParser(final IdentifierProxy oldname,
-                           final WatersAnalyzerPanel panel,
-                           final ExpressionParser parser,
-                           final boolean nameChange)
+  //# Constructors
+  protected AbstractSimpleExpressionInputHandler(final int mask,
+                                                 final ExpressionParser parser)
   {
-    super(oldname, parser);
-    mModel = panel.getAutomataTableModel();
-    mNameChange = nameChange;
+    mParser = parser;
+    mTypeMask = mask;
+    mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.FormattedInputParser
+  //# Interface net.sourceforge.waters.gui.FormattedInputHandler<E>
   @Override
-  public IdentifierProxy parse(final String text)
+  public String format(final Object value)
+  {
+    if (value == null) {
+      return "";
+    } else {
+      return value.toString();
+    }
+  }
+
+  @Override
+  public DocumentFilter getDocumentFilter()
+  {
+    return mDocumentFilter;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  protected SimpleExpressionProxy callParser(final String text)
     throws java.text.ParseException
   {
     try {
-      final IdentifierProxy ident = super.parse(text);
-      if (!mNameChange) {
-        mModel.checkNewAutomatonName(ident);
-      } else {
-        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-        if (!eq.equals(getOldIdentifier(), ident)) {
-          mModel.checkNewAutomatonName(ident);
-        }
-      }
-      return ident;
+      return mParser.parse(text, mTypeMask);
     } catch (final ParseException exception) {
       throw exception.getJavaException();
     }
   }
 
 
-  //#######################################################################
+  //#########################################################################
   //# Data Members
-  private final AutomataTableModel mModel;
-  private final boolean mNameChange;
+  private final ExpressionParser mParser;
+  private final int mTypeMask;
+  private final DocumentFilter mDocumentFilter;
 
 }

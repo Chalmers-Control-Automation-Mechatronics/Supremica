@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.dialog;
 
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 
 import javax.swing.Action;
 import javax.swing.InputVerifier;
@@ -46,139 +47,72 @@ import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.ErrorDisplay;
-import net.sourceforge.waters.gui.ModuleWindowInterface;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
- * <P>A text field to enter simple expressions.</P>
+ * <P>A text field with support for validation and error display.</P>
  *
- * <P>A SimpleExpressionCell allows the user to input text representing
- * a Waters simple expression ({@link SimpleExpressionProxy}) of a specific
- * type.</P>
+ * <P>A validating cell allows the user to input text representing
+ * representing an numeric value or other object. The type of object
+ * edited is determined by the type parameter <CODE>T</CODE> of the
+ * class. A {@link FormattedInputHandler} is used to determine how
+ * these objects are converted to and from text.</P>
  *
- * <P>This class provides support for use inside a table or list. An
- * {@link ExpressionParser} is used to validate the input, and error messages
- * from the parser can be sent to a configurable destination. Attempts are
- * made to prevent the entry of characters that are not allowed in an
- * expression of the expected type.</P>
+ * <P>This class provides support for use inside a table or list. A
+ * {@link FormattedInputHandler} is used to validate and format the input, and
+ * error messages from the parsing process can be sent to a configurable
+ * destination. Through the {@link FormattedInputHandler}, it is also
+ * possible to restrict the allowed characters in the text field.</P>
+ *
+ * <P>This class is implemented as a subclass of Swing's {@link
+ * JFormattedTextField}. Thanks to the {@link FormattedInputHandler}, it is
+ * no longer necessary to implement the {@link InputVerifier}, {@link
+ * javax.swing.JFormattedTextField.AbstractFormatter AbstractFormatter}, and
+ * {@link DocumentFilter} interfaces explicitly. In addition, this class
+ * provides type-safe access.</P>
  *
  * @author Robi Malik
  */
 
-public class SimpleExpressionCell
+public abstract class ValidatingTextCell<T>
   extends JFormattedTextField
 {
 
   //#########################################################################
   //# Constructors
   /**
-   * Creates a cell to enter expressions of an arbitrary type.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
+   * Creates a customised validating cell.
+   * @param  handler    An input handler to validate and format the text input.
+   * @see    FormattedInputHandler
    */
-  public SimpleExpressionCell(final ExpressionParser parser)
+  public ValidatingTextCell(final FormattedInputHandler<? extends T> handler)
   {
-    this(Operator.TYPE_ANY, parser);
-  }
-
-  /**
-   * Creates a cell to enter expressions of a specific type.
-   * @param  mask      Type mask of supported types.
-   *                   It can be defined using the constants in
-   *                   {@link Operator}.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
-   */
-  public SimpleExpressionCell(final int mask,
-                              final ExpressionParser parser)
-  {
-    this(new DefaultInputParser(mask, parser));
-  }
-
-  /**
-   * Creates a cell to enter expressions of an arbitrary type.
-   * @param  expr      The initial value for the text field.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
-   */
-  public SimpleExpressionCell(final SimpleExpressionProxy expr,
-                              final ExpressionParser parser)
-  {
-    this(expr, Operator.TYPE_ANY, parser);
-  }
-
-  /**
-   * Creates a cell to enter expressions of a specific type.
-   * @param  expr      The initial value for the text field.
-   * @param  mask      Type mask of supported types.
-   *                   It can be defined using the constants in
-   *                   {@link Operator}.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
-   */
-  public SimpleExpressionCell(final SimpleExpressionProxy expr,
-                              final int mask,
-                              final ExpressionParser parser)
-  {
-    this(expr, new DefaultInputParser(mask, parser));
-  }
-
-  /**
-   * Creates a customised simple expression cell.
-   * @param  parser    An input parser to validate the text input.
-   *                   By specifying a customised input parser, the user
-   *                   possible to implement type checking beyond the type
-   *                   masks.
-   * @see    SimpleIdentifierInputParser
-   */
-  public SimpleExpressionCell(final FormattedInputParser parser)
-  {
-    this(null, parser);
-  }
-
-  /**
-   * Creates a customised simple expression cell.
-   * @param  expr      The initial value for the text field.
-   * @param  parser    An input parser to validate the text input.
-   *                   By specifying a customised input parser, the user
-   *                   can implement type checking beyond the type masks.
-   * @see    SimpleIdentifierInputParser
-   */
-  public SimpleExpressionCell(final SimpleExpressionProxy expr,
-                              final FormattedInputParser parser)
-  {
-    mParser = parser;
-    mVerifier = new SimpleExpressionVerifier();
+    mInputHandler = handler;
+    mVerifier = new ValidatingCellVerifier();
     final JFormattedTextField.AbstractFormatter formatter =
-      new SimpleExpressionFormatter();
+      new ValidatingCellFormatter();
     final DefaultFormatterFactory factory =
       new DefaultFormatterFactory(formatter);
     setFormatterFactory(factory);
     setInputVerifier(mVerifier);
-    setValue(expr);
+  }
+
+  /**
+   * Creates a customised validating cell.
+   * @param  value      The initial value for the text field.
+   * @param  handler    An input handler to validate and format the text input.
+   * @see    FormattedInputHandler
+   */
+  public ValidatingTextCell(final T value,
+                            final FormattedInputHandler<? extends T> handler)
+  {
+    this(handler);
+    setValue(value);
   }
 
 
   //#########################################################################
   //# Simple Access
-  /**
-   * Gets the cell's currently used input parser.
-   * The input parser is a wrapper around the cell's {@link ExpressionParser}
-   * to perform customised type checking in addition to parsing.
-   */
-  public FormattedInputParser getFormattedInputParser()
-  {
-    return mParser;
-  }
-
   /**
    * Sets whether the cell allows empty input.
    * If allowed, an empty text input is accepted and causes a
@@ -186,9 +120,18 @@ public class SimpleExpressionCell
    * (the default), attempting to commit the cell without input
    * causes an error to be reported.
    */
-  public void setAllowNull(final boolean allow)
+  public void setNullAllowed(final boolean allowed)
   {
-    mAllowNull = allow;
+    mNullAllowed = allowed;
+  }
+
+  /**
+   * Returns whether the cell allows empty input.
+   * @see #setNullAllowed(boolean)
+   */
+  public boolean isNullAllowed()
+  {
+    return mNullAllowed;
   }
 
 
@@ -215,15 +158,15 @@ public class SimpleExpressionCell
    */
   public void revert()
   {
-    final Object oldvalue = getValue();
-    setValue(oldvalue);
+    final Object oldValue = getValue();
+    setValue(oldValue);
   }
 
 
   //#########################################################################
   //# Actions
   /**
-   * Sets a keyboard binding for the &lt;ENTER&gt; key.
+   * Sets a keyboard binding for the &langle;ENTER&rangle; key.
    */
   public void addEnterAction(final Action action)
   {
@@ -231,7 +174,7 @@ public class SimpleExpressionCell
   }
 
   /**
-   * Sets a keyboard binding for the &lt;ESCAPE&gt; key.
+   * Sets a keyboard binding for the &langle;ESCAPE&rangle; key.
    */
   public void addEscapeAction(final Action action)
   {
@@ -317,118 +260,70 @@ public class SimpleExpressionCell
 
 
   //#########################################################################
-  //# Inner Class DefaultInputParser
-  private static class DefaultInputParser
-    extends DocumentFilter
-    implements FormattedInputParser
+  //# Inner Class ValidatingCellFormatter
+  private class ValidatingCellFormatter extends DefaultFormatter
   {
-
     //#######################################################################
     //# Constructors
-    private DefaultInputParser(final int mask, final ExpressionParser parser)
-    {
-      mParser = parser;
-      mTypeMask = mask;
-      mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
-    }
-
-    //#######################################################################
-    //# Interface net.sourceforge.waters.gui.FormattedInputParser
-    @Override
-    public SimpleExpressionProxy parse(final String text)
-      throws ParseException
-    {
-      return mParser.parse(text, mTypeMask);
-    }
-
-    @Override
-    public DocumentFilter getDocumentFilter()
-    {
-      return mDocumentFilter;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final ExpressionParser mParser;
-    private final int mTypeMask;
-    private final DocumentFilter mDocumentFilter;
-
-  }
-
-
-  //#########################################################################
-  //# Inner Class SimpleExpressionFormatter
-  private class SimpleExpressionFormatter extends DefaultFormatter
-  {
-
-    //#######################################################################
-    //# Constructors
-    private SimpleExpressionFormatter()
+    private ValidatingCellFormatter()
     {
       setCommitsOnValidEdit(false);
     }
-
 
     //#######################################################################
     //# Overrides for class javax.swing.text.DefaultFormatter
     @Override
     public Object stringToValue(final String text)
-      throws java.text.ParseException
+      throws ParseException
     {
       if (text.length() != 0) {
         try {
-          final Object value = mParser.parse(text);
+          final Object value = mInputHandler.parse(text);
           clearErrorMessage();
           return value;
-        } catch (final ParseException exception) {
+        } catch (final java.text.ParseException exception) {
           final String msg = exception.getMessage();
           setErrorMessage(msg);
-          final SimpleExpressionProxy oldvalue =
-            (SimpleExpressionProxy) getValue();
-          final String oldtext = valueToString(oldvalue);
-          if (text.equals(oldtext)) {
-            return oldvalue.clone();
+          final Object oldValue = getValue();
+          final String oldText = valueToString(oldValue);
+          if (text.equals(oldText)) {
+            return oldValue;
           } else {
-            throw exception.getJavaException();
+            throw exception;
           }
         }
-      } else if (mAllowNull) {
+      } else if (mNullAllowed) {
         return null;
       } else {
         final String msg = "Empty input!";
         setErrorMessage(msg);
-        throw new java.text.ParseException(msg, 0);
+        throw new ParseException(msg, 0);
       }
     }
 
     @Override
     public String valueToString(final Object value)
     {
-      if (value == null) {
-        return "";
-      } else {
-        return value.toString();
-      }
+      return mInputHandler.format(value);
     }
 
     @Override
     protected DocumentFilter getDocumentFilter()
     {
-      return mParser.getDocumentFilter();
+      return mInputHandler.getDocumentFilter();
     }
 
     //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4485842434559114931L;
   }
 
 
   //#########################################################################
-  //# Inner Class SimpleExpressionVerifier
-  private class SimpleExpressionVerifier
+  //# Inner Class ValidatingCellVerifier
+  private class ValidatingCellVerifier
     extends InputVerifier
   {
-
     //#######################################################################
     //# Overrides for class javax.swing.InputVerifier
     @Override
@@ -441,7 +336,7 @@ public class SimpleExpressionCell
         final String text = textfield.getText();
         formatter.stringToValue(text);
         return true;
-      } catch (final java.text.ParseException exception) {
+      } catch (final ParseException exception) {
         return false;
       }
     }
@@ -449,31 +344,30 @@ public class SimpleExpressionCell
     @Override
     public boolean shouldYieldFocus(final JComponent input)
     {
-      final SimpleExpressionCell textfield = (SimpleExpressionCell) input;
+      final JFormattedTextField textfield = (JFormattedTextField) input;
       try {
         textfield.commitEdit();
         return true;
-      } catch (final java.text.ParseException exception) {
+      } catch (final ParseException exception) {
         final int pos = exception.getErrorOffset();
         textfield.setCaretPosition(pos);
         return false;
       }
     }
-
   }
 
 
   //#########################################################################
   //# Data Members
-  private final FormattedInputParser mParser;
-  private final SimpleExpressionVerifier mVerifier;
+  private final FormattedInputHandler<? extends T> mInputHandler;
+  private final ValidatingCellVerifier mVerifier;
 
-  private boolean mAllowNull;
+  private boolean mNullAllowed;
   private ErrorDisplay mErrorDisplay;
 
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 22908014877081408L;
 
 }

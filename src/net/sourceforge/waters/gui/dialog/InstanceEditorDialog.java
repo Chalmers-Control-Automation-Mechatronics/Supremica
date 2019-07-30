@@ -149,6 +149,7 @@ public class InstanceEditorDialog extends JDialog
     }
 
     final ActionListener commithandler = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         commitDialog();
@@ -160,9 +161,9 @@ public class InstanceEditorDialog extends JDialog
     mNameLabel = new JLabel("Name: ");
     final IdentifierProxy oldname = template.getIdentifier();
     final ModuleContext context = mRoot.getModuleContext();
-    final FormattedInputParser nameparser =
+    final FormattedInputHandler<IdentifierProxy> nameParser =
       new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionCell(oldname, nameparser);
+    mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter the name");
 
@@ -182,6 +183,7 @@ public class InstanceEditorDialog extends JDialog
 
     mFileChooserButton = new JButton(" ... ");
     mFileChooserButton.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         chooseFile();
@@ -203,6 +205,7 @@ public class InstanceEditorDialog extends JDialog
 
     final Action pressOK = new AbstractAction() {
       private static final long serialVersionUID = 1L;
+      @Override
       public void actionPerformed(final ActionEvent e)
       {
         mOkButton.doClick();
@@ -216,6 +219,7 @@ public class InstanceEditorDialog extends JDialog
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent event)
       {
         dispose();
@@ -448,6 +452,7 @@ public class InstanceEditorDialog extends JDialog
 
     //#######################################################################
     //# Overrides for class javax.swing.InputVerifier
+    @Override
     public boolean verify(final JComponent input)
     {
       final ModuleSubject module = mRoot.getModuleSubject();
@@ -494,6 +499,7 @@ public class InstanceEditorDialog extends JDialog
       }
     }
 
+    @Override
     public boolean shouldYieldFocus(final JComponent input)
     {
       mNameInput.clearErrorMessage();
@@ -510,6 +516,7 @@ public class InstanceEditorDialog extends JDialog
   //# Inner Class ModuleFileFilter
   private class ModuleFileFilter extends FileFilter{
 
+    @Override
     public boolean accept(final File file)
     {
       final ModuleSubject module = mRoot.getModuleSubject();
@@ -525,6 +532,7 @@ public class InstanceEditorDialog extends JDialog
       return true;
     }
 
+    @Override
     public String getDescription()
     {
       return "Waters Module Files [*.wmod]";
@@ -536,7 +544,7 @@ public class InstanceEditorDialog extends JDialog
   //# Data Members
   private final ModuleWindowInterface mRoot;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mModuleLabel;
   private JFormattedTextField mModuleInput;
   private JButton mFileChooserButton;

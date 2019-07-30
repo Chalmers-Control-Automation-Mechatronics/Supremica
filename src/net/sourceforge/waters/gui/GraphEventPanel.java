@@ -79,7 +79,7 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.ReplaceCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
+import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionEditor;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
@@ -683,8 +683,8 @@ public class GraphEventPanel
   public void createEvent()
   {
     if (isEditing()) {
-      final SimpleExpressionCell comp =
-        (SimpleExpressionCell) getEditorComponent();
+      final SimpleExpressionInputCell comp =
+        (SimpleExpressionInputCell) getEditorComponent();
       try {
         comp.commitEdit();
         if (comp.getValue() == null) {
@@ -722,8 +722,8 @@ public class GraphEventPanel
     if (row < 0) {
       return;
     } else if (isEditing()) {
-      final SimpleExpressionCell comp =
-        (SimpleExpressionCell) getEditorComponent();
+      final SimpleExpressionInputCell comp =
+        (SimpleExpressionInputCell) getEditorComponent();
       try {
         comp.commitEdit();
         if (comp.getValue() == null) {

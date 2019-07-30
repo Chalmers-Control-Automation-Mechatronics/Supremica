@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.dialog;
 
+import java.text.ParseException;
+
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -40,7 +42,6 @@ import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.subject.base.IndexedListSubject;
@@ -58,7 +59,8 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
  * @author Carly Hona
  */
 
-public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
+public class ParameterBindingEditorDialog
+  extends AbstractBindingEditorDialog<SimpleIdentifierProxy>
 {
 
   //#########################################################################
@@ -143,8 +145,9 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  FormattedInputParser createInputParser(final IdentifierProxy oldIdent,
-                                         final ExpressionParser parser)
+  FormattedInputHandler<SimpleIdentifierProxy>
+  createInputParser(final IdentifierProxy oldIdent,
+                    final ExpressionParser parser)
   {
     final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldIdent;
     return new ParameterBindingInputParser(simple, parser);
@@ -203,7 +206,7 @@ public class ParameterBindingEditorDialog extends AbstractBindingEditorDialog
   //#########################################################################
   //# Inner Class ParameterBindingInputParser
   private class ParameterBindingInputParser
-  extends SimpleIdentifierInputParser
+  extends SimpleIdentifierInputHandler
   {
     //#######################################################################
     //# Constructor

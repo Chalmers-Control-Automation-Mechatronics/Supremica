@@ -81,7 +81,8 @@ import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
  * @author Carly Hona
  */
 
-public abstract class AbstractBindingEditorDialog extends JDialog
+public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
+  extends JDialog
 {
 
   //#########################################################################
@@ -122,8 +123,8 @@ public abstract class AbstractBindingEditorDialog extends JDialog
                                               ExpressionSubject exp);
   abstract ExpressionSubject getExpression();
   abstract ExpressionSubject getExpression(ProxySubject template);
-  abstract FormattedInputParser createInputParser(IdentifierProxy ident,
-                                                  ExpressionParser parser);
+  abstract FormattedInputHandler<I>
+    createInputParser(IdentifierProxy ident, ExpressionParser parser);
   abstract IdentifierSubject getProxyIdentifier();
   abstract IdentifierSubject getProxyIdentifier(ProxySubject template);
   abstract int getOperatorMask();
@@ -172,8 +173,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     final IdentifierSubject oldIdent = getProxyIdentifier(template);
-    final FormattedInputParser nameparser = createInputParser(oldIdent, parser);
-    mNameInput = new SimpleExpressionCell(oldIdent, nameparser);
+    final FormattedInputHandler<I>
+      nameParser = createInputParser(oldIdent, parser);
+    mNameInput = new SimpleExpressionInputCell(oldIdent, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter the name");
     mExpressionLabel = new JLabel("Expression:");
@@ -183,10 +185,10 @@ public abstract class AbstractBindingEditorDialog extends JDialog
       oldexp = (SimpleExpressionProxy) getExpression();
     }
     mExpressionInput =
-      new SimpleExpressionCell(oldexp, getOperatorMask(), parser);
+      new SimpleExpressionInputCell(oldexp, getOperatorMask(), parser);
     mExpressionInput.addActionListener(commithandler);
     mExpressionInput.setToolTipText("Enter the expression");
-    mExpressionInput.setAllowNull(false);
+    mExpressionInput.setNullAllowed(false);
 
     final ExpressionProxy exp = getExpression(template);
     mIsSimpleExpCheckBox = new JCheckBox("Use Simple Expression");
@@ -422,9 +424,9 @@ public abstract class AbstractBindingEditorDialog extends JDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mExpressionLabel;
-  private SimpleExpressionCell mExpressionInput;
+  private SimpleExpressionInputCell mExpressionInput;
   private JCheckBox mIsSimpleExpCheckBox;
 
   private JPanel mErrorPanel;

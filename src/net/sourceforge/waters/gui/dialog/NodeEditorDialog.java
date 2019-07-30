@@ -41,6 +41,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,7 +61,6 @@ import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.ModuleProxyCloner;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -150,7 +150,7 @@ public class NodeEditorDialog
     mNameLabel = new JLabel("Name:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject subject = new SimpleIdentifierSubject(oldname);
-    mNameInput = new SimpleExpressionCell(subject,  new NodeNameInputParser(subject));
+    mNameInput = new SimpleExpressionInputCell(subject,  new NodeNameInputParser(subject));
 
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
@@ -386,7 +386,7 @@ public class NodeEditorDialog
   //#########################################################################
   //# Inner Class StateNameInputParser
   private class NodeNameInputParser
-    extends SimpleIdentifierInputParser
+    extends SimpleIdentifierInputHandler
   {
 
     //#######################################################################
@@ -399,7 +399,7 @@ public class NodeEditorDialog
     //#######################################################################
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
     @Override
-    public SimpleIdentifierProxy parse(final String text) throws net.sourceforge.waters.model.expr.ParseException
+    public SimpleIdentifierProxy parse(final String text) throws ParseException
     {
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
@@ -407,7 +407,7 @@ public class NodeEditorDialog
         final GraphSubject graph = mModuleContainer.getActiveComponentEditorPanel().getGraphEditorPanel().getGraph();
         if (graph.getNodesModifiable().containsName(text)) {
           throw new ParseException
-          ("Node name '" + text + "' is already taken!", 0);
+            ("Node name '" + text + "' is already taken!", 0);
         }
       }
       return ident;
@@ -425,7 +425,7 @@ public class NodeEditorDialog
   private JPanel mMainPanel;
   private JLabel mNameLabel;
   private PropositionsPanel mPropostionsPanel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;

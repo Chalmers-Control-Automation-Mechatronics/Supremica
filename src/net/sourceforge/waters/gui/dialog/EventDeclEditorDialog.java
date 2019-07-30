@@ -78,9 +78,6 @@ import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -100,7 +97,6 @@ import net.sourceforge.waters.gui.util.PropositionIcon;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ExpressionScanner;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -227,8 +223,9 @@ public class EventDeclEditorDialog
       final boolean advanced = Config.INCLUDE_INSTANTION.isTrue();
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
-      final FormattedInputParser parser = new EventNameInputParser();
-      mNameInput = new SimpleExpressionCell(template.getIdentifier(), parser);
+      final FormattedInputHandler<SimpleIdentifierProxy> parser =
+        new EventNameInputHandler();
+      mNameInput = new SimpleExpressionInputCell(template.getIdentifier(), parser);
       commithandler = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent event)
@@ -719,7 +716,7 @@ public class EventDeclEditorDialog
     } else if (mIndexTable != null && mIndexTable.isEditing()) {
       final SimpleExpressionEditor editor =
         (SimpleExpressionEditor) mIndexTable.getCellEditor();
-      final SimpleExpressionCell cell = editor.getComponent();
+      final SimpleExpressionInputCell cell = editor.getComponent();
       return !cell.shouldYieldFocus();
     } else {
       return false;
@@ -744,9 +741,9 @@ public class EventDeclEditorDialog
         @Override
         public void run()
         {
-          mIsFilterEnabled = false;
+          mFilterEnabled = false;
           mNameInput.setText(name);
-          mIsFilterEnabled = true;
+          mFilterEnabled = true;
           mNameInput.setCaretPosition(pos);
         }
       };
@@ -1169,97 +1166,51 @@ public class EventDeclEditorDialog
 
 
   //#########################################################################
-  //# Local Class EventNameInputParser
-  private class EventNameInputParser
-    extends DocumentFilter
-    implements FormattedInputParser
+  //# Inner Class EventNameInputHandler
+  private class EventNameInputHandler
+    extends SimpleIdentifierInputHandler
   {
+    //#######################################################################
+    //# Constructor
+    private EventNameInputHandler()
+    {
+      super(mEventDecl == null ? "" : mEventDecl.getName(),
+            getExpressionParser());
+    }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    //# Interface
+    //# net.sourceforge.waters.gui.FormattedInputHandler<SimpleIdentifierProxy>
     @Override
     public SimpleIdentifierProxy parse(final String text)
-      throws ParseException
+      throws java.text.ParseException
     {
-      final ExpressionParser parser = getExpressionParser();
-      final SimpleIdentifierProxy ident = parser.parseSimpleIdentifier(text);
-      final String newname = ident.getName();
-      final String oldname = mEventDecl == null ? "" : mEventDecl.getName();
-      if (!newname.equals(oldname)) {
-        mModuleContext.checkNewEventName(newname);
-      }
-      return ident;
-    }
-
-    @Override
-    public DocumentFilter getDocumentFilter()
-    {
-      return this;
-    }
-
-
-    //#######################################################################
-    //# Overrides for class javax.swing.DocumentFilter
-    @Override
-    public void insertString(final DocumentFilter.FilterBypass bypass,
-                             final int offset,
-                             final String text,
-                             final AttributeSet attribs)
-      throws BadLocationException
-    {
-      final String filtered = filter(text);
-      if (filtered != null) {
-        super.insertString(bypass, offset, filtered, attribs);
-      }
-    }
-
-    @Override
-    public void replace(final DocumentFilter.FilterBypass bypass,
-                        final int offset,
-                        final int length,
-                        final String text,
-                        final AttributeSet attribs)
-      throws BadLocationException
-    {
-      final String filtered = filter(text);
-      if (filtered != null) {
-        super.replace(bypass, offset, length, filtered, attribs);
-      }
-    }
-
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private String filter(final String text)
-    {
-      if (mIsFilterEnabled) {
-        if (text == null) {
-          return null;
-        } else {
-          final int len = text.length();
-          final StringBuilder buffer = new StringBuilder(len);
-          for (int i = 0; i < len; i++) {
-            final char ch = text.charAt(i);
-            if (ExpressionScanner.isIdentifierCharacter(ch)) {
-              buffer.append(ch);
-            }
-          }
-          if (buffer.length() == 0) {
-            return null;
-          } else {
-            return buffer.toString();
-          }
+      try {
+        final SimpleIdentifierProxy ident = super.parse(text);
+        final String newName = ident.getName();
+        final String oldName = getOldName();
+        if (!newName.equals(oldName)) {
+          final ModuleContext context = mRoot.getModuleContext();
+          context.checkNewEventName(newName);
         }
+        return ident;
+      } catch (final ParseException exception) {
+        throw exception.getJavaException();
       }
-      else{
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.gui.dialog.SimpleIdentifierInputHandler
+    @Override
+    protected String filter(final String text)
+    {
+      if (mFilterEnabled) {
+        return super.filter(text);
+      } else {
         return text;
       }
     }
-
-    //#######################################################################
-    //# Data Members
-    private final ModuleContext mModuleContext = mRoot.getModuleContext();
-
   }
 
 
@@ -1425,12 +1376,12 @@ public class EventDeclEditorDialog
   // Dialog state
   private final ModuleWindowInterface mRoot;
   private boolean mDisplayingMoreOptions;
-  private boolean mIsFilterEnabled = true;
+  private boolean mFilterEnabled = true;
 
   // Swing components
   private JPanel mNamePanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
   private IconRadioButton mControllableButton;

@@ -54,7 +54,8 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
  * @author Carly Hona
  */
 
-public class EventAliasEditorDialog extends AbstractBindingEditorDialog
+public class EventAliasEditorDialog
+  extends AbstractBindingEditorDialog<IdentifierProxy>
 {
 
   //#########################################################################
@@ -127,10 +128,11 @@ public class EventAliasEditorDialog extends AbstractBindingEditorDialog
   }
 
   @Override
-  FormattedInputParser createInputParser(final IdentifierProxy oldIdent,
-                                         final ExpressionParser parser)
+  FormattedInputHandler<IdentifierProxy>
+  createInputParser(final IdentifierProxy oldIdent,
+                    final ExpressionParser parser)
   {
-    return new IdentifierInputParser(oldIdent, parser);
+    return new IdentifierInputHandler(oldIdent, parser);
   }
 
   @Override

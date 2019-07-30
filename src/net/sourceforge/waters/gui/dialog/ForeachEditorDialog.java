@@ -165,24 +165,24 @@ public class ForeachEditorDialog
     mVariableLabel = new JLabel("Variable:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputParser nameparser =
-      new SimpleIdentifierInputParser(ident, parser);
-    mVariableInput = new SimpleExpressionCell(ident, nameparser);
+    final SimpleIdentifierInputHandler nameparser =
+      new SimpleIdentifierInputHandler(ident, parser);
+    mVariableInput = new SimpleExpressionInputCell(ident, nameparser);
     mVariableInput.addActionListener(commithandler);
     mVariableInput.setToolTipText("Enter the name of the index variable");
     mRangeLabel = new JLabel("Range:");
     final SimpleExpressionProxy oldrange =
       mForeach == null ? null : template.getRange();
     mRangeInput =
-      new SimpleExpressionCell(oldrange, Operator.TYPE_RANGE, parser);
+      new SimpleExpressionInputCell(oldrange, Operator.TYPE_RANGE, parser);
     mRangeInput.addActionListener(commithandler);
     mRangeInput.setToolTipText
       ("Enter the index range, e.g., 1..10 or [a,b,c]");
     mGuardLabel = new JLabel("Guard:");
     final SimpleExpressionProxy oldguard = template.getGuard();
     mGuardInput =
-      new SimpleExpressionCell(oldguard, Operator.TYPE_BOOLEAN, parser);
-    mGuardInput.setAllowNull(true);
+      new SimpleExpressionInputCell(oldguard, Operator.TYPE_BOOLEAN, parser);
+    mGuardInput.setNullAllowed(true);
     mGuardInput.addActionListener(commithandler);
     mGuardInput.setToolTipText("Optionally enter a Boolean expression");
 
@@ -407,11 +407,11 @@ public class ForeachEditorDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mVariableLabel;
-  private SimpleExpressionCell mVariableInput;
+  private SimpleExpressionInputCell mVariableInput;
   private JLabel mRangeLabel;
-  private SimpleExpressionCell mRangeInput;
+  private SimpleExpressionInputCell mRangeInput;
   private JLabel mGuardLabel;
-  private SimpleExpressionCell mGuardInput;
+  private SimpleExpressionInputCell mGuardInput;
 
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;

@@ -45,26 +45,30 @@ import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
 
 /**
+ * An input handler to support simple identifiers ({@link
+ * SimpleIdentifierProxy}), for use with a {@link SimpleExpressionInputCell}.
+ *
+ * @see SimpleExpressionInputCell
  * @author Robi Malik
  */
 
-public class SimpleIdentifierInputParser
+public class SimpleIdentifierInputHandler
   extends DocumentFilter
-  implements FormattedInputParser
+  implements FormattedInputHandler<SimpleIdentifierProxy>
 {
 
   //#########################################################################
   //# Constructor
-  public SimpleIdentifierInputParser(final SimpleIdentifierProxy oldident,
-                                     final ExpressionParser parser)
+  public SimpleIdentifierInputHandler(final SimpleIdentifierProxy oldident,
+                                      final ExpressionParser parser)
   {
     mOldName = oldident.getName();
     mOldIdentifier = oldident;
     mExpressionParser = parser;
   }
 
-  public SimpleIdentifierInputParser(final String oldname,
-                                     final ExpressionParser parser)
+  public SimpleIdentifierInputHandler(final String oldname,
+                                      final ExpressionParser parser)
   {
     mOldName = oldname;
     mOldIdentifier = new SimpleIdentifierSubject(oldname);
@@ -86,19 +90,37 @@ public class SimpleIdentifierInputParser
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.FormattedInputParser
+  //# Interface
+  //# net.sourceforge.waters.gui.FormattedInputHandler<SimpleIdentifierProxy>
+  @Override
+  public String format(final Object value)
+  {
+    if (value == null) {
+      return "";
+    } else {
+      final SimpleIdentifierProxy ident = (SimpleIdentifierProxy) value;
+      return ident.getName();
+    }
+  }
+
+  @Override
   public SimpleIdentifierProxy parse(final String text)
-    throws ParseException
+    throws java.text.ParseException
   {
     if (!text.equals(mOldName)) {
-      final SimpleIdentifierProxy result =
-        mExpressionParser.parseSimpleIdentifier(text);
-      return result;
+      try {
+        final SimpleIdentifierProxy result =
+          mExpressionParser.parseSimpleIdentifier(text);
+        return result;
+      } catch (final ParseException exception) {
+        throw exception.getJavaException();
+      }
     } else {
       return mOldIdentifier;
     }
   }
 
+  @Override
   public DocumentFilter getDocumentFilter()
   {
     return this;
@@ -107,6 +129,7 @@ public class SimpleIdentifierInputParser
 
   //#########################################################################
   //# Overrides for class javax.swing.DocumentFilter
+  @Override
   public void insertString(final DocumentFilter.FilterBypass bypass,
                            final int offset,
                            final String text,
@@ -119,6 +142,7 @@ public class SimpleIdentifierInputParser
     }
   }
 
+  @Override
   public void replace(final DocumentFilter.FilterBypass bypass,
                       final int offset,
                       final int length,
@@ -135,7 +159,7 @@ public class SimpleIdentifierInputParser
 
   //#########################################################################
   //# Auxiliary Methods
-  private String filter(final String text)
+  protected String filter(final String text)
   {
     if (text == null) {
       return null;
@@ -144,7 +168,7 @@ public class SimpleIdentifierInputParser
       final StringBuilder buffer = new StringBuilder(len);
       for (int i = 0; i < len; i++) {
         final char ch = text.charAt(i);
-        if (ExpressionScanner.isIdentifierCharacter((int) ch)) {
+        if (ExpressionScanner.isIdentifierCharacter(ch)) {
           buffer.append(ch);
         }
       }

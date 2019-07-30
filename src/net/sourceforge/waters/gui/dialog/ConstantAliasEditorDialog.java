@@ -162,18 +162,18 @@ public class ConstantAliasEditorDialog
     mNameLabel = new JLabel("Name:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputParser nameparser =
-      new SimpleIdentifierInputParser(ident, parser);
-    mNameInput = new SimpleExpressionCell(ident, nameparser);
-    mNameInput.setAllowNull(true);
+    final SimpleIdentifierInputHandler nameparser =
+      new SimpleIdentifierInputHandler(ident, parser);
+    mNameInput = new SimpleExpressionInputCell(ident, nameparser);
+    mNameInput.setNullAllowed(true);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Name of constant or parameter");
     mExpressionLabel = new JLabel("Expression:");
     final SimpleExpressionProxy oldexp =
       mAlias == null ? null : (SimpleExpressionProxy)template.getExpression();
     mExpressionInput =
-      new SimpleExpressionCell(oldexp, Operator.TYPE_ANY, parser);
-    mExpressionInput.setAllowNull(true);
+      new SimpleExpressionInputCell(oldexp, Operator.TYPE_ANY, parser);
+    mExpressionInput.setNullAllowed(true);
     mExpressionInput.addActionListener(commithandler);
     mExpressionInput.setToolTipText
       ("Formula for value of constant or default value of parameter");
@@ -423,11 +423,11 @@ public class ConstantAliasEditorDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mExpressionLabel;
   private JCheckBox mIsParameterCheckBox;
   private JCheckBox mIsRequiredCheckBox;
-  private SimpleExpressionCell mExpressionInput;
+  private SimpleExpressionInputCell mExpressionInput;
 
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;

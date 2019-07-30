@@ -169,9 +169,9 @@ public class SimpleComponentEditorDialog
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     final IdentifierProxy oldname = template.getIdentifier();
-    final FormattedInputParser nameparser =
+    final FormattedInputHandler<IdentifierProxy> nameParser =
       new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionCell(oldname, nameparser);
+    mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -474,7 +474,7 @@ public class SimpleComponentEditorDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mDeterministicLabel;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;

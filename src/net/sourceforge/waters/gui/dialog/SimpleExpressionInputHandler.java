@@ -33,17 +33,31 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
-import javax.swing.text.DocumentFilter;
 
-
-/**
- * @author Robi Malik
- */
-
-public interface FormattedInputParser
+public class SimpleExpressionInputHandler
+  extends AbstractSimpleExpressionInputHandler<SimpleExpressionProxy>
 {
-  public Object parse(final String text) throws ParseException;
-  public DocumentFilter getDocumentFilter();
+
+  //#########################################################################
+  //# Constructors
+  public SimpleExpressionInputHandler(final int mask,
+                                      final ExpressionParser parser)
+  {
+    super(mask, parser);
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.gui.FormattedInputHandler<SimpleExpressionProxy>
+  @Override
+  public SimpleExpressionProxy parse(final String text)
+    throws java.text.ParseException
+  {
+    return callParser(text);
+  }
+
 }

@@ -52,6 +52,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +80,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
-import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.EditorColor;
 import net.sourceforge.waters.gui.ModuleContext;
@@ -96,7 +96,6 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.expr.Operator;
-import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -199,25 +198,25 @@ public class VariableEditorDialog
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     final IdentifierProxy oldname = template.getIdentifier();
-    final FormattedInputParser nameparser =
+    final FormattedInputHandler<IdentifierProxy> nameParser =
       new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionCell(oldname, nameparser);
+    mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]. "
                               + "A variable name started by 'clock:' will be "
                               + "treated as clock, i.e., the value of the variable "
                               + "will implicitly be increased at locations.");
-    mNameInput.setAllowNull(false);
+    mNameInput.setNullAllowed(false);
     mTypeLabel = new JLabel("Type:");
-    mTypeInput = new SimpleExpressionCell
+    mTypeInput = new SimpleExpressionInputCell
       (template.getType(), Operator.TYPE_RANGE, parser);
     mTypeInput.addActionListener(commithandler);
     mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or [on,off]");
-    mTypeInput.setAllowNull(false);
+    mTypeInput.setNullAllowed(false);
     mInitialLabel = new JLabel("Initial:");
     mInitialInput = new InitialStatePredicateCell(template);
     mInitialInput.addActionListener(commithandler);
-    mInitialInput.setAllowNull(false);
+    mInitialInput.setNullAllowed(false);
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -763,7 +762,7 @@ public class VariableEditorDialog
    * reflected in a smart tooltip.</P>
    */
   private class InitialStatePredicateCell
-    extends SimpleExpressionCell
+    extends SimpleExpressionInputCell
   {
 
     //#######################################################################
@@ -771,7 +770,7 @@ public class VariableEditorDialog
     private InitialStatePredicateCell(final VariableComponentSubject template)
     {
       super(template.getInitialStatePredicate(),
-            new InitialStateInputParser());
+            new InitialStateInputHandler());
       setToolTipText("");
     }
 
@@ -813,44 +812,25 @@ public class VariableEditorDialog
 
   //#########################################################################
   //# Local Class InitialStateInputParser
-  /**
-   * This parser is needed to support the weird initial state predicate
-   * cell. It changes its behaviour depending on the state of the
-   * deterministic check box.
-   */
-  private class InitialStateInputParser
-    extends DocumentFilter
-    implements FormattedInputParser
+  private class InitialStateInputHandler
+    extends AbstractSimpleExpressionInputHandler<SimpleExpressionProxy>
   {
-
     //#######################################################################
     //# Constructors
-    private InitialStateInputParser()
+    private InitialStateInputHandler()
     {
-      final ExpressionParser parser = mRoot.getExpressionParser();
-      mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
+      super(Operator.TYPE_BOOLEAN, mRoot.getExpressionParser());
     }
 
     //#######################################################################
-    //# Interface net.sourceforge.waters.gui.FormattedInputParser
+    //# Interface
+    //# net.sourceforge.waters.gui.FormattedInputParser<SimpleExpressionProxy>
     @Override
     public SimpleExpressionProxy parse(final String text)
       throws ParseException
     {
-      final ExpressionParser parser = mRoot.getExpressionParser();
-      return parser.parse(text, Operator.TYPE_BOOLEAN);
+      return callParser(text);
     }
-
-    @Override
-    public DocumentFilter getDocumentFilter()
-    {
-      return mDocumentFilter;
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final DocumentFilter mDocumentFilter;
-
   }
 
 
@@ -875,11 +855,11 @@ public class VariableEditorDialog
     //# Overrides for Base Class
     //# net.sourceforge.waters.gui.SimpleExpressionEditor
     @Override
-    public SimpleExpressionCell getTableCellEditorComponent
+    public SimpleExpressionInputCell getTableCellEditorComponent
       (final JTable table, final Object value, final boolean isSelected,
        final int row, final int column)
     {
-      final SimpleExpressionCell cell = super.getTableCellEditorComponent
+      final SimpleExpressionInputCell cell = super.getTableCellEditorComponent
         (table, value, isSelected, row, column);
       final String text = mNameInput.getText();
       final String name = text.length() == 0 ? "x" : text;
@@ -1078,9 +1058,9 @@ public class VariableEditorDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mTypeLabel;
-  private SimpleExpressionCell mTypeInput;
+  private SimpleExpressionInputCell mTypeInput;
   private JLabel mInitialLabel;
   private InitialStatePredicateCell mInitialInput;
 

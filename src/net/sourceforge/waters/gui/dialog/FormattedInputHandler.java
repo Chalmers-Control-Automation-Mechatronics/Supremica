@@ -33,67 +33,48 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
-import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ParseException;
-import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import java.text.ParseException;
+
+import javax.swing.text.DocumentFilter;
 
 
 /**
- * An input parser for automaton names, for use with a
- * {@link javax.swing.JFormattedTextField JFormattedTextField}. This parser
- * allows entry of structured identifiers, and checks in addition whether an
- * entered name is already used by a component in a given module context.
+ * <P>An interface that determines how objects of a type <CODE>T</CODE> can be
+ * converted to and from text.</P>
  *
- * @see SimpleExpressionInputCell
+ * <P>The formatted input handler is used to configure a {@link
+ * ValidatingTextCell} to facilitate the input of structured objects
+ * as text.</P>
+ *
  * @author Robi Malik
  */
 
-public class AutomatonNameInputParser extends IdentifierInputHandler
+public interface FormattedInputHandler<T>
 {
+  /**
+   * Formats the given object as a string.
+   * @param   value  The object to be formatted, which should be of type T.
+   *                 The argument may be <CODE>null</CODE> for text fields
+   *                 that support the <CODE>null</CODE> value, which typically
+   *                 is formatted as an empty string.
+   * @return  A string representation of the object.
+   */
+  public String format(Object value);
 
+  /**
+   * Tries to parse the given text into an object.
+   * @param  text    The text to be parsed. An empty string may be provided
+   *                 to request a <CODE>null</CODE> object for text fields
+   *                 that support it.
+   * @return An object corresponding to the textual input.
+   * @throws ParseException to indicate that the text does not represent
+   *                 a valid object of the handler's type.
+   */
+  public T parse(final String text) throws ParseException;
 
-  //#########################################################################
-  //# Constructor
-  public AutomatonNameInputParser(final IdentifierProxy oldname,
-                           final WatersAnalyzerPanel panel,
-                           final ExpressionParser parser,
-                           final boolean nameChange)
-  {
-    super(oldname, parser);
-    mModel = panel.getAutomataTableModel();
-    mNameChange = nameChange;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.FormattedInputParser
-  @Override
-  public IdentifierProxy parse(final String text)
-    throws java.text.ParseException
-  {
-    try {
-      final IdentifierProxy ident = super.parse(text);
-      if (!mNameChange) {
-        mModel.checkNewAutomatonName(ident);
-      } else {
-        final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
-        if (!eq.equals(getOldIdentifier(), ident)) {
-          mModel.checkNewAutomatonName(ident);
-        }
-      }
-      return ident;
-    } catch (final ParseException exception) {
-      throw exception.getJavaException();
-    }
-  }
-
-
-  //#######################################################################
-  //# Data Members
-  private final AutomataTableModel mModel;
-  private final boolean mNameChange;
-
+  /**
+   * Gets a document filter to restrict the characters entered
+   * into a text field.
+   */
+  public DocumentFilter getDocumentFilter();
 }

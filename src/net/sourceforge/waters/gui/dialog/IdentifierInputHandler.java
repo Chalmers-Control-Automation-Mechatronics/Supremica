@@ -33,38 +33,37 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import javax.swing.text.DocumentFilter;
+import java.text.ParseException;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.expr.ParseException;
+import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
+import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
- * An input parser to support identifiers ({@link IdentifierProxy}), for use
- * with a {@link javax.swing.JFormattedTextField JFormattedTextField}. This
- * parser allows entry of arbitrary structured identifiers. No additional
- * checks are performed.
+ * An input handler to support identifiers ({@link IdentifierProxy}), for use
+ * with a {@link SimpleExpressionInputCell}. This handler allows entry of arbitrary
+ * structured identifiers. No additional checks are performed.
  *
- * @see SimpleExpressionCell
+ * @see SimpleExpressionInputCell
  * @author Robi Malik
  */
 
-public class IdentifierInputParser
-  implements FormattedInputParser
+public class IdentifierInputHandler
+  extends AbstractSimpleExpressionInputHandler<IdentifierProxy>
 {
 
   //#########################################################################
   //# Constructor
-  public IdentifierInputParser(final IdentifierProxy oldIdent,
+  public IdentifierInputHandler(final IdentifierProxy oldIdent,
                                final ExpressionParser parser)
   {
+    super(Operator.TYPE_NAME, parser);
     mOldIdentifier = oldIdent;
     mOldName = oldIdent.toString();
     mEquality = new ModuleEqualityVisitor(true);
-    mExpressionParser = parser;
-    mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
   }
 
 
@@ -77,7 +76,8 @@ public class IdentifierInputParser
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.gui.FormattedInputParser
+  //# Interface
+  //# net.sourceforge.waters.gui.FormattedInputParser<IdentifierProxy>
   @Override
   public IdentifierProxy parse(final String text)
     throws ParseException
@@ -85,17 +85,16 @@ public class IdentifierInputParser
     if (text.equals(mOldName)) {
       return mOldIdentifier;
     }
-    final IdentifierProxy ident = mExpressionParser.parseIdentifier(text);
+    final SimpleExpressionProxy expr = callParser(text);
+    if (!(expr instanceof IdentifierProxy)) {
+      throw new ParseException("The expression '" + text +
+                               "' is not an identifier.", 0);
+    }
+    final IdentifierProxy ident = (IdentifierProxy) expr;
     if (mEquality.equals(mOldIdentifier, ident)) {
       return mOldIdentifier;
     }
     return ident;
-  }
-
-  @Override
-  public DocumentFilter getDocumentFilter()
-  {
-    return mDocumentFilter;
   }
 
 
@@ -104,7 +103,5 @@ public class IdentifierInputParser
   private final IdentifierProxy mOldIdentifier;
   private final String mOldName;
   private final ModuleEqualityVisitor mEquality;
-  private final ExpressionParser mExpressionParser;
-  private final DocumentFilter mDocumentFilter;
 
 }

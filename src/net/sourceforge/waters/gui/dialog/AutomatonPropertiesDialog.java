@@ -130,9 +130,10 @@ public class AutomatonPropertiesDialog extends JDialog
       oldname = factory.createSimpleIdentifierProxy(mAutomaton.getName());
       //exception.printStackTrace();
     }
-    final FormattedInputParser nameparser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, true);
+    final FormattedInputHandler<IdentifierProxy>
+      nameParser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, true);
     mNameInput =
-      new SimpleExpressionCell(oldname, nameparser);
+      new SimpleExpressionInputCell(oldname, nameParser);
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
     mKindLabel = new JLabel("Kind:");
@@ -386,7 +387,7 @@ public class AutomatonPropertiesDialog extends JDialog
   // Swing components
   private JPanel mMainPanel;
   private JLabel mNameLabel;
-  private SimpleExpressionCell mNameInput;
+  private SimpleExpressionInputCell mNameInput;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
   private IconRadioButton mPlantButton;

@@ -91,8 +91,8 @@ import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
 import net.sourceforge.waters.gui.dialog.EdgeEditorDialog;
 import net.sourceforge.waters.gui.dialog.NodeEditorDialog;
-import net.sourceforge.waters.gui.dialog.SimpleExpressionCell;
-import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputParser;
+import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
+import net.sourceforge.waters.gui.dialog.SimpleIdentifierInputHandler;
 import net.sourceforge.waters.gui.editor.ZoomSelector;
 import net.sourceforge.waters.gui.language.ProxyNamer;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
@@ -4896,7 +4896,7 @@ public class GraphEditorPanel
    * change the state name to the new value by pressing &lt;ENTER&gt;.
    */
   private class StateNameInputCell
-    extends SimpleExpressionCell
+    extends SimpleExpressionInputCell
     implements FocusListener
   {
     //#######################################################################
@@ -5035,7 +5035,7 @@ public class GraphEditorPanel
   //#########################################################################
   //# Inner Class StateNameInputParser
   private class StateNameInputParser
-    extends SimpleIdentifierInputParser
+    extends SimpleIdentifierInputHandler
   {
 
     //#######################################################################
@@ -5049,13 +5049,13 @@ public class GraphEditorPanel
     //# Interface net.sourceforge.waters.gui.FormattedInputParser
     @Override
     public SimpleIdentifierProxy parse(final String text)
-      throws ParseException
+      throws java.text.ParseException
     {
       final SimpleIdentifierProxy ident = super.parse(text);
       final String oldname = getOldName();
       if (!text.equals(oldname)) {
         if (getGraph().getNodesModifiable().containsName(text)) {
-          throw new ParseException
+          throw new java.text.ParseException
             ("State name '" + text + "' is already taken!", 0);
         }
       }

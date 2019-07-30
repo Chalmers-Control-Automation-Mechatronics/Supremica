@@ -45,12 +45,12 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  * allows entry of structured identifiers, and checks in addition whether
  * an entered name is already used by a component in a given module context.
  *
- * @see SimpleExpressionCell
+ * @see SimpleExpressionInputCell
  * @author Robi Malik
  */
 
 class ComponentNameInputParser
-  extends IdentifierInputParser
+  extends IdentifierInputHandler
 {
 
   //#########################################################################
@@ -68,11 +68,15 @@ class ComponentNameInputParser
   //# Interface net.sourceforge.waters.gui.FormattedInputParser
   @Override
   public IdentifierProxy parse(final String text)
-    throws ParseException
+    throws java.text.ParseException
   {
     final IdentifierProxy ident = super.parse(text);
     if (ident != getOldIdentifier()) {
-      mModuleContext.checkNewComponentName(ident);
+      try {
+        mModuleContext.checkNewComponentName(ident);
+      } catch (final ParseException exception) {
+        throw exception.getJavaException();
+      }
     }
     return ident;
   }
