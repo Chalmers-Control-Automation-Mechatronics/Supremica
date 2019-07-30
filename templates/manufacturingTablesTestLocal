@@ -1,3 +1,0 @@
-#/bin/sh
-
-java ..\build;..\lib\unjared\; -enableassertions org.supremica.manufacturingTables.management.Main $*
