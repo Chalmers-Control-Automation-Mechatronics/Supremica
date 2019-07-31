@@ -1,4 +1,0 @@
-#/bin/sh
-
-java -cp Supremica.jar:SupremicaLib.jar org.jgrafchart.Basic2GC
-

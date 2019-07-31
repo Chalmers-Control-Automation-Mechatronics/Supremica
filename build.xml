@@ -402,10 +402,6 @@ Class-Path: ${manifest.pathlist}</echo>
     </target>
 
     <target name="-startfiles_local_supremica">
-        <copy file="${templates}/verifyRACLocal.cmd" todir="${dist}"/>
-        <chmod file="${dist}/verifyRACLocal.cmd" perm="644"/>
-        <copy file="${templates}/verifyRAC.cmd" todir="${dist}"/>
-        <chmod file="${dist}/verifyRAC.cmd" perm="644"/>
         <!--
         <copy file="${templates}/IDELocal.cmd" todir="${dist}"/>
         <chmod file="${dist}/IDELocal.cmd" perm="644"/>
@@ -417,15 +413,9 @@ Class-Path: ${manifest.pathlist}</echo>
         <chmod file="${dist}/SupremicaLocalMoreMem.cmd" perm="644"/>
         <copy file="${templates}/SupremicaLocal" todir="${dist}"/>      
         <chmod file="${dist}/SupremicaLocal" perm="755"/>
-        -->
-        <copy file="${templates}/SFCtoSMV.cmd" todir="${dist}"/>        
-        <chmod file="${dist}/SFCtoSMV.cmd" perm="644"/>
-        <!--
         <copy file="${templates}/SupremicaBDD.cmd" todir="${dist}"/>    
         <chmod file="${dist}/SupremicaBDD.cmd" perm="644"/>
--->
-        <copy file="${templates}/RelationExtraction.cmd" todir="${dist}"/>
-        <chmod file="${dist}/RelationExtraction.cmd" perm="644"/>
+        -->
         <copy file="${templates}/waters.bat" todir="${dist}"/>
         <chmod file="${dist}/waters.bat" perm="644"/>
         <copy file="${templates}/waters.vbs" todir="${dist}"/>
@@ -469,12 +459,12 @@ Class-Path: ${manifest.pathlist}</echo>
         -->
     </target>
 	
-	<!-- 
-*       Copies the launch commands, the ST Code Converterand
-*       and the config properties files to /dist
+    <!-- 
+      Copies the launch commands, the ST Code Converter and
+      and the config properties files to /dist
     -->
     <target name="startfiles_tum">
-		<delete file="${dist}/launchSupremica.cmd"/>
+        <delete file="${dist}/launchSupremica.cmd"/>
         <copy file="${templates}/launchSupremica_local.cmd" todir="${dist}"/>
         <chmod file="${dist}/launchSupremica_local.cmd" perm="555"/>
         <copy file="${templates}/launchSupremica_local_MaxMem.cmd" todir="${dist}"/>
