@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.dialog;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+
 import javax.swing.DefaultCellEditor;
 import javax.swing.JTable;
 
@@ -54,9 +55,10 @@ public class SimpleExpressionEditor
   //#########################################################################
   //# Constructors
   public SimpleExpressionEditor(final int mask,
-                                final ExpressionParser parser)
+                                final ExpressionParser parser,
+                                final boolean nullAllowed)
   {
-    super(new SimpleExpressionInputCell(mask, parser));
+    super(new SimpleExpressionInputCell(mask, parser, nullAllowed));
     final SimpleExpressionInputCell cell = getComponent();
     cell.addFocusListener(this);
   }
@@ -64,9 +66,10 @@ public class SimpleExpressionEditor
 
   public SimpleExpressionEditor(final int mask,
                                 final ExpressionParser parser,
+                                final boolean nullAllowed,
                                 final ErrorDisplay display)
   {
-    super(new SimpleExpressionInputCell(mask, parser));
+    super(new SimpleExpressionInputCell(mask, parser, nullAllowed));
     final SimpleExpressionInputCell cell = getComponent();
     cell.setErrorDisplay(display);
     cell.addFocusListener(this);
@@ -75,12 +78,6 @@ public class SimpleExpressionEditor
 
   //#########################################################################
   //# Simple Access
-  public void setAllowNull(final boolean allow)
-  {
-    final SimpleExpressionInputCell cell = getComponent();
-    cell.setNullAllowed(allow);
-  }
-
   public void setToolTipText(final String tooltip)
   {
     final SimpleExpressionInputCell cell = getComponent();
@@ -96,6 +93,7 @@ public class SimpleExpressionEditor
 
   //#########################################################################
   //# Overrides for base class javax.swing.DefaultCellEditor
+  @Override
   public SimpleExpressionInputCell getTableCellEditorComponent
     (final JTable table, final Object value, final boolean isSelected,
      final int row, final int column)
@@ -107,18 +105,21 @@ public class SimpleExpressionEditor
     return textfield;
   }
 
+  @Override
   public Object getCellEditorValue()
   {
     final SimpleExpressionInputCell textfield = getComponent();
     return textfield.getValue();
   }
 
+  @Override
   public boolean stopCellEditing()
   {
     final SimpleExpressionInputCell textfield = getComponent();
     return textfield.shouldYieldFocus() && super.stopCellEditing();
   }
 
+  @Override
   public SimpleExpressionInputCell getComponent()
   {
     return (SimpleExpressionInputCell) super.getComponent();
@@ -130,6 +131,7 @@ public class SimpleExpressionEditor
   /**
    * Does nothing.
    */
+  @Override
   public void focusGained(final FocusEvent event)
   {
   }
@@ -140,6 +142,7 @@ public class SimpleExpressionEditor
    * this handler makes sure that every non-temporary loss of focus
    * causes editing to stop.
    */
+  @Override
   public void focusLost(final FocusEvent event)
   {
     if (!event.isTemporary()) {

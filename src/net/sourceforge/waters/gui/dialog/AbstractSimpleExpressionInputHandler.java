@@ -48,11 +48,13 @@ public abstract class AbstractSimpleExpressionInputHandler
   //#########################################################################
   //# Constructors
   protected AbstractSimpleExpressionInputHandler(final int mask,
-                                                 final ExpressionParser parser)
+                                                 final ExpressionParser parser,
+                                                 final boolean nullAllowed)
   {
     mParser = parser;
     mTypeMask = mask;
     mDocumentFilter = new SimpleExpressionDocumentFilter(parser);
+    mNullAllowed = nullAllowed;
   }
 
 
@@ -80,11 +82,22 @@ public abstract class AbstractSimpleExpressionInputHandler
   protected SimpleExpressionProxy callParser(final String text)
     throws java.text.ParseException
   {
-    try {
-      return mParser.parse(text, mTypeMask);
-    } catch (final ParseException exception) {
-      throw exception.getJavaException();
+    if (text.length() != 0) {
+      try {
+        return mParser.parse(text, mTypeMask);
+      } catch (final ParseException exception) {
+        throw exception.getJavaException();
+      }
+    } else if (mNullAllowed) {
+      return null;
+    } else {
+      throw new java.text.ParseException("Please enter an expression.", 0);
     }
+  }
+
+  protected boolean isNullAllowed()
+  {
+    return mNullAllowed;
   }
 
 
@@ -93,5 +106,6 @@ public abstract class AbstractSimpleExpressionInputHandler
   private final ExpressionParser mParser;
   private final int mTypeMask;
   private final DocumentFilter mDocumentFilter;
+  private final boolean mNullAllowed;
 
 }

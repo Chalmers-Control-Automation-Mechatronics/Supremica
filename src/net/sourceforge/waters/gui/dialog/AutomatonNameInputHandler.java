@@ -51,18 +51,19 @@ import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
  * @author Robi Malik
  */
 
-public class AutomatonNameInputParser extends IdentifierInputHandler
+public class AutomatonNameInputHandler extends IdentifierInputHandler
 {
 
 
   //#########################################################################
   //# Constructor
-  public AutomatonNameInputParser(final IdentifierProxy oldname,
-                           final WatersAnalyzerPanel panel,
-                           final ExpressionParser parser,
-                           final boolean nameChange)
+  public AutomatonNameInputHandler(final IdentifierProxy oldname,
+                                   final WatersAnalyzerPanel panel,
+                                   final ExpressionParser parser,
+                                   final boolean nameChange,
+                                   final boolean nullAllowed)
   {
-    super(oldname, parser);
+    super(oldname, parser, nullAllowed);
     mModel = panel.getAutomataTableModel();
     mNameChange = nameChange;
   }

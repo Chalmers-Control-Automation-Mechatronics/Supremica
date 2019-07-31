@@ -62,7 +62,6 @@ public class IntegerInputCell
                           final int maxValue)
   {
     super(new IntegerInputHandler(minValue, maxValue));
-    setNullAllowed(false);
     setValue(minValue);
   }
 
@@ -81,7 +80,6 @@ public class IntegerInputCell
                           final int nullValue)
   {
     super(new IntegerInputHandler(minValue, maxValue, nullValue));
-    setNullAllowed(true);
     setValue(nullValue);
   }
 

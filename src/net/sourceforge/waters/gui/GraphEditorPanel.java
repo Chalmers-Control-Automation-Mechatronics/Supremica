@@ -5042,7 +5042,9 @@ public class GraphEditorPanel
     //# Constructor
     private StateNameInputParser(final SimpleIdentifierProxy oldident)
     {
-      super(oldident, mRoot.getModuleWindowInterface().getExpressionParser());
+      super(oldident,
+            mRoot.getModuleWindowInterface().getExpressionParser(),
+            false);
     }
 
     //#######################################################################

@@ -131,7 +131,7 @@ public class AutomatonPropertiesDialog extends JDialog
       //exception.printStackTrace();
     }
     final FormattedInputHandler<IdentifierProxy>
-      nameParser = new AutomatonNameInputParser(oldname, mAnalyzerPanel, parser, true);
+      nameParser = new AutomatonNameInputHandler(oldname, mAnalyzerPanel, parser, true, false);  // TODO
     mNameInput =
       new SimpleExpressionInputCell(oldname, nameParser);
     mNameInput.addActionListener(commithandler);

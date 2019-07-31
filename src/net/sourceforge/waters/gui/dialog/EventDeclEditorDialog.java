@@ -75,6 +75,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
@@ -86,6 +87,7 @@ import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.CompoundCommand;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
@@ -113,6 +115,7 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
 
+import org.supremica.gui.ide.IDE;
 import org.supremica.properties.Config;
 
 
@@ -125,7 +128,7 @@ public class EventDeclEditorDialog
 {
 
   //#########################################################################
-  //# Constructor
+  //# Constructors
   public EventDeclEditorDialog(final ModuleWindowInterface root)
   {
     this(root, false);
@@ -138,13 +141,13 @@ public class EventDeclEditorDialog
   }
 
   public EventDeclEditorDialog(final ModuleWindowInterface root,
-                               final boolean moreoptions)
+                               final boolean moreOptions)
   {
-    this(root, moreoptions, null);
+    this(root, moreOptions, null);
   }
 
   public EventDeclEditorDialog(final ModuleWindowInterface root,
-                               final boolean moreoptions,
+                               final boolean moreOptions,
                                final EventDeclSubject decl)
   {
     super(root.getRootWindow());
@@ -154,7 +157,7 @@ public class EventDeclEditorDialog
       setTitle("Editing event declaration '" + decl.getName() + "'");
     }
     mRoot = root;
-    mDisplayingMoreOptions = moreoptions;
+    mDisplayingMoreOptions = moreOptions;
     mEventDecl = decl;
     createComponents();
     layoutComponents();
@@ -164,6 +167,7 @@ public class EventDeclEditorDialog
     mActionListeners = new LinkedList<ActionListener>();
     setMinimumSize(getSize());
   }
+
 
   //#########################################################################
   //# Access to Created Item
@@ -223,17 +227,25 @@ public class EventDeclEditorDialog
       final boolean advanced = Config.INCLUDE_INSTANTION.isTrue();
       mNamePanel = new RaisedDialogPanel();
       mNameLabel = new JLabel("Name:");
-      final FormattedInputHandler<SimpleIdentifierProxy> parser =
-        new EventNameInputHandler();
-      mNameInput = new SimpleExpressionInputCell(template.getIdentifier(), parser);
+      final EventNameInputHandler handler = new EventNameInputHandler();
+      mNameInput =
+        new SimpleExpressionInputCell(handler.getOldIdentifier(), handler);
+      final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+        @Override
+        public void documentChanged(final DocumentEvent event)
+        {
+          updateOkButtonStatus();
+        }
+      };
+      mNameInput.addSimpleDocumentListener(okEnablement);
       commitHandler = new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent event)
-          {
-            commitDialog();
-            fireActionPerformed(event);
-          }
-        };
+        @Override
+        public void actionPerformed(final ActionEvent event)
+        {
+          commitDialog();
+          fireActionPerformed(event);
+        }
+      };
       mNameInput.addActionListener(commitHandler);
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
@@ -277,17 +289,18 @@ public class EventDeclEditorDialog
       mNameInput.setErrorDisplay(mErrorLabel);
       // Buttons panel ...
       mButtonsPanel = new JPanel();
-      final JButton okButton = new JButton("OK");
-      okButton.setRequestFocusEnabled(false);
-      okButton.addActionListener(commitHandler);
-      mButtonsPanel.add(okButton);
+      mOkButton = new JButton("OK");
+      mOkButton.setRequestFocusEnabled(false);
+      mOkButton.addActionListener(commitHandler);
+      mButtonsPanel.add(mOkButton);
       final Action cancelAction = DialogCancelAction.getInstance();
       final JButton cancelButton = new JButton(cancelAction);
       cancelButton.setRequestFocusEnabled(false);
       mButtonsPanel.add(cancelButton);
+      updateOkButtonStatus();
 
       final JRootPane root = getRootPane();
-      root.setDefaultButton(okButton);
+      root.setDefaultButton(mOkButton);
       DialogCancelAction.register(this);
 
       // And record the colour ...
@@ -386,8 +399,7 @@ public class EventDeclEditorDialog
       mIndexTable.addEscapeAction();
       final ExpressionParser parser = getExpressionParser();
       final SimpleExpressionEditor editor =
-        new SimpleExpressionEditor(Operator.TYPE_RANGE, parser, mErrorLabel);
-      editor.setAllowNull(true);
+        new SimpleExpressionEditor(Operator.TYPE_RANGE, parser, true, mErrorLabel);
       editor.addCellEditorListener(mIndexModel);
       mIndexTable.setDefaultEditor(Object.class, editor);
       final ListSelectionModel selmodel = mIndexTable.getSelectionModel();
@@ -711,16 +723,9 @@ public class EventDeclEditorDialog
    */
   private boolean isInputLocked()
   {
-    if (mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()) {
-      return true;
-    } else if (mIndexTable != null && mIndexTable.isEditing()) {
-      final SimpleExpressionEditor editor =
-        (SimpleExpressionEditor) mIndexTable.getCellEditor();
-      final SimpleExpressionInputCell cell = editor.getComponent();
-      return !cell.shouldYieldFocus();
-    } else {
-      return false;
-    }
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
   /**
@@ -990,27 +995,23 @@ public class EventDeclEditorDialog
     }
   }
 
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled = mNameInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model.
    * This method is attached as an action listener of the 'OK' button
    * of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
-    if (mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()) {
+    if (isInputLocked()) {
       // nothing
-    } else if (mIndexTable != null && mIndexTable.isEditing()) {
-      final TableCellEditor editor = mIndexTable.getCellEditor();
-      if (editor.stopCellEditing()) {
-        // Must wait for focus change events to be processed ...
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run()
-            {
-              commitDialog();
-            }
-          });
-      }
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter an event name.");
     } else {
       final IdentifierSubject ident =
         (IdentifierSubject) mNameInput.getValue();
@@ -1037,12 +1038,15 @@ public class EventDeclEditorDialog
         } else {
           scope = ScopeKind.OPTIONAL_PARAMETER;
         }
+        if (mIndexTable.isEditing()) {
+          mIndexTable.getCellEditor().stopCellEditing();
+        }
         // *** BUG ***
         // This copying would not be necessary if assignFrom() could accept
         // proxies.
-        final List<SimpleExpressionSubject> origranges = mIndexModel.getList();
-        ranges = new ArrayList<SimpleExpressionSubject>(origranges.size());
-        for (final SimpleExpressionSubject range : origranges) {
+        final List<SimpleExpressionSubject> origRanges = mIndexModel.getList();
+        ranges = new ArrayList<SimpleExpressionSubject>(origRanges.size());
+        for (final SimpleExpressionSubject range : origRanges) {
           if (range.getParent() == null) {
             ranges.add(range);
           } else {
@@ -1175,7 +1179,7 @@ public class EventDeclEditorDialog
     private EventNameInputHandler()
     {
       super(mEventDecl == null ? "" : mEventDecl.getName(),
-            getExpressionParser());
+            getExpressionParser(), true);
     }
 
     //#######################################################################
@@ -1187,11 +1191,13 @@ public class EventDeclEditorDialog
     {
       try {
         final SimpleIdentifierProxy ident = super.parse(text);
-        final String newName = ident.getName();
-        final String oldName = getOldName();
-        if (!newName.equals(oldName)) {
-          final ModuleContext context = mRoot.getModuleContext();
-          context.checkNewEventName(newName);
+        if (ident != null) {
+          final String newName = ident.getName();
+          final String oldName = getOldName();
+          if (!newName.equals(oldName)) {
+            final ModuleContext context = mRoot.getModuleContext();
+            context.checkNewEventName(newName);
+          }
         }
         return ident;
       } catch (final ParseException exception) {
@@ -1408,6 +1414,7 @@ public class EventDeclEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Action Listeners
   private final List<ActionListener> mActionListeners;

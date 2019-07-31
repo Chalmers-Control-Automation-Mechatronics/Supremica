@@ -33,32 +33,19 @@
 
 package net.sourceforge.waters.gui.dialog;
 
-import net.sourceforge.waters.model.expr.ExpressionParser;
-import net.sourceforge.waters.model.module.SimpleExpressionProxy;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 
-public class SimpleExpressionInputHandler
-  extends AbstractSimpleExpressionInputHandler<SimpleExpressionProxy>
+/**
+ * A simplified replacement for Swing's {@link DocumentListener} interface.
+ * This interface has only one method instead of three. It is used to
+ * simplify the interface of {@link ValidatingTextCell}.
+ *
+ * @author Robi Malik
+ */
+
+public interface SimpleDocumentListener
 {
-
-  //#########################################################################
-  //# Constructors
-  public SimpleExpressionInputHandler(final int mask,
-                                      final ExpressionParser parser,
-                                      final boolean nullAllowed)
-  {
-    super(mask, parser, nullAllowed);
-  }
-
-
-  //#########################################################################
-  //# Interface
-  //# net.sourceforge.waters.gui.FormattedInputHandler<SimpleExpressionProxy>
-  @Override
-  public SimpleExpressionProxy parse(final String text)
-    throws java.text.ParseException
-  {
-    return callParser(text);
-  }
-
+  public void documentChanged(DocumentEvent event);
 }

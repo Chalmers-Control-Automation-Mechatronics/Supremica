@@ -49,20 +49,20 @@ import net.sourceforge.waters.model.module.IdentifierProxy;
  * @author Robi Malik
  */
 
-class ComponentNameInputParser
+class ComponentNameInputHandler
   extends IdentifierInputHandler
 {
 
   //#########################################################################
   //# Constructor
-  ComponentNameInputParser(final IdentifierProxy oldname,
-                           final ModuleContext context,
-                           final ExpressionParser parser)
+  ComponentNameInputHandler(final IdentifierProxy oldIdent,
+                            final ModuleContext context,
+                            final ExpressionParser parser,
+                            final boolean nullAllowed)
   {
-    super(oldname, parser);
+    super(oldIdent, parser, nullAllowed);
     mModuleContext = context;
   }
-
 
   //#########################################################################
   //# Interface net.sourceforge.waters.gui.FormattedInputParser

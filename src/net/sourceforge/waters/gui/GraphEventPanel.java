@@ -79,8 +79,8 @@ import net.sourceforge.waters.gui.command.DeleteCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
 import net.sourceforge.waters.gui.command.ReplaceCommand;
 import net.sourceforge.waters.gui.command.UndoInterface;
-import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
 import net.sourceforge.waters.gui.dialog.SimpleExpressionEditor;
+import net.sourceforge.waters.gui.dialog.SimpleExpressionInputCell;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.gui.observer.Observer;
 import net.sourceforge.waters.gui.observer.SelectionChangedEvent;
@@ -184,8 +184,7 @@ public class GraphEventPanel
       new RendererNoFocus(textrenderer0, true);
     setDefaultRenderer(Object.class, textrenderer1);
     final SimpleExpressionEditor editor =
-      new SimpleExpressionEditor(Operator.TYPE_NAME, parser);
-    editor.setAllowNull(true);
+      new SimpleExpressionEditor(Operator.TYPE_NAME, parser, true);
     editor.addFocusListener(handler);
     setDefaultEditor(Object.class, editor);
 

@@ -150,7 +150,7 @@ public class ParameterBindingEditorDialog
                     final ExpressionParser parser)
   {
     final SimpleIdentifierProxy simple = (SimpleIdentifierProxy) oldIdent;
-    return new ParameterBindingInputParser(simple, parser);
+    return new ParameterBindingInputHandler(simple, parser);
   }
 
   @Override
@@ -204,16 +204,16 @@ public class ParameterBindingEditorDialog
 
 
   //#########################################################################
-  //# Inner Class ParameterBindingInputParser
-  private class ParameterBindingInputParser
-  extends SimpleIdentifierInputHandler
+  //# Inner Class ParameterBindingInputHandler
+  private class ParameterBindingInputHandler
+    extends SimpleIdentifierInputHandler
   {
     //#######################################################################
     //# Constructor
-    ParameterBindingInputParser(final SimpleIdentifierProxy oldname,
-                                final ExpressionParser parser)
+    ParameterBindingInputHandler(final SimpleIdentifierProxy oldname,
+                                 final ExpressionParser parser)
     {
-      super(oldname, parser);
+      super(oldname, parser, true);
     }
 
     //#######################################################################
@@ -233,7 +233,7 @@ public class ParameterBindingEditorDialog
           buffer.append(instName);
           buffer.append("' already has a binding for '");
           buffer.append(name);
-          buffer.append("'!");
+          buffer.append("'.");
           final String msg = buffer.toString();
           throw new ParseException(msg, 0);
         }
@@ -251,6 +251,6 @@ public class ParameterBindingEditorDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1483302008823600671L;
 
 }

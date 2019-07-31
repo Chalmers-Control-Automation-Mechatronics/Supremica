@@ -59,20 +59,32 @@ public class SimpleIdentifierInputHandler
 
   //#########################################################################
   //# Constructor
-  public SimpleIdentifierInputHandler(final SimpleIdentifierProxy oldident,
-                                      final ExpressionParser parser)
+  public SimpleIdentifierInputHandler(final SimpleIdentifierProxy oldIdent,
+                                      final ExpressionParser parser,
+                                      final boolean nullAllowed)
   {
-    mOldName = oldident.getName();
-    mOldIdentifier = oldident;
+    mOldName = oldIdent.getName();
+    mOldIdentifier = oldIdent;
     mExpressionParser = parser;
+    mNullAllowed = nullAllowed;
   }
 
-  public SimpleIdentifierInputHandler(final String oldname,
-                                      final ExpressionParser parser)
+  public SimpleIdentifierInputHandler(final String oldName,
+                                      final ExpressionParser parser,
+                                      final boolean nullAllowed)
   {
-    mOldName = oldname;
-    mOldIdentifier = new SimpleIdentifierSubject(oldname);
+    if (oldName.length() > 0) {
+      mOldName = oldName;
+      mOldIdentifier = new SimpleIdentifierSubject(oldName);
+    } else if (nullAllowed) {
+      mOldName = oldName;
+      mOldIdentifier = null;
+    } else {
+      mOldName = null;
+      mOldIdentifier = null;
+    }
     mExpressionParser = parser;
+    mNullAllowed = nullAllowed;
   }
 
 
@@ -107,7 +119,9 @@ public class SimpleIdentifierInputHandler
   public SimpleIdentifierProxy parse(final String text)
     throws java.text.ParseException
   {
-    if (!text.equals(mOldName)) {
+    if (text.equals(mOldName)) {
+      return mOldIdentifier;
+    } else if (text.length() != 0) {
       try {
         final SimpleIdentifierProxy result =
           mExpressionParser.parseSimpleIdentifier(text);
@@ -115,8 +129,10 @@ public class SimpleIdentifierInputHandler
       } catch (final ParseException exception) {
         throw exception.getJavaException();
       }
+    } else if (mNullAllowed) {
+      return null;
     } else {
-      return mOldIdentifier;
+      throw new java.text.ParseException("Please enter an identifier name.", 0);
     }
   }
 
@@ -186,5 +202,6 @@ public class SimpleIdentifierInputHandler
   private final String mOldName;
   private final SimpleIdentifierProxy mOldIdentifier;
   private final ExpressionParser mExpressionParser;
+  private final boolean mNullAllowed;
 
 }

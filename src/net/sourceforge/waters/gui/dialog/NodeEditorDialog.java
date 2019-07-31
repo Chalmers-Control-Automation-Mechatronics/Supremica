@@ -150,7 +150,7 @@ public class NodeEditorDialog
     mNameLabel = new JLabel("Name:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject subject = new SimpleIdentifierSubject(oldname);
-    mNameInput = new SimpleExpressionInputCell(subject,  new NodeNameInputParser(subject));
+    mNameInput = new SimpleExpressionInputCell(subject,  new NodeNameInputHandler(subject));
 
     mNameInput.addActionListener(commithandler);
     mNameInput.setToolTipText("Enter node name, eg. \"IDLE\" or \"WORKING\"");
@@ -384,16 +384,16 @@ public class NodeEditorDialog
 
   }
   //#########################################################################
-  //# Inner Class StateNameInputParser
-  private class NodeNameInputParser
+  //# Inner Class StateNameInputHandler
+  private class NodeNameInputHandler
     extends SimpleIdentifierInputHandler
   {
 
     //#######################################################################
     //# Constructor
-    private NodeNameInputParser(final SimpleIdentifierProxy oldident)
+    private NodeNameInputHandler(final SimpleIdentifierProxy oldident)
     {
-      super(oldident, mModuleContainer.getExpressionParser());
+      super(oldident, mModuleContainer.getExpressionParser(), false);
     }
 
     //#######################################################################

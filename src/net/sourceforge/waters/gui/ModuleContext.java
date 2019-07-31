@@ -364,7 +364,7 @@ public class ModuleContext
   {
     if (getEventDecl(name) != null) {
       throw new ParseException("Name '" + name
-                               + "' is already taken by an event!", 0);
+                               + "' is already taken by an event.", 0);
     }
   }
 

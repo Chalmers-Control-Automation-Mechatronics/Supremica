@@ -58,11 +58,12 @@ public class IdentifierInputHandler
   //#########################################################################
   //# Constructor
   public IdentifierInputHandler(final IdentifierProxy oldIdent,
-                               final ExpressionParser parser)
+                                final ExpressionParser parser,
+                                final boolean nullAllowed)
   {
-    super(Operator.TYPE_NAME, parser);
+    super(Operator.TYPE_NAME, parser, nullAllowed);
     mOldIdentifier = oldIdent;
-    mOldName = oldIdent.toString();
+    mOldName = oldIdent == null ? "" : oldIdent.toString();
     mEquality = new ModuleEqualityVisitor(true);
   }
 
@@ -82,19 +83,25 @@ public class IdentifierInputHandler
   public IdentifierProxy parse(final String text)
     throws ParseException
   {
-    if (text.equals(mOldName)) {
+    if (text.length() == 0) {
+      if (isNullAllowed()) {
+        return null;
+      } else {
+        throw new ParseException("Please enter an identifier name.", 0);
+      }
+    } else if (text.equals(mOldName)) {
       return mOldIdentifier;
+    } else {
+      final SimpleExpressionProxy expr = callParser(text);
+      if (!(expr instanceof IdentifierProxy)) {
+        throw new ParseException("Please enter an identifier name.", 0);
+      }
+      final IdentifierProxy ident = (IdentifierProxy) expr;
+      if (mEquality.equals(ident, mOldIdentifier)) {
+        return mOldIdentifier;
+      }
+      return ident;
     }
-    final SimpleExpressionProxy expr = callParser(text);
-    if (!(expr instanceof IdentifierProxy)) {
-      throw new ParseException("The expression '" + text +
-                               "' is not an identifier.", 0);
-    }
-    final IdentifierProxy ident = (IdentifierProxy) expr;
-    if (mEquality.equals(mOldIdentifier, ident)) {
-      return mOldIdentifier;
-    }
-    return ident;
   }
 
 

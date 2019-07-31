@@ -51,11 +51,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -69,6 +71,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.subject.module.ForeachSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -152,39 +156,47 @@ public class ForeachEditorDialog
       template = mForeach;
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
-    final ActionListener commithandler = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          commitDialog();
-        }
-      };
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        commitDialog();
+      }
+    };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mVariableLabel = new JLabel("Variable:");
-    final String oldname = template.getName();
-    final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputHandler nameparser =
-      new SimpleIdentifierInputHandler(ident, parser);
-    mVariableInput = new SimpleExpressionInputCell(ident, nameparser);
-    mVariableInput.addActionListener(commithandler);
-    mVariableInput.setToolTipText("Enter the name of the index variable");
+    final String oldName = template.getName();
+    final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldName);
+    final SimpleIdentifierInputHandler handler =
+      new SimpleIdentifierInputHandler(ident, parser, true);
+    mVariableInput = new SimpleExpressionInputCell(ident, handler);
+    mVariableInput.addActionListener(commitHandler);
+    mVariableInput.addSimpleDocumentListener(okEnablement);
+    mVariableInput.setToolTipText("Enter the name of the index variable.");
     mRangeLabel = new JLabel("Range:");
-    final SimpleExpressionProxy oldrange =
+    final SimpleExpressionProxy oldRange =
       mForeach == null ? null : template.getRange();
     mRangeInput =
-      new SimpleExpressionInputCell(oldrange, Operator.TYPE_RANGE, parser);
-    mRangeInput.addActionListener(commithandler);
+      new SimpleExpressionInputCell(oldRange, Operator.TYPE_RANGE, parser, true);
+    mRangeInput.addActionListener(commitHandler);
+    mRangeInput.addSimpleDocumentListener(okEnablement);
     mRangeInput.setToolTipText
-      ("Enter the index range, e.g., 1..10 or [a,b,c]");
+      ("Enter the index range, e.g., 1..10 or [a,b,c].");
     mGuardLabel = new JLabel("Guard:");
-    final SimpleExpressionProxy oldguard = template.getGuard();
+    final SimpleExpressionProxy oldGuard = template.getGuard();
     mGuardInput =
-      new SimpleExpressionInputCell(oldguard, Operator.TYPE_BOOLEAN, parser);
-    mGuardInput.setNullAllowed(true);
-    mGuardInput.addActionListener(commithandler);
-    mGuardInput.setToolTipText("Optionally enter a Boolean expression");
+      new SimpleExpressionInputCell(oldGuard, Operator.TYPE_BOOLEAN, parser, true);
+    mGuardInput.addActionListener(commitHandler);
+    mGuardInput.setToolTipText("Optionally enter a Boolean expression.");
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -196,10 +208,10 @@ public class ForeachEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commitHandler);
+    mButtonsPanel.add(mOkButton);
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
@@ -210,9 +222,10 @@ public class ForeachEditorDialog
         }
       });
     mButtonsPanel.add(cancelButton);
+    updateOkButtonStatus();
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
   }
 
@@ -302,17 +315,29 @@ public class ForeachEditorDialog
 
   //#########################################################################
   //# Action Listeners
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled =
+      mVariableInput.getText().length() > 0 &&
+      mRangeInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model.
    * This method is attached to action listener of the 'OK' button
    * of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
-    } else if (!mRangeInput.shouldYieldFocus()) {
-      mRangeInput.requestFocusInWindow();
+    } else if (mVariableInput.getValue() == null) {
+      mVariableInput.requestFocusWithErrorMessage
+        ("Please enter the name of the index variable.");
+    } else if (mRangeInput.getValue() == null) {
+      mRangeInput.requestFocusWithErrorMessage
+        ("Please enter an expression for the range.");
     } else {
       final String name = mVariableInput.getText();
       final SimpleExpressionSubject range0 =
@@ -372,10 +397,9 @@ public class ForeachEditorDialog
    */
   private boolean isInputLocked()
   {
-    return
-      mVariableInput.isFocusOwner() && !mVariableInput.shouldYieldFocus() ||
-      mRangeInput.isFocusOwner() && !mRangeInput.shouldYieldFocus() ||
-      mGuardInput.isFocusOwner() && !mGuardInput.shouldYieldFocus();
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
   private SimpleExpressionSubject makeUnique
@@ -416,6 +440,7 @@ public class ForeachEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Created Item
   /**

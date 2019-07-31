@@ -132,7 +132,7 @@ public class EventAliasEditorDialog
   createInputParser(final IdentifierProxy oldIdent,
                     final ExpressionParser parser)
   {
-    return new IdentifierInputHandler(oldIdent, parser);
+    return new IdentifierInputHandler(oldIdent, parser, true);
   }
 
   @Override

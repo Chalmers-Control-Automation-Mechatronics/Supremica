@@ -52,6 +52,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
@@ -152,34 +153,41 @@ public class ConstantAliasEditorDialog
       template = mAlias;
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
     final ActionListener commithandler = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          commitDialog();
-        }
-      };
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        commitDialog();
+      }
+    };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     final String oldname = template.getName();
     final SimpleIdentifierSubject ident = new SimpleIdentifierSubject(oldname);
-    final SimpleIdentifierInputHandler nameparser =
-      new SimpleIdentifierInputHandler(ident, parser);
-    mNameInput = new SimpleExpressionInputCell(ident, nameparser);
-    mNameInput.setNullAllowed(true);
+    final SimpleIdentifierInputHandler nameParser =
+      new SimpleIdentifierInputHandler(ident, parser, true);
+    mNameInput = new SimpleExpressionInputCell(ident, nameParser);
     mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Name of constant or parameter");
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.setToolTipText("Name of constant or parameter.");
     mExpressionLabel = new JLabel("Expression:");
     final SimpleExpressionProxy oldexp =
       mAlias == null ? null : (SimpleExpressionProxy)template.getExpression();
     mExpressionInput =
-      new SimpleExpressionInputCell(oldexp, Operator.TYPE_ANY, parser);
-    mExpressionInput.setNullAllowed(true);
+      new SimpleExpressionInputCell(oldexp, Operator.TYPE_ANY, parser, true);
     mExpressionInput.addActionListener(commithandler);
+    mExpressionInput.addSimpleDocumentListener(okEnablement);
     mExpressionInput.setToolTipText
-      ("Formula for value of constant or default value of parameter");
+      ("Formula for value of constant or default value of parameter.");
 
     final ScopeKind scope = template.getScope();
     mIsParameterCheckBox = new JCheckBox("Parameter");
@@ -193,13 +201,13 @@ public class ConstantAliasEditorDialog
         }
       });
     mIsParameterCheckBox.setToolTipText
-      ("Check to make this constant a parameter");
+      ("Check to make this constant a parameter.");
 
     mIsRequiredCheckBox = new JCheckBox("Required");
     mIsRequiredCheckBox.setRequestFocusEnabled(false);
     mIsRequiredCheckBox.setSelected(scope != ScopeKind.OPTIONAL_PARAMETER);
     mIsRequiredCheckBox.setToolTipText
-      ("Check to declare this parameter as required");
+      ("Check to declare this parameter as required.");
     updateRequiredEnabled();
 
     // Error panel ...
@@ -211,10 +219,10 @@ public class ConstantAliasEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commithandler);
+    mButtonsPanel.add(mOkButton);
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
@@ -225,9 +233,10 @@ public class ConstantAliasEditorDialog
         }
       });
     mButtonsPanel.add(cancelButton);
+    updateOkButtonStatus();
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
   }
 
@@ -311,12 +320,21 @@ public class ConstantAliasEditorDialog
 
   //#########################################################################
   //# Action Listeners
+
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled =
+      mNameInput.getText().length() > 0 &&
+      mExpressionInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model.
    * This method is attached to action listener of the 'OK' button
    * of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
@@ -435,6 +453,7 @@ public class ConstantAliasEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Created Item
   /**

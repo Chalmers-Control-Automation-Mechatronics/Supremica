@@ -75,6 +75,7 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableCellEditor;
@@ -189,37 +190,47 @@ public class VariableEditorDialog
     }
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
-    final ActionListener commithandler = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          commitDialog();
-        }
-      };
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        commitDialog();
+      }
+    };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    final IdentifierProxy oldname = template.getIdentifier();
-    final FormattedInputHandler<IdentifierProxy> nameParser =
-      new ComponentNameInputParser(oldname, context, parser);
-    mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter variable name, e.g., x or v[i]. "
-                              + "A variable name started by 'clock:' will be "
-                              + "treated as clock, i.e., the value of the variable "
-                              + "will implicitly be increased at locations.");
-    mNameInput.setNullAllowed(false);
+    final IdentifierProxy oldIdent =
+      mVariable == null ? null : mVariable.getIdentifier();
+    final ComponentNameInputHandler handler =
+      new ComponentNameInputHandler(oldIdent, context, parser, true);
+    mNameInput = new SimpleExpressionInputCell(oldIdent, handler);
+    mNameInput.addActionListener(commitHandler);
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.setToolTipText("Enter variable name, e.g., x or v[i].");
+    // Standard verification does not support clocks, do not suggest it here.
+    //                    + "A variable name started by 'clock:' will be "
+    //                    + "treated as clock, i.e., the value of the variable "
+    //                    + "will implicitly be increased at locations.");
     mTypeLabel = new JLabel("Type:");
-    mTypeInput = new SimpleExpressionInputCell
-      (template.getType(), Operator.TYPE_RANGE, parser);
-    mTypeInput.addActionListener(commithandler);
+    final SimpleExpressionProxy type = mVariable == null ? null : mVariable.getType();
+    mTypeInput =
+      new SimpleExpressionInputCell(type, Operator.TYPE_RANGE, parser, true);
+    mTypeInput.addActionListener(commitHandler);
+    mTypeInput.addSimpleDocumentListener(okEnablement);
     mTypeInput.setToolTipText("Enter type expression, e.g., 0..8 or [on,off]");
-    mTypeInput.setNullAllowed(false);
     mInitialLabel = new JLabel("Initial:");
-    mInitialInput = new InitialStatePredicateCell(template);
-    mInitialInput.addActionListener(commithandler);
-    mInitialInput.setNullAllowed(false);
+    mInitialInput = new InitialStatePredicateCell();
+    mInitialInput.addActionListener(commitHandler);
+    mInitialInput.addSimpleDocumentListener(okEnablement);
 
     // Error panel ...
     mErrorPanel = new RaisedDialogPanel();
@@ -266,9 +277,8 @@ public class VariableEditorDialog
       (KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, backward);
     mMarkingsTable.addEscapeAction();
     final SimpleExpressionEditor propeditor =
-      new SimpleExpressionEditor(Operator.TYPE_NAME, parser, mErrorLabel);
+      new SimpleExpressionEditor(Operator.TYPE_NAME, parser, true, mErrorLabel);
     mMarkingsTable.setDefaultEditor(IdentifierSubject.class, propeditor);
-    propeditor.setAllowNull(true);
     propeditor.setToolTipText("Enter the name of a proposition event");
     propeditor.addCellEditorListener(mMarkingsModel);
     final TableCellEditor prededitor = new PredicateExpressionEditor(parser);
@@ -315,16 +325,17 @@ public class VariableEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commitHandler);
+    mButtonsPanel.add(mOkButton);
     final Action cancelAction = DialogCancelAction.getInstance();
     final JButton cancelButton = new JButton(cancelAction);
     cancelButton.setRequestFocusEnabled(false);
     mButtonsPanel.add(cancelButton);
+    updateOkButtonStatus();
 
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
   }
 
@@ -645,31 +656,32 @@ public class VariableEditorDialog
     }
   }
 
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled =
+      mNameInput.getText().length() > 0 &&
+      mTypeInput.getText().length() > 0 &&
+      mInitialInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model.
    * This method is attached to action listener of the 'OK' button
    * of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
-    } else if (mMarkingsTable.isEditing()) {
-      final TableCellEditor editor = mMarkingsTable.getCellEditor();
-      if (editor.stopCellEditing()) {
-        // Must wait for focus change events to be processed ...
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run()
-            {
-              commitDialog();
-            }
-          });
-      }
-    } else if (!mTypeInput.shouldYieldFocus()) {
-      mTypeInput.requestFocusInWindow();
-    } else if (!mInitialInput.shouldYieldFocus()) {
-      mInitialInput.requestFocusInWindow();
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter a variable name.");
+    } else if (mTypeInput.getValue() == null) {
+      mTypeInput.requestFocusWithErrorMessage
+        ("Please enter an expression for the variable range.");
+    } else if (mInitialInput.getValue() == null) {
+      mInitialInput.requestFocusWithErrorMessage
+        ("Please enter an initial state condition.");
     } else {
       final IdentifierSubject ident =
         (IdentifierSubject) mNameInput.getValue();
@@ -677,11 +689,14 @@ public class VariableEditorDialog
         (SimpleExpressionSubject) mTypeInput.getValue();
       final SimpleExpressionSubject initial =
         mInitialInput.getInitialStatePredicate();
-      final List<VariableMarkingSubject> origmarkings =
+      if (mMarkingsTable.isEditing()) {
+        mMarkingsTable.getCellEditor().stopCellEditing();
+      }
+      final List<VariableMarkingSubject> origMarkings =
         mMarkingsModel.getList();
       final List<VariableMarkingSubject> markings =
-        new ArrayList<VariableMarkingSubject>(origmarkings.size());
-      for (final VariableMarkingSubject marking : origmarkings) {
+        new ArrayList<VariableMarkingSubject>(origMarkings.size());
+      for (final VariableMarkingSubject marking : origMarkings) {
         if (marking.getParent() == null) {
           markings.add(marking);
         } else {
@@ -765,12 +780,11 @@ public class VariableEditorDialog
   private class InitialStatePredicateCell
     extends SimpleExpressionInputCell
   {
-
     //#######################################################################
     //# Constructor
-    private InitialStatePredicateCell(final VariableComponentSubject template)
+    private InitialStatePredicateCell()
     {
-      super(template.getInitialStatePredicate(),
+      super(mVariable == null ? null : mVariable.getInitialStatePredicate(),
             new InitialStateInputHandler());
       setToolTipText("");
     }
@@ -804,10 +818,9 @@ public class VariableEditorDialog
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = -1703295424347060568L;
   }
 
 
@@ -820,7 +833,7 @@ public class VariableEditorDialog
     //# Constructors
     private InitialStateInputHandler()
     {
-      super(Operator.TYPE_BOOLEAN, mRoot.getExpressionParser());
+      super(Operator.TYPE_BOOLEAN, mRoot.getExpressionParser(), true);
     }
 
     //#######################################################################
@@ -844,12 +857,11 @@ public class VariableEditorDialog
   private class PredicateExpressionEditor
     extends SimpleExpressionEditor
   {
-
     //#######################################################################
     //# Constructor
     private PredicateExpressionEditor(final ExpressionParser parser)
     {
-      super(Operator.TYPE_BOOLEAN, parser, mErrorLabel);
+      super(Operator.TYPE_BOOLEAN, parser, false, mErrorLabel);
     }
 
     //#######################################################################
@@ -876,10 +888,9 @@ public class VariableEditorDialog
       return cell;
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 6964682623458579505L;
   }
 
 
@@ -892,7 +903,6 @@ public class VariableEditorDialog
   private static class VariableMarkingTable
     extends NonTypingTable
   {
-
     //#######################################################################
     //# Constructor
     private VariableMarkingTable(final VariableMarkingTableModel model)
@@ -914,18 +924,16 @@ public class VariableEditorDialog
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = -3655210236422935964L;
   }
 
 
   //#########################################################################
-  //# Inner Class AddIndexAction
+  //# Inner Class AddMarkingAction
   private class AddMarkingAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private AddMarkingAction()
@@ -946,10 +954,9 @@ public class VariableEditorDialog
       addMarking();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = -4680369986902735099L;
   }
 
 
@@ -957,7 +964,6 @@ public class VariableEditorDialog
   //# Inner Class RemoveMarkingsAction
   private class RemoveMarkingsAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private RemoveMarkingsAction()
@@ -978,10 +984,9 @@ public class VariableEditorDialog
       removeMarkings();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 5595797508063606092L;
   }
 
 
@@ -989,7 +994,6 @@ public class VariableEditorDialog
   //# Inner Class MoveMarkingsUpAction
   private class MoveMarkingsUpAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private MoveMarkingsUpAction()
@@ -1011,10 +1015,9 @@ public class VariableEditorDialog
       moveMarkingsUp();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = -3528168004852617521L;
   }
 
 
@@ -1022,7 +1025,6 @@ public class VariableEditorDialog
   //# Inner Class MoveMarkingsDownAction
   private class MoveMarkingsDownAction extends AbstractAction
   {
-
     //#######################################################################
     //# Constructor
     private MoveMarkingsDownAction()
@@ -1044,10 +1046,9 @@ public class VariableEditorDialog
       moveMarkingsDown();
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
-    private static final long serialVersionUID = 1L;
-
+    private static final long serialVersionUID = 4153451970893897487L;
   }
 
 
@@ -1080,6 +1081,7 @@ public class VariableEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Created Item
   /**
@@ -1100,7 +1102,7 @@ public class VariableEditorDialog
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -2853266631960752351L;
   private static final Insets INSETS = new Insets(2, 4, 2, 4);
   private static final VariableComponentSubject VARIABLE_TEMPLATE =
     new VariableComponentSubject(new SimpleIdentifierSubject(""),

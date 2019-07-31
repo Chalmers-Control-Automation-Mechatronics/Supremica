@@ -42,6 +42,8 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultFormatter;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.DocumentFilter;
@@ -136,33 +138,39 @@ public abstract class ValidatingTextCell<T>
   //#########################################################################
   //# Simple Access
   /**
-   * Sets whether the cell allows empty input.
-   * If allowed, an empty text input is accepted and causes a
-   * <CODE>null</CODE> expression to be returned. If not allowed
-   * (the default), attempting to commit the cell without input
-   * causes an error to be reported.
-   */
-  public void setNullAllowed(final boolean allowed)
-  {
-    mNullAllowed = allowed;
-  }
-
-  /**
-   * Returns whether the cell allows empty input.
-   * @see #setNullAllowed(boolean)
-   */
-  public boolean isNullAllowed()
-  {
-    return mNullAllowed;
-  }
-
-  /**
    * Restores the cell to the content it had when it was last committed.
    */
   public void revert()
   {
     final Object oldValue = getValue();
     setValue(oldValue);
+  }
+
+  public void addSimpleDocumentListener(final SimpleDocumentListener listener)
+  {
+    final DocumentListener docListener = new DocumentListener() {
+      @Override
+      public void insertUpdate(final DocumentEvent event)
+      {
+        listener.documentChanged(event);
+      }
+      @Override
+      public void removeUpdate(final DocumentEvent event)
+      {
+        listener.documentChanged(event);
+      }
+      @Override
+      public void changedUpdate(final DocumentEvent event)
+      {
+        listener.documentChanged(event);
+      }
+    };
+    addDocumentListener(docListener);
+  }
+
+  public void addDocumentListener(final DocumentListener listener)
+  {
+    getDocument().addDocumentListener(listener);
   }
 
 
@@ -261,7 +269,6 @@ public abstract class ValidatingTextCell<T>
   }
 
 
-
   //#########################################################################
   //# Inner Class ValidatingCellFormatter
   private class ValidatingCellFormatter extends DefaultFormatter
@@ -279,28 +286,21 @@ public abstract class ValidatingTextCell<T>
     public Object stringToValue(final String text)
       throws ParseException
     {
-      if (text.length() != 0) {
-        try {
-          final Object value = mInputHandler.parse(text);
-          clearErrorMessage();
-          return value;
-        } catch (final java.text.ParseException exception) {
-          final String msg = exception.getMessage();
-          setErrorMessage(msg);
-          final Object oldValue = getValue();
+      try {
+        final Object value = mInputHandler.parse(text);
+        clearErrorMessage();
+        return value;
+      } catch (final java.text.ParseException exception) {
+        final String msg = exception.getMessage();
+        setErrorMessage(msg);
+        final Object oldValue = getValue();
+        if (oldValue != null) {
           final String oldText = valueToString(oldValue);
           if (text.equals(oldText)) {
             return oldValue;
-          } else {
-            throw exception;
           }
         }
-      } else if (mNullAllowed) {
-        return null;
-      } else {
-        final String msg = "Empty input!";
-        setErrorMessage(msg);
-        throw new ParseException(msg, 0);
+        throw exception;
       }
     }
 
@@ -364,8 +364,6 @@ public abstract class ValidatingTextCell<T>
   //# Data Members
   private final FormattedInputHandler<? extends T> mInputHandler;
   private final ValidatingCellVerifier mVerifier;
-
-  private boolean mNullAllowed;
   private ErrorDisplay mErrorDisplay;
 
 

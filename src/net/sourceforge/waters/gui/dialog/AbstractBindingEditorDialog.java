@@ -51,11 +51,13 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.ProxyTransferable;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
@@ -76,8 +78,14 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleExpressionSubject;
 
+import org.supremica.gui.ide.IDE;
+
 
 /**
+ * A common superclass to implement the similar dialogs for event aliases
+ * ({@link EventAliasEditorDialog}) and parameter bindings ({@link
+ * ParameterBindingEditorDialog}).
+ *
  * @author Carly Hona
  */
 
@@ -161,7 +169,14 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
       template = getProxySubject();
     }
     final ExpressionParser parser = mRoot.getExpressionParser();
-    final ActionListener commithandler = new ActionListener() {
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
       {
@@ -174,24 +189,27 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
     mNameLabel = new JLabel("Name:");
     final IdentifierSubject oldIdent = getProxyIdentifier(template);
     final FormattedInputHandler<I>
-      nameParser = createInputParser(oldIdent, parser);
-    mNameInput = new SimpleExpressionInputCell(oldIdent, nameParser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter the name");
+      handler = createInputParser(oldIdent, parser);
+    mNameInput = new SimpleExpressionInputCell(oldIdent, handler);
+    mNameInput.addActionListener(commitHandler);
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.setToolTipText("Enter the name.");
     mExpressionLabel = new JLabel("Expression:");
-    SimpleExpressionProxy oldexp = null;
-    if (getProxySubject() != null
-        && getExpression() instanceof SimpleExpressionProxy) {
-      oldexp = (SimpleExpressionProxy) getExpression();
+    SimpleExpressionProxy oldExp = null;
+    if (getProxySubject() != null &&
+        getExpression() instanceof SimpleExpressionProxy) {
+      oldExp = (SimpleExpressionProxy) getExpression();
     }
     mExpressionInput =
-      new SimpleExpressionInputCell(oldexp, getOperatorMask(), parser);
-    mExpressionInput.addActionListener(commithandler);
-    mExpressionInput.setToolTipText("Enter the expression");
-    mExpressionInput.setNullAllowed(false);
+      new SimpleExpressionInputCell(oldExp, getOperatorMask(), parser, true);
+    mExpressionInput.addActionListener(commitHandler);
+    mExpressionInput.addSimpleDocumentListener(okEnablement);
+    mExpressionInput.setToolTipText("Enter the expression.");
 
     final ExpressionProxy exp = getExpression(template);
     mIsSimpleExpCheckBox = new JCheckBox("Use Simple Expression");
+    mIsSimpleExpCheckBox.setToolTipText
+      ("Uncheck this to create an event list expression after closing this dialog.");
     mIsSimpleExpCheckBox.setRequestFocusEnabled(false);
     mIsSimpleExpCheckBox.setSelected(exp instanceof SimpleExpressionProxy);
     mIsSimpleExpCheckBox.addActionListener(new ActionListener() {
@@ -211,10 +229,10 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commitHandler);
+    mButtonsPanel.add(mOkButton);
     final JButton cancelButton = new JButton("Cancel");
     cancelButton.setRequestFocusEnabled(false);
     cancelButton.addActionListener(new ActionListener() {
@@ -227,7 +245,7 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
     mButtonsPanel.add(cancelButton);
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
     updateExpressionEnabled();
   }
@@ -315,10 +333,16 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
    * Commits the contents of this dialog to the model. This method is attached
    * to action listener of the 'OK' button of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter a name.");
+    } else if (mIsSimpleExpCheckBox.isSelected() &&
+               mExpressionInput.getValue() == null) {
+      mExpressionInput.requestFocusWithErrorMessage
+        ("Please enter an expression.");
     } else {
       ExpressionSubject exp = null;
       if (mIsSimpleExpCheckBox.isSelected()) {
@@ -376,16 +400,15 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
    * Checks whether it is unsafe to commit the currently edited text field. If
    * this method returns <CODE>true</CODE>, it is unsafe to commit the current
    * dialog contents, and shifting the focus is to be avoided.
-   *
    * @return <CODE>true</CODE> if the component currently owning the focus is
    *         to be parsed and has been found to contain invalid information,
    *         <CODE>false</CODE> otherwise.
    */
   private boolean isInputLocked()
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus()
-           || mExpressionInput.isFocusOwner()
-           && !mExpressionInput.shouldYieldFocus();
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
   private SimpleExpressionSubject makeUnique(final SimpleExpressionSubject subject)
@@ -397,21 +420,27 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
     }
   }
 
-  /**
-   * Enables or disables the 'required' checkbox. This method is attached to
-   * action listeners in response to the selection or deselection of the
-   * 'parameter' checkbox.
-   */
   private void updateExpressionEnabled()
   {
     final boolean enable = mIsSimpleExpCheckBox.isSelected();
     mExpressionInput.setEnabled(enable);
     mExpressionLabel.setEnabled(enable);
-    if(!enable){
+    if (!enable) {
       mErrorLabel.clearDisplay();
-    }
-    else{
+    } else {
       mExpressionInput.requestFocusInWindow();
+    }
+    updateOkButtonStatus();
+  }
+
+  private void updateOkButtonStatus()
+  {
+    if (mNameInput.getText().length() == 0) {
+      mOkButton.setEnabled(false);
+    } else if (mIsSimpleExpCheckBox.isSelected()) {
+      mOkButton.setEnabled(mExpressionInput.getText().length() > 0);
+    } else {
+      mOkButton.setEnabled(true);
     }
   }
 
@@ -432,11 +461,13 @@ public abstract class AbstractBindingEditorDialog<I extends IdentifierProxy>
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   private Object mInsertPosition;
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = -2379273742747986895L;
 
 }

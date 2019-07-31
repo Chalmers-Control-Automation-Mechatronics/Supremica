@@ -44,33 +44,33 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.InputVerifier;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.text.DefaultFormatter;
-import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.DocumentFilter;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -79,6 +79,7 @@ import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.expr.ExpressionParser;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
+import net.sourceforge.waters.model.marshaller.ProxyMarshaller;
 import net.sourceforge.waters.model.marshaller.WatersUnmarshalException;
 import net.sourceforge.waters.model.module.ConstantAliasProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -95,6 +96,8 @@ import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 import net.sourceforge.waters.subject.module.ParameterBindingSubject;
 import net.sourceforge.waters.subject.module.PlainEventListSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -114,12 +117,15 @@ public class InstanceEditorDialog extends JDialog
   public InstanceEditorDialog(final ModuleWindowInterface root,
                               final InstanceSubject inst)
   {
-    setTitle("Instance Editor");
+    if (inst == null) {
+      setTitle("Creating new instance");
+    } else {
+      setTitle("Editing instance '" + inst.getName() + "'");
+    }
     mRoot = root;
     mInstance = inst;
     createComponents();
     layoutComponents();
-
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
@@ -129,8 +135,6 @@ public class InstanceEditorDialog extends JDialog
   private void createComponents()
   {
     setModal(true);
-    setLocationRelativeTo(null);
-
     InstanceSubject template;
     if (mInstance == null) {
       try {
@@ -139,16 +143,21 @@ public class InstanceEditorDialog extends JDialog
         final List<InsertInfo> inserts = panel.getInsertInfo(TRANSFERABLE);
         final InsertInfo insert = inserts.get(0);
         mInsertPosition = insert.getInsertPosition();
-      } catch (final IOException exception) {
-        throw new WatersRuntimeException(exception);
-      } catch (final UnsupportedFlavorException exception) {
+      } catch (final IOException | UnsupportedFlavorException exception) {
         throw new WatersRuntimeException(exception);
       }
     } else {
       template = mInstance;
     }
 
-    final ActionListener commithandler = new ActionListener() {
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
       {
@@ -158,30 +167,25 @@ public class InstanceEditorDialog extends JDialog
 
     mMainPanel = new RaisedDialogPanel();
     final ExpressionParser parser = mRoot.getExpressionParser();
-    mNameLabel = new JLabel("Name: ");
+    mNameLabel = new JLabel("Name:");
     final IdentifierProxy oldname = template.getIdentifier();
     final ModuleContext context = mRoot.getModuleContext();
     final FormattedInputHandler<IdentifierProxy> nameParser =
-      new ComponentNameInputParser(oldname, context, parser);
+      new ComponentNameInputHandler(oldname, context, parser, true);
     mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter the name");
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.addActionListener(commitHandler);
+    mNameInput.setToolTipText(NAME_TOOLTIP);
 
+    final String toolTip = getModuleToolTip();
     mModuleLabel = new JLabel("Module:");
-    mModuleInput = new JFormattedTextField();
-    mModuleInput.addActionListener(commithandler);
-    mModuleInput.setToolTipText("Enter or select a .wmod file");
-    mVerifier = new ModuleVerifier();
-    final DefaultFormatter formatter =
-      new DefaultFormatter();
-    formatter.setOverwriteMode(false);
-    final DefaultFormatterFactory factory =
-      new DefaultFormatterFactory(formatter);
-    mModuleInput.setFormatterFactory(factory);
-    mModuleInput.setInputVerifier(mVerifier);
-    mModuleInput.setText(template.getModuleName());
+    mModuleInput = new ModuleInputCell(template.getModuleName());
+    mModuleInput.setToolTipText(toolTip);
+    mModuleInput.addActionListener(commitHandler);
+    mModuleInput.addSimpleDocumentListener(okEnablement);
 
     mFileChooserButton = new JButton(" ... ");
+    mFileChooserButton.setToolTipText(toolTip);
     mFileChooserButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -195,13 +199,15 @@ public class InstanceEditorDialog extends JDialog
     mErrorLabel = new ErrorLabel();
     mErrorPanel.add(mErrorLabel);
     mNameInput.setErrorDisplay(mErrorLabel);
+    mModuleInput.setErrorDisplay(mErrorLabel);
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
     mOkButton = new JButton("OK");
     mOkButton.setRequestFocusEnabled(false);
-    mOkButton.addActionListener(commithandler);
+    mOkButton.addActionListener(commitHandler);
     mButtonsPanel.add(mOkButton);
+    updateOkButtonStatus();
 
     final Action pressOK = new AbstractAction() {
       private static final long serialVersionUID = 1L;
@@ -321,16 +327,26 @@ public class InstanceEditorDialog extends JDialog
       final URI moduleUri = module.getLocation();
       final URI relativePath = relativise(fileUri, moduleUri);
       final String name = relativePath.getPath();
-      mModuleInput.setText(name.substring(0, name.length() - 5));
+      mModuleInput.setText(removeExtension(name));
     }
     mModuleInput.requestFocusInWindow();
   }
 
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled =
+      mNameInput.getText().length() > 0 && mModuleInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
 
   private void commitDialog()
   {
     if (isInputLocked()) {
       // nothing
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage(NAME_TOOLTIP);
+    } else if (mModuleInput.getValue() == null) {
+      mModuleInput.requestFocusWithErrorMessage(getModuleToolTip());
     } else {
       final ModuleProxyCloner cloner =
         ModuleSubjectFactory.getCloningInstance();
@@ -339,11 +355,6 @@ public class InstanceEditorDialog extends JDialog
       final IdentifierSubject newIdent =
         (IdentifierSubject) cloner.getClone(inputIdent);
       final String moduleName = mModuleInput.getText();
-      if (moduleName.equals("")){
-        mModuleInput.requestFocusInWindow();
-        mNameInput.setErrorMessage("Enter or select a .wmod file!");
-        return;
-      }
       final SelectionOwner panel = mRoot.getComponentsPanel();
       InstanceSubject template = (InstanceSubject) cloner.getClone(mInstance);
       if (mInstance == null) {
@@ -406,8 +417,9 @@ public class InstanceEditorDialog extends JDialog
 
   private boolean isInputLocked()
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus() ||
-      mModuleInput.isFocusOwner() && !mVerifier.shouldYieldFocus(mModuleInput);
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
   private URI relativise(final URI file, final URI module)
@@ -443,102 +455,151 @@ public class InstanceEditorDialog extends JDialog
     }
   }
 
+  private String getModuleToolTip()
+  {
+    final DocumentManager manager = mRoot.getRootWindow().getDocumentManager();
+    final ProxyMarshaller<ModuleProxy> marshaller =
+      manager.findProxyMarshaller(ModuleProxy.class);
+    final String ext = marshaller.getDefaultExtension();
+    final StringBuilder builder = new StringBuilder();
+    builder.append("Please enter or select a ");
+    builder.append(ext);
+    builder.append(" file.");
+    return builder.toString();
+  }
+
+  private String removeExtension(final String fileName)
+  {
+    final DocumentManager manager = mRoot.getRootWindow().getDocumentManager();
+    final ProxyMarshaller<ModuleProxy> marshaller =
+      manager.findProxyMarshaller(ModuleProxy.class);
+    final String ext = marshaller.getDefaultExtension();
+    if (fileName.endsWith(ext)) {
+      final int len = fileName.length() - ext.length();
+      return fileName.substring(0, len);
+    } else {
+      return fileName;
+    }
+  }
+
 
   //#########################################################################
-  //# Inner Class ModuleVerifierVerifier
-  private class ModuleVerifier
-    extends InputVerifier
+  //# Inner Class ModuleInputCell
+  private class ModuleInputCell extends ValidatingTextCell<String>
   {
+    //#######################################################################
+    //# Constructor
+    private ModuleInputCell(final String value)
+    {
+      super(new ModuleInputHandler());
+      setValue(value);
+    }
 
     //#######################################################################
-    //# Overrides for class javax.swing.InputVerifier
+    //# Overrides for javax.swing.JFormattedTextField
     @Override
-    public boolean verify(final JComponent input)
+    public String getValue()
     {
-      final ModuleSubject module = mRoot.getModuleSubject();
-      final URI moduleUri = module.getLocation();
-      final JFormattedTextField textfield = (JFormattedTextField) input;
-      final String text = textfield.getText();
-      File file = null;
-      try {
-        if (moduleUri != null) {
-          String mod = moduleUri.getPath();
-          mod = mod.substring(0, mod.lastIndexOf("/") + 1);
-          mod += text + ".wmod";
-          file = new File(mod);
-
-          final JFormattedTextField.AbstractFormatter formatter =
-            textfield.getFormatter();
-          formatter.stringToValue(text);
-          if (moduleUri.getPath().compareTo(file.getAbsolutePath()) == 0) {
-            mMessage = "Cannot make recursive instantiations of the module!";
-            return false;
-          }
-        } else {
-          file = new File(text + ".wmod");
-        }
-
-        if (text.length() != 0) {
-          final DocumentManager docman =
-            mRoot.getRootWindow().getDocumentManager();
-          docman.load(moduleUri, text, ModuleProxy.class);
-        } else {
-          mMessage = "Enter or select a .wmod file!";
-          return false;
-        }
-        return true;
-      } catch (final WatersUnmarshalException exception) {
-        mMessage = "File or directory does not exist in .wmod format!";
-        if (file.exists()) {
-          mMessage = "File is not a correctly formatted .wmod file!";
-        }
-        return false;
-      } catch (final Exception exception) {
-        mMessage = exception.getMessage();
-        return false;
-      }
+      return (String) super.getValue();
     }
 
-    @Override
-    public boolean shouldYieldFocus(final JComponent input)
-    {
-      mNameInput.clearErrorMessage();
-      if (verify(input)) {
-        return true;
-      }
-      mNameInput.setErrorMessage(mMessage);
-      return false;
-    }
 
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -356551293645968366L;
   }
+
+
+  //#########################################################################
+  //# Inner Class ModuleInputHandler
+  private class ModuleInputHandler
+    extends DocumentFilter
+    implements FormattedInputHandler<String>
+  {
+    //#######################################################################
+    //# Interface
+    //# net.sourceforge.waters.gui.dialog.FormattedInputHandler<String>
+    @Override
+    public String format(final Object value)
+    {
+      return (String) value;
+    }
+
+    @Override
+    public String parse(String text) throws ParseException
+    {
+      if (text.length() == 0) {
+        return null;
+      }
+      text = removeExtension(text);
+      try {
+        final DocumentManager manager =
+          mRoot.getRootWindow().getDocumentManager();
+        final ModuleSubject module = mRoot.getModuleSubject();
+        final URI moduleURI = module.getLocation();
+        manager.load(moduleURI, text, ModuleProxy.class);
+      } catch (final FileNotFoundException exception) {
+        throw new ParseException("File not found.", 0);
+      } catch (final WatersUnmarshalException | IOException exception) {
+        throw new ParseException("Cannot open module.", 0);
+      }
+      return text;
+    }
+
+    @Override
+    public DocumentFilter getDocumentFilter()
+    {
+      return this;
+    }
+  }
+
 
   //#########################################################################
   //# Inner Class ModuleFileFilter
-  private class ModuleFileFilter extends FileFilter{
+  private class ModuleFileFilter extends FileFilter
+  {
+    //#######################################################################
+    //# Constructor
+    private ModuleFileFilter()
+    {
+      final DocumentManager manager =
+        mRoot.getRootWindow().getDocumentManager();
+      final ProxyMarshaller<ModuleProxy> marshaller =
+        manager.findProxyMarshaller(ModuleProxy.class);
+      mExtension = marshaller.getDefaultExtension();
+      final FileFilter filter = marshaller.getDefaultFileFilter();
+      mDescription = filter.getDescription();
+    }
 
+    //#######################################################################
+    //# Overrides for javax.swing.filechooser.FileFilter
     @Override
     public boolean accept(final File file)
     {
-      final ModuleSubject module = mRoot.getModuleSubject();
-      final URI modURI = module.getLocation();
-      //filter out the current module
-      if (modURI != null && file.getAbsolutePath().compareTo(modURI.getPath()) == 0) {
+      if (file.isDirectory()) {
+        return true;
+      } else if (!file.getName().endsWith(mExtension)) {
         return false;
+      } else {
+        final URI uri = file.getAbsoluteFile().toURI();
+        final ModuleSubject module = mRoot.getModuleSubject();
+        final URI modURI = module.getLocation();
+        return !uri.equals(modURI);
       }
-      //filter out files that aren't .wmod
-      if(file.isFile() && !file.getName().endsWith(".wmod")){
-        return false;
-      }
-      return true;
     }
 
     @Override
     public String getDescription()
     {
-      return "Waters Module Files [*.wmod]";
+      return mDescription;
     }
 
+    //#######################################################################
+    //# Data Members
+    private final String mExtension;
+    private final String mDescription;
   }
+
 
   //#######################################################################
   //# Data Members
@@ -546,16 +607,14 @@ public class InstanceEditorDialog extends JDialog
   private JLabel mNameLabel;
   private SimpleExpressionInputCell mNameInput;
   private JLabel mModuleLabel;
-  private JFormattedTextField mModuleInput;
+  private ModuleInputCell mModuleInput;
   private JButton mFileChooserButton;
   private JButton mOkButton;
   private JPanel mMainPanel;
-  private ModuleVerifier mVerifier;
 
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
-  private String mMessage;
 
   private InstanceSubject mInstance;
   private Object mInsertPosition;
@@ -567,5 +626,7 @@ public class InstanceEditorDialog extends JDialog
     new InstanceSubject(new SimpleIdentifierSubject(""), "");
   private static final Transferable TRANSFERABLE = WatersDataFlavor
     .createTransferable(TEMPLATE);
+  private static final String NAME_TOOLTIP =
+    "Please enter a name for the instance.";
 
 }

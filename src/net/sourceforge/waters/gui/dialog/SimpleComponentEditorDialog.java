@@ -57,12 +57,14 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.ModuleWindowInterface;
 import net.sourceforge.waters.gui.command.Command;
 import net.sourceforge.waters.gui.command.EditCommand;
 import net.sourceforge.waters.gui.command.InsertCommand;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.transfer.InsertInfo;
 import net.sourceforge.waters.gui.transfer.SelectionOwner;
 import net.sourceforge.waters.gui.transfer.WatersDataFlavor;
@@ -82,6 +84,8 @@ import net.sourceforge.waters.subject.module.IdentifierSubject;
 import net.sourceforge.waters.subject.module.LabelBlockSubject;
 import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 import net.sourceforge.waters.subject.module.SimpleIdentifierSubject;
+
+import org.supremica.gui.ide.IDE;
 
 
 /**
@@ -157,23 +161,31 @@ public class SimpleComponentEditorDialog
     }
     final ModuleContext context = mRoot.getModuleContext();
     final ExpressionParser parser = mRoot.getExpressionParser();
-    final ActionListener commithandler = new ActionListener() {
-        @Override
-        public void actionPerformed(final ActionEvent event)
-        {
-          commitDialog();
-        }
-      };
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        commitDialog();
+      }
+    };
 
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
     final IdentifierProxy oldname = template.getIdentifier();
     final FormattedInputHandler<IdentifierProxy> nameParser =
-      new ComponentNameInputParser(oldname, context, parser);
+      new ComponentNameInputHandler(oldname, context, parser, true);
     mNameInput = new SimpleExpressionInputCell(oldname, nameParser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
+    mNameInput.addActionListener(commitHandler);
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i].");
     mKindLabel = new JLabel("Kind:");
     mKindGroup = new ButtonGroup();
     mPlantButton =
@@ -220,17 +232,18 @@ public class SimpleComponentEditorDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commitHandler);
+    mButtonsPanel.add(mOkButton);
     final Action cancelAction = DialogCancelAction.getInstance();
     final JButton cancelButton = new JButton(cancelAction);
     cancelButton.setRequestFocusEnabled(false);
     mButtonsPanel.add(cancelButton);
+    updateOkButtonStatus();
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
   }
 
@@ -351,6 +364,12 @@ public class SimpleComponentEditorDialog
 
   //#########################################################################
   //# Action Listeners
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled = mNameInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model.
    * This method is attached to the action listener of the 'OK' button
@@ -361,6 +380,8 @@ public class SimpleComponentEditorDialog
     if (isInputLocked()) {
       // There is invalid input and an error message has been displayed.
       // Do not try to commit.
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter an automaton name.");
     } else {
       // Read the data from the dialog ...
       final IdentifierSubject ident0 =
@@ -434,8 +455,9 @@ public class SimpleComponentEditorDialog
    */
   private boolean isInputLocked()
   {
-    return
-      mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
+    final IDE ide = mRoot.getRootWindow();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
 
 
@@ -487,6 +509,7 @@ public class SimpleComponentEditorDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Created Item
   /**

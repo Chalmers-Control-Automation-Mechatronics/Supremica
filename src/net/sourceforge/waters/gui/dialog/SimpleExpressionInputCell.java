@@ -63,58 +63,82 @@ public class SimpleExpressionInputCell
   //# Constructors
   /**
    * Creates a cell to enter expressions of an arbitrary type.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
+   * @param  parser       The expression parser to be used for input validation.
+   *                      It can be obtained from the
+   *                      {@link ModuleWindowInterface}.
+   * @param  nullAllowed  Whether the text field accepts an empty input.
+   *                      If <CODE>true</CODE>, an empty input results in a
+   *                      <CODE>null</CODE> expression as the value;
+   *                      otherwise committing an empty input produces an
+   *                      error.
    */
-  public SimpleExpressionInputCell(final ExpressionParser parser)
+  public SimpleExpressionInputCell(final ExpressionParser parser,
+                                   final boolean nullAllowed)
   {
-    this(Operator.TYPE_ANY, parser);
+    this(Operator.TYPE_ANY, parser, nullAllowed);
   }
 
   /**
    * Creates a cell to enter expressions of a specific type.
-   * @param  mask      Type mask of supported types.
-   *                   It can be defined using the constants in
-   *                   {@link Operator}.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
+   * @param  mask         Type mask of supported types.
+   *                      It can be defined using the constants in class
+   *                      {@link Operator}.
+   * @param  parser       The expression parser to be used for input validation.
+   *                      It can be obtained from the
+   *                      {@link ModuleWindowInterface}.
+   * @param  nullAllowed  Whether the text field accepts an empty input.
+   *                      If <CODE>true</CODE>, an empty input results in a
+   *                      <CODE>null</CODE> expression as the value;
+   *                      otherwise committing an empty input produces an
+   *                      error.
    */
   public SimpleExpressionInputCell(final int mask,
-                                   final ExpressionParser parser)
+                                   final ExpressionParser parser,
+                                   final boolean nullAllowed)
   {
-    this(new SimpleExpressionInputHandler(mask, parser));
+    this(new SimpleExpressionInputHandler(mask, parser, nullAllowed));
   }
 
   /**
    * Creates a cell to enter expressions of an arbitrary type.
-   * @param  expr      The initial value for the text field.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
+   * @param  expr         The initial value for the text field.
+   * @param  parser       The expression parser to be used for input validation.
+   *                      It can be obtained from the
+   *                      {@link ModuleWindowInterface}.
+   * @param  nullAllowed  Whether the text field accepts an empty input.
+   *                      If <CODE>true</CODE>, an empty input results in a
+   *                      <CODE>null</CODE> expression as the value;
+   *                      otherwise committing an empty input produces an
+   *                      error.
    */
   public SimpleExpressionInputCell(final SimpleExpressionProxy expr,
-                                   final ExpressionParser parser)
+                                   final ExpressionParser parser,
+                                   final boolean nullAllowed)
   {
-    this(expr, Operator.TYPE_ANY, parser);
+    this(expr, Operator.TYPE_ANY, parser, nullAllowed);
   }
 
   /**
    * Creates a cell to enter expressions of a specific type.
-   * @param  expr      The initial value for the text field.
-   * @param  mask      Type mask of supported types.
-   *                   It can be defined using the constants in
-   *                   {@link Operator}.
-   * @param  parser    The expression parser to be used for input validation.
-   *                   It can be obtained from the
-   *                   {@link ModuleWindowInterface}.
+   * @param  expr         The initial value for the text field.
+   * @param  mask         Type mask of supported types.
+   *                      It can be defined using the constants in
+   *                      {@link Operator}.
+   * @param  parser       The expression parser to be used for input validation.
+   *                      It can be obtained from the
+   *                      {@link ModuleWindowInterface}.
+   * @param  nullAllowed  Whether the text field accepts an empty input.
+   *                      If <CODE>true</CODE>, an empty input results in a
+   *                      <CODE>null</CODE> expression as the value;
+   *                      otherwise committing an empty input produces an
+   *                      error.
    */
   public SimpleExpressionInputCell(final SimpleExpressionProxy expr,
                                    final int mask,
-                                   final ExpressionParser parser)
+                                   final ExpressionParser parser,
+                                   final boolean nullAllowed)
   {
-    this(expr, new SimpleExpressionInputHandler(mask, parser));
+    this(expr, new SimpleExpressionInputHandler(mask, parser, nullAllowed));
   }
 
   /**
