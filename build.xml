@@ -423,8 +423,6 @@ Class-Path: ${manifest.pathlist}</echo>
 
     <target name="-startfiles_supremica"
             depends="-startfiles_local_supremica,-dynamic_libs">
-        <copy file="${templates}/StepToPPN.cmd" todir="${dist}"/>
-        <chmod file="${dist}/StepToPPN.cmd" perm="644"/>
         <copy file="${templates}/IDE.cmd" todir="${dist}"/>     
         <chmod file="${dist}/IDE.cmd" perm="644"/>
         <copy file="${templates}/IDE" todir="${dist}"/> 
