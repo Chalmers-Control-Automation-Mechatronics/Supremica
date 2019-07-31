@@ -94,12 +94,12 @@ public class WatersAnalyzerPanel extends MainPanel
 
   //#########################################################################
   //# Simple Access
-  ModuleContainer getModuleContainer()
+  public ModuleContainer getModuleContainer()
   {
     return mModuleContainer;
   }
 
-  ModuleSubject getModule()
+  public ModuleSubject getModule()
   {
     return mModuleContainer.getModule();
   }

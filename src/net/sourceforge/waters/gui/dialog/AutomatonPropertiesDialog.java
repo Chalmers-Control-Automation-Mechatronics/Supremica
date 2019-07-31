@@ -48,9 +48,11 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
+import javax.swing.event.DocumentEvent;
 
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.gui.util.IconRadioButton;
@@ -68,10 +70,17 @@ import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 
+import org.supremica.gui.ide.IDE;
+
 
 /**
+ * The dialog to edit the properties of an automaton ({@link AutomatonProxy})
+ * in the Waters Analyser. The user can change the name, kind, and attributes
+ * of an existing automaton.
+ *
  * @author George Hewlett, Carly Hona
  */
+
 public class AutomatonPropertiesDialog extends JDialog
 {
 
@@ -91,6 +100,7 @@ public class AutomatonPropertiesDialog extends JDialog
     setMinimumSize(getSize());
   }
 
+
   //#########################################################################
   //# Access to Edited Item
   /**
@@ -103,6 +113,7 @@ public class AutomatonPropertiesDialog extends JDialog
     return mAutomaton;
   }
 
+
   //#########################################################################
   //# Initialisation and Layout of Components
   /**
@@ -113,7 +124,14 @@ public class AutomatonPropertiesDialog extends JDialog
     final ModuleProxyFactory factory = ModuleElementFactory.getInstance();
     final OperatorTable optable = CompilerOperatorTable.getInstance();
     final ExpressionParser parser = new ExpressionParser(factory, optable);
-    final ActionListener commithandler = new ActionListener() {
+    final SimpleDocumentListener okEnablement = new SimpleDocumentListener() {
+      @Override
+      public void documentChanged(final DocumentEvent event)
+      {
+        updateOkButtonStatus();
+      }
+    };
+    final ActionListener commitHandler = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
       {
@@ -123,32 +141,31 @@ public class AutomatonPropertiesDialog extends JDialog
     // Main panel ...
     mMainPanel = new RaisedDialogPanel();
     mNameLabel = new JLabel("Name:");
-    IdentifierProxy oldname = null;
+    IdentifierProxy oldName = null;
     try {
-      oldname = parser.parseIdentifier(mAutomaton.getName());
+      oldName = parser.parseIdentifier(mAutomaton.getName());
     } catch (final ParseException exception) {
-      oldname = factory.createSimpleIdentifierProxy(mAutomaton.getName());
-      //exception.printStackTrace();
+      oldName = factory.createSimpleIdentifierProxy(mAutomaton.getName());
     }
-    final FormattedInputHandler<IdentifierProxy>
-      nameParser = new AutomatonNameInputHandler(oldname, mAnalyzerPanel, parser, true, false);  // TODO
-    mNameInput =
-      new SimpleExpressionInputCell(oldname, nameParser);
-    mNameInput.addActionListener(commithandler);
-    mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i]");
+    final FormattedInputHandler<IdentifierProxy> handler =
+      new AutomatonNameInputHandler(oldName, mAnalyzerPanel, parser, true, true);
+    mNameInput = new SimpleExpressionInputCell(oldName, handler);
+    mNameInput.addActionListener(commitHandler);
+    mNameInput.addSimpleDocumentListener(okEnablement);
+    mNameInput.setToolTipText("Enter automaton name.");
     mKindLabel = new JLabel("Kind:");
-    mKindGroup = new ButtonGroup();
+    final ButtonGroup group = new ButtonGroup();
     mPlantButton = new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
-                                       mKindGroup, 'p');
+                                       group, 'p');
     mPropertyButton =
       new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
-                          mKindGroup, 'o');
+                          group, 'o');
     mSpecButton =
       new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC,
-                          mKindGroup, 's');
+                          group, 's');
     mSupervisorButton =
       new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
-                          mKindGroup, 'u');
+                          group, 'u');
     switch (mAutomaton.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -176,17 +193,18 @@ public class AutomatonPropertiesDialog extends JDialog
 
     // Buttons panel ...
     mButtonsPanel = new JPanel();
-    final JButton okButton = new JButton("OK");
-    okButton.setRequestFocusEnabled(false);
-    okButton.addActionListener(commithandler);
-    mButtonsPanel.add(okButton);
+    mOkButton = new JButton("OK");
+    mOkButton.setRequestFocusEnabled(false);
+    mOkButton.addActionListener(commitHandler);
+    mButtonsPanel.add(mOkButton);
     final Action cancelAction = DialogCancelAction.getInstance();
     final JButton cancelButton = new JButton(cancelAction);
     cancelButton.setRequestFocusEnabled(false);
     mButtonsPanel.add(cancelButton);
+    updateOkButtonStatus();
 
     final JRootPane root = getRootPane();
-    root.setDefaultButton(okButton);
+    root.setDefaultButton(mOkButton);
     DialogCancelAction.register(this);
   }
 
@@ -289,19 +307,28 @@ public class AutomatonPropertiesDialog extends JDialog
     pack();
   }
 
+
   //#########################################################################
   //# Action Listeners
+  private void updateOkButtonStatus()
+  {
+    final boolean enabled = mNameInput.getText().length() > 0;
+    mOkButton.setEnabled(enabled);
+  }
+
   /**
    * Commits the contents of this dialog to the model. This method is attached
    * to the action listener of the 'OK' button of the event editor dialog.
    */
-  public void commitDialog()
+  private void commitDialog()
   {
     final ProductDESProxyFactory factory =
       ProductDESElementFactory.getInstance();
     if (isInputLocked()) {
       // There is invalid input and an error message has been displayed.
       // Do not try to commit.
+    } else if (mNameInput.getValue() == null) {
+      mNameInput.requestFocusWithErrorMessage("Please enter an automaton name.");
     } else {
       // Read the data from the dialog ...
       final String name = mNameInput.getText();
@@ -319,15 +346,15 @@ public class AutomatonPropertiesDialog extends JDialog
       }
       final Map<String,String> attribs = mAttributesPanel.getTableData();
       final Map<String,String> autAttribs = mAutomaton.getAttributes();
-      if (!attribs.equals(autAttribs) || !kind.equals(mAutomaton.getKind())
-          || !name.equals(mAutomaton.getName())) {
+      if (!attribs.equals(autAttribs) ||
+          !kind.equals(mAutomaton.getKind()) ||
+          !name.equals(mAutomaton.getName())) {
         final AutomatonProxy newAut =
           factory.createAutomatonProxy(name, kind,
                                        mAutomaton.getEvents(),
                                        mAutomaton.getStates(),
                                        mAutomaton.getTransitions(),
                                        attribs);
-
         final AutomataTableModel model =
           mAnalyzerPanel.getAutomataTableModel();
         model.replaceAutomaton(mAutomaton, newAut);
@@ -336,6 +363,7 @@ public class AutomatonPropertiesDialog extends JDialog
       dispose();
     }
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -350,14 +378,16 @@ public class AutomatonPropertiesDialog extends JDialog
    */
   private boolean isInputLocked()
   {
-    return mNameInput.isFocusOwner() && !mNameInput.shouldYieldFocus();
+    final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
+    final FocusTracker tracker = ide.getFocusTracker();
+    return !tracker.shouldYieldFocus(this);
   }
+
 
   //#########################################################################
   //# Inner Class SimpleComponentAttributesPanel
   private class AutomatonAttributesPanel extends AttributesPanel
   {
-
     //#######################################################################
     //# Constructor
     private AutomatonAttributesPanel(final Map<String,String> attribs)
@@ -376,8 +406,8 @@ public class AutomatonPropertiesDialog extends JDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = -3597766255951309897L;
-
   }
+
 
   //#########################################################################
   //# Data Members
@@ -389,7 +419,6 @@ public class AutomatonPropertiesDialog extends JDialog
   private JLabel mNameLabel;
   private SimpleExpressionInputCell mNameInput;
   private JLabel mKindLabel;
-  private ButtonGroup mKindGroup;
   private IconRadioButton mPlantButton;
   private IconRadioButton mPropertyButton;
   private IconRadioButton mSpecButton;
@@ -398,19 +427,17 @@ public class AutomatonPropertiesDialog extends JDialog
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;
   private JPanel mButtonsPanel;
+  private JButton mOkButton;
 
   // Created Item
   /**
-   * <P>
-   * The Waters Automaton edited by this dialog.
-   * </P>
+   * <P>The Waters Automaton edited by this dialog.</P>
    *
-   * <P>
-   * The edited automaton is stored only in the dialog. Changes are only
-   * committed to the original automaton when the OK button is pressed.
-   * </P>
+   * <P>The edited automaton is stored only in the dialog. Changes are only
+   * committed to the original automaton when the OK button is pressed.</P>
    */
   private final AutomatonProxy mAutomaton;
+
 
   //#########################################################################
   //# Class Constants

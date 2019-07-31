@@ -187,19 +187,19 @@ public class SimpleComponentEditorDialog
     mNameInput.addSimpleDocumentListener(okEnablement);
     mNameInput.setToolTipText("Enter automaton name, e.g., x or v[i].");
     mKindLabel = new JLabel("Kind:");
-    mKindGroup = new ButtonGroup();
+    final ButtonGroup group = new ButtonGroup();
     mPlantButton =
       new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
-                          mKindGroup, 'p');
+                          group, 'p');
     mPropertyButton =
       new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
-                          mKindGroup, 'o');
+                          group, 'o');
     mSpecButton =
       new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC,
-                          mKindGroup, 's');
+                          group, 's');
     mSupervisorButton =
       new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
-                          mKindGroup, 'u');
+                          group, 'u');
     switch (template.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -499,7 +499,6 @@ public class SimpleComponentEditorDialog
   private SimpleExpressionInputCell mNameInput;
   private JLabel mDeterministicLabel;
   private JLabel mKindLabel;
-  private ButtonGroup mKindGroup;
   private IconRadioButton mPlantButton;
   private IconRadioButton mPropertyButton;
   private IconRadioButton mSpecButton;
