@@ -55,7 +55,6 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.base.ComponentKind;
 
 
 /**
@@ -159,7 +158,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         setUpClasses();
         setUpEventList(enabDisabEvents, disabEvents);
         if (enabDisabEvents.size() == 0) {
-          partition = createOneStateTR(disabEvents);
+          partition = createOneStatePartition(disabEvents);
         } else {
           partition = reduceSupervisor(enabDisabEvents);
         }
@@ -178,7 +177,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         }
       }
     } else {
-      partition = createOneStateTR(new TIntArrayList(0));
+      partition = createOneStatePartition(new TIntArrayList(0));
     }
     setResultPartition(partition);
     if (partition != null) {
@@ -890,59 +889,28 @@ public class SuWonhamSupervisorReductionTRSimplifier
     return pair;
   }
 
-  private TRPartition createOneStateTR(final TIntArrayList disabEvents)
+  private TRPartition createOneStatePartition(final TIntArrayList disabEvents)
     throws OverflowException, AnalysisAbortException
   {
     final ListBufferTransitionRelation oldRel = getTransitionRelation();
-    final ListBufferTransitionRelation rel =
-      new ListBufferTransitionRelation("OneStateSup",
-                                       ComponentKind.SUPERVISOR,
-                                       mNumProperEvents,
-                                       oldRel.getNumberOfPropositions(),
-                                       2, 1,
-                                       ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-    rel.setInitial(0, true);
-    // set all events in disabEvents USED
-    for (int e = EventEncoding.TAU; e < rel.getNumberOfProperEvents(); e++) {
-      if (!disabEvents.contains(e)) {
-        final byte status = rel.getProperEventStatus(e);
-        rel.setProperEventStatus(e, status | EventStatus.STATUS_UNUSED);
-      }
-    }
-    // Create a one-reachable-state automaton if the disabled event set is
-    // empty, otherwise create a two-reachable-state automaton.
-    if (disabEvents.isEmpty()) {
-      // set initial state markings
-      final int numProps = rel.getNumberOfPropositions();
-      for (int p = 0; p < numProps; p++) {
-        rel.setPropositionUsed(p, false);
-      }
-      // dump state not reachable
-      rel.setReachable(1, false);
+    if (oldRel.getNumberOfReachableStates() <= 1 &&
+        oldRel.getNumberOfTransitions() == 0) {
+      return null;
     } else {
-      // add transitions from state 0 to dump state
-      for (int i = 0; i < disabEvents.size(); i++) {
-        rel.addTransition(0, disabEvents.get(i), 1);
+      final int oldDumpIndex = oldRel.getDumpStateIndex();
+      final int oldNumStates = oldRel.getNumberOfStates();
+      final int[] stateToClass = new int[oldNumStates];
+      for (int s = 0; s < oldNumStates; s++) {
+        if (!oldRel.isReachable(s)) {
+          stateToClass[s] = -1;
+        } else if (s != oldDumpIndex) {
+          stateToClass[s] = 0;
+        } else {
+          stateToClass[s] = 1;
+        }
       }
-      // set initial state markings
-      final int numProps = rel.getNumberOfPropositions();
-      for (int p = 0; p < numProps; p++) {
-        rel.setMarked(0, p, true);
-      }
+      return new TRPartition(stateToClass, 2);
     }
-    final int oldDumpIndex = oldRel.getDumpStateIndex();
-    final int oldNumStates = oldRel.getNumberOfStates();
-    final int[] stateToClass = new int[oldNumStates];
-    for (int s = 0; s < oldNumStates; s++) {
-      if (!oldRel.isReachable(s)) {
-        stateToClass[s] = -1;
-      } else if (s != oldDumpIndex) {
-        stateToClass[s] = 0;
-      } else {
-        stateToClass[s] = 1;
-      }
-    }
-    return new TRPartition(stateToClass, 2);
   }
 
   private int getSuccessorState(final int source, final int event)

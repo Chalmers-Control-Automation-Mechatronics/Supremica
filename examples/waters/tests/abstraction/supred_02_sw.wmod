@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="supred_01">
-<B:Comment>A simple supervisor reduction test.
-It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorithms.</B:Comment>
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="supred_02_sw">
+<B:Comment>A test for the supervisor reduction.
+A reduced supervisor is obtained using the overlapping maximal cliques of compatibles {S0,S1} and {S1,S2}.
+No reduction is possible without overlapping.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="c"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
+<EventDecl Kind="UNCONTROLLABLE" Name="v"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT" Name="before">
@@ -57,6 +59,9 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <StartPointGeometry>
 <Point X="80" Y="112"/>
 </StartPointGeometry>
+<SplineGeometry>
+<Point X="96" Y="152"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="S0" Target="S1">
 <LabelBlock>
@@ -65,6 +70,9 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <Point X="4" Y="-7"/>
 </LabelGeometry>
 </LabelBlock>
+<SplineGeometry>
+<Point X="96" Y="72"/>
+</SplineGeometry>
 </Edge>
 <Edge Source="S0" Target="S0">
 <LabelBlock>
@@ -85,80 +93,26 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 </LabelGeometry>
 </LabelBlock>
 </Edge>
-</EdgeList>
-</Graph>
-</SimpleComponent>
-<SimpleComponent Kind="PLANT" Name="after">
-<Graph Deterministic="false">
-<NodeList>
-<SimpleNode Initial="false" Name="S12">
-<PointGeometry>
-<Point X="80" Y="112"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-35" Y="-2"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="true" Name="S01">
-<PointGeometry>
-<Point X="80" Y="32"/>
-</PointGeometry>
-<InitialArrowGeometry>
-<Point X="-16" Y="-14"/>
-</InitialArrowGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-32" Y="2"/>
-</LabelGeometry>
-</SimpleNode>
-<SimpleNode Initial="false" Name=":dump">
-<PointGeometry>
-<Point X="80" Y="192"/>
-</PointGeometry>
-<LabelGeometry Anchor="NW">
-<Point X="-25" Y="9"/>
-</LabelGeometry>
-</SimpleNode>
-</NodeList>
-<EdgeList>
-<Edge Source="S01" Target="S12">
+<Edge Source="S2" Target="S1">
 <LabelBlock>
-<SimpleIdentifier Name="u"/>
+<SimpleIdentifier Name="v"/>
 <LabelGeometry Anchor="NW">
-<Point X="4" Y="-7"/>
-</LabelGeometry>
-</LabelBlock>
-</Edge>
-<Edge Source="S01" Target="S01">
-<LabelBlock>
-<SimpleIdentifier Name="c"/>
-<LabelGeometry Anchor="NW">
-<Point X="-17" Y="-10"/>
+<Point X="-20" Y="-9"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="122" Y="34"/>
+<Point X="64" Y="152"/>
 </SplineGeometry>
 </Edge>
-<Edge Source="S12" Target=":dump">
+<Edge Source="S1" Target="S0">
 <LabelBlock>
-<SimpleIdentifier Name="c"/>
+<SimpleIdentifier Name="v"/>
 <LabelGeometry Anchor="NW">
-<Point X="4" Y="-4"/>
-</LabelGeometry>
-</LabelBlock>
-<StartPointGeometry>
-<Point X="80" Y="112"/>
-</StartPointGeometry>
-</Edge>
-<Edge Source="S12" Target="S12">
-<LabelBlock>
-<SimpleIdentifier Name="u"/>
-<LabelGeometry Anchor="NW">
-<Point X="-20" Y="-7"/>
+<Point X="-19" Y="-7"/>
 </LabelGeometry>
 </LabelBlock>
 <SplineGeometry>
-<Point X="122" Y="114"/>
+<Point X="64" Y="72"/>
 </SplineGeometry>
 </Edge>
 </EdgeList>
