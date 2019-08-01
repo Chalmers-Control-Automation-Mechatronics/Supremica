@@ -42,7 +42,6 @@ import java.util.Map;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.module.AliasProxy;
-import net.sourceforge.waters.model.module.AnchorPosition;
 import net.sourceforge.waters.model.module.BinaryExpressionProxy;
 import net.sourceforge.waters.model.module.BoxGeometryProxy;
 import net.sourceforge.waters.model.module.ColorGeometryProxy;
@@ -80,7 +79,6 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.SimpleIdentifierProxy;
 import net.sourceforge.waters.model.module.SimpleNodeProxy;
 import net.sourceforge.waters.model.module.SplineGeometryProxy;
-import net.sourceforge.waters.model.module.SplineKind;
 import net.sourceforge.waters.model.module.UnaryExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.model.module.VariableMarkingProxy;
@@ -161,7 +159,7 @@ public class StAXModuleWriter
   {
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_ConstantAlias);
     writeAttribute(SchemaModule.ATTRIB_Scope, alias.getScope(),
-                   ScopeKind.LOCAL); // TODO use default
+                   SchemaModule.DEFAULT_ScopeKind);
     visitAliasProxy(alias);
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_ConstantAliasExpression);
     alias.getExpression().acceptVisitor(this);
@@ -422,7 +420,7 @@ public class StAXModuleWriter
   {
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_LabelGeometry);
     writeAttribute(SchemaModule.ATTRIB_Anchor, geo.getAnchor(),
-                   AnchorPosition.SW);  // TODO use default
+                   SchemaModule.DEFAULT_AnchorPosition);
     visitGeometryProxy(geo);
     writePoint(geo.getOffset());
     writeEndElement();
@@ -574,7 +572,8 @@ public class StAXModuleWriter
     final boolean empty = props.getEventIdentifierList().isEmpty() &&
       pointGeo == null && initGeo == null && labelGeo == null;
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_SimpleNode, empty);
-    writeAttribute(SchemaModule.ATTRIB_Initial, node.isInitial());
+    writeAttribute(SchemaModule.ATTRIB_Initial, node.isInitial(),
+                   SchemaModule.DEFAULT_Initial);
     visitNodeProxy(node);
     writePointGeometry(pointGeo);
     writePointGeometry(initGeo, SchemaModule.ELEMENT_InitialArrowGeometry);
@@ -589,7 +588,7 @@ public class StAXModuleWriter
   {
     writeStartElement(NAMESPACE, SchemaModule.ELEMENT_SplineGeometry);
     writeAttribute(SchemaModule.ATTRIB_Kind, geo.getKind(),
-                   SplineKind.INTERPOLATING);  // TODO use default
+                   SchemaModule.DEFAULT_SplineKind);
     visitGeometryProxy(geo);
     for (final Point2D point : geo.getPoints()) {
       writePoint(point);
