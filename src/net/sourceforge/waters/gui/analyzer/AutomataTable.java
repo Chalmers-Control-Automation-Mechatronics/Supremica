@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FontMetrics;
@@ -435,8 +437,9 @@ public class AutomataTable extends JTable implements SelectionOwner
     for (final Proxy p : items) {
       if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
-        if ((model.getIndex(aut) != -1))
+        if ((model.getIndex(aut) != -1)) {
           return true;
+        }
       }
     }
     return false;
@@ -445,9 +448,10 @@ public class AutomataTable extends JTable implements SelectionOwner
   @Override
   public List<InsertInfo> getDeletionVictims(final List<? extends Proxy> items)
   {
-    final List<InsertInfo> infoList = new ArrayList<InsertInfo>(items.size());
-    for (final Proxy p : items)
+    final List<InsertInfo> infoList = new ArrayList<>(items.size());
+    for (final Proxy p : items) {
       infoList.add(new InsertInfo(p));
+    }
     return infoList;
   }
 
@@ -470,7 +474,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   @Override
   public void deleteItems(final List<InsertInfo> deletes)
   {
-    final List<Integer> deleteIndexList = new ArrayList<Integer>();
+    final TIntArrayList deleteIndexList = new TIntArrayList(deletes.size());
     final AutomataTableModel model = getModel();
     for (final InsertInfo info : deletes) {
       final Proxy proxy = info.getProxy();

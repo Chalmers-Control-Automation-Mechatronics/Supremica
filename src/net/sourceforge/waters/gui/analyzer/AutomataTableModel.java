@@ -33,10 +33,11 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,43 +99,44 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     return mEventMap;
   }
 
-  void deleteRows(final List<Integer> deleteList)
+  void deleteRows(final TIntArrayList deleteIndexList)
   {
-    final Comparator<Integer> c = Collections.reverseOrder();
-    Collections.sort(deleteList, c);
-
+    deleteIndexList.sort();
     int start = -1;
     int end = -1;
-    for (final int i : deleteList) {
-      final int position = i;
-      if (start == -1) {
-        start = end = position;
-      } else if (position > (end + 1)) {
-        for (int q = start; q >= end; q--) {
-          removeFromDisplayMap(mAutomataList.get(q));
-          mAutomataList.remove(q);
-        }
-        fireTableRowsDeleted(end, start);
-        start = end = position;
+    for (int p = deleteIndexList.size() - 1; p >= 0; p--) {
+      final int deleteIndex = deleteIndexList.get(p);
+      if (start < 0) {
+        start = end = deleteIndex;
+      } else if (deleteIndex == start - 1) {
+        start = deleteIndex;
       } else {
-        end = position;
+        deleteRows(start, end);
+        start = end = deleteIndex;
       }
     }
-    for (int q = start; q >= end; q--) {
-      removeFromDisplayMap(mAutomataList.get(q));
-      mAutomataList.remove(q);
+    if (start >= 0) {
+      deleteRows(start, end);
     }
-    fireTableRowsDeleted(end, start);
   }
 
-  public void insertRows(final Collection<? extends AutomatonProxy> insertList)
+  private void deleteRows(final int start, final int end)
+  {
+    for (int i = end; i >= start; i--) {
+      final AutomatonProxy aut = mAutomataList.remove(i);
+      removeFromDisplayMap(aut);
+    }
+    fireTableRowsDeleted(start, end);
+  }
+
+  void insertRows(final Collection<? extends AutomatonProxy> insertList)
   {
     final int count = mAutomataList.size();
     mAutomataList.addAll(insertList);
     fireTableRowsInserted(count, count + (insertList.size()-1));
   }
 
-  public void insertRow(final AutomatonProxy insert)
+  void insertRow(final AutomatonProxy insert)
   {
     final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
     autList.add(insert);
