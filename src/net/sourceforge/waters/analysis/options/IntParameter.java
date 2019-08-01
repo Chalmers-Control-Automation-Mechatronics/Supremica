@@ -71,13 +71,8 @@ public class IntParameter extends AbstractTextFieldParameter
     mValue = defValue;
     mFormat = NumberFormat.getIntegerInstance();
     mFormat.setGroupingUsed(false);
-    if(min < 0) {
-      mAlphabet = "-?[0-9]+";
-    } else {
-      mAlphabet = "[0-9]+";
-    }
+    mAlphabet = "[0-9]|[-]|^$";
   }
-
 
   //#########################################################################
   //# Overrides for ney.sourceforge.waters.analysis.options.Parameter
@@ -140,6 +135,15 @@ public class IntParameter extends AbstractTextFieldParameter
       }
      return false;
  }
+
+  @Override
+  protected boolean filterText(final String text)
+  {
+   if(text.matches(mAlphabet))
+    return true;
+   else
+     return false;
+  }
 
   public int getValue() {
     return mValue;
@@ -204,5 +208,6 @@ public class IntParameter extends AbstractTextFieldParameter
   private int mValue;
   private final int defaultValue;
   private final NumberFormat mFormat;
-  private String mAlphabet;
+  private final String mAlphabet;
+
 }

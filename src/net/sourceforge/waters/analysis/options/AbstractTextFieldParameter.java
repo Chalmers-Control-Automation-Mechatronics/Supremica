@@ -63,6 +63,8 @@ public abstract class AbstractTextFieldParameter extends Parameter
 
   protected abstract boolean testAlphabet(final String text);
 
+  protected abstract boolean filterText(final String text);
+
   private class InputFilter extends DocumentFilter {
 
     @Override
@@ -79,7 +81,12 @@ public abstract class AbstractTextFieldParameter extends Parameter
       final StringBuilder sb = new StringBuilder();
       sb.append(doc.getText(0, doc.getLength()));
       sb.replace(offset, offset + length, text);
-      if (testAlphabet(sb.toString())) {
+
+      //if (testAlphabet(sb.toString())) {
+      //  super.replace(fb, offset, length, text, attrs);
+      //}
+
+      if (filterText(text)) {
         super.replace(fb, offset, length, text, attrs);
       }
     }
