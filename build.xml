@@ -42,8 +42,8 @@
               location="${waters.dir}/java/jar/jniglue.jar"/>
 
     <!-- LOG4J2 -->
-    <property name="log4j2.api.jar" value="log4j-api-2.9.0.jar"/>
-    <property name="log4j2.core.jar" value="log4j-core-2.9.0.jar"/>
+    <property name="log4j2.api.jar" value="log4j-api-2.12.0.jar"/>
+    <property name="log4j2.core.jar" value="log4j-core-2.12.0.jar"/>
 
     <!-- Class paths -->
     <path id="other.jars.classpath">
