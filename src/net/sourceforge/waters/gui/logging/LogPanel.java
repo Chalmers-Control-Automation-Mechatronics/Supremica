@@ -75,6 +75,7 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 
 import org.supremica.gui.WhiteScrollPane;
 import org.supremica.gui.ide.IDE;
@@ -412,7 +413,7 @@ public class LogPanel extends JPanel
                              final Layout<String> layout,
                              final boolean ignoreExceptions)
     {
-      super(name, null, layout, ignoreExceptions);
+      super(name, null, layout, ignoreExceptions, Property.EMPTY_ARRAY);
     }
 
     //#######################################################################

@@ -13,9 +13,9 @@
   <property name="anarres.jar" location="${supremica.lib}/anarres-cpp.jar"/>
   <property name="javabdd.jar" location="${supremica.lib}/javabdd-2.0.jar"/>
   <property name="log4j-api.jar"
-            location="${supremica.lib}/log4j-api-2.9.0.jar"/>
+            location="${supremica.lib}/log4j-api-2.12.0.jar"/>
   <property name="log4j-core.jar"
-            location="${supremica.lib}/log4j-core-2.9.0.jar"/>
+            location="${supremica.lib}/log4j-core-2.12.0.jar"/>
   <property name="junit.jar" location="${supremica.lib}/junit.jar"/>
   <property name="trove.jar" location="${supremica.lib}/trove-3.0.3.jar"/>
 

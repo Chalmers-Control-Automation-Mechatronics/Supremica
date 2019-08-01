@@ -45,6 +45,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.apache.logging.log4j.core.appender.FileAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
@@ -118,11 +119,11 @@ public class IDEAppender
               final Layout<? extends Serializable> layout,
               final boolean ignoreExceptions)
   {
-    super(name, filter, layout, ignoreExceptions);
+    super(name, filter, layout, ignoreExceptions, Property.EMPTY_ARRAY);
     final ConsoleAppender.Builder<?> builder = ConsoleAppender.newBuilder();
-    builder.withName("stderr");
-    builder.withLayout(layout);
-    builder.withIgnoreExceptions(ignoreExceptions);
+    builder.setName("stderr");
+    builder.setLayout(layout);
+    builder.setIgnoreExceptions(ignoreExceptions);
     builder.setTarget(ConsoleAppender.Target.SYSTEM_ERR);
     mStdErrAppender = builder.build();
   }
@@ -149,14 +150,14 @@ public class IDEAppender
     final String fileName = Config.LOG_FILE.get();
     if (fileName.length() > 0) {
       final FileAppender.Builder<?> builder = FileAppender.newBuilder();
-      builder.withName("logFile");
+      builder.setName("logFile");
       builder.withFileName(fileName);
       final PatternLayout.Builder layoutBuilder = PatternLayout.newBuilder();
       layoutBuilder.withPattern("%-5level [%d] %msg%ex%n");
       final Layout<String> layout = layoutBuilder.build();
-      builder.withLayout(layout);
+      builder.setLayout(layout);
       final boolean ignore = ignoreExceptions();
-      builder.withIgnoreExceptions(ignore);
+      builder.setIgnoreExceptions(ignore);
       mFileAppender = builder.build();
       mFileAppender.start();
     }
