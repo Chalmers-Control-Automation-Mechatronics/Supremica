@@ -703,10 +703,14 @@ public class VariableEditorDialog
           markings.add(marking.clone());
         }
       }
-      final IdentifierSubject iclone =
+      final IdentifierSubject tIdent =
         ident.getParent() == null ? ident : ident.clone();
+      final SimpleExpressionSubject tType =
+        type.getParent() == null ? type : type.clone();
+      final SimpleExpressionSubject tInitial =
+        initial.getParent() == null ? initial : initial.clone();
       final VariableComponentSubject template =
-        new VariableComponentSubject(iclone, type, initial, markings);
+        new VariableComponentSubject(tIdent, tType, tInitial, markings);
       final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(true);
       if (mVariable == null) {
         final SelectionOwner panel = mRoot.getComponentsPanel();
