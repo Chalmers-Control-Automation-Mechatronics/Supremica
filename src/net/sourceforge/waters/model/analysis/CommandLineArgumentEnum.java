@@ -194,6 +194,12 @@ public abstract class CommandLineArgumentEnum<E extends Enum<E>>
       return Arrays.asList(array);
     }
 
+    @Override
+    public String getConsoleName(final E item)
+    {
+      return item.name();
+    }
+
     //#######################################################################
     //# Data Members
     private final Class<E> mEnumerationClass;

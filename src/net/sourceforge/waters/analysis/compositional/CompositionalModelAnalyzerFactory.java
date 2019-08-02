@@ -36,15 +36,19 @@ package net.sourceforge.waters.analysis.compositional;
 import java.io.File;
 import java.io.PrintStream;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -94,6 +98,8 @@ public class CompositionalModelAnalyzerFactory
     addArgument(new AbstractionMethodArgument());
     addArgument(new PreselectingMethodArgument());
     addArgument(new SelectingMethodArgument());
+    addArgument(new SupervisorReductionArgument());
+    addArgument(new SupervisorLocalisationArgument());
     addArgument(new SubsumptionArgument());
     addArgument(new SpecialEventsArgument());
     addArgument(new BlockedEventsArgument());
@@ -471,7 +477,68 @@ public class CompositionalModelAnalyzerFactory
         factory.dumpEnumeration(stream, INDENT);
       }
     }
+  }
 
+
+  //#########################################################################
+  //# Inner Class SupervisorReductionArgument
+  private static class SupervisorReductionArgument
+    extends CommandLineArgumentEnum<DefaultSupervisorReductionFactory>
+  {
+    //#######################################################################
+    //# Constructors
+    private SupervisorReductionArgument()
+    {
+      super("-red", "Supervisor reduction method",
+            DefaultSupervisorReductionFactory.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof SupervisorSynthesizer) {
+        final SupervisorSynthesizer synthesizer =
+          (SupervisorSynthesizer) analyzer;
+        final SupervisorReductionFactory factory = getValue();
+        synthesizer.setSupervisorReductionFactory(factory);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for synthesis!");
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class SupervisorLocalisationArgument
+  private static class SupervisorLocalisationArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private SupervisorLocalisationArgument()
+    {
+      super("-loc", "Localise reduced supervisors");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof SupervisorSynthesizer) {
+        final SupervisorSynthesizer synthesizer =
+          (SupervisorSynthesizer) analyzer;
+        synthesizer.setSupervisorLocalizationEnabled(true);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for synthesis!");
+      }
+    }
   }
 
 
@@ -479,7 +546,6 @@ public class CompositionalModelAnalyzerFactory
   //# Inner Class SubsumptionArgument
   private static class SubsumptionArgument extends CommandLineArgumentFlag
   {
-
     //#######################################################################
     //# Constructors
     private SubsumptionArgument()
@@ -497,7 +563,6 @@ public class CompositionalModelAnalyzerFactory
         (AbstractCompositionalModelAnalyzer) analyzer;
       composer.setSubumptionEnabled(true);
     }
-
   }
 
 

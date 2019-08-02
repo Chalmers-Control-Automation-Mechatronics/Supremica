@@ -60,7 +60,8 @@ public abstract class EnumFactory<E>
   public E getEnumValue(final String name)
   {
     for (final E value : getEnumConstants()) {
-      if (value.toString().equalsIgnoreCase(name)) {
+      final String eName = getConsoleName(value);
+      if (eName.equalsIgnoreCase(name)) {
         return value;
       }
     }
@@ -88,8 +89,8 @@ public abstract class EnumFactory<E>
     stream.println("Possible values are:");
     int column = 0;
     boolean first = true;
-    for (final Object item : getEnumConstants()) {
-      final String label = item.toString();
+    for (final E item : getEnumConstants()) {
+      final String label = getConsoleName(item);
       final int len = label.length();
       if (first) {
         first = false;
@@ -112,6 +113,17 @@ public abstract class EnumFactory<E>
       column += len;
     }
     stream.println();
+  }
+
+  /**
+   * Gets the raw name of the given enumeration element, which can be
+   * displayed in the console. The default implementation simply calls
+   * {@link #toString()}, but this may be overridden in subclasses that
+   * distinguish pretty GUI names from console names.
+   */
+  public String getConsoleName(final E item)
+  {
+    return item.toString();
   }
 
 }

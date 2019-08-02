@@ -33,11 +33,16 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
+import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.StateCounter;
+import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
@@ -69,6 +74,18 @@ public class MonolithicModelAnalyzerFactory
   //# Constructors
   private MonolithicModelAnalyzerFactory()
   {
+  }
+
+
+  //#########################################################################
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractModelAnalyzerFactory
+  @Override
+  protected void addArguments()
+  {
+    super.addArguments();
+    addArgument(new SupervisorReductionArgument());
+    addArgument(new SupervisorLocalisationArgument());
   }
 
 
@@ -137,5 +154,69 @@ public class MonolithicModelAnalyzerFactory
   {
     return new MonolithicSynthesizer(factory);
   }
+
+
+  //#########################################################################
+  //# Inner Class SupervisorReductionArgument
+  private static class SupervisorReductionArgument
+    extends CommandLineArgumentEnum<DefaultSupervisorReductionFactory>
+  {
+    //#######################################################################
+    //# Constructors
+    private SupervisorReductionArgument()
+    {
+      super("-red", "Supervisor reduction method",
+            DefaultSupervisorReductionFactory.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof SupervisorSynthesizer) {
+        final SupervisorSynthesizer synthesizer =
+          (SupervisorSynthesizer) analyzer;
+        final SupervisorReductionFactory factory = getValue();
+        synthesizer.setSupervisorReductionFactory(factory);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for synthesis!");
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class SupervisorLocalisationArgument
+  private static class SupervisorLocalisationArgument
+    extends CommandLineArgumentFlag
+  {
+    //#######################################################################
+    //# Constructors
+    private SupervisorLocalisationArgument()
+    {
+      super("-loc", "Localise reduced supervisors");
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof SupervisorSynthesizer) {
+        final SupervisorSynthesizer synthesizer =
+          (SupervisorSynthesizer) analyzer;
+        synthesizer.setSupervisorLocalizationEnabled(true);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for synthesis!");
+      }
+    }
+  }
+
+
 
 }
