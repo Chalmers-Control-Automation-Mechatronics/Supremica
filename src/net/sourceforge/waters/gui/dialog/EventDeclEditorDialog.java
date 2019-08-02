@@ -152,7 +152,7 @@ public class EventDeclEditorDialog
   {
     super(root.getRootWindow());
     if (decl == null) {
-      setTitle("Creating new event declaration");
+      setTitle("Creating event declaration");
     } else {
       setTitle("Editing event declaration '" + decl.getName() + "'");
     }
@@ -161,6 +161,7 @@ public class EventDeclEditorDialog
     mEventDecl = decl;
     createComponents();
     layoutComponents();
+    setMinimumSize(getSize());
     setLocationRelativeTo(mRoot.getRootWindow());
     mNameInput.requestFocusInWindow();
     setVisible(true);
@@ -458,7 +459,6 @@ public class EventDeclEditorDialog
     constraints.weightx = 1.0;
     constraints.gridwidth = GridBagConstraints.REMAINDER;
     if (mDisplayingMoreOptions) {
-      setMinimumSize(getSize());
       constraints.weighty = 0.0;
       constraints.fill = GridBagConstraints.HORIZONTAL;
       layoutExtendedNamePanel();
@@ -756,16 +756,9 @@ public class EventDeclEditorDialog
     resetPanels();
     mDisplayingMoreOptions = !mDisplayingMoreOptions;
     createComponents();
+    setMinimumSize(null);
     layoutComponents();
-    pack();
-    if(mDisplayingMoreOptions){
-      setMinimumSize(MIN_MORE_OPTIONS_SIZE);
-    }
-    else{
-      setMinimumSize(MIN_LESS_OPTIONS_SIZE);
-      setSize(MIN_LESS_OPTIONS_SIZE);
-    }
-
+    setMinimumSize(getSize());
     mNameInput.requestFocusInWindow();
     if (restorer != null) {
       SwingUtilities.invokeLater(restorer);
@@ -1449,7 +1442,5 @@ public class EventDeclEditorDialog
     new SimpleIdentifierSubject("");
   private static final EventDeclSubject TEMPLATE =
     new EventDeclSubject(TEMPLATE_IDENT, EventKind.CONTROLLABLE);
-  private static Dimension MIN_LESS_OPTIONS_SIZE = new Dimension(485, 195);
-  private static Dimension MIN_MORE_OPTIONS_SIZE = new Dimension(502, 437);
 
 }
