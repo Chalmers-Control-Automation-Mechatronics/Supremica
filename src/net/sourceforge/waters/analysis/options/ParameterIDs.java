@@ -148,7 +148,7 @@ public class ParameterIDs
     new BoolParameter
       (SupervisorSynthesizer_SupervisorLocalisationEnabled_ID,
        "Localize supervisors",
-       "If using supervisor reduction, create a separate supervisor " +
+       "If using supervisor reduction, create separate supervisors " +
        "for each controllable event that needs to be disabled.",
        true);
 

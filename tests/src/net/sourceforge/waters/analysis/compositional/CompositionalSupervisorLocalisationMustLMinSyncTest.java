@@ -41,7 +41,7 @@ import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
-public class CompositionalSupervisorReductionMustLMinSTest
+public class CompositionalSupervisorLocalisationMustLMinSyncTest
   extends AbstractSupervisorSynthesizerTest
 {
 
@@ -50,7 +50,7 @@ public class CompositionalSupervisorReductionMustLMinSTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(CompositionalSupervisorReductionMustLMinSTest.class);
+      new TestSuite(CompositionalSupervisorLocalisationMustLMinSyncTest.class);
     return testSuite;
   }
 
@@ -75,10 +75,10 @@ public class CompositionalSupervisorReductionMustLMinSTest
     synthesizer.setInternalTransitionLimit(500000);
     synthesizer.setPreselectingMethod(AbstractCompositionalModelAnalyzer.MustL);
     synthesizer.setSelectionHeuristic
-      (CompositionalSelectionHeuristicFactory.MinS);
+      (CompositionalSelectionHeuristicFactory.MinSync);
     synthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.SU_WONHAM);
-    synthesizer.setSupervisorLocalizationEnabled(false);
+      (DefaultSupervisorReductionFactory.SU_WONHAM_EXPERIMENTAL);
+    synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
 

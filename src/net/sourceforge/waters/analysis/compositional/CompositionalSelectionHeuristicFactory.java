@@ -99,8 +99,8 @@ public class CompositionalSelectionHeuristicFactory
   //# Constructors
   protected CompositionalSelectionHeuristicFactory()
   {
-    register(MaxL);
     register(MaxC);
+    register(MaxL, true);
     register(MinE);
     register(MinF);
     register(MinS);

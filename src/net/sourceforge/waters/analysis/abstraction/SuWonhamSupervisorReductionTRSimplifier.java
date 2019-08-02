@@ -441,7 +441,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     }
 
     for (int s = 0; s < numStates; s++) {
-      if (!mSearchingBitSet.get(s)) {
+      if (!mSearchingBitSet.get(s) && rel.isReachable(s)) {
         final int list = mClasses.createList();
         mClasses.add(list, s);
         mStateToClass[count] = list;

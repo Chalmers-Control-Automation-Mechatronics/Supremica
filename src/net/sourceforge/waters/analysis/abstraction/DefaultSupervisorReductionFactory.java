@@ -78,7 +78,7 @@ public enum DefaultSupervisorReductionFactory
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
-      main.setExperimentalMode(true);
+      main.setExperimentalMode(false);
       return new SupervisorReductionChain(false, main);
     }
   },
@@ -100,6 +100,63 @@ public enum DefaultSupervisorReductionFactory
    * @see SelfloopSupervisorReductionTRSimplifier
    */
   PROJECTION_SU_WONHAM("Projection + Su/Wonham") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SuWonhamSupervisorReductionTRSimplifier main =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      main.setExperimentalMode(false);
+      return new SupervisorReductionChain(true, main);
+    }
+  },
+  /**
+   * <P>An option to specify an experimental version of the Su/Wonham
+   * supervisor reduction algorithm. The experimental works in the case
+   * of supervisor localisation only. It uses an alternative ordering of the
+   * state pairs to be merged based on the distance to disabling states.
+   * This option applies the Su/Wonham algorithm and afterwards removes
+   * events that appear only on selfloops and are not under supervision.</P>
+   *
+   * <P><I>Reference.</I><BR>
+   * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+   * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see SuWonhamSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
+  SU_WONHAM_EXPERIMENTAL("Su/Wonham (experimental)") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SuWonhamSupervisorReductionTRSimplifier main =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      main.setExperimentalMode(true);
+      return new SupervisorReductionChain(false, main);
+    }
+  },
+  /**
+   * <P>An option to specify a combination of event removal and the Su/Wonham
+   * supervisor reduction algorithm in experimental mode. This options
+   * simplifies supervisors by first removing events that are not needed to
+   * make control decisions, then invoking the Su/Wonham algorithm, and
+   * afterwards removing events that appear only on selfloops and are not
+   * under supervision. The experimental Su/Wonham algorithm uses an
+   * alternative ordering of the state pairs to be merged based on the
+   * distance to disabling states.</P>
+   *
+   * <P><I>Reference.</I><BR>
+   * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+   * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   *
+   * @see ObservationEquivalenceTRSimplifier
+   * @see ProjectingSupervisorReductionTRSimplifier
+   * @see SuWonhamSupervisorReductionTRSimplifier
+   * @see SelfloopSupervisorReductionTRSimplifier
+   */
+  PROJECTION_SU_WONHAM_EXPERIMENTAL("Projection + Su/Wonham (experimental)") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
     {

@@ -38,9 +38,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
@@ -214,27 +212,6 @@ public abstract class AbstractCompositionalSynthesizer
         setDetailedOutputEnabled(getValue());
       }
     });
-    list.add(new EnumParameter<SupervisorReductionFactory>(ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory) {
-      @Override
-      public void commitValue() {
-        setSupervisorReductionFactory(getValue());
-      }
-    });
-   /* Supervisor localisation not yet implemented ...
-    list.add(new BoolParameter
-      (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled,
-       "Localize supervisors",
-       "If using supervisor reduction, create a separate supervisor " +
-       "for each controllable event that needs to be disabled.",
-       true)
-      {
-        @Override
-        public void commitValue()
-        {
-          setSupervisorLocalizationEnabled(getValue());
-        }
-      });
-    */
     return list;
   }
 

@@ -716,8 +716,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       new IsomorphismChecker(getFactory(), false, false);
     final String prefix = getSupervisorNamePrefix() + ":";
     for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
-      final byte status = mTransitionRelation.getProperEventStatus(e);
-      if (EventStatus.isControllableEvent(status) && isEverDisabledEvent(e)) {
+      if (isEverDisabledControllableEvent(mTransitionRelation, e)) {
         // TODO avoid duplicate computation and duplicate supervisors if
         // several events are enabled and disabled in exactly the same states
         mReductionChain.setSupervisedEvent(e);
@@ -745,20 +744,28 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     }
   }
 
-  private boolean isEverDisabledEvent(final int event)
+
+  //#########################################################################
+  //# Static Methods for Supervisor Localisation
+  public static boolean isEverDisabledControllableEvent
+    (final ListBufferTransitionRelation rel, final int e)
   {
-    final int dump = mTransitionRelation.getDumpStateIndex();
-    final TransitionIterator iter =
-      mTransitionRelation.createAllTransitionsReadOnlyIterator(event);
-    while (iter.advance()) {
-      if (iter.getCurrentTargetState() == dump) {
-        return true;
+    final byte status = rel.getProperEventStatus(e);
+    if (EventStatus.isControllableEvent(status) &&
+        EventStatus.isUsedEvent(status)) {
+      final int dump = rel.getDumpStateIndex();
+      final TransitionIterator iter =
+        rel.createAllTransitionsReadOnlyIterator(e);
+      while (iter.advance()) {
+        if (iter.getCurrentTargetState() == dump) {
+          return true;
+        }
       }
     }
     return false;
   }
 
-  private void removeOtherControllableDisablements
+  public static void removeOtherControllableDisablements
     (final ListBufferTransitionRelation rel, final int supervisedEvent)
   {
     final int dump = rel.getDumpStateIndex();

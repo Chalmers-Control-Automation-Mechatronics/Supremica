@@ -248,6 +248,11 @@ public class TRAutomatonProxy
     mStateNames = null;
   }
 
+  public void setName(final String name)
+  {
+    mTransitionRelation.setName(name);
+  }
+
   public void setKind(final ComponentKind kind)
   {
     mTransitionRelation.setKind(kind);

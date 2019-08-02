@@ -36,6 +36,10 @@ package net.sourceforge.waters.analysis.abstraction;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+
 
 /**
  * A test for the Su/Wonham reduction simplifier
@@ -68,7 +72,10 @@ public class SuWonhamSupervisorReductionTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new SuWonhamSupervisorReductionTRSimplifier();
+    final SuWonhamSupervisorReductionTRSimplifier simplifier =
+      new SuWonhamSupervisorReductionTRSimplifier();
+    simplifier.setExperimentalMode(false);
+    return simplifier;
   }
 
   @Override
@@ -76,6 +83,30 @@ public class SuWonhamSupervisorReductionTRSimplifierTest
   {
     return (SuWonhamSupervisorReductionTRSimplifier)
       super.getTransitionRelationSimplifier();
+  }
+
+  @Override
+  protected void configureTransitionRelationSimplifier()
+  {
+    super.configureTransitionRelationSimplifier();
+    final SuWonhamSupervisorReductionTRSimplifier simplifier =
+      getTransitionRelationSimplifier();
+    final ListBufferTransitionRelation rel = simplifier.getTransitionRelation();
+    final int numEvents = rel.getNumberOfProperEvents();
+    int controllable = -1;
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isControllableEvent(status)) {
+        if (controllable < 0) {
+          controllable = e;
+        } else {
+          return;
+        }
+      }
+    }
+    if (controllable >= 0) {
+      simplifier.setSupervisedEvent(controllable);
+    }
   }
 
 
