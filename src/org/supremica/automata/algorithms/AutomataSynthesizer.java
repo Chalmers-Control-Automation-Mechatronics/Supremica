@@ -374,6 +374,8 @@ public class AutomataSynthesizer
             supervisorReduction = DefaultSupervisorReductionFactory.OFF;
           }
           synthesizer.setSupervisorReductionFactory(supervisorReduction);
+          synthesizer.setSupervisorLocalizationEnabled
+            (synthesizerOptions.getLocalizeSupervisors());
           synthesizer.setInternalStateLimit(5000);
           final MinimizationOptions mOptions = new MinimizationOptions();
           final String preselectingHeuristic = mOptions.getMinimizationPreselctingHeuristic().toStringAbbreviated();

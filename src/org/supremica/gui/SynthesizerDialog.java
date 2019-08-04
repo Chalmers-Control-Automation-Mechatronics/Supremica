@@ -280,7 +280,6 @@ public class SynthesizerDialog
 
     public void updatePanel()
     {
-
       final int heuristicTabIndex = 2;
       mTabbedPane .setComponentAt(heuristicTabIndex, mHeuristicPanel);
       if (algorithmSelector.getAlgorithm() == SynthesisAlgorithm.COMPOSITIONAL_WATERS)
@@ -322,7 +321,8 @@ public class SynthesizerDialog
         algorithmSelector.setAlgorithm(selected);
       }
       if (advancedPanel != null) {
-        if (selected == SynthesisAlgorithm.MONOLITHIC_WATERS) {
+        if (selected == SynthesisAlgorithm.MONOLITHIC_WATERS ||
+            selected == SynthesisAlgorithm.COMPOSITIONAL_WATERS) {
           advancedPanel.setLocalizeBoxEnabled(true);
         } else {
           advancedPanel.setLocalizeBoxEnabled(false);
