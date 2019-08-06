@@ -115,7 +115,13 @@ public class SimpleSupervisorReductionFactory
   //#########################################################################
   //# Factory Methods
   @Override
-  public SupervisorReductionSimplifier createSimplifier()
+  public TransitionRelationSimplifier createInitialMinimizer()
+  {
+    return new SupervisorReductionChain();
+  }
+
+  @Override
+  public SupervisorReductionSimplifier createSupervisorReducer()
   {
     return new SupervisorReductionChain(mProjecting, mSimplifier);
   }

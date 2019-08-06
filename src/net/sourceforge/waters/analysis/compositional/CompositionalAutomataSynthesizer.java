@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFac
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.options.BoolParameter;
@@ -68,6 +69,7 @@ import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.SupervisorTooBigException;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -237,11 +239,29 @@ public class CompositionalAutomataSynthesizer
   public void requestAbort()
   {
     super.requestAbort();
-    if (mSupervisorSimplifier != null) {
-      mSupervisorSimplifier.requestAbort();
-    }
+    if (mPreSupervisorReducer != null) {
+        mPreSupervisorReducer.requestAbort();
+      }
+    if (mMainSupervisorReducer != null) {
+        mMainSupervisorReducer.requestAbort();
+      }
     if (mHalfwaySimplifier != null) {
       mHalfwaySimplifier.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    if (mPreSupervisorReducer != null) {
+        mPreSupervisorReducer.resetAbort();
+      }
+    if (mMainSupervisorReducer != null) {
+        mMainSupervisorReducer.resetAbort();
+      }
+    if (mHalfwaySimplifier != null) {
+      mHalfwaySimplifier.resetAbort();
     }
   }
 
@@ -329,7 +349,7 @@ public class CompositionalAutomataSynthesizer
         result.close(factory, getOutputName());
       }
       final Logger logger = LogManager.getLogger();
-      logger.debug("CompositionalSynthesizer done.");
+      logger.debug("{} done.", ProxyTools.getShortClassName(this));
       result.setNumberOfRenamings(mDistinguisherInfoList.size());
       return result.isSatisfied();
     } catch (final AnalysisException exception) {
@@ -368,10 +388,23 @@ public class CompositionalAutomataSynthesizer
     mHalfwaySimplifier.setOutputMode
       (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
     if (isDetailedOutputEnabled()) {
-      mSupervisorSimplifier = mSupervisorReductionFactory.createSimplifier();
-      if (mSupervisorSimplifier != null && mSupervisorLocalizationEnabled) {
-        final ProductDESProxyFactory factory = getFactory();
-        mIsomorphismChecker = new IsomorphismChecker(factory, false, false);
+      mMainSupervisorReducer = mSupervisorReductionFactory.createSupervisorReducer();
+      if (mMainSupervisorReducer != null) {
+        final int stateLimit = getInternalStateLimit();
+        mMainSupervisorReducer.setStateLimit(stateLimit);
+        final int transitionLimit = getInternalTransitionLimit();
+        mMainSupervisorReducer.setTransitionLimit(transitionLimit);
+        mPreSupervisorReducer = mSupervisorReductionFactory.createInitialMinimizer();
+        if (mPreSupervisorReducer != null) {
+          mPreSupervisorReducer.setStateLimit(stateLimit);
+          mPreSupervisorReducer.setTransitionLimit(transitionLimit);
+          final int config = mMainSupervisorReducer.getPreferredInputConfiguration();
+          mPreSupervisorReducer.setPreferredOutputConfiguration(config);
+        }
+        if (isUsingSupervisorLocalization()) {
+          final ProductDESProxyFactory factory = getFactory();
+          mIsomorphismChecker = new IsomorphismChecker(factory, false, false);
+        }
       }
     }
     super.setUp();
@@ -383,7 +416,7 @@ public class CompositionalAutomataSynthesizer
     super.tearDown();
     mDistinguisherInfoList = null;
     mBackRenaming = null;
-    mSupervisorSimplifier = null;
+    mMainSupervisorReducer = null;
     mHalfwaySimplifier = null;
   }
 
@@ -686,102 +719,6 @@ public class CompositionalAutomataSynthesizer
   }
 
 
-  private void localiseSupervisor(final ListBufferTransitionRelation rel)
-    throws AnalysisException
-  {
-    if (mSupervisorSimplifier == null) {
-      final AutomatonProxy sup = createSupervisorAutomaton(rel);
-      recordSupervisor(sup);
-    } else {
-      // TODO Creating dump state---could this have been done before?
-      final EventProxy marking = getUsedDefaultMarking();
-      final int markingID = mTempEventEncoding.getEventCode(marking);
-      final int dumpIndex = rel.getDumpStateIndex();
-      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
-      final TransitionIterator iter =
-        rel.createAllTransitionsModifyingIterator();
-      while (iter.advance()) {
-        final int target = iter.getCurrentToState();
-        if (target != dumpIndex && rel.isDeadlockState(target, markingID)) {
-          iter.setCurrentToState(dumpIndex);
-          rel.setReachable(dumpIndex, true);
-          if (rel.isInitial(target)) {
-            rel.setInitial(dumpIndex, true);
-            rel.setInitial(target, false);
-          }
-          rel.setReachable(target, false);
-        }
-      }
-      // No local events before supervisor reduction
-      final int numEvents = rel.getNumberOfProperEvents();
-      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-        final byte status = rel.getProperEventStatus(e);
-        rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
-      }
-      if (mSupervisorReductionFactory.isSupervisedEventRequired() ||
-          mSupervisorLocalizationEnabled) {
-        final List<AutomatonProxy> results = new ArrayList<>(numEvents);
-        try {
-          final String prefix = rel.getName();
-          for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
-            if (MonolithicSynthesizer.isEverDisabledControllableEvent(rel, e)) {
-              final ListBufferTransitionRelation reduced = reduceSupervisor(rel, e);
-              final EventProxy event = mTempEventEncoding.getProperEvent(e);
-              final String name = prefix + ":" + event.getName();
-              reduced.setName(name);
-              final AutomatonProxy sup = createSupervisorAutomaton(reduced);
-              if (isNewSupervisor(sup, results)) {
-                results.add(sup);
-              }
-            }
-          }
-        } catch (final OutOfMemoryError error) {
-          System.gc();
-          warnSupervisorReductionOverflow(rel);
-          return;
-        } catch (final OverflowException overflow) {
-          warnSupervisorReductionOverflow(rel);
-          return;
-        }
-        for (final AutomatonProxy sup : results) {
-          recordSupervisor(sup);
-        }
-      } else {
-        ListBufferTransitionRelation reduced = null;
-        try {
-          reduced = reduceSupervisor(rel, -1);
-        } catch (final OutOfMemoryError error) {
-          System.gc();
-          warnSupervisorReductionOverflow(rel);
-          return;
-        } catch (final OverflowException overflow) {
-          warnSupervisorReductionOverflow(rel);
-          return;
-        }
-        final AutomatonProxy sup = createSupervisorAutomaton(reduced);
-        recordSupervisor(sup);
-      }
-    }
-  }
-
-  private ListBufferTransitionRelation reduceSupervisor
-    (final ListBufferTransitionRelation sup,
-     final int supervsisedEvent)
-    throws AnalysisException
-  {
-    final int config = mSupervisorSimplifier.getPreferredInputConfiguration();
-    final ListBufferTransitionRelation copy =
-      new ListBufferTransitionRelation(sup, config);
-    if (supervsisedEvent >= 0) {
-      MonolithicSynthesizer.removeOtherControllableDisablements
-        (copy, supervsisedEvent);
-    }
-    mSupervisorSimplifier.setTransitionRelation(copy);
-    mSupervisorSimplifier.setSupervisedEvent(supervsisedEvent);
-    mSupervisorSimplifier.run();
-    return mSupervisorSimplifier.getTransitionRelation();
-  }
-
   private void createSupervisor(ListBufferTransitionRelation rel)
     throws AnalysisException
   {
@@ -955,6 +892,146 @@ public class CompositionalAutomataSynthesizer
                                             ListBufferTransitionRelation.CONFIG_SUCCESSORS);
   }
 
+
+  private void localiseSupervisor(final ListBufferTransitionRelation rel)
+    throws AnalysisException
+  {
+    if (mMainSupervisorReducer == null) {
+      final AutomatonProxy sup = createSupervisorAutomaton(rel);
+      recordSupervisor(sup);
+    } else {
+      // TODO Creating dump state---could this have been done before?
+      final EventProxy marking = getUsedDefaultMarking();
+      final int markingID = mTempEventEncoding.getEventCode(marking);
+      mMainSupervisorReducer.setDefaultMarkingID(markingID);
+      if (mPreSupervisorReducer != null) {
+        mPreSupervisorReducer.setDefaultMarkingID(markingID);
+      }
+      final int dumpIndex = rel.getDumpStateIndex();
+      rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+      final TransitionIterator iter =
+        rel.createAllTransitionsModifyingIterator();
+      while (iter.advance()) {
+        final int target = iter.getCurrentToState();
+        if (target != dumpIndex && rel.isDeadlockState(target, markingID)) {
+          iter.setCurrentToState(dumpIndex);
+          rel.setReachable(dumpIndex, true);
+          if (rel.isInitial(target)) {
+            rel.setInitial(dumpIndex, true);
+            rel.setInitial(target, false);
+          }
+          rel.setReachable(target, false);
+        }
+      }
+      // No local events before supervisor reduction
+      final int numEvents = rel.getNumberOfProperEvents();
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
+      }
+      final Logger logger = LogManager.getLogger();
+      if (isUsingSupervisorLocalization()) {
+        final List<AutomatonProxy> results = new ArrayList<>(numEvents);
+        final String prefix = rel.getName();
+        final ListBufferTransitionRelation preReduced =
+          reduceSupervisorStep1(rel);
+        try {
+          for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+            if (MonolithicSynthesizer.isEverDisabledControllableEvent(rel, e)) {
+              final EventProxy event = mTempEventEncoding.getProperEvent(e);
+              logger.debug("Reducing localised supervisor for controllable {} ...",
+                           event.getName());
+              final ListBufferTransitionRelation reduced =
+                reduceSupervisorStep2(preReduced, e);
+              final String name = prefix + ":" + event.getName();
+              reduced.setName(name);
+              final AutomatonProxy sup = createSupervisorAutomaton(reduced);
+              if (isNewSupervisor(sup, results)) {
+                results.add(sup);
+                logger.debug("Supervisor to be included.");
+              } else {
+                logger.debug("Duplicate supervisor suppressed.");
+              }
+            }
+          }
+        } catch (OutOfMemoryError | OverflowException exception) {
+          // Overflow in supervisor reduction must be caught here -
+          // otherwise errors moving to next candidate in main loop.
+          System.gc();
+          logger.debug(UNREDUCED_SUPERVISOR);
+          final AutomatonProxy sup = createSupervisorAutomaton(preReduced);
+          recordSupervisor(sup);
+          return;
+        }
+        for (final AutomatonProxy sup : results) {
+          recordSupervisor(sup);
+        }
+      } else {
+        logger.debug("Reducing supervisor ...");
+        ListBufferTransitionRelation reduced = reduceSupervisorStep1(rel);
+        try {
+          reduced = reduceSupervisorStep2(reduced, -1);
+          logger.debug("Supervisor added.");
+        } catch (OutOfMemoryError | OverflowException exception) {
+          // Overflow in supervisor reduction must be caught here.
+          System.gc();
+          logger.debug(UNREDUCED_SUPERVISOR);
+        }
+        final AutomatonProxy sup = createSupervisorAutomaton(reduced);
+        recordSupervisor(sup);
+      }
+    }
+  }
+
+  private boolean isUsingSupervisorLocalization()
+  {
+    return mSupervisorReductionFactory.isSupervisedEventRequired() ||
+           mSupervisorLocalizationEnabled;
+  }
+
+  private ListBufferTransitionRelation reduceSupervisorStep1
+    (final ListBufferTransitionRelation sup)
+    throws AnalysisException
+  {
+    if (mPreSupervisorReducer != null) {
+      final Logger logger = LogManager.getLogger();
+      if (isUsingSupervisorLocalization()) {
+        logger.debug("Common steps of supervisor reduction ...");
+      }
+      sup.logSizes(logger);
+      mPreSupervisorReducer.createStatistics();
+      mPreSupervisorReducer.setTransitionRelation(sup);
+      mPreSupervisorReducer.run();
+      final CompositionalAutomataSynthesisResult result = getAnalysisResult();
+      result.addPreSupervisorReductionStatistics(mPreSupervisorReducer);
+      return mPreSupervisorReducer.getTransitionRelation();
+    } else {
+      return sup;
+    }
+  }
+
+  private ListBufferTransitionRelation reduceSupervisorStep2
+    (ListBufferTransitionRelation sup,
+     final int supervsisedEvent)
+    throws AnalysisException
+  {
+    if (supervsisedEvent >= 0) {
+      final Logger logger = LogManager.getLogger();
+      sup.logSizes(logger);
+      final int config = mMainSupervisorReducer.getPreferredInputConfiguration();
+      sup = new ListBufferTransitionRelation(sup, config);
+      MonolithicSynthesizer.removeOtherControllableDisablements
+        (sup, supervsisedEvent);
+    }
+    mMainSupervisorReducer.createStatistics();
+    mMainSupervisorReducer.setTransitionRelation(sup);
+    mMainSupervisorReducer.setSupervisedEvent(supervsisedEvent);
+    mMainSupervisorReducer.run();
+    final CompositionalAutomataSynthesisResult result = getAnalysisResult();
+    result.addMainSupervisorReductionStatistics(mMainSupervisorReducer);
+    return mMainSupervisorReducer.getTransitionRelation();
+  }
+
   private String getUniqueSupervisorName(final ListBufferTransitionRelation rel)
   {
     final CompositionalAutomataSynthesisResult result = getAnalysisResult();
@@ -984,6 +1061,7 @@ public class CompositionalAutomataSynthesizer
   private AutomatonProxy createSupervisorAutomaton
     (final ListBufferTransitionRelation rel)
   {
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final EventProxy defaultMarking = getUsedDefaultMarking();
     final int defaultID = mTempEventEncoding.getEventCode(defaultMarking);
     rel.removeDeadlockStateTransitions(defaultID);
@@ -996,21 +1074,14 @@ public class CompositionalAutomataSynthesizer
                                   final Collection<AutomatonProxy> results)
     throws AnalysisException
   {
+    final Logger logger = LogManager.getLogger();
+    logger.debug("Comparing with existing supervisors ...");
     for (final AutomatonProxy existing : results) {
       if (mIsomorphismChecker.checkBisimulation(aut, existing)) {
         return false;
       }
     }
     return true;
-  }
-
-  private void warnSupervisorReductionOverflow(final ListBufferTransitionRelation rel)
-  {
-    final Logger logger = LogManager.getLogger();
-    logger.warn("Overflow trying to reduce {} - using unreduced supervisor.",
-                rel.getName());
-    final AutomatonProxy aut = createSupervisorAutomaton(rel);
-    recordSupervisor(aut);
   }
 
   private void recordSupervisor(final AutomatonProxy sup)
@@ -1333,7 +1404,8 @@ public class CompositionalAutomataSynthesizer
   private boolean mSupervisorLocalizationEnabled = false;
 
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;
-  private SupervisorReductionSimplifier mSupervisorSimplifier;
+  private TransitionRelationSimplifier mPreSupervisorReducer;
+  private SupervisorReductionSimplifier mMainSupervisorReducer;
   private IsomorphismChecker mIsomorphismChecker;
   private List<DistinguisherInfo> mDistinguisherInfoList;
   /**
@@ -1345,5 +1417,12 @@ public class CompositionalAutomataSynthesizer
    * A temporary event encoding for supervisor back-renaming.
    */
   private EventEncoding mTempEventEncoding;
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final String UNREDUCED_SUPERVISOR =
+    "Overflow during supervisor reduction - using unreduced supervisor.";
+
 
 }

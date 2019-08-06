@@ -136,9 +136,9 @@ public class CompositionalStateRepresentationSynthesisResult
   }
 
   @Override
-  public void print(final PrintWriter writer)
+  protected void printPart1(final PrintWriter writer)
   {
-    super.print(writer);
+    super.printPart1(writer);
     writer.print("Number of maps: ");
     writer.println(getNumberOfMaps());
     writer.print("Memory estimate for supervisor maps: ");
@@ -147,22 +147,20 @@ public class CompositionalStateRepresentationSynthesisResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(writer);
-    writer.print(',');
-    writer.print("NumberOfMaps");
-    writer.print(',');
-    writer.print("MemoryEstimate");
+    super.printCSVHorizontalHeadingsPart1(writer);
+    writer.print(",NumberOfMaps");
+    writer.print(",MemoryEstimate");
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontal(writer);
-    writer.print(",");
+    super.printCSVHorizontalPart1(writer);
+    writer.print(',');
     writer.print(getNumberOfMaps());
-    writer.print(",");
+    writer.print(',');
     writer.print(getMemoryEstimate());
   }
 

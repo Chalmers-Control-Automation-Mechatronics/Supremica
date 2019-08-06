@@ -395,7 +395,6 @@ public class ModularAndCompositionalSynthesizer
     for (final AutomatonProxy aut : synthesizer.getComputedProductDES().getAutomata()) {
       if (!supressedAutomata.contains(aut)) {
         results.addBackRenamedSupervisor(aut);
-        results.increaseNumberOfSupervisors(1);
       }
     }
   }

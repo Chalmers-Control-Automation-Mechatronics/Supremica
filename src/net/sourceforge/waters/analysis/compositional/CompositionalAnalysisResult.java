@@ -334,9 +334,15 @@ public class CompositionalAnalysisResult
   //#########################################################################
   //# Printing
   @Override
-  public void print(final PrintWriter writer)
+  public final void print(final PrintWriter writer)
   {
     super.print(writer);
+    printPart1(writer);
+    printPart2(writer);
+  }
+
+  protected void printPart1(final PrintWriter writer)
+  {
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
     writer.print("Total number of compositions: ");
@@ -373,6 +379,10 @@ public class CompositionalAnalysisResult
       writer.print("Number of always enabled events: ");
       writer.println(mAlwaysEnabledEventsCount);
     }
+  }
+
+  protected void printPart2(final PrintWriter writer)
+  {
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         writer.println("--------------------------------------------------");
@@ -394,9 +404,15 @@ public class CompositionalAnalysisResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  public final void printCSVHorizontalHeadings(final PrintWriter writer)
   {
     super.printCSVHorizontalHeadings(writer);
+    printCSVHorizontalHeadingsPart1(writer);
+    printCSVHorizontalHeadingsPart2(writer);
+  }
+
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
+  {
     writer.print(",Compositions");
     writer.print(",Overflows");
     writer.print(",SplitAttempts");
@@ -406,6 +422,10 @@ public class CompositionalAnalysisResult
     writer.print(",FailingEvents");
     writer.print(",SelfloopOnlyEvents");
     writer.print(",AlwaysEnabledEvents");
+  }
+
+  protected void printCSVHorizontalHeadingsPart2(final PrintWriter writer)
+  {
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontalHeadings(writer);
@@ -423,9 +443,15 @@ public class CompositionalAnalysisResult
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  public final void printCSVHorizontal(final PrintWriter writer)
   {
     super.printCSVHorizontal(writer);
+    printCSVHorizontalPart1(writer);
+    printCSVHorizontalPart2(writer);
+  }
+
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
+  {
     writer.print(',');
     writer.print(mTotalCompositionsCount);
     writer.print(',');
@@ -444,6 +470,10 @@ public class CompositionalAnalysisResult
     writer.print(mSelfloopOnlyEventsCount);
     writer.print(',');
     writer.print(mAlwaysEnabledEventsCount);
+  }
+
+  protected void printCSVHorizontalPart2(final PrintWriter writer)
+  {
     if (mSimplifierStatistics != null) {
       for (final TRSimplifierStatistics ruleStats : mSimplifierStatistics) {
         ruleStats.printCSVHorizontal(writer);

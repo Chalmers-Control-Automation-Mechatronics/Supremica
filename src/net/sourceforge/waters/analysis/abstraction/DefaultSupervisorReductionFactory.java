@@ -53,7 +53,13 @@ public enum DefaultSupervisorReductionFactory
    */
   OFF("Off") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createInitialMinimizer()
+    {
+      return null;
+    }
+
+    @Override
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       return null;
     }
@@ -74,7 +80,7 @@ public enum DefaultSupervisorReductionFactory
    */
   SU_WONHAM("Su/Wonham") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
@@ -101,7 +107,7 @@ public enum DefaultSupervisorReductionFactory
    */
   PROJECTION_SU_WONHAM("Projection + Su/Wonham") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
@@ -128,7 +134,7 @@ public enum DefaultSupervisorReductionFactory
    */
   SU_WONHAM_EXPERIMENTAL("Su/Wonham (experimental)") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
@@ -158,7 +164,7 @@ public enum DefaultSupervisorReductionFactory
    */
   PROJECTION_SU_WONHAM_EXPERIMENTAL("Projection + Su/Wonham (experimental)") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
@@ -179,7 +185,7 @@ public enum DefaultSupervisorReductionFactory
    */
   CLIQUE_BASED("Clique-based") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SupervisorReductionSimplifier main =
         new CliqueBasedSupervisorReductionTRSimplifier();
@@ -208,7 +214,7 @@ public enum DefaultSupervisorReductionFactory
    */
   PROJECTION_CLIQUE_BASED("Projection + Clique-based") {
     @Override
-    public SupervisorReductionSimplifier createSimplifier()
+    public SupervisorReductionSimplifier createSupervisorReducer()
     {
       final SupervisorReductionSimplifier main =
         new CliqueBasedSupervisorReductionTRSimplifier();
@@ -243,6 +249,12 @@ public enum DefaultSupervisorReductionFactory
   //#########################################################################
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
+  @Override
+  public TransitionRelationSimplifier createInitialMinimizer()
+  {
+    return new SupervisorReductionChain();
+  }
+
   @Override
   public boolean isSupervisedEventRequired()
   {

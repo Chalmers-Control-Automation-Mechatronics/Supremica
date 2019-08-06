@@ -197,7 +197,7 @@ public class MonolithicModelAnalyzerFactory
     //# Constructors
     private SupervisorLocalisationArgument()
     {
-      super("-loc", "Localise reduced supervisors");
+      super("-loc", "Separate supervisors for each controllable event");
     }
 
     //#######################################################################

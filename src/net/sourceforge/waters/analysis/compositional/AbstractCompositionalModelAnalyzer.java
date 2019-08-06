@@ -2092,7 +2092,7 @@ public abstract class AbstractCompositionalModelAnalyzer
         aut = last.getResultAutomaton();
         final KindTranslator translator = getKindTranslator();
         final Collection<EventProxy> newEvents =
-          new THashSet<EventProxy>(aut.getEvents());
+          new THashSet<>(aut.getEvents());
         for (final EventProxy event : oldEvents) {
           if (event != tau &&
               translator.getEventKind(event) != EventKind.PROPOSITION &&
@@ -2572,8 +2572,8 @@ public abstract class AbstractCompositionalModelAnalyzer
   /**
    * A record to store information about the automata an event occurs in.
    * The event information record basically consists of the set of automata
-   * it occurs in, plus information in which automata the event only appears
-   * as selfloops.
+   * it occurs in, plus information about the selfloop, blocked, and
+   * failing event status.
    */
   protected static class EventInfo implements Comparable<EventInfo>
   {
@@ -2586,7 +2586,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     protected EventInfo(final EventProxy event)
     {
       mEvent = event;
-      mAutomataMap = new TObjectByteHashMap<AutomatonProxy>(0, 0.5f, (byte) -1);
+      mAutomataMap = new TObjectByteHashMap<>(0, 0.5f, (byte) -1);
       mSortedAutomataList = null;
       mNumNonSelfloopAutomata = 0;
       mIsBlocked = false;
@@ -2623,9 +2623,9 @@ public abstract class AbstractCompositionalModelAnalyzer
 
     /**
      * Returns whether this event can be considered as local event. Local
-     * events that have not been replaced by TAU during synchronous
-     * compositions are passed to the abstraction procedure for special
-     * treatment.
+     * events that have not been replaced by {@link EventEncoding#TAU TAU}
+     * during synchronous compositions are passed to the abstraction procedure
+     * for special treatment.
      */
     protected boolean canBeLocal()
     {
@@ -3033,8 +3033,7 @@ public abstract class AbstractCompositionalModelAnalyzer
     {
       final List<Candidate> candidates = new LinkedList<Candidate>();
       final int size = mEventInfoMap.size();
-      final Collection<List<AutomatonProxy>> found =
-        new THashSet<List<AutomatonProxy>>(size);
+      final Collection<List<AutomatonProxy>> found = new THashSet<>(size);
       for (final EventInfo info : mEventInfoMap.values()) {
         assert info.getNumberOfAutomata() > 0;
         if (info.getNumberOfAutomata() > 1) {

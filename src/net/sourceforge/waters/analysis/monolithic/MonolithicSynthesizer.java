@@ -49,9 +49,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.SelfloopSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
@@ -420,7 +417,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
                              EventEncoding.NONTAU, mNumProperEvents - 1);
     mDisabledEvents = new THashSet<>();
 
-    mReductionChain = getSupervisorReductionFactory().createSimplifier();
+    mReductionChain = getSupervisorReductionFactory().createSupervisorReducer();
     if (mReductionChain != null) {
       final int stateLimit = getNodeLimit();
       final int transitionLimit = getTransitionLimit();
@@ -428,19 +425,14 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       mReductionChain.setStateLimit(stateLimit);
       mReductionChain.setTransitionLimit(transitionLimit);
       mReductionChain.setDefaultMarkingID(markingID);
-      final int config = mReductionChain.getPreferredInputConfiguration();
-      final ChainTRSimplifier chain = new ChainTRSimplifier();
-      chain.add(new SelfloopSupervisorReductionTRSimplifier());
-      final ObservationEquivalenceTRSimplifier bisimulator =
-        new ObservationEquivalenceTRSimplifier();
-      bisimulator.setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.
-         DETERMINISTIC_MINSTATE);
-      bisimulator.setTransitionLimit(transitionLimit);
-      chain.add(bisimulator);
-      chain.setDefaultMarkingID(markingID);
-      chain.setPreferredOutputConfiguration(config);
-      mMinimizationChain = chain;
+      mMinimizationChain = getSupervisorReductionFactory().createInitialMinimizer();
+      if (mMinimizationChain != null) {
+        mMinimizationChain.setStateLimit(stateLimit);
+        mMinimizationChain.setTransitionLimit(transitionLimit);
+        mMinimizationChain.setDefaultMarkingID(markingID);
+        final int config = mReductionChain.getPreferredInputConfiguration();
+        mMinimizationChain.setPreferredOutputConfiguration(config);
+      }
     }
   }
 

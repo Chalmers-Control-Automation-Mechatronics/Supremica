@@ -36,8 +36,12 @@ package net.sourceforge.waters.analysis.compositional;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -74,7 +78,8 @@ public class CompositionalAutomataSynthesisResult
      final boolean detailedOutputEnabled)
   {
     super(analyzer);
-    mNumberOfSupervisors = 0;
+    mNumberOfUnrenamedSupervisors = 0;
+    mNumberOfRenamedSupervisors = 0;
     mSupervisors = detailedOutputEnabled ? new ArrayList<>() : null;
     mMaxUnrenamedSupervisorStates = -1;
     mTotalUnrenamedSupervisorStates = -1;
@@ -84,6 +89,8 @@ public class CompositionalAutomataSynthesisResult
     mTotalRenamedSupervisorStates = -1;
     mMaxRenamedSupervisorTransitions = -1;
     mTotalRenamedSupervisorTransitions = -1;
+    mPreSupervisorReductionStatistics = null;
+    mMainSupervisorReductionStatistics = null;
   }
 
 
@@ -132,7 +139,7 @@ public class CompositionalAutomataSynthesisResult
   void addUnrenamedSupervisor(final ListBufferTransitionRelation sup,
                               final int defaultMarking)
   {
-    mNumberOfSupervisors++;
+    mNumberOfUnrenamedSupervisors++;
     final int numberOfStates =
       getNumberOfSupervisorStates(sup, defaultMarking);
     mMaxUnrenamedSupervisorStates =
@@ -149,6 +156,7 @@ public class CompositionalAutomataSynthesisResult
 
   void addBackRenamedSupervisor(final AutomatonProxy sup)
   {
+    mNumberOfRenamedSupervisors++;
     final int numberOfStates = sup.getStates().size();
     mMaxRenamedSupervisorStates =
       Math.max(mMaxRenamedSupervisorStates, numberOfStates);
@@ -164,11 +172,6 @@ public class CompositionalAutomataSynthesisResult
     }
   }
 
-  void increaseNumberOfSupervisors(final int num)
-  {
-    mNumberOfSupervisors += num;
-  }
-
   void setNumberOfRenamings(final int renaming)
   {
     mNumberOfRenamings = renaming;
@@ -177,6 +180,50 @@ public class CompositionalAutomataSynthesisResult
   int getNumberOfRenamings()
   {
     return mNumberOfRenamings;
+  }
+
+  List<TRSimplifierStatistics> getPreSupervisorReductionStatistics()
+  {
+    return mPreSupervisorReductionStatistics;
+  }
+
+  void setPreSupervisorReductionStatistics
+    (final List<? extends TRSimplifierStatistics> stats)
+  {
+    final int size = stats.size();
+    mPreSupervisorReductionStatistics = new ArrayList<TRSimplifierStatistics>(size);
+    mPreSupervisorReductionStatistics.addAll(stats);
+  }
+
+  void addPreSupervisorReductionStatistics
+    (final TransitionRelationSimplifier simplifier)
+  {
+    if (mPreSupervisorReductionStatistics == null) {
+      mPreSupervisorReductionStatistics = new LinkedList<TRSimplifierStatistics>();
+    }
+    simplifier.collectStatistics(mPreSupervisorReductionStatistics);
+  }
+
+  List<TRSimplifierStatistics> getMainSupervisorReductionStatistics()
+  {
+    return mMainSupervisorReductionStatistics;
+  }
+
+  void setMainSupervisorReductionStatistics
+    (final List<? extends TRSimplifierStatistics> stats)
+  {
+    final int size = stats.size();
+    mMainSupervisorReductionStatistics = new ArrayList<TRSimplifierStatistics>(size);
+    mMainSupervisorReductionStatistics.addAll(stats);
+  }
+
+  void addMainSupervisorReductionStatistics
+    (final TransitionRelationSimplifier simplifier)
+  {
+    if (mMainSupervisorReductionStatistics == null) {
+      mMainSupervisorReductionStatistics = new LinkedList<TRSimplifierStatistics>();
+    }
+    simplifier.collectStatistics(mMainSupervisorReductionStatistics);
   }
 
 
@@ -198,8 +245,10 @@ public class CompositionalAutomataSynthesisResult
     final CompositionalAutomataSynthesisResult result =
       (CompositionalAutomataSynthesisResult) other;
     final Collection<AutomatonProxy> sups = result.getComputedAutomata();
-    mNumberOfSupervisors =
-      mergeAdd(mNumberOfSupervisors, result.mNumberOfSupervisors);
+    mNumberOfUnrenamedSupervisors =
+      mergeAdd(mNumberOfUnrenamedSupervisors, result.mNumberOfUnrenamedSupervisors);
+    mNumberOfRenamedSupervisors =
+      mergeAdd(mNumberOfRenamedSupervisors, result.mNumberOfRenamedSupervisors);
     if (mSupervisors != null && sups != null) {
       mSupervisors.addAll(sups);
     }
@@ -220,16 +269,40 @@ public class CompositionalAutomataSynthesisResult
                                                 result.mMaxRenamedSupervisorTransitions);
     mTotalRenamedSupervisorTransitions = mergeAdd(mTotalRenamedSupervisorTransitions,
                                                   result.mTotalRenamedSupervisorTransitions);
+    if (mPreSupervisorReductionStatistics != null &&
+        result.mPreSupervisorReductionStatistics != null) {
+      final Iterator<TRSimplifierStatistics> iter1 =
+        mPreSupervisorReductionStatistics.iterator();
+      final Iterator<TRSimplifierStatistics> iter2 =
+        result.mPreSupervisorReductionStatistics.iterator();
+      while (iter1.hasNext() && iter2.hasNext()) {
+        final TRSimplifierStatistics stats1 = iter1.next();
+        final TRSimplifierStatistics stats2 = iter2.next();
+        stats1.merge(stats2);
+      }
+    }
+    if (mMainSupervisorReductionStatistics != null &&
+        result.mMainSupervisorReductionStatistics != null) {
+      final Iterator<TRSimplifierStatistics> iter1 =
+        mMainSupervisorReductionStatistics.iterator();
+      final Iterator<TRSimplifierStatistics> iter2 =
+        result.mMainSupervisorReductionStatistics.iterator();
+      while (iter1.hasNext() && iter2.hasNext()) {
+        final TRSimplifierStatistics stats1 = iter1.next();
+        final TRSimplifierStatistics stats2 = iter2.next();
+        stats1.merge(stats2);
+      }
+    }
   }
 
   @Override
-  public void print(final PrintWriter writer)
+  protected void printPart1(final PrintWriter writer)
   {
-    super.print(writer);
+    super.printPart1(writer);
     writer.print("Number of renamings: ");
     writer.println(mNumberOfRenamings);
-    writer.print("Number of supervisors: ");
-    writer.println(mNumberOfSupervisors);
+    writer.print("Number of unrenamed supervisors: ");
+    writer.println(mNumberOfUnrenamedSupervisors);
     if (mMaxUnrenamedSupervisorStates >= 0) {
       writer.print("Maximum number of unrenamed supervisor states: ");
       writer.println(mMaxUnrenamedSupervisorStates);
@@ -245,6 +318,8 @@ public class CompositionalAutomataSynthesisResult
       writer.println(" bytes");
     }
     if (mMaxRenamedSupervisorStates >= 0) {
+      writer.print("Number of localised supervisors: ");
+      writer.println(mNumberOfRenamedSupervisors);
       writer.print("Maximum number of renamed supervisor states: ");
       writer.println(mMaxRenamedSupervisorStates);
       writer.print("Total number of renamed supervisor states: ");
@@ -261,65 +336,114 @@ public class CompositionalAutomataSynthesisResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  protected void printPart2(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(writer);
-    writer.print(',');
-    writer.print("NumberOfRenamings");
-    writer.print(',');
-    writer.print("NumberOfSupervisors");
-    writer.print(',');
-    writer.print("MaxUnrenamedSupervisorStates");
-    writer.print(',');
-    writer.print("TotalUnrenamedSupervisorStates");
-    writer.print(',');
-    writer.print("MaxUnrenamedSupervisorTransitions");
-    writer.print(',');
-    writer.print("TotalUnrenamedSupervisorTransitions");
-    writer.print(',');
-    writer.print("UnrenamedSupervisorMemoryEstimate");
-    writer.print(',');
-    writer.print("MaxRenamedSupervisorStates");
-    writer.print(',');
-    writer.print("TotalRenamedSupervisorStates");
-    writer.print(',');
-    writer.print("MaxRenamedSupervisorTransitions");
-    writer.print(',');
-    writer.print("TotalRenamedSupervisorTransitions");
-    writer.print(',');
-    writer.print("RenamedSupervisorMemoryEstimate");
+    super.printPart2(writer);
+    if (mPreSupervisorReductionStatistics != null) {
+      for (final TRSimplifierStatistics ruleStats : mPreSupervisorReductionStatistics) {
+        writer.println("--------------------------------------------------");
+        ruleStats.print(writer);
+      }
+    }
+    if (mMainSupervisorReductionStatistics != null) {
+      for (final TRSimplifierStatistics ruleStats : mMainSupervisorReductionStatistics) {
+        writer.println("--------------------------------------------------");
+        ruleStats.print(writer);
+      }
+    }
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontal(writer);
-    writer.print(",");
+    super.printCSVHorizontalHeadingsPart1(writer);
+    writer.print(",NumberOfRenamings");
+    writer.print(",NumberOfUnrenamedSupervisors");
+    writer.print(",MaxUnrenamedSupervisorStates");
+    writer.print(",TotalUnrenamedSupervisorStates");
+    writer.print(",MaxUnrenamedSupervisorTransitions");
+    writer.print(",TotalUnrenamedSupervisorTransitions");
+    writer.print(",UnrenamedSupervisorMemoryEstimate");
+    writer.print(",NumberOfSupervisors");
+    writer.print(",MaxRenamedSupervisorStates");
+    writer.print(",TotalRenamedSupervisorStates");
+    writer.print(",MaxRenamedSupervisorTransitions");
+    writer.print(",TotalRenamedSupervisorTransitions");
+    writer.print(",RenamedSupervisorMemoryEstimate");
+  }
+
+  @Override
+  protected void printCSVHorizontalHeadingsPart2(final PrintWriter writer)
+  {
+    super.printCSVHorizontalHeadingsPart2(writer);
+    if (mPreSupervisorReductionStatistics != null ||
+        mMainSupervisorReductionStatistics != null) {
+      writer.print(",SupervisorReduction");
+      if (mPreSupervisorReductionStatistics != null) {
+        for (final TRSimplifierStatistics ruleStats : mPreSupervisorReductionStatistics) {
+          ruleStats.printCSVHorizontalHeadings(writer);
+        }
+      }
+      if (mMainSupervisorReductionStatistics != null) {
+        for (final TRSimplifierStatistics ruleStats : mMainSupervisorReductionStatistics) {
+          ruleStats.printCSVHorizontalHeadings(writer);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
+  {
+    super.printCSVHorizontalPart1(writer);
+    writer.print(',');
     writer.print(getNumberOfRenamings());
-    writer.print(",");
-    writer.print(mNumberOfSupervisors);
-    writer.print(",");
+    writer.print(',');
+    writer.print(mNumberOfUnrenamedSupervisors);
+    writer.print(',');
     writer.print(mMaxUnrenamedSupervisorStates);
-    writer.print(",");
+    writer.print(',');
     writer.print(mTotalUnrenamedSupervisorStates);
-    writer.print(",");
+    writer.print(',');
     writer.print(mMaxUnrenamedSupervisorTransitions);
-    writer.print(",");
+    writer.print(',');
     writer.print(mTotalUnrenamedSupervisorTransitions);
-    writer.print(",");
+    writer.print(',');
     writer.print(getMemoryEstimate(mTotalUnrenamedSupervisorStates,
                                    mTotalUnrenamedSupervisorTransitions));
-    writer.print(",");
+    writer.print(',');
+    writer.print(mNumberOfRenamedSupervisors);
+    writer.print(',');
     writer.print(mMaxRenamedSupervisorStates);
-    writer.print(",");
+    writer.print(',');
     writer.print(mTotalRenamedSupervisorStates);
-    writer.print(",");
+    writer.print(',');
     writer.print(mMaxRenamedSupervisorTransitions);
-    writer.print(",");
+    writer.print(',');
     writer.print(mTotalRenamedSupervisorTransitions);
-    writer.print(",");
+    writer.print(',');
     writer.print(getMemoryEstimate(mTotalRenamedSupervisorStates,
                                    mTotalRenamedSupervisorTransitions));
+  }
+
+  @Override
+  protected void printCSVHorizontalPart2(final PrintWriter writer)
+  {
+    super.printCSVHorizontalPart2(writer);
+    if (mPreSupervisorReductionStatistics != null ||
+        mMainSupervisorReductionStatistics != null) {
+      writer.print(',');
+      if (mPreSupervisorReductionStatistics != null) {
+        for (final TRSimplifierStatistics ruleStats : mPreSupervisorReductionStatistics) {
+          ruleStats.printCSVHorizontal(writer);
+        }
+      }
+      if (mMainSupervisorReductionStatistics != null) {
+        for (final TRSimplifierStatistics ruleStats : mMainSupervisorReductionStatistics) {
+          ruleStats.printCSVHorizontal(writer);
+        }
+      }
+    }
   }
 
 
@@ -384,14 +508,15 @@ public class CompositionalAutomataSynthesisResult
 
   private static int getMemoryEstimate(final int states, final int transitions)
   {
-    return states + 2*transitions;
+    return states + 2 * transitions;
   }
 
 
   //#########################################################################
   //# Data Members
   private ProductDESProxy mProductDES;
-  private int mNumberOfSupervisors;
+  private int mNumberOfUnrenamedSupervisors;
+  private int mNumberOfRenamedSupervisors;
   private final List<AutomatonProxy> mSupervisors;
   private int mNumberOfRenamings;
   private int mMaxUnrenamedSupervisorStates;
@@ -402,5 +527,7 @@ public class CompositionalAutomataSynthesisResult
   private int mTotalRenamedSupervisorStates;
   private int mMaxRenamedSupervisorTransitions;
   private int mTotalRenamedSupervisorTransitions;
+  private List<TRSimplifierStatistics> mPreSupervisorReductionStatistics;
+  private List<TRSimplifierStatistics> mMainSupervisorReductionStatistics;
 
 }

@@ -109,10 +109,9 @@ public abstract class CompositionalSynthesisResult
   }
 
   @Override
-  public void print(final PrintWriter writer)
+  protected void printPart1(final PrintWriter writer)
   {
-    super.print(writer);
-    writer.println("--------------------------------------------------");
+    super.printPart1(writer);
     writer.print("Final number of states: ");
     writer.println(mSynchStates);
     writer.print("Final number of transitions: ");
@@ -120,22 +119,20 @@ public abstract class CompositionalSynthesisResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(writer);
-    writer.print(',');
-    writer.print("SynchStates");
-    writer.print(',');
-    writer.print("SynchTransitions");
+    super.printCSVHorizontalHeadingsPart1(writer);
+    writer.print(",SynchStates");
+    writer.print(",SynchTransitions");
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontal(writer);
-    writer.print(",");
+    super.printCSVHorizontalPart1(writer);
+    writer.print(',');
     writer.print(getSynchStates());
-    writer.print(",");
+    writer.print(',');
     writer.print(getSynchTransitions());
   }
 

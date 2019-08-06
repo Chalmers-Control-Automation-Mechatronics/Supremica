@@ -51,12 +51,27 @@ public interface SupervisorReductionFactory
   //#########################################################################
   //# Factory Methods
   /**
+   * Creates a transition relation simplifier that performs initial
+   * minimisation steps. If supervisor localisation is performed, then
+   * the same automaton will undergo supervisor reduction several times,
+   * once for each controllable event. In this case, some simplification
+   * operations may be the same for controllable events and can be performed
+   * at the start, before the automaton is replicated and separate
+   * supervisor reduction begins.
+   * @return  A fully configured transition relation simplifier to perform
+   *          common steps, or <CODE>null</CODE> if there are no common steps.
+   */
+  public TransitionRelationSimplifier createInitialMinimizer();
+
+  /**
    * Creates a transition relation simplifier that can perform supervisor
-   * reduction.
+   * reduction. If the factory returns an initial minimiser, then the
+   * transition relation simplifier returned by this method assumes that
+   * the initial minimisation has been performed on any input it receives.   *
    * @return  The fully configured transition relation simplifier,
    *          or <CODE>null</CODE> to disable supervisor reduction.
    */
-  public abstract SupervisorReductionSimplifier createSimplifier();
+  public SupervisorReductionSimplifier createSupervisorReducer();
 
   /**
    * Whether the supervisor reduction algorithm provided by this algorithm
@@ -70,6 +85,7 @@ public interface SupervisorReductionFactory
   public boolean isSupervisedEventRequired();
 
 
+
   //#########################################################################
   //# Inner Class SupervisorReductionChain
   public static class SupervisorReductionChain
@@ -78,8 +94,14 @@ public interface SupervisorReductionFactory
   {
     //#######################################################################
     //# Constructor
-    protected SupervisorReductionChain(final boolean projecting,
-                                       final SupervisorReductionSimplifier main)
+    public SupervisorReductionChain()
+    {
+      mMainSimplifier = null;
+      addInitialMinimisationSteps();
+    }
+
+    public SupervisorReductionChain(final boolean projecting,
+                                    final SupervisorReductionSimplifier main)
     {
       mMainSimplifier = main;
       if (projecting) {
@@ -89,13 +111,7 @@ public interface SupervisorReductionFactory
           new SubsetConstructionTRSimplifier();
         subset.setDumpStateAware(true);
         add(subset);
-        add(new SelfloopSupervisorReductionTRSimplifier());
-        final ObservationEquivalenceTRSimplifier bisimulator =
-          new ObservationEquivalenceTRSimplifier();
-        bisimulator.setEquivalence
-          (ObservationEquivalenceTRSimplifier.Equivalence.
-           DETERMINISTIC_MINSTATE);
-        add(bisimulator);
+        addInitialMinimisationSteps();
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
@@ -114,6 +130,18 @@ public interface SupervisorReductionFactory
     public int getSupervisedEvent()
     {
       return mMainSimplifier.getSupervisedEvent();
+    }
+
+    //#########################################################################
+    //# Auxiliary Methods
+    private void addInitialMinimisationSteps()
+    {
+      add(new SelfloopSupervisorReductionTRSimplifier());
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
+      add(bisimulator);
     }
 
     //#######################################################################

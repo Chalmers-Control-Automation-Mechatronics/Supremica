@@ -166,9 +166,9 @@ public class CompositionalVerificationResult
   //#########################################################################
   //# Printing
   @Override
-  public void print(final PrintWriter writer)
+  protected void printPart1(final PrintWriter writer)
   {
-    super.print(writer);
+    super.printPart1(writer);
     if (mCounterExample != null) {
       writer.println("--------------------------------------------------");
       final int len =
@@ -184,9 +184,9 @@ public class CompositionalVerificationResult
   }
 
   @Override
-  public void printCSVHorizontal(final PrintWriter writer)
+  protected void printCSVHorizontalPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontal(writer);
+    super.printCSVHorizontalPart1(writer);
     writer.print(',');
     if (mCounterExample != null) {
       final int len =
@@ -210,9 +210,9 @@ public class CompositionalVerificationResult
   }
 
   @Override
-  public void printCSVHorizontalHeadings(final PrintWriter writer)
+  protected void printCSVHorizontalHeadingsPart1(final PrintWriter writer)
   {
-    super.printCSVHorizontalHeadings(writer);
+    super.printCSVHorizontalHeadingsPart1(writer);
     writer.print(",CounterLength");
     if (ConflictChecker.class.isAssignableFrom(getAnalyzerClass())) {
       writer.print(",ConflictKind");

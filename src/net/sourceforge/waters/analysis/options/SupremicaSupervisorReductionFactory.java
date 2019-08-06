@@ -52,6 +52,7 @@ package net.sourceforge.waters.analysis.options;
 
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 
 
 /**
@@ -95,7 +96,13 @@ public enum SupremicaSupervisorReductionFactory
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
   @Override
-  public SupervisorReductionSimplifier createSimplifier()
+  public TransitionRelationSimplifier createInitialMinimizer()
+  {
+    return new SupervisorReductionChain();
+  }
+
+  @Override
+  public SupervisorReductionSimplifier createSupervisorReducer()
   {
     return null;
   }
