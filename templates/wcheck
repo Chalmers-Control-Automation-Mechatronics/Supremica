@@ -7,7 +7,8 @@ export LD_LIBRARY_PATH=$DIR
 
 WPACK="net.sourceforge.waters"
 FACTORY="Native"
-MEM="-Xmx512m"
+MEM1="-Xmx512m"
+MEM2=
 ARGS=
 FACTORY=
 MAIN_FACTORY=
@@ -99,7 +100,10 @@ for F in "$@"; do
         ARGS="$ARGS \"-wrapper\" \"$WPACK.analysis.hisc.SICProperty6Verifier\""
         ;;
     -Xmx*)
-        MEM="$F"
+        MEM1="$F"
+        ;;
+    -Xss*)
+        MEM2="$F"
         ;;
     *)
         ARGS="$ARGS \"$F\""
@@ -123,6 +127,6 @@ if [ "" = "$CHECK" ]; then
 fi
 
 if [ $OK = 1 ]; then
-    eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM \
+    eval java -cp "$DIR/Supremica.jar" -enableassertions $MEM1 $MEM2 \
         $WPACK.model.analysis.CommandLineTool $MAIN_FACTORY $CHECK "$ARGS"
 fi
