@@ -38,7 +38,6 @@ import java.awt.Component;
 import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 
@@ -46,7 +45,7 @@ import javax.swing.text.PlainDocument;
 public abstract class AbstractTextFieldParameter extends Parameter
 {
 
-  public AbstractTextFieldParameter(final int id, final String name, final String description)
+  AbstractTextFieldParameter(final int id, final String name, final String description)
   {
     super(id, name, description);
   }
@@ -61,9 +60,7 @@ public abstract class AbstractTextFieldParameter extends Parameter
     return textField;
   }
 
-  protected abstract boolean testAlphabet(final String text);
-
-  protected abstract boolean filterText(final String text);
+  protected abstract String filterText(final String text);
 
   private class InputFilter extends DocumentFilter {
 
@@ -75,20 +72,7 @@ public abstract class AbstractTextFieldParameter extends Parameter
                         final AttributeSet attrs)
       throws BadLocationException
     {
-      // TODO Filter bad characters in text, insert all that are OK.
-      // Even if some bad characters, insert those are OK.
-      final Document doc = fb.getDocument();
-      final StringBuilder sb = new StringBuilder();
-      sb.append(doc.getText(0, doc.getLength()));
-      sb.replace(offset, offset + length, text);
-
-      //if (testAlphabet(sb.toString())) {
-      //  super.replace(fb, offset, length, text, attrs);
-      //}
-
-      if (filterText(text)) {
-        super.replace(fb, offset, length, text, attrs);
-      }
+      super.replace(fb, offset, length, filterText(text), attrs);
     }
   }
 }

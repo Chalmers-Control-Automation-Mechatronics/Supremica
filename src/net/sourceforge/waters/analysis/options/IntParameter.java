@@ -36,7 +36,6 @@ package net.sourceforge.waters.analysis.options;
 import java.awt.Component;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.text.NumberFormat;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -69,9 +68,6 @@ public class IntParameter extends AbstractTextFieldParameter
     mMax = max;
     defaultValue = defValue;
     mValue = defValue;
-    mFormat = NumberFormat.getIntegerInstance();
-    mFormat.setGroupingUsed(false);
-    mAlphabet = "[0-9]|[-]|^$";
   }
 
   //#########################################################################
@@ -89,7 +85,7 @@ public class IntParameter extends AbstractTextFieldParameter
       @Override
       public void focusLost(final FocusEvent e)
       {
-        //very valid integer if there is text
+        //verify valid integer if there is text
         if (!textField.getText().isEmpty()) {
           try {
             final Integer tmp = Integer.parseInt(textField.getText());
@@ -119,30 +115,18 @@ public class IntParameter extends AbstractTextFieldParameter
   }
 
   @Override
-  protected boolean testAlphabet(final String text) {
-
-    //only verify in alphabet
-
-      //special case where minimum is negative
-      if (text.length() == 1 && text.equals("-") && mAlphabet.substring(0,1).contains("-")) {
-        return true;
-      }
-      else if(text.isEmpty()) {
-        return true;
-      }
-      else if (text.matches(mAlphabet)) {
-        return true;
-      }
-     return false;
- }
-
-  @Override
-  protected boolean filterText(final String text)
+  protected String filterText(final String text)
   {
-   if(text.matches(mAlphabet))
-    return true;
-   else
-     return false;
+   final StringBuilder sb = new StringBuilder();
+
+   for (int i = 0; i < text.length(); i++){
+     final char ch = text.charAt(i);
+     if(Character.isDigit(ch))
+       sb.append(ch);
+     else if(ch == '-' && mMin < 0)
+       sb.append(ch);
+   }
+     return sb.toString();
   }
 
   public int getValue() {
@@ -207,7 +191,5 @@ public class IntParameter extends AbstractTextFieldParameter
   private final int mMax;
   private int mValue;
   private final int defaultValue;
-  private final NumberFormat mFormat;
-  private final String mAlphabet;
 
 }

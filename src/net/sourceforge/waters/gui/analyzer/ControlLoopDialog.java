@@ -34,8 +34,9 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ConflictChecker;
+import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -74,24 +75,22 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    //return new ConflictLoopPopUpDialog(ide, des);
-    return null;
+    return new ControlLoopPopUpDialog(ide, des);
   }
 
    @Override
-   protected ConflictChecker getAnalyzer()
+   protected ControlLoopChecker getAnalyzer()
    {
-     return (ConflictChecker) super.getAnalyzer();
+     return (ControlLoopChecker) super.getAnalyzer();
    }
 
   //#########################################################################
   //# Inner Class AnalyzerDialog
-   /*
-  private class ConflictLoopPopUpDialog extends WatersVerificationDialog
+  private class ControlLoopPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
-    public ConflictLoopPopUpDialog(final IDE owner,
+    public ControlLoopPopUpDialog(final IDE owner,
                                 final ProductDESProxy des)
     {
       super(owner, des);
@@ -100,19 +99,19 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
     @Override
     protected String getFailureDescription()
     {
-      return "is blocking";
+      return "has a loop.";
     }
 
     @Override
     protected String getSuccessDescription()
     {
-      return "is nonblocking";
+      return "is loop free.";
     }
 
     @Override
     protected String getAnalysisName()
     {
-      return "Conflict Check";
+      return "Control Loop Check.";
     }
 
     @Override
@@ -125,7 +124,7 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
 
-  }*/
+  }
 
   //#########################################################################
   //# Class Constants
