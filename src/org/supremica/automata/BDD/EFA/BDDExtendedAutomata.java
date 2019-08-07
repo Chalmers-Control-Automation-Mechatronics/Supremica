@@ -1546,6 +1546,10 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         BDD2IDD2FILE(bdd, validStatesBDD, fileName, "ps");
     }
 
+    public void BDD2IDD2PDF(final BDD bdd, final BDD validStatesBDD, final String fileName) {
+        BDD2IDD2FILE(bdd, validStatesBDD, fileName, "pdf");
+    }
+
     public void IDD2DOT(final BufferedWriter out, final IDD idd, final HashSet<IDD> visited) {
         final IDDNode root = idd.getRoot();
         try {
