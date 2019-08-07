@@ -1525,8 +1525,9 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     }
 
     private void BDD2IDD2FILE(final BDD bdd, final BDD validStatesBDD, final String fileName, final String fileExtension) {
-      final String absPathDot = pathRoot + standardizePathAddress(fileName) + ".dot";
-      final String absPathPs = pathRoot + standardizePathAddress(fileName) + "." + fileExtension;
+      final String absPath = pathRoot + standardizePathAddress(fileName);
+      final String absPathDot = absPath + ".dot";
+      final String absPathPs = absPath + "." + fileExtension;
       generateDOT(generateIDD(bdd, validStatesBDD), absPathDot);
       final Runtime rt = Runtime.getRuntime();
       try {
