@@ -73,7 +73,7 @@ public class EventParameter extends Parameter
                  final EventParameterType type)
   {
     super(id, name, description);
-    mValue = null;
+    mValue = ProductDESElementFactory.getInstance().createEventProxy("initial", EventKind.PROPOSITION);
     mNullOptions = type;
   }
 
@@ -92,46 +92,54 @@ public class EventParameter extends Parameter
         noPropositions = false;
         propositions.add(event);
         //if :accepting exists and this is first creation
-        if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue == null)
-          mValue = event;
+        if(mValue != null)
+          if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue.getName().equals("initial")) {
+            mValue = event;
+          }
       }
     }
 
-    //handle the case that there are no propositions in the model.
-    if(noPropositions) {
+    //if mValue is null then not first creation and noEvent is possible and selected
+    if(mValue == null) {
       propositions.add(noEvent);
       mValue = noEvent;
     }
     else {
-      // 1 - Null is not allowed, and the default is :accepting if available,
-      //     otherwise the first proposition in the model. (If there is no
-      //     proposition in the model, use null as the only option.)
-      if (mNullOptions == EventParameterType.PREVENT_NULL) {
-        //:accepting not available
-        if (mValue == null) {
-          if (propositions.size() > 0)
-            mValue = propositions.get(0);
-          else {
-            propositions.add(noEvent);
-            mValue = noEvent;
-          }
-        }
-      }
-      // 2 - Null is allowed and the default is :accepting if available,
-      //     otherwise the first proposition in the model, or null if
-      //     there is no proposition in the model. (Unlike case 1,
-      //     null is also an option if there are propositions in the model.)
-      else if (mNullOptions == EventParameterType.ALLOW_NULL) {
-        propositions.add(noEvent);
-        //:accepting not available
-        if (mValue == null) {
-          mValue = propositions.get(0);
-        }
-      }
-      // 3 - Null is allowed and is the default.
-      else if (mNullOptions == EventParameterType.DEFAULT_NULL) {
+      //handle the case that there are no propositions in the model.
+      if (noPropositions) {
         propositions.add(noEvent);
         mValue = noEvent;
+      } else {
+        // 1 - Null is not allowed, and the default is :accepting if available,
+        //     otherwise the first proposition in the model. (If there is no
+        //     proposition in the model, use null as the only option.)
+        if (mNullOptions == EventParameterType.PREVENT_NULL) {
+          //:accepting not available
+          if (mValue.getName().equals("initial")) {
+            if (propositions.size() > 0)
+              mValue = propositions.get(0);
+            else {
+              propositions.add(noEvent);
+              mValue = noEvent;
+            }
+          }
+        }
+        // 2 - Null is allowed and the default is :accepting if available,
+        //     otherwise the first proposition in the model, or null if
+        //     there is no proposition in the model. (Unlike case 1,
+        //     null is also an option if there are propositions in the model.)
+        else if (mNullOptions == EventParameterType.ALLOW_NULL) {
+          propositions.add(noEvent);
+          //:accepting not available
+          if (mValue.getName().equals("initial")) {
+            mValue = propositions.get(0);
+          }
+        }
+        // 3 - Null is allowed and is the default.
+        else if (mNullOptions == EventParameterType.DEFAULT_NULL) {
+          propositions.add(noEvent);
+          mValue = noEvent;
+        }
       }
     }
 
@@ -155,11 +163,12 @@ public class EventParameter extends Parameter
 
   public EventProxy getValue()
   {
-    // TODO If noEvent is selected, pass null to the model analyser.
-    //if(mValue.getName() == "(none)")
-    //if (mValue == noEvent)
-    // return null;
-    return mValue;
+    if(mValue == null)
+      return null;
+    else if(mValue.getName() == "(none)")
+     return null;
+    else
+      return mValue;
   }
 
   @SuppressWarnings("unchecked")
