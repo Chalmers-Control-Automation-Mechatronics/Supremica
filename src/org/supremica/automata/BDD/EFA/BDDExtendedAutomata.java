@@ -1524,22 +1524,25 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
         return sPath;
     }
 
-    public void BDD2IDD2PS(final BDD bdd, final BDD validStatesBDD, final String fileName) {
-        final String absPathDot = pathRoot + standardizePathAddress(fileName) + ".dot";
-        final String absPathPs = pathRoot + standardizePathAddress(fileName) + ".ps";
-        generateDOT(generateIDD(bdd, validStatesBDD), absPathDot);
-        final Runtime rt = Runtime.getRuntime();
-        try {
-            final Process proc1 = rt.exec("dot -Tps " + absPathDot + " -o " + absPathPs);
-            proc1.waitFor();
-            proc1.exitValue();
-            final Process proc2 = rt.exec("cmd /C del " + absPathDot);
-            proc2.waitFor();
-            proc2.exitValue();
-        } catch (final Exception e) {
-            System.out.println(e);
-        }
+    private void BDD2IDD2FILE(final BDD bdd, final BDD validStatesBDD, final String fileName, final String fileExtension) {
+      final String absPathDot = pathRoot + standardizePathAddress(fileName) + ".dot";
+      final String absPathPs = pathRoot + standardizePathAddress(fileName) + "." + fileExtension;
+      generateDOT(generateIDD(bdd, validStatesBDD), absPathDot);
+      final Runtime rt = Runtime.getRuntime();
+      try {
+          final Process proc1 = rt.exec("dot -T" + fileExtension + " " + absPathDot + " -o " + absPathPs);
+          proc1.waitFor();
+          proc1.exitValue();
+          final Process proc2 = rt.exec("cmd /C del " + absPathDot);
+          proc2.waitFor();
+          proc2.exitValue();
+      } catch (final Exception e) {
+          System.out.println(e);
+      }
+    }
 
+    public void BDD2IDD2PS(final BDD bdd, final BDD validStatesBDD, final String fileName) {
+        BDD2IDD2FILE(bdd, validStatesBDD, fileName, "ps");
     }
 
     public void IDD2DOT(final BufferedWriter out, final IDD idd, final HashSet<IDD> visited) {
