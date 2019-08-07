@@ -64,10 +64,12 @@ class AnalyzerPopupFactory
     final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
     final IDEAction showConflict = master.getAnalyzerConflictCheckAction();
     final IDEAction showControlLoop = master.getAnalyzerControlLoopCheckAction();
+    final IDEAction showControllability = master.getAnalyzerControllabilityCheckAction();
     popup.add(showSychronous);
     popup.add(showSynthesize);
     popup.add(showConflict);
     popup.add(showControlLoop);
+    popup.add(showControllability);
   }
 
 }

@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.IntParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -100,6 +105,29 @@ public abstract class AbstractSafetyVerifier
   public SafetyCounterExampleProxy getCounterExample()
   {
     return (SafetyCounterExampleProxy) super.getCounterExample();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(0, new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+      @Override
+      public void commitValue()
+      {
+        setNodeLimit(getValue());
+      }
+    });
+    list.add(0, new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
+      @Override
+      public void commitValue()
+      {
+        setTransitionLimit(getValue());
+      }
+    });
+    return list;
   }
 
 

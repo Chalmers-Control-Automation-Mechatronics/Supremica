@@ -52,9 +52,11 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.gnonblocking.PreselectingHeuristicFactory;
 import net.sourceforge.waters.analysis.gnonblocking.SelectingHeuristicFactory;
 import net.sourceforge.waters.analysis.modular.AutomataGroup;
+import net.sourceforge.waters.analysis.modular.ModularHeuristicFactory;
 import net.sourceforge.waters.analysis.trcomp.AbstractTRCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.trcomp.TRCandidate;
 import net.sourceforge.waters.analysis.trcomp.TRCompositionalConflictChecker;
+import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
 import net.sourceforge.waters.analysis.trcomp.TRPreselectionHeuristic;
 import net.sourceforge.waters.analysis.trcomp.TRToolCreator;
 import net.sourceforge.waters.cpp.analysis.ConflictCheckMode;
@@ -744,5 +746,68 @@ public class ParameterIDs
       "Select Version",
       "",
       AutomataGroup.SelectVersion.values());
+
+  //net.sourceforge.waters.analysis.modular.AbstractModularSafetyVerifier
+  private static final int AbstractModularSafetyVerifier_HeuristicMethod_ID = 5600;
+  private static final int AbstractModularSafetyVerifier_HeuristicPreference_ID = 5601;
+
+  public static final EnumParameter<ModularHeuristicFactory.Method>
+  AbstractModularSafetyVerifier_HeuristicMethod =
+  new EnumParameter<ModularHeuristicFactory.Method>
+   (AbstractModularSafetyVerifier_HeuristicMethod_ID,
+    "Heuristic Method",
+    "",
+    ModularHeuristicFactory.Method.values(),
+    ModularHeuristicFactory.Method.EarlyNotAccept);
+
+  public static final EnumParameter<ModularHeuristicFactory.Preference>
+  AbstractModularSafetyVerifier_HeuristicPreference =
+  new EnumParameter<ModularHeuristicFactory.Preference>
+   (AbstractModularSafetyVerifier_HeuristicPreference_ID,
+     "Heuristic Preference",
+     "",
+    ModularHeuristicFactory.Preference.values(),
+    ModularHeuristicFactory.Preference.NOPREF);
+
+  //net.sourceforge.waters.analysis.modular.ModularControllabilityChecker
+  private static final int ModularControllabilityChecker_CollectsFailedSpecs_ID = 5700;
+  private static final int ModularControllabilityChecker_StartsWithSmallestSpec_ID = 5701;
+
+  public static final BoolParameter ModularControllabilityChecker_CollectsFailedSpecs =
+    new BoolParameter
+      (ModularControllabilityChecker_CollectsFailedSpecs_ID,
+       "Collects Failed Specs",
+       "",
+       false);
+
+  public static final BoolParameter ModularControllabilityChecker_StartsWithSmallestSpec =
+    new BoolParameter
+      (ModularControllabilityChecker_StartsWithSmallestSpec_ID,
+       "Starts With Smallest Spec",
+       "",
+       false);
+
+  //net.sourceforge.waters.analysis.trcomp.AbstractTRDelegatingAnalyzer
+  private static final int AbstractTRDelegatingAnalyzer_SimplifierCreator_ID = 5800;
+  private static final int AbstractTRDelegatingAnalyzer_PreselectionHeuristic_ID = 5801;
+  private static final int AbstractTRDelegatingAnalyzer_SelectionHeuristic_ID = 5802;
+
+
+  public static final EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+  AbstractTRDelegatingAnalyzer_SimplifierCreator =
+  new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+    (AbstractTRDelegatingAnalyzer_SimplifierCreator_ID,
+     AbstractTRCompositionalModelAnalyzer_SimplifierCreator,
+     (new TRControllabilityChecker()).getTRSimplifierFactory());
+
+  public static final EnumParameter<TRPreselectionHeuristic> AbstractTRDelegatingAnalyzer_PreselectionHeuristic =
+    new EnumParameter<TRPreselectionHeuristic>
+      (AbstractTRDelegatingAnalyzer_PreselectionHeuristic_ID, AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
+        (new TRControllabilityChecker()).getPreselectionHeuristicFactory());
+
+  public static final EnumParameter<SelectionHeuristic<TRCandidate>> AbstractTRDelegatingAnalyzer_SelectionHeuristic =
+    new EnumParameter<SelectionHeuristic<TRCandidate>>
+      (AbstractTRDelegatingAnalyzer_SelectionHeuristic_ID, AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
+       (new TRControllabilityChecker()).getSelectionHeuristicFactory());
 
 }

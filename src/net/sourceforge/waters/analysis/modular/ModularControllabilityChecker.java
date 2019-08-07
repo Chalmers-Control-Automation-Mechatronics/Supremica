@@ -48,6 +48,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.KindTranslator;
@@ -125,6 +128,28 @@ public class ModularControllabilityChecker
     return mStartsWithSmallestSpec;
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(0, new BoolParameter(ParameterIDs.ModularControllabilityChecker_CollectsFailedSpecs) {
+      @Override
+      public void commitValue()
+      {
+        setCollectsFailedSpecs(getValue());
+      }
+    });
+    list.add(0, new BoolParameter(ParameterIDs.ModularControllabilityChecker_StartsWithSmallestSpec) {
+      @Override
+      public void commitValue()
+      {
+        setStartsWithSmallestSpec(getValue());
+      }
+    });
+    return list;
+  }
 
   //#########################################################################
   //# Invocation

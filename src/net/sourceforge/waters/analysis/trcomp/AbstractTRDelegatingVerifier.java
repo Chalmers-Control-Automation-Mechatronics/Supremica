@@ -33,7 +33,12 @@
 
 package net.sourceforge.waters.analysis.trcomp;
 
+import java.util.List;
+
 import net.sourceforge.waters.analysis.compositional.CompositionalVerificationResult;
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -64,6 +69,23 @@ public abstract class AbstractTRDelegatingVerifier
                                       final AbstractTRAnalyzer delegate)
   {
     super(model, translator, delegate);
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+
+    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+      @Override
+      public void commitValue()
+      {
+        setShortCounterExampleRequested(getValue());
+      }
+    });
+    return list;
   }
 
 

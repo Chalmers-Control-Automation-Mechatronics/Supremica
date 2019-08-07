@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
@@ -127,6 +132,29 @@ abstract class AbstractModularSafetyVerifier
   public boolean supportsNondeterminism()
   {
     return mMonolithicVerifier.supportsNondeterminism();
+  }
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(0, new EnumParameter<ModularHeuristicFactory.Method>(ParameterIDs.AbstractModularSafetyVerifier_HeuristicMethod) {
+      @Override
+      public void commitValue()
+      {
+        setHeuristicMethod(getValue());
+      }
+    });
+    list.add(0, new EnumParameter<ModularHeuristicFactory.Preference>(ParameterIDs.AbstractModularSafetyVerifier_HeuristicPreference) {
+      @Override
+      public void commitValue()
+      {
+        setHeuristicPreference(getValue());
+      }
+    });
+    return list;
   }
 
 
