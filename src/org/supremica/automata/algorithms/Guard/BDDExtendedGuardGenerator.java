@@ -700,7 +700,14 @@ public final class BDDExtendedGuardGenerator {
     ArrayList<String> incrementalSeq;
     final ArrayList<String> setTemp = new ArrayList<String>(set);
     String inEq;
-    if (!isAutomaton) {
+    boolean isInteger = false;
+    try {
+        Integer.parseInt(set.get(0));
+        isInteger = true;
+    } catch (final NumberFormatException e) {
+        isInteger = false;
+    }
+    if (!isAutomaton && isInteger) {
       boolean firstTime = true;
       do {
         incrementalSeq = isIncrementalSeq(setTemp);

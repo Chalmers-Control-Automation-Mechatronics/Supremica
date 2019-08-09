@@ -466,13 +466,11 @@ public abstract class BDDAbstractManager {
 
                 return new ResultOverflows(tmp, getZeroBDD());
             } else {
-                final Integer index = bddExAutomata.getIndexMap().getIndexOfVal(expr.toString());
-                if (index != null) {
-//                    return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),index),getZeroBDD());
-//                  return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-//                          bddExAutomata.BDDBitVectoryType+createDomain(Math.abs(index.intValue())+1).varNum(), index), getZeroBDD());
+                final int value = ((IntConstantProxy) expr).getValue();
+                final boolean inDomain = value >= bddExAutomata.theIndexMap.getVariableLowerBound() && value <= bddExAutomata.theIndexMap.getVariableUpperBound();
+                if (inDomain) {
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), index), getZeroBDD());
+                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), ((IntConstantProxy) expr).getValue()), getZeroBDD());
                 } else {
                     logger.error(expr.toString() + " is out of the bounds. The value will be set to 0!");
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0), getZeroBDD());

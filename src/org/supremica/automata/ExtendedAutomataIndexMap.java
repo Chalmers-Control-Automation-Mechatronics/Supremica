@@ -36,17 +36,18 @@ public class ExtendedAutomataIndexMap {
     public Map<String, Integer> variableStringToIndexMap;
     private final Map<String, Integer> var2initValMap;
     private final Map<String, List<VariableMarkingProxy>> var2markedValMap;
-    private final Map<String, Integer> val2indexMap;
-    private final Map<Integer, String> index2valMap;
+    private final Map<String,Map<String,Integer>> var2valIndexMap;
+    private final Map<String,Map<Integer,String>> var2indexValMap;
     private Set<String> EFANames = null;
     private Set<String> variableNames = null;
     ExtendedAutomata theExAutomata = null;
+    private MinMax variableBounds = null;
 
     public ExtendedAutomataIndexMap() {
         var2initValMap = new HashMap<String, Integer>();
         var2markedValMap = new HashMap<String, List<VariableMarkingProxy>>();
-        val2indexMap = new HashMap<String, Integer>();
-        index2valMap = new HashMap<Integer, String>();
+        var2valIndexMap = new HashMap<String,Map<String,Integer>>();
+        var2indexValMap = new HashMap<String,Map<Integer,String>>();
     }
 
     public ExtendedAutomataIndexMap(final ExtendedAutomata theExAutomata) {
@@ -113,12 +114,37 @@ public class ExtendedAutomataIndexMap {
 
             final String varName = var.getName();
             final String range = var.getType().toString();
+            final Map<String, Integer> val2indexMap = new HashMap<String, Integer>();
+            final Map<Integer, String> index2valMap = new HashMap<Integer, String>();
 
-            for (int i = theExAutomata.getMinValueofVar(varName); i <= theExAutomata.getMaxValueofVar(varName); i++) {
-                val2indexMap.put("" + i, i);
-                index2valMap.put(i, "" + i);
+            final int lowerBound = theExAutomata.getMinValueofVar(varName);
+            final int upperBound = theExAutomata.getMaxValueofVar(varName);
+            if (variableBounds == null) {
+                variableBounds = new MinMax(lowerBound, upperBound);
+            } else {
+                if (lowerBound < variableBounds.getMin()) {
+                    variableBounds.setMin(lowerBound);
+                }
+                if (upperBound > variableBounds.getMax()) {
+                    variableBounds.setMax(upperBound);
+                }
+            }
+
+            for (int i = lowerBound; i <= upperBound; i++) {
+                String valueLabel;
+                if (theExAutomata.getNonIntegerVarNameSet().contains(varName)) {
+                    // We have an enumeration datatype
+                    valueLabel = theExAutomata.getNonIntVar2IntInstanceMap().get(varName).get(String.valueOf(i));
+                } else {
+                    // We have an integer datatype
+                    valueLabel = String.valueOf(i);
+                }
+                val2indexMap.put(valueLabel, i);
+                index2valMap.put(i, valueLabel);
                 integerDomain.add(i);
             }
+            var2valIndexMap.put(varName, val2indexMap);
+            var2indexValMap.put(varName, index2valMap);
 
             if (range.contains(CompilerOperatorTable.getInstance().getRangeOperator().getName())) {
                 final int initialValue = val2indexMap.get(((BinaryExpressionProxy) var.getInitialStatePredicate()).getRight().toString());
@@ -185,12 +211,20 @@ public class ExtendedAutomataIndexMap {
 
     }
 
-    public Integer getIndexOfVal(final String val) {
-        return val2indexMap.get(val);
+    public Integer getIndexOfVal(final String variableName, final String val) {
+        Integer returnValue = null;
+        if (var2valIndexMap.containsKey(variableName)) {
+            returnValue = var2valIndexMap.get(variableName).get(val);
+        }
+        return returnValue;
     }
 
-    public String getValOfIndex(final int index) {
-        return index2valMap.get(index);
+    public String getValOfIndex(final String variableName, final int index) {
+        String returnValue = null;
+        if (var2indexValMap.containsKey(variableName)) {
+            returnValue = var2indexValMap.get(variableName).get(index);
+        }
+        return returnValue;
     }
 
     public int getInitValueofVar(final String var) {
@@ -199,6 +233,14 @@ public class ExtendedAutomataIndexMap {
 
     public List<VariableMarkingProxy> getMarkedPredicatesofVar(final String var) {
         return var2markedValMap.get(var);
+    }
+
+    public int getVariableLowerBound() {
+        return variableBounds.getMin();
+    }
+
+    public int getVariableUpperBound() {
+        return variableBounds.getMax();
     }
 
     public Integer getVariableIndex(final VariableComponentProxy var) {
