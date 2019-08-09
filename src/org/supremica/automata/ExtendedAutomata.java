@@ -262,15 +262,15 @@ public class ExtendedAutomata implements Iterable<ExtendedAutomaton>
                     final Map<String, String> varInstanceIntMap = new HashMap<String, String>();
                     final Map<String, String> varIntInstanceMap = new HashMap<String, String>();
                     final StringTokenizer token = new StringTokenizer(range, ", [ ]");
-                    int mapedIntValue = 0;
+                    int mappedIntValue = 0;
                     upperBound = token.countTokens();
-                    lowerBound = mapedIntValue;
+                    lowerBound = mappedIntValue;
                     while(token.hasMoreTokens()) {
                       final String anInstance = token.nextToken();
-                      final String mapedIntValueString = String.valueOf(mapedIntValue);
-                      varInstanceIntMap.put(anInstance, mapedIntValueString);
-                      varIntInstanceMap.put(mapedIntValueString, anInstance);
-                      mapedIntValue ++;
+                      final String mappedIntValueString = String.valueOf(mappedIntValue);
+                      varInstanceIntMap.put(anInstance, mappedIntValueString);
+                      varIntInstanceMap.put(mappedIntValueString, anInstance);
+                      mappedIntValue ++;
                     }
                     nonIntVar2InstanceIntMap.put(varName, varInstanceIntMap);
                     nonIntVar2IntInstanceMap.put(varName, varIntInstanceMap);
