@@ -62,7 +62,9 @@ public abstract class AbstractTextFieldParameter extends Parameter
 
   protected abstract String filterText(final String text);
 
-  private class InputFilter extends DocumentFilter {
+  private class InputFilter extends DocumentFilter
+  {
+    // TODO Also implement insert()
 
     @Override
     public void replace(final FilterBypass fb,

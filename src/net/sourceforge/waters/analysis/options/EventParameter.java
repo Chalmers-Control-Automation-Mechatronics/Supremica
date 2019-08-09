@@ -93,6 +93,8 @@ public class EventParameter extends Parameter
         propositions.add(event);
         //if :accepting exists and this is first creation
         if(mValue != null)
+          // TODO Can't rely on name (what if the model has an event "initial"?
+          // Use object compare mValue == mNoEvent
           if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue.getName().equals("initial")) {
             mValue = event;
           }
@@ -163,6 +165,7 @@ public class EventParameter extends Parameter
 
   public EventProxy getValue()
   {
+    // TODO Avoid name compare. Can mValue == null?
     if(mValue == null)
       return null;
     else if(mValue.getName() == "(none)")
