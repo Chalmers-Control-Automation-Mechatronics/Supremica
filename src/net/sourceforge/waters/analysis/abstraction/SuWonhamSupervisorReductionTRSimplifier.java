@@ -255,10 +255,13 @@ public class SuWonhamSupervisorReductionTRSimplifier
         for (int s = 0; s < numStates; s++) {
           mShadowStateToClass[s] = IntListBuffer.NULL;
         }
-        if (checkMergibility(i, j, i, j, statePairs, restrictedEventList)) {
+        final boolean success =
+          checkMergibility(i, j, i, j, statePairs, restrictedEventList);
+        if (success) {
           merge(statePairs);
           mMerged = true;
         }
+        // System.out.format("%d/%d - %s\n", i, j, success ? "merged" : "failed");
         statePairs = null;
         mShadowClasses = null;
         mShadowStateToClass = null;

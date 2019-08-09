@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="supred_01">
 <B:Comment>A simple supervisor reduction test.
-It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorithms.</B:Comment>
+It is possible to merge states S1 and S2 with Su/Wonham and clique-based algorithms.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="CONTROLLABLE" Name="c"/>
 <EventDecl Kind="UNCONTROLLABLE" Name="u"/>
@@ -21,7 +21,7 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <Point X="-26" Y="2"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name="S1">
+<SimpleNode Name="S1">
 <PointGeometry>
 <Point X="80" Y="112"/>
 </PointGeometry>
@@ -29,7 +29,7 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <Point X="-27" Y="0"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name="S2">
+<SimpleNode Name="S2">
 <PointGeometry>
 <Point X="80" Y="192"/>
 </PointGeometry>
@@ -37,7 +37,7 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <Point X="-28" Y="-1"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name=":dump">
+<SimpleNode Name=":dump">
 <PointGeometry>
 <Point X="80" Y="272"/>
 </PointGeometry>
@@ -91,7 +91,7 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <SimpleComponent Kind="PLANT" Name="after">
 <Graph Deterministic="false">
 <NodeList>
-<SimpleNode Initial="false" Name="S12">
+<SimpleNode Name="S12">
 <PointGeometry>
 <Point X="80" Y="112"/>
 </PointGeometry>
@@ -110,7 +110,7 @@ It is possible to merge states S0 and S1 with Su/Wonham and clique-based algorit
 <Point X="-32" Y="2"/>
 </LabelGeometry>
 </SimpleNode>
-<SimpleNode Initial="false" Name=":dump">
+<SimpleNode Name=":dump">
 <PointGeometry>
 <Point X="80" Y="192"/>
 </PointGeometry>
