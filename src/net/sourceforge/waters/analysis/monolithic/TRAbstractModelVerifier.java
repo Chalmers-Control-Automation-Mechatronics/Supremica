@@ -33,6 +33,11 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.BoolParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -66,6 +71,30 @@ public abstract class TRAbstractModelVerifier
                                  final KindTranslator translator)
   {
     super(model, translator);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
+      @Override
+      public void commitValue()
+      {
+        setDetailedOutputEnabled(getValue());
+      }
+    });
+    list.add(new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+      @Override
+      public void commitValue()
+      {
+        setShortCounterExampleRequested(getValue());
+      }
+    });
+    return list;
   }
 
 

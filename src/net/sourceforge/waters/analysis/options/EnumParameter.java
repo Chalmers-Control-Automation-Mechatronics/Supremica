@@ -173,7 +173,6 @@ public class EnumParameter<T> extends Parameter
 
   //#########################################################################
   //# Data Members
-  // TODO Make these private
-  protected List<? extends T> mList;
-  protected T mValue;
+  private List<? extends T> mList;
+  private T mValue;
 }

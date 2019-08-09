@@ -422,6 +422,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerControllabilityCheckAction.class);
   }
 
+  public IDEAction getAnalyzerDeadlockCheckAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerDeadlockCheckAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;

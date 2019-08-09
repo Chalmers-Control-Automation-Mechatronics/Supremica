@@ -50,7 +50,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 
-import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecker;
 import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -92,7 +91,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
 
     AllParams = new HashMap<Integer,Parameter>();
     factory = ProductDESElementFactory.getInstance();
-    des = AutomatonTools.createProductDESProxy("synchronousForAnalyzer", mAutomata, factory);
+    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
     generateAnalyzerCombobox();
     generateGUI();
     setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
@@ -255,8 +254,8 @@ public abstract class AbstractAnalysisDialog extends JDialog
    * one in database
    *
    * @param parametersToStore
-   *          the list of parameters that are to be stored in the database of
-   *          all parameters
+   *          the list of parameters that are to be updated using
+   *          the corresponding parameter in the database
    */
   public void copyFromDatabase(final List<Parameter> parametersToStore)
   {
@@ -297,10 +296,6 @@ public abstract class AbstractAnalysisDialog extends JDialog
     //commit all of the values to the synthesizer
     for (final Parameter current : parameters)
       current.commitValue();
-
-
-    if(mAnalyzer instanceof CompositionalConflictChecker)
-      System.out.println(((CompositionalConflictChecker)mAnalyzer).isDetailedOutputEnabled());
 
     final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
     final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
