@@ -51,7 +51,7 @@ import net.sourceforge.waters.model.analysis.OverflowKind;
 
 
 /**
- * <P>A skeleton implementation of for verifier-based analysis algorithms.</P>
+ * <P>A skeleton implementation for verifier-based analysis algorithms.</P>
  *
  * <P>A <I>verifier</I> is constructed from a transition relation
  * (deterministic or nondeterministic) and a set of local events. The local
