@@ -127,8 +127,10 @@ public class IntListBuffer
 
   /**
    * Creates a new list from the data of two given lists.
-   * This method merges the two lists destructively, and there is no
-   * guarantee that either input list continues to exists after the call.
+   * This method merges the two lists destructively, possibly
+   * destroying one of them. If one of the two lists is empty or {@link #NULL},
+   * then the other is returned. If both lists are nonempty, the first is
+   * modified by appending the second, and the second is destroyed.
    * @param  list1   The unique list number that identifies the
    *                 first list to be catenated.
    * @param  list2   The unique list number that identifies the

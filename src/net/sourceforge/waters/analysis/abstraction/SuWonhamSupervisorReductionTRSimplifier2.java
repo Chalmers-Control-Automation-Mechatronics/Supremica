@@ -34,13 +34,16 @@
 package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.iterator.TIntByteIterator;
+import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntByteHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
 import gnu.trove.stack.TLongStack;
 import gnu.trove.stack.array.TLongArrayStack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -757,10 +760,10 @@ public class SuWonhamSupervisorReductionTRSimplifier2
     //# Data Members
     private IntListBuffer.Iterator createIterator(final int clazz)
     {
-      if (mClassToList == null) {
+      if (mMap == null) {
         return null;
       }
-      final int list = mClassToList[clazz];
+      final int list = mMap.get(clazz);
       if (list == IntListBuffer.NULL) {
         return null;
       }
@@ -769,30 +772,46 @@ public class SuWonhamSupervisorReductionTRSimplifier2
 
     private TRPartition createTRPartition()
     {
-      if (mStateToClass == null) {
+      if (mMap == null) {
         return null;
       } else {
-        return new TRPartition(mStateToClass, mStateToClass.length);
+        final ListBufferTransitionRelation rel = getTransitionRelation();
+        final int numStates = rel.getFirstInitialState();
+        final List<int[]> classes = new ArrayList<>(numStates);
+        for (int s = 0; s < numStates; s++) {
+          final int list = mMap.get(s);
+          if (list == IntListBuffer.NULL ||
+              mListBuffer.getFirst(list) != s) {
+            classes.add(null);
+          } else {
+            final int[] array = mListBuffer.toArray(list);
+            classes.add(array);
+          }
+        }
+        return new TRPartition(classes, numStates);
       }
     }
 
     private int getClassCode(final int state)
     {
-      if (mStateToClass == null) {
+      if (mMap == null) {
         return state;
-      } else {
-        return mStateToClass[state];
       }
+      final int list = mMap.get(state);
+      if (list == IntListBuffer.NULL) {
+        return state;
+      }
+      return mListBuffer.getFirst(list);
     }
 
     private void getStates(final int clazz, final TIntArrayList buffer)
     {
       buffer.clear();
-      if (mStateToClass == null) {
+      if (mMap == null) {
         buffer.add(clazz);
         return;
       }
-      final int list = mClassToList[clazz];
+      final int list = mMap.get(clazz);
       if (list == IntListBuffer.NULL) {
         buffer.add(clazz);
         return;
@@ -802,20 +821,14 @@ public class SuWonhamSupervisorReductionTRSimplifier2
 
     private void initialize()
     {
-      if (mStateToClass == null) {
-        final ListBufferTransitionRelation rel = getTransitionRelation();
-        final int numStates = rel.getNumberOfStates();
-        mStateToClass = new int[numStates];
-        mClassToList = new int[numStates];
-        mListBuffer = new IntListBuffer();
-        for (int s = 0; s < numStates; s++) {
-          if (rel.isReachable(s)) {
-            mStateToClass[s] = s;
-          } else {
-            mStateToClass[s] = -1;
-          }
+      if (mMap == null) {
+        mMap = new TIntIntHashMap(10, 0.5f, -1, IntListBuffer.NULL);
+        if (mListBuffer == null) {
+          mListBuffer = new IntListBuffer();
+          mIterator = mListBuffer.createReadOnlyIterator();
+        } else {
+          mListBuffer.clear();
         }
-        mIterator = mListBuffer.createReadOnlyIterator();
       }
     }
 
@@ -823,13 +836,11 @@ public class SuWonhamSupervisorReductionTRSimplifier2
                                       final int state2)
     {
       final int list1, list2;
-      if (mStateToClass == null) {
+      if (mMap == null) {
         list1 = list2 = IntListBuffer.NULL;
       } else {
-        final int clazz1 = mStateToClass[state1];
-        list1 = mClassToList[clazz1];
-        final int clazz2 = mStateToClass[state2];
-        list2 = mClassToList[clazz2];
+        list1 = mMap.get(state1);
+        list2 = mMap.get(state2);
       }
       if (list1 == IntListBuffer.NULL && list2 == IntListBuffer.NULL) {
         return isStateCompatible(state1, state2);
@@ -867,31 +878,35 @@ public class SuWonhamSupervisorReductionTRSimplifier2
 
     private boolean isEquivalent(final int state1, final int state2)
     {
-      if (mStateToClass == null) {
+      if (mMap == null) {
         return state1 == state2;
-      } else {
-        return mStateToClass[state1] == mStateToClass[state2];
       }
+      final int list1 = mMap.get(state1);
+      if (list1 == IntListBuffer.NULL) {
+        return state1 == state2;
+      }
+      return list1 == mMap.get(state2);
     }
 
     private ListBufferPartition merge(final ListBufferPartition partition)
     {
-      if (mStateToClass == null) {
+      if (mMap == null) {
         return partition;
-      } else if (partition.mStateToClass == null) {
+      } else if (partition.mMap == null) {
         return this;
       } else {
-        final IntListBuffer.Iterator iter = partition.mIterator;
-        for (final int list : partition.mClassToList) {
-          if (list != IntListBuffer.NULL) {
-            iter.reset(list);
-            iter.advance();
-            final int state1 = iter.getCurrentData();
-            final int clazz1 = mStateToClass[state1];
-            while (iter.advance()) {
-              final int state2 = iter.getCurrentData();
-              final int clazz2 = mStateToClass[state2];
-              mergeClasses(clazz1, clazz2);
+        final IntListBuffer.Iterator listIter = partition.mIterator;
+        final TIntIntIterator mapIter = partition.mMap.iterator();
+        while (mapIter.hasNext()) {
+          mapIter.advance();
+          final int clazz = mapIter.key();
+          final int list = mapIter.value();
+          listIter.reset(list);
+          listIter.advance();
+          if (listIter.getCurrentData() == clazz) {
+            while (listIter.advance()) {
+              final int clazz2 = listIter.getCurrentData();
+              mergeClasses(clazz, clazz2);
             }
           }
         }
@@ -903,36 +918,39 @@ public class SuWonhamSupervisorReductionTRSimplifier2
     {
       if (clazz1 != clazz2) {
         initialize();
-        final int list1 = mClassToList[clazz1];
-        final int list2 = mClassToList[clazz2];
-        if (list1 == IntListBuffer.NULL && list2 == IntListBuffer.NULL) {
-          mStateToClass[clazz2] = clazz1;
-          final int list = mListBuffer.createList();
-          mListBuffer.append(list, clazz1);
-          mListBuffer.append(list, clazz2);
-          mClassToList[clazz1] = list;
-        } else if (list2 == IntListBuffer.NULL) {
-          mStateToClass[clazz2] = clazz1;
-          mListBuffer.append(list1, clazz2);
-        } else if (list1 == IntListBuffer.NULL) {
-          mIterator.reset(list2);
-          while (mIterator.advance()) {
-            final int state = mIterator.getCurrentData();
-            mStateToClass[state] = clazz1;
+        final int list1 = mMap.get(clazz1);
+        final int list2 = mMap.get(clazz2);
+        if (list1 == IntListBuffer.NULL) {
+          if (list2 == IntListBuffer.NULL) {
+            final int list = mListBuffer.createList();
+            mListBuffer.append(list, clazz1);
+            mListBuffer.append(list, clazz2);
+            mMap.put(clazz1, list);
+            mMap.put(clazz2, list);
+          } else {
+            mMap.put(clazz1, list2);
+            mListBuffer.prepend(list2, clazz1);
           }
-          mListBuffer.prepend(list2, clazz1);
-          mClassToList[clazz1] = list2;
-          mClassToList[clazz2] = IntListBuffer.NULL;
         } else {
-          mIterator.reset(list2);
-          while (mIterator.advance()) {
-            final int state = mIterator.getCurrentData();
-            mStateToClass[state] = clazz1;
+          if (list2 == IntListBuffer.NULL) {
+            mMap.put(clazz2, list1);
+            mListBuffer.append(list1, clazz2);
+          } else {
+            mIterator.reset(list2);
+            while (mIterator.advance()) {
+              final int state = mIterator.getCurrentData();
+              mMap.put(state, list1);
+            }
+            mListBuffer.catenateDestructively(list1, list2);
           }
-          mClassToList[clazz1] = mListBuffer.catenateDestructively(list1, list2);
-          mClassToList[clazz2] = IntListBuffer.NULL;
         }
       }
+    }
+
+    @SuppressWarnings("unused")
+    private void reset()
+    {
+      mMap = null;
     }
 
     //#######################################################################
@@ -940,15 +958,16 @@ public class SuWonhamSupervisorReductionTRSimplifier2
     @Override
     public String toString()
     {
-      if (mStateToClass == null) {
+      if (mMap == null) {
         return "(identity partition)";
       } else {
         final StringBuilder builder = new StringBuilder();
-        for (int clazz = 0; clazz < mClassToList.length; clazz++) {
-          if (mStateToClass[clazz] == clazz) {
+        final int[] keys = mMap.keys();
+        for (final int clazz : keys) {
+          if (getClassCode(clazz) == clazz) {
             builder.append(clazz);
             builder.append(": [");
-            final int list = mClassToList[clazz];
+            final int list = mMap.get(clazz);
             if (list == IntListBuffer.NULL) {
               builder.append(clazz);
             } else {
@@ -975,8 +994,7 @@ public class SuWonhamSupervisorReductionTRSimplifier2
 
     //#######################################################################
     //# Data Members
-    private int[] mStateToClass;
-    private int[] mClassToList;
+    private TIntIntHashMap mMap;
     private IntListBuffer mListBuffer;
     private IntListBuffer.Iterator mIterator;
   }
