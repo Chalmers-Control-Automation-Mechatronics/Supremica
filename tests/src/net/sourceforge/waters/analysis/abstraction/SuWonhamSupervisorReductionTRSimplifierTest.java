@@ -74,7 +74,7 @@ public class SuWonhamSupervisorReductionTRSimplifierTest
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
-    simplifier.setExperimentalMode(false);
+    //simplifier.setExperimentalMode(false);
     return simplifier;
   }
 
@@ -198,6 +198,14 @@ public class SuWonhamSupervisorReductionTRSimplifierTest
     final String group = "tests";
     final String subdir = "abstraction";
     final String name = "supred_05_sw.wmod";
+    runTransitionRelationSimplifier(group, subdir, name);
+  }
+
+  public void test_supred_06() throws Exception
+  {
+    final String group = "tests";
+    final String subdir = "abstraction";
+    final String name = "supred_06.wmod";
     runTransitionRelationSimplifier(group, subdir, name);
   }
 

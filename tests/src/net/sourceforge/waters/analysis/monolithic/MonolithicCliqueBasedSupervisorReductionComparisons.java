@@ -242,7 +242,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
-    simplifier.setExperimentalMode(true);
+    simplifier.setDiagonalPairOrdering(true);
     return simplifier;
   }
 
@@ -303,9 +303,9 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
       }
       mPrintWriter.write(mNoEntryValue);
     } else if (cliqueBasedStats == null) {
-     mPrintWriter.write(suWonhamStats.getInputStates() + ",");
-     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getOutputStates() + "," + mNoEntryValue +",");
-     mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getRunTime() + "," + mNoEntryValue);
+      mPrintWriter.write(suWonhamStats.getInputStates() + ",");
+      mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getOutputStates() + "," + mNoEntryValue +",");
+      mPrintWriter.write(mNoEntryValue + "," + suWonhamStats.getRunTime() + "," + mNoEntryValue);
     } else if (suWonhamStats == null) {
       mPrintWriter.write(cliqueBasedStats.getInputStates() + ",");
       mPrintWriter.write(cliqueBasedStats.getOutputStates() + "," + mNoEntryValue + "," + mNoEntryValue + ",");

@@ -33,22 +33,24 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import gnu.trove.iterator.TLongIterator;
+import gnu.trove.iterator.TIntByteIterator;
+import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntByteHashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
 import gnu.trove.set.hash.TLongHashSet;
+import gnu.trove.stack.TLongStack;
+import gnu.trove.stack.array.TLongArrayStack;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Deque;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
-import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
-import net.sourceforge.waters.analysis.tr.IntListBuffer.ReadOnlyIterator;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -88,11 +90,27 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Constructors
   public SuWonhamSupervisorReductionTRSimplifier()
   {
+    setAppliesPartitionAutomatically(true);
   }
 
   public SuWonhamSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
+    setAppliesPartitionAutomatically(true);
+  }
+
+
+  //#########################################################################
+  //# Configuration
+  public void setDiagonalPairOrdering(final boolean diag)
+  {
+    mPairOrdering =
+      diag ? new DiagonalPairOrdering() : new LexicographicPairOrdering();
+  }
+
+  public boolean isDiagonalPairOrdering()
+  {
+    return mPairOrdering instanceof DiagonalPairOrdering;
   }
 
 
@@ -108,526 +126,168 @@ public class SuWonhamSupervisorReductionTRSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
-    return ListBufferTransitionRelation.CONFIG_ALL;
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
   }
 
 
   //#########################################################################
-  //# Configuration
-  /**
-   * Enables or disables reordering of states based on distance to decision
-   * states. This experimental optimisation by Fangqian Qiu only works with
-   * supervisor localisation, i.e., when a supervised event is configured.
-   * Otherwise, the setting has no effect.
-   * @param experimentalMode <CODE>true</CODE> to enable reordering.
-   * @see #setSupervisedEvent(int) setSupervisedEvent()
-   */
-  public void setExperimentalMode(final boolean experimentalMode)
-  {
-    mExperimentalMode = experimentalMode;
-  }
-
-  public boolean getExperimentalMode()
-  {
-    return mExperimentalMode;
-  }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
-  protected void setUp() throws AnalysisException
+  protected void setUp()
+    throws AnalysisException
   {
     super.setUp();
+    mStack = new StackOfPairs();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumProperEvents = rel.getNumberOfProperEvents();
+    rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final int numStates = rel.getNumberOfReachableStates();
+    mStates1 = new TIntArrayList(numStates);
+    mStates2 = new TIntArrayList(numStates);
+    mSuccessors2 = new TIntArrayList(numStates);
   }
 
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
-    final TRPartition partition;
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int dumpIndex = rel.getDumpStateIndex();
-    if (rel.isReachable(dumpIndex)) {
-      final TIntArrayList enabDisabEvents = new TIntArrayList();
-      final TIntArrayList disabEvents = new TIntArrayList();
-      final int supervisedEvent = getSupervisedEvent();
-      if (supervisedEvent < 0) {
-        // monolithic supervisor reduction
-        setUpClasses();
-        setUpEventList(enabDisabEvents, disabEvents);
-        if (enabDisabEvents.size() == 0) {
-          partition = createOneStatePartition(disabEvents);
-        } else {
-          partition = reduceSupervisor(enabDisabEvents);
-        }
-      } else {
-        // supervisor localisation
-        final TIntArrayList singletonList = new TIntArrayList(1);
-        singletonList.add(supervisedEvent);
-        if (mExperimentalMode) {
-          final int numStates = rel.getNumberOfStates();
-          mStateToClass = new int[numStates];
-          mClasses = new IntListBuffer();
-          partition = reduceSupervisorExperimental(singletonList);
-        } else {
-          setUpClasses();
-          partition = reduceSupervisor(singletonList);
-        }
-      }
+    final TRPartition partition;
+    setUpCompatibilityRelation();
+    if (mCompatibiliyRelation.isEmpty()) {
+      partition = createOneStatePartition();
+      rel.merge(partition);
     } else {
-      partition = createOneStatePartition(new TIntArrayList(0));
+      setUpStateOrder();
+      partition = mPairOrdering.mergeAllPairs();
     }
     setResultPartition(partition);
     if (partition != null) {
-      applyResultPartitionAutomatically();
+      rel.removeProperSelfLoopEvents();
+      rel.removeRedundantPropositions();
+      return true;
+    } else {
+      return false;
     }
-    return partition != null;
   }
 
   @Override
-  protected void applyResultPartition() throws AnalysisException
+  public void applyResultPartition()
   {
-    super.applyResultPartition();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    // Remove uncontrollable events that are selfloop-only
-    final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIterator();
-    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
-      checkAbort();
-      final byte status = rel.getProperEventStatus(e);
-      if (!EventStatus.isControllableEvent(status)) {
-        iter.resetEvent(e);
-        boolean selfloopOnly = true;
-        while (iter.advance()) {
-          if (iter.getCurrentSourceState() != iter.getCurrentTargetState()) {
-            selfloopOnly = false;
-            break;
-          }
-        }
-        if (selfloopOnly) {
-          rel.removeEvent(e);
-        }
-      }
-    }
-    // Remove ordinary full-selfloop events
-    rel.removeProperSelfLoopEvents();
-    rel.removeRedundantPropositions();
   }
 
   @Override
   protected void tearDown()
   {
     super.tearDown();
-    mStateToClass = null;
-    mClasses = null;
-    mShadowStateToClass = null;
-    mShadowClasses = null;
-    mStateMap = null;
-    mInverseMap = null;
-    mSearchingBitSet = null;
+    mCompatibiliyRelation = null;
+    mOrderedStates = null;
+    mStateOrderIndex = null;
+    mStack = null;
+    mStates1 = mStates2 = mSuccessors2 = null;
+    mSparePartition = null;
   }
 
 
   //#########################################################################
   //# Methods for Supervisor Reduction
-  private TRPartition reduceSupervisor(final TIntArrayList restrictedEventList)
+  private ListBufferPartition checkMergibility(final int state1,
+                                               final int state2)
     throws AnalysisAbortException
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final int dumpIndex = rel.getDumpStateIndex();
-    mMerged = false;
-
-    for (int i = 0; i < numStates - 1; i++) {
-      if (!rel.isReachable(i) || i == dumpIndex || i > getMinimum(i)) {
-        continue;
-      }
-      for (int j = i + 1; j < numStates; j++) {
-        if (!rel.isReachable(j) || j == dumpIndex || j > getMinimum(j)) {
-          continue;
-        }
-        checkAbort();
-        TLongHashSet statePairs = new TLongHashSet();
-        mShadowClasses = new IntListBuffer();
-        mShadowStateToClass = new int[numStates];
-        for (int s = 0; s < numStates; s++) {
-          mShadowStateToClass[s] = IntListBuffer.NULL;
-        }
-        final boolean success =
-          checkMergibility(i, j, i, j, statePairs, restrictedEventList);
-        if (success) {
-          merge(statePairs);
-          mMerged = true;
-        }
-        // System.out.format("%d/%d - %s\n", i, j, success ? "merged" : "failed");
-        statePairs = null;
-        mShadowClasses = null;
-        mShadowStateToClass = null;
-      }
-    }
-    if (mMerged) {
-      return createResultPartition();
+    final ListBufferPartition partition;
+    if (mSparePartition == null) {
+      partition = new ListBufferPartition();
     } else {
-      return null;
+      partition = mSparePartition;
+      partition.reset();
+      mSparePartition = null;
     }
+    mStack.clear();
+    mStack.push(state1, state2);
+    while (!mStack.isEmpty()) {
+      checkAbort();
+      final long pair = mStack.pop();
+      final int s1 = StackOfPairs.getLo(pair);
+      final int s2 = StackOfPairs.getHi(pair);
+      if (!mergeAndExpand(s1, s2, partition)) {
+        return null;
+      }
+    }
+    return partition;
   }
 
-  private boolean checkMergibility(final int x, final int y, final int x0,
-                                   final int y0,
-                                   final TLongHashSet statePairs,
-                                   final TIntArrayList restrictedEventList)
-    throws AnalysisAbortException
+  private boolean mergeAndExpand(final int state1,
+                                 final int state2,
+                                 final ListBufferPartition partition)
   {
-    checkAbort();
-    if (mStateToClass[x] == mStateToClass[y]) {
+    if (partition.isEquivalent(state1, state2)) {
       return true;
-    }
-
-    final int minX = getMinimum(x);
-    final int minY = getMinimum(y);
-    if (minX == minY) {
-      return true;
-    }
-    final long p1 = constructLong(minX, minY);
-    final long p2 = constructLong(x0, y0);
-    if (compare(p1, p2) < 0) {
+    } else if (mPairOrdering.hasFailedMergibilityCheck(state1, state2,
+                                                       partition)) {
+      return false;
+    } else if (!partition.isClassCompatible(state1, state2)) {
       return false;
     }
 
-    copyIfShadowNull(x);
-    copyIfShadowNull(y);
-
-    final int lx = mShadowStateToClass[x];
-    final int ly = mShadowStateToClass[y];
-    final int[] listX = mShadowClasses.toArray(lx);
-    final int[] listY = mShadowClasses.toArray(ly);
-
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int dumpIndex = rel.getDumpStateIndex();
-    final TIntHashSet xSet = new TIntHashSet();
-    final TIntHashSet ySet = new TIntHashSet();
-    final TIntArrayList xList = new TIntArrayList();
-    final TIntArrayList yList = new TIntArrayList();
-
-    for (int i = 0; i < restrictedEventList.size(); i++) {
-      final int e = restrictedEventList.get(i);
-      xSet.clear();
-      xList.clear();
-      boolean enabled = false;
-      boolean disabled = false;
-      for (final int xx : listX) {
-        final int succ = getSuccessorState(xx, e);
-        if (succ >= 0) {
-          if (xSet.add(xx)) {
-            xList.add(xx);
-          }
-          if (succ == dumpIndex) {
-            disabled = true;
-          } else {
-            enabled = true;
-          }
-        }
-      }
-      if (disabled) {
-        for (final int yy : listY) {
-          final int succ = getSuccessorState(yy, e);
-          if (succ >= 0 && succ != dumpIndex) {
-            return false;
-          }
-        }
-      }
-      if (enabled) {
-        for (final int yy : listY) {
-          final int succ = getSuccessorState(yy, e);
-          if (succ == dumpIndex) {
-            return false;
-          }
-        }
-      }
-    }
-
-    final int l = mergeLists(lx, ly, mShadowClasses);
-    updateStateToClass(l, mShadowStateToClass, mShadowClasses);
-
-    final long pair = constructLong(x, y);
-    statePairs.add(pair);
-
-    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
-      xSet.clear();
-      ySet.clear();
-      xList.clear();
-      yList.clear();
-      for (final int xx : listX) {
-        final int xSucc = getSuccessorState(xx, e);
-        if (xSucc >= 0 && xSucc != dumpIndex) {
-          final int xmin = getMinimum(xSucc);
-          if (xSet.add(xmin)) {
-            xList.add(xmin);
-          }
-        }
-      }
-      if (xList.isEmpty()) {
-        continue;
-      }
-      for (final int yy : listY) {
-        final int ySucc = getSuccessorState(yy, e);
-        if (ySucc >= 0 && ySucc != dumpIndex) {
-          final int ymin = getMinimum(ySucc);
-          if (ySet.add(ymin)) {
-            yList.add(ymin);
-          }
-        }
-      }
-      for (int i = 0; i < xList.size(); i++) {
-        for (int j = 0; j < yList.size(); j++) {
-          if (!checkMergibility(xList.get(i), yList.get(j), x0, y0,
-                                statePairs, restrictedEventList)) {
-            return false;
-          }
-        }
-      }
-    }
-    return true;
-  }
-
-  private TRPartition reduceSupervisorExperimental(final TIntArrayList restrictedEventList)
-    throws AnalysisAbortException
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final int dumpIndex = rel.getDumpStateIndex();
-    mMerged = false;
-
-    // find disabled states
-    mSearchingBitSet = new BitSet();
-    mQueue = new ArrayDeque<Integer>();
-    final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIterator();
-    iter.resetEvent(restrictedEventList.get(0));
-    while (iter.advance()) {
-      final int pre = iter.getCurrentSourceState();
-      final int succ = iter.getCurrentTargetState();
-      if (succ == dumpIndex) {
-        mQueue.add(pre);
-        mSearchingBitSet.set(pre);
-      }
-    }
-
-    // reorder states
-    mStateMap = new int[numStates];
-    mInverseMap = new int[numStates];
-    int count = 0;
-    final TransitionIterator preIter =
-      rel.createPredecessorsReadOnlyIterator();
-    while (!mQueue.isEmpty()) {
-      final int state = mQueue.remove().intValue();
-      if (state == dumpIndex) {
-        continue;
-      }
-      final int list = mClasses.createList();
-      mClasses.add(list, state);
-      mStateToClass[count] = list;
-      mInverseMap[state] = count;
-      mStateMap[count++] = state;
-      preIter.resetState(state);
-      while (preIter.advance()) {
-        final int source = preIter.getCurrentSourceState();
-        if (mSearchingBitSet.get(source)) {
-          continue;
-        } else {
-          mSearchingBitSet.set(source);
-          mQueue.add(new Integer(source));
-        }
-      }
-    }
-
-    for (int s = 0; s < numStates; s++) {
-      if (!mSearchingBitSet.get(s) && rel.isReachable(s)) {
-        final int list = mClasses.createList();
-        mClasses.add(list, s);
-        mStateToClass[count] = list;
-        mInverseMap[s] = count;
-        mStateMap[count++] = s;
-      }
-    }
-
-    for (int sum = 1; sum < 2 * (numStates - 1); sum++) {
-      final int hi = (sum - 1) / 2;
-      final int lo = Math.max(0, sum - numStates + 1);
-      for (int b = hi; b >= lo; b--) {
-        final int a = sum - b;
-        if (rel.isReachable(a) && a != dumpIndex &&
-            rel.isReachable(b) && b != dumpIndex) {
-          if (mStateMap[a] > getMinimumExperimental(mStateMap[a])
-              || mStateMap[b] > getMinimumExperimental(mStateMap[b])) {
-            continue;
-          }
-          checkAbort();
-          TLongHashSet statePairs = new TLongHashSet();
-          mShadowClasses = new IntListBuffer();
-          mShadowStateToClass = new int[numStates];
-          for (int s = 0; s < numStates; s++) {
-            mShadowStateToClass[s] = IntListBuffer.NULL;
-          }
-          if (checkMergibilityExperimental(mStateMap[a], mStateMap[b],
-                                           statePairs, restrictedEventList)) {
-            mergeExperimental(statePairs);
-            mMerged = true;
-          }
-          statePairs = null;
-          mShadowClasses = null;
-          mShadowStateToClass = null;
-        }
-      }
-    }
-
-    if (mMerged) {
-      return createResultPartition();
+    final int clazz1 = partition.getClassCode(state1);
+    partition.getStates(clazz1, mStates1);
+    final int clazz2 = partition.getClassCode(state2);
+    partition.getStates(clazz2, mStates2);
+    if (mStateOrderIndex[clazz1] < mStateOrderIndex[clazz2]) {
+      partition.mergeClasses(clazz1, clazz2);
     } else {
-      return null;
+      partition.mergeClasses(clazz2, clazz1);
     }
-  }
 
-  private boolean checkMergibilityExperimental(final int x0,
-                                               final int y0,
-                                               final TLongHashSet statePairs,
-                                               final TIntArrayList restrictedEventList)
-    throws AnalysisAbortException
-  {
-    final Deque<Long> pairStack = new ArrayDeque<Long>();
-    pairStack.push(constructLong(x0, y0));
-    final long initialPair = constructLong(mInverseMap[x0], mInverseMap[y0]);
-
-    while (!pairStack.isEmpty()) {
-      checkAbort();
-      final long pair = pairStack.pop().longValue();
-      final int x = getState(0, pair);
-      final int y = getState(1, pair);
-
-      if (mStateToClass[mInverseMap[x]] == mStateToClass[mInverseMap[y]]) {
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    final int dumpIndex = rel.getDumpStateIndex();
+    final int numEvents = rel.getNumberOfProperEvents();
+    eventLoop:
+    for (int e = 0; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (!EventStatus.isUsedEvent(status)) {
         continue;
       }
-
-      final int minX = getMinimumExperimental(x);
-      final int minY = getMinimumExperimental(y);
-      if (minX == minY) {
+      mSuccessors2.clear();
+      final TIntHashSet set2 = new TIntHashSet();
+      for (int i2 = 0; i2 < mStates2.size(); i2++) {
+        final int s2 = mStates2.get(i2);
+        iter.reset(s2, e);
+        if (iter.advance()) {
+          final int t2 = iter.getCurrentTargetState();
+          if (t2 == dumpIndex) {
+            continue eventLoop;
+          }
+          final int min2 = partition.getClassCode(t2);
+          if (set2.add(min2)) {
+            mSuccessors2.add(min2);
+          }
+        }
+      }
+      if (mSuccessors2.size() == 0) {
         continue;
       }
-
-      final long minPair =
-        constructLong(mInverseMap[minX], mInverseMap[minY]);
-      if (compareOrder(minPair, initialPair) < 0) {
-        return false;
-      }
-
-      if (mShadowStateToClass[mInverseMap[x]] == IntListBuffer.NULL) {
-        final int newlist =
-          mShadowClasses.copy(mStateToClass[mInverseMap[x]], mClasses);
-        final ReadOnlyIterator iter =
-          mShadowClasses.createReadOnlyIterator(newlist);
-        iter.reset(newlist);
-        while (iter.advance()) {
-          final int current = iter.getCurrentData();
-          mShadowStateToClass[mInverseMap[current]] = newlist;
-        }
-      }
-      if (mShadowStateToClass[mInverseMap[y]] == IntListBuffer.NULL) {
-        final int newlist =
-          mShadowClasses.copy(mStateToClass[mInverseMap[y]], mClasses);
-        final ReadOnlyIterator iter =
-          mShadowClasses.createReadOnlyIterator(newlist);
-        iter.reset(newlist);
-        while (iter.advance()) {
-          final int current = iter.getCurrentData();
-          mShadowStateToClass[mInverseMap[current]] = newlist;
-        }
-      }
-
-      final int lx = mShadowStateToClass[mInverseMap[x]];
-      final int ly = mShadowStateToClass[mInverseMap[y]];
-      final int[] listX = mShadowClasses.toArray(lx);
-      final int[] listY = mShadowClasses.toArray(ly);
-
-      final ListBufferTransitionRelation rel = getTransitionRelation();
-      final int dumpIndex = rel.getDumpStateIndex();
-      final TIntHashSet xSet = new TIntHashSet();
-      final TIntHashSet ySet = new TIntHashSet();
-      final TIntArrayList xList = new TIntArrayList();
-      final TIntArrayList yList = new TIntArrayList();
-
-      for (int i = 0; i < restrictedEventList.size(); i++) {
-        final int e = restrictedEventList.get(i);
-        xSet.clear();
-        xList.clear();
-        boolean enabled = false;
-        boolean disabled = false;
-        for (final int xx : listX) {
-          final int succ = getSuccessorState(xx, e);
-          if (succ >= 0) {
-            if (xSet.add(xx)) {
-              xList.add(xx);
+      final TIntHashSet set1 = new TIntHashSet();
+      for (int i1 = mStates1.size() - 1; i1 >= 0; i1--) {
+        final int s1 = mStates1.get(i1);
+        iter.reset(s1, e);
+        if (iter.advance()) {
+          final int t1 = iter.getCurrentTargetState();
+          final int min1 = partition.getClassCode(t1);
+          if (set1.add(min1)) {
+            for (int i2 = mSuccessors2.size() - 1; i2 >= 0; i2--) {
+              final int min2 = mSuccessors2.get(i2);
+              if (min1 == min2) {
+                continue;
+              } else if (mPairOrdering.hasFailedMergibilityCheck(min1, min2,
+                                                                 partition)) {
+                return false;
+              } else if (!partition.isClassCompatible(min1, min2)) {
+                return false;
+              }
+              mStack.push(min1, min2);
             }
-            if (succ == dumpIndex) {
-              disabled = true;
-            } else {
-              enabled = true;
-            }
-          }
-        }
-        if (disabled) {
-          for (final int yy : listY) {
-            final int succ = getSuccessorState(yy, e);
-            if (succ >= 0 && succ != dumpIndex) {
-              return false;
-            }
-          }
-        }
-        if (enabled) {
-          for (final int yy : listY) {
-            final int succ = getSuccessorState(yy, e);
-            if (succ == dumpIndex) {
-              return false;
-            }
-          }
-        }
-      }
-
-      final int l = mergeLists(lx, ly, mShadowClasses);
-      updateStateToClassExperimental(l, mShadowStateToClass, mShadowClasses);
-
-      statePairs.add(pair);
-
-      for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
-        xSet.clear();
-        ySet.clear();
-        xList.clear();
-        yList.clear();
-        for (final int xx : listX) {
-          final int xSucc = getSuccessorState(xx, e);
-          if (xSucc >= 0 && xSucc != dumpIndex) {
-            final int xmin = getMinimumExperimental(xSucc);
-            if (xSet.add(xmin)) {
-              xList.add(xmin);
-            }
-          }
-        }
-        if (xList.isEmpty()) {
-          continue;
-        }
-        for (final int yy : listY) {
-          final int ySucc = getSuccessorState(yy, e);
-          if (ySucc >= 0 && ySucc != dumpIndex) {
-            final int ymin = getMinimumExperimental(ySucc);
-            if (ySet.add(ymin)) {
-              yList.add(ymin);
-            }
-          }
-        }
-        for (int i = 0; i < xList.size(); i++) {
-          for (int j = 0; j < yList.size(); j++) {
-            pairStack.push(constructLong(xList.get(i), yList.get(j)));
           }
         }
       }
@@ -635,278 +295,160 @@ public class SuWonhamSupervisorReductionTRSimplifier
     return true;
   }
 
-  private void setUpClasses() throws AnalysisAbortException
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    final int dumpIndex = rel.getDumpStateIndex();
-    mStateToClass = new int[numStates];
-    mClasses = new IntListBuffer();
-    for (int s = 0; s < numStates; s++) {
-      checkAbort();
-      if (s == dumpIndex) {
-        mStateToClass[s] = IntListBuffer.NULL;
-      } else {
-        final int list = mClasses.createList();
-        mClasses.add(list, s);
-        mStateToClass[s] = list;
-      }
-    }
-  }
-
-  public void setUpEventList(final TIntArrayList enabDisabEvents,
-                             final TIntArrayList disabEvents)
-    throws AnalysisAbortException
-  {
-    enabDisabEvents.clear();
-    disabEvents.clear();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    mNumProperEvents = rel.getNumberOfProperEvents();
-    final int dumpIndex = rel.getDumpStateIndex();
-    final TIntArrayList[] disabledEventsToStates =
-      new TIntArrayList[mNumProperEvents];
-    final TIntArrayList[] enabledEventsToStates =
-      new TIntArrayList[mNumProperEvents];
-    final TransitionIterator iter =
-      rel.createAllTransitionsReadOnlyIteratorByStatus
-        (EventStatus.STATUS_CONTROLLABLE);
-    while (iter.advance()) {
-      // for each controllable transition ...
-      checkAbort();
-      final int currentEvent = iter.getCurrentEvent();
-      final int succ = iter.getCurrentTargetState();
-      final int pre = iter.getCurrentSourceState();
-      if (succ == dumpIndex) {
-        if (disabledEventsToStates[currentEvent] == null) {
-          disabledEventsToStates[currentEvent] = new TIntArrayList();
-        }
-        disabledEventsToStates[currentEvent].add(pre);
-      } else {
-        if (enabledEventsToStates[currentEvent] == null) {
-          enabledEventsToStates[currentEvent] = new TIntArrayList();
-        }
-        enabledEventsToStates[currentEvent].add(pre);
-      }
-    }
-    for (int i = 0; i < mNumProperEvents - 1; i++) {
-      for (int j = i + 1; j < mNumProperEvents; j++) {
-        checkAbort();
-        // if event e1 is enabled and disabled in the same set of states as event e2, then ignore one of them
-        if (disabledEventsToStates[i] != null
-            && enabledEventsToStates[i] != null
-            && disabledEventsToStates[i].equals(disabledEventsToStates[j])
-            && enabledEventsToStates[i].equals(enabledEventsToStates[j])) {
-          disabledEventsToStates[j] = null;
-          enabledEventsToStates[j] = null;
-        }
-
-      }
-    }
-    for (int e = EventEncoding.NONTAU; e < mNumProperEvents; e++) {
-      final byte status = rel.getProperEventStatus(e);
-      if (EventStatus.isControllableEvent(status)) {
-        if (disabledEventsToStates[e] != null) {
-          if (enabledEventsToStates[e] != null) {
-            enabDisabEvents.add(e);
-          } else {
-            disabEvents.add(e);
-          }
-        }
-      }
-    }
-  }
 
   //#########################################################################
-  //# Auxiliary Methods
-  private TRPartition createResultPartition() throws AnalysisAbortException
+  //# Compatibility Relation
+  private void setUpCompatibilityRelation()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TIntArrayList controllableEvents;
+    final int supEvent = getSupervisedEvent();
+    if (supEvent >= 0) {
+      controllableEvents = new TIntArrayList(1);
+      controllableEvents.add(supEvent);
+    } else {
+      final int numEvents = rel.getNumberOfProperEvents();
+      controllableEvents = new TIntArrayList(numEvents);
+      for (int e = 0; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (EventStatus.isUsedEvent(status) &&
+            EventStatus.isControllableEvent(status)) {
+          controllableEvents.add(e);
+        }
+      }
+    }
+    mCompatibiliyRelation = new LinkedList<>();
+    final int numStates = rel.getNumberOfStates();
+    final TIntArrayList enabled = new TIntArrayList(numStates);
+    final TIntArrayList disabled = new TIntArrayList(numStates);
+    final int dumpIndex = rel.getDumpStateIndex();
+    final TransitionIterator iter =
+      rel.createAllTransitionsModifyingIterator();
+    for (int i = 0; i < controllableEvents.size(); i++) {
+      enabled.clear();
+      disabled.clear();
+      final int e = controllableEvents.get(i);
+      iter.resetEvent(e);
+      while (iter.advance()) {
+        final int s = iter.getCurrentSourceState();
+        if (iter.getCurrentTargetState() == dumpIndex) {
+          disabled.add(s);
+        } else {
+          enabled.add(s);
+        }
+      }
+      if (!enabled.isEmpty() && !disabled.isEmpty()) {
+        final CompatibilityPair pair = new CompatibilityPair(enabled, disabled);
+        addCompatibilityPair(mCompatibiliyRelation, pair);
+      }
+    }
+    Collections.sort(mCompatibiliyRelation);
+  }
+
+  private boolean updateCompatibilityRelation(final ListBufferPartition partition)
+  {
+    List<CompatibilityPair> changedPairs = null;
+    Iterator<CompatibilityPair> iter = mCompatibiliyRelation.iterator();
+    while (iter.hasNext()) {
+      final CompatibilityPair pair = iter.next();
+      if (pair.applyPartition(partition)) {
+        iter.remove();
+        if (changedPairs == null) {
+          changedPairs = new LinkedList<>();
+          changedPairs.add(pair);
+        } else {
+          addCompatibilityPair(changedPairs, pair);
+        }
+      }
+    }
+    if (changedPairs != null) {
+      iter = mCompatibiliyRelation.iterator();
+      while (iter.hasNext()) {
+        final CompatibilityPair unchanged = iter.next();
+        for (final CompatibilityPair changed : changedPairs) {
+          if (changed.subsumes(unchanged)) {
+            iter.remove();
+            break;
+          }
+        }
+      }
+      mCompatibiliyRelation.addAll(changedPairs);
+      Collections.sort(mCompatibiliyRelation);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private static boolean addCompatibilityPair
+    (final List<CompatibilityPair> relation,
+     final CompatibilityPair pair)
+  {
+    final Iterator<CompatibilityPair> iter = relation.iterator();
+    while (iter.hasNext()) {
+      final CompatibilityPair existing = iter.next();
+      if (existing.subsumes(pair)) {
+        return false;
+      } else if (pair.subsumes(existing)) {
+        iter.remove();
+      }
+    }
+    relation.add(pair);
+    return true;
+  }
+
+  private boolean isStateCompatible(final int state1,
+                                    final int state2)
+  {
+    for (final CompatibilityPair pair : mCompatibiliyRelation) {
+      if (!pair.isCompatible(state1, state2)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
+  //#########################################################################
+  //# State Order
+  private void setUpStateOrder()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
+    mStateOrderIndex = new int[numStates];
+    final int numReachable = rel.getNumberOfReachableStates() - 1;
+    mOrderedStates = new int[numReachable];
     final int dumpIndex = rel.getDumpStateIndex();
-    final List<int[]> classes = new ArrayList<>();
-    boolean trChanged = false;
+    int orderIndex = 0;
     for (int s = 0; s < numStates; s++) {
-      checkAbort();
       if (rel.isReachable(s) && s != dumpIndex) {
-        int listID = mStateToClass[s];
-        if (mInverseMap != null) { // experimental mode
-          listID = mStateToClass[mInverseMap[s]];
-        }
-        if (mClasses.getFirst(listID) == s) {
-          final int[] states = mClasses.toArray(listID);
-          classes.add(states);
-        } else {
-          trChanged = true;
-        }
-      }
-    }
-    if (trChanged) {
-      if (rel.isReachable(dumpIndex)) {
-        final int[] badClass = new int[] {dumpIndex};
-        classes.add(badClass);
-      }
-      return new TRPartition(classes, numStates);
-    } else {
-      return null;
-    }
-  }
-
-  private void merge(final TLongHashSet statePairs)
-    throws AnalysisAbortException
-  {
-    final TLongIterator itr = statePairs.iterator();
-    while (itr.hasNext()) {
-      checkAbort();
-      final long pair = itr.next();
-      final int hi = getState(0, pair);
-      final int lo = getState(1, pair);
-      if (mStateToClass[hi] != mStateToClass[lo]) {
-        final int list1 = mStateToClass[hi];
-        final int list2 = mStateToClass[lo];
-        final int list3 = mergeLists(list1, list2, mClasses);
-        updateStateToClass(list3, mStateToClass, mClasses);
+        mStateOrderIndex[s] = orderIndex;
+        mOrderedStates[orderIndex] = s;
+        orderIndex++;
+      } else {
+        mStateOrderIndex[s] = -1;
       }
     }
   }
 
-  private void mergeExperimental(final TLongHashSet statePairs)
-    throws AnalysisAbortException
-  {
-    final TLongIterator itr = statePairs.iterator();
-    while (itr.hasNext()) {
-      checkAbort();
-      final long pair = itr.next();
-      final int hi = getState(0, pair);
-      final int lo = getState(1, pair);
-      if (mStateToClass[mInverseMap[hi]] != mStateToClass[mInverseMap[lo]]) {
-        final int list1 = mStateToClass[mInverseMap[hi]];
-        final int list2 = mStateToClass[mInverseMap[lo]];
-        final int list3 = mergeLists(list1, list2, mClasses);
-        updateStateToClassExperimental(list3, mStateToClass, mClasses);
-      }
-    }
-  }
 
-  private int mergeLists(final int list1, final int list2,
-                         final IntListBuffer classes)
-  {
-    final int x = classes.getFirst(list1);
-    final int y = classes.getFirst(list2);
-    if (x < y) {
-      return classes.catenateDestructively(list1, list2);
-    } else if (x > y) {
-      return classes.catenateDestructively(list2, list1);
-    }
-    return list1;
-  }
-
-  private void copyIfShadowNull(final int state)
-    throws AnalysisAbortException
-  {
-    if (mShadowStateToClass[state] == IntListBuffer.NULL) {
-      final int newlist = mShadowClasses.copy(mStateToClass[state], mClasses);
-      final ReadOnlyIterator iter =
-        mShadowClasses.createReadOnlyIterator(newlist);
-      iter.reset(newlist);
-      while (iter.advance()) {
-        final int current = iter.getCurrentData();
-        mShadowStateToClass[current] = newlist;
-      }
-    }
-  }
-
-  private void updateStateToClass(final int list, final int[] stateToClass,
-                                  final IntListBuffer classes)
-    throws AnalysisAbortException
-  {
-    final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
-    iter.reset(list);
-    while (iter.advance()) {
-      final int current = iter.getCurrentData();
-      stateToClass[current] = list;
-    }
-  }
-
-  private void updateStateToClassExperimental(final int list,
-                                              final int[] stateToClass,
-                                              final IntListBuffer classes)
-    throws AnalysisAbortException
-  {
-    final ReadOnlyIterator iter = classes.createReadOnlyIterator(list);
-    iter.reset(list);
-    while (iter.advance()) {
-      final int current = iter.getCurrentData();
-      stateToClass[mInverseMap[current]] = list;
-    }
-  }
-
-  private int compare(final long pair1, final long pair2)
-  {
-    if (pair1 < pair2) {
-      return -1;
-    } else if (pair1 > pair2) {
-      return 1;
-    } else {
-      return 0;
-    }
-  }
-
-  private int getMinimum(final int state)
-  {
-    if (mShadowStateToClass == null
-        || mShadowStateToClass[state] == IntListBuffer.NULL) {
-      return mClasses.getFirst(mStateToClass[state]);
-    } else {
-      return mShadowClasses.getFirst(mShadowStateToClass[state]);
-    }
-  }
-
-  private int getMinimumExperimental(final int state)
-  {
-    if (mShadowStateToClass == null
-        || mShadowStateToClass[mInverseMap[state]] == IntListBuffer.NULL) {
-      return mClasses.getFirst(mStateToClass[mInverseMap[state]]);
-    } else {
-      return mShadowClasses.getFirst(mShadowStateToClass[mInverseMap[state]]);
-    }
-  }
-
-  private int getState(final int position, final long pair)
-  {
-    if (position == 0) {
-      return (int) (pair >>> 32);
-    } else if (position == 1) {
-      return (int) (pair & 0xffffffff);
-    }
-    return -1;
-  }
-
-  private long constructLong(int state1, int state2)
-  {
-    if (state1 > state2) {
-      state1 = state1 + state2;
-      state2 = state1 - state2;
-      state1 = state1 - state2;
-    }
-    final long pair = state2 | ((long) state1 << 32);
-    return pair;
-  }
-
-  private TRPartition createOneStatePartition(final TIntArrayList disabEvents)
+  //#########################################################################
+  //# Partition
+  private TRPartition createOneStatePartition()
     throws OverflowException, AnalysisAbortException
   {
-    final ListBufferTransitionRelation oldRel = getTransitionRelation();
-    if (oldRel.getNumberOfReachableStates() <= 1 &&
-        oldRel.getNumberOfTransitions() == 0) {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    if (rel.getNumberOfReachableStates() <= 1 &&
+        rel.getNumberOfTransitions() == 0) {
       return null;
     } else {
-      final int oldDumpIndex = oldRel.getDumpStateIndex();
-      final int oldNumStates = oldRel.getNumberOfStates();
-      final int[] stateToClass = new int[oldNumStates];
-      for (int s = 0; s < oldNumStates; s++) {
-        if (!oldRel.isReachable(s)) {
+      final int dumpIndex = rel.getDumpStateIndex();
+      final int numStates = rel.getNumberOfStates();
+      final int[] stateToClass = new int[numStates];
+      for (int s = 0; s < numStates; s++) {
+        if (!rel.isReachable(s)) {
           stateToClass[s] = -1;
-        } else if (s != oldDumpIndex) {
+        } else if (s != dumpIndex) {
           stateToClass[s] = 0;
         } else {
           stateToClass[s] = 1;
@@ -916,64 +458,698 @@ public class SuWonhamSupervisorReductionTRSimplifier
     }
   }
 
-  private int getSuccessorState(final int source, final int event)
+  private ListBufferPartition icorporatePartition
+    (ListBufferPartition result, final ListBufferPartition partition)
   {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
-    iter.reset(source, event);
-    if (iter.advance()) {
-      return iter.getCurrentTargetState();
-    } else {
-      return -1;
+    if (partition != null) {
+      applyPartition(partition);
+      result = result.merge(partition);
+      if (result != partition && mSparePartition == null) {
+        mSparePartition = partition;
+      }
     }
+    return result;
   }
 
-  private int compareOrder(final long pair1, final long pair2)
+  private void applyPartition(final ListBufferPartition partition)
   {
-    final int pair1a = getState(0, pair1);
-    final int pair1b = getState(1, pair1);
-    final int pair2a = getState(0, pair2);
-    final int pair2b = getState(1, pair2);
-    if (pair1a + pair1b < pair2a + pair2b) {
-      return -1;
-    } else if (pair1a + pair1b > pair2a + pair2b) {
-      return 1;
-    } else {
-      return pair2a - pair1a;
+    if (partition == null) {
+      return;
+    }
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TransitionIterator writer = rel.createSuccessorsModifyingIterator();
+    final TransitionIterator reader = rel.createSuccessorsReadOnlyIterator();
+    final int numEvents = rel.getNumberOfProperEvents();
+    final TIntHashSet events = new TIntHashSet(numEvents);
+    final int numProps = rel.getNumberOfPropositions();
+    final int numStates = rel.getNumberOfStates();
+    for (int state = 0; state < numStates; state++) {
+      if (rel.isReachable(state) && state == partition.getClassCode(state)) {
+        events.clear();
+        writer.resetState(state);
+        while (writer.advance()) {
+          final int e = writer.getCurrentEvent();
+          events.add(e);
+          final int t = writer.getCurrentTargetState();
+          final int min = partition.getClassCode(t);
+          if (t != min) {
+            writer.setCurrentToState(min);
+          }
+        }
+        final int clazz = partition.getClassCode(state);
+        final IntListBuffer.Iterator iter = partition.createIterator(clazz);
+        if (iter != null) {
+          while (iter.advance()) {
+            final int s = iter.getCurrentData();
+            if (s != state) {
+              reader.resetState(s);
+              while (reader.advance()) {
+                final int e = reader.getCurrentEvent();
+                if (events.add(e)) {
+                  final int t = reader.getCurrentTargetState();
+                  final int min = partition.getClassCode(t);
+                  rel.addTransition(state, e, min);
+                }
+              }
+              if (rel.isInitial(s)) {
+                rel.setInitial(state, true);
+              }
+              for (int p = 0; p < numProps; p++) {
+                if (rel.isMarked(s, p)) {
+                  rel.setMarked(state, p, true);
+                }
+              }
+              rel.setReachable(s, false);
+            }
+          }
+        }
+      }
+    }
+    updateCompatibilityRelation(partition);
+  }
+
+
+  //#########################################################################
+  //# Inner Interface PairOrdering
+  private interface PairOrdering
+  {
+    public TRPartition mergeAllPairs()
+      throws AnalysisAbortException;
+    public boolean hasFailedMergibilityCheck
+      (int state1, int state2, final ListBufferPartition partition);
+  }
+
+
+  //#########################################################################
+  //# Inner Class LexicographicPairOrdering
+  private class LexicographicPairOrdering implements PairOrdering
+  {
+    @Override
+    public TRPartition mergeAllPairs()
+      throws AnalysisAbortException
+    {
+      ListBufferPartition result = new ListBufferPartition();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      for (mCurrentIndex1 = 0;
+           mCurrentIndex1 < mOrderedStates.length;
+           mCurrentIndex1++) {
+        final int state1 = mOrderedStates[mCurrentIndex1];
+        if (!rel.isReachable(state1)) {
+          continue;
+        }
+        for (mCurrentIndex2 = mCurrentIndex1 + 1;
+             mCurrentIndex2 < mOrderedStates.length;
+             mCurrentIndex2++) {
+          final int state2 = mOrderedStates[mCurrentIndex2];
+          if (!rel.isReachable(state2)) {
+            continue;
+          }
+          checkAbort();
+          final ListBufferPartition partition = checkMergibility(state1, state2);
+          // System.out.format("%d/%d - %s\n", state1, state2,
+          //                   partition == null ? "failed" : "merged");
+          result = icorporatePartition(result, partition);
+        }
+      }
+      return result.createTRPartition();
+    }
+
+    @Override
+    public boolean hasFailedMergibilityCheck(final int state1,
+                                              final int state2,
+                                              final ListBufferPartition partition)
+    {
+      int min1 = partition.getClassCode(state1);
+      int min2 = partition.getClassCode(state2);
+      if (mStateOrderIndex[min1] > mStateOrderIndex[min2]) {
+        final int tmp = min1;
+        min1 = min2;
+        min2 = tmp;
+      }
+      if (mStateOrderIndex[min1] < mCurrentIndex1) {
+        return true;
+      } else if (mStateOrderIndex[min1] == mCurrentIndex1) {
+        return mStateOrderIndex[min2] < mCurrentIndex2;
+      } else {
+        return false;
+      }
     }
   }
 
 
   //#########################################################################
-  //# Debugging
-  public int[] showClassList(final IntListBuffer classes, final int list)
+  //# Inner Class DiagonalPairOrdering
+  private class DiagonalPairOrdering implements PairOrdering
   {
-    final int[] array = classes.toArray(list);
-    return array;
+    @Override
+    public TRPartition mergeAllPairs()
+      throws AnalysisAbortException
+    {
+      ListBufferPartition result = new ListBufferPartition();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      outerLoop:
+      for (mCurrentIndex1 = 1;
+           mCurrentIndex1 < mOrderedStates.length;
+           mCurrentIndex1++) {
+        final int state1 = mOrderedStates[mCurrentIndex1];
+        if (!rel.isReachable(state1)) {
+          continue;
+        }
+        for (mCurrentIndex2 = 0;
+             mCurrentIndex2 < mCurrentIndex1;
+             mCurrentIndex2++) {
+          final int state2 = mOrderedStates[mCurrentIndex2];
+          if (!rel.isReachable(state2)) {
+            continue;
+          }
+          checkAbort();
+          final ListBufferPartition partition = checkMergibility(state1, state2);
+          // System.out.format("%d/%d - %s\n", state1, state2,
+          //                   partition == null ? "failed" : "merged");
+          result = icorporatePartition(result, partition);
+          if (!rel.isReachable(state1)) {
+            continue outerLoop;
+          }
+        }
+      }
+      return result.createTRPartition();
+    }
+
+    @Override
+    public boolean hasFailedMergibilityCheck(final int state1,
+                                             final int state2,
+                                             final ListBufferPartition partition)
+    {
+      int min1 = partition.getClassCode(state1);
+      int min2 = partition.getClassCode(state2);
+      if (mStateOrderIndex[min1] < mStateOrderIndex[min2]) {
+        final int tmp = min1;
+        min1 = min2;
+        min2 = tmp;
+      }
+      if (mStateOrderIndex[min1] < mCurrentIndex1) {
+        return true;
+      } else if (mStateOrderIndex[min1] == mCurrentIndex1) {
+        return mStateOrderIndex[min2] < mCurrentIndex2;
+      } else {
+        return false;
+      }
+    }
   }
 
-  public void PrintStateToClassToConsole(final int event)
+
+  //#########################################################################
+  //# Inner Class CompatibilityPair
+  private static class CompatibilityPair
+    implements Comparable<CompatibilityPair>
   {
-    System.out.println("[------" + event + "------]");
-    for (int i = 0; i < mStateToClass.length; i++) {
-      System.out.println(mStateToClass[i]);
+    //#######################################################################
+    //# Constructor
+    private CompatibilityPair(final TIntArrayList enabling,
+                              final TIntArrayList disabling)
+    {
+      mStatusMap = new TIntByteHashMap
+        (enabling.size() + disabling.size(), 0.5f, -1, DONT_CARE);
+      for (int i = 0; i < enabling.size(); i++) {
+        final int state = enabling.get(i);
+        mStatusMap.put(state, ENABLING);
+      }
+      for (int i = 0; i < disabling.size(); i++) {
+        final int state = disabling.get(i);
+        mStatusMap.put(state, DISABLING);
+      }
     }
+
+    //#######################################################################
+    //# Interface java.lang.Comparable<CompatibilityPair>
+    @Override
+    public int compareTo(final CompatibilityPair other)
+    {
+      return other.size() - size();
+    }
+
+    //#######################################################################
+    //# Compatibility Checking
+    private int size()
+    {
+      return mStatusMap.size();
+    }
+
+    private boolean isCompatible(final int state1, final int state2)
+    {
+      final byte status1 = mStatusMap.get(state1);
+      if (status1 == DONT_CARE) {
+        return true;
+      } else {
+        final byte status2 = mStatusMap.get(state2);
+        return status2 == DONT_CARE || status1 == status2;
+      }
+    }
+
+    private boolean isCompatible(final IntListBuffer.Iterator iter1,
+                                 final IntListBuffer.Iterator iter2)
+    {
+      byte status1 = DONT_CARE;
+      iter1.reset();
+      while (iter1.advance()) {
+        final int s = iter1.getCurrentData();
+        status1 = mStatusMap.get(s);
+        if (status1 != DONT_CARE) {
+          break;
+        }
+      }
+      if (status1 != DONT_CARE) {
+        iter2.reset();
+        while (iter2.advance()) {
+          final int s = iter2.getCurrentData();
+          final byte status2 = mStatusMap.get(s);
+          if (status2 != DONT_CARE) {
+            return status1 == status2;
+          }
+        }
+      }
+      return true;
+    }
+
+    private boolean subsumes(final CompatibilityPair other)
+    {
+      byte mode = DONT_CARE;
+      final TIntByteIterator iter = other.mStatusMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final int state = iter.key();
+        final byte status = mStatusMap.get(state);
+        if (status == DONT_CARE) {
+          return false;
+        }
+        final boolean equal = status == iter.value();
+        switch (mode) {
+        case EQUAL:
+          if (!equal) {
+            return false;
+          }
+          break;
+        case INVERSE:
+          if (equal) {
+            return false;
+          }
+          break;
+        default:
+          mode = equal ? EQUAL : INVERSE;
+          break;
+        }
+      }
+      return true;
+    }
+
+    private boolean applyPartition(final ListBufferPartition partition)
+    {
+      final TIntArrayList changed = new TIntArrayList(size());
+      final TIntByteIterator iter = mStatusMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final int state = iter.key();
+        if (state != partition.getClassCode(state)) {
+          changed.add(state);
+        }
+      }
+      if (changed.size() > 0) {
+        for (int i = 0; i < changed.size(); i++) {
+          final int state = changed.get(i);
+          final byte status = mStatusMap.remove(state);
+          final int min = partition.getClassCode(state);
+          mStatusMap.put(min, status);
+        }
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      final TIntArrayList enabling = new TIntArrayList(size());
+      final TIntArrayList disabling = new TIntArrayList(size());
+      final TIntByteIterator iter = mStatusMap.iterator();
+      while (iter.hasNext()) {
+        iter.advance();
+        final int state = iter.key();
+        switch (iter.value()) {
+        case ENABLING:
+          enabling.add(state);
+          break;
+        case DISABLING:
+          disabling.add(state);
+          break;
+        default:
+          assert false : "Unexpected status in compatibility map!";
+        }
+      }
+      enabling.sort();
+      disabling.sort();
+      final StringBuilder builder = new StringBuilder();
+      builder.append("Enabling: ");
+      builder.append(enabling.toString());
+      builder.append("\nDisabling: ");
+      builder.append(disabling.toString());
+      return builder.toString();
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TIntByteHashMap mStatusMap;
+  }
+
+
+  //#########################################################################
+  //# Inner Class ListBufferPartition
+  private class ListBufferPartition
+  {
+    //#######################################################################
+    //# Data Members
+    private IntListBuffer.Iterator createIterator(final int clazz)
+    {
+      if (mMap == null) {
+        return null;
+      }
+      final int list = mMap.get(clazz);
+      if (list == IntListBuffer.NULL) {
+        return null;
+      }
+      return mListBuffer.createReadOnlyIterator(list);
+    }
+
+    private TRPartition createTRPartition()
+    {
+      if (mMap == null) {
+        return null;
+      } else {
+        final ListBufferTransitionRelation rel = getTransitionRelation();
+        final int numStates = rel.getFirstInitialState();
+        final List<int[]> classes = new ArrayList<>(numStates);
+        for (int s = 0; s < numStates; s++) {
+          final int list = mMap.get(s);
+          if (list == IntListBuffer.NULL ||
+              mListBuffer.getFirst(list) != s) {
+            classes.add(null);
+          } else {
+            final int[] array = mListBuffer.toArray(list);
+            classes.add(array);
+          }
+        }
+        return new TRPartition(classes, numStates);
+      }
+    }
+
+    private int getClassCode(final int state)
+    {
+      if (mMap == null) {
+        return state;
+      }
+      final int list = mMap.get(state);
+      if (list == IntListBuffer.NULL) {
+        return state;
+      }
+      return mListBuffer.getFirst(list);
+    }
+
+    private void getStates(final int clazz, final TIntArrayList buffer)
+    {
+      buffer.clear();
+      if (mMap == null) {
+        buffer.add(clazz);
+        return;
+      }
+      final int list = mMap.get(clazz);
+      if (list == IntListBuffer.NULL) {
+        buffer.add(clazz);
+        return;
+      }
+      mListBuffer.toArrayList(list, buffer);
+    }
+
+    private void initialize()
+    {
+      if (mMap == null) {
+        mMap = new TIntIntHashMap(10, 0.5f, -1, IntListBuffer.NULL);
+        if (mListBuffer == null) {
+          mListBuffer = new IntListBuffer();
+          mIterator = mListBuffer.createReadOnlyIterator();
+        } else {
+          mListBuffer.clear();
+        }
+      }
+    }
+
+    private boolean isClassCompatible(final int state1,
+                                      final int state2)
+    {
+      final int list1, list2;
+      if (mMap == null) {
+        list1 = list2 = IntListBuffer.NULL;
+      } else {
+        list1 = mMap.get(state1);
+        list2 = mMap.get(state2);
+      }
+      if (list1 == IntListBuffer.NULL && list2 == IntListBuffer.NULL) {
+        return isStateCompatible(state1, state2);
+      } else if (list1 == IntListBuffer.NULL) {
+        mIterator.reset(list2);
+        while (mIterator.advance()) {
+          final int s2 = mIterator.getCurrentData();
+          if (!isStateCompatible(state1, s2)) {
+            return false;
+          }
+        }
+        return true;
+      } else if (list2 == IntListBuffer.NULL) {
+        mIterator.reset(list1);
+        while (mIterator.advance()) {
+          final int s1 = mIterator.getCurrentData();
+          if (!isStateCompatible(s1, state2)) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        final IntListBuffer.Iterator iter1 =
+          mListBuffer.createReadOnlyIterator(list1);
+        final IntListBuffer.Iterator iter2 =
+          mListBuffer.createReadOnlyIterator(list2);
+        for (final CompatibilityPair pair : mCompatibiliyRelation) {
+          if (!pair.isCompatible(iter1, iter2)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+
+    private boolean isEquivalent(final int state1, final int state2)
+    {
+      if (mMap == null) {
+        return state1 == state2;
+      }
+      final int list1 = mMap.get(state1);
+      if (list1 == IntListBuffer.NULL) {
+        return state1 == state2;
+      }
+      return list1 == mMap.get(state2);
+    }
+
+    private ListBufferPartition merge(final ListBufferPartition partition)
+    {
+      if (mMap == null) {
+        return partition;
+      } else if (partition.mMap == null) {
+        return this;
+      } else {
+        final IntListBuffer.Iterator listIter = partition.mIterator;
+        final TIntIntIterator mapIter = partition.mMap.iterator();
+        while (mapIter.hasNext()) {
+          mapIter.advance();
+          final int clazz = mapIter.key();
+          final int list = mapIter.value();
+          listIter.reset(list);
+          listIter.advance();
+          if (listIter.getCurrentData() == clazz) {
+            while (listIter.advance()) {
+              final int clazz2 = listIter.getCurrentData();
+              mergeClasses(clazz, clazz2);
+            }
+          }
+        }
+        return this;
+      }
+    }
+
+    private void mergeClasses(final int clazz1, final int clazz2)
+    {
+      if (clazz1 != clazz2) {
+        initialize();
+        final int list1 = mMap.get(clazz1);
+        final int list2 = mMap.get(clazz2);
+        if (list1 == IntListBuffer.NULL) {
+          if (list2 == IntListBuffer.NULL) {
+            final int list = mListBuffer.createList();
+            mListBuffer.append(list, clazz1);
+            mListBuffer.append(list, clazz2);
+            mMap.put(clazz1, list);
+            mMap.put(clazz2, list);
+          } else {
+            mMap.put(clazz1, list2);
+            mListBuffer.prepend(list2, clazz1);
+          }
+        } else {
+          if (list2 == IntListBuffer.NULL) {
+            mMap.put(clazz2, list1);
+            mListBuffer.append(list1, clazz2);
+          } else {
+            mIterator.reset(list2);
+            while (mIterator.advance()) {
+              final int state = mIterator.getCurrentData();
+              mMap.put(state, list1);
+            }
+            mListBuffer.catenateDestructively(list1, list2);
+          }
+        }
+      }
+    }
+
+    private void reset()
+    {
+      mMap = null;
+    }
+
+    //#######################################################################
+    //# Debugging
+    @Override
+    public String toString()
+    {
+      if (mMap == null) {
+        return "(identity partition)";
+      } else {
+        final StringBuilder builder = new StringBuilder();
+        final int[] keys = mMap.keys();
+        for (final int clazz : keys) {
+          if (getClassCode(clazz) == clazz) {
+            builder.append(clazz);
+            builder.append(": [");
+            final int list = mMap.get(clazz);
+            if (list == IntListBuffer.NULL) {
+              builder.append(clazz);
+            } else {
+              boolean first = true;
+              final IntListBuffer.Iterator iter =
+                mListBuffer.createReadOnlyIterator(list);
+              iter.reset(list);
+              while (iter.advance()) {
+                if (first) {
+                  first = false;
+                } else {
+                  builder.append(", ");
+                }
+                final int s = iter.getCurrentData();
+                builder.append(s);
+              }
+            }
+            builder.append("]\n");
+          }
+        }
+        return builder.toString();
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private TIntIntHashMap mMap;
+    private IntListBuffer mListBuffer;
+    private IntListBuffer.Iterator mIterator;
+  }
+
+
+  //#########################################################################
+  //# Inner Class StackOfPairs
+  private static class StackOfPairs
+  {
+    //#######################################################################
+    //# Access
+    private void clear()
+    {
+      mStack.clear();
+      mVisited = new TLongHashSet();
+    }
+
+    private boolean isEmpty()
+    {
+      return mStack.size() == 0;
+    }
+
+    private long pop()
+    {
+      return mStack.pop();
+    }
+
+    private void push(final int s1, final int s2)
+    {
+      final long lo, hi;
+      if (s1 < s2) {
+        lo = s1;
+        hi = s2;
+      } else {
+        lo = s2;
+        hi = s1;
+      }
+      final long pair = lo | (hi << 32);
+      if (mVisited.add(pair)) {
+        mStack.push(pair);
+      }
+    }
+
+    //#######################################################################
+    //# Pair Decomposition
+    private static int getLo(final long pair)
+    {
+      return (int) (pair & 0xffffffffL);
+    }
+
+    private static int getHi(final long pair)
+    {
+      return (int) (pair >>> 32);
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final TLongStack mStack = new TLongArrayStack();
+    private TLongHashSet mVisited = null;
   }
 
 
   //#########################################################################
   //# Data Members
-  private boolean mExperimentalMode = false;
+  private PairOrdering mPairOrdering = new LexicographicPairOrdering();
 
-  private int mNumProperEvents;
-  private int[] mStateToClass;
-  private IntListBuffer mClasses;
-  private int[] mShadowStateToClass;
-  private IntListBuffer mShadowClasses;
-  private boolean mMerged;
-  private int[] mStateMap;
-  private int[] mInverseMap;
+  private List<CompatibilityPair> mCompatibiliyRelation;
+  private int[] mOrderedStates;
+  private int[] mStateOrderIndex;
+  private int mCurrentIndex1;
+  private int mCurrentIndex2;
+  private StackOfPairs mStack;
+  private TIntArrayList mStates1;
+  private TIntArrayList mStates2;
+  private TIntArrayList mSuccessors2;
+  private ListBufferPartition mSparePartition;
 
-  private Queue<Integer> mQueue;
-  private BitSet mSearchingBitSet;
+
+  //#########################################################################
+  //# Class Constants
+  private static final byte DONT_CARE = 0;
+  private static final byte ENABLING = 1;
+  private static final byte DISABLING = 2;
+  private static final byte EQUAL = 3;
+  private static final byte INVERSE = 4;
+
 }

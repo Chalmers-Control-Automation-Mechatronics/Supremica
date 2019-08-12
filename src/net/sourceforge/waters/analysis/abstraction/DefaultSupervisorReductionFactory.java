@@ -84,7 +84,7 @@ public enum DefaultSupervisorReductionFactory
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
-      main.setExperimentalMode(false);
+      //main.setExperimentalMode(false);
       return new SupervisorReductionChain(false, main);
     }
   },
@@ -111,7 +111,6 @@ public enum DefaultSupervisorReductionFactory
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
-      main.setExperimentalMode(false);
       return new SupervisorReductionChain(true, main);
     }
   },
@@ -138,7 +137,7 @@ public enum DefaultSupervisorReductionFactory
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
-      main.setExperimentalMode(true);
+      main.setDiagonalPairOrdering(true);
       return new SupervisorReductionChain(false, main);
     }
   },
@@ -168,7 +167,7 @@ public enum DefaultSupervisorReductionFactory
     {
       final SuWonhamSupervisorReductionTRSimplifier main =
         new SuWonhamSupervisorReductionTRSimplifier();
-      main.setExperimentalMode(true);
+      main.setDiagonalPairOrdering(true);
       return new SupervisorReductionChain(true, main);
     }
   },

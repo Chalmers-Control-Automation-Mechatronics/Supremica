@@ -374,6 +374,7 @@
 </Edge>
 <Edge Source="S0" Target="S0">
 <LabelBlock>
+<SimpleIdentifier Name="m"/>
 <SimpleIdentifier Name="mb"/>
 <LabelGeometry Anchor="NW">
 <Point X="-14" Y="5"/>

@@ -649,7 +649,7 @@ public class CliqueBasedReductionLocalisedComparisons
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
-    simplifier.setExperimentalMode(true);
+    simplifier.setDiagonalPairOrdering(true);
     return simplifier;
   }
 
