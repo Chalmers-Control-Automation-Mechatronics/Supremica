@@ -1,7 +1,11 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
-import net.sf.javabdd.*;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDException;
+import net.sf.javabdd.BDDFactory;
 
 /**
  *
@@ -32,7 +36,7 @@ public abstract class SupremicaBDDBitVector
 
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum, boolean c);
 
-    protected void initialize(boolean isTrue)
+    protected void initialize(final boolean isTrue)
     {
         for (int n = 0; n < bitNum; n++)
             if (isTrue)
@@ -262,7 +266,7 @@ public abstract class SupremicaBDDBitVector
         rest = next.mulfixed(c>>1);
         if ((c & 0x1) != 0)
         {
-            res = (SupremicaBDDBitVector)add(rest);
+            res = add(rest);
             rest.free();
         }
         else
@@ -288,7 +292,7 @@ public abstract class SupremicaBDDBitVector
         leftshifttmp.free();
         for (n=0 ; n<right.length() ; n++)
         {
-            final SupremicaBDDBitVector added = (SupremicaBDDBitVector)res.add(leftshift);
+            final SupremicaBDDBitVector added = res.add(leftshift);
             int m;
             for (m=0 ; m<localBitNum ; m++)
                 res.bitvec[m] = right.bitvec[n].ite(added.bitvec[m], res.bitvec[m]);
@@ -320,7 +324,7 @@ public abstract class SupremicaBDDBitVector
         return bitvec[n];
     }
 
-    protected int getLargerLength(SupremicaBDDBitVector that)
+    protected int getLargerLength(final SupremicaBDDBitVector that)
     {
         if(that.length() > this.length())
         {

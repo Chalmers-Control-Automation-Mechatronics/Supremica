@@ -9,8 +9,8 @@ import net.sf.javabdd.BDD;
 public class ResultOverflows {
 
 
-    private SupremicaBDDBitVector result;
-    private BDD overflows;
+    private final SupremicaBDDBitVector result;
+    private final BDD overflows;
 
     public ResultOverflows(final SupremicaBDDBitVector result, final BDD overflows)
     {
