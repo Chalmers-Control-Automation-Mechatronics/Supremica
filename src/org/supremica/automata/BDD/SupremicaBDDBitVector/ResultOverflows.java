@@ -27,5 +27,12 @@ public class ResultOverflows {
     {
         return overflows;
     }
-    
+
+    @Override
+    public String toString()
+    {
+      return String.format("result: %s, bdd: %s",
+                           this.result.toString(), this.overflows.toString());
+    }
+
 }

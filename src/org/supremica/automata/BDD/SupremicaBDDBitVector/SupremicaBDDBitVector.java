@@ -1,6 +1,7 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -29,7 +30,7 @@ public abstract class SupremicaBDDBitVector
     {
         return mFactory;
     }
-    
+
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum);
 
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum, long c);
@@ -67,7 +68,7 @@ public abstract class SupremicaBDDBitVector
         final SupremicaBDDBitVector dst = buildSupBDDBitVector(bitNum);
         for (int n = 0; n < bitNum; n++)
             dst.bitvec[n] = bitvec[n].id();
-        
+
         return dst;
     }
 
@@ -81,7 +82,7 @@ public abstract class SupremicaBDDBitVector
 
         for (; n < minnum; n++)
             dst.bitvec[n] = mFactory.zero();
-        
+
         return dst;
     }
 
@@ -121,12 +122,12 @@ public abstract class SupremicaBDDBitVector
 
             if(n < that.length())
                 rightBDD = that.bitvec[n];
-            
+
             res.bitvec[n] = leftBDD.apply(rightBDD, op);
         }
         return res;
-    }        
-    
+    }
+
     public abstract BDD getBDDThatResultsMaxValue();
 
     public abstract ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that);
@@ -155,7 +156,7 @@ public abstract class SupremicaBDDBitVector
     {
 //        if (this.bitNum != r.bitNum)
 //            throw new BDDException("gth operator: The length of the left-side vector is not equal to the right-side!");
-        
+
         final BDD tmp = lte(r);
         final BDD p = tmp.not();
         return p;
@@ -187,7 +188,7 @@ public abstract class SupremicaBDDBitVector
     {
         if (bitNum != that.bitNum)
             throw new BDDException("replaceWith operator: The length of the left-side vector is not equal to the right-side!");
-        
+
         free();
         this.bitvec = that.bitvec;
         that.bitvec = null;
@@ -330,8 +331,18 @@ public abstract class SupremicaBDDBitVector
         {
             return that.length();
         }
-        
+
         return this.length();
     }
-    
+
+    @Override
+    public String toString()
+    {
+        if (isConst()) {
+            return String.format("%s", val());
+        } else {
+            return Arrays.toString(bitvec);
+        }
+    }
+
 }
