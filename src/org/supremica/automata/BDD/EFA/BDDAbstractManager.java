@@ -242,10 +242,29 @@ public abstract class BDDAbstractManager {
         return expr2BDDBitVec(expr, guardAction, null);
     }
 
-    // This method should be implemented using Visitor Pattern.
+    /**
+     * Recursively traverses the expression tree. Every operator and identifier
+     * in the tree is converted to an equivalent BDD bit vector.
+     * <p>
+     * A BDD bit vector is a bit vector representation of a number where each
+     * bit is represented by a BDD instead of logical 1 and 0. This way it is
+     * possible to do integer arithmetic with BDDs. See Clarke et. al. (1993)
+     * for a bit more information.
+     * <p>
+     * C. M. Clarke et. al. "Spectral transforms for large boolean functions
+     * with applications to technology mapping" 30th ACM/IEEE Design Automation
+     * Conference, 1993
+     *
+     * @param expr The root node of an expression tree.
+     * @param guardAction True if the expression is a guard.
+     * @param updatedVariables The names of all variables that are updated by
+     * the next operator are added to this set.
+     * @return A BDD bit vector that represents the complete expression tree.
+     */
     ResultOverflows expr2BDDBitVec(final SimpleExpressionProxy expr,
                                    final boolean guardAction,
                                    final HashSet<String> updatedVariables) {
+        // This method should be implemented using Visitor Pattern.
         if (expr instanceof UnaryExpressionProxy) {
             final UnaryExpressionProxy unExpr = (UnaryExpressionProxy) expr;
             if (unExpr.getOperator().equals(CompilerOperatorTable.getInstance().getNotOperator())) {
