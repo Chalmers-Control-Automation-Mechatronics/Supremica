@@ -73,7 +73,8 @@ public class EventParameter extends Parameter
                  final EventParameterType type)
   {
     super(id, name, description);
-    mValue = ProductDESElementFactory.getInstance().createEventProxy("initial", EventKind.PROPOSITION);
+    mInitial = ProductDESElementFactory.getInstance().createEventProxy("initial", EventKind.PROPOSITION);
+    mValue = mInitial;
     mNullOptions = type;
   }
 
@@ -93,9 +94,7 @@ public class EventParameter extends Parameter
         propositions.add(event);
         //if :accepting exists and this is first creation
         if(mValue != null)
-          // TODO Can't rely on name (what if the model has an event "initial"?
-          // Use object compare mValue == mNoEvent
-          if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue.getName().equals("initial")) {
+          if(event.getName().equals(EventDeclProxy.DEFAULT_MARKING_NAME) && mValue == mInitial) {
             mValue = event;
           }
       }
@@ -117,7 +116,7 @@ public class EventParameter extends Parameter
         //     proposition in the model, use null as the only option.)
         if (mNullOptions == EventParameterType.PREVENT_NULL) {
           //:accepting not available
-          if (mValue.getName().equals("initial")) {
+          if (mValue == mInitial) {
             if (propositions.size() > 0)
               mValue = propositions.get(0);
             else {
@@ -133,7 +132,7 @@ public class EventParameter extends Parameter
         else if (mNullOptions == EventParameterType.ALLOW_NULL) {
           propositions.add(noEvent);
           //:accepting not available
-          if (mValue.getName().equals("initial")) {
+          if (mValue == mInitial) {
             mValue = propositions.get(0);
           }
         }
@@ -165,7 +164,6 @@ public class EventParameter extends Parameter
 
   public EventProxy getValue()
   {
-    // TODO Avoid name compare. Can mValue == null?
     if(mValue == null)
       return null;
     else if(mValue.getName() == "(none)")
@@ -243,5 +241,6 @@ public class EventParameter extends Parameter
   private EventProxy mValue;
   private final EventParameterType mNullOptions;
   private ProductDESContext mDESContext;
+  private final EventProxy mInitial;
 
 }

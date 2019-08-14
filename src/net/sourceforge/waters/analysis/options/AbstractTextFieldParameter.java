@@ -64,7 +64,15 @@ public abstract class AbstractTextFieldParameter extends Parameter
 
   private class InputFilter extends DocumentFilter
   {
-    // TODO Also implement insert()
+    @Override
+    public void insertString(final FilterBypass fb,
+                        final int offset,
+                        final String text,
+                        final AttributeSet attrs)
+      throws BadLocationException
+    {
+      super.insertString(fb, offset, filterText(text), attrs);
+    }
 
     @Override
     public void replace(final FilterBypass fb,
