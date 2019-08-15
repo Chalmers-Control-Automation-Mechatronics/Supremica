@@ -45,6 +45,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.EnumParameter;
+import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.cpp.analysis.NativeSafetyVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -142,6 +145,20 @@ public class CompositionalSafetyVerifier
     return mDiagnostics;
   }
 
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
+  @Override
+  public List<Parameter> getParameters()
+  {
+    final List<Parameter> list = super.getParameters();
+    list.add(new EnumParameter<AbstractionProcedureCreator>(ParameterIDs.CompositionalSafetyVerifier_AbstractionProcedureCreator) {
+      @Override
+      public void commitValue() {
+        setAbstractionProcedureCreator(getValue());
+      }
+    });
+    return list;
+  }
 
   //#########################################################################
   //# Configuration

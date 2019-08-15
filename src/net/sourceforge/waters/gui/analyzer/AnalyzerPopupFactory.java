@@ -66,12 +66,14 @@ class AnalyzerPopupFactory
     final IDEAction showControlLoop = master.getAnalyzerControlLoopCheckAction();
     final IDEAction showControllability = master.getAnalyzerControllabilityCheckAction();
     final IDEAction showDeadlock = master.getAnalyzerDeadlockCheckAction();
+    final IDEAction showLanguageInclusion = master.getAnalyzerLanguageInclusionCheckAction();
     popup.add(showSychronous);
     popup.add(showSynthesize);
     popup.add(showConflict);
     popup.add(showControlLoop);
     popup.add(showControllability);
     popup.add(showDeadlock);
+    popup.add(showLanguageInclusion);
   }
 
 }

@@ -47,6 +47,7 @@ import net.sourceforge.waters.analysis.compositional.CompositionalConflictChecke
 import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuristicFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.ConflictSelectionHeuristicFactory;
+import net.sourceforge.waters.analysis.compositional.ProjectionAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristicCreator;
 import net.sourceforge.waters.analysis.gnonblocking.PreselectingHeuristicFactory;
@@ -792,7 +793,6 @@ public class ParameterIDs
   private static final int AbstractTRDelegatingAnalyzer_PreselectionHeuristic_ID = 5801;
   private static final int AbstractTRDelegatingAnalyzer_SelectionHeuristic_ID = 5802;
 
-
   public static final EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
   AbstractTRDelegatingAnalyzer_SimplifierCreator =
   new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
@@ -809,5 +809,15 @@ public class ParameterIDs
     new EnumParameter<SelectionHeuristic<TRCandidate>>
       (AbstractTRDelegatingAnalyzer_SelectionHeuristic_ID, AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
        (new TRControllabilityChecker()).getSelectionHeuristicFactory());
+
+  //net.sourceforge.waters.analysis.compositional.CompositionalSafetyVerifier
+  private static final int CompositionalSafetyVerifier_AbstractionProcedureCreator_ID = 5900;
+
+  public static final EnumParameter<AbstractionProcedureCreator>
+  CompositionalSafetyVerifier_AbstractionProcedureCreator =
+  new EnumParameter<AbstractionProcedureCreator>
+    (CompositionalSafetyVerifier_AbstractionProcedureCreator_ID,
+     AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
+     ProjectionAbstractionProcedureFactory.getInstance());
 
 }

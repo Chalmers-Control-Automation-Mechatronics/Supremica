@@ -55,6 +55,7 @@ import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -539,6 +540,8 @@ public class IDEMenuBar
     menu.add(controllability);
     final Action deadlock = actions.getAction(AnalyzerDeadlockCheckAction.class);
     menu.add(deadlock);
+    final Action languageInclusion = actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
+    menu.add(languageInclusion);
     add(menu);
   }
 

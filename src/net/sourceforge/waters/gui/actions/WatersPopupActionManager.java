@@ -428,6 +428,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerDeadlockCheckAction.class);
   }
 
+  public IDEAction getAnalyzerLanguageInclusionCheckAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerLanguageInclusionCheckAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;
