@@ -220,15 +220,17 @@ public class InsertCommand
   }
 
   /**
-   * Displays an inserted automaton.
+   * <P>Displays an inserted automaton.
    * This method is used to make sure an automaton that has just been
-   * created or pasted is displayed, under the following conditions:
+   * created or pasted is displayed, under the following conditions:</P>
    * <UL>
    * <LI>A non-<CODE>null</CODE> root panel has been specified.</LI>
    * <LI>The command is executed for the first time (no redo).</LI>
    * <LI>The list of inserted items contains a single automaton.</LI>
+   * <LI>The automaton can be displayed graphically.</LI>
    * </UL>
-   * @return <CODE>true</CODE> if an automaton has been displayed.
+   * @return <CODE>true</CODE> if the above conditions are true and an
+   *         automaton has been displayed, <CODE>false</CODE> otherwise.
    */
   private boolean showAutomaton()
   {
@@ -256,7 +258,7 @@ public class InsertCommand
       mRoot.showEditor(subject);
       return true;
     } catch (final GeometryAbsentException exception) {
-      throw new WatersRuntimeException(exception);
+      return false;
     }
   }
 
