@@ -31,10 +31,30 @@ public abstract class SupremicaBDDBitVector
         return mFactory;
     }
 
+    /**
+     * Build a BDD bit vector. Calls the constructor of the relevant subclass.
+     *
+     * @param bitNum Number of bits in the vector
+     * @return A non-initialized bit vector with specified number of bits.
+     */
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum);
 
+    /**
+     * Build a BDD bit vector. Calls the constructor of the relevant subclass.
+     *
+     * @param bitNum Number of bits in the vector
+     * @param c The value to be represented by the bit vector
+     * @return A bit vector initialized to represent the value of integer 'c'
+     */
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum, long c);
 
+    /**
+     * Build a BDD bit vector. Calls the constructor of the relevant subclass.
+     *
+     * @param bitNum Number of bits in the vector
+     * @param c The boolean value to assign to all bits
+     * @return A bit vector initialized with all bits set to the value of 'c'
+     */
     protected abstract SupremicaBDDBitVector buildSupBDDBitVector(int bitNum, boolean c);
 
     protected void initialize(final boolean isTrue)
@@ -86,16 +106,31 @@ public abstract class SupremicaBDDBitVector
         return dst;
     }
 
+    /**
+     * Checks whether the bit vector represents a fixed integer. A bit vector
+     * can represent operations on variables and relations between variables, in
+     * which case this method returns false.
+     *
+     * @return True if the bit vector represents a fixed integer.
+     */
     public boolean isConst()
     {
         for (int n = 0; n < bitNum; n++)
         {
             final BDD b = bitvec[n];
+            /*
+             * A bit vector representing a fixed integer has each of its bits
+             * set to True or False. The equivalent for BDDs are One and Zero.
+             */
             if (!b.isOne() && !b.isZero()) return false;
         }
         return true;
     }
 
+    /**
+     * @return The integer representation of the bit vector. If the bit vector
+     * does not represent exactly one integer, 0 is returned.
+     */
     public abstract int val();
 
     public void free()
@@ -138,20 +173,45 @@ public abstract class SupremicaBDDBitVector
 
     public abstract SupremicaBDDBitVector sub(final SupremicaBDDBitVector that);
 
+    /**
+     * Less than (or equal).
+     *
+     * @param r Right hand side of comparison
+     * @param thanORequal With equality? BDD.zero() for no, BDD.one() for yes.
+     * @return A BDD representing the result of the comparison.
+     */
     protected abstract BDD lthe(final SupremicaBDDBitVector r, BDD thanORequal);
 
     public abstract BDD equ(final SupremicaBDDBitVector r);
 
+    /**
+     * Less than (strict) comparison of two bit vectors.
+     *
+     * @param r Right hand side of comparison
+     * @return A BDD representing the result of the comparison.
+     */
     public BDD lth(final SupremicaBDDBitVector r)
     {
       return lthe(r, mFactory.zero());
     }
 
+    /**
+     * Less than or equal comparison of two bit vectors.
+     *
+     * @param r Right hand side of comparison
+     * @return A BDD representing the result of the comparison.
+     */
     public BDD lte(final SupremicaBDDBitVector r)
     {
         return lthe(r, mFactory.one());
     }
 
+    /**
+     * Greater than (strict) comparison of two bit vectors.
+     *
+     * @param r Right hand side of comparison
+     * @return A BDD representing the result of the comparison.
+     */
     public BDD gth(final SupremicaBDDBitVector r)
     {
 //        if (this.bitNum != r.bitNum)
@@ -162,6 +222,12 @@ public abstract class SupremicaBDDBitVector
         return p;
     }
 
+    /**
+     * Greater than or equal comparison of two bit vectors.
+     *
+     * @param r Right hand side of comparison
+     * @return A BDD representing the result of the comparison.
+     */
     public BDD gte(final SupremicaBDDBitVector r)
     {
 //        if (this.bitNum != r.bitNum)
@@ -194,6 +260,13 @@ public abstract class SupremicaBDDBitVector
         that.bitvec = null;
     }
 
+    /**
+     * Shift left. Shifts the bits in this bit vector to the left (toward MSB).
+     *
+     * @param pos The number of positions to shift
+     * @param c The BDD shifted in from the right
+     * @return A copy of the bit vector with all bits shifted to the left.
+     */
     public SupremicaBDDBitVector shl(final int pos, final BDD c)
     {
         final int minnum = Math.min(bitNum, pos);
@@ -210,6 +283,13 @@ public abstract class SupremicaBDDBitVector
         return res;
     }
 
+    /**
+     * Shift right. Shifts the bits in this bit vector to the right (toward LSB).
+     *
+     * @param pos The number of positions to shift
+     * @param c The BDD shifted in from the left
+     * @return A copy of the bit vector with all bits shifted to the right.
+     */
     public SupremicaBDDBitVector shr(final int pos, final BDD c)
     {
         final int maxnum = Math.max(0, bitNum - pos);
@@ -226,6 +306,14 @@ public abstract class SupremicaBDDBitVector
         return res;
     }
 
+    /**
+     * Integer division or modulo of the bit vector and a constant.
+     *
+     * @param c Divisor
+     * @param which True for integer division, False for integer modulo.
+     * @return Quotient or remainder from integer division, depending on value
+     * of 'which' parameter.
+     */
     public SupremicaBDDBitVector divmod(final long c, final boolean which)
     {
         if (c <= 0L)
