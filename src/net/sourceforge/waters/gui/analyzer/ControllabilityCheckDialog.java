@@ -84,14 +84,15 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
      return (ControllabilityChecker) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class ControllabilityCheckPopUpDialog
   private class ControllabilityCheckPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
     public ControllabilityCheckPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                           final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -105,7 +106,7 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
     @Override
     protected String getSuccessDescription()
     {
-      return "is controllable ";
+      return "is controllable";
     }
 
     @Override
@@ -123,8 +124,8 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
-
   }
+
 
   //#########################################################################
   //# Class Constants

@@ -54,12 +54,13 @@ import org.supremica.gui.ide.IDE;
 
 public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
 {
+
   //#########################################################################
   //# Constructor
   protected AnalyzerLanguageInclusionCheckAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Language Check ...");
+    putValue(Action.NAME, "Language Inclusion Check ...");
     //putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
     //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
@@ -100,18 +101,11 @@ public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
       putValue(Action.SHORT_DESCRIPTION,
                "Check whether automata satisfy language inclusion");
     } else if (table.getSelectedRowCount() > 0) {
-      if (propertyExists()) {
-        setEnabled(true);
-        putValue(Action.SHORT_DESCRIPTION,
-                 "Check whether the selected automata satisfy language inclusion");
-      }
-      else {
-        setEnabled(false);
-        putValue(Action.SHORT_DESCRIPTION,
-          "Check whether the selected automata satisfy language inclusion");
-      }
-    } else if (propertyExists()){
-      setEnabled(table.getRowCount() > 0);
+      setEnabled(propertyExists());
+      putValue(Action.SHORT_DESCRIPTION,
+               "Check whether the selected automata satisfy language inclusion");
+    } else {
+      setEnabled(propertyExists());
       putValue(Action.SHORT_DESCRIPTION,
                "Check whether all automata satisfy language inclusion");
     }
@@ -119,9 +113,11 @@ public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
 
   private boolean propertyExists()
   {
-    for (final AutomatonProxy aut : getAnalyzerPanel().getAutomataTable().getOperationArgument()) {
-      if(aut.getKind().equals(ComponentKind.PROPERTY))
+    final AutomataTable table = getAnalyzerTable();
+    for (final AutomatonProxy aut : table.getOperationArgument()) {
+      if (aut.getKind() == ComponentKind.PROPERTY) {
         return true;
+      }
     }
     return false;
   }
@@ -129,6 +125,6 @@ public class AnalyzerLanguageInclusionCheckAction extends WatersAnalyzerAction
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 636028154288275788L;
+  private static final long serialVersionUID = 1520642680879701265L;
 
 }

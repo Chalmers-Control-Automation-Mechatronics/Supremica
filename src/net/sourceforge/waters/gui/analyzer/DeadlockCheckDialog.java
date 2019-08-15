@@ -84,14 +84,15 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
      return (DeadlockChecker) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class DeadlockCheckPopUpDialog
   private class DeadlockCheckPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
     public DeadlockCheckPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                    final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -123,8 +124,8 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
-
   }
+
 
   //#########################################################################
   //# Class Constants

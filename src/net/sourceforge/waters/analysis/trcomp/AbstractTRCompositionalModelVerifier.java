@@ -69,8 +69,8 @@ public abstract class AbstractTRCompositionalModelVerifier
   //#########################################################################
   //# Constructors
   public AbstractTRCompositionalModelVerifier(final ProductDESProxy model,
-                                         final KindTranslator translator,
-                                         final ModelVerifier mono)
+                                              final KindTranslator translator,
+                                              final ModelVerifier mono)
   {
     super(model, translator, mono);
   }
@@ -139,21 +139,24 @@ public abstract class AbstractTRCompositionalModelVerifier
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    list.add(0, new BoolParameter(ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled) {
+    list.add(0, new BoolParameter
+        (ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled) {
       @Override
       public void commitValue()
       {
         setOutputCheckingEnabled(getValue());
       }
     });
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
+    list.add(0, new BoolParameter
+        (ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
       @Override
       public void commitValue()
       {
         setShortCounterExampleRequested(getValue());
       }
     });
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
+    list.add(0, new BoolParameter
+        (ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
       @Override
       public void commitValue()
       {

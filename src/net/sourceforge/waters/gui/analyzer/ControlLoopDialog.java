@@ -84,14 +84,15 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
      return (ControlLoopChecker) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class ControlLoopPopUpDialog
   private class ControlLoopPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
     public ControlLoopPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                  final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -99,19 +100,19 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
     @Override
     protected String getFailureDescription()
     {
-      return "has a loop.";
+      return "has a loop";
     }
 
     @Override
     protected String getSuccessDescription()
     {
-      return "is loop free.";
+      return "is loop free";
     }
 
     @Override
     protected String getAnalysisName()
     {
-      return "Control Loop Check.";
+      return "Control Loop Check";
     }
 
     @Override
@@ -123,8 +124,8 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
-
   }
+
 
   //#########################################################################
   //# Class Constants

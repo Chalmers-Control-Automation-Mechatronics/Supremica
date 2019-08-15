@@ -84,14 +84,15 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
      return (ConflictChecker) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class ConflictCheckPopUpDialog
   private class ConflictCheckPopUpDialog extends WatersVerificationDialog
   {
     //#######################################################################
     //# Constructor
     public ConflictCheckPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                    final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -123,8 +124,8 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 6159733639861131531L;
-
   }
+
 
   //#########################################################################
   //# Class Constants

@@ -84,15 +84,16 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
      return (LanguageInclusionChecker) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class LanguageInclusionCheckPopUpDialog
   private class LanguageInclusionCheckPopUpDialog extends WatersVerificationDialog
   {
 
     //#######################################################################
     //# Constructor
     public LanguageInclusionCheckPopUpDialog(final IDE owner,
-                                final ProductDESProxy des)
+                                             final ProductDESProxy des)
     {
       super(owner, des);
     }
@@ -124,8 +125,8 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 7981974814785870939L;
-
   }
+
 
   //#########################################################################
   //# Class Constants

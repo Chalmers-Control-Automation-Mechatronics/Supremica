@@ -88,123 +88,84 @@ public abstract class AbstractTRDelegatingAnalyzer
   public List<Parameter> getParameters()
   {
     final List<Parameter> list = super.getParameters();
-    //which DetailedOutputEnabled ?
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
+    list.add(new EnumParameter<TRPreselectionHeuristic>
+        (ParameterIDs.AbstractTRDelegatingAnalyzer_PreselectionHeuristic) {
       @Override
       public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
-    list.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>(ParameterIDs.AbstractTRDelegatingAnalyzer_SimplifierCreator) {
-        @Override
-        public void commitValue()
-        {
-          setSimplifierCreator(getValue());
-        }
-      });
-    list.add(new EnumParameter<TRPreselectionHeuristic>(ParameterIDs.AbstractTRDelegatingAnalyzer_PreselectionHeuristic) {
-      @Override
-      public void commitValue()
-      {
         setPreselectionHeuristic(getValue());
       }
     });
-    list.add(new BoolParameter(ParameterIDs.AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled) {
-        @Override
-        public void commitValue()
-        {
-          setAlwaysEnabledEventsEnabled(getValue());
-        }
-      });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled) {
-        @Override
-        public void commitValue()
-        {
-          setBlockedEventsEnabled(getValue());
-        }
-      });
+    list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>
+        (ParameterIDs.AbstractTRDelegatingAnalyzer_SelectionHeuristic) {
+      @Override
+      public void commitValue() {
+        setSelectionHeuristic(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit) {
+      @Override
+      public void commitValue() {
+        setInternalStateLimit(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit) {
+      @Override
+      public void commitValue() {
+        setInternalTransitionLimit(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit) {
+      @Override
+      public void commitValue()
+      {
+        setMonolithicStateLimit(getValue());
+      }
+    });
+    list.add(new IntParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit) {
+      @Override
+      public void commitValue() {
+        setMonolithicTransitionLimit(getValue());
+      }
+    });
     list.add(new BoolParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setFailingEventsEnabled(getValue());
-               }
-             });
-    list.add(new IntParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setInternalStateLimit(getValue());
-               }
-             });
-    list.add(new IntParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setInternalTransitionLimit(getValue());
-               }
-             });
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled) {
+      @Override
+      public void commitValue() {
+        setBlockedEventsEnabled(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled) {
+      @Override
+      public void commitValue() {
+        setSelfloopOnlyEventsEnabled(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled) {
+      @Override
+      public void commitValue() {
+        setAlwaysEnabledEventsEnabled(getValue());
+      }
+    });
+    list.add(new BoolParameter
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled) {
+      @Override
+      public void commitValue() {
+        setFailingEventsEnabled(getValue());
+      }
+    });
     list.add(new FileParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setMonolithicDumpFile(getValue());
-               }
-             });
-    list.add(new IntParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setMonolithicStateLimit(getValue());
-               }
-             });
-    list.add(new IntParameter
-             (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
-             {
-               @Override
-               public void commitValue()
-               {
-                 setMonolithicTransitionLimit(getValue());
-               }
-             });
-    list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>(ParameterIDs.AbstractTRDelegatingAnalyzer_SelectionHeuristic) {
-        @Override
-        public void commitValue()
-        {
-          setSelectionHeuristic(getValue());
-        }
-      });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled) {
-        @Override
-        public void commitValue()
-        {
-          setSelfloopOnlyEventsEnabled(getValue());
-        }
-      });
-    list.add(0,
-           new BoolParameter(ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled) {
-             @Override
-             public void commitValue()
-             {
-               setOutputCheckingEnabled(getValue());
-             }
-           });
+        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile) {
+      @Override
+      public void commitValue() {
+        setMonolithicDumpFile(getValue());
+      }
+    });
     return list;
   }
 
