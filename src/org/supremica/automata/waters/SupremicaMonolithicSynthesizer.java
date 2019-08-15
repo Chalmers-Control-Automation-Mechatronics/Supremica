@@ -516,10 +516,9 @@ public class SupremicaMonolithicSynthesizer
       final Automaton aut = supResult.automaton;
 
       final StateSet states = aut.getStateSet();
-      final int numStates = states.size();
-      if (numStates == 0) {
+      if (!states.hasInitialState()) {
         return setBooleanResult(false);
-      } else if (numStates > getNodeLimit()) {
+      } else if (states.size() > getNodeLimit()) {
         throw new OverflowException(getNodeLimit());
       } else if (mHelperStatistics.getNumberOfExaminedTransitions() >
                  getTransitionLimit()) {
@@ -538,9 +537,8 @@ public class SupremicaMonolithicSynthesizer
         importer.setSuppressingRedundantSelfloops(true);
         final AutomatonProxy sup = importer.convertAutomaton(aut);
         final Collection<AutomatonProxy> sups = Collections.singletonList(sup);
-        final String name = getOutputName();
         final ProductDESProxy supDES =
-          AutomatonTools.createProductDESProxy(name, sups, factory);
+          AutomatonTools.createProductDESProxy(mOutputName, sups, factory);
         final ProductDESResult watersResult = getAnalysisResult();
         watersResult.setComputedProductDES(supDES);
       }

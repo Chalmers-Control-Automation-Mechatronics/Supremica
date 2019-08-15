@@ -543,7 +543,21 @@ public abstract class AbstractSupervisorSynthesizerTest
     runSynthesizer(des, true);
   }
 
-  public void testTrafficlights() throws Exception
+  public void testTictactoe() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "synthesis", "tictactoe.wmod");
+    runSynthesizer(des, true);
+  }
+
+ public void testTictactoeIncomplete() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("handwritten", "tictactoe_incomplete.wmod");
+    runSynthesizer(des, false);
+  }
+
+ public void testTrafficlights() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "trafficlights.wmod");
@@ -567,13 +581,6 @@ public abstract class AbstractSupervisorSynthesizerTest
   public void testTransferLine3() throws Exception
   {
     checkTransferline(3);
-  }
-
-  public void testTictactoe() throws Exception
-  {
-    final ProductDESProxy des =
-      getCompiledDES("tests", "synthesis", "tictactoe.wmod");
-    runSynthesizer(des, true);
   }
 
   public void testThreeRobot() throws Exception
@@ -600,14 +607,12 @@ public abstract class AbstractSupervisorSynthesizerTest
 
   //#########################################################################
   //# Test Cases --- BIG
-  /* Too slow (20min) for supervisor reduction
   public void testAip0Sub1P1() throws Exception
   {
     final ProductDESProxy des =
       getCompiledDES("tests", "synthesis", "aip0sub1p1.wmod");
     runSynthesizer(des, true);
   }
-  */
 
   public void test2LinkAltBatch() throws Exception
   {
