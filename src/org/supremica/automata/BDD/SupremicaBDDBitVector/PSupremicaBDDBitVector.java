@@ -1,7 +1,10 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
-import net.sf.javabdd.*;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDFactory;
 
 /**
  *
@@ -15,7 +18,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         super(factory,bitNum);
     }
 
-    public PSupremicaBDDBitVector(final BDDFactory factory, final int bitNum, boolean b)
+    public PSupremicaBDDBitVector(final BDDFactory factory, final int bitNum, final boolean b)
     {
         this(factory, bitNum);
         initialize(b);
@@ -33,21 +36,25 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
       initialize(d);
     }
 
-    protected PSupremicaBDDBitVector buildSupBDDBitVector(int bitNum)
+    @Override
+    protected PSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum)
     {
         return new PSupremicaBDDBitVector(mFactory, bitNum);
     }
 
-    protected PSupremicaBDDBitVector buildSupBDDBitVector(int bitNum, boolean val)
+    @Override
+    protected PSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum, final boolean val)
     {
         return new PSupremicaBDDBitVector(mFactory, bitNum, val);
     }
 
-    protected PSupremicaBDDBitVector buildSupBDDBitVector(int bitNum, long val)
+    @Override
+    protected PSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum, final long val)
     {
         return new PSupremicaBDDBitVector(mFactory, bitNum, val);
     }
 
+    @Override
     protected void initialize(long val)
     {
         for (int n = 0; n < bitvec.length; n++)
@@ -56,11 +63,12 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
                 bitvec[n] = mFactory.one();
             else
                 bitvec[n] = mFactory.zero();
-            
+
             val >>= 1;
         }
     }
 
+    @Override
     protected void initialize(BigInteger val)
     {
         for (int n = 0; n < bitvec.length; n++) {
@@ -73,6 +81,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         }
     }
 
+    @Override
     public int val()
     {
         int n, val = 0;
@@ -89,6 +98,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     }
 
 
+    @Override
     public BDD getBDDThatResultsMaxValue()
     {
         BDD bit = bitvec[0];
@@ -104,7 +114,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             if(bit.satCount() == 1)
                 return bit;
 
-            BDD newBDD = bit.and(bitvec[i]);
+            final BDD newBDD = bit.and(bitvec[i]);
             if(!newBDD.isZero())
                 bit = newBDD.id();
         }
@@ -114,6 +124,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
     }
 
+    @Override
     public BDD equ(final SupremicaBDDBitVector r)
     {
 //        if (this.bitNum != r.bitNum)
@@ -139,13 +150,14 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         return p;
     }
 
+    @Override
     public ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that)
     {
 //        if (bitvec.length != that.bitvec.length)
 //            throw new BDDException("add operator: The length of the left-side vector is not equal to the right-side!");
 
         BDD c = mFactory.zero();
-        PSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
+        final PSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
 
         for (int n = 0 ; n < res.bitvec.length ; n++)
         {
@@ -171,7 +183,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             c = tmp2;
         }
 
-        BDD overflow = c.id();
+        final BDD overflow = c.id();
 
         c.free();
 
@@ -180,8 +192,8 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
     public PSupremicaBDDBitVector addRemoveOverflows(final SupremicaBDDBitVector that)
     {
-        ResultOverflows resOvfls = addConsideringOverflows(that);
-        PSupremicaBDDBitVector result = (PSupremicaBDDBitVector)resOvfls.getResult();
+        final ResultOverflows resOvfls = addConsideringOverflows(that);
+        final PSupremicaBDDBitVector result = (PSupremicaBDDBitVector)resOvfls.getResult();
         for(int i = 0; i < result.bitNum; i++)
         {
             result.bitvec[i] = result.bitvec[i].and(resOvfls.getOverflows().not());
@@ -190,15 +202,16 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         return result;
     }
 
+    @Override
     public ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that)
     {
 //       if (bitvec.length != that.bitvec.length)
 //            throw new BDDException("sub operator: The length of the left-side vector is not equal to the right-side!");
 
-        BDDFactory bdd = getFactory();
+        final BDDFactory bdd = getFactory();
 
         BDD c = bdd.zero();
-        PSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
+        final PSupremicaBDDBitVector res = buildSupBDDBitVector(getLargerLength(that));
 
         for (int n = 0; n < res.bitvec.length; n++)
         {
@@ -218,7 +231,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
 
             // c = (l[n] & r[n] & c) | (!l[n] & (r[n] | c));
             BDD tmp1 = rightBDD.or(c);
-            BDD tmp2 = leftBDD.apply(tmp1, BDDFactory.less);
+            final BDD tmp2 = leftBDD.apply(tmp1, BDDFactory.less);
             tmp1.free();
             tmp1 = leftBDD.and(rightBDD);
             tmp1.andWith(c);
@@ -226,7 +239,7 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             c = tmp1;
         }
 
-        BDD overflow = c.id();
+        final BDD overflow = c.id();
 
         c.free();
 
@@ -234,17 +247,20 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         //return new ResultOverflows(res,highOrderCarryIn.xor(highOrderCarryOut));
     }
 
+    @Override
     public PSupremicaBDDBitVector add(final SupremicaBDDBitVector that)
     {
       return (PSupremicaBDDBitVector)addConsideringOverflows(that).getResult();
     }
 
+    @Override
     public PSupremicaBDDBitVector sub(final SupremicaBDDBitVector that)
     {
       return (PSupremicaBDDBitVector)subConsideringOverflows(that).getResult();
     }
 
-    protected BDD lthe(final SupremicaBDDBitVector r, BDD thanORequal)
+    @Override
+    protected BDD lthe(final SupremicaBDDBitVector r, final BDD thanORequal)
     {
 //        if (this.bitvec.length != r.bitvec.length)
 //            throw new BDDException("lte operator: The length of the left-side vector is not equal to the right-side!");
@@ -263,10 +279,15 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
             if(n < r.length())
                 rightBDD = r.bitvec[n];
 
-            BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.less);
-            BDD tmp2 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            // Check if current left bit is less than current right bit
+            final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.less);
+            // Check if current left bit is equivalent to current right bit
+            final BDD tmp2 = leftBDD.apply(rightBDD, BDDFactory.biimp);
+            // Carry the result from previous bit
             tmp2.andWith(p);
+            // Check if current left bit is less than or equal to right bit
             tmp1.orWith(tmp2);
+            // Remember the carry
             p = tmp1;
         }
 
@@ -274,21 +295,22 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     }
 
     //This function needs to be modified
+    @Override
     public void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,
                                final int step)
     {
-        BDD isSmaller = divisor.lte(remainder);
-        PSupremicaBDDBitVector newResult = (PSupremicaBDDBitVector)result.shl(1, isSmaller);
-        PSupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
-        PSupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitvec.length, false);
+        final BDD isSmaller = divisor.lte(remainder);
+        final PSupremicaBDDBitVector newResult = (PSupremicaBDDBitVector)result.shl(1, isSmaller);
+        final PSupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
+        final PSupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitvec.length, false);
 
         for (int n = 0; n < divisor.bitvec.length; n++)
             sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
 
-        PSupremicaBDDBitVector tmp = (PSupremicaBDDBitVector)remainder.sub(sub);
-        PSupremicaBDDBitVector newRemainder = (PSupremicaBDDBitVector)tmp.shl(1, result.bitvec[divisor.bitvec.length - 1]);
+        final PSupremicaBDDBitVector tmp = (PSupremicaBDDBitVector)remainder.sub(sub);
+        final PSupremicaBDDBitVector newRemainder = (PSupremicaBDDBitVector)tmp.shl(1, result.bitvec[divisor.bitvec.length - 1]);
 
         if (step > 1)
             div_rec(divisor, newRemainder, newResult, step - 1);
