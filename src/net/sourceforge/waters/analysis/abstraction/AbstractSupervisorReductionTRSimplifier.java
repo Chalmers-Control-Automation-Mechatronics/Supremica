@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 
@@ -133,6 +134,21 @@ public abstract class AbstractSupervisorReductionTRSimplifier
   public int getTransitionLimit()
   {
     return Integer.MAX_VALUE;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  protected boolean isSupervisedEvent(final int event)
+  {
+    final int supervised = getSupervisedEvent();
+    if (supervised >= 0) {
+      return event == supervised;
+    } else {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final byte status = rel.getProperEventStatus(event);
+      return EventStatus.isControllableEvent(status);
+    }
   }
 
 

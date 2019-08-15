@@ -1012,20 +1012,20 @@ public class CompositionalAutomataSynthesizer
 
   private ListBufferTransitionRelation reduceSupervisorStep2
     (ListBufferTransitionRelation sup,
-     final int supervsisedEvent)
+     final int supervisedEvent)
     throws AnalysisException
   {
-    if (supervsisedEvent >= 0) {
+    if (supervisedEvent >= 0) {
       final Logger logger = LogManager.getLogger();
       sup.logSizes(logger);
       final int config = mMainSupervisorReducer.getPreferredInputConfiguration();
       sup = new ListBufferTransitionRelation(sup, config);
       MonolithicSynthesizer.removeOtherControllableDisablements
-        (sup, supervsisedEvent);
+        (sup, supervisedEvent);
     }
     mMainSupervisorReducer.createStatistics();
     mMainSupervisorReducer.setTransitionRelation(sup);
-    mMainSupervisorReducer.setSupervisedEvent(supervsisedEvent);
+    mMainSupervisorReducer.setSupervisedEvent(supervisedEvent);
     mMainSupervisorReducer.run();
     final CompositionalAutomataSynthesisResult result = getAnalysisResult();
     result.addMainSupervisorReductionStatistics(mMainSupervisorReducer);

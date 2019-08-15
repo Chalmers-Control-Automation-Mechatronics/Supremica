@@ -33,10 +33,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -107,6 +107,16 @@ public class ProjectingSupervisorReductionTRSimplifier
     return mVerifierBuilder.getStateLimit();
   }
 
+  public void setExhaustive(final boolean exhaustive)
+  {
+    mExhaustive = exhaustive;
+  }
+
+  public boolean isExhaustive()
+  {
+    return mExhaustive;
+  }
+
 
   //#########################################################################
   //# Interface
@@ -128,34 +138,14 @@ public class ProjectingSupervisorReductionTRSimplifier
   //# Overrides for
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
-  protected void setUp() throws AnalysisException
-  {
-    super.setUp();
-    mEventInfo = new LinkedList<>();
-  }
-
-  @Override
   public boolean runSimplifier() throws AnalysisException
   {
     final Logger logger = LogManager.getLogger();
     setUpEventInfo();
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final Iterator<EventInfo> iter = mEventInfo.iterator();
-    int numRemoved = 0;
-    while (iter.hasNext()) {
-      final EventInfo info = iter.next();
-      final int event = info.getEvent();
-      final byte status = rel.getProperEventStatus(event);
-      rel.setProperEventStatus(event, status | EventStatus.STATUS_LOCAL);
-      if (mVerifierBuilder.buildVerifier(rel)) {
-        numRemoved++;
-      } else {
-        rel.setProperEventStatus(event, status);
-        iter.remove();
-      }
-    }
+    final int numRemoved =
+      mExhaustive ? searchExhaustively() : searchGreedily();
     logger.debug("Proposing to remove {} events.", numRemoved);
-    return false;
+    return numRemoved > 0;
   }
 
   @Override
@@ -163,6 +153,8 @@ public class ProjectingSupervisorReductionTRSimplifier
   {
     super.tearDown();
     mEventInfo = null;
+    mOutstandingInfo = null;
+    mKnownBest = null;
   }
 
 
@@ -171,42 +163,192 @@ public class ProjectingSupervisorReductionTRSimplifier
   private void setUpEventInfo()
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numEvents = rel.getNumberOfProperEvents();
-    final EventInfo[] info = new EventInfo[numEvents];
-    for (int event = EventEncoding.NONTAU; event < numEvents; event++) {
-      if (!isSupervisedEvent(event)) {
-        info[event] = new EventInfo(event);
-        mEventInfo.add(info[event]);
+    int numEvents = rel.getNumberOfProperEvents();
+    final EventInfo[] array = new EventInfo[numEvents];
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status) && !isSupervisedEvent(e)) {
+        array[e] = new EventInfo(e);
+      } else {
+        numEvents--;
       }
     }
     final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
     while (iter.advance()) {
-      final int event = iter.getCurrentEvent();
-      if (info[event] != null) {
+      final int e = iter.getCurrentEvent();
+      final EventInfo info = array[e];
+      if (info != null) {
         final boolean selfloop =
           iter.getCurrentFromState() == iter.getCurrentToState();
-        info[event].addTransition(selfloop);
+        info.addTransition(selfloop);
+      }
+    }
+    mEventInfo = new ArrayList<>(numEvents);
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+      if (array[e] != null) {
+        mEventInfo.add(array[e]);
       }
     }
     Collections.sort(mEventInfo);
   }
 
-  private boolean isSupervisedEvent(final int event)
+  private void setUpOutstandingInfo()
   {
-    final int supervised = getSupervisedEvent();
-    if (supervised >= 0) {
-      return event == supervised;
+    final int numEvents = mEventInfo.size();
+    mOutstandingInfo = new ResultInfo[numEvents];
+    final ListIterator<EventInfo> iter = mEventInfo.listIterator(numEvents);
+    ResultInfo next = null;
+    int e = numEvents;
+    while (iter.hasPrevious()) {
+      final EventInfo eventInfo = iter.previous();
+      final ResultInfo info = new ResultInfo(eventInfo);
+      if (next != null) {
+        info.add(next);
+      }
+      mOutstandingInfo[--e] = info;
+      next = info;
+    }
+  }
+
+  private int searchGreedily() throws AnalysisException
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    int numRemoved = 0;
+    for (final EventInfo info : mEventInfo) {
+      final int event = info.getEvent();
+      final byte status = rel.getProperEventStatus(event);
+      rel.setProperEventStatus(event, status | EventStatus.STATUS_LOCAL);
+      if (mVerifierBuilder.buildVerifier(rel)) {
+        numRemoved++;
+      } else {
+        rel.setProperEventStatus(event, status);
+      }
+    }
+    return numRemoved;
+  }
+
+  private int searchExhaustively() throws AnalysisException
+  {
+    setUpOutstandingInfo();
+    final ResultInfo parent = new ResultInfo();
+    searchExhaustively(parent, 0);
+    if (mKnownBest == null) {
+      return 0;
     } else {
       final ListBufferTransitionRelation rel = getTransitionRelation();
-      final byte status = rel.getProperEventStatus(event);
-      return EventStatus.isControllableEvent(status);
+      return mKnownBest.apply(rel);
+    }
+  }
+
+  private void searchExhaustively(final ResultInfo parent,
+                                  final int nextEvent)
+    throws AnalysisException
+  {
+    if (nextEvent < mOutstandingInfo.length &&
+        parent.canImprove(mKnownBest, mOutstandingInfo[nextEvent])) {
+      final EventInfo info = mEventInfo.get(nextEvent);
+      final int e = info.getEvent();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final byte status = rel.getProperEventStatus(e);
+      rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
+      if (mVerifierBuilder.buildVerifier(rel)) {
+        final Result result = new Result(info, parent);
+        if (result.isBetterThan(mKnownBest)) {
+          mKnownBest = result;
+        }
+        searchExhaustively(result, nextEvent + 1);
+      }
+      rel.setProperEventStatus(e, status);
+      searchExhaustively(parent, nextEvent + 1);
     }
   }
 
 
   //#########################################################################
+  //# Inner Class ResultInfo
+  private static class ResultInfo implements Comparable<ResultInfo>
+  {
+    //#######################################################################
+    //# Constructor
+    private ResultInfo()
+    {
+    }
+
+    private ResultInfo(final ResultInfo info)
+    {
+      mNumNonSelfloopTransitions = info.mNumNonSelfloopTransitions;
+      mNumSelfloopTransitions = info.mNumSelfloopTransitions;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    void addTransition(final boolean selfloop)
+    {
+      if (selfloop) {
+        mNumSelfloopTransitions++;
+      } else {
+        mNumNonSelfloopTransitions++;
+      }
+    }
+
+    void add(final ResultInfo info)
+    {
+      mNumNonSelfloopTransitions += info.mNumNonSelfloopTransitions;
+      mNumSelfloopTransitions += info.mNumSelfloopTransitions;
+    }
+
+    boolean isBetterThan(final ResultInfo other)
+    {
+      if (other == null) {
+        return true;
+      } else {
+        return compareTo(other) < 0;
+      }
+    }
+
+    private boolean canImprove(final ResultInfo best,
+                               final ResultInfo outstanding)
+    {
+      if (best == null) {
+        return true;
+      }
+      final int nonSelfloops =
+        mNumNonSelfloopTransitions + outstanding.mNumNonSelfloopTransitions;
+      if (nonSelfloops > best.mNumNonSelfloopTransitions) {
+        return true;
+      } else if (nonSelfloops < best.mNumNonSelfloopTransitions) {
+        return false;
+      } else {
+        return
+          mNumSelfloopTransitions + outstanding.mNumSelfloopTransitions >
+          best.mNumSelfloopTransitions;
+      }
+    }
+
+     //#######################################################################
+    //# Interface java.util.Comparable<EventInfo>
+    @Override
+    public int compareTo(final ResultInfo info)
+    {
+      final int result =
+        info.mNumNonSelfloopTransitions - mNumNonSelfloopTransitions;
+      if (result != 0) {
+        return result;
+      } else {
+        return info.mNumSelfloopTransitions - mNumSelfloopTransitions;
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private int mNumNonSelfloopTransitions;
+    private int mNumSelfloopTransitions;
+  }
+
+
+  //#########################################################################
   //# Inner Class EventInfo
-  private class EventInfo implements Comparable<EventInfo>
+  private static class EventInfo extends ResultInfo
   {
     //#######################################################################
     //# Constructor
@@ -222,34 +364,48 @@ public class ProjectingSupervisorReductionTRSimplifier
       return mEvent;
     }
 
-    private void addTransition(final boolean selfloop)
+    //#######################################################################
+    //# Data Members
+    private final int mEvent;
+  }
+
+
+  //#########################################################################
+  //# Inner Class Result
+  private static class Result extends ResultInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private Result(final EventInfo info,
+                   final ResultInfo parent)
     {
-      if (selfloop) {
-        mNumSelfloopTransitions++;
+      super(info);
+      mEvent = info.getEvent();
+      if (parent instanceof Result) {
+        mParent = (Result) parent;
+        add(parent);
       } else {
-        mNumNonSelfloopTransitions++;
+        mParent = null;
       }
     }
 
     //#######################################################################
-    //# Interface java.util.Comparable<EventInfo>
-    @Override
-    public int compareTo(final EventInfo info)
+    //# Simple Access
+    private int apply(final ListBufferTransitionRelation rel)
     {
-      final int result =
-        info.mNumNonSelfloopTransitions - mNumNonSelfloopTransitions;
-      if (result != 0) {
-        return result;
+      final byte status = rel.getProperEventStatus(mEvent);
+      rel.setProperEventStatus(mEvent, status | EventStatus.STATUS_LOCAL);
+      if (mParent == null) {
+        return 1;
       } else {
-        return info.mNumSelfloopTransitions - mNumSelfloopTransitions;
+        return mParent.apply(rel) + 1;
       }
     }
 
     //#######################################################################
     //# Data Members
     private final int mEvent;
-    private int mNumNonSelfloopTransitions;
-    private int mNumSelfloopTransitions;
+    private final Result mParent;
   }
 
 
@@ -286,8 +442,12 @@ public class ProjectingSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mExhaustive = false;
+
   private final VerifierBuilder mVerifierBuilder =
     new SupervisorReductionVerifierBuilder();
   private List<EventInfo> mEventInfo;
+  private ResultInfo[] mOutstandingInfo;
+  private Result mKnownBest;
 
 }

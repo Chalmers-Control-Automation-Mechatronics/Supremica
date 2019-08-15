@@ -44,7 +44,9 @@ import gnu.trove.stack.TLongStack;
 import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,7 +159,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       partition = createOneStatePartition();
       rel.merge(partition);
     } else {
-      setUpStateOrder();
+      mStateOrdering.setUpStateOrdering();
       partition = mPairOrdering.mergeAllPairs();
     }
     setResultPartition(partition);
@@ -257,7 +259,11 @@ public class SuWonhamSupervisorReductionTRSimplifier
         if (iter.advance()) {
           final int t2 = iter.getCurrentTargetState();
           if (t2 == dumpIndex) {
-            continue eventLoop;
+            if (isSupervisedEvent(e)) {
+              continue eventLoop;
+            } else {
+              continue;
+            }
           }
           final int min2 = partition.getClassCode(t2);
           if (set2.add(min2)) {
@@ -274,6 +280,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
         iter.reset(s1, e);
         if (iter.advance()) {
           final int t1 = iter.getCurrentTargetState();
+          if (t1 == dumpIndex) {
+            continue;
+          }
           final int min1 = partition.getClassCode(t1);
           if (set1.add(min1)) {
             for (int i2 = mSuccessors2.size() - 1; i2 >= 0; i2--) {
@@ -410,29 +419,6 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# State Order
-  private void setUpStateOrder()
-  {
-    final ListBufferTransitionRelation rel = getTransitionRelation();
-    final int numStates = rel.getNumberOfStates();
-    mStateOrderIndex = new int[numStates];
-    final int numReachable = rel.getNumberOfReachableStates() - 1;
-    mOrderedStates = new int[numReachable];
-    final int dumpIndex = rel.getDumpStateIndex();
-    int orderIndex = 0;
-    for (int s = 0; s < numStates; s++) {
-      if (rel.isReachable(s) && s != dumpIndex) {
-        mStateOrderIndex[s] = orderIndex;
-        mOrderedStates[orderIndex] = s;
-        orderIndex++;
-      } else {
-        mStateOrderIndex[s] = -1;
-      }
-    }
-  }
-
-
-  //#########################################################################
   //# Partition
   private TRPartition createOneStatePartition()
     throws OverflowException, AnalysisAbortException
@@ -483,17 +469,22 @@ public class SuWonhamSupervisorReductionTRSimplifier
     final TIntHashSet events = new TIntHashSet(numEvents);
     final int numProps = rel.getNumberOfPropositions();
     final int numStates = rel.getNumberOfStates();
+    final int dumpIndex = rel.getDumpStateIndex();
     for (int state = 0; state < numStates; state++) {
       if (rel.isReachable(state) && state == partition.getClassCode(state)) {
         events.clear();
         writer.resetState(state);
         while (writer.advance()) {
           final int e = writer.getCurrentEvent();
-          events.add(e);
           final int t = writer.getCurrentTargetState();
-          final int min = partition.getClassCode(t);
-          if (t != min) {
-            writer.setCurrentToState(min);
+          if (t == dumpIndex && !isSupervisedEvent(e)) {
+            writer.remove();
+          } else {
+            events.add(e);
+            final int min = partition.getClassCode(t);
+            if (t != min) {
+              writer.setCurrentToState(min);
+            }
           }
         }
         final int clazz = partition.getClassCode(state);
@@ -505,8 +496,10 @@ public class SuWonhamSupervisorReductionTRSimplifier
               reader.resetState(s);
               while (reader.advance()) {
                 final int e = reader.getCurrentEvent();
-                if (events.add(e)) {
-                  final int t = reader.getCurrentTargetState();
+                final int t = reader.getCurrentTargetState();
+                if (t == dumpIndex && !isSupervisedEvent(e)) {
+                  // skip
+                } else if (events.add(e)) {
                   final int min = partition.getClassCode(t);
                   rel.addTransition(state, e, min);
                 }
@@ -526,6 +519,213 @@ public class SuWonhamSupervisorReductionTRSimplifier
       }
     }
     updateCompatibilityRelation(partition);
+  }
+
+
+  //#########################################################################
+  //# Inner Interface StateOrdering
+  private abstract class StateOrdering
+  {
+    private void setUpStateOrdering()
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      mOrderedStates = getOrderedStates(rel);
+      final int numStates = rel.getNumberOfStates();
+      mStateOrderIndex = new int[numStates];
+      for (int i = 0; i < mOrderedStates.length; i++) {
+        final int s = mOrderedStates[i];
+        mStateOrderIndex[s] = i;
+      }
+    }
+
+    abstract int[] getOrderedStates(ListBufferTransitionRelation rel);
+  }
+
+
+  //#########################################################################
+  //# Inner Class TrivialStateOrdering
+  private class TrivialStateOrdering extends StateOrdering
+  {
+    @Override
+    int[] getOrderedStates(final ListBufferTransitionRelation rel)
+    {
+      final int numStates = rel.getNumberOfStates();
+      final int numReachable = rel.getNumberOfReachableStates() - 1;
+      final int[] orderedStates = new int[numReachable];
+      final int dumpIndex = rel.getDumpStateIndex();
+      int orderIndex = 0;
+      for (int s = 0; s < numStates; s++) {
+        if (rel.isReachable(s) && s != dumpIndex) {
+          orderedStates[orderIndex++] = s;
+        }
+      }
+      return orderedStates;
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class BFSStateOrdering
+  @SuppressWarnings("unused")
+  private class BFSStateOrdering
+    extends StateOrdering
+    implements Comparator<StateOrderInfo>
+  {
+    //#######################################################################
+    //# Overrides for StateOrdering
+    @Override
+    int[] getOrderedStates(final ListBufferTransitionRelation rel)
+    {
+      final int numStates = rel.getNumberOfStates();
+      final int dumpIndex = rel.getDumpStateIndex();
+      final StateOrderInfo[] info = new StateOrderInfo[numStates];
+      final TIntArrayList queue = new TIntArrayList(numStates);
+      for (int s = 0; s < numStates; s++) {
+        if (rel.isInitial(s) && s != dumpIndex) {
+          queue.add(s);
+          info[s] = new StateOrderInfo(s, 0);
+          break;
+        }
+      }
+      final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+      int nextLevel = 1;
+      int i = 0;
+      while (i < queue.size()) {
+        final int startOfNextLevel = queue.size();
+        while (i < startOfNextLevel) {
+          final int s = queue.get(i);
+          int numSelfloops = 0;
+          int numForward = 0;
+          int numBackward = 0;
+          iter.resetState(s);
+          while (iter.advance()) {
+            final int t = iter.getCurrentTargetState();
+            if (t == dumpIndex) {
+              // skip
+            } else if (s == t) {
+              numSelfloops++;
+            } else if (info[t] == null) {
+              numForward++;
+              queue.add(t);
+              info[t] = new StateOrderInfo(t, nextLevel);
+            } else {
+              numBackward++;
+            }
+          }
+          info[s].setFanOut(numSelfloops, numForward, numBackward);
+          i++;
+        }
+        nextLevel++;
+      }
+      Arrays.sort(info, this);
+      final int numReachable = queue.size();
+      final int[] orderedStates = new int[numReachable];
+      for (int j = 0; j < numReachable; j++) {
+        orderedStates[j] = info[j].getState();
+      }
+      return orderedStates;
+    }
+
+    //#######################################################################
+    //# Interface java.util.Comparator<StateOrderInfo>
+    @Override
+    public int compare(final StateOrderInfo info1,
+                       final StateOrderInfo info2)
+    {
+      if (info1 == null) {
+        return info2 == null ? 0 : 1;
+      } else if (info2 == null) {
+        return -1;
+      }
+      int result = info1.getBFSLevel() - info2.getBFSLevel();
+      if (result != 0) {
+        return result;
+      }
+      result = info2.getFanOut() - info1.getFanOut();
+      if (result != 0) {
+        return result;
+      }
+      result = info2.getNonSelfloopFanOut() - info1.getNonSelfloopFanOut();
+      if (result != 0) {
+        return result;
+      }
+      result = info2.getForwardFanOut() - info1.getForwardFanOut();
+      if (result != 0) {
+        return result;
+      }
+      return info1.getState() - info2.getState();
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class StateOrderInfo
+  private static class StateOrderInfo
+  {
+    //#######################################################################
+    //# Constructor
+    private StateOrderInfo(final int state,
+                           final int level)
+    {
+      mState = state;
+      mBFSLevel = level;
+    }
+
+    //#######################################################################
+    //# Simple Access
+    private int getState()
+    {
+      return mState;
+    }
+
+    private int getBFSLevel()
+    {
+      return mBFSLevel;
+    }
+
+    private int getFanOut()
+    {
+      return mSelfloopFanOut + mForwardFanOut + mBackwardFanOut;
+    }
+
+    @SuppressWarnings("unused")
+    private int getSelfloopFanOut()
+    {
+      return mSelfloopFanOut;
+    }
+
+    private int getNonSelfloopFanOut()
+    {
+      return mForwardFanOut + mBackwardFanOut;
+    }
+
+    private int getForwardFanOut()
+    {
+      return mForwardFanOut;
+    }
+
+    @SuppressWarnings("unused")
+    private int getBarckwardFanOut()
+    {
+      return mBackwardFanOut;
+    }
+
+    private void setFanOut(final int numSelfloops,
+                           final int numForward,
+                           final int numBackward)
+    {
+      mSelfloopFanOut = numSelfloops;
+      mForwardFanOut = numForward;
+      mBackwardFanOut = numBackward;
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final int mState;
+    private final int mBFSLevel;
+    private int mSelfloopFanOut;
+    private int mForwardFanOut;
+    private int mBackwardFanOut;
   }
 
 
@@ -1130,6 +1330,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private final StateOrdering mStateOrdering = new TrivialStateOrdering();
   private PairOrdering mPairOrdering = new LexicographicPairOrdering();
 
   private List<CompatibilityPair> mCompatibiliyRelation;
