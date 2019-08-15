@@ -295,31 +295,44 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
     }
 
     //This function needs to be modified
+    // Now it is modified, but unclear what the initial comment meant -- Jonas Krook
     @Override
     public void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,
                                final int step)
     {
-        final BDD isSmaller = divisor.lte(remainder);
-        final PSupremicaBDDBitVector newResult = (PSupremicaBDDBitVector)result.shl(1, isSmaller);
-        final PSupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
-        final PSupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitvec.length, false);
+        // Shift the msb of the dividend left into the remainder to search for
+        // a part of the dividend that are greater than the divisor.
+        final PSupremicaBDDBitVector shiftedRemainder = (PSupremicaBDDBitVector) remainder.shl(1, bitvec[step]);
+        final BDD isSmaller = divisor.lte(shiftedRemainder);
+        // If the divisor is smaller than the remainder, we can conclude that,
+        // at this bit, we have a quotient of 1. Shift previous quotients to the
+        // left since they were calculated for more significant bits.
+        final SupremicaBDDBitVector newResult = result.shl(1, isSmaller);
+
+        // Build up a bit vector for subtraction. If the remainder were greater
+        // than the divisor and we added 1 to the quotient, we need to subtract
+        // the same amount from the remainder.
+        final SupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
+        final SupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitvec.length, false);
 
         for (int n = 0; n < divisor.bitvec.length; n++)
             sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
 
-        final PSupremicaBDDBitVector tmp = (PSupremicaBDDBitVector)remainder.sub(sub);
-        final PSupremicaBDDBitVector newRemainder = (PSupremicaBDDBitVector)tmp.shl(1, result.bitvec[divisor.bitvec.length - 1]);
+        final PSupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
 
-        if (step > 1)
+        // Do the same for the next less significant bit, if any.
+        if (step > 0)
             div_rec(divisor, newRemainder, newResult, step - 1);
 
-        tmp.free();
+        shiftedRemainder.free();
         sub.free();
         zero.free();
         isSmaller.free();
 
+        // The remainder and quotient in the last recursion step are the answers
+        // we want. Bypass them to the top.
         result.replaceWith(newResult);
         remainder.replaceWith(newRemainder);
     }

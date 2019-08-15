@@ -245,6 +245,22 @@ public abstract class SupremicaBDDBitVector
         return p;
     }
 
+    /**
+     * Long integer division of two bit vectors. Both quotient and remainder are
+     * calculated. The calculation is performed recursively with one bit handled
+     * in each recursion step.
+     * <p>
+     * https://en.wikipedia.org/wiki/Division_algorithm#Integer_division_(unsigned)_with_remainder
+     *
+     * @param divisor Bit vector representing the divisor in integer division
+     * @param remainder The current remainder. Should be all zero bits for the
+     * initial call of this algorithm. The resulting remainder after the
+     * algorithm finishes is stored in this variable.
+     * @param result The current quotient. Should be all zero bits for the
+     * initial call of this algorithm. The resulting quotient after the
+     * algorithm finishes is stored in this variable.
+     * @param step The current bit. Should start with the msb.
+     */
     public abstract void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,
@@ -318,15 +334,13 @@ public abstract class SupremicaBDDBitVector
     {
         if (c <= 0L)
             throw new BDDException();
+        // Preallocate bit vectors used for the algorithm
         final SupremicaBDDBitVector divisor = buildSupBDDBitVector(bitNum, c);
-        final SupremicaBDDBitVector tmp = buildSupBDDBitVector(bitNum, false);
-        final SupremicaBDDBitVector tmpremainder = tmp.shl(1, bitvec[bitNum-1]);
-        final SupremicaBDDBitVector result = this.shl(1, mFactory.zero());
-        SupremicaBDDBitVector remainder;
-        div_rec(divisor, tmpremainder, result, divisor.bitNum);
-        remainder = tmpremainder.shr(1, mFactory.zero());
-        tmp.free();
-        tmpremainder.free();
+        final SupremicaBDDBitVector remainder = buildSupBDDBitVector(bitNum, false);
+        final SupremicaBDDBitVector result = buildSupBDDBitVector(bitNum, false);
+        // Perform long division recursively
+        div_rec(divisor, remainder, result, divisor.bitNum-1);
+        // Clean up, and return quotient or remainder depending on choice.
         divisor.free();
         if (which) {
             remainder.free();

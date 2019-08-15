@@ -1,7 +1,10 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
-import net.sf.javabdd.*;
+
+import net.sf.javabdd.BDD;
+import net.sf.javabdd.BDDDomain;
+import net.sf.javabdd.BDDFactory;
 
 /**
  *
@@ -18,7 +21,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         signBitIndex = bitNum-1;
     }
 
-    public TCSupremicaBDDBitVector(final BDDFactory factory, final int bitNum, boolean b)
+    public TCSupremicaBDDBitVector(final BDDFactory factory, final int bitNum, final boolean b)
     {
         this(factory, bitNum);
         initialize(b);
@@ -41,37 +44,42 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         return signBitIndex;
     }
 
-    protected TCSupremicaBDDBitVector buildSupBDDBitVector(int bitNum)
+    @Override
+    protected TCSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum)
     {
         return new TCSupremicaBDDBitVector(mFactory, bitNum);
     }
 
-    protected TCSupremicaBDDBitVector buildSupBDDBitVector(int bitNum, boolean val)
+    @Override
+    protected TCSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum, final boolean val)
     {
         return new TCSupremicaBDDBitVector(mFactory, bitNum, val);
     }
 
-    protected TCSupremicaBDDBitVector buildSupBDDBitVector(int bitNum, long val)
+    @Override
+    protected TCSupremicaBDDBitVector buildSupBDDBitVector(final int bitNum, final long val)
     {
         return new TCSupremicaBDDBitVector(mFactory, bitNum, val);
     }
 
     //Not implemented yet
+    @Override
     public BDD getBDDThatResultsMaxValue()
     {
         return bitvec[bitNum-2];
     }
 
+    @Override
     protected void initialize(final long val)
     {
-        long absVal = Math.abs(val);        
+        long absVal = Math.abs(val);
         for (int n = 0; n < bitNum; n++)
         {
             if ((absVal & 0x1) != 0)
                 bitvec[n] = mFactory.one();
             else
                 bitvec[n] = mFactory.zero();
-            
+
             absVal >>= 1;
         }
         if (val < 0)
@@ -81,6 +89,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         }
     }
 
+    @Override
     protected void initialize(final BigInteger val)
     {
         BigInteger absVal = val.abs();
@@ -100,6 +109,7 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         }
     }
 
+    @Override
     public int val()
     {
         int n, val = 0;
@@ -133,10 +143,11 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         for (int n = 0; n < res.bitNum; n++)
             res.bitvec[n] = bitvec[n].not();
 
-        return (TCSupremicaBDDBitVector)res.add(buildSupBDDBitVector(bitNum, 1));
+        return res.add(buildSupBDDBitVector(bitNum, 1));
     }
 
 
+    @Override
     public BDD equ(final SupremicaBDDBitVector that)
     {
 //        if (this.bitNum != r.bitNum)
@@ -154,15 +165,16 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
 
             if(n < that.bitNum)
                 rightBDD = that.bitvec[n];
-            
+
             final BDD tmp1 = leftBDD.apply(rightBDD, BDDFactory.biimp);
             final BDD tmp2 = tmp1.and(p);
             p = tmp2;
         }
-        
+
         return p;
     }
 
+    @Override
     public ResultOverflows addConsideringOverflows(final SupremicaBDDBitVector that)
     {
 //        if (bitNum != that.bitNum)
@@ -210,22 +222,26 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         return new ResultOverflows(res,highOrderCarryIn.xor(highOrderCarryOut));
     }
 
+    @Override
     public ResultOverflows subConsideringOverflows(final SupremicaBDDBitVector that)
     {
       return addConsideringOverflows(((TCSupremicaBDDBitVector)that).toTwosComplement());
     }
 
+    @Override
     public TCSupremicaBDDBitVector add(final SupremicaBDDBitVector that)
     {
       return (TCSupremicaBDDBitVector)addConsideringOverflows(that).getResult();
     }
 
+    @Override
     public TCSupremicaBDDBitVector sub(final SupremicaBDDBitVector that)
     {
       return (TCSupremicaBDDBitVector)subConsideringOverflows(that).getResult();
     }
 
-    protected BDD lthe(final SupremicaBDDBitVector that, BDD thanORequal)
+    @Override
+    protected BDD lthe(final SupremicaBDDBitVector that, final BDD thanORequal)
     {
 //        if (this.bitNum != r.bitNum)
 //            throw new BDDException();
@@ -251,34 +267,41 @@ public final class TCSupremicaBDDBitVector extends SupremicaBDDBitVector
         final BDD SBIRBDD = that.bitvec[((TCSupremicaBDDBitVector)that).getSignBitIndex()];
         return (SBILBDD.and(SBIRBDD.not())).or((SBILBDD.or(SBIRBDD.not())).and(p));
     }
-    
+
     //This function needs to be modified
+    // Now it is modified, but unclear what the initial comment meant. This
+    // method is identical to the one in PSupremicaBDDBitVector, except some
+    // type casts, so there seems to be really no reason as to why these two
+    // methods cannot be implemented in the superclass. The only obstacle is
+    // the method sub(), but that should be easy to have an abstract declaration
+    // in the superclass. -- Jonas Krook
+    @Override
     public void div_rec(final SupremicaBDDBitVector divisor,
                                final SupremicaBDDBitVector remainder,
                                final SupremicaBDDBitVector result,
                                final int step)
     {
-        final BDD isSmaller = divisor.lte(remainder);
-        final TCSupremicaBDDBitVector newResult = (TCSupremicaBDDBitVector)result.shl(1, isSmaller);
-        final TCSupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitNum, false);
-        final TCSupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitNum, false);
+      final TCSupremicaBDDBitVector shiftedRemainder = (TCSupremicaBDDBitVector) remainder.shl(1, bitvec[step]);
+      final BDD isSmaller = divisor.lte(shiftedRemainder);
+      final SupremicaBDDBitVector newResult = result.shl(1, isSmaller);
+      final SupremicaBDDBitVector zero = buildSupBDDBitVector(divisor.bitvec.length, false);
+      final SupremicaBDDBitVector sub = buildSupBDDBitVector(divisor.bitvec.length, false);
 
-        for (int n = 0; n < divisor.bitNum; n++)
-            sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
+      for (int n = 0; n < divisor.bitvec.length; n++)
+          sub.bitvec[n] = isSmaller.ite(divisor.bitvec[n], zero.bitvec[n]);
 
-        final TCSupremicaBDDBitVector tmp = (TCSupremicaBDDBitVector)remainder.add(sub.toTwosComplement());
-        final TCSupremicaBDDBitVector newRemainder = (TCSupremicaBDDBitVector)tmp.shl(1, result.bitvec[divisor.bitNum - 1]);
+      final TCSupremicaBDDBitVector newRemainder = shiftedRemainder.sub(sub);
 
-        if (step > 1)
-            div_rec(divisor, newRemainder, newResult, step - 1);
-        
-        tmp.free();
-        sub.free();
-        zero.free();
-        isSmaller.free();
+      if (step > 0)
+          div_rec(divisor, newRemainder, newResult, step - 1);
 
-        result.replaceWith(newResult);
-        remainder.replaceWith(newRemainder);
+      shiftedRemainder.free();
+      sub.free();
+      zero.free();
+      isSmaller.free();
+
+      result.replaceWith(newResult);
+      remainder.replaceWith(newRemainder);
     }
 
 }
