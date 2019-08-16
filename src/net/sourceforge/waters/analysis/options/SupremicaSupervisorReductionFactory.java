@@ -96,9 +96,10 @@ public enum SupremicaSupervisorReductionFactory
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
   @Override
-  public TransitionRelationSimplifier createInitialMinimizer()
+  public TransitionRelationSimplifier createInitialMinimizer
+    (final boolean includeCoreachability)
   {
-    return new SupervisorReductionChain();
+    return new SupervisorReductionChain(includeCoreachability);
   }
 
   @Override

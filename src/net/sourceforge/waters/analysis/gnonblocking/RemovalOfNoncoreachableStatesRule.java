@@ -37,7 +37,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.GNBCoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -74,7 +74,7 @@ class RemovalOfNoncoreachableStatesRule extends TRSimplifierAbstractionRule
                                     final Collection<EventProxy> propositions)
   {
     super(factory, translator, propositions,
-          new CoreachabilityTRSimplifier());
+          new GNBCoreachabilityTRSimplifier());
   }
 
 

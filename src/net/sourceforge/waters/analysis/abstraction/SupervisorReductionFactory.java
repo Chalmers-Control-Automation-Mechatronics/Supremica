@@ -58,10 +58,13 @@ public interface SupervisorReductionFactory
    * operations may be the same for controllable events and can be performed
    * at the start, before the automaton is replicated and separate
    * supervisor reduction begins.
+   * @param   includeCoreachability  Whether the input supervisor may include
+   *          non-coreachable states that should be removed as a first step.
    * @return  A fully configured transition relation simplifier to perform
    *          common steps, or <CODE>null</CODE> if there are no common steps.
    */
-  public TransitionRelationSimplifier createInitialMinimizer();
+  public TransitionRelationSimplifier createInitialMinimizer
+    (boolean includeCoreachability);
 
   /**
    * Creates a transition relation simplifier that can perform supervisor
@@ -94,10 +97,10 @@ public interface SupervisorReductionFactory
   {
     //#######################################################################
     //# Constructor
-    public SupervisorReductionChain()
+    public SupervisorReductionChain(final boolean includeCoreachability)
     {
       mMainSimplifier = null;
-      addInitialMinimisationSteps();
+      addInitialMinimisationSteps(includeCoreachability);
     }
 
     public SupervisorReductionChain(final boolean projecting,
@@ -111,7 +114,7 @@ public interface SupervisorReductionFactory
           new SubsetConstructionTRSimplifier();
         subset.setDumpStateAware(true);
         add(subset);
-        addInitialMinimisationSteps();
+        addInitialMinimisationSteps(false);
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
@@ -134,8 +137,14 @@ public interface SupervisorReductionFactory
 
     //#########################################################################
     //# Auxiliary Methods
-    private void addInitialMinimisationSteps()
+    private void addInitialMinimisationSteps(final boolean includeCoreachability)
     {
+      if (includeCoreachability) {
+        final CoreachabilityTRSimplifier coreachability =
+          new CoreachabilityTRSimplifier();
+        coreachability.setKeepingDumpState(true);
+        add(coreachability);
+      }
       add(new SelfloopSupervisorReductionTRSimplifier());
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier();

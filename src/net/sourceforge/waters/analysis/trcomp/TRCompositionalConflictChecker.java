@@ -45,7 +45,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.abstraction.ActiveEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.GNBCoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -1327,8 +1327,8 @@ public class TRCompositionalConflictChecker
     omegaRemover.setSimplificationListener(omegaRemovalListener);
     chain.add(omegaRemover);
     if (mConfiguredPreconditionMarking != null) {
-      final CoreachabilityTRSimplifier nonCoreachableRemover =
-        new CoreachabilityTRSimplifier();
+      final GNBCoreachabilityTRSimplifier nonCoreachableRemover =
+        new GNBCoreachabilityTRSimplifier();
       nonCoreachableRemover.setSimplificationListener(partitioningListener);
       chain.add(nonCoreachableRemover);
     }

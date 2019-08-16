@@ -115,9 +115,10 @@ public class SimpleSupervisorReductionFactory
   //#########################################################################
   //# Factory Methods
   @Override
-  public TransitionRelationSimplifier createInitialMinimizer()
+  public TransitionRelationSimplifier createInitialMinimizer
+    (final boolean includeCoreachability)
   {
-    return new SupervisorReductionChain();
+    return new SupervisorReductionChain(includeCoreachability);
   }
 
   @Override

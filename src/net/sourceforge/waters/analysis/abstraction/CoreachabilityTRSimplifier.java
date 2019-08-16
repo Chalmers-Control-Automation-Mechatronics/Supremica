@@ -43,10 +43,16 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 
 
 /**
- * For a given Automaton applies an abstraction rule which removes states from
- * which neither an alpha or omega state can be reached.
+ * A transition relation simplifier to remove non-coreachable states.
  *
- * @author Rachel Francis
+ * A state is coreachable if it is possible to reach a marked state from
+ * that state. This simplifier removes all states found to be not coreachable
+ * together with any transitions linked to them, and all states that become
+ * unreachable as a result are also removed. By default, whether a state is
+ * marked is determined by the default (omega) marking, but this behaviour
+ * can be overridden by a subclass.
+ *
+ * @author Rachel Francis, Robi Malik
  */
 
 public class CoreachabilityTRSimplifier
@@ -66,7 +72,34 @@ public class CoreachabilityTRSimplifier
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
+  //# Configuration
+  /**
+   * Sets how the dump state is treated in abstraction.
+   * If this setting is false (the default), the dump state is treated
+   * as an ordinary non-coreachable state that gets removed.
+   * If this setting is true, the dump state is considered as coreachable
+   * (but not marked), so it is only removed if it becomes unreachable
+   * by the removal of other states.
+   * @param keeping
+   */
+  public void setKeepingDumpState(final boolean keeping)
+  {
+    mKeepingDumpState = keeping;
+  }
+
+  /**
+   * Returns how the dump state is treated in abstraction.
+   * @see #setKeepingDumpState(boolean)
+   */
+  public boolean isKeepingDumpState()
+  {
+    return mKeepingDumpState;
+  }
+
+
+  //#########################################################################
+  //# Interface
+  //# net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier
   @Override
   public int getPreferredInputConfiguration()
   {
@@ -81,24 +114,25 @@ public class CoreachabilityTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected boolean runSimplifier()
   throws AnalysisException
   {
+    if (isTriviallyUnchanged()) {
+      return false;
+    }
+
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TransitionIterator iter = rel.createPredecessorsReadOnlyIterator();
-    final int alphaID = getPreconditionMarkingID();
-    final int defaultID = getDefaultMarkingID();
     final int numStates = rel.getNumberOfStates();
     final TIntHashSet coreachableStates = new TIntHashSet(numStates);
     final TIntStack unvisitedStates = new TIntArrayStack();
-    // Creates a hash set of all states which can reach an omega marked or alpha
-    // marked state.
+    // Creates a hash set of all states which can reach a marked state.
     for (int sourceID = 0; sourceID < numStates; sourceID++) {
-      if ((rel.isMarked(sourceID, defaultID) ||
-           rel.isMarked(sourceID, alphaID)) &&
-          rel.isReachable(sourceID) &&
+      if (rel.isReachable(sourceID) &&
+          isMarked(sourceID) &&
           coreachableStates.add(sourceID) ) {
         checkAbort();
         unvisitedStates.push(sourceID);
@@ -114,21 +148,36 @@ public class CoreachabilityTRSimplifier
         }
       }
     }
-    // Remove states which cannot reach a state marked alpha or omega.
-    final int numReachable = coreachableStates.size();
-    if (numReachable < numStates) {
-      boolean modified = false;
+    // Special treatment of dump state.
+    if (mKeepingDumpState) {
+      final int dumpIndex = rel.getDumpStateIndex();
+      if (rel.isReachable(dumpIndex)) {
+        iter.resetState(dumpIndex);
+        while (iter.advance()) {
+          final int s = iter.getCurrentSourceState();
+          if (coreachableStates.contains(s)) {
+            coreachableStates.add(dumpIndex);
+            break;
+          }
+        }
+      }
+    }
+    // Remove states which cannot reach a marked state.
+    boolean modified = false;
+    final int numCoreachable = coreachableStates.size();
+    if (numCoreachable < numStates) {
       for (int sourceID = 0; sourceID < numStates; sourceID++) {
-        if (rel.isReachable(sourceID) && !coreachableStates.contains(sourceID)) {
+        if (rel.isReachable(sourceID) &&
+            !coreachableStates.contains(sourceID)) {
           rel.setReachable(sourceID, false);
           modified = true;
         }
       }
-      applyResultPartitionAutomatically();
-      return modified;
-    } else {
-      return false;
+      if (modified) {
+        applyResultPartitionAutomatically();
+      }
     }
+    return modified;
   }
 
   @Override
@@ -141,5 +190,27 @@ public class CoreachabilityTRSimplifier
     rel.removeTauSelfLoops();
     rel.removeProperSelfLoopEvents();
   }
+
+
+  //#########################################################################
+  //# Hooks
+  protected boolean isTriviallyUnchanged()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int defaultID = getDefaultMarkingID();
+    return !rel.isPropositionUsed(defaultID);
+  }
+
+  protected boolean isMarked(final int state)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int defaultID = getDefaultMarkingID();
+    return rel.isMarked(state, defaultID);
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private boolean mKeepingDumpState = false;
 
 }

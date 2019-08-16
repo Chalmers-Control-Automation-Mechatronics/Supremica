@@ -425,7 +425,8 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       mReductionChain.setStateLimit(stateLimit);
       mReductionChain.setTransitionLimit(transitionLimit);
       mReductionChain.setDefaultMarkingID(markingID);
-      mMinimizationChain = getSupervisorReductionFactory().createInitialMinimizer();
+      mMinimizationChain =
+        getSupervisorReductionFactory().createInitialMinimizer(false);
       if (mMinimizationChain != null) {
         mMinimizationChain.setStateLimit(stateLimit);
         mMinimizationChain.setTransitionLimit(transitionLimit);

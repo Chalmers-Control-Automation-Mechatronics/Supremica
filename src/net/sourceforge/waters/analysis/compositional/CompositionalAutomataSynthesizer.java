@@ -394,7 +394,8 @@ public class CompositionalAutomataSynthesizer
         mMainSupervisorReducer.setStateLimit(stateLimit);
         final int transitionLimit = getInternalTransitionLimit();
         mMainSupervisorReducer.setTransitionLimit(transitionLimit);
-        mPreSupervisorReducer = mSupervisorReductionFactory.createInitialMinimizer();
+        mPreSupervisorReducer =
+          mSupervisorReductionFactory.createInitialMinimizer(true);
         if (mPreSupervisorReducer != null) {
           mPreSupervisorReducer.setStateLimit(stateLimit);
           mPreSupervisorReducer.setTransitionLimit(transitionLimit);

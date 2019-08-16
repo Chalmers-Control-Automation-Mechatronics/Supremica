@@ -37,7 +37,7 @@ import java.util.Collection;
 
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CoreachabilityTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.GNBCoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
@@ -115,8 +115,8 @@ class TRConflictEquivalenceAbstractionProcedure
       new OmegaRemovalTRSimplifier();
     chain.add(omegaRemover);
     if (preconditionMarking != null) {
-      final CoreachabilityTRSimplifier nonCoreachableRemover =
-        new CoreachabilityTRSimplifier();
+      final GNBCoreachabilityTRSimplifier nonCoreachableRemover =
+        new GNBCoreachabilityTRSimplifier();
       chain.add(nonCoreachableRemover);
     }
     final SilentIncomingTRSimplifier silentInRemover =

@@ -62,7 +62,7 @@ public class CoreachabilityTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new CoreachabilityTRSimplifier();
+    return new GNBCoreachabilityTRSimplifier();
   }
 
   @Override

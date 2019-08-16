@@ -53,7 +53,8 @@ public enum DefaultSupervisorReductionFactory
    */
   OFF("Off") {
     @Override
-    public SupervisorReductionSimplifier createInitialMinimizer()
+    public SupervisorReductionSimplifier createInitialMinimizer
+      (final boolean includeCoreachability)
     {
       return null;
     }
@@ -249,9 +250,10 @@ public enum DefaultSupervisorReductionFactory
   //# Interface
   //# net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory
   @Override
-  public TransitionRelationSimplifier createInitialMinimizer()
+  public TransitionRelationSimplifier createInitialMinimizer
+    (final boolean includeCoreachability)
   {
-    return new SupervisorReductionChain();
+    return new SupervisorReductionChain(includeCoreachability);
   }
 
   @Override
