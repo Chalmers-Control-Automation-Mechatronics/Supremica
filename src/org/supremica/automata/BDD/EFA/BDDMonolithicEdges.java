@@ -6,12 +6,18 @@ package org.supremica.automata.BDD.EFA;
  */
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
+
 import net.sourceforge.waters.model.module.VariableComponentProxy;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 
 public class BDDMonolithicEdges
         implements BDDEdges {
+
+    private static Logger logger = LogManager.getLogger(BDDMonolithicEdges.class);
 
     private final BDDExtendedAutomata bddExAutomata;
     private final BDDExtendedManager manager;
@@ -99,9 +105,9 @@ public class BDDMonolithicEdges
             specUncontrollableEdgesForwardBDD = manager.getZeroBDD();
         }
 
-        System.err.println("Synchronizing actions...");
+        logger.debug("Synchronizing actions...");
         final BDD actionsBDD = synchronizedActions(bddExAutomata.forwardTransWhereVisUpdated, bddExAutomata.forwardTransAndNextValsForV);
-        System.err.println("Done.");
+        logger.debug("Done.");
 
 
         edgesForwardBDD = edgesForwardBDD.and(actionsBDD);
@@ -123,7 +129,7 @@ public class BDDMonolithicEdges
         //edgesBackwardBDD.printDot();
         if (!bddExAutomata.orgExAutomata.getClocks().isEmpty()) {
             final BDD[] clocksWithTheSameRate = computeClocksExtension();
-            System.err.println("Clock extenstion computed.");
+            logger.debug("Clock extenstion computed.");
             forwardClocksWithTheSameRate = saturateForwardClocks(clocksWithTheSameRate[0]);
             backwardClocksWithTheSameRate = clocksWithTheSameRate[1];
             oneStepTickBDD = saturateForwardClocks(clocksWithTheSameRate[2]);
@@ -150,7 +156,7 @@ public class BDDMonolithicEdges
             specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(sourceInvariant);
             plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(sourceInvariant);
 
-            System.err.println("Timing stuffs created.");
+            logger.debug("Timing stuffs created.");
 
         }
 
@@ -182,8 +188,8 @@ public class BDDMonolithicEdges
 
         edgesForwardBDD = edgesForwardBDD.exist(bddExAutomata.getEventVarSet());
         currentFrwdGoodTransBDD = edgesForwardBDD.id();
-        System.err.println("BDD represeting forward edges without events is created.");
-        System.err.println("The number of nodes in the forward edge BDD: " + edgesForwardBDD.nodeCount());
+        logger.debug("BDD represeting forward edges without events is created.");
+        logger.debug("The number of nodes in the forward edge BDD: " + edgesForwardBDD.nodeCount());
         edgesBackwardBDD = edgesBackwardBDD.exist(bddExAutomata.getEventVarSet());
         //System.err.println("BDD represeting backward edges without events is created.");
         //System.err.println("The number of nodes in the backward edge BDD: " + edgesBackwardBDD.nodeCount());
@@ -252,10 +258,10 @@ public class BDDMonolithicEdges
     @SuppressWarnings("unused")
     private void computeDeadlocks()
     {
-        System.err.println("Compute deadlocks...");
+        logger.debug("Compute deadlocks...");
         final BDD notDeadlocks = edgesForwardBDD.exist(bddExAutomata.getDestStatesVarSet());
         deadlockStatesBDD = notDeadlocks.not();
-        System.err.println("Deadlocks computed.");
+        logger.debug("Deadlocks computed.");
     }
 
     public BDD getDeadlockStatesBDD()
@@ -277,26 +283,26 @@ public class BDDMonolithicEdges
 
     public void makeTheEdgesReachable()
     {
-        System.err.println("Start making the edges reachable...");
+        logger.debug("Start making the edges reachable...");
 
         edgesForwardBDD = edgesForwardBDD.and(bddExAutomata.getReachableStates());
-        System.err.println("1");
+        logger.debug("1");
 //        edgesForwardWithEventsBDD = edgesForwardWithEventsBDD.and(bddExAutomata.getReachableStates());
         forcibleEdgesForwardBDD = forcibleEdgesForwardBDD.and(bddExAutomata.getReachableStates());
 //        forcibleEdgesForwardBDDCopy = forcibleEdgesForwardBDD.id();
-        System.err.println("2");
+        logger.debug("2");
 //        plantUncontrollableEdgesForwardBDD = plantUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
 //        specUncontrollableEdgesForwardBDD = specUncontrollableEdgesForwardBDD.and(bddExAutomata.getReachableStates());
 
         BDD destReachableStates = bddExAutomata.getReachableStates().replace(bddExAutomata.getSourceToDestLocationPairing());
         destReachableStates = destReachableStates.replace(bddExAutomata.getSourceToDestVariablePairing());
         edgesBackwardBDD = edgesBackwardBDD.and(destReachableStates);
-        System.err.println("3");
+        logger.debug("3");
 
 //        edgesBackwardWithEventsBDD = edgesBackwardWithEventsBDD.and(destReachableStates);
         uncontrollableEdgesBackwardBDD = uncontrollableEdgesBackwardBDD.and(destReachableStates);
 
-        System.err.println("The edges only including reachable states are computed.");
+        logger.debug("The edges only including reachable states are computed.");
     }
 
 //    private BDD synchronizeForwardClocks()
@@ -523,7 +529,7 @@ public class BDDMonolithicEdges
 
     // A new function to extend the clocks at the same rate
     private BDD[] computeClocksExtension() {
-        System.err.println("Synchronizining clocks...");
+        logger.debug("Synchronizining clocks...");
         BDD frwdClocksWithTheSameRate = manager.getOneBDD();
         BDD bckwdClocksWithTheSameRate = manager.getOneBDD();
         BDD oneTickForward = manager.getOneBDD();
@@ -560,7 +566,7 @@ public class BDDMonolithicEdges
             bckwdClocksWithTheSameRate = bckwdClocksWithTheSameRate.and(clockExBack);
         } else {
             for (final VariableComponentProxy clockComponent : bddExAutomata.orgExAutomata.getClocks()) {
-                System.err.println(clockComponent.getName());
+                logger.debug(clockComponent.getName());
                 final int clockIndex = bddExAutomata.theIndexMap.getVariableIndex(clockComponent);
                 final int clockDomain = bddExAutomata.orgExAutomata.getVarDomain(clockComponent.getName());
                 final BDDDomain clockTempDomain = bddExAutomata.tempClockDomains1[clockIndex];

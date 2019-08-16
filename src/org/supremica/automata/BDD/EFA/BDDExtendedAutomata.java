@@ -36,7 +36,6 @@ import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.ExtendedAutomataIndexMap;
 import org.supremica.automata.ExtendedAutomaton;
 import org.supremica.automata.FlowerEFABuilder;
-import org.supremica.automata.BDD.BDDAutomata;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.TCSupremicaBDDBitVector;
 import org.supremica.automata.algorithms.EditorSynthesizerOptions;
@@ -49,7 +48,7 @@ import org.supremica.automata.algorithms.SynthesisAlgorithm;
 
 public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
-    private static Logger logger = LogManager.getLogger(BDDAutomata.class);
+    private static Logger logger = LogManager.getLogger(BDDExtendedAutomata.class);
     private final BDDExtendedManager manager;
     List<ExtendedAutomaton> theExAutomata;
     ExtendedAutomata orgExAutomata;
@@ -1131,7 +1130,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public void computeReachableStates() {
         if (reachableStatesBDD == null) {
-            System.err.println("Computing reachable states...");
+            logger.debug("Computing reachable states...");
             if (synType.equals(SynthesisAlgorithm.PARTITIONBDD))
             {
                 parAlgoWorker = getParAlgoWorker();
@@ -1156,7 +1155,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             }
 
 
-            System.err.println(numberOfReachableStates() + " reachable states found.");
+            logger.debug(numberOfReachableStates() + " reachable states found.");
 
 
 //            logger.info("Number of reachable states in the closed-loop system: "+nbrOfReachableStates);
@@ -1174,7 +1173,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
             final IDD idd = generateIDD(coreachableStatesBDD, coreachableStatesBDD);
             nbrOfCoreachableStates = nbrOfStatesIDD(idd).longValue();
-            System.err.println(nbrOfCoreachableStates + " coreachable states found.");
+            logger.debug(nbrOfCoreachableStates + " coreachable states found.");
         }
     }
 
@@ -1206,7 +1205,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                   manager.disjunctiveNonblockingControllable(initialForbiddenStates, reachable);
             }
 
-            System.err.println("Nonblocking and controllable states computed!");
+            logger.debug("Nonblocking and controllable states computed!");
 
 
             if(!orgExAutomata.getClocks().isEmpty())
@@ -1253,7 +1252,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
                 }
             }
 
-            System.err.println("Controllable states computed!");
+            logger.debug("Controllable states computed!");
 
 //            if(options.getOptimization())
 //            {
@@ -1538,7 +1537,7 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
           proc2.waitFor();
           proc2.exitValue();
       } catch (final Exception e) {
-          System.out.println(e);
+          logger.error(e);
       }
     }
 

@@ -29,12 +29,17 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 import net.sourceforge.waters.model.module.VariableComponentProxy;
 import net.sourceforge.waters.subject.module.ModuleSubjectFactory;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.supremica.automata.ExtendedAutomata;
 import org.supremica.automata.FlowerEFABuilder;
 import org.supremica.automata.BDD.SupremicaBDDBitVector.SupremicaBDDBitVector;
 import org.supremica.properties.Config;
 
 public class BDDExtendedManager extends BDDAbstractManager {
+
+    private static Logger logger = LogManager.getLogger(BDDExtendedManager.class);
 
     BDD globalLargerBDD = null;
     //The BDD representing the forward transition relation, where the destination variables are removed.
@@ -122,7 +127,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
     }
 
     public BDD uncontrollableBackward(final BDD forbidden) {
-        System.err.println("UncontrollableBackward entered.");
+        logger.debug("UncontrollableBackward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD t_u = bddEdges.getMonolithicUncontrollableEdgesBackwardBDD();
 
@@ -158,7 +163,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //        }
         int i = 0;
         do {
-            System.err.println("ub: "+(i++));
+            logger.debug("ub: "+(i++));
             Qk = Qkn.id();
             newUCstates = image_preImage(Qk, t_u);
             Qkn = Qk.or(newUCstates);
@@ -181,12 +186,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
             }
         } while (!Qkn.equals(Qk));
 
-        System.err.println("UncontrollableBackward exited.");
+        logger.debug("UncontrollableBackward exited.");
         return Qkn;
     }
 
     public BDD restrictedBackward(final BDD markedStates, final BDD forb) {
-        System.err.println("RestrictedBackward entered.");
+        logger.debug("RestrictedBackward entered.");
 
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD trans = bddEdges.getMonolithicEdgesBackwardBDD();
@@ -209,7 +214,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         int i = 0;
         do {
-            System.err.println("rb "+(i++));
+            logger.debug("rb "+(i++));
 
             Qk = Qkn.id();
             Qm = image_preImage(Qk, trans, backwardTime);//.and(bddExAutomata.getReachableStates());
@@ -223,12 +228,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         } while (!Qkn.equals(Qk));
 
-        System.err.println("RestrictedBackward exited.");
+        logger.debug("RestrictedBackward exited.");
         return Qkn;
     }
 
     public BDD restrictedForward(final BDD initialStates, final BDD forb) {
-        System.err.println("RestrictedForward entered.");
+        logger.debug("RestrictedForward entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD trans = bddEdges.getMonolithicEdgesForwardBDD();
 
@@ -246,7 +251,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         int iteration = 0;
 
         do {
-            System.err.println("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
+            logger.debug("RForward "+(iteration++) + "\t" + Qkn.nodeCount());
 
             Qk = Qkn.id();
             Qm = image_preImage(Qk, trans, forwardTime);
@@ -260,12 +265,12 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         } while (!Qkn.equals(Qk));
 
-        System.err.println("RestrictedForward exited.");
+        logger.debug("RestrictedForward exited.");
         return Qkn;
     }
 
     public BDD nonblockingControllable(final BDD forb, final boolean reachable) {
-        System.err.println("NonblockingControllable entered.");
+        logger.debug("NonblockingControllable entered.");
         final BDDMonolithicEdges bddEdges = ((BDDMonolithicEdges) bddExAutomata.getBDDEdges());
         final BDD forwardTime = bddEdges.getForwardClocksWithTheSameRate();
 
@@ -284,7 +289,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         BDD Q2;
         int i = 0;
         do {
-            System.err.println("nbc i: "+(i++));
+            logger.debug("nbc i: "+(i++));
             Qk = Qkn.id();
             Q1 = restrictedBackward(bddExAutomata.getMarkedStates(), Qk);
             BDD forbiddenStates = Q1.not();//.and(bddExAutomata.getReachableStates());
@@ -296,7 +301,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
             Qkn = Qk.or(Q2);
         } while ((!Qkn.equals(Qk)));
 
-        System.err.println("NonblockingControllable exited.");
+        logger.debug("NonblockingControllable exited.");
 
         if (reachable) {
             return restrictedForward(bddExAutomata.getInitialState(), Qkn);
@@ -409,7 +414,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //        frwdTrans = frwdTrans.and(coreachable);
 
         do {
-            System.err.println("i: "+i);
+            logger.debug("i: "+i);
             Qk = Qkn.id();
             nextTrans = frwdTrans.and(Qk);
 //            localFrwdTrans = localFrwdTrans.or(nextTrans);
@@ -417,11 +422,11 @@ public class BDDExtendedManager extends BDDAbstractManager {
             /*
              * Image operator
              */
-            System.err.println("Performing the image operator...");
+            logger.debug("Performing the image operator...");
             nextStates = nextTrans.exist(bddExAutomata.getSourceStatesVarSet());
             Qm = bddExAutomata.destToSource(nextStates);
             Qkn = Qk.or(Qm);
-            System.err.println("Image computed.");
+            logger.debug("Image computed.");
 
             /*
              * Perform a local analysis (synthesis):
@@ -430,15 +435,15 @@ public class BDDExtendedManager extends BDDAbstractManager {
              *     - find states that are on the edge between the locally good
              *       and bad states
              */
-            System.err.println("Procedure: finding new blocking states...");
+            logger.debug("Procedure: finding new blocking states...");
             localBadStates = getBlockingStates(frwdTrans, Qm);
-            System.err.println("Procedure done.");
+            logger.debug("Procedure done.");
             localBadStatesExt = getZeroBDD();
             localUnconStates = getZeroBDD();
             j = 0;
             while(!localBadStates.equals(localBadStatesExt))
             {
-                System.err.println("j: "+j);
+                logger.debug("j: "+j);
                 localBadStatesExt = localBadStates.id();
                 /*
                  * Compute the local uncontrollable states
@@ -452,24 +457,24 @@ public class BDDExtendedManager extends BDDAbstractManager {
 //                    bddExAutomata.uncontrollableEventsBDD)).exist(bddExAutomata.getEventVarSet());
 //
 //                }
-                System.err.println("compute local uncon states...");
+                logger.debug("compute local uncon states...");
                 localUnconStates = coreachability(bkwdUnconTrans, localBadStates);
                 localUnconStates = localUnconStates.and(localBadStates.not());
-                System.err.println("local uncon states computed.");
+                logger.debug("local uncon states computed.");
 
                 localBadStates = localBadStates.or(localUnconStates);
 //                localBadStates.printDot();
 
-                System.err.println("local prune...");
+                logger.debug("local prune...");
                 pruneTrans(frwdTrans, localBadStates);
 //                localFrwdTrans = localFrwdTrans.and(bddExAutomata.sourceToDest(localBadStates).not());
 
 //                unconStates = unconStates.or(localUnconStates);
 
                 Qkn = Qkn.and(localBadStates.not());
-                System.err.println("computing next local bad states...");
+                logger.debug("computing next local bad states...");
                 nextBlockingStates = getBlockingStates(frwdTrans, Qkn);
-                System.err.println("next local bad states comoputed.");
+                logger.debug("next local bad states comoputed.");
                 localBadStates = localBadStates.or(nextBlockingStates);
                 j++;
             }
@@ -525,7 +530,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
         int i = 0;
         do
         {
-            System.err.println("unnVS: "+i);
+            logger.debug("unnVS: "+i);
             Qk = Qkn.id();
             nextStates = image_preImage(Qkn, tmpLocalFrwdTrans);
             tmpFrwdTrans = tmpFrwdTrans.and(Qkn.not());
@@ -1027,7 +1032,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
                   feasibleEquationExpressions[i] = (parser.parse(feasibleEquationStrings[i], Operator.TYPE_BOOLEAN));
                 }
             } catch (final ParseException pe) {
-                System.err.println(pe);
+                logger.error(pe);
             }
 
             feasibleSourceStates = getOneBDD();
@@ -1067,7 +1072,7 @@ public class BDDExtendedManager extends BDDAbstractManager {
 
         setupPartitioningBDDs();
 
-        System.err.println("Computing the deadlock states with the event-based "
+        logger.debug("Computing the deadlock states with the event-based "
                 + "partitioning approach.");
 
         final BDD deadlocks = getDeadlocksWithPartitions();
