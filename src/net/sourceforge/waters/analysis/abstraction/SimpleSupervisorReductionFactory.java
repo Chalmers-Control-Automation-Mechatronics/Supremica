@@ -68,24 +68,40 @@ public class SimpleSupervisorReductionFactory
   //# Constructor
   /**
    * Creates a supervisor reduction factory for localised and non-localised
-   * supervisor reduction.
-   * @param  projecting  Whether the supervisor reduction chain should include
-   *                     a {@link ProjectingSupervisorReductionTRSimplifier}
-   *                     to remove events that are not needed to make control
-   *                     decisions.
+   * supervisor reduction, without projection.
    * @param  simplifier  The transition relation simplifier that implements
    *                     the core supervisor reduction algorithm.
    */
   public SimpleSupervisorReductionFactory
-    (final boolean projecting,
+    (final SupervisorReductionSimplifier simplifier)
+  {
+    this(null, simplifier);
+  }
+
+  /**
+   * Creates a supervisor reduction factory that may or may not support
+   * for non-localised supervisor reduction, optionally with projection.
+   * @param  simplifier    The transition relation simplifier that implements
+   *                       the core supervisor reduction algorithm.
+   */
+  public SimpleSupervisorReductionFactory
+    (final TransitionRelationSimplifier projector,
      final SupervisorReductionSimplifier simplifier)
   {
-    this(false, projecting, simplifier);
+    this(projector, simplifier, false);
   }
 
   /**
    * Creates a supervisor reduction factory that may or may not support
    * for non-localised supervisor reduction.
+   * @param  projector     A supervisor simplifier (typically
+   *                       {@link ProjectingSupervisorReductionTRSimplifier})
+   *                       to remove events that are not needed to make control
+   *                       decisions, which is applied before the core
+   *                       supervisor reduction algorithm is invoked;
+   *                       or <CODE>null</CODE> to disable event removal.
+   * @param  simplifier    The transition relation simplifier that implements
+   *                       the core supervisor reduction algorithm.
    * @param  localizedOnly Whether the core supervisor reduction simplifier
    *                       requires a localised event. If <CODE>true</CODE>,
    *                       the supervisor reduction factory indicates through
@@ -94,21 +110,15 @@ public class SimpleSupervisorReductionFactory
    *                       if started without first calling the {@link
    *                       SupervisorReductionSimplifier#setSupervisedEvent(int)}
    *                       method.
-   * @param  projecting    Whether the supervisor reduction chain should include
-   *                       a {@link ProjectingSupervisorReductionTRSimplifier}
-   *                       to remove events that are not needed to make control
-   *                       decisions.
-   * @param  simplifier    The transition relation simplifier that implements
-   *                       the core supervisor reduction algorithm.
    */
   public SimpleSupervisorReductionFactory
-    (final boolean localizedOnly,
-     final boolean projecting,
-     final SupervisorReductionSimplifier simplifier)
+    (final TransitionRelationSimplifier projector,
+     final SupervisorReductionSimplifier simplifier,
+     final boolean localizedOnly)
   {
-    mProjecting = projecting;
-    mLocalizedOnly = localizedOnly;
+    mProjector = projector;
     mSimplifier = simplifier;
+    mLocalizedOnly = localizedOnly;
   }
 
 
@@ -124,7 +134,13 @@ public class SimpleSupervisorReductionFactory
   @Override
   public SupervisorReductionSimplifier createSupervisorReducer()
   {
-    return new SupervisorReductionChain(mProjecting, mSimplifier);
+    return new SupervisorReductionChain(mProjector, mSimplifier);
+  }
+
+  @Override
+  public boolean isSupervisedReductionEnabled()
+  {
+    return true;
   }
 
   @Override
@@ -136,8 +152,8 @@ public class SimpleSupervisorReductionFactory
 
   //#########################################################################
   //# Data Members
-  private final boolean mProjecting;
-  private final boolean mLocalizedOnly;
+  private final TransitionRelationSimplifier mProjector;
   private final SupervisorReductionSimplifier mSimplifier;
+  private final boolean mLocalizedOnly;
 
 }

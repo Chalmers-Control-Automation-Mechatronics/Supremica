@@ -35,8 +35,10 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.EventParameter;
@@ -204,11 +206,20 @@ public abstract class AbstractSupervisorSynthesizer
         setTransitionLimit(getValue());
       }
     });
-    list.add(new EnumParameter<SupervisorReductionFactory>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory) {
+    list.add(new EnumParameter<SupervisorReductionMainMethod>
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionMainMethod) {
       @Override
       public void commitValue() {
-        setSupervisorReductionFactory(getValue());
+        ProjectingSupervisorReductionFactory.configureSynthesizer
+          (AbstractSupervisorSynthesizer.this, getValue());
+      }
+    });
+    list.add(new EnumParameter<SupervisorReductionProjectionMethod>
+      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionProjectionMethod) {
+      @Override
+      public void commitValue() {
+        ProjectingSupervisorReductionFactory.configureSynthesizer
+          (AbstractSupervisorSynthesizer.this, getValue());
       }
     });
     list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled) {
@@ -297,7 +308,7 @@ public abstract class AbstractSupervisorSynthesizer
   private EventProxy mUsedMarking = null;
   private boolean mNondeterminismEnabled = false;
   private SupervisorReductionFactory mSupervisorReductionFactory =
-    DefaultSupervisorReductionFactory.OFF;
+    new ProjectingSupervisorReductionFactory();
   private boolean mSupervisorLocalizationEnabled = false;
 
 }

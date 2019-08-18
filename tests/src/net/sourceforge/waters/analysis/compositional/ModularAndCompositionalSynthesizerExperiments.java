@@ -40,7 +40,9 @@ import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.model.analysis.AbstractAnalysisTest;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.Watchdog;
@@ -121,8 +123,10 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
                          ",SelecHeuristic," + mSelecting );
     // mPrintWriter.println("SupervisorReduction," + mSupervisorReductionEnabled);
     mHasBeenPrinted = false;
-    mSynthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.SU_WONHAM);
+    final SupervisorReductionFactory supRed =
+      new ProjectingSupervisorReductionFactory
+      (SupervisorReductionMainMethod.SU_WONHAM);
+    mSynthesizer.setSupervisorReductionFactory(supRed);
     mSynthesizer.setRemovesUnnecessarySupervisors(true);
   }
 
@@ -184,9 +188,9 @@ public class ModularAndCompositionalSynthesizerExperiments extends AbstractAnaly
                    final List<ParameterBindingProxy> bindings)
     throws Exception
   {
-    final String with =
-      mSynthesizer.getSupervisorReductionFactory() ==
-      DefaultSupervisorReductionFactory.OFF ? " without" : " with";
+
+    final String with = mSynthesizer.getSupervisorReductionFactory().
+      isSupervisedReductionEnabled() ? " with" : " without";
     printAndLog("Running " + name + " with " + mPreselecting + "/" +
                 mSelecting + with + " supervisor reduction ... ", false);
     final String inputprop = System.getProperty("waters.test.inputdir");

@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +45,7 @@ import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -117,6 +120,16 @@ public class ProjectingSupervisorReductionTRSimplifier
     return mExhaustive;
   }
 
+  public void setEnsuringOP(final boolean ensure)
+  {
+    mEnsuringOP = ensure;
+  }
+
+  public boolean isEnsuringOP()
+  {
+    return mEnsuringOP;
+  }
+
 
   //#########################################################################
   //# Interface
@@ -140,12 +153,24 @@ public class ProjectingSupervisorReductionTRSimplifier
   @Override
   public boolean runSimplifier() throws AnalysisException
   {
-    final Logger logger = LogManager.getLogger();
-    setUpEventInfo();
-    final int numRemoved =
-      mExhaustive ? searchExhaustively() : searchGreedily();
-    logger.debug("Proposing to remove {} events.", numRemoved);
-    return numRemoved > 0;
+    try {
+      final Logger logger = LogManager.getLogger();
+      setUpEventInfo();
+      final int numRemoved =
+        mExhaustive ? searchExhaustively() : searchGreedily();
+      logger.debug("Proposing to remove {} events.", numRemoved);
+      return numRemoved > 0;
+    } catch (final AnalysisException exception) {
+      restoreEventStatus();
+      throw exception;
+    } catch (final OutOfMemoryError error) {
+      System.gc();
+      restoreEventStatus();
+      throw new OverflowException(error);
+    } catch (final StackOverflowError error) {
+      restoreEventStatus();
+      throw new OverflowException(error);
+    }
   }
 
   @Override
@@ -167,7 +192,9 @@ public class ProjectingSupervisorReductionTRSimplifier
     final EventInfo[] array = new EventInfo[numEvents];
     for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
-      if (EventStatus.isUsedEvent(status) && !isSupervisedEvent(e)) {
+      if (EventStatus.isUsedEvent(status) &&
+          !EventStatus.isLocalEvent(status) &&
+          !isSupervisedEvent(e)) {
         array[e] = new EventInfo(e);
       } else {
         numEvents--;
@@ -214,15 +241,24 @@ public class ProjectingSupervisorReductionTRSimplifier
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
     int numRemoved = 0;
+    final TIntArrayList uncertain = new TIntArrayList(mEventInfo.size());
     for (final EventInfo info : mEventInfo) {
-      final int event = info.getEvent();
-      final byte status = rel.getProperEventStatus(event);
-      rel.setProperEventStatus(event, status | EventStatus.STATUS_LOCAL);
-      if (mVerifierBuilder.buildVerifier(rel)) {
-        numRemoved++;
+      final int e = info.getEvent();
+      final byte status = rel.getProperEventStatus(e);
+      rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
+      if (!mVerifierBuilder.buildVerifier(rel)) {
+        rel.setProperEventStatus(e, status);
+      } else if (!mEnsuringOP || mVerifierBuilder.isOPSatisfied()) {
+        numRemoved += uncertain.size() + 1;
+        uncertain.clear();
       } else {
-        rel.setProperEventStatus(event, status);
+        uncertain.add(e);
       }
+    }
+    for (int i = 0; i < uncertain.size(); i++) {
+      final int e = uncertain.get(i);
+      final byte status = rel.getProperEventStatus(e);
+      rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
     }
     return numRemoved;
   }
@@ -253,13 +289,26 @@ public class ProjectingSupervisorReductionTRSimplifier
       rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
       if (mVerifierBuilder.buildVerifier(rel)) {
         final Result result = new Result(info, parent);
-        if (result.isBetterThan(mKnownBest)) {
+        if ((!mEnsuringOP || mVerifierBuilder.isOPSatisfied()) &&
+            result.isBetterThan(mKnownBest)) {
           mKnownBest = result;
         }
         searchExhaustively(result, nextEvent + 1);
       }
       rel.setProperEventStatus(e, status);
       searchExhaustively(parent, nextEvent + 1);
+    }
+  }
+
+  private void restoreEventStatus()
+  {
+    if (mEventInfo != null) {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      for (final EventInfo info : mEventInfo) {
+        final int e = info.getEvent();
+        final byte status = rel.getProperEventStatus(e);
+        rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
+      }
     }
   }
 
@@ -443,6 +492,7 @@ public class ProjectingSupervisorReductionTRSimplifier
   //#########################################################################
   //# Data Members
   private boolean mExhaustive = false;
+  private boolean mEnsuringOP = false;
 
   private final VerifierBuilder mVerifierBuilder =
     new SupervisorReductionVerifierBuilder();

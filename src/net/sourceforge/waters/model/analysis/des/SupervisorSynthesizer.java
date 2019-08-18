@@ -33,7 +33,8 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
@@ -120,10 +121,10 @@ public interface SupervisorSynthesizer
   /**
    * Sets the method of supervisor reduction to be used after synthesis.
    * @param  factory  A factory object that can produce a supervisor reduction
-   *                  chain. This can be one of the values of the enumeration
-   *                  {@link DefaultSupervisorReductionFactory}, which includes
-   *                  the option {@link DefaultSupervisorReductionFactory#OFF}
-   *                  to disable supervisor reduction.
+   *                  chain. The simplest way to obtain such a factory is
+   *                  through the constructors of {@link
+   *                  SimpleSupervisorReductionFactory} or {@link
+   *                  ProjectingSupervisorReductionFactory}/
    */
   public void setSupervisorReductionFactory
     (final SupervisorReductionFactory factory);

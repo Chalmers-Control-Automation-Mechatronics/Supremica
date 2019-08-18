@@ -39,7 +39,6 @@ import java.util.Set;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
@@ -61,8 +60,6 @@ public class MonolithicSynthesizerNormalityTest
   {
     final MonolithicSynthesizerNormality synthesizer =
       new MonolithicSynthesizerNormality(factory);
-    synthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.OFF);
     synthesizer.setSupervisorLocalizationEnabled(false);
     return synthesizer;
   }

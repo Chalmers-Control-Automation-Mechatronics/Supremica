@@ -36,7 +36,9 @@ package net.sourceforge.waters.analysis.compositional;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
@@ -62,8 +64,9 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
       final ModularAndCompositionalSynthesizer automataSynthesizer =
         new ModularAndCompositionalSynthesizer(factory);
       automataSynthesizer.setDetailedOutputEnabled(false);
-      automataSynthesizer.setSupervisorReductionFactory
-        (DefaultSupervisorReductionFactory.SU_WONHAM);
+      final SupervisorReductionFactory supRed = new ProjectingSupervisorReductionFactory
+        (SupervisorReductionMainMethod.SU_WONHAM);
+      automataSynthesizer.setSupervisorReductionFactory(supRed);
       automataSynthesizer.setInternalStateLimit(20000);
       automataSynthesizer.setInternalTransitionLimit(1000000);
       final List<Configuration> configurations = new LinkedList<>();
@@ -93,9 +96,8 @@ public class SelfRunningExperimentModularAndCompositionalSynthesis
           for (final Configuration config: configurations) {
             final String preName = preselectingMethod.toString();
             final String selName = selectingMethod.toString();
-            final String with =
-              automataSynthesizer.getSupervisorReductionFactory() ==
-              DefaultSupervisorReductionFactory.OFF ? " without" : " with";
+            final String with = automataSynthesizer.getSupervisorReductionFactory().
+              isSupervisedReductionEnabled() ? " with" : " without";
             System.out.println
               ("Method " + methodCount + " *** " + config + "/" + preName +
                "/" + selName + with + " reduction" + " ***");

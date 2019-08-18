@@ -33,8 +33,9 @@
 
 package net.sourceforge.waters.analysis.monolithic;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
-import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
@@ -85,6 +86,7 @@ public class MonolithicModelAnalyzerFactory
   {
     super.addArguments();
     addArgument(new SupervisorReductionArgument());
+    addArgument(new SupervisorReductionProjectionArgument());
     addArgument(new SupervisorLocalisationArgument());
   }
 
@@ -159,14 +161,14 @@ public class MonolithicModelAnalyzerFactory
   //#########################################################################
   //# Inner Class SupervisorReductionArgument
   private static class SupervisorReductionArgument
-    extends CommandLineArgumentEnum<DefaultSupervisorReductionFactory>
+    extends CommandLineArgumentEnum<SupervisorReductionMainMethod>
   {
     //#######################################################################
     //# Constructors
     private SupervisorReductionArgument()
     {
-      super("-red", "Supervisor reduction method",
-            DefaultSupervisorReductionFactory.class);
+      super("-red", "Core method for supervisor reduction",
+            SupervisorReductionMainMethod.class);
     }
 
     //#######################################################################
@@ -178,8 +180,40 @@ public class MonolithicModelAnalyzerFactory
       if (analyzer instanceof SupervisorSynthesizer) {
         final SupervisorSynthesizer synthesizer =
           (SupervisorSynthesizer) analyzer;
-        final SupervisorReductionFactory factory = getValue();
-        synthesizer.setSupervisorReductionFactory(factory);
+        final SupervisorReductionMainMethod method = getValue();
+        ProjectingSupervisorReductionFactory.
+          configureSynthesizer(synthesizer, method);
+      } else {
+        fail("Command line option " + getName() +
+             " is only supported for synthesis!");
+      }
+    }
+  }
+
+
+  private static class SupervisorReductionProjectionArgument
+    extends CommandLineArgumentEnum<SupervisorReductionProjectionMethod>
+  {
+    //#######################################################################
+    //# Constructors
+    private SupervisorReductionProjectionArgument()
+    {
+      super("-redproj", "Projection method for supervisor reduction",
+            SupervisorReductionProjectionMethod.class);
+    }
+
+    //#######################################################################
+    //# Overrides for Abstract Base Class
+    //# net.sourceforge.waters.model.analysis.CommandLineArgument
+    @Override
+    public void configureAnalyzer(final Object analyzer)
+    {
+      if (analyzer instanceof SupervisorSynthesizer) {
+        final SupervisorSynthesizer synthesizer =
+          (SupervisorSynthesizer) analyzer;
+        final SupervisorReductionProjectionMethod method = getValue();
+        ProjectingSupervisorReductionFactory.
+          configureSynthesizer(synthesizer, method);
       } else {
         fail("Command line option " + getName() +
              " is only supported for synthesis!");

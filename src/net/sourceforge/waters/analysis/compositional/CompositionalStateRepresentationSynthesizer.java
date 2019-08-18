@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.tr.AbstractSynchronisationEncoding;
@@ -249,7 +249,7 @@ public class CompositionalStateRepresentationSynthesizer extends
   @Override
   public SupervisorReductionFactory getSupervisorReductionFactory()
   {
-    return DefaultSupervisorReductionFactory.OFF;
+    return new ProjectingSupervisorReductionFactory();
   }
 
   @Override

@@ -38,6 +38,7 @@ import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
@@ -67,12 +68,14 @@ public class MonolithicCliqueBasedSupervisorReductionExperiments
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier = new CliqueBasedSupervisorReductionTRSimplifier();
-
+    final ProjectingSupervisorReductionTRSimplifier projector =
+      new ProjectingSupervisorReductionTRSimplifier();
+    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
+      new CliqueBasedSupervisorReductionTRSimplifier();
     simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.CONNECTIVITY);
     simplifier.setMaxHeuristicCovers(2);
     final SupervisorReductionFactory reduction =
-      new SimpleSupervisorReductionFactory(true, true, simplifier);
+      new SimpleSupervisorReductionFactory(projector, simplifier, true);
     synthesizer.setSupervisorReductionFactory(reduction);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;

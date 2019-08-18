@@ -260,7 +260,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     throws EventNotFoundException
   {
     final SupervisorReductionFactory factory =
-      new SimpleSupervisorReductionFactory(true, false, simplifier);
+      new SimpleSupervisorReductionFactory(null, simplifier, true);
     mSynthesizer.setSupervisorReductionFactory(factory);
     super.configureSynthesizer(des);
   }

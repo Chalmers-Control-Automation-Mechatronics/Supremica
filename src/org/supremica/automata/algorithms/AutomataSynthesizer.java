@@ -54,8 +54,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.compositional.AutomataSynthesisAbstractionProcedureFactory;
 import net.sourceforge.waters.analysis.compositional.CompositionalAutomataSynthesizer;
@@ -299,9 +300,12 @@ public class AutomataSynthesizer
            synthesizer.setConfiguredDefaultMarking(marking);
            final SupervisorReductionFactory supervisorReduction;
            if (synthesizerOptions.getReduceSupervisors()) {
-             supervisorReduction = DefaultSupervisorReductionFactory.SU_WONHAM;
+             supervisorReduction =
+               new ProjectingSupervisorReductionFactory
+               (SupervisorReductionMainMethod.SU_WONHAM);
            } else {
-             supervisorReduction = DefaultSupervisorReductionFactory.OFF;
+             supervisorReduction =
+               new ProjectingSupervisorReductionFactory();
            }
            synthesizer.setSupervisorReductionFactory(supervisorReduction);
            final boolean supervisorLocalization =
@@ -369,9 +373,12 @@ public class AutomataSynthesizer
           synthesizer.setConfiguredDefaultMarking(marking);
           final SupervisorReductionFactory supervisorReduction;
           if (synthesizerOptions.getReduceSupervisors()) {
-            supervisorReduction = DefaultSupervisorReductionFactory.SU_WONHAM;
+            supervisorReduction =
+              new ProjectingSupervisorReductionFactory
+              (SupervisorReductionMainMethod.SU_WONHAM);
           } else {
-            supervisorReduction = DefaultSupervisorReductionFactory.OFF;
+            supervisorReduction =
+              new ProjectingSupervisorReductionFactory();
           }
           synthesizer.setSupervisorReductionFactory(supervisorReduction);
           synthesizer.setSupervisorLocalizationEnabled

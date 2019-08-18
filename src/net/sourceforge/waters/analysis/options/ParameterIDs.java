@@ -33,8 +33,9 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.bdd.BDDPackage;
 import net.sourceforge.waters.analysis.bdd.TransitionPartitioningStrategy;
@@ -107,7 +108,8 @@ public class ParameterIDs
   private static final int SupervisorSynthesizer_NormalSynthesis_ID = 204;
   private static final int SupervisorSynthesizer_ConfiguredDefaultMarking_ID = 205;
   private static final int SupervisorSynthesizer_SupervisorLocalisationEnabled_ID = 206;
-  private static final int SupervisorSynthesizer_SupervisorReductionFactory_ID = 207;
+  private static final int SupervisorSynthesizer_SupervisorReductionProjectionMethod_ID = 208;
+  private static final int SupervisorSynthesizer_SupervisorReductionMainMethod_ID = 209;
 
   public static final BoolParameter SupervisorSynthesizer_DetailedOutputEnabled =
     new BoolParameter
@@ -155,12 +157,21 @@ public class ParameterIDs
        "for each controllable event that needs to be disabled.",
        true);
 
-  public static final EnumParameter<SupervisorReductionFactory> SupervisorSynthesizer_SupervisorReductionFactory =
-    new EnumParameter<SupervisorReductionFactory>
-     (SupervisorSynthesizer_SupervisorReductionFactory_ID,
-      "Supervisor reduction",
-      "Method of supervisor reduction to be used after synthesis.",
-      DefaultSupervisorReductionFactory.values());
+  public static final EnumParameter<SupervisorReductionProjectionMethod>
+    SupervisorSynthesizer_SupervisorReductionProjectionMethod =
+    new EnumParameter<>
+     (SupervisorSynthesizer_SupervisorReductionProjectionMethod_ID,
+      "Supervisor reduction projection",
+      "Method to reduce the number of events before supervisor reduction.",
+      SupervisorReductionProjectionMethod.values());
+
+  public static final EnumParameter<SupervisorReductionMainMethod>
+    SupervisorSynthesizer_SupervisorReductionMainMethod =
+    new EnumParameter<>
+     (SupervisorSynthesizer_SupervisorReductionMainMethod_ID,
+      "Supervisor reduction method",
+      "Core algorithm to reduce the size of computed supervisors.",
+      SupervisorReductionMainMethod.values());
 
 
   //net.sourceforge.waters.analysis.compositional.AbstractCompositionalModelAnalyzer

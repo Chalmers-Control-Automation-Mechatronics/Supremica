@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.options.BoolParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -392,8 +391,7 @@ public class ModularControllabilitySynthesizer
         }
         mDisabledEvents.addAll(disabledEvents);
         if (mIncludesAllAutomata &&
-            getSupervisorReductionFactory() ==
-            DefaultSupervisorReductionFactory.OFF) {
+            !getSupervisorReductionFactory().isSupervisedReductionEnabled()) {
           final Collection<AutomatonProxy> usedAutomata =
             mMonolithicSynthesizer.getModel().getAutomata();
           for (final AutomatonProxy sup : localSups) {
@@ -430,8 +428,7 @@ public class ModularControllabilitySynthesizer
       // 5. Create product DES containing supervisors
       if (mIncludesAllAutomata) {
         final Collection<AutomatonProxy> usedAutomata = new THashSet<>();
-        if (getSupervisorReductionFactory() ==
-            DefaultSupervisorReductionFactory.OFF) {
+        if (!getSupervisorReductionFactory().isSupervisedReductionEnabled()) {
           for (final AutomatonProxy sup : supervisors) {
             usedAutomata.addAll(mSupervisorUsedAutomataMap.get(sup));
           }

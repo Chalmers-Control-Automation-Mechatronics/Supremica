@@ -109,6 +109,12 @@ public enum SupremicaSupervisorReductionFactory
   }
 
   @Override
+  public boolean isSupervisedReductionEnabled()
+  {
+    return this != OFF;
+  }
+
+  @Override
   public boolean isSupervisedEventRequired()
   {
     return false;

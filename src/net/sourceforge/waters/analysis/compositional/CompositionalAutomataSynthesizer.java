@@ -46,9 +46,11 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.HalfWaySynthesisTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
@@ -311,11 +313,20 @@ public class CompositionalAutomataSynthesizer
             setAbstractionProcedureCreator(getValue());
           }
         });
-        iter.add(new EnumParameter<SupervisorReductionFactory>
-            (ParameterIDs.SupervisorSynthesizer_SupervisorReductionFactory) {
+        iter.add(new EnumParameter<SupervisorReductionMainMethod>
+          (ParameterIDs.SupervisorSynthesizer_SupervisorReductionMainMethod) {
           @Override
           public void commitValue() {
-            setSupervisorReductionFactory(getValue());
+            ProjectingSupervisorReductionFactory.configureSynthesizer
+              (CompositionalAutomataSynthesizer.this, getValue());
+          }
+        });
+        iter.add(new EnumParameter<SupervisorReductionProjectionMethod>
+          (ParameterIDs.SupervisorSynthesizer_SupervisorReductionProjectionMethod) {
+          @Override
+          public void commitValue() {
+            ProjectingSupervisorReductionFactory.configureSynthesizer
+              (CompositionalAutomataSynthesizer.this, getValue());
           }
         });
         iter.add(new BoolParameter
@@ -1401,7 +1412,7 @@ public class CompositionalAutomataSynthesizer
   //#########################################################################
   //# Data Members
   private SupervisorReductionFactory mSupervisorReductionFactory =
-    DefaultSupervisorReductionFactory.OFF;
+    new ProjectingSupervisorReductionFactory();
   private boolean mSupervisorLocalizationEnabled = false;
 
   private HalfWaySynthesisTRSimplifier mHalfwaySimplifier;

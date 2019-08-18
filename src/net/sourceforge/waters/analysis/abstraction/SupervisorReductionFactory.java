@@ -77,6 +77,15 @@ public interface SupervisorReductionFactory
   public SupervisorReductionSimplifier createSupervisorReducer();
 
   /**
+   * Whether the supervisor reduction factory is configured to perform
+   * supervisor reduction.
+   * @return <CODE>true</CODE> if the factory in its current configuration
+   *         will perform some kind of supervisor reduction,
+   *         <CODE>false</CODE> otherwise.
+   */
+  public boolean isSupervisedReductionEnabled();
+
+  /**
    * Whether the supervisor reduction algorithm provided by this algorithm
    * requires a supervised event. If a supervised event is required,
    * supervisor reduction must be performed for one controllable event
@@ -103,12 +112,12 @@ public interface SupervisorReductionFactory
       addInitialMinimisationSteps(includeCoreachability);
     }
 
-    public SupervisorReductionChain(final boolean projecting,
+    public SupervisorReductionChain(final TransitionRelationSimplifier projector,
                                     final SupervisorReductionSimplifier main)
     {
       mMainSimplifier = main;
-      if (projecting) {
-        add(new ProjectingSupervisorReductionTRSimplifier());
+      if (projector != null) {
+        add(projector);
         add(new SpecialEventsTRSimplifier());
         final SubsetConstructionTRSimplifier subset =
           new SubsetConstructionTRSimplifier();

@@ -161,6 +161,11 @@ public class VerifierBuilder implements Abortable
     return mVerificationSuccess;
   }
 
+  public boolean isOPSatisfied()
+  {
+    return mOPSatisfied;
+  }
+
   public int getNumberOfPairs()
   {
     return mNumberOfPairs;
@@ -179,7 +184,7 @@ public class VerifierBuilder implements Abortable
       new WatersLongIntHashMap(numStates, VerifierPairHashingStrategy.INSTANCE);
     mTransitionIterator1 = mTransitionRelation.createSuccessorsReadOnlyIterator();
     mTransitionIterator2 = mTransitionRelation.createSuccessorsReadOnlyIterator();
-    mVerificationSuccess = true;
+    mVerificationSuccess = mOPSatisfied = true;
   }
 
   protected boolean buildVerifier()
@@ -321,13 +326,17 @@ public class VerifierBuilder implements Abortable
             }
           }
         } else if (event1 < event2) {
+          mOPSatisfied = false;
           mTransitionIterator1.advance();
         } else {
+          mOPSatisfied = false;
           mTransitionIterator2.advance();
         }
       } else if (mTransitionIterator1.isValid()) {
+        mOPSatisfied = false;
         mTransitionIterator1.advance();
       } else if (mTransitionIterator2.isValid()) {
+        mOPSatisfied = false;
         mTransitionIterator2.advance();
       }
     }
@@ -442,6 +451,7 @@ public class VerifierBuilder implements Abortable
   private ListBufferTransitionRelation mTransitionRelation;
 
   private boolean mVerificationSuccess = false;
+  private boolean mOPSatisfied = false;
   private int mNumberOfPairs = -1;
 
   private TLongArrayList mVerifierStatePairs;

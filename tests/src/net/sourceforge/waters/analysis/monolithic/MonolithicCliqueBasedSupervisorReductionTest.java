@@ -39,7 +39,9 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 
 import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.DefaultSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierStatistics;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
@@ -68,8 +70,9 @@ public class MonolithicCliqueBasedSupervisorReductionTest
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    synthesizer.setSupervisorReductionFactory
-      (DefaultSupervisorReductionFactory.CLIQUE_BASED);
+    final SupervisorReductionFactory supRed = new ProjectingSupervisorReductionFactory
+      (SupervisorReductionMainMethod.CLIQUE);
+    synthesizer.setSupervisorReductionFactory(supRed);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
