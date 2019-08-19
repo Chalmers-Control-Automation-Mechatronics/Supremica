@@ -107,12 +107,12 @@ public class SuWonhamSupervisorReductionTRSimplifier
   public void setDiagonalPairOrdering(final boolean diag)
   {
     mPairOrdering =
-      diag ? new DiagonalPairOrdering() : new LexicographicPairOrdering();
+      diag ? new DiagonalPairOrdering1() : new LexicographicPairOrdering();
   }
 
   public boolean isDiagonalPairOrdering()
   {
-    return mPairOrdering instanceof DiagonalPairOrdering;
+    return mPairOrdering instanceof DiagonalPairOrdering1;
   }
 
 
@@ -444,7 +444,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     }
   }
 
-  private ListBufferPartition icorporatePartition
+  private ListBufferPartition incorporatePartition
     (ListBufferPartition result, final ListBufferPartition partition)
   {
     if (partition != null) {
@@ -768,7 +768,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
           final ListBufferPartition partition = checkMergibility(state1, state2);
           // System.out.format("%d/%d - %s\n", state1, state2,
           //                   partition == null ? "failed" : "merged");
-          result = icorporatePartition(result, partition);
+          result = incorporatePartition(result, partition);
         }
       }
       return result.createTRPartition();
@@ -798,8 +798,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class DiagonalPairOrdering
-  private class DiagonalPairOrdering implements PairOrdering
+  //# Inner Class DiagonalPairOrdering1
+  private class DiagonalPairOrdering1 implements PairOrdering
   {
     @Override
     public TRPartition mergeAllPairs()
@@ -826,7 +826,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
           final ListBufferPartition partition = checkMergibility(state1, state2);
           // System.out.format("%d/%d - %s\n", state1, state2,
           //                   partition == null ? "failed" : "merged");
-          result = icorporatePartition(result, partition);
+          result = incorporatePartition(result, partition);
           if (!rel.isReachable(state1)) {
             continue outerLoop;
           }
@@ -851,6 +851,68 @@ public class SuWonhamSupervisorReductionTRSimplifier
         return true;
       } else if (mStateOrderIndex[min1] == mCurrentIndex1) {
         return mStateOrderIndex[min2] < mCurrentIndex2;
+      } else {
+        return false;
+      }
+    }
+  }
+
+
+  //#########################################################################
+  //# Inner Class DiagonalPairOrdering2
+  @SuppressWarnings("unused")
+  private class DiagonalPairOrdering2 implements PairOrdering
+  {
+    @Override
+    public TRPartition mergeAllPairs()
+      throws AnalysisAbortException
+    {
+      ListBufferPartition result = new ListBufferPartition();
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      outerLoop:
+      for (mCurrentIndex1 = 1;
+           mCurrentIndex1 < mOrderedStates.length;
+           mCurrentIndex1++) {
+        final int state1 = mOrderedStates[mCurrentIndex1];
+        if (!rel.isReachable(state1)) {
+          continue;
+        }
+        for (mCurrentIndex2 = mCurrentIndex1 - 1;
+             mCurrentIndex2 >= 0;
+             mCurrentIndex2--) {
+          final int state2 = mOrderedStates[mCurrentIndex2];
+          if (!rel.isReachable(state2)) {
+            continue;
+          }
+          checkAbort();
+          final ListBufferPartition partition = checkMergibility(state1, state2);
+          // System.out.format("%d/%d - %s\n", state1, state2,
+          //                   partition == null ? "failed" : "merged");
+          result = incorporatePartition(result, partition);
+          if (!rel.isReachable(state1)) {
+            continue outerLoop;
+          }
+        }
+      }
+      return result.createTRPartition();
+    }
+
+    @Override
+    public boolean hasFailedMergibilityCheck(final int state1,
+                                             final int state2,
+                                             final ListBufferPartition partition)
+    {
+      int min1 = partition.getClassCode(state1);
+      int min2 = partition.getClassCode(state2);
+      if (mStateOrderIndex[min1] < mStateOrderIndex[min2]) {
+        final int tmp = min1;
+        min1 = min2;
+        min2 = tmp;
+      }
+      if (mStateOrderIndex[min1] < mCurrentIndex1) {
+        return true;
+      } else if (mStateOrderIndex[min1] == mCurrentIndex1) {
+        return mStateOrderIndex[min2] > mCurrentIndex2;
       } else {
         return false;
       }

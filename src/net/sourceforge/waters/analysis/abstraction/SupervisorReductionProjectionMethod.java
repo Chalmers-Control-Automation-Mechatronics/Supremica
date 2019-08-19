@@ -84,7 +84,7 @@ public enum SupervisorReductionProjectionMethod
       final ProjectingSupervisorReductionTRSimplifier projector =
         new ProjectingSupervisorReductionTRSimplifier();
       projector.setExhaustive(false);
-      projector.setEnsuringOP(false);
+      projector.setEnsuringOP(true);
       return projector;
     }
   },
@@ -98,7 +98,7 @@ public enum SupervisorReductionProjectionMethod
     {
       final ProjectingSupervisorReductionTRSimplifier projector =
         new ProjectingSupervisorReductionTRSimplifier();
-      projector.setExhaustive(false);
+      projector.setExhaustive(true);
       projector.setEnsuringOP(false);
       return projector;
     }
@@ -114,8 +114,8 @@ public enum SupervisorReductionProjectionMethod
     {
       final ProjectingSupervisorReductionTRSimplifier projector =
         new ProjectingSupervisorReductionTRSimplifier();
-      projector.setExhaustive(false);
-      projector.setEnsuringOP(false);
+      projector.setExhaustive(true);
+      projector.setEnsuringOP(true);
       return projector;
     }
   };

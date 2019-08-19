@@ -1,43 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="ZhennanCASE">
+<Module xmlns="http://waters.sourceforge.net/xsd/module" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="assembly53vi">
 <B:Comment>File path: Z:\RAS_assembly\Excel files for RAS models\
-Excel file name: Benchmark2_RAS.xls
-File originally created: Thu Dec 08 12:35:45 CET 2011
+Excel file name: FiveToThreeAssemblyFixturesAsVariablesImplicitBuffersInResources.xls
+File originally created: Thu Dec 08 14:45:45 CET 2011
 
-Controllable and blocking, 526500 reachable states.</B:Comment>
+Controllable and blocking, 51744 reachable states.</B:Comment>
 <EventDeclList>
 <EventDecl Kind="PROPOSITION" Name=":accepting"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_13_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_25_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p5_53_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_45_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_24_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p3_33_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_25_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p3_33_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p3_31_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p3_32_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p5_51_0"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p2_24_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_16_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_14_0"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p4_44_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p5_52_0"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p2_23_0"/>
-<EventDecl Kind="UNCONTROLLABLE" Name="uc_e_p4_42_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_14_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_11_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_42_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_45_1"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_12_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_22_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_44_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_23_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p2_21_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p1_15_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_41_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p4_43_0"/>
-<EventDecl Kind="CONTROLLABLE" Name="e_p3_34_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pace_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pc_fixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pc_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pb_milling1_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pe_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pd_fixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pabd_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pace_join_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pd_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pb_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pb_fixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pe_milling1_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pa_fixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pe_fixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pd_milling1_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pacd_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pe_milling2_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pa_unfixate_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pb_milling2_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pd_milling2_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pc_milling1_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pacd_join_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pa_milling_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pabd_join_0"/>
+<EventDecl Kind="CONTROLLABLE" Name="e_pc_milling2_0"/>
 </EventDeclList>
 <ComponentList>
 <SimpleComponent Kind="PLANT" Name="MartinFabian">
@@ -52,82 +46,70 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 <EdgeList>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p1_13_0"/>
+<SimpleIdentifier Name="e_pace_unfixate_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r7&gt;=1 &amp; Vop_p1_11&gt;0">
+<BinaryExpression Operator="&amp;" Text="Vr_fixtable&gt;=1 &amp; Vop_pace_join&gt;0">
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_11"/>
+<SimpleIdentifier Name="Vop_pace_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_13"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_13"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vop_pace_join"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vop_pace_join"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="fjoin"/>
 <IntConstant Value="1"/>
-</BinaryExpression>
 </BinaryExpression>
 </Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p2_25_1"/>
+<SimpleIdentifier Name="e_pc_fixate_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p2_24&gt;0 &amp; Vr_r3&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_24"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r3"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
-</BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r6"/>
+<SimpleIdentifier Name="Vop_pc_fixate"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pc_fixate"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_24"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_24"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -136,33 +118,90 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p5_53_0"/>
+<SimpleIdentifier Name="e_pc_unfixate_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p5_52&gt;0">
+<BinaryExpression Operator="&amp;" Text="Vr_jointable&gt;=1 &amp; Vop_pc_milling2&gt;0">
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p5_52"/>
+<SimpleIdentifier Name="Vop_pc_milling2"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p5_52"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="posm_pc"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pc_milling2"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p5_52"/>
+<SimpleIdentifier Name="Vop_pc_milling2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pb_milling1_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pb_fixate&gt;0 &amp; Vr_millingm1&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r9"/>
+<SimpleIdentifier Name="Vop_pb_milling1"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r9"/>
+<SimpleIdentifier Name="Vop_pb_milling1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -171,40 +210,326 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p4_45_0"/>
+<SimpleIdentifier Name="e_pe_unfixate_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p4_43&gt;0">
+<BinaryExpression Operator="&amp;" Text="Vr_jointable&gt;=1 &amp; Vop_pe_milling2&gt;0">
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_43"/>
+<SimpleIdentifier Name="Vop_pe_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="f3"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="posr_pe"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pe_milling2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pe_milling2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pd_fixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pd_fixate"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pd_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="f3"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pabd_unfixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pabd_join&gt;0 &amp; Vr_fixtable&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pabd_join"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pabd_join"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pabd_join"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pace_join_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posr_pe"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posm_pc"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pace_join"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pace_join"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pd_unfixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pd_milling2&gt;0 &amp; Vr_jointable&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pd_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="f3"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pd_milling2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pd_milling2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="posr_pd"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pb_unfixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pb_milling2&gt;0 &amp; Vr_jointable&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="posm_pb"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pb_fixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pe_milling1_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vr_millingm2&gt;=1 &amp; Vop_pe_fixate&gt;0">
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pe_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_43"/>
+<SimpleIdentifier Name="Vop_pe_fixate"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_43"/>
+<SimpleIdentifier Name="Vop_pe_fixate"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r3"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r3"/>
+<SimpleIdentifier Name="Vop_pe_milling1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -213,47 +538,244 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p2_24_0"/>
+<SimpleIdentifier Name="e_pa_fixate_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r6&gt;=2 &amp; Vop_p2_24_uc&gt;0">
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="f1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pa_fixate"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pa_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pe_fixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pe_fixate"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pe_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="f3"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pd_milling1_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pd_fixate&gt;0 &amp; Vr_millingm2&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pd_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pd_fixate"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pd_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pacd_unfixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pacd_join&gt;0 &amp; Vr_fixtable&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pacd_join"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pacd_join"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pacd_join"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pe_milling2_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pe_milling1&gt;0 &amp; Vr_millingm1&gt;=1">
+<BinaryExpression Operator="&gt;">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Guards>
+<Actions>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pe_milling2"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pe_milling2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+</Actions>
+</GuardActionBlock>
+</Edge>
+<Edge Source="pm" Target="pm">
+<LabelBlock>
+<SimpleIdentifier Name="e_pa_unfixate_0"/>
+</LabelBlock>
+<GuardActionBlock>
+<Guards>
+<BinaryExpression Operator="&amp;" Text="Vr_jointable&gt;=1 &amp; Vop_pa_milling&gt;0">
+<BinaryExpression Operator="&gt;=">
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
+<SimpleIdentifier Name="Vop_pa_milling"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r6"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r4"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
+<BinaryExpression Operator="+=">
+<SimpleIdentifier Name="f1"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_24"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_24"/>
+<SimpleIdentifier Name="Vop_pa_milling"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pa_milling"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -262,68 +784,47 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p3_33_1"/>
+<SimpleIdentifier Name="e_pb_milling2_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p3_34&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
+<BinaryExpression Operator="&amp;" Text="Vop_pb_milling1&gt;0 &amp; Vr_millingm2&gt;=1">
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p3_34"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_34"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p3_34"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p2_25_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p2_23&gt;0 &amp; Vr_r3&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_23"/>
+<SimpleIdentifier Name="Vop_pb_milling1"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r3"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r5"/>
+<SimpleIdentifier Name="Vop_pb_milling2"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_23"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_23"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pb_milling1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pb_milling1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -332,111 +833,47 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p3_33_0"/>
+<SimpleIdentifier Name="e_pd_milling2_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p3_32&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
+<BinaryExpression Operator="&amp;" Text="Vop_pd_milling1&gt;0 &amp; Vr_millingm1&gt;=1">
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p3_32"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r5"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_32"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p3_32"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p3_31_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p3_32_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p3_31&gt;0 &amp; Vr_r5&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p3_31"/>
+<SimpleIdentifier Name="Vop_pd_milling1"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r5"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r5"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_32"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p3_32"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_31"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p3_31"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pd_milling2"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vop_pd_milling2"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -445,91 +882,47 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p5_51_0"/>
+<SimpleIdentifier Name="e_pc_milling1_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r8"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r8"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r8"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p5_51"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p5_51"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="uc_e_p2_24_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pc_fixate&gt;0 &amp; Vr_millingm1&gt;=1">
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p1_16_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p1_15&gt;0 &amp; Vr_r3&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_15"/>
+<SimpleIdentifier Name="Vop_pc_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r3"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_15"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_15"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pc_fixate"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vop_pc_fixate"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pc_milling1"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r7"/>
+<SimpleIdentifier Name="Vop_pc_milling1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -538,125 +931,92 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p1_14_0"/>
+<SimpleIdentifier Name="e_pacd_join_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p1_12&gt;0">
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_12"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posr_pd"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_12"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_12"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posm_pc"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_14"/>
+<SimpleIdentifier Name="Vop_pacd_join"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_14"/>
+<SimpleIdentifier Name="Vop_pacd_join"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r4"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r2"/>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="fjoin"/>
 <IntConstant Value="1"/>
-</BinaryExpression>
 </BinaryExpression>
 </Actions>
 </GuardActionBlock>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="uc_e_p4_44_0"/>
+<SimpleIdentifier Name="e_pa_milling_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
+<BinaryExpression Operator="&amp;" Text="Vop_pa_fixate&gt;0 &amp; Vr_millingm1&gt;=1">
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p5_52_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p5_51&gt;0 &amp; Vr_r9&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p5_51"/>
+<SimpleIdentifier Name="Vop_pa_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r9"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r8"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r8"/>
+<SimpleIdentifier Name="Vr_fixtable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p5_52"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pa_milling"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p5_52"/>
+<SimpleIdentifier Name="Vop_pa_milling"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r9"/>
+<SimpleIdentifier Name="Vop_pa_fixate"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r9"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p5_51"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p5_51"/>
+<SimpleIdentifier Name="Vop_pa_fixate"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -665,134 +1025,43 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="uc_e_p2_23_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="uc_e_p4_42_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p1_14_1"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p1_13&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_13"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_13"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_13"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p1_11_0"/>
+<SimpleIdentifier Name="e_pabd_join_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </Guards>
 <Actions>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posr_pd"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_11"/>
+<SimpleIdentifier Name="Vr_jointable"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_jointable"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+<BinaryExpression Operator="-=">
+<SimpleIdentifier Name="posm_pb"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vop_pabd_join"/>
+<BinaryExpression Operator="+">
+<SimpleIdentifier Name="Vop_pabd_join"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -801,496 +1070,47 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </Edge>
 <Edge Source="pm" Target="pm">
 <LabelBlock>
-<SimpleIdentifier Name="e_p4_42_0"/>
+<SimpleIdentifier Name="e_pc_milling2_0"/>
 </LabelBlock>
 <GuardActionBlock>
 <Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p4_42_uc&gt;0 &amp; Vr_r1&gt;=1">
+<BinaryExpression Operator="&amp;" Text="Vop_pc_milling1&gt;0 &amp; Vr_millingm2&gt;=1">
 <BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
+<SimpleIdentifier Name="Vop_pc_milling1"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 <BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 </Guards>
 <Actions>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_42"/>
+<SimpleIdentifier Name="Vr_millingm2"/>
+<BinaryExpression Operator="-">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</BinaryExpression>
+<BinaryExpression Operator="=">
+<SimpleIdentifier Name="Vop_pc_milling2"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_42"/>
+<SimpleIdentifier Name="Vop_pc_milling2"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
 <BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
 <BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="Vop_pc_milling1"/>
 <BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p4_45_1"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r2&gt;=1 &amp; Vop_p4_44&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_44"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r6"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_44"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_44"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p1_12_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p1_11&gt;0 &amp; Vr_r4&gt;=2">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_11"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_12"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_12"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r4"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p2_22_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p2_21&gt;0 &amp; Vr_r4&gt;=2">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_22"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r4"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p4_44_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p4_44_uc&gt;0 &amp; Vr_r6&gt;=2">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r6"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r6"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_44"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_44"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p2_23_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r5&gt;=2 &amp; Vop_p2_23_uc&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r4"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r5"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_23"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_23"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p2_21_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p1_15_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p1_14&gt;0 &amp; Vr_r7&gt;=1">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_15"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p1_15"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p4_41_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r2"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p4_43_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vop_p4_42&gt;0 &amp; Vr_r7&gt;=1 &amp; Vr_r3&gt;=1">
-<BinaryExpression Operator="&amp;">
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p4_42"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r3"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r3"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r3"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_43"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p4_43"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p4_42"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p4_42"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-</Actions>
-</GuardActionBlock>
-</Edge>
-<Edge Source="pm" Target="pm">
-<LabelBlock>
-<SimpleIdentifier Name="e_p3_34_0"/>
-</LabelBlock>
-<GuardActionBlock>
-<Guards>
-<BinaryExpression Operator="&amp;" Text="Vr_r7&gt;=2 &amp; Vop_p3_31&gt;0">
-<BinaryExpression Operator="&gt;=">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-<BinaryExpression Operator="&gt;">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</BinaryExpression>
-</Guards>
-<Actions>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r7"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<BinaryExpression Operator="-">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vr_r1"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vr_r1"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</BinaryExpression>
-<BinaryExpression Operator="=">
-<SimpleIdentifier Name="Vop_p3_34"/>
-<BinaryExpression Operator="+">
-<SimpleIdentifier Name="Vop_p3_34"/>
+<SimpleIdentifier Name="Vop_pc_milling1"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </BinaryExpression>
@@ -1300,591 +1120,572 @@ Controllable and blocking, 526500 reachable states.</B:Comment>
 </EdgeList>
 </Graph>
 </SimpleComponent>
-<VariableComponent Name="Vr_r9">
+<VariableComponent Name="Vop_pd_milling1">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
+<IntConstant Value="7"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r9"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r9"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pd_milling1"/>
+<IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vr_r8">
+<VariableComponent Name="Vop_pe_fixate">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
+<IntConstant Value="6"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r8"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pe_fixate"/>
+<IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r8"/>
-<IntConstant Value="2"/>
+<SimpleIdentifier Name="Vop_pe_fixate"/>
+<IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p4_42">
+<VariableComponent Name="Vop_pb_fixate">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="f3">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_42"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_42"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p2_23">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_23"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_23"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vr_r7">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r7"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p1_14">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="4"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_14"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p2_21">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_21"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vr_r1">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="f3"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r1"/>
+<SimpleIdentifier Name="f3"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p3_32">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_32"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_32"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p2_22">
+<VariableComponent Name="posr_pe">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_22"/>
+<SimpleIdentifier Name="posr_pe"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_22"/>
+<SimpleIdentifier Name="posr_pe"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p5_51">
+<VariableComponent Name="Vop_pc_fixate">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
-<IntConstant Value="2"/>
+<IntConstant Value="6"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p5_51"/>
+<SimpleIdentifier Name="Vop_pc_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p5_51"/>
+<SimpleIdentifier Name="Vop_pc_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p2_24_uc">
+<VariableComponent Name="Vop_pe_milling2">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
-<IntConstant Value="1"/>
+<IntConstant Value="6"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
+<SimpleIdentifier Name="Vop_pe_milling2"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_24_uc"/>
+<SimpleIdentifier Name="Vop_pe_milling2"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p2_23_uc">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_23_uc"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vr_r3">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r3"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r3"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p4_43">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_43"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_43"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vr_r5">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r5"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vr_r4">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r4"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p1_11">
+<VariableComponent Name="posr_pd">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_11"/>
+<SimpleIdentifier Name="posr_pd"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_11"/>
+<SimpleIdentifier Name="posr_pd"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p4_41">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_41"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p1_13">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_13"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_13"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p4_44_uc">
+<VariableComponent Name="Vop_pabd_join">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
+<SimpleIdentifier Name="Vop_pabd_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_44_uc"/>
+<SimpleIdentifier Name="Vop_pabd_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p1_12">
+<VariableComponent Name="Vop_pa_milling">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pa_milling"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pa_milling"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pc_milling1">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pc_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pc_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pc_milling2">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pc_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pc_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pe_milling1">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pe_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vr_jointable">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_12"/>
-<IntConstant Value="0"/>
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_12"/>
-<IntConstant Value="0"/>
+<SimpleIdentifier Name="Vr_jointable"/>
+<IntConstant Value="1"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vr_r6">
+<VariableComponent Name="f1">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r6"/>
+<SimpleIdentifier Name="f1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r6"/>
+<SimpleIdentifier Name="f1"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p4_42_uc">
+<VariableComponent Name="Vop_pacd_join">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
+<SimpleIdentifier Name="Vop_pacd_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_42_uc"/>
+<SimpleIdentifier Name="Vop_pacd_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vr_r2">
+<VariableComponent Name="Vop_pd_fixate">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
-<IntConstant Value="4"/>
+<IntConstant Value="6"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="4"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vr_r2"/>
-<IntConstant Value="4"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p3_34">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_34"/>
+<SimpleIdentifier Name="Vop_pd_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_34"/>
+<SimpleIdentifier Name="Vop_pd_fixate"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p5_52">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="2"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p5_52"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p5_52"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p4_44">
+<VariableComponent Name="Vop_pace_join">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="1"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_44"/>
+<SimpleIdentifier Name="Vop_pace_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p4_44"/>
+<SimpleIdentifier Name="Vop_pace_join"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
 </VariableComponent>
-<VariableComponent Name="Vop_p3_31">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p3_31"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p2_24">
-<VariableRange><BinaryExpression Operator="..">
-<IntConstant Value="0"/>
-<IntConstant Value="1"/>
-</BinaryExpression>
-</VariableRange>
-<VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_24"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableInitial>
-<VariableMarking>
-<SimpleIdentifier Name=":accepting"/>
-<BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p2_24"/>
-<IntConstant Value="0"/>
-</BinaryExpression>
-</VariableMarking>
-</VariableComponent>
-<VariableComponent Name="Vop_p1_15">
+<VariableComponent Name="f2">
 <VariableRange><BinaryExpression Operator="..">
 <IntConstant Value="0"/>
 <IntConstant Value="2"/>
 </BinaryExpression>
 </VariableRange>
 <VariableInitial><BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_15"/>
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="f2"/>
+<IntConstant Value="2"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vr_millingm2">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_millingm2"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pd_milling2">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pd_milling2"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableInitial>
 <VariableMarking>
 <SimpleIdentifier Name=":accepting"/>
 <BinaryExpression Operator="==">
-<SimpleIdentifier Name="Vop_p1_15"/>
+<SimpleIdentifier Name="Vop_pd_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="fjoin">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="fjoin"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pa_fixate">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pa_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pa_fixate"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vr_millingm1">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_millingm1"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vr_fixtable">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vr_fixtable"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pb_milling2">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="7"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_milling2"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="posl_pa">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="posl_pa"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="posm_pc">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="posm_pc"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="posm_pc"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="posm_pb">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="1"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="posm_pb"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="posm_pb"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableMarking>
+</VariableComponent>
+<VariableComponent Name="Vop_pb_milling1">
+<VariableRange><BinaryExpression Operator="..">
+<IntConstant Value="0"/>
+<IntConstant Value="6"/>
+</BinaryExpression>
+</VariableRange>
+<VariableInitial><BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_milling1"/>
+<IntConstant Value="0"/>
+</BinaryExpression>
+</VariableInitial>
+<VariableMarking>
+<SimpleIdentifier Name=":accepting"/>
+<BinaryExpression Operator="==">
+<SimpleIdentifier Name="Vop_pb_milling1"/>
 <IntConstant Value="0"/>
 </BinaryExpression>
 </VariableMarking>
