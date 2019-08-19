@@ -54,7 +54,7 @@ import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.module.IdentifierProxy;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
+import net.sourceforge.waters.subject.module.SimpleComponentSubject;
 
 import org.supremica.gui.ide.ModuleContainer;
 
@@ -176,7 +176,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
       i++;
     }
     fireTableRowsUpdated(i, i);
-    final SimpleComponentProxy comp = mDisplayMap.get(oldAut);
+    final SimpleComponentSubject comp = mDisplayMap.get(oldAut);
     if (comp != null) {
       mDisplayMap.remove(oldAut);
       mDisplayMap.put(newAut, comp);
@@ -188,13 +188,13 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     return mDisplayMap.containsKey(aut);
   }
 
-  SimpleComponentProxy getCompFromDisplayMap(final AutomatonProxy aut)
+  SimpleComponentSubject getCompFromDisplayMap(final AutomatonProxy aut)
   {
     return mDisplayMap.get(aut);
   }
 
   void addToDisplayMap(final AutomatonProxy aut,
-                       final SimpleComponentProxy comp)
+                       final SimpleComponentSubject comp)
   {
     mDisplayMap.put(aut, comp);
   }
@@ -333,7 +333,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
   private List<AutomatonProxy> mAutomataList;
   private final ModuleContainer mModuleContainer;
   private Map<String,EventProxy> mEventMap;
-  private Map<AutomatonProxy,SimpleComponentProxy> mDisplayMap;
+  private Map<AutomatonProxy,SimpleComponentSubject> mDisplayMap;
 
 
   //#########################################################################

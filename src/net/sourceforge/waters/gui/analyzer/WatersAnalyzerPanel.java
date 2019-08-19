@@ -50,7 +50,6 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.expr.ParseException;
 import net.sourceforge.waters.model.marshaller.ProductDESImporter;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
-import net.sourceforge.waters.model.module.SimpleComponentProxy;
 import net.sourceforge.waters.plain.module.ModuleElementFactory;
 import net.sourceforge.waters.subject.module.GraphSubject;
 import net.sourceforge.waters.subject.module.ModuleSubject;
@@ -137,16 +136,18 @@ public class WatersAnalyzerPanel extends MainPanel
     final Map<Object,SourceInfo> infoMap =
       mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(aut);
-    final GraphSubject graph;
-    final BindingContext bindings;
+    SimpleComponentSubject comp = null;
     if (info != null) {
       final Proxy source = info.getSourceObject();
-      final SimpleComponentSubject comp = (SimpleComponentSubject) source;
-      graph = comp.getGraph();
+      if (source instanceof SimpleComponentSubject) {
+        comp = (SimpleComponentSubject) source;
+      }
+    }
+    final BindingContext bindings;
+    if (comp != null) {
       bindings = info.getBindingContext();
     } else {
       final AutomataTableModel autModel = mAutomataTable.getModel();
-      final SimpleComponentProxy comp;
       if (autModel.containsDisplayMap(aut)) {
         comp = autModel.getCompFromDisplayMap(aut);
       } else {
@@ -154,7 +155,7 @@ public class WatersAnalyzerPanel extends MainPanel
           final ModuleProxyFactory factory =
             ModuleSubjectFactory.getInstance();
           final ProductDESImporter importer = new ProductDESImporter(factory);
-          comp = importer.importComponent(aut);
+          comp = (SimpleComponentSubject) importer.importComponent(aut);
           autModel.addToDisplayMap(aut, comp);
         } catch (final ParseException exception) {
           final Logger logger = LogManager.getLogger();
@@ -162,9 +163,9 @@ public class WatersAnalyzerPanel extends MainPanel
           return null;
         }
       }
-      graph = (GraphSubject) comp.getGraph();
       bindings = null;
     }
+    final GraphSubject graph = comp.getGraph();
     final AutomatonDisplayPane displayPane =
       new AutomatonDisplayPane(graph, bindings, mModuleContainer,
                                mSimpleExpressionCompiler, aut);
