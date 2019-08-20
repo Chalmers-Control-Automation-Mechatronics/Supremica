@@ -59,7 +59,10 @@ public enum SupervisorReductionMainMethod
   },
   /**
    * <P>An option to specify the Su/Wonham supervisor reduction algorithm
-   * using the lexicographic state pair ordering as originally proposed.</P>
+   * using the lexicographic state pair ordering as originally proposed.
+   * If the states are ordered 0,1,2,...,<I>n</I> then this strategy
+   * attempts to merge pairs in the order (0,1), (0,2), ..., (0,<I>n</I>),
+   * (1,2), (1,3), ..., (1,<I>n</I>), (2,3), ...</P>
    *
    * <P><I>Reference.</I><BR>
    * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
@@ -74,7 +77,8 @@ public enum SupervisorReductionMainMethod
     {
       final SuWonhamSupervisorReductionTRSimplifier simplifier =
         new SuWonhamSupervisorReductionTRSimplifier();
-      simplifier.setDiagonalPairOrdering(false);
+      simplifier.setPairOrdering
+        (SuWonhamSupervisorReductionTRSimplifier.PairOrdering.LEXICOGRAPHIC);
       return simplifier;
     }
   },
@@ -82,7 +86,9 @@ public enum SupervisorReductionMainMethod
    * <P>An option to specify the Su/Wonham supervisor reduction algorithm
    * using an alternative diagonal state pair ordering, which is more
    * likely to merge states that are close to each other in the state
-   * ordering.</P>
+   * ordering. If the states are ordered 0,1,2,..., then this strategy
+   * attempts to merge pairs in the order (1,0), (2,0), (2,1), (3,0), (3,1),
+   * (3,2), ...</P>
    *
    * <P><I>Reference.</I><BR>
    * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
@@ -91,13 +97,40 @@ public enum SupervisorReductionMainMethod
    *
    * @see SuWonhamSupervisorReductionTRSimplifier
    */
-  SU_WONHAM_DIAGONAL("Su/Wonham (diagonal)") {
+  SU_WONHAM_DIAGONAL1("Su/Wonham (diagonal1)") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
     {
       final SuWonhamSupervisorReductionTRSimplifier simplifier =
         new SuWonhamSupervisorReductionTRSimplifier();
-      simplifier.setDiagonalPairOrdering(true);
+      simplifier.setPairOrdering
+        (SuWonhamSupervisorReductionTRSimplifier.PairOrdering.DIAGONAL1);
+      return simplifier;
+    }
+  },
+  /**
+   * <P>An option to specify the Su/Wonham supervisor reduction algorithm
+   * using an alternative diagonal state pair ordering, which is more
+   * likely to merge states that are close to each other in the state
+   * ordering. If the states are ordered 0,1,2,..., then this strategy
+   * attempts to merge pairs in the order (1,0), (2,1), (2,0), (3,2), (3,1),
+   * (3,0), ...</P>
+   *
+   * <P><I>Reference.</I><BR>
+   * R. Su and W. Murray Wonham. Supervisor Reduction for Discrete-Event
+   * Systems. Discrete Event Dynamic Systems: Theory and Applications,
+   * <STRONG>14</STRONG>&nbsp;(1), 31-53, 2004.</P>
+   *
+   * @see SuWonhamSupervisorReductionTRSimplifier
+   */
+  SU_WONHAM_DIAGONAL2("Su/Wonham (diagonal2)") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SuWonhamSupervisorReductionTRSimplifier simplifier =
+        new SuWonhamSupervisorReductionTRSimplifier();
+      simplifier.setPairOrdering
+        (SuWonhamSupervisorReductionTRSimplifier.PairOrdering.DIAGONAL2);
       return simplifier;
     }
   },

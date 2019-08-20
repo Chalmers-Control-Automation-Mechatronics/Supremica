@@ -80,7 +80,7 @@ public class CompositionalSupervisorLocalisationMustLMinSyncTest
       (CompositionalSelectionHeuristicFactory.MinSync);
     final SupervisorReductionFactory supRed =
       new ProjectingSupervisorReductionFactory
-      (SupervisorReductionMainMethod.SU_WONHAM_DIAGONAL);
+      (SupervisorReductionMainMethod.SU_WONHAM_DIAGONAL1);
     synthesizer.setSupervisorReductionFactory(supRed);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;

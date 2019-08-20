@@ -104,15 +104,14 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Configuration
-  public void setDiagonalPairOrdering(final boolean diag)
+  public void setPairOrdering(final PairOrdering ordering)
   {
-    mPairOrdering =
-      diag ? new DiagonalPairOrdering1() : new LexicographicPairOrdering();
+    mPairOrdering = ordering;
   }
 
-  public boolean isDiagonalPairOrdering()
+  public PairOrdering getPairOrdering()
   {
-    return mPairOrdering instanceof DiagonalPairOrdering1;
+    return mPairOrdering;
   }
 
 
@@ -140,6 +139,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     throws AnalysisException
   {
     super.setUp();
+    mPairOrderingHandler = mPairOrdering.createHandler(this);
     mStack = new StackOfPairs();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
@@ -160,7 +160,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       rel.merge(partition);
     } else {
       mStateOrdering.setUpStateOrdering();
-      partition = mPairOrdering.mergeAllPairs();
+      partition = mPairOrderingHandler.mergeAllPairs();
     }
     setResultPartition(partition);
     if (partition != null) {
@@ -181,6 +181,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
+    mPairOrderingHandler = null;
     mCompatibiliyRelation = null;
     mOrderedStates = null;
     mStateOrderIndex = null;
@@ -224,8 +225,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     if (partition.isEquivalent(state1, state2)) {
       return true;
-    } else if (mPairOrdering.hasFailedMergibilityCheck(state1, state2,
-                                                       partition)) {
+    } else if (mPairOrderingHandler.hasFailedMergibilityCheck(state1, state2,
+                                                              partition)) {
       return false;
     } else if (!partition.isClassCompatible(state1, state2)) {
       return false;
@@ -289,8 +290,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
               final int min2 = mSuccessors2.get(i2);
               if (min1 == min2) {
                 continue;
-              } else if (mPairOrdering.hasFailedMergibilityCheck(min1, min2,
-                                                                 partition)) {
+              } else if (mPairOrderingHandler.hasFailedMergibilityCheck
+                          (min1, min2, partition)) {
                 return false;
               } else if (!partition.isClassCompatible(min1, min2)) {
                 return false;
@@ -730,8 +731,65 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Inner Interface PairOrdering
-  private interface PairOrdering
+  //# Inner Enumeration PairOrdering
+  public enum PairOrdering
+  {
+    //#######################################################################
+    //# Enumeration
+    LEXICOGRAPHIC("Lexicographic") {
+      @Override
+      PairOrderingHandler
+      createHandler(final SuWonhamSupervisorReductionTRSimplifier owner)
+      {
+        return owner.new LexicographicPairOrderingHandler();
+      }
+    },
+    DIAGONAL1("Diagonal 1") {
+      @Override
+      PairOrderingHandler
+      createHandler(final SuWonhamSupervisorReductionTRSimplifier owner)
+      {
+        return owner.new Diagonal1PairOrderingHandler();
+      }
+    },
+    DIAGONAL2("Diagonal 2") {
+      @Override
+      PairOrderingHandler
+      createHandler(final SuWonhamSupervisorReductionTRSimplifier owner)
+      {
+        return owner.new Diagonal2PairOrderingHandler();
+      }
+    };
+
+    //#######################################################################
+    //# Constructor
+    private PairOrdering(final String name)
+    {
+      mName = name;
+    }
+
+    //#######################################################################
+    //# Overrides for java.lang.Object
+    @Override
+    public String toString()
+    {
+      return mName;
+    }
+
+    //#######################################################################
+    //# Handler Creation
+    abstract PairOrderingHandler createHandler
+      (SuWonhamSupervisorReductionTRSimplifier owner);
+
+    //#######################################################################
+    //# Data Members
+    private String mName;
+  }
+
+
+  //#########################################################################
+  //# Inner Interface PairOrderingHandler
+  private interface PairOrderingHandler
   {
     public TRPartition mergeAllPairs()
       throws AnalysisAbortException;
@@ -742,7 +800,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
   //#########################################################################
   //# Inner Class LexicographicPairOrdering
-  private class LexicographicPairOrdering implements PairOrdering
+  private class LexicographicPairOrderingHandler
+    implements PairOrderingHandler
   {
     @Override
     public TRPartition mergeAllPairs()
@@ -798,8 +857,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class DiagonalPairOrdering1
-  private class DiagonalPairOrdering1 implements PairOrdering
+  //# Inner Class Diagonal1PairOrderingHandler
+  private class Diagonal1PairOrderingHandler implements PairOrderingHandler
   {
     @Override
     public TRPartition mergeAllPairs()
@@ -859,9 +918,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class DiagonalPairOrdering2
-  @SuppressWarnings("unused")
-  private class DiagonalPairOrdering2 implements PairOrdering
+  //# Inner Class Diagonal2PairOrderingHandler
+  private class Diagonal2PairOrderingHandler implements PairOrderingHandler
   {
     @Override
     public TRPartition mergeAllPairs()
@@ -1393,8 +1451,9 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //#########################################################################
   //# Data Members
   private final StateOrdering mStateOrdering = new TrivialStateOrdering();
-  private PairOrdering mPairOrdering = new LexicographicPairOrdering();
+  private PairOrdering mPairOrdering = PairOrdering.LEXICOGRAPHIC;
 
+  private PairOrderingHandler mPairOrderingHandler;
   private List<CompatibilityPair> mCompatibiliyRelation;
   private int[] mOrderedStates;
   private int[] mStateOrderIndex;

@@ -242,7 +242,8 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   {
     final SuWonhamSupervisorReductionTRSimplifier simplifier =
       new SuWonhamSupervisorReductionTRSimplifier();
-    simplifier.setDiagonalPairOrdering(true);
+    simplifier.setPairOrdering
+      (SuWonhamSupervisorReductionTRSimplifier.PairOrdering.DIAGONAL1);
     return simplifier;
   }
 
