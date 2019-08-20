@@ -148,10 +148,45 @@ public class ProjectingSupervisorReductionTRSimplifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.Abortable
+  @Override
+  public void requestAbort()
+  {
+    super.requestAbort();
+    mVerifierBuilder.requestAbort();
+    if (mLoopRemover != null) {
+      mLoopRemover.requestAbort();
+    }
+  }
+
+  @Override
+  public void resetAbort()
+  {
+    super.resetAbort();
+    mVerifierBuilder.resetAbort();
+    if (mLoopRemover != null) {
+      mLoopRemover.resetAbort();
+    }
+  }
+
+
+  //#########################################################################
   //# Overrides for
   //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  protected void setUo() throws AnalysisException
+  {
+    super.setUp();
+    if (mEnsuringOP) {
+      mLoopRemover = new TauLoopRemovalTRSimplifier();
+      mLoopRemover.setTauOnly(false);
+      mLoopRemover.setAppliesPartitionAutomatically(false);
+      mLoopRemover.setPreferredOutputConfiguration
+        (mVerifierBuilder.getPreferredInputConfiguration());
+    }
+  }
+
   @Override
-  public boolean runSimplifier() throws AnalysisException
+  protected boolean runSimplifier() throws AnalysisException
   {
     try {
       final Logger logger = LogManager.getLogger();
@@ -177,6 +212,7 @@ public class ProjectingSupervisorReductionTRSimplifier
   protected void tearDown()
   {
     super.tearDown();
+    mLoopRemover = null;
     mEventInfo = null;
     mOutstandingInfo = null;
     mKnownBest = null;
@@ -246,9 +282,9 @@ public class ProjectingSupervisorReductionTRSimplifier
       final int e = info.getEvent();
       final byte status = rel.getProperEventStatus(e);
       rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
-      if (!mVerifierBuilder.buildVerifier(rel)) {
+      if (!mVerifierBuilder.isSuitableProjection(rel)) {
         rel.setProperEventStatus(e, status);
-      } else if (!mEnsuringOP || mVerifierBuilder.isOPSatisfied()) {
+      } else if (mVerifierBuilder.isOPAcceptable()) {
         numRemoved += uncertain.size() + 1;
         uncertain.clear();
       } else {
@@ -287,9 +323,9 @@ public class ProjectingSupervisorReductionTRSimplifier
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final byte status = rel.getProperEventStatus(e);
       rel.setProperEventStatus(e, status | EventStatus.STATUS_LOCAL);
-      if (mVerifierBuilder.buildVerifier(rel)) {
+      if (mVerifierBuilder.isSuitableProjection(rel)) {
         final Result result = new Result(info, parent);
-        if ((!mEnsuringOP || mVerifierBuilder.isOPSatisfied()) &&
+        if (mVerifierBuilder.isOPAcceptable() &&
             result.isBetterThan(mKnownBest)) {
           mKnownBest = result;
         }
@@ -463,6 +499,33 @@ public class ProjectingSupervisorReductionTRSimplifier
   private class SupervisorReductionVerifierBuilder extends VerifierBuilder
   {
     //#######################################################################
+    //# Invocation
+    private boolean isSuitableProjection(ListBufferTransitionRelation rel)
+      throws AnalysisException
+    {
+      if (mLoopRemover != null) {
+        mLoopRemover.setTransitionRelation(rel);
+        if (mLoopRemover.run()) {
+          final int config = mVerifierBuilder.getPreferredInputConfiguration();
+          rel = new ListBufferTransitionRelation(rel, config);
+          mLoopRemover.setTransitionRelation(rel);
+          mLoopRemover.applyResultPartition();
+          rel = mLoopRemover.getTransitionRelation();
+        }
+      }
+      return buildVerifier(rel);
+    }
+
+    private boolean isOPAcceptable()
+    {
+      if (mEnsuringOP) {
+        return isOPSatisfied();
+      } else {
+        return true;
+      }
+    }
+
+    //#######################################################################
     //# Overrides for
     //# net.sourceforge.waters.analysis.abstraction.VerifierBuilder
     @Override
@@ -494,7 +557,8 @@ public class ProjectingSupervisorReductionTRSimplifier
   private boolean mExhaustive = false;
   private boolean mEnsuringOP = false;
 
-  private final VerifierBuilder mVerifierBuilder =
+  private TauLoopRemovalTRSimplifier mLoopRemover = null;
+  private final SupervisorReductionVerifierBuilder mVerifierBuilder =
     new SupervisorReductionVerifierBuilder();
   private List<EventInfo> mEventInfo;
   private ResultInfo[] mOutstandingInfo;

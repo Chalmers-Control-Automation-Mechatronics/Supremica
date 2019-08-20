@@ -40,6 +40,7 @@ import gnu.trove.stack.array.TIntArrayStack;
 import java.util.Arrays;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
@@ -81,6 +82,27 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Configuration
+  /**
+   * Sets what events are considered for cycles. The default of this setting
+   * is <CODE>true</CODE>, which means that the simplifier checks for cycles
+   * of {@link EventEncoding#TAU TAU} events only. If this is set to
+   * <CODE>false</CODE>, then all local events, i.e., all events with status
+   * {@link EventStatus#STATUS_LOCAL STATUS_LOCAL} can constitute a loop.
+   */
+  public void setTauOnly(final boolean tauOnly)
+  {
+    mTauOnly = tauOnly;
+  }
+
+  /**
+   * Returns what events are considered for cycles.
+   * @see #setTauOnly(boolean)
+   */
+  public boolean isTauOnly()
+  {
+    return mTauOnly;
+  }
+
   /**
    * Sets whether this simplifier should consider deadlock states when
    * removing selfloops.
@@ -207,7 +229,7 @@ public class TauLoopRemovalTRSimplifier
   }
 
   @Override
-  protected void applyResultPartition()
+  public void applyResultPartition()
     throws AnalysisException
   {
     super.applyResultPartition();
@@ -228,8 +250,13 @@ public class TauLoopRemovalTRSimplifier
     throws AnalysisAbortException
   {
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TransitionIterator iter = rel.createAnyReadOnlyIterator();
-    iter.resetEvent(EventEncoding.TAU);
+    final TransitionIterator iter;
+    if (mTauOnly) {
+      iter = rel.createAnyReadOnlyIterator();
+      iter.resetEvent(EventEncoding.TAU);
+    } else {
+      iter = rel.createAnyReadOnlyIteratorByStatus(EventStatus.STATUS_LOCAL);
+    }
     mControlStack.add(start);
     mControlStack.add(start);
     do {
@@ -283,6 +310,7 @@ public class TauLoopRemovalTRSimplifier
 
   //#########################################################################
   //# Data Members
+  private boolean mTauOnly = true;
   private boolean mDumpStateAware = false;
   private int mDefaultMarkingID = -1;
 

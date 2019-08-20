@@ -123,6 +123,16 @@ public class VerifierBuilder implements Abortable
     return mStateLimit;
   }
 
+  /**
+   * Gets the preferred configuration of a transition relation to
+   * be processed by a verifier builder.
+   * @return {@link ListBufferTransitionRelation#CONFIG_SUCCESSORS}
+   */
+  public int getPreferredInputConfiguration()
+  {
+    return ListBufferTransitionRelation.CONFIG_SUCCESSORS;
+  }
+
 
   //#########################################################################
   //# Simple Access
@@ -265,6 +275,8 @@ public class VerifierBuilder implements Abortable
     mTransitionIterator2.resetEvents(0, lastEvent);
     mTransitionIterator2.resetState(code2);
     mTransitionIterator2.advance();
+    boolean hasLocal = false;
+    boolean hasMismatch = false;
     while (mTransitionIterator1.isValid() || mTransitionIterator2.isValid()) {
       while (mTransitionIterator1.isValid()) {
         final int event1 = mTransitionIterator1.getCurrentEvent();
@@ -276,6 +288,7 @@ public class VerifierBuilder implements Abortable
             return;
           }
           mTransitionIterator1.advance();
+          hasLocal = true;
         } else {
           break;
         }
@@ -290,6 +303,7 @@ public class VerifierBuilder implements Abortable
             return;
           }
           mTransitionIterator2.advance();
+          hasLocal = true;
         } else {
           break;
         }
@@ -326,19 +340,22 @@ public class VerifierBuilder implements Abortable
             }
           }
         } else if (event1 < event2) {
-          mOPSatisfied = false;
+          hasMismatch = true;
           mTransitionIterator1.advance();
         } else {
-          mOPSatisfied = false;
+          hasMismatch = true;
           mTransitionIterator2.advance();
         }
       } else if (mTransitionIterator1.isValid()) {
-        mOPSatisfied = false;
+        hasMismatch = true;
         mTransitionIterator1.advance();
       } else if (mTransitionIterator2.isValid()) {
-        mOPSatisfied = false;
+        hasMismatch = true;
         mTransitionIterator2.advance();
       }
+    }
+    if (!hasLocal && hasMismatch) {
+      mOPSatisfied = false;
     }
   }
 
