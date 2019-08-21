@@ -31,51 +31,85 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.actions;
 
-import javax.swing.JPopupMenu;
+import java.awt.event.ActionEvent;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
+import net.sourceforge.waters.gui.analyzer.StateCounterDialog;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
+import org.supremica.gui.ide.IDE;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+/**
+ * The action to invoke the State Counter dialog in the Waters analyser.
+ *
+ * @author Brandon Bassett
+ */
+
+public class AnalyzerStateCounterCheckAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
   //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  protected AnalyzerStateCounterCheckAction(final IDE ide)
   {
-    super(master);
+    super(ide);
+    putValue(Action.NAME, "State Counter ...");
+    //putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
+    //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
+    //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
+    updateEnabledStatus();
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent arg0)
+  {
+    final IDE ide = getIDE();
+    if (ide != null) {
+      new StateCounterDialog(getAnalyzerPanel());
+    }
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    final AutomataTable table = getAnalyzerTable();
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION, "State Counter");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(table.getSelectedRowCount() >= 2);
+      putValue(Action.SHORT_DESCRIPTION,
+        "State Counter");
+    } else {
+      setEnabled(table.getRowCount() >= 0);
+      putValue(Action.SHORT_DESCRIPTION,
+        "State Counter");
+    }
   }
 
   //#########################################################################
-  //# Shared Menu Items
-  @Override
-  protected void addCommonMenuItems()
-  {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
-    final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
-    final IDEAction showConflict = master.getAnalyzerConflictCheckAction();
-    final IDEAction showControlLoop = master.getAnalyzerControlLoopCheckAction();
-    final IDEAction showControllability = master.getAnalyzerControllabilityCheckAction();
-    final IDEAction showDeadlock = master.getAnalyzerDeadlockCheckAction();
-    final IDEAction showLanguageInclusion = master.getAnalyzerLanguageInclusionCheckAction();
-    final IDEAction showStateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(showSychronous);
-    popup.add(showSynthesize);
-    popup.add(showConflict);
-    popup.add(showControlLoop);
-    popup.add(showControllability);
-    popup.add(showDeadlock);
-    popup.add(showLanguageInclusion);
-    popup.add(showStateCounter);
-  }
+  //# Class Constants
+  private static final long serialVersionUID = -760171387242522343L;
 
 }

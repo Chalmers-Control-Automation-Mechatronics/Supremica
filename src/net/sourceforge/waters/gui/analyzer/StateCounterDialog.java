@@ -36,11 +36,10 @@ package net.sourceforge.waters.gui.analyzer;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.analysis.des.StateCounter;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -51,17 +50,18 @@ import org.supremica.gui.ide.IDE;
 
 
 /**
- * @author George Hewlett, Carly Hona, Brandon Bassett
+ * @author Brandon Bassett
  */
-public class SynchronousProductDialog extends AbstractAnalysisDialog
+public class StateCounterDialog extends AbstractAnalysisDialog
 {
 
   //#######################################################################
   //# Constructor
-  public SynchronousProductDialog(final WatersAnalyzerPanel panel)
+  public StateCounterDialog(final WatersAnalyzerPanel panel)
   {
     super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Synchronous product");
+    setTitle("State Counter");
+
   }
 
   //#########################################################################
@@ -72,16 +72,16 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
                                          final ProductDESProxyFactory desFactory)
   {
     try {
-      return analyzerFactory.createSynchronousProductBuilder(desFactory);
+      return analyzerFactory.createStateCounter(desFactory);
     } catch (final AnalysisConfigurationException exception) {   }
 
     return null;
   }
 
   @Override
-  protected SynchronousProductBuilder getAnalyzer()
+  protected StateCounter getAnalyzer()
   {
-    return (SynchronousProductBuilder) super.getAnalyzer();
+    return (StateCounter) super.getAnalyzer();
   }
 
   @Override
@@ -91,10 +91,11 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     getAnalyzer().setModel(des);
     try {
       getAnalyzer().run();
-      final AutomatonResult result = getAnalyzer().getAnalysisResult();
-      final AutomatonProxy aut = result.getComputedProxy();
-      final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
-      model.insertRow(aut);
+      @SuppressWarnings("unused")
+      final AnalysisResult result = getAnalyzer().getAnalysisResult();
+      @SuppressWarnings("unused")
+      final Logger logger = LogManager.getLogger();
+
     } catch (final AnalysisException exception) {
       final Logger logger = LogManager.getLogger();
       final String msg = exception.getMessage();
@@ -103,8 +104,9 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     return null;
   }
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -5945541495761539710L;
+  private static final long serialVersionUID = 1069804247073793761L;
 
 }

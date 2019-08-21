@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.modular.ModularHeuristicFactory;
 import net.sourceforge.waters.analysis.trcomp.AbstractTRCompositionalModelAnalyzer;
 import net.sourceforge.waters.analysis.trcomp.TRCandidate;
 import net.sourceforge.waters.analysis.trcomp.TRCompositionalConflictChecker;
+import net.sourceforge.waters.analysis.trcomp.TRCompositionalStateCounter;
 import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
 import net.sourceforge.waters.analysis.trcomp.TRPreselectionHeuristic;
 import net.sourceforge.waters.analysis.trcomp.TRToolCreator;
@@ -830,5 +831,16 @@ public class ParameterIDs
     (CompositionalSafetyVerifier_AbstractionProcedureCreator_ID,
      AbstractCompositionalModelAnalyzer_AbstractionProcedureCreator,
      ProjectionAbstractionProcedureFactory.getInstance());
+
+//net.sourceforge.waters.analysis.trcomp.TRCompositionalStateCounter
+  private static final int TRCompositionalStateCounter_SimplifierCreator_ID = 6000;
+
+  public static final EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+  TRCompositionalStateCounter_SimplifierCreator =
+  new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
+    (TRCompositionalStateCounter_SimplifierCreator_ID,
+     AbstractTRCompositionalModelAnalyzer_SimplifierCreator,
+     (new TRCompositionalStateCounter()).getTRSimplifierFactory());
+
 
 }
