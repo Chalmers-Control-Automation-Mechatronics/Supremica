@@ -39,9 +39,6 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntByteHashMap;
 import gnu.trove.map.hash.TIntIntHashMap;
 import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
-import gnu.trove.stack.TLongStack;
-import gnu.trove.stack.array.TLongArrayStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +53,7 @@ import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
+import net.sourceforge.waters.analysis.tr.WatersIntPairStack;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -140,7 +138,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     super.setUp();
     mPairOrderingHandler = mPairOrdering.createHandler(this);
-    mStack = new StackOfPairs();
+    mStack = new WatersIntPairStack();
     final ListBufferTransitionRelation rel = getTransitionRelation();
     rel.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
     final int numStates = rel.getNumberOfReachableStates();
@@ -155,7 +153,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final TRPartition partition;
     setUpCompatibilityRelation();
-    if (mCompatibiliyRelation.isEmpty()) {
+    if (mCompatibilityRelation.isEmpty()) {
       partition = createOneStatePartition();
       rel.merge(partition);
     } else {
@@ -182,7 +180,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   {
     super.tearDown();
     mPairOrderingHandler = null;
-    mCompatibiliyRelation = null;
+    mCompatibilityRelation = null;
     mOrderedStates = null;
     mStateOrderIndex = null;
     mStack = null;
@@ -210,19 +208,18 @@ public class SuWonhamSupervisorReductionTRSimplifier
     while (!mStack.isEmpty()) {
       checkAbort();
       final long pair = mStack.pop();
-      final int s1 = StackOfPairs.getLo(pair);
-      final int s2 = StackOfPairs.getHi(pair);
-      if (!mergeAndExpand(s1, s2, partition)) {
+      if (!mergeAndExpand(pair, partition)) {
         return null;
       }
     }
     return partition;
   }
 
-  private boolean mergeAndExpand(final int state1,
-                                 final int state2,
+  private boolean mergeAndExpand(final long pair,
                                  final ListBufferPartition partition)
   {
+    final int state1 = WatersIntPairStack.getLo(pair);
+    final int state2 = WatersIntPairStack.getHi(pair);
     if (partition.isEquivalent(state1, state2)) {
       return true;
     } else if (mPairOrderingHandler.hasFailedMergibilityCheck(state1, state2,
@@ -310,34 +307,19 @@ public class SuWonhamSupervisorReductionTRSimplifier
   //# Compatibility Relation
   private void setUpCompatibilityRelation()
   {
+    final TIntArrayList supervisedEvents = getSupervisedEvents();
     final ListBufferTransitionRelation rel = getTransitionRelation();
-    final TIntArrayList controllableEvents;
-    final int supEvent = getSupervisedEvent();
-    if (supEvent >= 0) {
-      controllableEvents = new TIntArrayList(1);
-      controllableEvents.add(supEvent);
-    } else {
-      final int numEvents = rel.getNumberOfProperEvents();
-      controllableEvents = new TIntArrayList(numEvents);
-      for (int e = 0; e < numEvents; e++) {
-        final byte status = rel.getProperEventStatus(e);
-        if (EventStatus.isUsedEvent(status) &&
-            EventStatus.isControllableEvent(status)) {
-          controllableEvents.add(e);
-        }
-      }
-    }
-    mCompatibiliyRelation = new LinkedList<>();
     final int numStates = rel.getNumberOfStates();
     final TIntArrayList enabled = new TIntArrayList(numStates);
     final TIntArrayList disabled = new TIntArrayList(numStates);
     final int dumpIndex = rel.getDumpStateIndex();
     final TransitionIterator iter =
-      rel.createAllTransitionsModifyingIterator();
-    for (int i = 0; i < controllableEvents.size(); i++) {
+      rel.createAllTransitionsReadOnlyIterator();
+    mCompatibilityRelation = new LinkedList<>();
+    for (int i = 0; i < supervisedEvents.size(); i++) {
       enabled.clear();
       disabled.clear();
-      final int e = controllableEvents.get(i);
+      final int e = supervisedEvents.get(i);
       iter.resetEvent(e);
       while (iter.advance()) {
         final int s = iter.getCurrentSourceState();
@@ -349,16 +331,16 @@ public class SuWonhamSupervisorReductionTRSimplifier
       }
       if (!enabled.isEmpty() && !disabled.isEmpty()) {
         final CompatibilityPair pair = new CompatibilityPair(enabled, disabled);
-        addCompatibilityPair(mCompatibiliyRelation, pair);
+        addCompatibilityPair(mCompatibilityRelation, pair);
       }
     }
-    Collections.sort(mCompatibiliyRelation);
+    Collections.sort(mCompatibilityRelation);
   }
 
   private boolean updateCompatibilityRelation(final ListBufferPartition partition)
   {
     List<CompatibilityPair> changedPairs = null;
-    Iterator<CompatibilityPair> iter = mCompatibiliyRelation.iterator();
+    Iterator<CompatibilityPair> iter = mCompatibilityRelation.iterator();
     while (iter.hasNext()) {
       final CompatibilityPair pair = iter.next();
       if (pair.applyPartition(partition)) {
@@ -372,7 +354,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
       }
     }
     if (changedPairs != null) {
-      iter = mCompatibiliyRelation.iterator();
+      iter = mCompatibilityRelation.iterator();
       while (iter.hasNext()) {
         final CompatibilityPair unchanged = iter.next();
         for (final CompatibilityPair changed : changedPairs) {
@@ -382,8 +364,8 @@ public class SuWonhamSupervisorReductionTRSimplifier
           }
         }
       }
-      mCompatibiliyRelation.addAll(changedPairs);
-      Collections.sort(mCompatibiliyRelation);
+      mCompatibilityRelation.addAll(changedPairs);
+      Collections.sort(mCompatibilityRelation);
       return true;
     } else {
       return false;
@@ -410,7 +392,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
   private boolean isStateCompatible(final int state1,
                                     final int state2)
   {
-    for (final CompatibilityPair pair : mCompatibiliyRelation) {
+    for (final CompatibilityPair pair : mCompatibilityRelation) {
       if (!pair.isCompatible(state1, state2)) {
         return false;
       }
@@ -1259,7 +1241,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
           mListBuffer.createReadOnlyIterator(list1);
         final IntListBuffer.Iterator iter2 =
           mListBuffer.createReadOnlyIterator(list2);
-        for (final CompatibilityPair pair : mCompatibiliyRelation) {
+        for (final CompatibilityPair pair : mCompatibilityRelation) {
           if (!pair.isCompatible(iter1, iter2)) {
             return false;
           }
@@ -1392,74 +1374,17 @@ public class SuWonhamSupervisorReductionTRSimplifier
 
 
   //#########################################################################
-  //# Inner Class StackOfPairs
-  private static class StackOfPairs
-  {
-    //#######################################################################
-    //# Access
-    private void clear()
-    {
-      mStack.clear();
-      mVisited = new TLongHashSet();
-    }
-
-    private boolean isEmpty()
-    {
-      return mStack.size() == 0;
-    }
-
-    private long pop()
-    {
-      return mStack.pop();
-    }
-
-    private void push(final int s1, final int s2)
-    {
-      final long lo, hi;
-      if (s1 < s2) {
-        lo = s1;
-        hi = s2;
-      } else {
-        lo = s2;
-        hi = s1;
-      }
-      final long pair = lo | (hi << 32);
-      if (mVisited.add(pair)) {
-        mStack.push(pair);
-      }
-    }
-
-    //#######################################################################
-    //# Pair Decomposition
-    private static int getLo(final long pair)
-    {
-      return (int) (pair & 0xffffffffL);
-    }
-
-    private static int getHi(final long pair)
-    {
-      return (int) (pair >>> 32);
-    }
-
-    //#######################################################################
-    //# Data Members
-    private final TLongStack mStack = new TLongArrayStack();
-    private TLongHashSet mVisited = null;
-  }
-
-
-  //#########################################################################
   //# Data Members
   private final StateOrdering mStateOrdering = new TrivialStateOrdering();
   private PairOrdering mPairOrdering = PairOrdering.LEXICOGRAPHIC;
 
   private PairOrderingHandler mPairOrderingHandler;
-  private List<CompatibilityPair> mCompatibiliyRelation;
+  private List<CompatibilityPair> mCompatibilityRelation;
   private int[] mOrderedStates;
   private int[] mStateOrderIndex;
   private int mCurrentIndex1;
   private int mCurrentIndex2;
-  private StackOfPairs mStack;
+  private WatersIntPairStack mStack;
   private TIntArrayList mStates1;
   private TIntArrayList mStates2;
   private TIntArrayList mSuccessors2;

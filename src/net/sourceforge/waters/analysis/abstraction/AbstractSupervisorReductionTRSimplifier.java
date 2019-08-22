@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
@@ -149,6 +151,28 @@ public abstract class AbstractSupervisorReductionTRSimplifier
       final byte status = rel.getProperEventStatus(event);
       return EventStatus.isControllableEvent(status);
     }
+  }
+
+  protected TIntArrayList getSupervisedEvents()
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final TIntArrayList result;
+    final int supEvent = getSupervisedEvent();
+    if (supEvent >= 0) {
+      result = new TIntArrayList(1);
+      result.add(supEvent);
+    } else {
+      final int numEvents = rel.getNumberOfProperEvents();
+      result = new TIntArrayList(numEvents);
+      for (int e = 0; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (EventStatus.isUsedEvent(status) &&
+            EventStatus.isControllableEvent(status)) {
+          result.add(e);
+        }
+      }
+    }
+    return result;
   }
 
 
