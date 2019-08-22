@@ -88,8 +88,9 @@ public class SynthesisDialog extends AbstractAnalysisDialog
      return (SupervisorSynthesizer) super.getAnalyzer();
    }
 
+
   //#########################################################################
-  //# Inner Class AnalyzerDialog
+  //# Inner Class SynthesisPopUpDialog
   private class SynthesisPopUpDialog extends WatersAnalyzeDialog
   {
     //#######################################################################
@@ -161,8 +162,9 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     private static final long serialVersionUID = 6159733639861131531L;
   }
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 6159733639861131531L;
+  private static final long serialVersionUID = -622825450495392984L;
 
 }

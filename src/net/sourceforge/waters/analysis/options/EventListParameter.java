@@ -22,16 +22,19 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 public class EventListParameter extends Parameter
 {
+  // TODO Display icons (see net.sourceforge.waters.gui.EventListCell,
+  // use setCellRenderer)
+  // TODO Create KindTranslator to pass events to control loop checker.
+  // Loop events are controllable, other uncontrollable.
+  // See net.sourceforge.waters.model.analysis.KindTranslator
 
-  protected EventListParameter(final int id, final String name,
-                                           final String description)
+  protected EventListParameter(final int id,
+                               final String name,
+                               final String description)
   {
     super(id, name, description);
-    //mUNCONTROLLABLEList = new ArrayList<EventProxy>();
-    //mCONTROLLABLEList = new ArrayList<EventProxy>();
     mUncontrollableList = null;
     mControllableList = null;
-
   }
 
   public EventListParameter(final EventListParameter template)
@@ -52,8 +55,8 @@ public class EventListParameter extends Parameter
     final JPanel panel = new JPanel();
     final JButton button = new JButton("...");
     final JTextField text = new JTextField();
-
     text.setColumns(10);
+    // TODO text field is not editable ...
 
     button.addActionListener(new ActionListener() {
 

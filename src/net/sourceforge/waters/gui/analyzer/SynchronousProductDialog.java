@@ -94,7 +94,7 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
       builder.run();
       final AutomatonResult result = builder.getAnalysisResult();
       final AutomatonProxy aut = result.getComputedProxy();
-      // TODO Check for null automaton. Try to display state (not transition)
+      // TODO Check for null automaton. Try to display state and transition
       // count if null.
       final AutomataTableModel model =
         getWatersAnalyzerPanel().getAutomataTableModel();
