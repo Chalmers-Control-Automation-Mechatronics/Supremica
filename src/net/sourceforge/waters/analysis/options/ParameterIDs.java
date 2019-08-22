@@ -72,6 +72,9 @@ public class ParameterIDs
     "JListParam Test",
     "", ComponentKind.values(), ComponentKind.SPEC);
 
+  public static final ControlLoopHideEventsParameter testControlLoopHideParam = new ControlLoopHideEventsParameter(9000,
+    "ControlLoopHideParam Test","");
+
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
   private static final int ModelAnalyzer_DetailedOutputEnabled_ID = 0;
   private static final int ModelAnalyzer_NodeLimit_ID = 2;

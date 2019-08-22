@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
+import net.sourceforge.waters.analysis.options.ControlLoopHideEventsParameter;
 import net.sourceforge.waters.analysis.options.EnumParameter;
 import net.sourceforge.waters.analysis.options.IntParameter;
 import net.sourceforge.waters.analysis.options.Parameter;
@@ -190,6 +191,16 @@ public class ModularControlLoopChecker
         setTransitionLimit(getValue());
       }
     });
+
+    list.add(new ControlLoopHideEventsParameter
+             (ParameterIDs.testControlLoopHideParam) {
+           @Override
+           public void commitValue() {
+
+           }
+         });
+
+
     return list;
   }
 
