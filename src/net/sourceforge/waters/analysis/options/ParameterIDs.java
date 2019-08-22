@@ -63,17 +63,15 @@ import net.sourceforge.waters.analysis.trcomp.TRControllabilityChecker;
 import net.sourceforge.waters.analysis.trcomp.TRPreselectionHeuristic;
 import net.sourceforge.waters.analysis.trcomp.TRToolCreator;
 import net.sourceforge.waters.cpp.analysis.ConflictCheckMode;
-import net.sourceforge.waters.model.base.ComponentKind;
 
 public class ParameterIDs
 {
 
-  public static final JListParameter<ComponentKind> testJListParam = new JListParameter<ComponentKind>(9000,
-    "JListParam Test",
-    "", ComponentKind.values(), ComponentKind.SPEC);
-
-  public static final ControlLoopHideEventsParameter testControlLoopHideParam = new ControlLoopHideEventsParameter(9000,
-    "ControlLoopHideParam Test","");
+  public static final EventListParameter testControlLoopHideParam =
+    new EventListParameter
+      (9000,
+       "Loop events",
+       "Check whether the system permits a loop using the selected events.");
 
   //net.sourceforge.waters.model.analysis.ModelAnalyzer
   private static final int ModelAnalyzer_DetailedOutputEnabled_ID = 0;

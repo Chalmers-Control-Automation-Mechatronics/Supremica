@@ -20,21 +20,21 @@ import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
-public class ControlLoopHideEventsParameter extends Parameter
+public class EventListParameter extends Parameter
 {
 
-  protected ControlLoopHideEventsParameter(final int id, final String name,
+  protected EventListParameter(final int id, final String name,
                                            final String description)
   {
     super(id, name, description);
     //mUNCONTROLLABLEList = new ArrayList<EventProxy>();
     //mCONTROLLABLEList = new ArrayList<EventProxy>();
-    mUNCONTROLLABLEList = null;
-    mCONTROLLABLEList = null;
+    mUncontrollableList = null;
+    mControllableList = null;
 
   }
 
-  public ControlLoopHideEventsParameter(final ControlLoopHideEventsParameter template)
+  public EventListParameter(final EventListParameter template)
   {
     this(template.getID(), template.getName(), template.getDescription());
   }
@@ -42,8 +42,8 @@ public class ControlLoopHideEventsParameter extends Parameter
   @Override
   public void updateFromParameter(final Parameter p)
   {
-    mUNCONTROLLABLEList = ((ControlLoopHideEventsParameter) p).getUncontrollable();
-    mCONTROLLABLEList = ((ControlLoopHideEventsParameter) p).getControllable();
+    mUncontrollableList = ((EventListParameter) p).getUncontrollable();
+    mControllableList = ((EventListParameter) p).getControllable();
   }
 
   @Override
@@ -79,29 +79,26 @@ public class ControlLoopHideEventsParameter extends Parameter
     // TODO Auto-generated method stub
   }
 
-  //Data Members
-  private List<EventProxy> mUNCONTROLLABLEList;
-  private List<EventProxy> mCONTROLLABLEList;
-
   @Override
   public String toString()
   {
-    return ("ID: " + getID() + " Name: " + getName() + " Controlable: " + getControllable() + " Uncontrolable: " + getUncontrollable());
+    return ("ID: " + getID() + " Name: " + getName() + " Controllable: " + getControllable() + " Uncontrollable: " + getUncontrollable());
   }
 
+  // TODO getValue() -- returns "controllable" list
   public List<EventProxy> getControllable()
   {
-      return mCONTROLLABLEList;
+      return mControllableList;
   }
 
   public List<EventProxy> getUncontrollable()
   {
-    return mUNCONTROLLABLEList;
+    return mUncontrollableList;
   }
 
-  //#########################################################################
-  //# Inner Class ControlLoopHideDialo
 
+  //#########################################################################
+  //# Inner Class ControlLoopHideDialog
   private class ControlLoopHideDialog extends JDialog
   {
     //#######################################################################
@@ -116,77 +113,72 @@ public class ControlLoopHideEventsParameter extends Parameter
     {
       setLayout(new GridLayout(0, 2));
 
-      final DefaultListModel<EventProxy> model_UNCONTROLLABLE_List = new DefaultListModel<EventProxy>();
-      final DefaultListModel<EventProxy> model_CONTROLLABLE_List = new DefaultListModel<EventProxy>();
+      final DefaultListModel<EventProxy> modelUncontrollableList =
+        new DefaultListModel<EventProxy>();
+      final DefaultListModel<EventProxy> modelControllableList =
+        new DefaultListModel<EventProxy>();
 
-      //Initial generation, uninitialized lists
-      if (mCONTROLLABLEList == null) {
-
-        mUNCONTROLLABLEList = new ArrayList<EventProxy>();
-        mCONTROLLABLEList = new ArrayList<EventProxy>();
-
+      //Initial generation, uninitialised lists
+      if (mControllableList == null) {
+        mUncontrollableList = new ArrayList<EventProxy>();
+        mControllableList = new ArrayList<EventProxy>();
         for (final EventProxy event : model.getProductDES().getEvents()) {
           if (event.getKind() == EventKind.UNCONTROLLABLE) {
-            model_UNCONTROLLABLE_List.addElement(event);
+            modelUncontrollableList.addElement(event);
           } else if (event.getKind() == EventKind.CONTROLLABLE) {
-            model_CONTROLLABLE_List.addElement(event);
+            modelControllableList.addElement(event);
           }
         }
-      }
-      else {
-        for(final EventProxy event: mCONTROLLABLEList) {
-          model_CONTROLLABLE_List.addElement(event);
+      } else {
+        for (final EventProxy event: mControllableList) {
+          modelControllableList.addElement(event);
         }
-
-        for(final EventProxy event: mUNCONTROLLABLEList) {
-          model_UNCONTROLLABLE_List.addElement(event);
+        for (final EventProxy event: mUncontrollableList) {
+          modelUncontrollableList.addElement(event);
         }
       }
 
-      final JList<EventProxy> UNCONTROLLABLE_List = new JList<EventProxy>();
-      UNCONTROLLABLE_List.setModel(model_UNCONTROLLABLE_List);
-
-      final JScrollPane Left_UNCONTROLLABLE_Scroller = new JScrollPane();
-      Left_UNCONTROLLABLE_Scroller.setViewportView(UNCONTROLLABLE_List);
-      UNCONTROLLABLE_List.setLayoutOrientation(JList.VERTICAL);
+      final JList<EventProxy> uncontrollableList = new JList<EventProxy>();
+      uncontrollableList.setModel(modelUncontrollableList);
+      final JScrollPane leftUncontrollableScroller = new JScrollPane();
+      leftUncontrollableScroller.setViewportView(uncontrollableList);
+      uncontrollableList.setLayoutOrientation(JList.VERTICAL);
 
       final JButton shiftRightButton = new JButton(">>>");
       shiftRightButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          UNCONTROLLABLE_List.getSelectedValuesList().stream()
+          uncontrollableList.getSelectedValuesList().stream()
             .forEach((data) -> {
-              model_CONTROLLABLE_List.addElement(data);
-              model_UNCONTROLLABLE_List.removeElement(data);
+              modelControllableList.addElement(data);
+              modelUncontrollableList.removeElement(data);
             });
         }
       });
 
-      final JList<EventProxy> CONTROLLABLE_List = new JList<EventProxy>();
-      CONTROLLABLE_List.setModel(model_CONTROLLABLE_List);
-
-      final JScrollPane Right_CONTROLLABLE_Scroller = new JScrollPane();
-      Right_CONTROLLABLE_Scroller.setViewportView(CONTROLLABLE_List);
-      CONTROLLABLE_List.setLayoutOrientation(JList.VERTICAL);
+      final JList<EventProxy> controllableList = new JList<EventProxy>();
+      controllableList.setModel(modelControllableList);
+      final JScrollPane rightControllableScroller = new JScrollPane();
+      rightControllableScroller.setViewportView(controllableList);
+      controllableList.setLayoutOrientation(JList.VERTICAL);
 
       final JButton shiftLeftButton = new JButton("<<<");
       shiftLeftButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          CONTROLLABLE_List.getSelectedValuesList().stream()
+          controllableList.getSelectedValuesList().stream()
             .forEach((data) -> {
-              model_CONTROLLABLE_List.removeElement(data);
-              model_UNCONTROLLABLE_List.addElement(data);
+              modelControllableList.removeElement(data);
+              modelUncontrollableList.addElement(data);
             });
         }
       });
 
-      final JButton Ok = new JButton("OK");
-      final JButton Cancel = new JButton("Cancel");
-
-      Cancel.addActionListener(new ActionListener() {
+      final JButton okButton = new JButton("OK");
+      final JButton cancelButton = new JButton("Cancel");
+      cancelButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e)
         {
@@ -194,37 +186,44 @@ public class ControlLoopHideEventsParameter extends Parameter
         }
       });
 
-      Ok.addActionListener(new ActionListener() {
+      okButton.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          for (int i = 0; i < model_UNCONTROLLABLE_List.getSize(); i++) {
-            mUNCONTROLLABLEList.add(model_UNCONTROLLABLE_List.get(i));
+          for (int i = 0; i < modelUncontrollableList.getSize(); i++) {
+            mUncontrollableList.add(modelUncontrollableList.get(i));
           }
 
-          for (int i = 0; i < model_CONTROLLABLE_List.getSize(); i++) {
-            mCONTROLLABLEList.add(model_CONTROLLABLE_List.get(i));
+          for (int i = 0; i < modelControllableList.getSize(); i++) {
+            mControllableList.add(modelControllableList.get(i));
           }
           dispose();
         }
       });
 
+      // TODO Use GridBagLayout
       add(new JLabel("Non-Loop Events"));
       add(new JLabel("Loop Events"));
 
-      add(Left_UNCONTROLLABLE_Scroller);
-      add(Right_CONTROLLABLE_Scroller);
+      add(leftUncontrollableScroller);
+      add(rightControllableScroller);
 
       add(shiftRightButton);
       add(shiftLeftButton);
 
-      add(Ok);
-      add(Cancel);
-
+      add(okButton);
+      add(cancelButton);
     }
 
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 4132888698192730783L;
   }
+
+
+  //#######################################################################
+  //# Data Members
+  private List<EventProxy> mUncontrollableList;
+  private List<EventProxy> mControllableList;
+
 }

@@ -73,9 +73,9 @@ public class StateCounterDialog extends AbstractAnalysisDialog
   {
     try {
       return analyzerFactory.createStateCounter(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    } catch (final AnalysisConfigurationException exception) {
+      return null;
+    }
   }
 
   @Override
@@ -88,14 +88,21 @@ public class StateCounterDialog extends AbstractAnalysisDialog
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    getAnalyzer().setModel(des);
+    // TODO Actually create a dialog (like synthesis) so that the user can abort
+    final StateCounter counter = getAnalyzer();
+    counter.setModel(des);
     try {
-      getAnalyzer().run();
-      @SuppressWarnings("unused")
-      final AnalysisResult result = getAnalyzer().getAnalysisResult();
-      @SuppressWarnings("unused")
-      final Logger logger = LogManager.getLogger();
-
+      counter.run();
+      final AnalysisResult result = counter.getAnalysisResult();
+      final double numStates = result.getTotalNumberOfStates();
+      final double numTrans = result.getTotalNumberOfTransitions();
+      final Logger logger = LogManager.getFormatterLogger();
+      if (numTrans >= 0) {
+        logger.info("Synchronous product has %.0f states and %.0f transitions.",
+                    numStates, numTrans);
+      } else {
+        logger.info("Synchronous product has %.0f states.", numStates);
+      }
     } catch (final AnalysisException exception) {
       final Logger logger = LogManager.getLogger();
       final String msg = exception.getMessage();

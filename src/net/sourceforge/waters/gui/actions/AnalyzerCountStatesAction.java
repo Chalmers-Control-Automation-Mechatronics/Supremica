@@ -50,15 +50,15 @@ import org.supremica.gui.ide.IDE;
  * @author Brandon Bassett
  */
 
-public class AnalyzerStateCounterCheckAction extends WatersAnalyzerAction
+public class AnalyzerCountStatesAction extends WatersAnalyzerAction
 {
 
   //#########################################################################
   //# Constructor
-  protected AnalyzerStateCounterCheckAction(final IDE ide)
+  protected AnalyzerCountStatesAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "State Counter ...");
+    putValue(Action.NAME, "Count States ...");
     //putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_ANALYZER_SYNTH);
     //putValue(Action.MNEMONIC_KEY, KeyEvent.VK_Y);
     //putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.ALT_MASK));
@@ -96,20 +96,24 @@ public class AnalyzerStateCounterCheckAction extends WatersAnalyzerAction
     final AutomataTable table = getAnalyzerTable();
     if (table == null) {
       setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION, "State Counter");
+      putValue(Action.SHORT_DESCRIPTION,
+               "Determine the number of states in the synchronous product");
     } else if (table.getSelectedRowCount() > 0) {
       setEnabled(table.getSelectedRowCount() >= 2);
       putValue(Action.SHORT_DESCRIPTION,
-        "State Counter");
+               "Determine the number of states in the synchronous product " +
+               "of the selected automata");
     } else {
       setEnabled(table.getRowCount() >= 0);
       putValue(Action.SHORT_DESCRIPTION,
-        "State Counter");
+               "Determine the number of states in the synchronous product " +
+               "of the automata in the analyzer");
     }
   }
 
+
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -760171387242522343L;
+  private static final long serialVersionUID = -6552536737234488915L;
 
 }

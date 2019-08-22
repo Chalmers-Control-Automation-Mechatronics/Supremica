@@ -66,16 +66,15 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
-
   @Override
   protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
                                          final ProductDESProxyFactory desFactory)
   {
     try {
       return analyzerFactory.createSynchronousProductBuilder(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    } catch (final AnalysisConfigurationException exception) {
+      return null;
+    }
   }
 
   @Override
@@ -88,12 +87,17 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    getAnalyzer().setModel(des);
+    // TODO Actually create a dialog (like synthesis) so that the user can abort
+    final SynchronousProductBuilder builder = getAnalyzer();
+    builder.setModel(des);
     try {
-      getAnalyzer().run();
-      final AutomatonResult result = getAnalyzer().getAnalysisResult();
+      builder.run();
+      final AutomatonResult result = builder.getAnalysisResult();
       final AutomatonProxy aut = result.getComputedProxy();
-      final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+      // TODO Check for null automaton. Try to display state (not transition)
+      // count if null.
+      final AutomataTableModel model =
+        getWatersAnalyzerPanel().getAutomataTableModel();
       model.insertRow(aut);
     } catch (final AnalysisException exception) {
       final Logger logger = LogManager.getLogger();
@@ -102,6 +106,7 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     }
     return null;
   }
+
 
   //#########################################################################
   //# Class Constants

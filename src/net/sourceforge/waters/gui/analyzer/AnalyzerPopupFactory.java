@@ -60,22 +60,26 @@ class AnalyzerPopupFactory
     final WatersPopupActionManager master = getMaster();
     final JPopupMenu popup = getPopup();
     popup.addSeparator();
-    final IDEAction showSychronous = master.getAnalyzerSynchronousProductAction();
-    final IDEAction showSynthesize = master.getAnalyzerSynthesizerAction();
-    final IDEAction showConflict = master.getAnalyzerConflictCheckAction();
-    final IDEAction showControlLoop = master.getAnalyzerControlLoopCheckAction();
-    final IDEAction showControllability = master.getAnalyzerControllabilityCheckAction();
-    final IDEAction showDeadlock = master.getAnalyzerDeadlockCheckAction();
-    final IDEAction showLanguageInclusion = master.getAnalyzerLanguageInclusionCheckAction();
-    final IDEAction showStateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(showSychronous);
-    popup.add(showSynthesize);
-    popup.add(showConflict);
-    popup.add(showControlLoop);
-    popup.add(showControllability);
-    popup.add(showDeadlock);
-    popup.add(showLanguageInclusion);
-    popup.add(showStateCounter);
+    final IDEAction synchronous = master.getAnalyzerSynchronousProductAction();
+    popup.add(synchronous);
+    final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
+    popup.add(synthesis);
+    popup.addSeparator();
+    final IDEAction controllability =
+      master.getAnalyzerControllabilityCheckAction();
+    popup.add(controllability);
+    final IDEAction conflict = master.getAnalyzerConflictCheckAction();
+    popup.add(conflict);
+    final IDEAction deadlock = master.getAnalyzerDeadlockCheckAction();
+    popup.add(deadlock);
+    final IDEAction controlLoop = master.getAnalyzerControlLoopCheckAction();
+    popup.add(controlLoop);
+    final IDEAction languageInclusion =
+      master.getAnalyzerLanguageInclusionCheckAction();
+    popup.add(languageInclusion);
+    popup.addSeparator();
+    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
+    popup.add(stateCounter);
   }
 
 }

@@ -437,7 +437,7 @@ public class WatersPopupActionManager
   public IDEAction getAnalyzerStateCounterCheckAction()
   {
     final WatersActionManager master = mIDE.getActions();
-    return master.getAction(AnalyzerStateCounterCheckAction.class);
+    return master.getAction(AnalyzerCountStatesAction.class);
   }
 
   //#########################################################################

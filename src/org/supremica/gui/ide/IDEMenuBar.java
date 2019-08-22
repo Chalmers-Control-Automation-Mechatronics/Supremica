@@ -54,9 +54,9 @@ import javax.swing.JMenuItem;
 import net.sourceforge.waters.gui.actions.AnalyzerConflictCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
-import net.sourceforge.waters.gui.actions.AnalyzerStateCounterCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
@@ -533,17 +533,25 @@ public class IDEMenuBar
     menu.add(sync);
     final Action synth = actions.getAction(AnalyzerSynthesisAction.class);
     menu.add(synth);
-    final Action conflict = actions.getAction(AnalyzerConflictCheckAction.class);
-    menu.add(conflict);
-    final Action control = actions.getAction(AnalyzerControlLoopCheckAction.class);
+    menu.addSeparator();
+    final Action control =
+      actions.getAction(AnalyzerControlLoopCheckAction.class);
     menu.add(control);
-    final Action controllability = actions.getAction(AnalyzerControllabilityCheckAction.class);
-    menu.add(controllability);
-    final Action deadlock = actions.getAction(AnalyzerDeadlockCheckAction.class);
+    final Action conflict =
+      actions.getAction(AnalyzerConflictCheckAction.class);
+    menu.add(conflict);
+    final Action deadlock =
+      actions.getAction(AnalyzerDeadlockCheckAction.class);
     menu.add(deadlock);
-    final Action languageInclusion = actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
+    final Action controllability =
+      actions.getAction(AnalyzerControllabilityCheckAction.class);
+    menu.add(controllability);
+    final Action languageInclusion =
+      actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
     menu.add(languageInclusion);
-    final Action stateCounter = actions.getAction(AnalyzerStateCounterCheckAction.class);
+    menu.addSeparator();
+    final Action stateCounter =
+      actions.getAction(AnalyzerCountStatesAction.class);
     menu.add(stateCounter);
     add(menu);
   }
