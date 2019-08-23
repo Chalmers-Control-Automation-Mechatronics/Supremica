@@ -1,7 +1,7 @@
 package org.supremica.automata.BDD.SupremicaBDDBitVector;
 
 import java.math.BigInteger;
-import java.util.Arrays;
+import java.util.HashSet;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDDomain;
@@ -443,8 +443,44 @@ public abstract class SupremicaBDDBitVector
         if (isConst()) {
             return String.format("%s", val());
         } else {
-            return Arrays.toString(bitvec);
+
+            // The bit vector is not constant so we want to figure out the set
+            // of all values it can take on.
+            final HashSet<Integer> satSet = new HashSet<Integer>();
+            // The mask start at zero and is incremented in every loop. When the
+            // increment overflows we have looped through all possible bit
+            // assignments. In every iteration we compare the mask with this bit
+            // vector. If the result can be satisfied, then we know that the
+            // current value of the mask can be represented by this bit vector,
+            // and we add that integer value to the set.
+            final SupremicaBDDBitVector mask = buildSupBDDBitVector(bitNum, 0);
+            BDD overflow = mFactory.zero();
+            while (overflow.isZero()) {
+                final BDD equality = this.equ(mask);
+                if (equality.satCount() > 0) {
+                    satSet.add(new Integer(mask.val()));
+                }
+                overflow = mask.increment();
+            }
+
+            return satSet.toString();
         }
+    }
+
+
+    /**
+     * Increments this bit vector with 1.
+     * @return The carry bit of the whole operation. This is set to one when the
+     * operation overflows.
+     */
+    public BDD increment() {
+        BDD carry = mFactory.one();
+        for (int i = 0; i<bitNum; i++) {
+            final BDD res = bitvec[i].xor(carry);
+            carry = bitvec[i].and(carry);
+            bitvec[i] = res;
+        }
+        return carry;
     }
 
 }
