@@ -860,7 +860,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
       mPredecessors[state] = tail;
       mClassWriteIterator.reset(mList, pred);
       mClassWriteIterator.advance();
-      mClassWriteIterator.moveTo(mOverflowList);
+      mClassWriteIterator.moveToEnd(mOverflowList);
       if (mClassWriteIterator.advance()) {
         final int next = mClassWriteIterator.getCurrentData();
         mPredecessors[next] = pred;

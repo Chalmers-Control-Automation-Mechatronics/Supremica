@@ -180,12 +180,6 @@ public class ProjectingSupervisorReductionFactory
     return mMainMethod != SupervisorReductionMainMethod.OFF;
   }
 
-  @Override
-  public boolean isSupervisedEventRequired()
-  {
-    return mMainMethod.isSupervisedEventRequired();
-  }
-
 
   //#########################################################################
   //# Data Members

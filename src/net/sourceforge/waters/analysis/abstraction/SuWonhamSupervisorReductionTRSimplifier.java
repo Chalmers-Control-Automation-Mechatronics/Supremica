@@ -1190,7 +1190,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         buffer.add(clazz);
         return;
       }
-      mListBuffer.toArrayList(list, buffer);
+      mListBuffer.toTIntCollection(list, buffer);
     }
 
     private void initialize()

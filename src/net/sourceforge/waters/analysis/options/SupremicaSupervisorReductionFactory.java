@@ -114,12 +114,6 @@ public enum SupremicaSupervisorReductionFactory
     return this != OFF;
   }
 
-  @Override
-  public boolean isSupervisedEventRequired()
-  {
-    return false;
-  }
-
 
   //#########################################################################
   //# Data Members

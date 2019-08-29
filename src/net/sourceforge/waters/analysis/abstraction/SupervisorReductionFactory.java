@@ -85,18 +85,6 @@ public interface SupervisorReductionFactory
    */
   public boolean isSupervisedReductionEnabled();
 
-  /**
-   * Whether the supervisor reduction algorithm provided by this algorithm
-   * requires a supervised event. If a supervised event is required,
-   * supervisor reduction must be performed for one controllable event
-   * at a time, i.e., supervisor localisation. Then the {@link
-   * SupervisorReductionSimplifier#setSupervisedEvent(int)} must be called
-   * to specify a controllable event before running the simplifier.
-   * @return <CODE>true</CODE> if a supervised event is required.
-   */
-  public boolean isSupervisedEventRequired();
-
-
 
   //#########################################################################
   //# Inner Class SupervisorReductionChain

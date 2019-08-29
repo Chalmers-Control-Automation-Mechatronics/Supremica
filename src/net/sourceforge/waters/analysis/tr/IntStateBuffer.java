@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TLongObjectHashMap;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -41,9 +44,6 @@ import java.util.Collection;
 
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.StateProxy;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TLongObjectHashMap;
 
 
 /**
@@ -157,7 +157,7 @@ public class IntStateBuffer extends AbstractStateBuffer
    * <CODE>false</CODE>.
    * @param  size       The number of states in the new buffer.
    * @param  dumpIndex  The index of the dump state in the new buffer.
-   *                    The dump state signifies a unmarked state without
+   *                    The dump state signifies an unmarked state without
    *                    outgoing transitions. It must be specified for
    *                    every state buffer to provide for algorithms that
    *                    redirect transitions to such a state.

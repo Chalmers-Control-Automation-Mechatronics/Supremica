@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.TIntCollection;
 import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -467,6 +469,33 @@ public class IntListBuffer
   }
 
   /**
+   * Removes the first element from the specified list.
+   * This method destructively changes the given list to remove its first
+   * element, and returns that element.
+   * @param  list   The unique list number that identifies the list to be
+   *                modified in this buffer, which must not be empty.
+   * @return The first list element that was removed.
+   */
+  public int removeFirst(final int list)
+  {
+    final int head = getNext(list);
+    if (head == NULL) {
+      throw new IllegalArgumentException
+        ("Attempting to remove element from NULL or empty list!");
+    }
+    final int item = getData(head);
+    final int next = getNext(head);
+    if (next == NULL) {
+      setDataAndNext(list, NULL, NULL);
+    } else {
+      setNext(list, next);
+    }
+    setNext(head, mRecycleStart);
+    mRecycleStart = head;
+    return item;
+  }
+
+  /**
    * Constructs an array containing the elements in the given list.
    * @param  list   The unique list number that identifies the list to be
    *                examined in this buffer.
@@ -487,18 +516,21 @@ public class IntListBuffer
   }
 
   /**
-   * Adds the contents of the given list to the end of a {@link TIntArrayList}.
-   * @param  list   The unique list number that identifies the list to be
-   *                examined in this buffer.
-   * @param  array  The array list to receive the data.
+   * Adds the contents of the given list to {@link TIntCollection},
+   * such as {@link TIntArrayList} or {@link TIntHashSet}. This method
+   * iterates over the given list and calls the collection's {@link
+   * TIntCollection#add(int) add()} method for each element.
+   * @param  list        The unique list number that identifies the list to be
+   *                     examined in this buffer.
+   * @param  collection  The collection to receive the data.
    */
-  public void toArrayList(final int list, final TIntArrayList array)
+  public void toTIntCollection(final int list, final TIntCollection collection)
   {
     int next = getNext(list);
     while (next != NULL) {
       final int[] block = mBlocks.get(next >> BLOCK_SHIFT);
       final int offset = next & BLOCK_MASK;
-      array.add(block[offset + OFFSET_DATA]);
+      collection.add(block[offset + OFFSET_DATA]);
       next = block[offset + OFFSET_NEXT];
     }
   }
@@ -912,11 +944,47 @@ public class IntListBuffer
     //# Specific Access
     /**
      * Removes the current item from the list being iterated over,
-     * and adds it to the end of the specified list.
+     * and adds it at the start of the specified list.
      * @param  list   The unique list number that identifies the list
      *                receiving the data.
      */
-    public void moveTo(final int list)
+    public void moveToStart(final int list)
+    {
+      if (mPrevious != NULL) {
+        final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);
+        final int offset = mCurrent & BLOCK_MASK;
+        final int next = block[offset + OFFSET_NEXT];
+        if (next != NULL) {
+          setNext(mPrevious, next);
+        } else if (mPrevious == mHead) {
+          setDataAndNext(mHead, NULL, NULL);
+        } else {
+          setNext(mPrevious, next);
+          setData(mHead, mPrevious);
+        }
+        block[offset + OFFSET_NEXT] = NULL;
+        final int head = getNext(list);
+        if (head == NULL) {
+          setDataAndNext(list, mCurrent, mCurrent);
+        } else {
+          setNext(list, mCurrent);
+          setNext(mCurrent, head);
+        }
+        mCurrent = mPrevious;
+        mPrevious = NULL;
+      } else {
+        throw new IllegalStateException
+          ("Attempting to move without previous call to advance()!");
+      }
+    }
+
+    /**
+     * Removes the current item from the list being iterated over,
+     * and adds it at the end of the specified list.
+     * @param  list   The unique list number that identifies the list
+     *                receiving the data.
+     */
+    public void moveToEnd(final int list)
     {
       if (mPrevious != NULL) {
         final int[] block = mBlocks.get(mCurrent >> BLOCK_SHIFT);

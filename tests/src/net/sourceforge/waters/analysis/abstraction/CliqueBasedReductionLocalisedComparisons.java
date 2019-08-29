@@ -45,7 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -636,10 +636,10 @@ public class CliqueBasedReductionLocalisedComparisons
     return rel;
   }
 
-  private CliqueBasedSupervisorReductionTRSimplifier createCliqueBasedSimplifier()
+  private MaxCliqueSupervisorReductionTRSimplifier createCliqueBasedSimplifier()
   {
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
-      new CliqueBasedSupervisorReductionTRSimplifier();
+    final MaxCliqueSupervisorReductionTRSimplifier simplifier =
+      new MaxCliqueSupervisorReductionTRSimplifier();
     simplifier.setHeuristicCoverStrategy(mCoverStrategy);
     simplifier.setMaxHeuristicCovers(mMaxNumberOfCovers);
     return simplifier;
@@ -679,7 +679,7 @@ public class CliqueBasedReductionLocalisedComparisons
 
   //#########################################################################
   //# Data Members
-  private final CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
+  private final MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
   private final int mMaxNumberOfCovers;
   private final long mTimeout; //seconds;
   private final String mFilename;

@@ -842,7 +842,7 @@ public class ActiveEventsTRSimplifier
       mPredecessors[state] = tail;
       mListWriteIterator.reset(mList, pred);
       mListWriteIterator.advance();
-      mListWriteIterator.moveTo(mSplitList);
+      mListWriteIterator.moveToEnd(mSplitList);
       if (mListWriteIterator.advance()) {
         final int next = mListWriteIterator.getCurrentData();
         mPredecessors[next] = pred;

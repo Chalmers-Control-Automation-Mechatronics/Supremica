@@ -45,8 +45,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import net.sourceforge.waters.analysis.abstraction.AbstractSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
+import net.sourceforge.waters.analysis.abstraction.MaxCliqueSupervisorReductionTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
 import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SuWonhamSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
@@ -218,7 +218,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   }
 
   private AbstractSupervisorReductionTRSimplifier createSimplifier(final Class<? extends AbstractSupervisorReductionTRSimplifier> simplifierClazz) {
-    if (simplifierClazz.equals(CliqueBasedSupervisorReductionTRSimplifier.class)) {
+    if (simplifierClazz.equals(MaxCliqueSupervisorReductionTRSimplifier.class)) {
       return createCliqueBasedSimplifier();
     }
     else if (simplifierClazz.equals(SuWonhamSupervisorReductionTRSimplifier.class)) {
@@ -229,10 +229,10 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     }
   }
 
-  private CliqueBasedSupervisorReductionTRSimplifier createCliqueBasedSimplifier()
+  private MaxCliqueSupervisorReductionTRSimplifier createCliqueBasedSimplifier()
   {
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
-      new CliqueBasedSupervisorReductionTRSimplifier();
+    final MaxCliqueSupervisorReductionTRSimplifier simplifier =
+      new MaxCliqueSupervisorReductionTRSimplifier();
     simplifier.setHeuristicCoverStrategy(mCoverStrategy);
     simplifier.setMaxHeuristicCovers(mMaxNumberOfCovers);
     return simplifier;
@@ -261,7 +261,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
     throws EventNotFoundException
   {
     final SupervisorReductionFactory factory =
-      new SimpleSupervisorReductionFactory(null, simplifier, true);
+      new SimpleSupervisorReductionFactory(null, simplifier);
     mSynthesizer.setSupervisorReductionFactory(factory);
     super.configureSynthesizer(des);
   }
@@ -294,7 +294,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
   {
     mBindings = bindings;
 
-    final TRSimplifierStatistics cliqueBasedStats = runSynthesizerAndValidate(des, expect, CliqueBasedSupervisorReductionTRSimplifier.class);
+    final TRSimplifierStatistics cliqueBasedStats = runSynthesizerAndValidate(des, expect, MaxCliqueSupervisorReductionTRSimplifier.class);
     final TRSimplifierStatistics suWonhamStats = runSynthesizerAndValidate(des, expect, SuWonhamSupervisorReductionTRSimplifier.class);
 
     mPrintWriter.write(des.getName() + ",");
@@ -380,7 +380,7 @@ public class MonolithicCliqueBasedSupervisorReductionComparisons
 
   //#########################################################################
   //# Data Members
-  private final CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
+  private final MaxCliqueSupervisorReductionTRSimplifier.HeuristicCoverStrategy mCoverStrategy;
   private final int mMaxNumberOfCovers;
   private final long mTimeout; //seconds;
   private final String mFilename;

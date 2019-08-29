@@ -389,7 +389,7 @@ public class UnifiedEFAVariableUnfolder extends AbstractEFAAlgorithm
       final int state = (int) (key >> 32);
       final int event = (int) (key & 0xffffffffL);
       final int list = mTransitionMap.get(key);
-      mTargetStatesBuffer.toArrayList(list, array);
+      mTargetStatesBuffer.toTIntCollection(list, array);
       rel.addTransitions(state, event, array);
       array.clear();
     }

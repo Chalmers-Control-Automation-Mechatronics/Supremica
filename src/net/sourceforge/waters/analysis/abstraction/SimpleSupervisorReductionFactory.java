@@ -39,7 +39,7 @@ package net.sourceforge.waters.analysis.abstraction;
  *
  * <P>A supervisor reduction method is defined by a core algorithm
  * such as {@link SuWonhamSupervisorReductionTRSimplifier} or {@link
- * CliqueBasedSupervisorReductionTRSimplifier} that defines how supervisor
+ * MaxCliqueSupervisorReductionTRSimplifier} that defines how supervisor
  * reduction is performed. Based on this, the simple supervisor reduction
  * factory returns a simplifier chain {@link ChainTRSimplifier} that includes
  * the core algorithm between some pre- and post-processing steps.</P>
@@ -88,37 +88,8 @@ public class SimpleSupervisorReductionFactory
     (final TransitionRelationSimplifier projector,
      final SupervisorReductionSimplifier simplifier)
   {
-    this(projector, simplifier, false);
-  }
-
-  /**
-   * Creates a supervisor reduction factory that may or may not support
-   * for non-localised supervisor reduction.
-   * @param  projector     A supervisor simplifier (typically
-   *                       {@link ProjectingSupervisorReductionTRSimplifier})
-   *                       to remove events that are not needed to make control
-   *                       decisions, which is applied before the core
-   *                       supervisor reduction algorithm is invoked;
-   *                       or <CODE>null</CODE> to disable event removal.
-   * @param  simplifier    The transition relation simplifier that implements
-   *                       the core supervisor reduction algorithm.
-   * @param  localizedOnly Whether the core supervisor reduction simplifier
-   *                       requires a localised event. If <CODE>true</CODE>,
-   *                       the supervisor reduction factory indicates through
-   *                       the {@link #isSupervisedEventRequired()} method
-   *                       that this is required, and the simplifier may fail
-   *                       if started without first calling the {@link
-   *                       SupervisorReductionSimplifier#setSupervisedEvent(int)}
-   *                       method.
-   */
-  public SimpleSupervisorReductionFactory
-    (final TransitionRelationSimplifier projector,
-     final SupervisorReductionSimplifier simplifier,
-     final boolean localizedOnly)
-  {
     mProjector = projector;
     mSimplifier = simplifier;
-    mLocalizedOnly = localizedOnly;
   }
 
 
@@ -143,17 +114,10 @@ public class SimpleSupervisorReductionFactory
     return true;
   }
 
-  @Override
-  public boolean isSupervisedEventRequired()
-  {
-    return mLocalizedOnly;
-  }
-
 
   //#########################################################################
   //# Data Members
   private final TransitionRelationSimplifier mProjector;
   private final SupervisorReductionSimplifier mSimplifier;
-  private final boolean mLocalizedOnly;
 
 }

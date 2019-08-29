@@ -659,8 +659,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
             mMinimizationChain.setTransitionRelation(mTransitionRelation);
             mMinimizationChain.run();
           }
-          if (isSupervisorLocalizationEnabled() ||
-              getSupervisorReductionFactory().isSupervisedEventRequired()) {
+          if (isSupervisorLocalizationEnabled()) {
             // localised supervisors, one per controllable event
             final List<AutomatonProxy> localizedSupervisors =
               new ArrayList<>(mNumControllableEvents);

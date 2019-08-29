@@ -36,58 +36,48 @@ package net.sourceforge.waters.analysis.monolithic;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.CliqueBasedSupervisorReductionTRSimplifier.HeuristicCoverStrategy;
-import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SimpleSupervisorReductionFactory;
+import net.sourceforge.waters.analysis.abstraction.SmallCliqueSupervisorReductionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+
 /**
  * @author Jordan Schroder
  */
-public class MonolithicCliqueBasedSupervisorReductionExperiments
+public class MonolithicSmallCliqueSupervisorReductionTest
   extends AbstractSupervisorSynthesizerTest
 {
 
   //#########################################################################
-  //# To be Provided by Subclasses
-  /**
-   * Creates an instance of the synthesiser under test. This method
-   * instantiates the class of the synthesiser tested by the particular
-   * subclass of this test, and configures it as needed.
-   * @param factory
-   *          The factory used by the synthesiser to create its output.
-   * @return An instance of the synthesiser.
-   */
+  //# Overrides for
+  //# net.sourceforge.waters.model.analysis.AbstractSupervisorSynthesizerTest
   @Override
   protected SupervisorSynthesizer createSynthesizer
     (final ProductDESProxyFactory factory)
   {
     final MonolithicSynthesizer synthesizer =
       new MonolithicSynthesizer(factory);
-    final ProjectingSupervisorReductionTRSimplifier projector =
-      new ProjectingSupervisorReductionTRSimplifier();
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
-      new CliqueBasedSupervisorReductionTRSimplifier();
-    simplifier.setHeuristicCoverStrategy(HeuristicCoverStrategy.CONNECTIVITY);
-    simplifier.setMaxHeuristicCovers(2);
+    final SmallCliqueSupervisorReductionTRSimplifier simplifier =
+      new SmallCliqueSupervisorReductionTRSimplifier();
+    simplifier.setMode
+      (SmallCliqueSupervisorReductionTRSimplifier.Mode.SMALL_CLIQUES);
     final SupervisorReductionFactory reduction =
-      new SimpleSupervisorReductionFactory(projector, simplifier, true);
+      new SimpleSupervisorReductionFactory(simplifier);
     synthesizer.setSupervisorReductionFactory(reduction);
     synthesizer.setSupervisorLocalizationEnabled(true);
     return synthesizer;
   }
 
 
-//#########################################################################
+  //#########################################################################
   //# Entry points in junit.framework.TestCase
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicCliqueBasedSupervisorReductionExperiments.class);
+      new TestSuite(MonolithicSmallCliqueSupervisorReductionTest.class);
     return testSuite;
   }
 
@@ -96,81 +86,53 @@ public class MonolithicCliqueBasedSupervisorReductionExperiments
     junit.textui.TestRunner.run(suite());
   }
 
-  //92 states, 56 events, 336 transitions
-/*  @Override
-  public void testCatMouseUnsup1() throws Exception
-  {
-  }*/
 
-  //698 states, 72 events, 4272 transitions
+  //#########################################################################
+  //# Too Big :-(
+  @Override
+  public void testAip0Sub1P1() throws Exception
+  {
+  }
+
   @Override
   public void testCatMouseUnsup2() throws Exception
   {
+    // 10 minutes on h2o
   }
 
-  //5992 states, 17 events, 29749 transitions
-  @Override
-  public void testTransferLine3() throws Exception
-  {
-  }
-
-  //830 states, 16 events, 8432 transitions
   @Override
   public void testIPC() throws Exception
   {
   }
 
-  //18432 states, 18 events, 83316 transitions
   @Override
   public void testIPCcswitch() throws Exception
   {
   }
 
-  //4374 states, 20 events, 14293 transitions
   @Override
   public void testIPClswitch() throws Exception
   {
   }
 
-  //852 states, 18 events, 2826 transitions
-/*  @Override
-  public void testIPCuswicth() throws Exception
-  {
-  }*/
-
-  //2394 states, 35 events, 4381 transitions
   @Override
-  public void testTictactoe() throws Exception
+  public void testIMS() throws Exception
   {
   }
 
-  //419 states, 22 events, 972 transitions
-/*  @Override
-  public void testCT3() throws Exception
-  {
-  }*/
-
-  //4675 states, 36 events, 20752 transitions (can be reduced to 2 states?)
   @Override
-  public void testRobotAssemblyCell() throws Exception
+  public void testTransferLine3() throws Exception
   {
   }
 
-  //6288 states, 26 events, 35308 transitions
   @Override
   public void test2LinkAlt() throws Exception
   {
+    // 3 hours on h2o
   }
 
-  //33712 states, 26 events, 186444 transitions
   @Override
   public void test2LinkAltBatch() throws Exception
-  {
-  }
-
-  //12960 states, 17 events, 49968 transitions
-  @Override
-  public void testIMS() throws Exception
   {
   }
 }

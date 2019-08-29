@@ -46,7 +46,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 /**
  * A test for the clique-based supervisor reduction simplifier (
- * {@link CliqueBasedSupervisorReductionTRSimplifier}).
+ * {@link MaxCliqueSupervisorReductionTRSimplifier}).
  *
  * @author Robi Malik, Jordan Schroder
  */
@@ -75,13 +75,13 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
   @Override
   protected TransitionRelationSimplifier createTransitionRelationSimplifier()
   {
-    return new CliqueBasedSupervisorReductionTRSimplifier();
+    return new MaxCliqueSupervisorReductionTRSimplifier();
   }
 
   @Override
-  protected CliqueBasedSupervisorReductionTRSimplifier getTransitionRelationSimplifier()
+  protected MaxCliqueSupervisorReductionTRSimplifier getTransitionRelationSimplifier()
   {
-    return (CliqueBasedSupervisorReductionTRSimplifier)
+    return (MaxCliqueSupervisorReductionTRSimplifier)
       super.getTransitionRelationSimplifier();
   }
 
@@ -100,7 +100,7 @@ public class CliqueBasedSupervisorReductionTRSimplifierTest
   protected void configureTransitionRelationSimplifier()
   {
     super.configureTransitionRelationSimplifier();
-    final CliqueBasedSupervisorReductionTRSimplifier simplifier =
+    final MaxCliqueSupervisorReductionTRSimplifier simplifier =
       getTransitionRelationSimplifier();
     final ListBufferTransitionRelation rel = simplifier.getTransitionRelation();
     if (rel.getNumberOfProperEvents() >= 2 &&

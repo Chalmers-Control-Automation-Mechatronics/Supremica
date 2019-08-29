@@ -413,7 +413,7 @@ public class CompositionalAutomataSynthesizer
           final int config = mMainSupervisorReducer.getPreferredInputConfiguration();
           mPreSupervisorReducer.setPreferredOutputConfiguration(config);
         }
-        if (isUsingSupervisorLocalization()) {
+        if (mSupervisorLocalizationEnabled) {
           final ProductDESProxyFactory factory = getFactory();
           mIsomorphismChecker = new IsomorphismChecker(factory, false, false);
         }
@@ -942,7 +942,7 @@ public class CompositionalAutomataSynthesizer
         rel.setProperEventStatus(e, status & ~EventStatus.STATUS_LOCAL);
       }
       final Logger logger = LogManager.getLogger();
-      if (isUsingSupervisorLocalization()) {
+      if (mSupervisorLocalizationEnabled) {
         final List<AutomatonProxy> results = new ArrayList<>(numEvents);
         final String prefix = rel.getName();
         final ListBufferTransitionRelation preReduced =
@@ -995,19 +995,13 @@ public class CompositionalAutomataSynthesizer
     }
   }
 
-  private boolean isUsingSupervisorLocalization()
-  {
-    return mSupervisorReductionFactory.isSupervisedEventRequired() ||
-           mSupervisorLocalizationEnabled;
-  }
-
   private ListBufferTransitionRelation reduceSupervisorStep1
     (final ListBufferTransitionRelation sup)
     throws AnalysisException
   {
     if (mPreSupervisorReducer != null) {
       final Logger logger = LogManager.getLogger();
-      if (isUsingSupervisorLocalization()) {
+      if (mSupervisorLocalizationEnabled) {
         logger.debug("Common steps of supervisor reduction ...");
       }
       sup.logSizes(logger);

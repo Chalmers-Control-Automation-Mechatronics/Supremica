@@ -70,14 +70,14 @@ import org.apache.logging.log4j.Logger;
 /**
  * @author Jordan Schroder
  */
-public class CliqueBasedSupervisorReductionTRSimplifier
+public class MaxCliqueSupervisorReductionTRSimplifier
   extends AbstractSupervisorReductionTRSimplifier
 {
-  public CliqueBasedSupervisorReductionTRSimplifier()
+  public MaxCliqueSupervisorReductionTRSimplifier()
   {
   }
 
-  public CliqueBasedSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
+  public MaxCliqueSupervisorReductionTRSimplifier(final ListBufferTransitionRelation rel)
   {
     super(rel);
   }
@@ -191,6 +191,7 @@ public class CliqueBasedSupervisorReductionTRSimplifier
   protected void setUp() throws AnalysisException
   {
     super.setUp();
+    assert getSupervisedEvent() >= 0;
 
     final ListBufferTransitionRelation relation = getTransitionRelation();
 

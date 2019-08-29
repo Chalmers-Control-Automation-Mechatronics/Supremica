@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.tr;
 
+import gnu.trove.TIntCollection;
 import gnu.trove.list.TIntList;
 import gnu.trove.set.TIntSet;
 
@@ -240,12 +241,12 @@ public class IntSetBuffer implements WatersIntHashingStrategy
   }
 
   /**
-   * Adds the contents of the given set in this buffer to the given hash set.
+   * Adds the contents of the given set in this buffer to the given collection.
    * @param  set     The unique set index identifying the set to be examined
    *                 in this integer set buffer.
    * @param  output  Hash set to which data is to be added.
    */
-  public void collect(final int set, final TIntSet output)
+  public void collect(final int set, final TIntCollection output)
   {
     int blockno = set >>> BLOCK_SHIFT;
     int[] block = mBlocks.get(blockno);

@@ -135,24 +135,65 @@ public enum SupervisorReductionMainMethod
     }
   },
   /**
-   * <P>An option to specify clique-based supervisor reduction.
+   * <P>An option to specify small clique-based supervisor reduction.
    * This options simplifies supervisors by invoking the clique-based
-   * algorithm that attempts to find a supervisor that uses the smallest
-   * possible number of cliques of compatible states.</P>
+   * algorithm that attempts to find a cover of <I>small</I> cliques.
+   * These cliques are formed by adding to each set of states to be covered
+   * all states that are compatible to all the states that need covering.
    *
-   * @see CliqueBasedSupervisorReductionTRSimplifier
+   * @see SmallCliqueSupervisorReductionTRSimplifier
    */
-  CLIQUE("Clique-based") {
+  SMALL_CLIQUES("Small cliques") {
     @Override
     public SupervisorReductionSimplifier createSimplifier()
     {
-      return new CliqueBasedSupervisorReductionTRSimplifier();
+      final SmallCliqueSupervisorReductionTRSimplifier simplifier =
+        new SmallCliqueSupervisorReductionTRSimplifier();
+      simplifier.setMode
+        (SmallCliqueSupervisorReductionTRSimplifier.Mode.SMALL_CLIQUES);
+      return simplifier;
     }
-
+  },
+  /**
+   * <P>An option to specify small clique-based supervisor reduction.
+   * This options simplifies supervisors by invoking the clique-based
+   * algorithm that attempts to find a cover of <I>small</I> cliques
+   * and their unions. The small cliques are formed as with option
+   * {@link #SMALL_CLIQUES}, but in addition it is attempted to forms unions
+   * of cliques already found to construct larger cliques.
+   *
+   * @see SmallCliqueSupervisorReductionTRSimplifier
+   */
+  SMALL_CLIQUES_UNION("United cliques") {
     @Override
-    public boolean isSupervisedEventRequired()
+    public SupervisorReductionSimplifier createSimplifier()
     {
-      return true;
+      final SmallCliqueSupervisorReductionTRSimplifier simplifier =
+        new SmallCliqueSupervisorReductionTRSimplifier();
+      simplifier.setMode
+        (SmallCliqueSupervisorReductionTRSimplifier.Mode.GREEDY_UNION);
+      return simplifier;
+    }
+  },
+  /**
+   * <P>An option to specify small clique-based supervisor reduction.
+   * This options simplifies supervisors by invoking the clique-based
+   * algorithm that attempts to find a cover of <I>maximal</I> cliques.
+   * These cliques are formed by extending each set of states to
+   * a maximal clique, by adding states that are most connected to those
+   * already selected.
+   *
+   * @see SmallCliqueSupervisorReductionTRSimplifier
+   */
+  MAX_CLIQUES("Max cliques") {
+    @Override
+    public SupervisorReductionSimplifier createSimplifier()
+    {
+      final SmallCliqueSupervisorReductionTRSimplifier simplifier =
+        new SmallCliqueSupervisorReductionTRSimplifier();
+      simplifier.setMode
+        (SmallCliqueSupervisorReductionTRSimplifier.Mode.MAX_CLIQUES);
+      return simplifier;
     }
   };
 
@@ -177,11 +218,6 @@ public enum SupervisorReductionMainMethod
   //#########################################################################
   //# Access
   public abstract SupervisorReductionSimplifier createSimplifier();
-
-  public boolean isSupervisedEventRequired()
-  {
-    return false;
-  }
 
 
   //#########################################################################

@@ -1121,7 +1121,7 @@ public class ObservationEquivalenceTRSimplifier
       mPredecessors[state] = tail;
       mClassWriteIterator.reset(mList, pred);
       mClassWriteIterator.advance();
-      mClassWriteIterator.moveTo(mOverflowList);
+      mClassWriteIterator.moveToEnd(mOverflowList);
       if (mClassWriteIterator.advance()) {
         final int next = mClassWriteIterator.getCurrentData();
         mPredecessors[next] = pred;
@@ -1823,13 +1823,13 @@ public class ObservationEquivalenceTRSimplifier
                 if (size1++ == 0) {
                   overflow1 = mClassLists.createList();
                 }
-                mClassWriteIterator.moveTo(overflow1);
+                mClassWriteIterator.moveToEnd(overflow1);
                 break;
               case LITTLE:
                 if (size2++ == 0) {
                   overflow2 = mClassLists.createList();
                 }
-                mClassWriteIterator.moveTo(overflow2);
+                mClassWriteIterator.moveToEnd(overflow2);
                 break;
               default:
                 break;
