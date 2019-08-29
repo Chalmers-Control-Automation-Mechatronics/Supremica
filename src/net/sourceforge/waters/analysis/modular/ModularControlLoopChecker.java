@@ -195,6 +195,7 @@ public class ModularControlLoopChecker
     list.add(new EventListParameter(ParameterIDs.testControlLoopHideParam) {
       @Override
       public void commitValue() {
+        setKindTranslator(getKindTranslator());
       }
     });
 
