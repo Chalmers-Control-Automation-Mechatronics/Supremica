@@ -42,8 +42,8 @@ import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.NamedProxy;
 import net.sourceforge.waters.model.base.Proxy;
@@ -222,7 +222,7 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
       if (aut == mNamedProxy) {
         return ComponentKind.SPEC;
       } else if (aut.getKind() == ComponentKind.PROPERTY) {
-        return ComponentKind.PROPERTY;
+        return null;
       } else {
         return super.getComponentKind(aut);
       }
@@ -253,7 +253,7 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
       } else if (info.getSourceObject() == mNamedProxy) {
         return ComponentKind.SPEC;
       } else if (aut.getKind() == ComponentKind.PROPERTY) {
-        return ComponentKind.PROPERTY;
+        return null;
       } else {
         return super.getComponentKind(aut);
       }
