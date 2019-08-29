@@ -107,6 +107,11 @@ public class AnalyzerProductDESContext
     return ModuleContext.getComponentKindToolTip(kind);
   }
 
+  @Override
+  public ModuleContext getModuleContext()
+  {
+    return mModuleContainer.getModuleContext();
+  }
 
   //#########################################################################
   //# Constructors

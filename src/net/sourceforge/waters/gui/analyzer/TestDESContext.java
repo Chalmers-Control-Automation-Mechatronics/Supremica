@@ -113,9 +113,16 @@ public class TestDESContext implements ProductDESContext
     return ModuleContext.getComponentKindToolTip(kind);
   }
 
+  @Override
+  public ModuleContext getModuleContext()
+  {
+    return mModuleContext;
+  }
+
   //#########################################################################
   //# Data Members
   private ModuleContext mModuleContext;
   private ProductDESProxy mProductDESProxy;
   private Map<Object,SourceInfo> mSourceInfoMap;
+
 }
