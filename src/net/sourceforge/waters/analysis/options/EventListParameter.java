@@ -18,11 +18,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.analysis.des.AbstractVerificationKindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 
 
@@ -32,10 +30,9 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class EventListParameter extends Parameter
 {
 
-
-  protected EventListParameter(final int id,
-                               final String name,
-                               final String description)
+  EventListParameter(final int id,
+                     final String name,
+                     final String description)
   {
     super(id, name, description);
     mUncontrollableList = null;
@@ -61,9 +58,9 @@ public class EventListParameter extends Parameter
 
     final JPanel panel = new JPanel();
     final JButton button = new JButton("...");
-    text = new JTextField();
-    text.setColumns(10);
-    text.setEditable(false);
+    mTextField = new JTextField();
+    mTextField.setColumns(10);
+    mTextField.setEditable(false);
 
     //Initial generation, uninitialized lists
     if (mControllableList == null) {
@@ -71,21 +68,21 @@ public class EventListParameter extends Parameter
       mControllableList = generateControllable();
     }
 
-    setText(text);
+    setText(mTextField);
 
     button.addActionListener(new ActionListener() {
 
       @Override
       public void actionPerformed(final ActionEvent arg0)
       {
-        final ControlLoopHideDialog hideEvents =
-          new ControlLoopHideDialog(model);
+        final EventListDialog hideEvents =
+          new EventListDialog(model);
         hideEvents.pack();
         hideEvents.setVisible(true);
       }
     });
 
-    panel.add(text);
+    panel.add(mTextField);
     panel.add(button);
 
     return panel;
@@ -139,7 +136,7 @@ public class EventListParameter extends Parameter
 
   public KindTranslator getKindTranslator()
   {
-    return new EventListTranslater();
+    return new EventListKindTranslator();
   }
 
   //Generate default controllable list
@@ -168,12 +165,12 @@ public class EventListParameter extends Parameter
   }
 
   //#########################################################################
-  //# Inner Class ControlLoopHideDialog
-  private class ControlLoopHideDialog extends JDialog
+  //# Inner Class EventListDialog
+  private class EventListDialog extends JDialog
   {
     //#######################################################################
     //# Constructor
-    public ControlLoopHideDialog(final ProductDESContext model)
+    public EventListDialog(final ProductDESContext model)
     {
       super();
       generate(model);
@@ -184,24 +181,25 @@ public class EventListParameter extends Parameter
       setLayout(new GridLayout(0, 2));
 
       final DefaultListModel<EventProxy> modelUncontrollableList =
-        new DefaultListModel<EventProxy>();
+        new DefaultListModel<>();
       final DefaultListModel<EventProxy> modelControllableList =
-        new DefaultListModel<EventProxy>();
+        new DefaultListModel<>();
 
-        for (final EventProxy event: mControllableList) {
-          modelControllableList.addElement(event);
-        }
-        for (final EventProxy event: mUncontrollableList) {
-          modelUncontrollableList.addElement(event);
-        }
+      for (final EventProxy event: mControllableList) {
+        modelControllableList.addElement(event);
+      }
+      for (final EventProxy event: mUncontrollableList) {
+        modelUncontrollableList.addElement(event);
+      }
 
       final JList<EventProxy> uncontrollableList = new JList<EventProxy>();
       uncontrollableList.setModel(modelUncontrollableList);
-      uncontrollableList.setCellRenderer(new EventListRenderer(model.getModuleContext()));
+      uncontrollableList.setCellRenderer(new EventCellRenderer());
       final JScrollPane leftUncontrollableScroller = new JScrollPane();
       leftUncontrollableScroller.setViewportView(uncontrollableList);
       uncontrollableList.setLayoutOrientation(JList.VERTICAL);
 
+      // TODO Maintain alphabetic order of lists
       final JButton shiftRightButton = new JButton(">>>");
       shiftRightButton.addActionListener(new ActionListener() {
         @Override
@@ -217,7 +215,7 @@ public class EventListParameter extends Parameter
 
       final JList<EventProxy> controllableList = new JList<EventProxy>();
       controllableList.setModel(modelControllableList);
-      controllableList.setCellRenderer(new EventListRenderer(model.getModuleContext()));
+      controllableList.setCellRenderer(new EventCellRenderer());
       final JScrollPane rightControllableScroller = new JScrollPane();
       rightControllableScroller.setViewportView(controllableList);
       controllableList.setLayoutOrientation(JList.VERTICAL);
@@ -263,7 +261,7 @@ public class EventListParameter extends Parameter
           }
 
           mControllableList = tmp;
-          setText(text);
+          setText(mTextField);
           dispose();
         }
       });
@@ -287,37 +285,23 @@ public class EventListParameter extends Parameter
     private static final long serialVersionUID = 4132888698192730783L;
   }
 
-  // Display icons (see net.sourceforge.waters.gui.EventListCell,
-  // use setCellRenderer)
 
-  private class EventListRenderer extends JLabel
+  //#########################################################################
+  //# Inner Class EventCellRenderer
+  private class EventCellRenderer extends JLabel
     implements ListCellRenderer<EventProxy>
   {
-
-    //#########################################################################
-    //# Constructor
-    EventListRenderer(final ModuleContext context)
-    {
-      mContext = context;
-    }
-
+    //#######################################################################
+    //# Interface javax.swing.ListCellRenderer<EventProxy>
     @Override
     public Component getListCellRendererComponent(final JList<? extends EventProxy> list,
-                                                  final EventProxy value,
+                                                  final EventProxy event,
                                                   final int index,
                                                   final boolean isSelected,
                                                   final boolean cellHasFocus)
     {
-      //class cast error
-      @SuppressWarnings("unused")
-      final EventProxy decl = value;
-      //final String text = HTMLPrinter.getHTMLString(decl, mContext);
-      //final Icon icon = mContext.getIcon(decl);
-      //setIcon(icon);
-      //final String tooltip = mContext.getToolTipText(decl);
-
-      setText(value.getName());
-      setIcon(mDESContext.getEventIcon(value));
+      setText(event.getName());
+      setIcon(mDESContext.getEventIcon(event));
       if (isSelected) {
         setBackground(list.getSelectionBackground());
         setForeground(list.getSelectionForeground());
@@ -329,47 +313,38 @@ public class EventListParameter extends Parameter
       return this;
     }
 
-    //#########################################################################
-    //# Data Members
-    @SuppressWarnings("unused")
-    private final ModuleContext mContext;
-
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 760104252849112475L;
-
   }
 
-  // Create KindTranslator to pass events to control loop checker.
-  // Loop events are controllable, other uncontrollable.
-  // See net.sourceforge.waters.model.analysis.KindTranslator
 
   //#########################################################################
-  //# Inner Class EventListTranslater
-  private class EventListTranslater implements KindTranslator{
-
-    @Override
-    public ComponentKind getComponentKind(final AutomatonProxy aut)
-    {
-      return aut.getKind();
-    }
-
+  //# Inner Class EventListKindTranslator
+  private class EventListKindTranslator
+    extends AbstractVerificationKindTranslator
+  {
+    //#######################################################################
+    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
     @Override
     public EventKind getEventKind(final EventProxy event)
     {
-      if(event.getKind() == EventKind.PROPOSITION)
+      if (event.getKind() == EventKind.PROPOSITION) {
         return EventKind.PROPOSITION;
-      else if(getControllable().contains(event))
+      } else if (getControllable().contains(event)) {
         return EventKind.CONTROLLABLE;
-      else
+      } else {
         return EventKind.UNCONTROLLABLE;
-    }}
+      }
+    }
+  }
 
-  //#######################################################################
+
+  //#########################################################################
   //# Data Members
   private List<EventProxy> mUncontrollableList;
   private List<EventProxy> mControllableList;
   private ProductDESContext mDESContext;
-  private JTextField text;
+  private JTextField mTextField;
 
 }

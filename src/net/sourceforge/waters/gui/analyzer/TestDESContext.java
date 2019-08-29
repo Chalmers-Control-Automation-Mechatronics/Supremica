@@ -43,6 +43,7 @@ public class TestDESContext implements ProductDESContext
   {
   }
 
+
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
   @Override
@@ -72,6 +73,7 @@ public class TestDESContext implements ProductDESContext
     final EventDeclProxy decl = (EventDeclProxy) proxy;
     return mModuleContext.getIcon(decl);
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
@@ -113,11 +115,6 @@ public class TestDESContext implements ProductDESContext
     return ModuleContext.getComponentKindToolTip(kind);
   }
 
-  @Override
-  public ModuleContext getModuleContext()
-  {
-    return mModuleContext;
-  }
 
   //#########################################################################
   //# Data Members

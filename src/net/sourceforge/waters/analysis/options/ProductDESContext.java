@@ -37,7 +37,6 @@ import java.util.List;
 
 import javax.swing.Icon;
 
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
@@ -55,6 +54,4 @@ public interface ProductDESContext
   public Icon getComponentKindIcon(ComponentKind kind);
 
   public String getComponentKindText(final ComponentKind kind);
-
-  public ModuleContext getModuleContext();
 }

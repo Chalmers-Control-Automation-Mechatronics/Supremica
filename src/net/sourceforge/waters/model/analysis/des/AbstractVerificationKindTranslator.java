@@ -31,86 +31,38 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.model.analysis.des;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.swing.Icon;
-
-import net.sourceforge.waters.analysis.options.ProductDESContext;
-import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import org.supremica.gui.ide.ModuleContainer;
 
 
-public class AnalyzerProductDESContext
-  implements ProductDESContext
+/**
+ * <P>A kind translator used for most verification algorithms.
+ * This reinterprets supervisors as specs and suppresses properties,
+ * while leaving event kinds unchanged.</P>
+ *
+ * @author Robi Malik
+ */
+
+public abstract class AbstractVerificationKindTranslator
+  extends AbstractKindTranslator
 {
 
   //#########################################################################
-  //# Constructor
-  public AnalyzerProductDESContext(final WatersAnalyzerPanel panel)
-  {
-    mModuleContainer = panel.getModuleContainer();
-    mAnalyzerPanel = panel;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
+  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
   @Override
-  public ProductDESProxy getProductDES()
+  public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    return mModuleContainer.getCompiledDES();
-  }
-
-  @Override
-  public List<AutomatonProxy> getActiveAutomata()
-  {
-    return mAnalyzerPanel.getAutomataTable().getOperationArgument();
-  }
-
-  @Override
-  public Icon getEventIcon(final EventProxy event)
-  {
-    final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(event);
-    if (info == null) {
+    final ComponentKind kind = aut.getKind();
+    switch (kind) {
+    case SUPERVISOR:
+      return ComponentKind.SPEC;
+    case PROPERTY:
       return null;
+    default:
+      return kind;
     }
-    final Proxy proxy = info.getSourceObject();
-    if (!(proxy instanceof EventDeclProxy)) {
-      return null;
-    }
-    final EventDeclProxy decl = (EventDeclProxy) proxy;
-    final ModuleContext context = mModuleContainer.getModuleContext();
-    return context.getIcon(decl);
   }
-
-  @Override
-  public Icon getComponentKindIcon(final ComponentKind kind)
-  {
-    return ModuleContext.getComponentKindIcon(kind);
-  }
-
-  @Override
-  public String getComponentKindText(final ComponentKind kind)
-  {
-    return ModuleContext.getComponentKindToolTip(kind);
-  }
-
-
-  //#########################################################################
-  //# Constructors
-  private final ModuleContainer mModuleContainer;
-  private final WatersAnalyzerPanel mAnalyzerPanel;
 
 }
