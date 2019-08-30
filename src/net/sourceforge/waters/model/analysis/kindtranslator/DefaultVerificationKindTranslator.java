@@ -31,64 +31,56 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.trcomp;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
-import net.sourceforge.waters.model.analysis.VerificationResult;
-import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
-import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
-import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.des.SafetyCounterExampleProxy;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 
 
 /**
- * <P>An abstract base class for delegation-based safety verifiers
- * in the TR-compositional framework.</P>
+ * <P>A kind translator used for most verification algorithms.
+ * This kind translator reinterprets supervisors as specs and suppresses
+ * properties, while leaving event kinds unchanged.</P>
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractTRDelegatingSafetyVerifier
-  extends AbstractTRDelegatingVerifier
-  implements SafetyVerifier
+public class DefaultVerificationKindTranslator
+  extends AbstractKindTranslator
 {
 
   //#########################################################################
-  //# Constructor
-  public AbstractTRDelegatingSafetyVerifier
-    (final ProductDESProxy model,
-     final KindTranslator translator,
-     final SafetyDiagnostics diag)
+  //# Singleton Implementation
+  /**
+   * Gets a kind translator that reinterprets supervisors as specs and
+   * suppresses properties, while leaving event kinds unchanged.
+   */
+  public static DefaultVerificationKindTranslator getInstance()
   {
-    super(model, translator,
-          new TRCompositionalOnePropertyChecker(diag));
+    return SingletonHolder.theInstance;
+  }
+
+  private static class SingletonHolder {
+    private static final DefaultVerificationKindTranslator theInstance =
+      new DefaultVerificationKindTranslator();
   }
 
 
   //#########################################################################
-  //# Interface for net.sourceforge.waters.model.analysis.des.SafetyVerifier
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
   @Override
-  public SafetyDiagnostics getDiagnostics()
+  public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    final TRCompositionalOnePropertyChecker delegate = getDelegate();
-    return delegate.getDiagnostics();
-  }
-
-  @Override
-  public SafetyCounterExampleProxy getCounterExample()
-  {
-    final VerificationResult result = getAnalysisResult();
-    return (SafetyCounterExampleProxy) result.getCounterExample();
-  }
-
-
-  //#########################################################################
-  //# Overrides for
-  //# net.sourceforge.waters.model.analysis.trcomp.AbstractTRDelegatingVerifier
-  @Override
-  protected TRCompositionalOnePropertyChecker getDelegate()
-  {
-    return (TRCompositionalOnePropertyChecker) super.getDelegate();
+    final ComponentKind kind = aut.getKind();
+    switch (kind) {
+    case SUPERVISOR:
+      return ComponentKind.SPEC;
+    case PROPERTY:
+      return null;
+    default:
+      return kind;
+    }
   }
 
 }

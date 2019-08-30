@@ -64,12 +64,12 @@ import net.sourceforge.waters.analysis.compositional.CompositionalSelectionHeuri
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizerNormality;
 import net.sourceforge.waters.model.analysis.Abortable;
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.SynthesisKindTranslator;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
+import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.SynthesisKindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;

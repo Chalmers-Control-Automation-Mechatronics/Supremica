@@ -49,7 +49,7 @@ import net.sourceforge.waters.analysis.distributed.application.Worker;
 import net.sourceforge.waters.analysis.distributed.schemata.AutomatonSchema;
 import net.sourceforge.waters.analysis.distributed.schemata.ProductDESSchema;
 import net.sourceforge.waters.analysis.distributed.schemata.SchemaBuilder;
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 

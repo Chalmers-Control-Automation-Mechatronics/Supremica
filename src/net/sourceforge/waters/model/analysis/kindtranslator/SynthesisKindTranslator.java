@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import java.io.Serializable;
 
@@ -42,56 +42,96 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * <P>A kind translator used for controllability checking.
- * This translator relabels supervisors as specifications and otherwise
- * returns all component and event types as they are in the original
- * model.</P>
+ * <P>A kind translator for synthesis.</P>
+ *
+ * <P>There are two versions of synthesis kind translation, depending on
+ * whether controllability is considered or not. If controllability is not
+ * considered, all uncontrollable events are redefined to be controllable,
+ * otherwise the event types are unchanged. In both cases, the synthesis kind
+ * translator suppresses supervisor and property components by mapping their
+ * component kind to <CODE>null</CODE>.</P>
  *
  * @author Robi Malik
  */
 
-public class ControllabilityKindTranslator
+public final class SynthesisKindTranslator
   implements KindTranslator, Serializable
 {
 
   //#########################################################################
-  //# Singleton Pattern
-  public static ControllabilityKindTranslator getInstance()
+  //# Singleton Implementation
+  /**
+   * Gets a kind translator for synthesis subject to controllability.
+   * @return A kind translator that leaves event kinds unchanged but
+   *         suppresses supervisors and properties.
+   */
+  public static SynthesisKindTranslator getInstanceWithControllability()
   {
-    return SingletonHolder.theInstance;
+    return SingletonHolderWithControllability.theInstance;
   }
 
-  private static class SingletonHolder {
-    private static final ControllabilityKindTranslator theInstance =
-      new ControllabilityKindTranslator();
+  /**
+   * Gets a kind translator for synthesis subject ignoring controllability.
+   * @return A kind translator that redefines all uncontrollable events to be
+   *         controllable, and suppresses supervisors and properties.
+   */
+  public static SynthesisKindTranslator getInstanceWithoutControllability()
+  {
+    return SingletonHolderWithoutControllability.theInstance;
   }
 
-  private ControllabilityKindTranslator()
+  private static class SingletonHolderWithControllability {
+    private static final SynthesisKindTranslator theInstance =
+      new SynthesisKindTranslator(EventKind.UNCONTROLLABLE);
+  }
+
+  private static class SingletonHolderWithoutControllability {
+    private static final SynthesisKindTranslator theInstance =
+      new SynthesisKindTranslator(EventKind.CONTROLLABLE);
+  }
+
+  private SynthesisKindTranslator(final EventKind kind)
   {
+    mUncontrollableEventKind = kind;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
+  @Override
+  public EventKind getEventKind(final EventProxy event)
   {
-    final ComponentKind kind = aut.getKind();
+    final EventKind kind = event.getKind();
     switch (kind) {
-    case SUPERVISOR:
-      return ComponentKind.SPEC;
+    case UNCONTROLLABLE:
+      return mUncontrollableEventKind;
     default:
       return kind;
     }
   }
 
-  public EventKind getEventKind(final EventProxy event)
+  @Override
+  public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    return event.getKind();
+    final ComponentKind kind = aut.getKind();
+    switch (kind) {
+    case PROPERTY:
+    case SUPERVISOR:
+      return null;
+    default:
+      return kind;
+    }
   }
 
 
   //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
+  //# Data Members
+  private final EventKind mUncontrollableEventKind;
+
+
+  //#########################################################################
+  //# Singleton Implementation
+  private static final long serialVersionUID = 4982215984233224218L;
 
 }

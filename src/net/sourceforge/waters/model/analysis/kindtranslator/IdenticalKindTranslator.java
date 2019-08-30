@@ -31,43 +31,43 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.EventKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
+import java.io.Serializable;
 
 
 /**
- * <P>A default implementation of kind translator that does not change
- * component and event attributes. It can be subclassed to provide more
- * advanced implementations.</P>
+ * <P>A kind translator that does not change component and event
+ * attributes. This simple kind translator implementation is used
+ * for simple controllability checks.</P>
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractKindTranslator
-  implements KindTranslator
+public final class IdenticalKindTranslator
+  extends AbstractKindTranslator
+  implements Serializable
 {
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  /**
-   * Returns the component kind of the given automaton.
-   */
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
+  //# Singleton Implementation
+  public static IdenticalKindTranslator getInstance()
   {
-    return aut.getKind();
+    return SingletonHolder.theInstance;
   }
 
-  /**
-   * Returns the event kind of the given event.
-   */
-  public EventKind getEventKind(final EventProxy event)
-  {
-    return event.getKind();
+  private static class SingletonHolder {
+    private static final IdenticalKindTranslator theInstance =
+      new IdenticalKindTranslator();
   }
+
+  private IdenticalKindTranslator()
+  {
+  }
+
+
+  //#########################################################################
+  //# Singleton Implementation
+  private static final long serialVersionUID = 5971560281957038019L;
 
 }

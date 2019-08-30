@@ -31,92 +31,53 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import java.io.Serializable;
 
 import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * <P>A kind translator for synthesis.</P>
- *
- * <P>There are two versions of synthesis kind translation, depending on
- * whether controllability is considered or not. If controllability is not
- * considered, all uncontrollable events are redefined to be controllable,
- * otherwise the event types are unchanged. In both cases, the synthesis kind
- * translator suppresses supervisor and property components by mapping their
- * component kind to <CODE>null</CODE>.</P>
+ * <P>A kind translator to suppress properties. The property suppression
+ * kind translator suppresses property automata ({@link ComponentKind#PROPERTY})
+ * by mapping their component kind to <CODE>null</CODE> and leaves everything
+ * else unchanged.</P>
  *
  * @author Robi Malik
  */
 
-public class SynthesisKindTranslator
-  implements KindTranslator, Serializable
+public final class PropertySuppressionKindTranslator
+  extends AbstractKindTranslator
+  implements Serializable
 {
 
   //#########################################################################
   //# Singleton Implementation
   /**
-   * Gets a kind translator for synthesis subject to controllability.
-   * @return A kind translator that leaves event kinds unchanged but
-   *         suppresses supervisors and properties.
+   * Gets a kind translator that suppresses properties.
    */
-  public static SynthesisKindTranslator getInstanceWithControllability()
+  public static PropertySuppressionKindTranslator getInstance()
   {
-    return SingletonHolderWithControllability.theInstance;
+    return SingletonHolder.theInstance;
   }
 
-  /**
-   * Gets a kind translator for synthesis subject ignoring controllability.
-   * @return A kind translator that redefines all uncontrollable events to be
-   *         controllable, and suppresses supervisors and properties.
-   */
-  public static SynthesisKindTranslator getInstanceWithoutControllability()
-  {
-    return SingletonHolderWithoutControllability.theInstance;
-  }
-
-  private static class SingletonHolderWithControllability {
-    private static final SynthesisKindTranslator theInstance =
-      new SynthesisKindTranslator(EventKind.UNCONTROLLABLE);
-  }
-
-  private static class SingletonHolderWithoutControllability {
-    private static final SynthesisKindTranslator theInstance =
-      new SynthesisKindTranslator(EventKind.CONTROLLABLE);
-  }
-
-  private SynthesisKindTranslator(final EventKind kind)
-  {
-    mUncontrollableEventKind = kind;
+  private static class SingletonHolder {
+    private static final PropertySuppressionKindTranslator theInstance =
+      new PropertySuppressionKindTranslator();
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  @Override
-  public EventKind getEventKind(final EventProxy event)
-  {
-    final EventKind kind = event.getKind();
-    switch (kind) {
-    case UNCONTROLLABLE:
-      return mUncontrollableEventKind;
-    default:
-      return kind;
-    }
-  }
-
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
   @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
     final ComponentKind kind = aut.getKind();
     switch (kind) {
     case PROPERTY:
-    case SUPERVISOR:
       return null;
     default:
       return kind;
@@ -125,12 +86,7 @@ public class SynthesisKindTranslator
 
 
   //#########################################################################
-  //# Data Members
-  private final EventKind mUncontrollableEventKind;
-
-
-  //#########################################################################
   //# Singleton Implementation
-  private static final long serialVersionUID = 4982215984233224218L;
+  private static final long serialVersionUID = 7769314630409045051L;
 
 }

@@ -55,13 +55,13 @@ import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.DiagnosabilityChecker;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductStateMap;
+import net.sourceforge.waters.model.analysis.kindtranslator.DefaultVerificationKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.DualCounterExampleProxy;
@@ -74,6 +74,27 @@ import net.sourceforge.waters.model.des.TraceStepProxy;
 
 
 /**
+ * <P>An implementation of the diagnosability check algorithm.</P>
+ *
+ * <P>This verifier checks is given a model with unobservable events,
+ * some of which are classified as faults. It determines whether all
+ * fault classes are diagnosable, using the verifier-based algorithm by
+ * Yoo and Lafortune&nbsp;(2002).</P>
+ *
+ * <P>Event attributes are used to define which events are faults. Events with
+ * the attribute {@link DiagnosabilityAttributeFactory#FAULT_KEY} are faults,
+ * and the value of the attribute is the fault class. Different events with
+ * the same fault class represent the same fault, and for the system to be
+ * diagnosable it is enough if it can be determined whether some event of
+ * each fault class has occurred without necessarily specifying the exact
+ * event.</P>
+ *
+ * <P><I>Reference.</I><BR>
+ * Tae-Sic Yoo and St&eacute;phane Lafortune. Polynomial-time verification
+ * of diagnosability of partially observed discrete-event systems.
+ * IEEE Transactions on Automatic Control, <STRONG>47</STRONG>&nbsp;(9),
+ * 1491&ndash;1495, 2002.</P>
+ *
  * @author Nicholas McGrath
  */
 public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
@@ -84,7 +105,7 @@ public class MonolithicDiagnosabilityVerifier extends AbstractModelVerifier
   //# Constructors
   public MonolithicDiagnosabilityVerifier(final ProductDESProxyFactory factory)
   {
-    this(factory, IdenticalKindTranslator.getInstance());
+    this(factory, DefaultVerificationKindTranslator.getInstance());
   }
 
   public MonolithicDiagnosabilityVerifier(final ProductDESProxyFactory factory,

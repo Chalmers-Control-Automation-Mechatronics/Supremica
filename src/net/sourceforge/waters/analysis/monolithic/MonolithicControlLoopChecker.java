@@ -47,12 +47,12 @@ import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -207,10 +207,10 @@ public class MonolithicControlLoopChecker
   {
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
-    final int numstates = mGlobalStateSet.size();
+    final int numStates = mGlobalStateSet == null ? 0 : mGlobalStateSet.size();
     result.setNumberOfAutomata(mNumAutomata);
-    result.setNumberOfStates(numstates);
-    result.setPeakNumberOfNodes(numstates);
+    result.setNumberOfStates(numStates);
+    result.setPeakNumberOfNodes(numStates);
   }
 
 
@@ -232,13 +232,15 @@ public class MonolithicControlLoopChecker
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
       final ComponentKind kind = translator.getComponentKind(aProxy);
-      switch (kind) {
-      case PLANT:
-      case SPEC:
-        mAutomataList.add(aProxy);
-        break;
-      default:
-        break;
+      if (kind != null) {
+        switch (kind) {
+        case PLANT:
+        case SPEC:
+          mAutomataList.add(aProxy);
+          break;
+        default:
+          break;
+        }
       }
     }
 

@@ -31,9 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
-
-import java.io.Serializable;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -42,49 +40,65 @@ import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * <P>A kind translator for events only.
- * The event-only kind translator masks another kind translator.
- * It returns the same event kinds as the masked translator, and reads
- * the component kinds directly from the automata without any translation.
+ * <P>A kind translator used for language inclusion checking.
+ * This translator remaps all events to be uncontrollable,
+ * all specs and supervisors are considered as plants, and all properties are
+ * considered as specs. Such a remapping makes it possible to
+ * implement language inclusion checking using a controllability
+ * checker.</P>
+ * <P>This is a non-serialisable, abstract default implementation of a
+ * language inclusion kind translator, which is subclassed for more specific
+ * implementations.</P>
  *
  * @author Robi Malik
  */
 
-public class EventOnlyKindTranslator
-  implements KindTranslator, Serializable
+public abstract class AbstractLanguageInclusionKindTranslator
+  implements KindTranslator
 {
 
   //#########################################################################
-  //# Constructor
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
   /**
-   * Creates an event-only kind translator.
-   * @param parent The masked kind translator that provides event kinds.
+   * Returns the component kind of the given automaton in a language
+   * inclusion check.
+   * @return {@link ComponentKind#PLANT}, if the given automaton is
+   *         a plant, spec, or supervisor, or {@link ComponentKind#SPEC} if
+   *         the given automaton is a property.
    */
-  public EventOnlyKindTranslator(final KindTranslator parent)
-  {
-    mParent = parent;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
   @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    return aut.getKind();
+    final ComponentKind kind = aut.getKind();
+    switch (kind) {
+    case PLANT:
+    case SPEC:
+    case SUPERVISOR:
+      return ComponentKind.PLANT;
+    case PROPERTY:
+      return ComponentKind.SPEC;
+    default:
+      return kind;
+    }
   }
 
+  /**
+   * Returns the event kind of the given event in a language
+   * inclusion check.
+   * @return {@link EventKind#UNCONTROLLABLE}.
+   */
   @Override
   public EventKind getEventKind(final EventProxy event)
   {
-    return mParent.getEventKind(event);
+    final EventKind kind = event.getKind();
+    switch (kind) {
+    case CONTROLLABLE:
+    case UNCONTROLLABLE:
+      return EventKind.UNCONTROLLABLE;
+    default:
+      return kind;
+    }
   }
-
-
-  //#########################################################################
-  //# Data Members
-  private final KindTranslator mParent;
-
-  private static final long serialVersionUID = -3554422505706642871L;
 
 }

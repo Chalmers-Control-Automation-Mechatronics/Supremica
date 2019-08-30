@@ -33,7 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.module;
 
-import net.sourceforge.waters.model.analysis.ConflictKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
 import net.sourceforge.waters.model.des.ConflictCounterExampleProxy;
 import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;

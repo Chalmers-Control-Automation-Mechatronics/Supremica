@@ -18,8 +18,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.des.AbstractVerificationKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -52,9 +52,9 @@ public class EventListParameter extends Parameter
   }
 
   @Override
-  public Component createComponent(final ProductDESContext model)
+  public Component createComponent(final ProductDESContext context)
   {
-    mDESContext = model;
+    mDESContext = context;
 
     final JPanel panel = new JPanel();
     final JButton button = new JButton("...");
@@ -71,14 +71,12 @@ public class EventListParameter extends Parameter
     setText(mTextField);
 
     button.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(final ActionEvent arg0)
       {
-        final EventListDialog hideEvents =
-          new EventListDialog(model);
-        hideEvents.pack();
-        hideEvents.setVisible(true);
+        final EventListDialog dialog = new EventListDialog(context);
+        dialog.pack();
+        dialog.setVisible(true);
       }
     });
 
@@ -88,22 +86,20 @@ public class EventListParameter extends Parameter
     return panel;
   }
 
-  public void setText(final JTextField text) {
-
-    final ArrayList<EventProxy> tmpCon = (ArrayList<EventProxy>) generateControllable();
-    final ArrayList<EventProxy> tmpUncon = (ArrayList<EventProxy>) generateUncontrollable();
-
+  public void setText(final JTextField text)
+  {
+    final List<EventProxy> tmpCon = generateControllable();
+    final List<EventProxy> tmpUncon = generateUncontrollable();
     Collections.sort(mControllableList);
     Collections.sort(tmpCon);
     Collections.sort(tmpUncon);
-
-   if(mControllableList.equals(tmpCon))
-     text.setText("Controllable");
-   else if(mControllableList.equals(tmpUncon))
-     text.setText("Uncontrollable");
-   else
-     text.setText("Custom");
-
+    if (mControllableList.equals(tmpCon)) {
+      text.setText("(controllable events)");
+    } else if(mControllableList.equals(tmpUncon)) {
+      text.setText("(uncontrollable events)");
+    } else {
+      text.setText("(custom list)");
+    }
   }
 
   @Override
@@ -120,13 +116,12 @@ public class EventListParameter extends Parameter
 
   public List<EventProxy> getValue()
   {
-      return mControllableList;
+    return mControllableList;
   }
-
 
   public List<EventProxy> getControllable()
   {
-      return mControllableList;
+    return mControllableList;
   }
 
   public List<EventProxy> getUncontrollable()
@@ -136,7 +131,7 @@ public class EventListParameter extends Parameter
 
   public KindTranslator getKindTranslator()
   {
-    return new EventListKindTranslator();
+    return new ControlLoopKindTranslator(mControllableList);
   }
 
   //Generate default controllable list
@@ -148,11 +143,10 @@ public class EventListParameter extends Parameter
         list.add(event);
       }
     }
-
     return list;
   }
 
-//Generate default uncontrollable list
+  //Generate default uncontrollable list
   public List<EventProxy> generateUncontrollable()
   {
     final ArrayList<EventProxy> list = new ArrayList<EventProxy>();
@@ -172,7 +166,7 @@ public class EventListParameter extends Parameter
     //# Constructor
     public EventListDialog(final ProductDESContext model)
     {
-      super();
+      // TODO Set owner and location and icon
       generate(model);
     }
 
@@ -316,27 +310,6 @@ public class EventListParameter extends Parameter
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 760104252849112475L;
-  }
-
-
-  //#########################################################################
-  //# Inner Class EventListKindTranslator
-  private class EventListKindTranslator
-    extends AbstractVerificationKindTranslator
-  {
-    //#######################################################################
-    //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-    @Override
-    public EventKind getEventKind(final EventProxy event)
-    {
-      if (event.getKind() == EventKind.PROPOSITION) {
-        return EventKind.PROPOSITION;
-      } else if (getControllable().contains(event)) {
-        return EventKind.CONTROLLABLE;
-      } else {
-        return EventKind.UNCONTROLLABLE;
-      }
-    }
   }
 
 

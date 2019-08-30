@@ -35,7 +35,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.LoopCounterExampleProxy;
 

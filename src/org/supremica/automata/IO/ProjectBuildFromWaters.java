@@ -60,10 +60,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.model.analysis.IdenticalKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.PropertySuppressionKindTranslator;
-import net.sourceforge.waters.model.analysis.SynthesisKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.PropertySuppressionKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.SynthesisKindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;

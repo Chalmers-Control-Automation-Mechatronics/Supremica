@@ -34,7 +34,7 @@
 package net.sourceforge.waters.analysis.monolithic;
 
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.model.analysis.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
 

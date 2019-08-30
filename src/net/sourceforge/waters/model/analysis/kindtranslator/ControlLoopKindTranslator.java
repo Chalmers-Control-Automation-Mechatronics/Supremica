@@ -31,45 +31,60 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
-import java.io.Serializable;
+import gnu.trove.set.hash.THashSet;
 
-import net.sourceforge.waters.model.analysis.des.AbstractKindTranslator;
+import java.util.Collection;
+import java.util.Set;
 
+import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.des.EventProxy;
 
 /**
- * <P>A kind translator that does not change component and event
- * attributes. This simple kind translator implementation is used
- * for simple controllability checks.</P>
+ * <P>A kind translator to perform a control-loop check with a custom
+ * list of loop events. This translator is parameterised with a list of loop
+ * events, which are remapped to be controllable, while other events are
+ * remapped to be uncontrollable.</P>
  *
  * @author Robi Malik
  */
 
-public class IdenticalKindTranslator
-  extends AbstractKindTranslator
-  implements Serializable
+public class ControlLoopKindTranslator
+  extends DefaultVerificationKindTranslator
 {
-
   //#########################################################################
-  //# Singleton Implementation
-  public static IdenticalKindTranslator getInstance()
+  //# Constructor
+  /**
+   * Creates a control loop kind translator
+   * @param  loopEvents  Collection of events to be considered as loop
+   *                     events. These events will be defined to be
+   *                     controllable by the kind translator.
+   */
+  public ControlLoopKindTranslator
+    (final Collection<? extends EventProxy> loopEvents)
   {
-    return SingletonHolder.theInstance;
-  }
-
-  private static class SingletonHolder {
-    private static final IdenticalKindTranslator theInstance =
-      new IdenticalKindTranslator();
-  }
-
-  private IdenticalKindTranslator()
-  {
+    mLoopEvents = new THashSet<>(loopEvents);
   }
 
 
   //#########################################################################
-  //# Singleton Implementation
-  private static final long serialVersionUID = 1L;
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
+  @Override
+  public EventKind getEventKind(final EventProxy event)
+  {
+    if (event.getKind() == EventKind.PROPOSITION) {
+      return EventKind.PROPOSITION;
+    } else if (mLoopEvents.contains(event)) {
+      return EventKind.CONTROLLABLE;
+    } else {
+      return EventKind.UNCONTROLLABLE;
+    }
+  }
 
+
+  //#########################################################################
+  //# Data Members
+  private final Set<EventProxy> mLoopEvents;
 }

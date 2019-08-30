@@ -45,12 +45,12 @@ import java.util.Stack;
 
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
-import net.sourceforge.waters.model.analysis.ControllabilityKindTranslator;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Pair;
@@ -83,24 +83,25 @@ public class MonolithicSCCControlLoopChecker
   }
 
   public MonolithicSCCControlLoopChecker(final KindTranslator translator,
-                                      final ProductDESProxyFactory factory)
+                                         final ProductDESProxyFactory factory)
   {
     this(null, translator, factory);
   }
 
   public MonolithicSCCControlLoopChecker(final ProductDESProxy model,
-                                      final ProductDESProxyFactory factory)
+                                         final ProductDESProxyFactory factory)
   {
     this(model, ControllabilityKindTranslator.getInstance(), factory);
   }
 
   public MonolithicSCCControlLoopChecker(final ProductDESProxy model,
-                                      final KindTranslator translator,
-                                      final ProductDESProxyFactory factory)
+                                         final KindTranslator translator,
+                                         final ProductDESProxyFactory factory)
   {
     super(model, factory, translator);
-    if (translator == null)
+    if (translator == null) {
       throw new IllegalArgumentException("Null Translator");
+    }
   }
 
 
@@ -216,13 +217,11 @@ public class MonolithicSCCControlLoopChecker
   {
     super.addStatistics();
     final VerificationResult result = getAnalysisResult();
-    final int numstates = mGlobalStateSet.size();
+    final int numstates = mGlobalStateSet == null ? 0 : mGlobalStateSet.size();
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(numstates);
     result.setPeakNumberOfNodes(numstates);
     result.setNumberOfTransitions(mNumTrans);
-    //TOD Remove this line
-    //System.out.println("DEBUG: Transitions : " + mNumTrans);
   }
 
 
@@ -244,13 +243,15 @@ public class MonolithicSCCControlLoopChecker
     // create Automaton list
     for (final AutomatonProxy aProxy : des.getAutomata()) {
       final ComponentKind kind = translator.getComponentKind(aProxy);
-      switch (kind) {
-      case PLANT:
-      case SPEC:
-        mAutomataList.add(aProxy);
-        break;
-      default:
-        break;
+      if (kind != null) {
+        switch (kind) {
+        case PLANT:
+        case SPEC:
+          mAutomataList.add(aProxy);
+          break;
+        default:
+          break;
+        }
       }
     }
 

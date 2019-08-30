@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.analysis.compositional;
 
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
+import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 

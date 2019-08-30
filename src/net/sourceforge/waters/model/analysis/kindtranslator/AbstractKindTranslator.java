@@ -31,48 +31,45 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
-import java.io.Serializable;
-
-import net.sourceforge.waters.model.analysis.des.AbstractLanguageInclusionKindTranslator;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.EventProxy;
 
 
 /**
- * <P>A kind translator used for language inclusion checking.
- * This translator remaps all events to be uncontrollable,
- * all specs and supervisors are considered as plants, and all properties are
- * considered as specs. Such a remapping makes it possible to
- * implement language inclusion checking using a controllability
- * checker.</P>
+ * <P>A default implementation of kind translator that does not change
+ * component and event attributes. It can be subclassed to provide more
+ * advanced implementations.</P>
  *
  * @author Robi Malik
  */
 
-public class LanguageInclusionKindTranslator
-  extends AbstractLanguageInclusionKindTranslator
-  implements Serializable
+public abstract class AbstractKindTranslator
+  implements KindTranslator
 {
 
   //#########################################################################
-  //# Singleton Implementation
-  public static LanguageInclusionKindTranslator getInstance()
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
+  /**
+   * Returns the component kind of the given automaton.
+   */
+  @Override
+  public ComponentKind getComponentKind(final AutomatonProxy aut)
   {
-    return SingletonHolder.theInstance;
+    return aut.getKind();
   }
 
-  private static class SingletonHolder {
-    private static final LanguageInclusionKindTranslator theInstance =
-      new LanguageInclusionKindTranslator();
-  }
-
-  private LanguageInclusionKindTranslator()
+  /**
+   * Returns the event kind of the given event.
+   */
+  @Override
+  public EventKind getEventKind(final EventProxy event)
   {
+    return event.getKind();
   }
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = 1L;
 
 }

@@ -31,62 +31,44 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import java.io.Serializable;
 
-import net.sourceforge.waters.model.analysis.des.AbstractKindTranslator;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-
 
 /**
- * <P>A kind translator to suppress properties. The property suppression
- * kind translator suppresses property automata ({@link ComponentKind#PROPERTY})
- * by mapping their component kind to <CODE>null</CODE> and leaves everything
- * else unchanged.</P>
+ * <P>A kind translator used for controllability checking.
+ * This translator relabels supervisors as specifications and suppresses
+ * properties, and otherwise returns all component and event types as they
+ * are in the original model.</P>
  *
  * @author Robi Malik
  */
 
-public class PropertySuppressionKindTranslator
-  extends AbstractKindTranslator
+public final class ControllabilityKindTranslator
+  extends DefaultVerificationKindTranslator
   implements Serializable
 {
 
   //#########################################################################
-  //# Singleton Implementation
-  /**
-   * Gets a kind translator that suppresses properties.
-   */
-  public static PropertySuppressionKindTranslator getInstance()
+  //# Singleton Pattern
+  public static ControllabilityKindTranslator getInstance()
   {
     return SingletonHolder.theInstance;
   }
 
   private static class SingletonHolder {
-    private static final PropertySuppressionKindTranslator theInstance =
-      new PropertySuppressionKindTranslator();
+    private static final ControllabilityKindTranslator theInstance =
+      new ControllabilityKindTranslator();
   }
 
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  @Override
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
+  private ControllabilityKindTranslator()
   {
-    final ComponentKind kind = aut.getKind();
-    switch (kind) {
-    case PROPERTY:
-      return null;
-    default:
-      return kind;
-    }
   }
 
 
   //#########################################################################
-  //# Singleton Implementation
-  private static final long serialVersionUID = 7769314630409045051L;
+  //# Class Constants
+  private static final long serialVersionUID = -2084760862203797634L;
 
 }

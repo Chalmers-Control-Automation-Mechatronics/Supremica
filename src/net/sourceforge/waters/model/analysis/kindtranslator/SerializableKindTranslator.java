@@ -31,7 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -56,7 +56,7 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
  * @author Robi Malik
  */
 
-public class SerializableKindTranslator
+public final class SerializableKindTranslator
   implements KindTranslator, Serializable
 {
 
@@ -141,7 +141,8 @@ public class SerializableKindTranslator
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
   @Override
   public ComponentKind getComponentKind(final AutomatonProxy aut)
   {

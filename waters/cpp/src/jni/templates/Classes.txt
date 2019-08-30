@@ -231,11 +231,6 @@ glue class VerificationResult extends AnalysisResult {
   void setCounterExample(glue CounterExampleProxy counter);
 }
 
-glue class KindTranslator {
-  glue ComponentKind getComponentKind(glue AutomatonProxy aut);
-  glue EventKind getEventKind(glue EventProxy event);
-}
-
 glue class AnalysisAbortException extends Exception {
   AnalysisAbortException();
 }
@@ -249,6 +244,16 @@ enum class OverflowKind {STATE, TRANSITION, NODE, MEMORY}
 glue class OverflowException extends Exception {
   OverflowException(glue OverflowKind kind);
   OverflowException(glue OverflowKind kind, int limit);
+}
+
+
+//###########################################################################
+package net.sourceforge.waters.model.analysis.kindtranslator;
+//###########################################################################
+
+glue class KindTranslator {
+  glue ComponentKind getComponentKind(glue AutomatonProxy aut);
+  glue EventKind getEventKind(glue EventProxy event);
 }
 
 

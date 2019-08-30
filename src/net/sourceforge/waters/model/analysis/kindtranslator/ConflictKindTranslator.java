@@ -31,9 +31,7 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis;
-
-import java.io.Serializable;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -55,7 +53,7 @@ import net.sourceforge.waters.model.des.EventProxy;
  */
 
 public class ConflictKindTranslator
-  implements KindTranslator, Serializable
+  implements KindTranslator
 {
 
   //#########################################################################
@@ -90,14 +88,24 @@ public class ConflictKindTranslator
       new ConflictKindTranslator(EventKind.UNCONTROLLABLE);
   }
 
-  private ConflictKindTranslator(final EventKind kind)
+  /**
+   * Creates a conflict kind translator.
+   * This method is available to facilitate subclassing.
+   * To obtain a standard conflict kind translator, the singleton methods
+   * {@link #getInstanceControllable()} and {@link
+   * #getInstanceUncontrollable()} should be used instead.
+   * @param  kind   The event kind to be returned for all non-proposition
+   *                events.
+   */
+  public ConflictKindTranslator(final EventKind kind)
   {
     mEventKind = kind;
   }
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
+  //# Interface
+  //# net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator
   /**
    * Returns the component kind of the given automaton in a conflict
    * check.
@@ -142,10 +150,5 @@ public class ConflictKindTranslator
   //#########################################################################
   //# Data Members
   private final EventKind mEventKind;
-
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -5515028385922953990L;
 
 }

@@ -33,9 +33,9 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import net.sourceforge.waters.model.analysis.KindTranslator;
-import net.sourceforge.waters.model.analysis.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.LanguageInclusionKindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 
 

@@ -31,38 +31,46 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.model.analysis.des;
+package net.sourceforge.waters.model.analysis.kindtranslator;
 
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
+import java.io.Serializable;
 
 
 /**
- * <P>A kind translator used for most verification algorithms.
- * This reinterprets supervisors as specs and suppresses properties,
- * while leaving event kinds unchanged.</P>
+ * <P>A kind translator used for language inclusion checking.
+ * This translator remaps all events to be uncontrollable,
+ * all specs and supervisors are considered as plants, and all properties are
+ * considered as specs. Such a remapping makes it possible to
+ * implement language inclusion checking using a controllability
+ * checker.</P>
  *
  * @author Robi Malik
  */
 
-public abstract class AbstractVerificationKindTranslator
-  extends AbstractKindTranslator
+public final class LanguageInclusionKindTranslator
+  extends AbstractLanguageInclusionKindTranslator
+  implements Serializable
 {
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.KindTranslator
-  @Override
-  public ComponentKind getComponentKind(final AutomatonProxy aut)
+  //# Singleton Implementation
+  public static LanguageInclusionKindTranslator getInstance()
   {
-    final ComponentKind kind = aut.getKind();
-    switch (kind) {
-    case SUPERVISOR:
-      return ComponentKind.SPEC;
-    case PROPERTY:
-      return null;
-    default:
-      return kind;
-    }
+    return SingletonHolder.theInstance;
   }
+
+  private static class SingletonHolder {
+    private static final LanguageInclusionKindTranslator theInstance =
+      new LanguageInclusionKindTranslator();
+  }
+
+  private LanguageInclusionKindTranslator()
+  {
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 1L;
 
 }

@@ -50,8 +50,8 @@ import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -328,22 +328,25 @@ public class ModularControlLoopChecker
     final Collection<AutomatonProxy> automata = model.getAutomata();
     mAutoSets = new ArrayList<>(automata.size());
     for (final AutomatonProxy aut: automata) {
-      switch (translator.getComponentKind(aut)) {
-      case PLANT:
-      case SPEC:
-        if (AutomatonTools.getFirstInitialState(aut) == null) {
-          setSatisfiedResult();
-          return;
-        }
-        mAutoSets.add(new AutomataGroup(aut));
-        for (final EventProxy event : aut.getEvents()) {
-          if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
-            mLoopEvents.add(event);
+      final ComponentKind kind = translator.getComponentKind(aut);
+      if (kind != null) {
+        switch (kind) {
+        case PLANT:
+        case SPEC:
+          if (AutomatonTools.getFirstInitialState(aut) == null) {
+            setSatisfiedResult();
+            return;
           }
+          mAutoSets.add(new AutomataGroup(aut));
+          for (final EventProxy event : aut.getEvents()) {
+            if (translator.getEventKind(event) == EventKind.CONTROLLABLE) {
+              mLoopEvents.add(event);
+            }
+          }
+          // fall through
+        default:
+          break;
         }
-        // fall through
-      default:
-        break;
       }
     }
 

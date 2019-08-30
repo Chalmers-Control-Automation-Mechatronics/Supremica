@@ -58,11 +58,11 @@ import net.sourceforge.waters.analysis.options.ParameterIDs;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
-import net.sourceforge.waters.model.analysis.KindTranslator;
 import net.sourceforge.waters.model.analysis.OverflowException;
-import net.sourceforge.waters.model.analysis.PropertySuppressionKindTranslator;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
+import net.sourceforge.waters.model.analysis.kindtranslator.DefaultVerificationKindTranslator;
+import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.CounterExampleProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
@@ -98,7 +98,7 @@ public  class SupremicaMonolithicVerifier
                                      final boolean ensuringUncontrollablesInPlant)
   {
     this(model, factory,
-         PropertySuppressionKindTranslator.getInstance(),
+         DefaultVerificationKindTranslator.getInstance(),
          type, ensuringUncontrollablesInPlant);
   }
 
