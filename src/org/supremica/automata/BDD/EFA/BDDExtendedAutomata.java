@@ -180,6 +180,8 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
     private Map<String, HashMap<EdgeProxy, BDD>> eventName2EdgeBDDMap;
     private Map<EdgeProxy, ExtendedAutomaton> edge2ExAutomatonMap;
 
+    private final int wordsize = 32;
+
     public BDDExtendedAutomata(final ExtendedAutomata orgExAutomata, final EditorSynthesizerOptions options) {
         this.orgExAutomata = orgExAutomata;
         locaVarSuffix = ExtendedAutomata.getlocVarSuffix();
@@ -620,11 +622,19 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 //            System.err.println("tempClock2 variables: " + tempClockDomains2[varIndex].set().toString());
         }
 
+        final int varMinValue = orgExAutomata.getMinValueofVar(varName);
+        final int varMaxValue = orgExAutomata.getMaxValueofVar(varName);
+
         final BDDDomain tempDomain = manager.createDomain(domain);
+        SupremicaBDDBitVector tempVector =
+          manager.createSupremicaBDDBitVector(
+                                              BDDBitVectoryType,
+                                              orgExAutomata.getMinValueofVar(varName) < 0,
+                                              getWordsize(),
+                                              tempDomain);
+        tempVector = tempVector.saturate(varMinValue, varMaxValue);
         BDDBitVecTempVarsMap.put(theIndexMap.getVariableIndex(var),
-                manager.createSupremicaBDDBitVector(BDDBitVectoryType,
-                orgExAutomata.getMinValueofVar(varName) < 0,
-                tempDomain));
+                                 tempVector);
 //        int[] reversedTempVarOrdering = manager.partialReverseVarOrdering(tempDomain.vars());
 //        reversedTempVarOrderings.put(varIndex, new TIntArrayList(reversedTempVarOrdering));
         tempVarDomains[varIndex] = tempDomain;
@@ -648,10 +658,15 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
             bddVar2AutVarName.put(sourceVars[i], varName);
         }
 
+        SupremicaBDDBitVector sourceVector =
+          manager.createSupremicaBDDBitVector(
+                                              BDDBitVectoryType,
+                                              orgExAutomata.getMinValueofVar(varName) < 0,
+                                              getWordsize(),
+                                              sourceDomain);
+        sourceVector = sourceVector.saturate(varMinValue, varMaxValue);
         BDDBitVecSourceVarsMap.put(theIndexMap.getVariableIndex(var),
-                manager.createSupremicaBDDBitVector(BDDBitVectoryType,
-                orgExAutomata.getMinValueofVar(varName) < 0,
-                sourceDomain));
+                                   sourceVector);
         if (orgExAutomata.getClocks().contains(var)) {
             sourceClockVarSet.unionWith(sourceDomain.set());
 
@@ -675,10 +690,14 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
         numberOfUsedBDDVariables += destDomain.varNum();
 //        System.err.println("destVar variables: " + destDomain.set().toString());
+        SupremicaBDDBitVector destVector =
+          manager.createSupremicaBDDBitVector(BDDBitVectoryType,
+                                              orgExAutomata.getMinValueofVar(varName) < 0,
+                                              getWordsize(),
+                                              destDomain);
+        destVector = destVector.saturate(varMinValue, varMaxValue);
         BDDBitVecTargetVarsMap.put(theIndexMap.getVariableIndex(var),
-                manager.createSupremicaBDDBitVector(BDDBitVectoryType,
-                orgExAutomata.getMinValueofVar(varName) < 0,
-                destDomain));
+                                   destVector);
 
         //Create the BDD that will be used to extend the clocks
 //        if(orgExAutomata.getClocks().contains(var))
@@ -1894,6 +1913,13 @@ public class BDDExtendedAutomata implements Iterable<BDDExtendedAutomaton> {
 
     public Map<EdgeProxy, ExtendedAutomaton> getEdge2ExAutomatonMap() {
       return edge2ExAutomatonMap;
+    }
+
+    /**
+     * @return The number of bits used to represent numbers.
+     */
+    public int getWordsize() {
+        return wordsize;
     }
 }
 

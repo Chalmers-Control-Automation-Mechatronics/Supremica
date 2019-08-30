@@ -80,9 +80,9 @@ public abstract class BDDAbstractManager {
         throw new IllegalArgumentException("BDDBitVector type not defined!");
     }
 
-    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final boolean negativesIncluded, final BDDDomain domain) {
+    public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final boolean negativesIncluded, final int bitnum, final BDDDomain domain) {
         if (P_TC == 0) {
-            return new PSupremicaBDDBitVector(getFactory(), domain.varNum(), domain);
+            return new PSupremicaBDDBitVector(getFactory(), bitnum, domain);
         } else if (P_TC == 1) {
             final TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
             if (!negativesIncluded) {
@@ -333,6 +333,7 @@ public abstract class BDDAbstractManager {
                     final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
                     tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                                                       false,
+                                                      bddExAutomata.getWordsize(),
                                                       bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName));
@@ -385,6 +386,7 @@ public abstract class BDDAbstractManager {
                     final String autName = leftString.substring(0, leftString.indexOf(bddExAutomata.getLocVarSuffix()));
                     tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                                                       false,
+                                                      bddExAutomata.getWordsize(),
                                                       bddExAutomata.getSourceLocationDomain(autName));
                     final BDD locBDD = createBDD(bddExAutomata.getIndexMap().getLocationIndex(autName, locName),
                             bddExAutomata.getSourceLocationDomain(autName)).not();
@@ -472,7 +474,7 @@ public abstract class BDDAbstractManager {
 			{
                 // SupremicaBDDBitVector tmp = null;
 //                if(constantDomain ==null)
-                final SupremicaBDDBitVector tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0).copy();
+                final SupremicaBDDBitVector tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.getWordsize(), 0).copy();
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, bddExAutomata.constantDomain.varNum(),0).copy();
 //                else
 //                    tmp = createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, factory, constantDomain.varNum(),0).copy();
@@ -486,10 +488,10 @@ public abstract class BDDAbstractManager {
                 return new ResultOverflows(tmp, getZeroBDD());
             } else {
                 final int value = ((IntConstantProxy) expr).getValue();
-                final boolean inDomain = value >= bddExAutomata.theIndexMap.getVariableLowerBound() && value <= bddExAutomata.theIndexMap.getVariableUpperBound();
+                final boolean inDomain = true || value >= bddExAutomata.theIndexMap.getVariableLowerBound() && value <= bddExAutomata.theIndexMap.getVariableUpperBound();
                 if (inDomain) {
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
-                            createDomain(bddExAutomata.orgExAutomata.getDomain()).varNum(), value), getZeroBDD());
+                            bddExAutomata.getWordsize(), ((IntConstantProxy) expr).getValue()), getZeroBDD());
                 } else {
                     logger.error(expr.toString() + " is out of the bounds. The value will be set to 0!");
                     return new ResultOverflows(createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType, bddExAutomata.BDDBitVectoryType + 1, 0), getZeroBDD());

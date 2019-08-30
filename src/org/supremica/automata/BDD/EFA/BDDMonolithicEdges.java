@@ -509,7 +509,10 @@ public class BDDMonolithicEdges
             final int clockDomain = bddExAutomata.orgExAutomata.getVarDomain(clockComponent.getName());
             final BDD largestValue = manager.getFactory().buildCube(clockDomain - 1, bddExAutomata.tempClockDomains2[clockIndex].vars());
             final BDD largerThanLargest = manager.createSupremicaBDDBitVector(
-                    bddExAutomata.BDDBitVectoryType, bddExAutomata.orgExAutomata.getMinValueofVar(clockComponent.getName()) < 0, bddExAutomata.tempClockDomains1[clockIndex]).gth(
+                    bddExAutomata.BDDBitVectoryType,
+                    bddExAutomata.orgExAutomata.getMinValueofVar(clockComponent.getName()) < 0,
+                    bddExAutomata.getWordsize(),
+                    bddExAutomata.tempClockDomains1[clockIndex]).gth(
                     manager.createSupremicaBDDBitVector(
                     bddExAutomata.BDDBitVectoryType, bddExAutomata.tempClockDomains1[clockIndex].size().intValue(), clockDomain - 1));
 
@@ -542,6 +545,7 @@ public class BDDMonolithicEdges
 
         final SupremicaBDDBitVector gclockBDDBitVector = manager.createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                 bddExAutomata.orgExAutomata.getMinValueofVar(gClockComponent.getName()) < 0,
+                bddExAutomata.getWordsize(),
                 gclockTempDomain); // BDDBit Vector for this clock with temporary domain
         if (bddExAutomata.BDDBitVectoryType == 1) {
             gclockBDDBitVector.setBit(gclockBDDBitVector.length() - 1, manager.getZeroBDD());
@@ -572,6 +576,7 @@ public class BDDMonolithicEdges
                 final BDDDomain clockTempDomain = bddExAutomata.tempClockDomains1[clockIndex];
                 final SupremicaBDDBitVector clockBDDBitVector = manager.createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                         bddExAutomata.orgExAutomata.getMinValueofVar(clockComponent.getName()) < 0,
+                        bddExAutomata.getWordsize(),
                         clockTempDomain);
                 if (bddExAutomata.BDDBitVectoryType == 1) {
                     clockBDDBitVector.setBit(clockBDDBitVector.length() - 1, manager.getZeroBDD());

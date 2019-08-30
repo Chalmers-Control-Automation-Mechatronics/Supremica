@@ -977,11 +977,13 @@ public class BDDExtendedManager extends BDDAbstractManager {
         final SupremicaBDDBitVector stageBDDBitVectorSource =
           createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                               bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                              bddExAutomata.getWordsize(),
                               stageSourceDomain);
 
         final SupremicaBDDBitVector stageBDDBitVectorTemp =
           createSupremicaBDDBitVector(bddExAutomata.BDDBitVectoryType,
                               bddExAutomata.orgExAutomata.getMinValueofVar(stage.getName()) < 0,
+                              bddExAutomata.getWordsize(),
                               stageTempDomain);
 
         final BDD stageLargerBDD = getZeroBDD();
