@@ -440,6 +440,13 @@ public abstract class SupremicaBDDBitVector
     @Override
     public String toString()
     {
+
+        for (int i = 0; i<bitNum; i++) {
+            if (bitvec[i] == null) {
+                return "null";
+            }
+        }
+
         if (isConst()) {
             return String.format("%s", val());
         } else {
