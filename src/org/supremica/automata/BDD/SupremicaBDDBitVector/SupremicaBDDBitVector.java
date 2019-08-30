@@ -483,4 +483,33 @@ public abstract class SupremicaBDDBitVector
         return carry;
     }
 
+    public SupremicaBDDBitVector saturate(final int min, final int max) {
+        final SupremicaBDDBitVector res = this.copy();
+        final SupremicaBDDBitVector maxVec = res.max(min);
+        final SupremicaBDDBitVector minVec = maxVec.min(max);
+        return minVec;
+    }
+
+    private SupremicaBDDBitVector min(final int val)
+    {
+        final SupremicaBDDBitVector constant = buildSupBDDBitVector(bitNum, val);
+        final BDD less = this.lth(constant);
+        final SupremicaBDDBitVector res = this.copy();
+        for (int i=0; i<res.bitNum; i++) {
+            res.bitvec[i] = less.ite(bitvec[i], constant.bitvec[i]);
+        }
+        return res;
+    }
+
+    private SupremicaBDDBitVector max(final int val)
+    {
+      final SupremicaBDDBitVector constant = buildSupBDDBitVector(bitNum, val);
+      final BDD greater = this.gth(constant);
+      final SupremicaBDDBitVector res = this.copy();
+      for (int i=0; i<res.bitNum; i++) {
+          res.bitvec[i] = greater.ite(bitvec[i], constant.bitvec[i]);
+      }
+      return res;
+    }
+
 }
