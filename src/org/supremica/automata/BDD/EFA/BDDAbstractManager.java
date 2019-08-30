@@ -82,7 +82,7 @@ public abstract class BDDAbstractManager {
 
     public SupremicaBDDBitVector createSupremicaBDDBitVector(final int P_TC, final boolean negativesIncluded, final BDDDomain domain) {
         if (P_TC == 0) {
-            return new PSupremicaBDDBitVector(getFactory(), domain);
+            return new PSupremicaBDDBitVector(getFactory(), domain.varNum(), domain);
         } else if (P_TC == 1) {
             final TCSupremicaBDDBitVector output = new TCSupremicaBDDBitVector(getFactory(), domain);
             if (!negativesIncluded) {

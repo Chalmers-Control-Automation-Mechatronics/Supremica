@@ -30,9 +30,9 @@ public final class PSupremicaBDDBitVector extends SupremicaBDDBitVector
         initialize(val);
     }
 
-    public PSupremicaBDDBitVector(final BDDFactory factory,final BDDDomain d)
+    public PSupremicaBDDBitVector(final BDDFactory factory,final int bitNum, final BDDDomain d)
     {
-      this(factory, d.varNum());
+      this(factory, bitNum);
       initialize(d);
     }
 

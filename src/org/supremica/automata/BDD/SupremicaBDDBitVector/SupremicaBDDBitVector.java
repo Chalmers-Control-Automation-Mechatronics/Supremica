@@ -73,9 +73,17 @@ public abstract class SupremicaBDDBitVector
 
     protected void initialize(final int[] var)
     {
+        if (var.length > bitNum) {
+            throw new IllegalArgumentException(String.format("Trying to set %d variables, but this bit vector only has %d.", var.length, bitNum));
+        }
+
         for (int n=0 ; n<bitNum ; n++)
         {
-            bitvec[bitNum-n-1] = mFactory.ithVar(var[n]);
+            if (n < var.length) {
+                bitvec[n] = mFactory.ithVar(var[var.length-n-1]);
+            } else {
+                bitvec[n] = mFactory.zero();
+            }
         }
     }
 
