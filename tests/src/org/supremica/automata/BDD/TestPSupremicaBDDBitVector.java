@@ -106,4 +106,25 @@ public class TestPSupremicaBDDBitVector extends TestSupremicaBDDBitVector
     assertEquals("[2, 3, 4, 5]", s);
   }
 
+  public void testMinMax() {
+    final BDDDomain domain = factory.extDomain(5);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final SupremicaBDDBitVector sat = bitVector.saturate(2, 5);
+
+    final int max = sat.max();
+    final int min = sat.min();
+
+    assertEquals(5, max);
+    assertEquals(2, min);
+  }
+
+  public void testLargeToString() {
+    final BDDDomain domain = factory.extDomain(100);
+    final PSupremicaBDDBitVector bitVector = new PSupremicaBDDBitVector(factory, domain.varNum(), domain);
+    final SupremicaBDDBitVector sat = bitVector.saturate(15, 100);
+    final String s = sat.toString();
+
+    assertEquals("[min=15, max=100]", s);
+  }
+
 }

@@ -468,17 +468,23 @@ public abstract class SupremicaBDDBitVector
             // vector. If the result can be satisfied, then we know that the
             // current value of the mask can be represented by this bit vector,
             // and we add that integer value to the set.
-            final SupremicaBDDBitVector mask = buildSupBDDBitVector(bitNum, 0);
-            BDD overflow = mFactory.zero();
-            while (overflow.isZero()) {
-                final BDD equality = this.equ(mask);
-                if (equality.satCount() > 0) {
-                    satSet.add(new Integer(mask.val()));
+            final int min = this.min();
+            final int max = this.max();
+            if (max-min > 20) {
+                return String.format("[min=%d, max=%d]", min, max);
+            } else {
+                final SupremicaBDDBitVector mask = buildSupBDDBitVector(bitNum, min);
+                BDD overflow = mFactory.zero();
+                while (mask.val() <= max && overflow.isZero()) {
+                    final BDD equality = this.equ(mask);
+                    if (equality.satCount() > 0) {
+                        satSet.add(new Integer(mask.val()));
+                    }
+                    overflow = mask.increment();
                 }
-                overflow = mask.increment();
-            }
 
-            return satSet.toString();
+                return satSet.toString();
+            }
         }
     }
 
@@ -525,6 +531,37 @@ public abstract class SupremicaBDDBitVector
           res.bitvec[i] = greater.ite(bitvec[i], constant.bitvec[i]);
       }
       return res;
+    }
+
+    public int max() {
+
+        int value = 0;
+        BDD bdd = mFactory.one();
+        for (int i=bitNum-1; i>=0; i--) {
+            value = value << 1;
+            if ((bitvec[i].and(bdd)).satCount() > 0) {
+                value = value | 1;
+                bdd = bdd.and(bitvec[i]);
+            }
+        }
+
+        return value;
+    }
+
+    public int min() {
+
+        int value = 0;
+        BDD bdd = mFactory.one();
+        for (int i=bitNum-1; i>=0; i--) {
+            value = value << 1;
+            if (bitvec[i].not().and(bdd).satCount() < 1) {
+                value = value | 1;
+            } else {
+                bdd = bdd.and(bitvec[i].not());
+            }
+        }
+
+        return value;
     }
 
 }
