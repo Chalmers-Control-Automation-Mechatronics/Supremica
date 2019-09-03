@@ -47,7 +47,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 /**
  * @author Jordan Schroder
  */
-public class MonolithicSmallCliqueSupervisorReductionTest
+public class MonolithicSmallCliqueUnionSupervisorReductionTest
   extends AbstractSupervisorSynthesizerTest
 {
 
@@ -63,7 +63,7 @@ public class MonolithicSmallCliqueSupervisorReductionTest
     final SmallCliqueSupervisorReductionTRSimplifier simplifier =
       new SmallCliqueSupervisorReductionTRSimplifier();
     simplifier.setMode
-      (SmallCliqueSupervisorReductionTRSimplifier.Mode.SMALL_CLIQUES);
+      (SmallCliqueSupervisorReductionTRSimplifier.Mode.GREEDY_UNION);
     final SupervisorReductionFactory reduction =
       new SimpleSupervisorReductionFactory(simplifier);
     synthesizer.setSupervisorReductionFactory(reduction);
@@ -77,7 +77,7 @@ public class MonolithicSmallCliqueSupervisorReductionTest
   public static Test suite()
   {
     final TestSuite testSuite =
-      new TestSuite(MonolithicSmallCliqueSupervisorReductionTest.class);
+      new TestSuite(MonolithicSmallCliqueUnionSupervisorReductionTest.class);
     return testSuite;
   }
 
@@ -92,6 +92,12 @@ public class MonolithicSmallCliqueSupervisorReductionTest
   @Override
   public void testAip0Sub1P1() throws Exception
   {
+  }
+
+  @Override
+  public void testCatMouseUnsup2() throws Exception
+  {
+    // out of memory checking result ...
   }
 
   @Override
@@ -122,7 +128,6 @@ public class MonolithicSmallCliqueSupervisorReductionTest
   @Override
   public void test2LinkAlt() throws Exception
   {
-    // 3 hours on h2o
   }
 
   @Override

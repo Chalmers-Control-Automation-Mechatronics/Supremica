@@ -133,10 +133,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
   public boolean runSimplifier() throws AnalysisException
   {
     setUpCompatibilityRelation();
-    System.out.print(mCompatibilityRelation.size());
-    System.out.print(',');
-    System.out.print(mCompatibilityRelation.getNumberOfAllCompatibleStates());
-    System.out.print(',');
 
     final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numStates = rel.getNumberOfStates();
@@ -147,41 +143,24 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       }
     }
     final TIntArrayList initCopy = new TIntArrayList(initList);
-    final int init = mCompatibilityRelation.extendToSmallCover(initCopy);
-    System.out.print(mCliqueDB.size(init));
-    System.out.print(',');
-    System.out.flush();
-
-    final int numRelevant =
-      mCompatibilityRelation.getNumberOfRelevantStates();
-    final TIntArrayList list = new TIntArrayList(numRelevant);
-    final int numEvents = rel.getNumberOfProperEvents();
-    CliqueQueue queue = new CliqueQueue();
-    queue.addNewClique(init);
+    final CliqueQueue queue = new CliqueQueue();
+    queue.addSmallCover(initCopy);
     if (mAddingEventCovers) {
       addEventCovers(queue);
     }
-    queue.propagate(list);
-    System.out.print(queue.size());
-    System.out.print(',');
-    System.out.flush();
 
-    if (mMode == Mode.DEFERRED_UNION && queue.size() > 2) {
-      queue = uniteCliques(queue, list);
-      System.out.print(queue.size());
-      System.out.print(',');
-      System.out.flush();
-    }
-    System.out.print('p');
+    final int numRelevant =
+      mCompatibilityRelation.getNumberOfRelevantStates();
+    queue.propagate();
+
+    final TIntArrayList list = new TIntArrayList(numRelevant);
     final int dumpIndex = queue.createDumpState();
     boolean dumpReachable = false;
     queue.preselectSingletonCovers();
-    System.out.print(queue.getNumberOfSelectedCovers() - 1);
-    System.out.print(',');
-    System.out.flush();
 
     resetEventInfo();
     final long[] markings = new long[queue.size() + 1];
+    final int numEvents = rel.getNumberOfProperEvents();
     final int limit = getTransitionLimit();
     final PreTransitionBuffer buffer =
       new PreTransitionBuffer(numEvents, limit);
@@ -210,7 +189,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       markings[s] = collectMarkings(clique);
     }
     final int numCovers = queue.getNumberOfSelectedCovers();
-    System.out.println(numCovers - 1);
 
     if (numCovers - 1 < mCompatibilityRelation.size()) {
       final int numTrans = buffer.size();
@@ -354,25 +332,37 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     final TIntArrayList[] relevantStates = new TIntArrayList[numEvents];
     final TIntHashSet[] allCompatibleSucc =
       numAllCompatible > 0 ? new TIntHashSet[numEvents] : null;
-    for (final EventInfo info : mUsedEvents) {
+      final TIntHashSet[] otherSucc = new TIntHashSet[numEvents];
+   for (final EventInfo info : mUsedEvents) {
       final int e = info.getEvent();
       if (!info.isBlocked()) {
         relevantStates[e] = new TIntArrayList(numReachable - numAllCompatible);
         if (allCompatibleSucc != null) {
           allCompatibleSucc[e] = new TIntHashSet();
         }
+        otherSucc[e] = new TIntHashSet();
       }
     }
-    final TransitionIterator iter = rel.createAllTransitionsReadOnlyIterator();
-    while (iter.advance()) {
-      final int t = iter.getCurrentTargetState();
-      if (mCompatibilityRelation.isRelevant(t)) {
-        final int s = iter.getCurrentSourceState();
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    for (final int s : mCompatibilityRelation.getAllCompatibleStates()) {
+      iter.resetState(s);
+      while (iter.advance()) {
         final int e = iter.getCurrentEvent();
-        if (mCompatibilityRelation.isRelevant(s)) {
-          relevantStates[e].add(s);
-        } else {
+        final int t = iter.getCurrentTargetState();
+        if (mCompatibilityRelation.isRelevant(t)) {
           allCompatibleSucc[e].add(t);
+        }
+      }
+    }
+    for (final int s : mCompatibilityRelation.getRelevantStates()) {
+      iter.resetState(s);
+      while (iter.advance()) {
+        final int e = iter.getCurrentEvent();
+        final int t = iter.getCurrentTargetState();
+        if (mCompatibilityRelation.isRelevant(t) &&
+            (allCompatibleSucc == null || !allCompatibleSucc[e].contains(t))) {
+          relevantStates[e].add(s);
+          otherSucc[e].add(t);
         }
       }
     }
@@ -382,7 +372,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         final int e = info.getEvent();
         final TIntCollection succ =
           allCompatibleSucc == null ? null : allCompatibleSucc[e];
-        info.setTransitionInfo(relevantStates[e], succ);
+        info.setTransitionInfo(relevantStates[e], succ, otherSucc[e].size());
         if (!info.isCovered()) {
           mRelevantEvents.add(info);
         }
@@ -424,71 +414,11 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     final Iterator<EventInfo> iter = mRelevantEvents.iterator();
     while (iter.hasNext()) {
       final EventInfo info = iter.next();
-      int cover = info.collectEnablingClique(buffer);
-      if (cover >= 0) {
-        queue.addNewClique(cover);
-        info.collectAllSuccessors(cover, buffer);
-        cover = mCompatibilityRelation.extendToSmallCover(buffer);
-        queue.addNewClique(cover);
+      if (info.collectEnablingClique(buffer)) {
+        queue.addSmallCover(buffer);
         iter.remove();
       }
     }
-  }
-
-  private CliqueQueue uniteCliques(CliqueQueue queue,
-                                   final TIntArrayList buffer)
-    throws AnalysisException
-  {
-    final int numClosed = queue.size();
-    final TIntArrayList candidates = new TIntArrayList(numClosed);
-    final TIntHashSet available = new TIntHashSet(numClosed);
-    queue.getClosedCliques(available);
-    final TLongHashSet failedUnions = new TLongHashSet(numClosed);
-    boolean changed;
-    do {
-      System.out.print('u');
-      candidates.clear();
-      queue.getClosedCliques(candidates);
-      changed = false;
-      outer:
-      for (int i = 0; i < candidates.size(); i++) {
-        final int clique1 = candidates.get(i);
-        for (int j = i + 1; j < candidates.size(); j++) {
-          final int clique2 = candidates.get(j);
-          if (!available.contains(clique1)) {
-            continue outer;
-          } else if (!available.contains(clique2)) {
-            continue;
-          }
-          final long pair = WatersIntPairStack.createPair(clique1, clique2);
-          if (failedUnions.contains(pair)) {
-            continue;
-          }
-          final CliqueQueue unionQueue = queue.prepareUnion(clique1, clique2);
-          if (unionQueue == null) {
-            failedUnions.add(pair);
-          } else {
-            try {
-              resetEventInfo();
-              unionQueue.propagate(buffer);
-              if (unionQueue.size() < queue.size()) {
-                queue.dispose();
-                queue = unionQueue;
-                available.clear();
-                queue.getClosedCliques(available);
-                changed = true;
-              } else {
-                unionQueue.dispose();
-              }
-            } catch (final OverflowException overflow) {
-              unionQueue.dispose();
-              failedUnions.add(pair);
-            }
-          }
-        }
-      }
-    } while (changed && queue.size() > 2);
-    return queue;
   }
 
 
@@ -512,7 +442,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
   public enum Mode {
     SMALL_CLIQUES,
     GREEDY_UNION,
-    DEFERRED_UNION,
     MAX_CLIQUES
   }
 
@@ -553,7 +482,8 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private void setTransitionInfo(final TIntCollection relevantStates,
-                                   final TIntCollection allCompatibleSucc)
+                                   final TIntCollection allCompatibleSucc,
+                                   final int numRelevantTargets)
     {
       mRelevantStates = relevantStates.toArray();
       mAllCompatibleSuccessors =
@@ -562,6 +492,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       if (mAllCompatibleSuccessors != null) {
         Arrays.sort(mAllCompatibleSuccessors);
       }
+      mNumRelevantTargets = numRelevantTargets;
       reset();
     }
 
@@ -635,7 +566,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         if (cliqueSet.isEmpty()) {
           mCliqueDB.collect(clique, cliqueSet);
         }
-        boolean allCovered = true;
         for (final int s : mRelevantStates) {
           if (cliqueSet.contains(s)) {
             mTransitionIterator.reset(s, mEvent);
@@ -643,11 +573,8 @@ public class SmallCliqueSupervisorReductionTRSimplifier
               final int t = mTransitionIterator.getCurrentTargetState();
               set.add(t);
             }
-          } else {
-            allCovered = false;
           }
         }
-        mAllCovered |= allCovered;
       }
       output.clear();
       if (!set.isEmpty()) {
@@ -656,12 +583,11 @@ public class SmallCliqueSupervisorReductionTRSimplifier
           output.addAll(mAllCompatibleSuccessors);
         }
         output.sort();
-        mAllCompatibleCovered = true;
       } else if (!mAllCompatibleCovered) {
         output.addAll(mAllCompatibleSuccessors);
-        mAllCompatibleCovered = true;
       }
       mAllCompatibleCovered = true;
+      mAllCovered |= (set.size() == mNumRelevantTargets);
     }
 
     private boolean isDisabledControllable(final int clique)
@@ -685,26 +611,24 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       }
     }
 
-    private int collectEnablingClique(final TIntArrayList buffer)
+    private boolean collectEnablingClique(final TIntArrayList buffer)
+      throws AnalysisAbortException
     {
       buffer.clear();
       for (final int s : mCompatibilityRelation.getRelevantStates()) {
         mTransitionIterator.reset(s, mEvent);
         if (mTransitionIterator.advance()) {
+          checkAbort();
           for (int i = 0; i < buffer.size(); i++) {
             final int s0 = buffer.get(i);
             if (!mCompatibilityRelation.isCompatible(s0, s)) {
-              return -1;
+              return false;
             }
           }
           buffer.add(s);
         }
       }
-      if (buffer.size() > 1) {
-        return mCompatibilityRelation.extendToSmallCover(buffer);
-      } else {
-        return -1;
-      }
+      return buffer.size() > 1;
     }
 
     //#######################################################################
@@ -715,6 +639,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     private boolean mAllCovered;
     private int[] mRelevantStates;
     private int[] mAllCompatibleSuccessors;
+    private int mNumRelevantTargets;
   }
 
 
@@ -843,6 +768,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     }
 
     private int extendToSmallCover(final TIntArrayList clique)
+      throws AnalysisAbortException
     {
       mBuffer.clear();
       if (!clique.isEmpty()) {
@@ -851,6 +777,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         collectCommonNeighbours(clique, mBuffer);
         outer:
         for (int i = 0; i < mBuffer.size(); i++) {
+          checkAbort();
           final int s1 = mBuffer.get(i);
           for (int j = 0; j < mBuffer.size(); j++) {
             final int s2 = mBuffer.get(j);
@@ -872,14 +799,16 @@ public class SmallCliqueSupervisorReductionTRSimplifier
 
     private void collectCommonNeighbours(final TIntArrayList cliqueList,
                                          final TIntArrayList neighbours)
+      throws AnalysisAbortException
     {
       final TIntHashSet cliqueSet = new TIntHashSet(cliqueList);
       outer:
       for (final int s1 : mRelevantStates) {
         if (!cliqueSet.contains(s1)) {
+          checkAbort();
           for (int i2 = 0; i2 < cliqueList.size(); i2++) {
             final int s2 = cliqueList.get(i2);
-            if (s1 == s2 || !isCompatible(s1, s2)) {
+            if (!isCompatible(s1, s2)) {
               continue outer;
             }
           }
@@ -958,6 +887,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     //#######################################################################
     //# Clique Extension
     private int extendToMaxClique(final int clique)
+      throws AnalysisAbortException
     {
       mCliqueBuffer.clear();
       mCliqueDB.collect(clique, mCliqueBuffer);
@@ -970,6 +900,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       NeighbourInfo best = new NeighbourInfo();
       NeighbourInfo other = new NeighbourInfo();
       do {
+        checkAbort();
         best.reset(mNeighboursBuffer.get(0));
         for (int i = 1; i < mNeighboursBuffer.size(); i++) {
           other.reset(mNeighboursBuffer.get(i));
@@ -1100,15 +1031,16 @@ public class SmallCliqueSupervisorReductionTRSimplifier
 
     private CliqueQueue(final int closed, final int limit)
     {
+      final int numRelevant =
+        mCompatibilityRelation.getNumberOfRelevantStates();
       mOpenCliques = mListBuffer.createList();
       mClosedCliques = closed;
+      mVisited = new TIntHashSet(numRelevant);
       mLimit = limit;
       mListReadIterator = mListBuffer.createReadOnlyIterator();
       mListEditIterator = mListBuffer.createModifyingIterator();
-      final int numRelevant =
-        mCompatibilityRelation.getNumberOfRelevantStates();
-      mCliqueIterator1 = mCliqueDB.iterator();
-      mCliqueIterator2 = mCliqueDB.iterator();
+      mCliqueIterator = mCliqueDB.iterator();
+      mPropagationBuffer = new TIntArrayList(numRelevant);
       mCliqueBuffer = new TIntArrayList(numRelevant);
       mAdditionsBuffer = new TIntArrayList(numRelevant);
       mSize = mListBuffer.getLength(closed);
@@ -1127,11 +1059,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       return mSize;
     }
 
-    private void getClosedCliques(final TIntCollection collection)
-    {
-      mListBuffer.toTIntCollection(mClosedCliques, collection);
-    }
-
     private int getNumberOfSelectedCovers()
     {
       if (mSelectedCovers == null) {
@@ -1146,16 +1073,9 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       return mSelectedCovers.get(s);
     }
 
-    private void dispose()
-    {
-      mListBuffer.dispose(mOpenCliques);
-      mListBuffer.dispose(mClosedCliques);
-    }
-
-
     //#######################################################################
-    //# Algorithms
-    private void propagate(final TIntArrayList buffer)
+    //# Algorithm
+    private void propagate()
       throws AnalysisException
     {
       main:
@@ -1165,13 +1085,11 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         final Iterator<EventInfo> iter = mRelevantEvents.iterator();
         while (iter.hasNext()) {
           final EventInfo info = iter.next();
-          info.collectRelevantSuccessors(clique, cliqueSet, buffer);
+          info.collectRelevantSuccessors(clique, cliqueSet, mPropagationBuffer);
           if (info.isCovered()) {
             iter.remove();
           }
-          if (!buffer.isEmpty()) {
-            final int succ = mCompatibilityRelation.extendToSmallCover(buffer);
-            addNewClique(succ);
+          if (addSmallCover(mPropagationBuffer)) {
             if (!isFirstClosedClique(clique)) {
               continue main;
             }
@@ -1180,20 +1098,29 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       }
     }
 
-    private boolean addNewClique(int clique)
+    //#######################################################################
+    //# Queue Management
+    private boolean addSmallCover(final TIntArrayList cliqueList)
       throws AnalysisException
     {
-      if (isDominatedBySome(clique, mOpenCliques) ||
-          isDominatedBySome(clique, mClosedCliques)) {
+      final int clique = mCliqueDB.add(cliqueList);
+      if (!mVisited.add(clique)) {
+        return false;
+      }
+      int cover = mCompatibilityRelation.extendToSmallCover(cliqueList);
+      if (cover != clique && !mVisited.add(cover)) {
+        return false;
+      } else if (isDominatedBySome(cover, mOpenCliques) ||
+                 isDominatedBySome(cover, mClosedCliques)) {
         return false;
       } else if (mMode == Mode.GREEDY_UNION) {
-        clique = removeAllDominatedWithUnion(clique);
+        cover = removeAllDominatedWithUnion(cover);
       } else {
-        removeAllDominated(clique, mOpenCliques);
-        removeAllDominated(clique, mClosedCliques);
+        removeAllDominated(cover, mOpenCliques);
+        removeAllDominated(cover, mClosedCliques);
       }
       if (mSize < mLimit) {
-        mListBuffer.prepend(mOpenCliques, clique);
+        mListBuffer.prepend(mOpenCliques, cover);
         mSize++;
         return true;
       } else {
@@ -1210,6 +1137,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       if (mMode == Mode.MAX_CLIQUES) {
         final int extension = mConnectivityMap.extendToMaxClique(clique);
         if (extension != clique) {
+          mVisited.add(extension);
           mListEditIterator.remove();
           removeAllDominated(extension, mOpenCliques);
           removeAllDominated(extension, mClosedCliques);
@@ -1228,14 +1156,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       } else {
         return mListBuffer.getFirst(mClosedCliques) == clique;
       }
-    }
-
-    private int createDumpState()
-    {
-      final int size = mListBuffer.getLength(mClosedCliques + 1);
-      mSelectedCovers = new TIntArrayList(size);
-      mSelectedCovers.add(-1);
-      return 0;
     }
 
     private boolean isCover(final int existing, final TIntArrayList clique)
@@ -1264,6 +1184,100 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         }
         return true;
       }
+    }
+
+    //#######################################################################
+    //# Domination Tests
+    private boolean isDominatedBySome(final int clique, final int list)
+      throws AnalysisAbortException
+    {
+      mListReadIterator.reset(list);
+      while (mListReadIterator.advance()) {
+        checkAbort();
+        final int existing = mListReadIterator.getCurrentData();
+        if (mCliqueDB.containsAll(existing, clique)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    private void removeAllDominated(final int clique, final int list)
+      throws AnalysisAbortException
+    {
+      mListEditIterator.reset(list);
+      while (mListEditIterator.advance()) {
+        checkAbort();
+        final int existing = mListEditIterator.getCurrentData();
+        if (mCliqueDB.containsAll(clique, existing)) {
+          mListEditIterator.remove();
+          mSize--;
+        }
+      }
+    }
+
+    private int removeAllDominatedWithUnion(final int clique)
+      throws AnalysisAbortException
+    {
+      mCliqueBuffer.clear();
+      mCliqueDB.collect(clique, mCliqueBuffer);
+      final TIntHashSet cliqueSet = new TIntHashSet(mCliqueBuffer);
+      mCliqueDB.collect(clique, cliqueSet);
+      if (removeAllDominatedWithUnion(mCliqueBuffer, cliqueSet, mOpenCliques) ||
+          removeAllDominatedWithUnion(mCliqueBuffer, cliqueSet, mClosedCliques)) {
+        final int union = mCliqueDB.add(cliqueSet);
+        mVisited.add(union);
+        return union;
+      } else {
+        return clique;
+      }
+    }
+
+    private boolean removeAllDominatedWithUnion(final TIntArrayList cliqueList,
+                                                final TIntHashSet cliqueSet,
+                                                final int list)
+      throws AnalysisAbortException
+    {
+      boolean addedSome = false;
+      mListEditIterator.reset(list);
+      queueLoop:
+      while (mListEditIterator.advance()) {
+        checkAbort();
+        mAdditionsBuffer.clear();
+        final int existing = mListEditIterator.getCurrentData();
+        mCliqueIterator.reset(existing);
+        while (mCliqueIterator.advance()) {
+          final int existingState = mCliqueIterator.getCurrentData();
+          if (!cliqueSet.contains(existingState)) {
+            for (int i = 0; i < cliqueList.size(); i++) {
+              final int cliqueState = cliqueList.get(i);
+              if (!mCompatibilityRelation.isCompatible(existingState,
+                                                       cliqueState)) {
+                continue queueLoop;
+              }
+            }
+            mAdditionsBuffer.add(existingState);
+          }
+        }
+        mListEditIterator.remove();
+        mSize--;
+        if (!mAdditionsBuffer.isEmpty()) {
+          cliqueList.addAll(mAdditionsBuffer);
+          cliqueSet.addAll(mAdditionsBuffer);
+          addedSome = true;
+        }
+      }
+      return addedSome;
+    }
+
+    //#######################################################################
+    //# Final Cover Selection
+    private int createDumpState()
+    {
+      final int size = mListBuffer.getLength(mClosedCliques + 1);
+      mSelectedCovers = new TIntArrayList(size);
+      mSelectedCovers.add(-1);
+      return 0;
     }
 
     private int selectCover(final TIntArrayList clique)
@@ -1354,142 +1368,39 @@ public class SmallCliqueSupervisorReductionTRSimplifier
       }
     }
 
-    private CliqueQueue prepareUnion(final int clique1,
-                                     final int clique2)
-      throws AnalysisException
-    {
-      final int cliqueSize1 = mCliqueDB.size(clique1);
-      final TIntHashSet cliqueSet1 = new TIntHashSet(cliqueSize1);
-      mCliqueDB.collect(clique1, cliqueSet1);
-      mCliqueIterator2.reset(clique2);
-      while (mCliqueIterator2.advance()) {
-        final int state2 = mCliqueIterator2.getCurrentData();
-        if (!cliqueSet1.contains(state2)) {
-          mCliqueIterator1.reset(clique1);
-          while (mCliqueIterator1.advance()) {
-            final int state1 = mCliqueIterator1.getCurrentData();
-            if (!mCompatibilityRelation.isCompatible(state1, state2)) {
-              return null;
-            }
-          }
-          cliqueSet1.add(state2);
-        }
-      }
-      assert cliqueSet1.size() > cliqueSize1;
-      final int newClosed = mListBuffer.createList();
-      mListReadIterator.reset(mClosedCliques);
-      while (mListReadIterator.advance()) {
-        final int clique = mListReadIterator.getCurrentData();
-        if (clique != clique1 && clique != clique2) {
-          mListBuffer.append(newClosed, clique);
-        }
-      }
-      final CliqueQueue queue = new CliqueQueue(newClosed, mSize);
-      final int union = mCliqueDB.add(cliqueSet1);
-      queue.addNewClique(union);
-      return queue;
-    }
-
-    //#######################################################################
-    //# Auxiliary Methods
-    private boolean isDominatedBySome(final int clique, final int list)
-      throws AnalysisAbortException
-    {
-      mListReadIterator.reset(list);
-      while (mListReadIterator.advance()) {
-        checkAbort();
-        final int existing = mListReadIterator.getCurrentData();
-        if (mCliqueDB.containsAll(existing, clique)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    private void removeAllDominated(final int clique, final int list)
-      throws AnalysisAbortException
-    {
-      mListEditIterator.reset(list);
-      while (mListEditIterator.advance()) {
-        checkAbort();
-        final int existing = mListEditIterator.getCurrentData();
-        if (mCliqueDB.containsAll(clique, existing)) {
-          mListEditIterator.remove();
-          mSize--;
-        }
-      }
-    }
-
-    private int removeAllDominatedWithUnion(final int clique)
-      throws AnalysisAbortException
-    {
-      mCliqueBuffer.clear();
-      mCliqueDB.collect(clique, mCliqueBuffer);
-      final TIntHashSet cliqueSet = new TIntHashSet(mCliqueBuffer);
-      mCliqueDB.collect(clique, cliqueSet);
-      if (removeAllDominatedWithUnion(mCliqueBuffer, cliqueSet, mOpenCliques) ||
-          removeAllDominatedWithUnion(mCliqueBuffer, cliqueSet, mClosedCliques)) {
-        return mCliqueDB.add(cliqueSet);
-      } else {
-        return clique;
-      }
-    }
-
-    private boolean removeAllDominatedWithUnion(final TIntArrayList cliqueList,
-                                                final TIntHashSet cliqueSet,
-                                                final int list)
-      throws AnalysisAbortException
-    {
-      boolean addedSome = false;
-      mListEditIterator.reset(list);
-      queueLoop:
-      while (mListEditIterator.advance()) {
-        checkAbort();
-        mAdditionsBuffer.clear();
-        final int existing = mListEditIterator.getCurrentData();
-        mCliqueIterator1.reset(existing);
-        while (mCliqueIterator1.advance()) {
-          final int existingState = mCliqueIterator1.getCurrentData();
-          if (!cliqueSet.contains(existingState)) {
-            for (int i = 0; i < cliqueList.size(); i++) {
-              final int cliqueState = cliqueList.get(i);
-              if (!mCompatibilityRelation.isCompatible(existingState,
-                                                       cliqueState)) {
-                continue queueLoop;
-              }
-            }
-            mAdditionsBuffer.add(existingState);
-          }
-        }
-        mListEditIterator.remove();
-        mSize--;
-        if (!mAdditionsBuffer.isEmpty()) {
-          cliqueList.addAll(mAdditionsBuffer);
-          cliqueSet.addAll(mAdditionsBuffer);
-          addedSome = true;
-        }
-      }
-      return addedSome;
-    }
-
     //#######################################################################
     //# Debugging
     @Override
     public String toString()
     {
-      return mListBuffer.toString(mOpenCliques) + "\n" +
-             mListBuffer.toString(mClosedCliques);
+      final StringBuilder builder = new StringBuilder();
+      builder.append("OPEN: ");
+      builder.append(mListBuffer.toString(mOpenCliques));
+      builder.append("\nCLOSED: ");
+      builder.append(mListBuffer.toString(mClosedCliques));
+      if (mSelectedCovers != null) {
+        builder.append("\nSELECTED: [");
+        for (int i = 1; i < mSelectedCovers.size(); i++) {
+          if (i > 1) {
+            builder.append(", ");
+          }
+          builder.append(mSelectedCovers.get(i));
+        }
+        builder.append(']');
+      }
+      return builder.toString();
     }
 
     //#######################################################################
     //# Data Members
     private final int mOpenCliques;
     private final int mClosedCliques;
+    private final TIntHashSet mVisited;
     private final int mLimit;
     private final IntListBuffer.ReadOnlyIterator mListReadIterator;
     private final IntListBuffer.ModifyingIterator mListEditIterator;
-    private final IntSetBuffer.IntSetIterator mCliqueIterator1;
-    private final IntSetBuffer.IntSetIterator mCliqueIterator2;
+    private final IntSetBuffer.IntSetIterator mCliqueIterator;
+    private final TIntArrayList mPropagationBuffer;
     private final TIntArrayList mCliqueBuffer;
     private final TIntArrayList mAdditionsBuffer;
     private TIntArrayList mSelectedCovers = null;
