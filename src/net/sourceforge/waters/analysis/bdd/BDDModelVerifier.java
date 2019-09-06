@@ -461,28 +461,16 @@ public abstract class BDDModelVerifier
     throws AnalysisException
   {
     final ProductDESProxy model = getModel();
-    final KindTranslator translator = getKindTranslator();
     final Collection<EventProxy> events = model.getEvents();
-    int numEvents = 0;
-    for (final EventProxy event : events) {
-      switch (translator.getEventKind(event)) {
-      case UNCONTROLLABLE:
-      case CONTROLLABLE:
-        numEvents++;
-        break;
-      default:
-        break;
-      }
-    }
+    final int numEvents = getNumberOfProperEvents();
     final EventBDD[] eventBDDs = new EventBDD[numEvents];
-    final Map<EventProxy,EventBDD> eventmap =
-      new HashMap<EventProxy,EventBDD>(numEvents);
+    final Map<EventProxy,EventBDD> eventMap = new HashMap<>(numEvents);
     int eventindex = 0;
     for (final EventProxy event : events) {
       checkAbort();
       final EventBDD eventBDD = createEventBDD(event);
       if (eventBDD != null) {
-        eventmap.put(event, eventBDD);
+        eventMap.put(event, eventBDD);
         eventBDDs[eventindex++] = eventBDD;
       }
     }
@@ -493,7 +481,7 @@ public abstract class BDDModelVerifier
       final Collection<EventProxy> localevents = aut.getEvents();
       for (final EventProxy event : localevents) {
         if (isProperEvent(event)) {
-          final EventBDD eventBDD = eventmap.get(event);
+          final EventBDD eventBDD = eventMap.get(event);
           eventBDD.startAutomaton(autBDD, mBDDFactory);
         }
       }
@@ -501,13 +489,13 @@ public abstract class BDDModelVerifier
         final StateProxy source = trans.getSource();
         if (autBDD.isReachable(source)) {
           final EventProxy event = trans.getEvent();
-          final EventBDD eventBDD = eventmap.get(event);
+          final EventBDD eventBDD = eventMap.get(event);
           eventBDD.includeTransition(trans, mBDDFactory);
         }
       }
       for (final EventProxy event : localevents) {
         if (isProperEvent(event)) {
-          final EventBDD eventBDD = eventmap.get(event);
+          final EventBDD eventBDD = eventMap.get(event);
           eventBDD.finishAutomaton(mBDDFactory);
         }
       }

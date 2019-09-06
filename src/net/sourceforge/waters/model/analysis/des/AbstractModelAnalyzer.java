@@ -260,6 +260,24 @@ public abstract class AbstractModelAnalyzer
   }
 
   /**
+   * Returns the number of proper events in the input model, under the current
+   * {@link KindTranslator}. A proper event is controllable or uncontrollable,
+   * not a proposition.
+   * @see #isProperEvent(EventProxy)
+   */
+  protected int getNumberOfProperEvents()
+  {
+    int result = 0;
+    final ProductDESProxy des = getModel();
+    for (final EventProxy event : des.getEvents()) {
+      if (isProperEvent(event)) {
+        result++;
+      }
+    }
+    return result;
+  }
+
+  /**
    * Returns whether the given automaton should be included in the
    * analysis. This default implementation returns <CODE>true</CODE> if
    * the given automaton is a plant or specification under the current
