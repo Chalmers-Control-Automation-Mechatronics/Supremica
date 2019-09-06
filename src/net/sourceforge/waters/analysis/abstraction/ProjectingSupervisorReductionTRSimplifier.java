@@ -43,6 +43,7 @@ import java.util.ListIterator;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
+import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -183,6 +184,14 @@ public class ProjectingSupervisorReductionTRSimplifier
       mLoopRemover.setPreferredOutputConfiguration
         (mVerifierBuilder.getPreferredInputConfiguration());
     }
+  }
+
+  @Override
+  public TRSimplifierStatistics createStatistics()
+  {
+    final TRSimplifierStatistics stats =
+      new TRSimplifierStatistics(this, false, false, false, false);
+    return setStatistics(stats);
   }
 
   @Override
@@ -350,6 +359,43 @@ public class ProjectingSupervisorReductionTRSimplifier
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private boolean isCompatibilityPreservingPartition(final TRPartition partition)
+  {
+    final ListBufferTransitionRelation rel = getTransitionRelation();
+    final int dumpIndex = rel.getDumpStateIndex();
+    final TransitionIterator iter = rel.createSuccessorsReadOnlyIterator();
+    final TIntArrayList supEvents = getSupervisedEvents();
+    for (int i = 0; i < supEvents.size(); i++) {
+      final int e = supEvents.get(i);
+      for (final int[] clazz : partition.getClasses()) {
+        boolean enabling = false;
+        boolean disabling = false;
+        for (final int s : clazz) {
+          iter.reset(s, e);
+          while (iter.advance()) {
+            if (iter.getCurrentTargetState() == dumpIndex) {
+              if (enabling) {
+                return false;
+              } else {
+                disabling = true;
+              }
+            } else {
+              if (disabling) {
+                return false;
+              } else {
+                enabling = true;
+              }
+            }
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+
+  //#########################################################################
   //# Inner Class ResultInfo
   private static class ResultInfo implements Comparable<ResultInfo>
   {
@@ -506,7 +552,11 @@ public class ProjectingSupervisorReductionTRSimplifier
       if (mLoopRemover != null) {
         mLoopRemover.setTransitionRelation(rel);
         if (mLoopRemover.run()) {
-          final int config = mVerifierBuilder.getPreferredInputConfiguration();
+          final TRPartition partition = mLoopRemover.getResultPartition();
+          if (!isCompatibilityPreservingPartition(partition)) {
+            return false;
+          }
+          final int config = getPreferredInputConfiguration();
           rel = new ListBufferTransitionRelation(rel, config);
           mLoopRemover.setTransitionRelation(rel);
           mLoopRemover.applyResultPartition();
