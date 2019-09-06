@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.set.hash.TIntHashSet;
+
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -45,9 +48,6 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.set.hash.TIntHashSet;
 
 
 /**
@@ -83,6 +83,7 @@ public class SubsetConstructionTRSimplifier
    *          The new state limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of states.
    */
+  @Override
   public void setStateLimit(final int limit)
   {
     mStateLimit = limit;
@@ -92,6 +93,7 @@ public class SubsetConstructionTRSimplifier
    * Gets the state limit.
    * @see #setStateLimit(int) setStateLimit()
    */
+  @Override
   public int getStateLimit()
   {
     return mStateLimit;
@@ -104,6 +106,7 @@ public class SubsetConstructionTRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
@@ -113,6 +116,7 @@ public class SubsetConstructionTRSimplifier
    * Gets the transition limit.
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;

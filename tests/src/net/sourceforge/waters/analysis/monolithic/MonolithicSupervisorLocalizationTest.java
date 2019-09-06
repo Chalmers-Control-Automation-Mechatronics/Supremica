@@ -67,7 +67,7 @@ public class MonolithicSupervisorLocalizationTest extends
       new MonolithicSynthesizer(factory);
     final SupervisorReductionFactory supRed =
       new ProjectingSupervisorReductionFactory
-      (SupervisorReductionProjectionMethod.GREEDY,
+      (SupervisorReductionProjectionMethod.GREEDY_OP,
        SupervisorReductionMainMethod.SU_WONHAM);
     synthesizer.setSupervisorReductionFactory(supRed);
     synthesizer.setSupervisorLocalizationEnabled(true);

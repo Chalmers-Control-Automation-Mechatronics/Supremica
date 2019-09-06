@@ -82,6 +82,7 @@ public class SynthesisTransitionRemovalTRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
    *          unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
@@ -91,6 +92,7 @@ public class SynthesisTransitionRemovalTRSimplifier
    * Gets the transition limit.
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;
@@ -242,7 +244,7 @@ public class SynthesisTransitionRemovalTRSimplifier
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, false, true, false);
+      new TRSimplifierStatistics(this, false, false, true, false);
     return setStatistics(stats);
   }
 

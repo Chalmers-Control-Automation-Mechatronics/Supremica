@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Formatter;
 
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -61,16 +62,22 @@ public class TRSimplifierStatistics
                                 final boolean trans,
                                 final boolean markings)
   {
-    this(simplifier, trans, trans, markings);
+    this(simplifier, trans, trans, trans, markings);
   }
 
   public TRSimplifierStatistics(final Object simplifier,
+                                final boolean events,
                                 final boolean states,
                                 final boolean trans,
                                 final boolean markings)
   {
     mSimplifierClass = simplifier.getClass();
     mApplicationCount = mOverflowCount = mReductionCount = 0;
+    if (events) {
+      mInputEvents = mOutputEvents = mUnchangedEvents = 0;
+    } else {
+      mInputEvents = mOutputEvents = mUnchangedEvents = -1;
+    }
     if (states) {
       mInputStates = mOutputStates = mUnchangedStates = 0;
     } else {
@@ -135,39 +142,39 @@ public class TRSimplifierStatistics
   }
 
   /**
-   * Gets the sum of the number of input markings for this rule.
+   * Gets the sum of the number of input events for this rule.
    */
-  public int getInputMarkings()
+  public int getInputEvents()
   {
-    return mInputMarkings;
+    return mInputEvents;
   }
 
   /**
-   * Gets the sum of the number of output markings for this rule when a
-   * reduction occurred.
+   * Gets the sum of the number of output events for this rule when a reduction
+   * occurred.
    */
-  public int getOutputMarkings()
+  public int getChangedOutputEvents()
   {
-    return mOutputMarkings;
+    return mOutputEvents;
   }
 
   /**
-   * Gets the sum of the number of output markings for this rule when no
-   * reduction occurred.
+   * Gets the sum of the number of input eEvents for this rule when no reduction
+   * occurred.
    */
-  public int getUnchangedMarkings()
+  public int getUnchangedEvents()
   {
-    return mUnchangedMarkings;
+    return mUnchangedEvents;
   }
 
   /**
-   * Gets the sum of the total number of output markings for this rule. This
-   * includes output for when a reduction did occur and when a reduction did not
-   * occur.
+   * Gets the sum of the total number of output events for this rule. This
+   * includes output for when a reduction did occur and when a reduction did
+   * not occur.
    */
-  public int getTotalOutputMarkings()
+  public int getOutputEvents()
   {
-    return mOutputMarkings + mUnchangedMarkings;
+    return mOutputEvents + mUnchangedEvents;
   }
 
   /**
@@ -241,6 +248,42 @@ public class TRSimplifierStatistics
   {
     return mOutputTransitions + mUnchangedTransitions;
   }
+  /**
+   * Gets the sum of the number of input markings for this rule.
+   */
+  public int getInputMarkings()
+  {
+    return mInputMarkings;
+  }
+
+  /**
+   * Gets the sum of the number of output markings for this rule when a
+   * reduction occurred.
+   */
+  public int getOutputMarkings()
+  {
+    return mOutputMarkings;
+  }
+
+  /**
+   * Gets the sum of the number of output markings for this rule when no
+   * reduction occurred.
+   */
+  public int getUnchangedMarkings()
+  {
+    return mUnchangedMarkings;
+  }
+
+  /**
+   * Gets the sum of the total number of output markings for this rule. This
+   * includes output for when a reduction did occur and when a reduction did not
+   * occur.
+   */
+  public int getTotalOutputMarkings()
+  {
+    return mOutputMarkings + mUnchangedMarkings;
+  }
+
 
 
   //#########################################################################
@@ -248,6 +291,9 @@ public class TRSimplifierStatistics
   public void recordStart(final ListBufferTransitionRelation rel)
   {
     mApplicationCount++;
+    if (mInputEvents >= 0) {
+      mInputEvents += getNumberOfUsedEvents(rel);
+    }
     if (mInputStates >= 0) {
       mInputStates += rel.getNumberOfReachableStates();
     }
@@ -262,6 +308,9 @@ public class TRSimplifierStatistics
   public void recordStart(final AutomatonProxy aut)
   {
     mApplicationCount++;
+    if (mInputEvents >= 0) {
+      mInputEvents += aut.getEvents().size();
+    }
     if (mInputStates >= 0) {
       mInputStates += aut.getStates().size();
     }
@@ -280,6 +329,9 @@ public class TRSimplifierStatistics
   {
     if (success) {
       mReductionCount++;
+      if (mOutputEvents >= 0) {
+        mOutputEvents += getNumberOfUsedEvents(rel);
+      }
       if (mOutputStates >= 0) {
         mOutputStates += rel.getNumberOfReachableStates();
       }
@@ -290,6 +342,9 @@ public class TRSimplifierStatistics
         mOutputMarkings += rel.getNumberOfMarkings(false);
       }
     } else {
+      if (mUnchangedEvents >= 0) {
+        mUnchangedEvents += getNumberOfUsedEvents(rel);
+      }
       if (mUnchangedStates >= 0) {
         mUnchangedStates += rel.getNumberOfReachableStates();
       }
@@ -306,6 +361,9 @@ public class TRSimplifierStatistics
   {
     if (success) {
       mReductionCount++;
+      if (mOutputEvents >= 0) {
+        mOutputEvents += aut.getEvents().size();
+      }
       if (mOutputStates >= 0) {
         mOutputStates += aut.getStates().size();
       }
@@ -318,6 +376,9 @@ public class TRSimplifierStatistics
         }
       }
     } else {
+      if (mUnchangedEvents >= 0) {
+        mUnchangedEvents += aut.getEvents().size();
+      }
       if (mUnchangedStates >= 0) {
         mUnchangedStates += aut.getStates().size();
       }
@@ -439,13 +500,19 @@ public class TRSimplifierStatistics
       (float) mReductionCount / (float) mApplicationCount;
     formatter.format("Probability of a reduction occurring: %.2f%%\n",
                      100.0f * probability);
+    if (mInputEvents >= 0) {
+      writer.print("Number of input events: ");
+      writer.println(mInputEvents);
+      writer.print("Number of output events: ");
+      writer.println(getOutputEvents());
+    }
     if (mInputStates >= 0) {
       writer.print("Number of input states: ");
       writer.println(mInputStates);
       writer.print("Number of output states: ");
       writer.println(getOutputStates());
     }
-    if (mInputTransitions >= 0) {
+   if (mInputTransitions >= 0) {
       writer.print("Number of input transitions: ");
       writer.println(mInputTransitions);
       writer.print("Number of output transitions: ");
@@ -468,6 +535,11 @@ public class TRSimplifierStatistics
     writer.print(",Applied");
     writer.print(",Reductions");
     writer.print(",Overflows");
+    if (mInputEvents >= 0) {
+      writer.print(",InEvents");
+      writer.print(",OutEventsRed");
+      writer.print(",OutEventsNoRed");
+    }
     if (mInputStates >= 0) {
       writer.print(",InStates");
       writer.print(",OutStatesRed");
@@ -494,6 +566,14 @@ public class TRSimplifierStatistics
     writer.print(mReductionCount);
     writer.print(',');
     writer.print(mOverflowCount);
+    if (mInputEvents >= 0) {
+      writer.print(',');
+      writer.print(mInputEvents);
+      writer.print(',');
+      writer.print(mOutputEvents);
+      writer.print(',');
+      writer.print(mUnchangedEvents);
+    }
     if (mInputStates >= 0) {
       writer.print(',');
       writer.print(mInputStates);
@@ -524,12 +604,32 @@ public class TRSimplifierStatistics
 
 
   //#########################################################################
+  //# Auxiliary Methods
+  private static int getNumberOfUsedEvents
+    (final ListBufferTransitionRelation rel)
+  {
+    final int numEvents = rel.getNumberOfProperEvents();
+    int numUsed = 0;
+    for (int e = 0; e < numEvents; e++) {
+      final byte status = rel.getProperEventStatus(e);
+      if (EventStatus.isUsedEvent(status)) {
+        numUsed++;
+      }
+    }
+    return numUsed;
+  }
+
+
+  //#########################################################################
   //# Data Members
   private final Class<?> mSimplifierClass;
 
   private int mApplicationCount;
   private int mOverflowCount;
   private int mReductionCount;
+  private int mInputEvents;
+  private int mOutputEvents;
+  private int mUnchangedEvents;
   private int mInputStates;
   private int mOutputStates;
   private int mUnchangedStates;

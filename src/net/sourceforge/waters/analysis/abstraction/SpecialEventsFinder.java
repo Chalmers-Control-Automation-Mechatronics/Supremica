@@ -206,7 +206,7 @@ public class SpecialEventsFinder
   public TRSimplifierStatistics createStatistics()
   {
     final TRSimplifierStatistics stats =
-      new TRSimplifierStatistics(this, false, false, false);
+      new TRSimplifierStatistics(this, false, false, false, false);
     return setStatistics(stats);
   }
 

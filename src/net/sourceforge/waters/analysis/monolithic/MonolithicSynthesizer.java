@@ -214,10 +214,10 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
     mTargetTuple = new int[mNumAutomata];
 
     //transitions indexed first by automaton then by event then by source state
-    transitions = new int[mNumAutomata][mNumProperEvents + 1][][];
-    reverseTransitions = new int[mNumAutomata][mNumProperEvents + 1][][];
-    eventAutomata = new int[mNumProperEvents + 1][];
-    reverseEventAutomata = new int[mNumProperEvents + 1][];
+    transitions = new int[mNumAutomata][mNumProperEvents][][];
+    reverseTransitions = new int[mNumAutomata][mNumProperEvents][][];
+    eventAutomata = new int[mNumProperEvents][];
+    reverseEventAutomata = new int[mNumProperEvents][];
     ndTuple1 = new int[mNumAutomata][];
 
     int a = 0;
@@ -251,9 +251,9 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       }
       ndTuple1[a] = initials.toArray();
       final TIntArrayList[][] autTransitionLists =
-        new TIntArrayList[mNumProperEvents + 1][numStates];
+        new TIntArrayList[mNumProperEvents][numStates];
       final TIntArrayList[][] autTransitionListsRvs =
-        new TIntArrayList[mNumProperEvents + 1][numStates];
+        new TIntArrayList[mNumProperEvents][numStates];
       for (final TransitionProxy trans : aut.getTransitions()) {
         final EventProxy event = trans.getEvent();
         final int e = mEventEncoding.getEventCode(event);
@@ -442,6 +442,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
   {
     super.addStatistics();
     final MonolithicSynthesisResult result = getAnalysisResult();
+    result.setTotalNumberOfEvents(mNumProperEvents - 1); // do not include tau
     result.setNumberOfAutomata(mNumAutomata);
     result.setNumberOfStates(mNumStates);
     if (mTransitionBuffer != null) {
@@ -482,6 +483,8 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
   @Override
   public boolean run() throws AnalysisException
   {
+    final Logger logger = LogManager.getLogger();
+
     try {
       setUp();
       final int[] sentinel = new int[1];
@@ -654,6 +657,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
           mTransitionRelation.removeRedundantPropositions();
           des = createDESProxy(mTransitionRelation);
         } else {
+          logger.debug("Reducing supervisor ...");
           //mTransitionRelation.setPropositionUsed(markingID, false);
           if (mMinimizationChain != null) {
             mMinimizationChain.setTransitionRelation(mTransitionRelation);
@@ -685,7 +689,6 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
       throw setExceptionResult(exception);
     } catch (final OutOfMemoryError error) {
       tearDown();
-      final Logger logger = LogManager.getLogger();
       logger.debug("<out of memory>");
       final OverflowException exception = new OverflowException(error);
       throw setExceptionResult(exception);
@@ -700,6 +703,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
   private void collectLocalizedSupervisors(final List<AutomatonProxy> supervisors)
     throws AnalysisException
   {
+    final Logger logger = LogManager.getLogger();
     int config = mReductionChain.getPreferredInputConfiguration();
     if (config == 0) {
       config = mTransitionRelation.getConfiguration();
@@ -717,16 +721,22 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
         removeOtherControllableDisablements(supervisor, e);
         final EventProxy event = mEventEncoding.getProperEvent(e);
-        supervisor.setName(prefix + event.getName());
+        final String eventName = event.getName();
+        logger.debug("Localised supervisor for event {} ...", eventName);
+        supervisor.setName(prefix + eventName);
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
         supervisor.removeDumpStateTransitions();
         supervisor.removeRedundantPropositions();
         AutomatonProxy aut = new TRAutomatonProxy(enc, supervisor);
-        for (final AutomatonProxy existing : supervisors) {
-          if (checker.checkBisimulation(aut, existing)) {
-            aut = null;
-            break;
+        if (!supervisors.isEmpty()) {
+          logger.debug("Comparing result with previous supervisors ...");
+          for (final AutomatonProxy existing : supervisors) {
+            if (checker.checkBisimulation(aut, existing)) {
+              logger.debug("Suppressing duplicate supervisor.");
+              aut = null;
+              break;
+            }
           }
         }
         if (aut != null) {
