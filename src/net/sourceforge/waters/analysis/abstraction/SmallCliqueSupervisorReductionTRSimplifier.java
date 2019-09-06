@@ -284,7 +284,6 @@ public class SmallCliqueSupervisorReductionTRSimplifier
     throws AnalysisAbortException
   {
     if (mCompatibilityRelation.pushIncompatibleIfNew(stack, state1, state2)) {
-      checkAbort();
       final ListBufferTransitionRelation rel = getTransitionRelation();
       final TransitionIterator iter1 = rel.createPredecessorsReadOnlyIterator();
       final TransitionIterator iter2 = rel.createPredecessorsReadOnlyIterator();
@@ -294,6 +293,7 @@ public class SmallCliqueSupervisorReductionTRSimplifier
         iter1.resetState(t1);
         final int t2 = WatersIntPairStack.getHi(pair);
         while (iter1.advance()) {
+          checkAbort();
           final int s1 = iter1.getCurrentSourceState();
           final int event = iter1.getCurrentEvent();
           iter2.reset(t2, event);
