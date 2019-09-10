@@ -417,7 +417,9 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
                              EventEncoding.NONTAU, mNumProperEvents - 1);
     mDisabledEvents = new THashSet<>();
 
-    mReductionChain = getSupervisorReductionFactory().createSupervisorReducer();
+    final boolean localisation = isSupervisorLocalizationEnabled();
+    mReductionChain =
+      getSupervisorReductionFactory().createSupervisorReducer(localisation);
     if (mReductionChain != null) {
       final int stateLimit = getNodeLimit();
       final int transitionLimit = getTransitionLimit();

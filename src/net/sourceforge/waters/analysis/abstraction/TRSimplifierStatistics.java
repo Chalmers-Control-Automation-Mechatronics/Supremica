@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Formatter;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.DefaultAnalysisResult;
@@ -292,7 +293,7 @@ public class TRSimplifierStatistics
   {
     mApplicationCount++;
     if (mInputEvents >= 0) {
-      mInputEvents += getNumberOfUsedEvents(rel);
+      mInputEvents += getNumberOfUsedEventsExceptTau(rel);
     }
     if (mInputStates >= 0) {
       mInputStates += rel.getNumberOfReachableStates();
@@ -330,7 +331,7 @@ public class TRSimplifierStatistics
     if (success) {
       mReductionCount++;
       if (mOutputEvents >= 0) {
-        mOutputEvents += getNumberOfUsedEvents(rel);
+        mOutputEvents += getNumberOfUsedEventsExceptTau(rel);
       }
       if (mOutputStates >= 0) {
         mOutputStates += rel.getNumberOfReachableStates();
@@ -343,7 +344,7 @@ public class TRSimplifierStatistics
       }
     } else {
       if (mUnchangedEvents >= 0) {
-        mUnchangedEvents += getNumberOfUsedEvents(rel);
+        mUnchangedEvents += getNumberOfUsedEventsExceptTau(rel);
       }
       if (mUnchangedStates >= 0) {
         mUnchangedStates += rel.getNumberOfReachableStates();
@@ -605,12 +606,12 @@ public class TRSimplifierStatistics
 
   //#########################################################################
   //# Auxiliary Methods
-  private static int getNumberOfUsedEvents
+  public static int getNumberOfUsedEventsExceptTau
     (final ListBufferTransitionRelation rel)
   {
     final int numEvents = rel.getNumberOfProperEvents();
     int numUsed = 0;
-    for (int e = 0; e < numEvents; e++) {
+    for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
       final byte status = rel.getProperEventStatus(e);
       if (EventStatus.isUsedEvent(status)) {
         numUsed++;

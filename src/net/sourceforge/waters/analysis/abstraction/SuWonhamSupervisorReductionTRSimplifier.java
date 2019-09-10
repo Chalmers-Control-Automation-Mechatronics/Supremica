@@ -1150,7 +1150,7 @@ public class SuWonhamSupervisorReductionTRSimplifier
         return null;
       } else {
         final ListBufferTransitionRelation rel = getTransitionRelation();
-        final int numStates = rel.getFirstInitialState();
+        final int numStates = rel.getNumberOfStates();
         final List<int[]> classes = new ArrayList<>(numStates);
         for (int s = 0; s < numStates; s++) {
           final int list = mMap.get(s);

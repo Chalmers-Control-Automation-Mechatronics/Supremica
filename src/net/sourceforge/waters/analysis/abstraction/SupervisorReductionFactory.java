@@ -70,11 +70,16 @@ public interface SupervisorReductionFactory
    * Creates a transition relation simplifier that can perform supervisor
    * reduction. If the factory returns an initial minimiser, then the
    * transition relation simplifier returned by this method assumes that
-   * the initial minimisation has been performed on any input it receives.   *
+   * the initial minimisation has been performed on any input it receives.
+   * @param   localisation  Whether or not supervisor localisation is
+   *                        performed. If <CODE>true</CODE>, the result of
+   *                        the initial minimiser may have been changed
+   *                        after selection of a single controllable event.
    * @return  The fully configured transition relation simplifier,
    *          or <CODE>null</CODE> to disable supervisor reduction.
    */
-  public SupervisorReductionSimplifier createSupervisorReducer();
+  public SupervisorReductionSimplifier createSupervisorReducer
+    (boolean localisation);
 
   /**
    * Whether the supervisor reduction factory is configured to perform
@@ -101,9 +106,17 @@ public interface SupervisorReductionFactory
     }
 
     public SupervisorReductionChain(final TransitionRelationSimplifier projector,
-                                    final SupervisorReductionSimplifier main)
+                                    final SupervisorReductionSimplifier main,
+                                    final boolean localisation)
     {
       mMainSimplifier = main;
+      if (localisation) {
+        final ObservationEquivalenceTRSimplifier bisimulator =
+          new ObservationEquivalenceTRSimplifier();
+        bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
+        add(bisimulator);
+      }
       if (projector != null) {
         add(projector);
         add(new SpecialEventsTRSimplifier());

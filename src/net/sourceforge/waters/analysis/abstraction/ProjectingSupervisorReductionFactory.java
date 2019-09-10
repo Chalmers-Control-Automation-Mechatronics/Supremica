@@ -162,13 +162,14 @@ public class ProjectingSupervisorReductionFactory
   }
 
   @Override
-  public SupervisorReductionSimplifier createSupervisorReducer()
+  public SupervisorReductionSimplifier createSupervisorReducer
+    (final boolean localisation)
   {
     if (isSupervisedReductionEnabled()) {
       final TransitionRelationSimplifier projector =
         mProjectionMethod.createSimplifier();
       final SupervisorReductionSimplifier main = mMainMethod.createSimplifier();
-      return new SupervisorReductionChain(projector, main);
+      return new SupervisorReductionChain(projector, main, localisation);
     } else {
       return null;
     }

@@ -399,7 +399,8 @@ public class CompositionalAutomataSynthesizer
     mHalfwaySimplifier.setOutputMode
       (HalfWaySynthesisTRSimplifier.OutputMode.PSEUDO_SUPERVISOR);
     if (isDetailedOutputEnabled()) {
-      mMainSupervisorReducer = mSupervisorReductionFactory.createSupervisorReducer();
+      mMainSupervisorReducer = mSupervisorReductionFactory.
+        createSupervisorReducer(mSupervisorLocalizationEnabled);
       if (mMainSupervisorReducer != null) {
         final int stateLimit = getInternalStateLimit();
         mMainSupervisorReducer.setStateLimit(stateLimit);

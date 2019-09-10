@@ -103,7 +103,8 @@ public enum SupremicaSupervisorReductionFactory
   }
 
   @Override
-  public SupervisorReductionSimplifier createSupervisorReducer()
+  public SupervisorReductionSimplifier createSupervisorReducer
+    (final boolean localisation)
   {
     return null;
   }
