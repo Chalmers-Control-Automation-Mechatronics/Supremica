@@ -49,6 +49,9 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 /**
  * A list buffer transition relation implementation of the subset
@@ -76,46 +79,52 @@ public class SubsetConstructionTRSimplifier
 
   //#########################################################################
   //# Configuration
-  /**
-   * Sets the state limit. The states limit specifies the maximum
-   * number of states that will be created.
-   * @param limit
-   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of states.
-   */
   @Override
   public void setStateLimit(final int limit)
   {
-    mStateLimit = limit;
+    mConfiguredStateLimit = limit;
   }
 
-  /**
-   * Gets the state limit.
-   * @see #setStateLimit(int) setStateLimit()
-   */
   @Override
   public int getStateLimit()
   {
-    return mStateLimit;
+    return mConfiguredStateLimit;
   }
 
   /**
-   * Sets the transition limit. The transition limit specifies the maximum
-   * number of transitions that will be created.
-   * @param limit
-   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of transitions.
+   * Sets the maximum factor by which the number of states may increase
+   * before subset construction is aborted. This option can be used as
+   * a relative state limit, which depends on the size of the input
+   * automaton. If a hard state limit is also set using {@link
+   * #setStateLimit(int)} then subset construction is aborted if either
+   * the hard or the relative state limit is reached.
+   * @param  maxIncrease  The maximum factor by which the number of states may
+   *                      increase. For example, a value of <CODE>2.0</CODE>
+   *                      means that subset construction is stopped when
+   *                      the number of encountered subsets hits twice the
+   *                      number of states of the input automaton.
    */
+  public void setMaxIncrease(final double maxIncrease)
+  {
+    mMaxIncrease = maxIncrease;
+  }
+
+  /**
+   * Gets the maximum factor by which the number of states may increase
+   * before subset construction is aborted.
+   * @see #setMaxIncrease(double)
+   */
+  public double getMaxIncrease()
+  {
+    return mMaxIncrease;
+  }
+
   @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
   }
 
-  /**
-   * Gets the transition limit.
-   * @see #setTransitionLimit(int) setTransitionLimit()
-   */
   @Override
   public int getTransitionLimit()
   {
@@ -216,7 +225,8 @@ public class SubsetConstructionTRSimplifier
 
 
   //#########################################################################
-  //# Overrides for net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
+  //# Overrides for
+  //# net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifier
   @Override
   protected void setUp()
   throws AnalysisException
@@ -238,6 +248,14 @@ public class SubsetConstructionTRSimplifier
     } else {
       mIsDeterministic = true;
       return;
+    }
+
+    if (Double.isFinite(mMaxIncrease)) {
+      final int numReachable = rel.getNumberOfReachableStates();
+      final int maxStates = (int) Math.ceil(mMaxIncrease * numReachable);
+      mEffectiveStateLimit = Math.min(maxStates, mConfiguredStateLimit);
+    } else {
+      mEffectiveStateLimit = mConfiguredStateLimit;
     }
 
     final int numEvents = rel.getNumberOfProperEvents();
@@ -336,8 +354,12 @@ public class SubsetConstructionTRSimplifier
               final int target;
               if (offset > last) {
                 target = mSetOffsets.size();
-                if (target >= mStateLimit) {
-                  throw new OverflowException(OverflowKind.STATE, mStateLimit);
+                if (target >= mEffectiveStateLimit) {
+                  final Logger logger = LogManager.getLogger();
+                  logger.debug("State limit of {} reached, aborting.",
+                               mEffectiveStateLimit);
+                  throw new OverflowException(OverflowKind.STATE,
+                                              mEffectiveStateLimit);
                 }
                 mSetOffsets.add(offset);
                 last = offset;
@@ -466,6 +488,7 @@ public class SubsetConstructionTRSimplifier
     }
   }
 
+
   //#########################################################################
   //# Simple Access Methods
   public int[] getSourceSet(final int stateIndex)
@@ -473,13 +496,16 @@ public class SubsetConstructionTRSimplifier
     return mStateSetBuffer.getSetContents(mSetOffsets.get(stateIndex));
   }
 
+
   //#########################################################################
   //# Data Members
-  private int mStateLimit = Integer.MAX_VALUE;
+  private int mConfiguredStateLimit = Integer.MAX_VALUE;
+  private double mMaxIncrease = Double.POSITIVE_INFINITY;
   private int mTransitionLimit = Integer.MAX_VALUE;
   private boolean mDumpStateAware = false;
   private boolean mFailingEventsAsSelfloops = false;
 
+  private int mEffectiveStateLimit = Integer.MAX_VALUE;
   private boolean mIsDeterministic;
   private TransitionIterator mTauIterator;
   private TransitionIterator mEventIterator;

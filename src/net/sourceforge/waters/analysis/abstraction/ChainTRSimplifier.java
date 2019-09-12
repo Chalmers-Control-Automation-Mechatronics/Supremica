@@ -130,13 +130,6 @@ public class ChainTRSimplifier
     }
   }
 
-  /**
-   * Sets the state limit. The states limit specifies the maximum
-   * number of states that will be created.
-   * @param limit
-   *          The new state limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of states.
-   */
   @Override
   public void setStateLimit(final int limit)
   {
@@ -145,10 +138,6 @@ public class ChainTRSimplifier
     }
   }
 
-  /**
-   * Gets the state limit.
-   * @see #setStateLimit(int) setStateLimit()
-   */
   @Override
   public int getStateLimit()
   {
@@ -161,13 +150,6 @@ public class ChainTRSimplifier
     return Integer.MAX_VALUE;
   }
 
-  /**
-   * Sets the transition limit. The transition limit specifies the maximum
-   * number of transitions that will be created.
-   * @param limit
-   *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
-   *          an unlimited number of transitions.
-   */
   @Override
   public void setTransitionLimit(final int limit)
   {
@@ -176,10 +158,6 @@ public class ChainTRSimplifier
     }
   }
 
-  /**
-   * Gets the transition limit.
-   * @see #setTransitionLimit(int) setTransitionLimit()
-   */
   @Override
   public int getTransitionLimit()
   {
@@ -243,15 +221,6 @@ public class ChainTRSimplifier
   }
 
   @Override
-  public void reset()
-  {
-    super.reset();
-    for (final TransitionRelationSimplifier step : mSteps) {
-      step.reset();
-    }
-  }
-
-  @Override
   protected void logStart()
   {
   }
@@ -290,7 +259,7 @@ public class ChainTRSimplifier
   protected void setUp()
     throws AnalysisException
   {
-    // Overriding this to avoid reconfiguration of TR ahead of time.
+    // Do not call super to avoid reconfiguration of TR ahead of time.
     setResultPartition(null);
   }
 
@@ -299,34 +268,34 @@ public class ChainTRSimplifier
     throws AnalysisException
   {
     mIsObservationEquivalentAbstraction = true;
-    final ListBufferTransitionRelation rel = getTransitionRelation();
+    ListBufferTransitionRelation rel = getTransitionRelation();
     final int numProps = rel.getNumberOfPropositions();
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
     for (final TransitionRelationSimplifier step : mSteps) {
-      checkAbort();
-      final int config = step.getPreferredInputConfiguration();
-      if (config != 0) {
-        rel.reconfigure(config);
-      }
-      step.setTransitionRelation(rel);
-      if (step.run()) {
-        final ListBufferTransitionRelation rel1 = step.getTransitionRelation();
-        setTransitionRelation(rel1);
-        result = true;
-        mIsObservationEquivalentAbstraction &=
-          step.isObservationEquivalentAbstraction();
-        for (int prop = 0; prop < numProps; prop++) {
-          mReducedMarkings[prop] |= step.isReducedMarking(prop);
+      try {
+        checkAbort();
+        step.setTransitionRelation(rel);
+        if (step.run()) {
+          rel = step.getTransitionRelation();
+          setTransitionRelation(rel);
+          result = true;
+          mIsObservationEquivalentAbstraction &=
+            step.isObservationEquivalentAbstraction();
+          for (int prop = 0; prop < numProps; prop++) {
+            mReducedMarkings[prop] |= step.isReducedMarking(prop);
+          }
         }
-      }
-      // rel.checkIntegrity();
-      if (isPartitioning()) {
-        final TRPartition currentPartition = getResultPartition();
-        final TRPartition newPartition = step.getResultPartition();
-        final TRPartition combinedPartition =
-          TRPartition.combine(currentPartition, newPartition);
-        setResultPartition(combinedPartition);
+        // rel.checkIntegrity();
+        if (isPartitioning()) {
+          final TRPartition currentPartition = getResultPartition();
+          final TRPartition newPartition = step.getResultPartition();
+          final TRPartition combinedPartition =
+            TRPartition.combine(currentPartition, newPartition);
+          setResultPartition(combinedPartition);
+        }
+      } finally {
+        step.reset();
       }
     }
     return result;

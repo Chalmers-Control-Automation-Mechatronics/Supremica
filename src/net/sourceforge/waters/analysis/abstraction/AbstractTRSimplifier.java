@@ -141,6 +141,10 @@ public abstract class AbstractTRSimplifier
   {
   }
 
+  /**
+   * Gets the state limit.
+   * @see #setStateLimit(int) setStateLimit()
+   */
   @Override
   public int getStateLimit()
   {
@@ -161,6 +165,10 @@ public abstract class AbstractTRSimplifier
   {
   }
 
+  /**
+   * Gets the transition limit.
+   * @see #setTransitionLimit(int) setTransitionLimit()
+   */
   @Override
   public int getTransitionLimit()
   {

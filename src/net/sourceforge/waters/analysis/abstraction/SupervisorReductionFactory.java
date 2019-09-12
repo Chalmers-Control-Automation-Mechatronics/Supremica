@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 
 
@@ -98,7 +101,7 @@ public interface SupervisorReductionFactory
     implements SupervisorReductionSimplifier
   {
     //#######################################################################
-    //# Constructor
+    //# Constructors
     public SupervisorReductionChain(final boolean includeCoreachability)
     {
       mMainSimplifier = null;
@@ -111,20 +114,11 @@ public interface SupervisorReductionFactory
     {
       mMainSimplifier = main;
       if (localisation) {
-        final ObservationEquivalenceTRSimplifier bisimulator =
-          new ObservationEquivalenceTRSimplifier();
-        bisimulator.setEquivalence
-        (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
-        add(bisimulator);
+        addInitialMinimisationSteps(false);
       }
       if (projector != null) {
         add(projector);
-        add(new SpecialEventsTRSimplifier());
-        final SubsetConstructionTRSimplifier subset =
-          new SubsetConstructionTRSimplifier();
-        subset.setDumpStateAware(true);
-        add(subset);
-        addInitialMinimisationSteps(false);
+        add(new ConditionalSupervisorReductionSubChain());
       }
       add(main);
       add(new SelfloopSupervisorReductionTRSimplifier());
@@ -168,4 +162,53 @@ public interface SupervisorReductionFactory
     private final SupervisorReductionSimplifier mMainSimplifier;
   }
 
+
+  //#########################################################################
+  //# Inner Class ConditionalSupervisorReductionSubChain
+  public static class ConditionalSupervisorReductionSubChain
+    extends ConditionalTRSimplifier
+  {
+    //#######################################################################
+    //# Constructor
+    private ConditionalSupervisorReductionSubChain()
+    {
+      add(new SpecialEventsTRSimplifier());
+      final SubsetConstructionTRSimplifier subset =
+        new SubsetConstructionTRSimplifier();
+      subset.setDumpStateAware(true);
+      subset.setMaxIncrease(2.0);
+      add(subset);
+      add(new SelfloopSupervisorReductionTRSimplifier());
+      final ObservationEquivalenceTRSimplifier bisimulator =
+        new ObservationEquivalenceTRSimplifier();
+      bisimulator.setEquivalence
+        (ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE);
+      add(bisimulator);
+    }
+
+    //#######################################################################
+    //# Overrides for
+    //# net.sourceforge.waters.analysis.abstraction.ConditionalTRSimplifier
+    @Override
+    protected boolean checkPreCondition()
+    {
+      final ListBufferTransitionRelation rel = getTransitionRelation();
+      final int numEvents = rel.getNumberOfProperEvents();
+      for (int e = EventEncoding.NONTAU; e < numEvents; e++) {
+        final byte status = rel.getProperEventStatus(e);
+        if (EventStatus.isLocalEvent(status)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    @Override
+    protected boolean checkPostCondition(final ListBufferTransitionRelation result)
+    {
+      final ListBufferTransitionRelation orig = getTransitionRelation();
+      return result.getNumberOfReachableStates() <=
+             orig.getNumberOfReachableStates();
+    }
+  }
 }
