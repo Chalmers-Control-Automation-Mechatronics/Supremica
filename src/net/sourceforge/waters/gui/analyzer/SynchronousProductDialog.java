@@ -35,7 +35,6 @@ package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -87,26 +86,82 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    // TODO Actually create a dialog (like synthesis) so that the user can abort
-    final SynchronousProductBuilder builder = getAnalyzer();
-    builder.setModel(des);
-    try {
-      builder.run();
-      final AutomatonResult result = builder.getAnalysisResult();
-      final AutomatonProxy aut = result.getComputedProxy();
-      // TODO Check for null automaton. Try to display state and transition
-      // count if null.
-      final AutomataTableModel model =
-        getWatersAnalyzerPanel().getAutomataTableModel();
-      model.insertRow(aut);
-    } catch (final AnalysisException exception) {
-      final Logger logger = LogManager.getLogger();
-      final String msg = exception.getMessage();
-      logger.error(msg);
-    }
-    return null;
+    return new SynchronousProductPopUpDialog(ide, des);
   }
 
+  //#########################################################################
+  //# Inner Class SynchronousProductPopUpDialog
+  private class SynchronousProductPopUpDialog extends WatersAnalyzeDialog
+  {
+
+    //#######################################################################
+    //# Constructor
+    public SynchronousProductPopUpDialog(final IDE owner,
+                                final ProductDESProxy des)
+    {
+      super(owner, des);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
+    @Override
+    public void succeed()
+    {
+      super.succeed();
+    }
+
+    @Override
+    protected String getAnalysisName()
+    {
+      return "Synchronous Product";
+    }
+
+    @Override
+    protected String getFailureText()
+    {
+      //Failure occurs when result is null, check if running for statistics
+      if(!getAnalyzer().isDetailedOutputEnabled())
+        return getSuccessText();
+
+      return "Synchronous Product has failed.";
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final AutomatonResult result = getAnalyzer().getAnalysisResult();
+      final AutomatonProxy aut = result.getComputedProxy();
+      //Statistics run
+      if(aut == null) {
+        final Logger logger = LogManager.getFormatterLogger();
+        if (result.getPeakNumberOfTransitions() >= 0) {
+          logger.info("Synchronous product has %.0f transitions.",
+                      result.getPeakNumberOfTransitions());
+        }
+        if (result.getPeakNumberOfStates() >= 0) {
+          logger.info("Synchronous product has %.0f states.",
+                      result.getPeakNumberOfStates());
+        }
+
+        return "Successfully produced synchronous product. Printing statistics to log.";
+      }
+      else {
+        final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+        model.insertRow(aut);
+        return "Successfully produced synchronous product.";
+      }
+    }
+
+    @Override
+    protected ModelAnalyzer createModelAnalyzer()
+    {
+      return getAnalyzer();
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -4410961155882957875L;
+  }
 
   //#########################################################################
   //# Class Constants

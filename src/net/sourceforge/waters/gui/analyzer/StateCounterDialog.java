@@ -35,7 +35,6 @@ package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -61,12 +60,10 @@ public class StateCounterDialog extends AbstractAnalysisDialog
   {
     super(panel, new AnalyzerProductDESContext(panel));
     setTitle("State Counter");
-
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
-
   @Override
   protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
                                          final ProductDESProxyFactory desFactory)
@@ -88,12 +85,45 @@ public class StateCounterDialog extends AbstractAnalysisDialog
   protected WatersAnalyzeDialog createAnalyzeDialog(final IDE ide,
                                                     final ProductDESProxy des)
   {
-    // TODO Actually create a dialog (like synthesis) so that the user can abort
-    final StateCounter counter = getAnalyzer();
-    counter.setModel(des);
-    try {
-      counter.run();
-      final AnalysisResult result = counter.getAnalysisResult();
+    return new StateCounterPopUpDialog(ide, des);
+  }
+
+  //#########################################################################
+  //# Inner Class StateCounterPopUpDialog
+  private class StateCounterPopUpDialog extends WatersAnalyzeDialog
+  {
+    //#######################################################################
+    //# Constructor
+    public StateCounterPopUpDialog(final IDE owner,
+                                final ProductDESProxy des)
+    {
+      super(owner, des);
+    }
+
+    //#######################################################################
+    //# Overrides for net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog
+    @Override
+    public void succeed()
+    {
+      super.succeed();
+    }
+
+    @Override
+    protected String getAnalysisName()
+    {
+      return "State Counter";
+    }
+
+    @Override
+    protected String getFailureText()
+    {
+      return "State Counter has failed.";
+    }
+
+    @Override
+    protected String getSuccessText()
+    {
+      final AnalysisResult result = getAnalyzer().getAnalysisResult();
       final double numStates = result.getTotalNumberOfStates();
       final double numTrans = result.getTotalNumberOfTransitions();
       final Logger logger = LogManager.getFormatterLogger();
@@ -103,14 +133,21 @@ public class StateCounterDialog extends AbstractAnalysisDialog
       } else {
         logger.info("Synchronous product has %.0f states.", numStates);
       }
-    } catch (final AnalysisException exception) {
-      final Logger logger = LogManager.getLogger();
-      final String msg = exception.getMessage();
-      logger.error(msg);
-    }
-    return null;
-  }
 
+      return "State Counter has succeded";
+    }
+
+    @Override
+    protected ModelAnalyzer createModelAnalyzer()
+    {
+      return getAnalyzer();
+    }
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = -8288851080599242814L;
+
+  }
 
   //#########################################################################
   //# Class Constants
