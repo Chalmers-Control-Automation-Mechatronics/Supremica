@@ -1,10 +1,12 @@
 package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
+import net.sourceforge.waters.gui.analyzer.AbstractAnalysisDialog;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
@@ -74,7 +77,14 @@ public class EventListParameter extends Parameter
       @Override
       public void actionPerformed(final ActionEvent arg0)
       {
-        final EventListDialog dialog = new EventListDialog(context);
+        final EventListDialog dialog = new EventListDialog(context, ((AbstractAnalysisDialog) button.getTopLevelAncestor()));
+        //button.getParent() order: 1: JPanel, 2: PPanel, 3: JPanel, 4: JViewPort, 5: PJScrollPanel,
+        //                          6: JPanel, 7: JLayerPanePanel, 8: JRootPanel, 9: Dialog, 10: SupremicaIDE
+        //final AbstractAnalysisDialog ancestor = (AbstractAnalysisDialog) button.getTopLevelAncestor();
+        //dialog.setIconImages(ancestor.getIconImages());
+        dialog.setLocationRelativeTo(button.getParent().getParent().getParent().getParent().getParent());
+        //Disable interaction with ancestors until dialog closed
+        dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.pack();
         dialog.setVisible(true);
       }
@@ -164,10 +174,11 @@ public class EventListParameter extends Parameter
   {
     //#######################################################################
     //# Constructor
-    public EventListDialog(final ProductDESContext model)
+    public EventListDialog(final ProductDESContext model, final AbstractAnalysisDialog parent)
     {
-      // TODO Set owner and location and icon
+      super(parent);
       generate(model);
+      setTitle("Hide Events");
     }
 
     public void generate(final ProductDESContext model)
@@ -193,7 +204,6 @@ public class EventListParameter extends Parameter
       leftUncontrollableScroller.setViewportView(uncontrollableList);
       uncontrollableList.setLayoutOrientation(JList.VERTICAL);
 
-      // TODO Maintain alphabetic order of lists
       final JButton shiftRightButton = new JButton(">>>");
       shiftRightButton.addActionListener(new ActionListener() {
         @Override
@@ -204,6 +214,8 @@ public class EventListParameter extends Parameter
               modelControllableList.addElement(data);
               modelUncontrollableList.removeElement(data);
             });
+          sortModel(modelControllableList);
+          sortModel(modelUncontrollableList);
         }
       });
 
@@ -224,6 +236,9 @@ public class EventListParameter extends Parameter
               modelControllableList.removeElement(data);
               modelUncontrollableList.addElement(data);
             });
+
+          sortModel(modelControllableList);
+          sortModel(modelUncontrollableList);
         }
       });
 
@@ -273,6 +288,18 @@ public class EventListParameter extends Parameter
       add(okButton);
       add(cancelButton);
     }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public void sortModel(final DefaultListModel model)
+    {
+      final Object[] data =  model.toArray();
+      Arrays.sort(data);
+      model.clear();
+      for (final Object o : data) {
+        model.addElement(o);
+      }
+    }
+
 
     //#######################################################################
     //# Class Constants
