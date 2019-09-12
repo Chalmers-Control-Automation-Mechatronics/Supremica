@@ -554,6 +554,29 @@ public class EventEncoding
     return new UsedEventList();
   }
 
+  /**
+   * Updates the status of all events to match the given event status
+   * provider. This method changes the event and proposition status of
+   * all events in this encoding.
+   * @param  provider  Event status provider with new event status.
+   *                   The number of events and propositions in this
+   *                   event encoding must match the numbers in the
+   *                   provider.
+   */
+  public void updateEventStatus(final EventStatusProvider provider)
+  {
+    assert getNumberOfProperEvents() == provider.getNumberOfProperEvents();
+    assert getNumberOfPropositions() == provider.getNumberOfPropositions();
+    for (int e = 0; e < getNumberOfProperEvents(); e++) {
+      final byte status = provider.getProperEventStatus(e);
+      setProperEventStatus(e, status);
+    }
+    for (int p = 0; p < getNumberOfPropositions(); p++) {
+      final boolean used = provider.isPropositionUsed(p);
+      setPropositionUsed(p, used);
+    }
+  }
+
 
   //#########################################################################
   //# Alphabet extension

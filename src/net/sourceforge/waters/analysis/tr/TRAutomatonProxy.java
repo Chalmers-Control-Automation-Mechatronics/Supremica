@@ -135,7 +135,7 @@ public class TRAutomatonProxy
   public TRAutomatonProxy(final EventEncoding eventEnc,
                           final ListBufferTransitionRelation rel)
   {
-    rel.checkEventStatusProvider(eventEnc);
+    rel.useEventEncoding(eventEnc);
     mEventEncoding = eventEnc;
     mStates = null;
     mTransitionRelation = rel;

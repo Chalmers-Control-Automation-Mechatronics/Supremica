@@ -664,6 +664,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
           if (mMinimizationChain != null) {
             mMinimizationChain.setTransitionRelation(mTransitionRelation);
             mMinimizationChain.run();
+            mTransitionRelation = mMinimizationChain.getTransitionRelation();
           }
           if (isSupervisorLocalizationEnabled()) {
             // localised supervisors, one per controllable event
@@ -719,7 +720,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
         // several events are enabled and disabled in exactly the same states
         mReductionChain.setSupervisedEvent(e);
         final EventEncoding enc = new EventEncoding(mEventEncoding);
-        final ListBufferTransitionRelation supervisor =
+        ListBufferTransitionRelation supervisor =
           new ListBufferTransitionRelation(mTransitionRelation, enc, config);
         removeOtherControllableDisablements(supervisor, e);
         final EventProxy event = mEventEncoding.getProperEvent(e);
@@ -728,6 +729,7 @@ public class MonolithicSynthesizer extends AbstractSupervisorSynthesizer
         supervisor.setName(prefix + eventName);
         mReductionChain.setTransitionRelation(supervisor);
         mReductionChain.run();
+        supervisor = mReductionChain.getTransitionRelation();
         supervisor.removeDumpStateTransitions();
         supervisor.removeRedundantPropositions();
         AutomatonProxy aut = new TRAutomatonProxy(enc, supervisor);

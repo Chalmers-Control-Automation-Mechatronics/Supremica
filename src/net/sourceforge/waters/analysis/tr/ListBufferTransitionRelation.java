@@ -3123,14 +3123,22 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   }
 
   /**
-   * Checks whether the transition relation's event status provider
-   * is the same object as the argument.
-   * @throws AssertionError to indicate that the transition relation
-   *         does not have the expected event status provider.
+   * Change the transition relation to use the given event encoding.
+   * This method first updates the status of all events in the given event
+   * encoding to match the status recorded in transition relation, and
+   * then changes the transition relation's event status provider to
+   * be this event event encoding.
+   * @param  enc       The event encoding to be used.
+   *                   The number of events and propositions in the event
+   *                   encoding must match the numbers in this transition
+   *                   relation.
    */
-  public void checkEventStatusProvider(final EventStatusProvider expected)
+  public void useEventEncoding(final EventEncoding enc)
   {
-    assert mEventStatus == expected;
+    if (mEventStatus != enc) {
+      enc.updateEventStatus(mEventStatus);
+      mEventStatus = enc;
+    }
   }
 
   public void checkIntegrity()
@@ -3232,7 +3240,7 @@ public class ListBufferTransitionRelation implements EventStatusProvider
   private String mName;
   private ComponentKind mKind;
 
-  private final EventStatusProvider mEventStatus;
+  private EventStatusProvider mEventStatus;
   private AbstractStateBuffer mStateBuffer;
   private OutgoingTransitionListBuffer mSuccessorBuffer;
   private IncomingTransitionListBuffer mPredecessorBuffer;
