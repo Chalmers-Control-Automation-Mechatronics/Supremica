@@ -2,6 +2,7 @@ package net.sourceforge.waters.analysis.options;
 
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,7 +21,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 
-import net.sourceforge.waters.gui.analyzer.AbstractAnalysisDialog;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.EventKind;
@@ -77,7 +77,7 @@ public class EventListParameter extends Parameter
       @Override
       public void actionPerformed(final ActionEvent arg0)
       {
-        final EventListDialog dialog = new EventListDialog(context, ((AbstractAnalysisDialog) button.getTopLevelAncestor()));
+        final EventListDialog dialog = new EventListDialog(context, ((Frame) button.getTopLevelAncestor()));
         //button.getParent() order: 1: JPanel, 2: PPanel, 3: JPanel, 4: JViewPort, 5: PJScrollPanel,
         //                          6: JPanel, 7: JLayerPanePanel, 8: JRootPanel, 9: Dialog, 10: SupremicaIDE
         //final AbstractAnalysisDialog ancestor = (AbstractAnalysisDialog) button.getTopLevelAncestor();
@@ -174,11 +174,11 @@ public class EventListParameter extends Parameter
   {
     //#######################################################################
     //# Constructor
-    public EventListDialog(final ProductDESContext model, final AbstractAnalysisDialog parent)
+    public EventListDialog(final ProductDESContext model, final Frame owner)
     {
-      super(parent);
+      super(owner);
       generate(model);
-      setTitle("Hide Events");
+      setTitle("Loop Events");
     }
 
     public void generate(final ProductDESContext model)
