@@ -3,7 +3,10 @@ package net.sourceforge.waters.analysis.options;
 import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.border.EmptyBorder;
 
 import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -82,7 +86,7 @@ public class EventListParameter extends Parameter
         //                          6: JPanel, 7: JLayerPanePanel, 8: JRootPanel, 9: Dialog, 10: SupremicaIDE
         //final AbstractAnalysisDialog ancestor = (AbstractAnalysisDialog) button.getTopLevelAncestor();
         //dialog.setIconImages(ancestor.getIconImages());
-        dialog.setLocationRelativeTo(button.getParent().getParent().getParent().getParent().getParent());
+        dialog.setLocationRelativeTo(button);
         //Disable interaction with ancestors until dialog closed
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
         dialog.pack();
@@ -275,18 +279,65 @@ public class EventListParameter extends Parameter
         }
       });
 
-      // TODO Use GridBagLayout
-      add(new JLabel("Non-Loop Events"));
-      add(new JLabel("Loop Events"));
+      setLayout(new GridBagLayout());
 
-      add(leftUncontrollableScroller);
-      add(rightControllableScroller);
+      final GridBagConstraints constraints = new GridBagConstraints();
+      final Insets INSETS = new Insets(2, 4, 2, 4);
+      constraints.insets = INSETS;
+      constraints.gridx = 0;
+      constraints.gridy = 0;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
 
-      add(shiftRightButton);
-      add(shiftLeftButton);
+      add(new JLabel("Non-Loop Events"), constraints);
 
-      add(okButton);
-      add(cancelButton);
+      constraints.gridx = 1;
+      constraints.gridy = 0;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
+      add(new JLabel("Loop Events"), constraints);
+
+      constraints.gridx = 0;
+      constraints.gridy = 1;
+      constraints.weightx = 1;
+      constraints.weighty = 1;
+
+      add(leftUncontrollableScroller, constraints);
+
+      constraints.gridx = 1;
+      constraints.gridy = 1;
+      constraints.weightx = 1;
+      constraints.weighty = 1;
+      add(rightControllableScroller, constraints);
+
+      constraints.gridx = 0;
+      constraints.gridy = 2;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
+
+      add(shiftRightButton, constraints);
+
+      constraints.gridx = 1;;
+      constraints.gridy = 2;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
+      add(shiftLeftButton, constraints);
+
+      constraints.gridx = 0;
+      constraints.gridy = 3;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
+      add(okButton, constraints);
+
+      constraints.gridx = 1;
+      constraints.gridy = 3;
+      constraints.weightx = 0;
+      constraints.weighty = 0;
+      add(cancelButton, constraints);
+
+      pack();
+      setVisible(true);
+
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -323,6 +374,7 @@ public class EventListParameter extends Parameter
     {
       setText(event.getName());
       setIcon(mDESContext.getEventIcon(event));
+      setBorder(new EmptyBorder(2, 2, 2, 2));
       if (isSelected) {
         setBackground(list.getSelectionBackground());
         setForeground(list.getSelectionForeground());
