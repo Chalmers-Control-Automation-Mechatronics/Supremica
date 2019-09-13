@@ -81,11 +81,7 @@ public class EventListParameter extends Parameter
       @Override
       public void actionPerformed(final ActionEvent arg0)
       {
-        final EventListDialog dialog = new EventListDialog(context, ((Frame) button.getTopLevelAncestor()));
-        //button.getParent() order: 1: JPanel, 2: PPanel, 3: JPanel, 4: JViewPort, 5: PJScrollPanel,
-        //                          6: JPanel, 7: JLayerPanePanel, 8: JRootPanel, 9: Dialog, 10: SupremicaIDE
-        //final AbstractAnalysisDialog ancestor = (AbstractAnalysisDialog) button.getTopLevelAncestor();
-        //dialog.setIconImages(ancestor.getIconImages());
+        final EventListDialog dialog = new EventListDialog(context, ((Frame) button.getTopLevelAncestor().getParent()));
         dialog.setLocationRelativeTo(button);
         //Disable interaction with ancestors until dialog closed
         dialog.setModalityType(ModalityType.APPLICATION_MODAL);
