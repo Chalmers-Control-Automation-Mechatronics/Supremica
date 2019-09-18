@@ -284,6 +284,7 @@ public class EventListParameter extends Parameter
       constraints.gridy = 0;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
 
       add(new JLabel("Non-Loop Events"), constraints);
 
@@ -291,12 +292,15 @@ public class EventListParameter extends Parameter
       constraints.gridy = 0;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
+
       add(new JLabel("Loop Events"), constraints);
 
       constraints.gridx = 0;
       constraints.gridy = 1;
       constraints.weightx = 1;
       constraints.weighty = 1;
+      constraints.fill = GridBagConstraints.BOTH;
 
       add(leftUncontrollableScroller, constraints);
 
@@ -304,12 +308,15 @@ public class EventListParameter extends Parameter
       constraints.gridy = 1;
       constraints.weightx = 1;
       constraints.weighty = 1;
+      constraints.fill = GridBagConstraints.BOTH;
+
       add(rightControllableScroller, constraints);
 
       constraints.gridx = 0;
       constraints.gridy = 2;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
 
       add(shiftRightButton, constraints);
 
@@ -317,18 +324,24 @@ public class EventListParameter extends Parameter
       constraints.gridy = 2;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
+
       add(shiftLeftButton, constraints);
 
       constraints.gridx = 0;
       constraints.gridy = 3;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
+
       add(okButton, constraints);
 
       constraints.gridx = 1;
       constraints.gridy = 3;
       constraints.weightx = 0;
       constraints.weighty = 0;
+      constraints.fill = GridBagConstraints.NONE;
+
       add(cancelButton, constraints);
 
       pack();
