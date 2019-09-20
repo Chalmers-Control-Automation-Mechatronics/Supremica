@@ -196,19 +196,23 @@ public class ModularControllabilityChecker
           }
         });
 
+      final KindTranslator translator = getKindTranslator();
       final List<AutomatonProxy> automata = new ArrayList<>(numAutomata);
       for (final AutomatonProxy aut : input) {
-        switch (getKindTranslator().getComponentKind(aut)) {
-        case PLANT:
-          automata.add(aut);
-          plants.add(aut);
-          break;
-        case SPEC:
-          automata.add(aut);
-          specs.add(aut);
-          break;
-        default:
-          break;
+        final ComponentKind kind = translator.getComponentKind(aut);
+        if (kind != null) {
+          switch (kind) {
+          case PLANT:
+            automata.add(aut);
+            plants.add(aut);
+            break;
+          case SPEC:
+            automata.add(aut);
+            specs.add(aut);
+            break;
+          default:
+            break;
+          }
         }
       }
 
