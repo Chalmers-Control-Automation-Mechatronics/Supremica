@@ -178,7 +178,6 @@ public interface SupervisorReductionFactory
       subset.setDumpStateAware(true);
       subset.setMaxIncrease(2.0);
       add(subset);
-      add(new SelfloopSupervisorReductionTRSimplifier());
       final ObservationEquivalenceTRSimplifier bisimulator =
         new ObservationEquivalenceTRSimplifier();
       bisimulator.setEquivalence
