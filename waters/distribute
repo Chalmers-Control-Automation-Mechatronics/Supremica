@@ -15,7 +15,7 @@ SUP_SRC=`readlink -f "$SUP_SRC"`
 SUP_DIST=$SUP_SRC/dist
 W_IN=distrib_inputs
 W_DIST_TMP=waters
-ARCHIVE_PREFIX=waterside241
+ARCHIVE_PREFIX=waterside25
 
 #############################################################################
 
@@ -113,6 +113,7 @@ then
         rm -f $ARCHIVE
     fi
     install -m 755 $W_IN/waters $W_DIST_TMP
+    install -m 755 $SUP_DIST/wcheck $W_DIST_TMP
     tar czf $ARCHIVE $W_DIST_TMP 
 else
     ARCHIVE=$WWW/$ARCHIVE_PREFIX.$PLATFORM.zip
