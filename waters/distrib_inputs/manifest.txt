@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Created-By: Robi Malik
 Main-Class: org.supremica.gui.ide.IDE
-Class-Path: SupremicaLib.jar log4j-api-2.9.0.jar log4j-core-2.9.0.jar
+Class-Path: SupremicaLib.jar log4j-api-2.12.0.jar log4j-core-2.12.0.jar
 
