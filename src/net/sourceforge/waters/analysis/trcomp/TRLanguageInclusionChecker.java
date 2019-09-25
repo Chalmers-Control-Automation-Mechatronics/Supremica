@@ -121,15 +121,18 @@ public class TRLanguageInclusionChecker
     int numPlants = 0;
     int numSpecs = 0;
     for (final AutomatonProxy aut : des.getAutomata()) {
-      switch (translator.getComponentKind(aut)) {
-      case PLANT:
-        numPlants++;
-        break;
-      case SPEC:
-        numSpecs++;
-        break;
-      default:
-        break;
+      final ComponentKind kind = translator.getComponentKind(aut);
+      if (kind != null) {
+        switch (kind) {
+        case PLANT:
+          numPlants++;
+          break;
+        case SPEC:
+          numSpecs++;
+          break;
+        default:
+          break;
+        }
       }
     }
     if (numSpecs == 0) {
@@ -140,15 +143,18 @@ public class TRLanguageInclusionChecker
     mPlants = new ArrayList<>(numPlants);
     mProperties = new ArrayList<>(numSpecs);
     for (final AutomatonProxy aut : des.getAutomata()) {
-      switch (translator.getComponentKind(aut)) {
-      case PLANT:
-        mPlants.add(aut);
-        break;
-      case SPEC:
-        mProperties.add(aut);
-        break;
-      default:
-        break;
+      final ComponentKind kind = translator.getComponentKind(aut);
+      if (kind != null) {
+        switch (kind) {
+        case PLANT:
+          mPlants.add(aut);
+          break;
+        case SPEC:
+          mProperties.add(aut);
+          break;
+        default:
+          break;
+        }
       }
     }
     final TRCompositionalOnePropertyChecker delegate = getDelegate();
