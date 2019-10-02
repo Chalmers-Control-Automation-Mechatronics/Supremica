@@ -55,25 +55,25 @@ import java.util.*;
  * Map for mapping LabeledEvent:s to Automata-objects.
  */
 public class EventToAutomataMap
-    extends HashMap<LabeledEvent,Automata>
+    extends HashMap<LabeledEvent, Automata>	// MF: Seems to be a bug here, should hash on the labels, not the LabeledEvent instances
+	// extends HashMap<String, Automata>	// MF: But a bunch of functions taking eventToAutomataMap are defined to take Map<LabeledEvent, Automata>
 {
     private static final long serialVersionUID = 1L;
 
     /**
      * Inserts Automaton aut in the Automata that is found using the
-     * LabeledEvent ev as a key in the map. Creates new Automata if there is none.
+	 * LabeledEvent event as a key in the map. Creates new Automata if there is none.
      */
-    public Automata insert(LabeledEvent ev, Automaton aut)
+    public Automata insert(LabeledEvent event, Automaton aut)
     {
-        Automata automata = get(ev);
+        final Automata automata = super.get(event);
         if (automata == null)
         {
-            // There were no automata in the map for this event,
-            automata = new Automata();
-            super.put(ev, automata);
+            // There was no Automata in the map for this event,
+			// So we create one and add aut to it, and put it in the map
+			super.put(event, new Automata(aut));
             
-            // Add and return
-            automata.addAutomaton(aut);
+            // return null to tell that no mapping existed for this event before this call
             return null;
         }
         else

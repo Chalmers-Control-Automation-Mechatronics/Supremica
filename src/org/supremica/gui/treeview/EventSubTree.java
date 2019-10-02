@@ -64,11 +64,12 @@ public class EventSubTree
         final SupremicaTreeNode currObservableNode = new SupremicaTreeNode("observable: " + event.isObservable());
         add(currObservableNode); directLeafs++;
 
-        // Hide junk...
-        /*
+		// Prioritized synch is not really junk, we use it.
         SupremicaTreeNode currPrioritizedNode = new SupremicaTreeNode("prioritized: " + event.isPrioritized());
         add(currPrioritizedNode); directLeafs++;
-
+		
+        // Hide junk...
+        /*
         SupremicaTreeNode currOperatorIncreaseNode = new SupremicaTreeNode("operatorIncrease: " + event.isOperatorIncrease());
         add(currOperatorIncreaseNode); directLeafs++;
 

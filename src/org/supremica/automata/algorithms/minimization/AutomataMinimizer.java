@@ -236,7 +236,7 @@ public class AutomataMinimizer
             }
         }
 
-        // For each event, find the automata that has this event in its alphabet
+        // For each event, find the automata that have this event in their alphabet
         eventToAutomataMap = AlphabetHelpers.buildEventToAutomataMap(theAutomata);
         // Sizes in the beginning (may include epsilon?)
         final int globalAlphabetSize = eventToAutomataMap.size() - options.getTargetAlphabet().size();
@@ -738,10 +738,18 @@ public class AutomataMinimizer
 
                     // Find neighbours
                     neighbours.clear();
-                    for (final LabeledEvent event: bestAutomaton.getAlphabet())
+                    for (final LabeledEvent event : bestAutomaton.getAlphabet())
                     {
                         if (event.isObservable())
-                            neighbours.addAutomata(eventToAutomataMap.get(event));
+						{	
+							final Automata aut = eventToAutomataMap.get(event);
+							if(aut == null)
+							{
+								logger.debug("Event " + event.getLabel() + " is associated to no automata!");
+							}
+							else
+								neighbours.addAutomata(aut);
+						}
                     }
                     neighbours.removeAutomaton(bestAutomaton);
                     /*
