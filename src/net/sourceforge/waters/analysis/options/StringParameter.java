@@ -45,7 +45,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
  *
  * @author Brandon Bassett
  */
-public class StringParameter extends Parameter
+public class StringParameter extends AbstractTextFieldParameter
 {
   public StringParameter(final StringParameter template)
   {
@@ -73,10 +73,16 @@ public class StringParameter extends Parameter
   @Override
   public Component createComponent(final ProductDESContext model)
   {
-    final JTextField ret = new JTextField();
-    ret.setText(mValue);
-    ret.setColumns(10);
-    return ret;
+    final JTextField textField = (JTextField) super.createComponent(model);
+    textField.setText(mValue);
+    return textField;
+  }
+
+  @Override
+  protected String filterText(final String text)
+  {
+    //no filter, return text
+    return text;
   }
 
   @Override
