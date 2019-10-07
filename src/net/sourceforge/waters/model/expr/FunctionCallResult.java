@@ -42,8 +42,8 @@ import net.sourceforge.waters.model.module.SimpleExpressionProxy;
 
 
 /**
- * An intermediate result of the expression parser that produces an
- * identifier ({@link FunctionCallExpressionProxy}) object.
+ * An intermediate result of the expression parser that produces a function
+ * call ({@link FunctionCallExpressionProxy}) object.
  *
  * @author Robi Malik
  */
@@ -80,8 +80,7 @@ class FunctionCallResult extends ParseResult {
                                           final String text)
   {
     final int size = mArguments.size();
-    final List<SimpleExpressionProxy> expressions =
-      new ArrayList<SimpleExpressionProxy>(size);
+    final List<SimpleExpressionProxy> expressions = new ArrayList<>(size);
     for (final ParseResult result : mArguments) {
       final SimpleExpressionProxy expr = result.createProxy(factory);
       expressions.add(expr);

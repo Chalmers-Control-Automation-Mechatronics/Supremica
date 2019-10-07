@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.dialog;
 import java.text.ParseException;
 
 import net.sourceforge.waters.model.expr.ExpressionParser;
+import net.sourceforge.waters.model.expr.ExpressionScanner;
 import net.sourceforge.waters.model.expr.Operator;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
@@ -87,21 +88,44 @@ public class IdentifierInputHandler
       if (isNullAllowed()) {
         return null;
       } else {
-        throw new ParseException("Please enter an identifier name.", 0);
+        throw new ParseException(NO_IDENT, 0);
       }
     } else if (text.equals(mOldName)) {
       return mOldIdentifier;
     } else {
-      final SimpleExpressionProxy expr = callParser(text);
-      if (!(expr instanceof IdentifierProxy)) {
-        throw new ParseException("Please enter an identifier name.", 0);
+      try {
+        final SimpleExpressionProxy expr = callParser(text);
+        if (!(expr instanceof IdentifierProxy)) {
+          throw new ParseException(NO_IDENT, 0);
+        }
+        final IdentifierProxy ident = (IdentifierProxy) expr;
+        if (mEquality.equals(ident, mOldIdentifier)) {
+          return mOldIdentifier;
+        }
+        return ident;
+      } catch (final ParseException exception) {
+        if (hasOnlyIdentifierCharacters(text)) {
+          throw new ParseException(NO_IDENT, 0);
+        } else {
+          throw exception;
+        }
       }
-      final IdentifierProxy ident = (IdentifierProxy) expr;
-      if (mEquality.equals(ident, mOldIdentifier)) {
-        return mOldIdentifier;
-      }
-      return ident;
     }
+  }
+
+
+  //#######################################################################
+  //# Auxiliary Methods
+  private static boolean hasOnlyIdentifierCharacters(final String text)
+  {
+    for (int i = 0; i < text.length(); i++) {
+      final char ch = text.charAt(i);
+      if (!ExpressionScanner.isWhitespace(ch) &&
+          !ExpressionScanner.isIdentifierCharacter(ch)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 
@@ -110,5 +134,10 @@ public class IdentifierInputHandler
   private final IdentifierProxy mOldIdentifier;
   private final String mOldName;
   private final ModuleEqualityVisitor mEquality;
+
+
+  //#######################################################################
+  //# Class Constants
+  private static final String NO_IDENT = "Please enter an identifier name.";
 
 }

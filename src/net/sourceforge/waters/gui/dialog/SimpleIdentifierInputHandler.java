@@ -123,16 +123,14 @@ public class SimpleIdentifierInputHandler
       return mOldIdentifier;
     } else if (text.length() != 0) {
       try {
-        final SimpleIdentifierProxy result =
-          mExpressionParser.parseSimpleIdentifier(text);
-        return result;
+        return mExpressionParser.parseSimpleIdentifier(text);
       } catch (final ParseException exception) {
-        throw exception.getJavaException();
+        throw new java.text.ParseException(NO_IDENT, 0);
       }
     } else if (mNullAllowed) {
       return null;
     } else {
-      throw new java.text.ParseException("Please enter an identifier name.", 0);
+      throw new java.text.ParseException(NO_IDENT, 0);
     }
   }
 
@@ -203,5 +201,10 @@ public class SimpleIdentifierInputHandler
   private final SimpleIdentifierProxy mOldIdentifier;
   private final ExpressionParser mExpressionParser;
   private final boolean mNullAllowed;
+
+
+  //#######################################################################
+  //# Class Constants
+  private static final String NO_IDENT = "Please enter an identifier name.";
 
 }

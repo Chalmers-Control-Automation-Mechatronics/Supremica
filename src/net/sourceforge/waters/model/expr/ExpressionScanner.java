@@ -150,7 +150,7 @@ public class ExpressionScanner {
    */
   public static boolean isWhitespace(final int ch)
   {
-    return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r';
+    return Character.isWhitespace(ch);
   }
 
   /**
