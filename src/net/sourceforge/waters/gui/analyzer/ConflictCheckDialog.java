@@ -54,21 +54,18 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
   //# Constructor
   public ConflictCheckDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Conflict Check");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected ConflictChecker createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createConflictChecker(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createConflictChecker(desFactory);
   }
 
   @Override
@@ -98,6 +95,12 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
     }
 
     @Override
+    protected String getAnalysisName()
+    {
+      return TITLE;
+    }
+
+    @Override
     protected String getFailureDescription()
     {
       return "is blocking";
@@ -107,12 +110,6 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
     protected String getSuccessDescription()
     {
       return "is nonblocking";
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return "Conflict Check";
     }
 
     @Override
@@ -129,5 +126,7 @@ public class ConflictCheckDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Conflict Check";
+
   private static final long serialVersionUID = -4771975182146634793L;
 }

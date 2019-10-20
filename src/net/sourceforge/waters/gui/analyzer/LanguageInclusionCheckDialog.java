@@ -54,21 +54,18 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
   //# Constructor
   public LanguageInclusionCheckDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Language Inclusion Check");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected LanguageInclusionChecker createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createLanguageInclusionChecker(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createLanguageInclusionChecker(desFactory);
   }
 
   @Override
@@ -99,6 +96,12 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
     }
 
     @Override
+    protected String getAnalysisName()
+    {
+      return TITLE;
+    }
+
+    @Override
     protected String getFailureDescription()
     {
       return "does not satisfy language inclusion";
@@ -108,12 +111,6 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
     protected String getSuccessDescription()
     {
       return "satisfies language inclusion";
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return "Language Inclusion Check";
     }
 
     @Override
@@ -130,6 +127,8 @@ public class LanguageInclusionCheckDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Language Inclusion Check";
+
   private static final long serialVersionUID = -1921272985614515952L;
 
 }

@@ -57,22 +57,25 @@ public class SynthesisDialog extends AbstractAnalysisDialog
   //# Constructor
   public SynthesisDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    //super(panel, new MonolithicSynthesizer(ProductDESElementFactory.getInstance()));
-    setTitle("Supervisor synthesis");
+    super(panel);
+    setTitle(TITLE);
   }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected SupervisorSynthesizer createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createSupervisorSynthesizer(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createSupervisorSynthesizer(desFactory);
+  }
 
-    return null;
+  @Override
+  protected SupervisorSynthesizer getAnalyzer()
+  {
+    return (SupervisorSynthesizer) super.getAnalyzer();
   }
 
   @Override
@@ -81,12 +84,6 @@ public class SynthesisDialog extends AbstractAnalysisDialog
   {
     return new SynthesisPopUpDialog(ide, des);
   }
-
-   @Override
-   protected SupervisorSynthesizer getAnalyzer()
-   {
-     return (SupervisorSynthesizer) super.getAnalyzer();
-   }
 
 
   //#########################################################################
@@ -119,7 +116,7 @@ public class SynthesisDialog extends AbstractAnalysisDialog
     @Override
     protected String getAnalysisName()
     {
-      return "Supervisor synthesis";
+      return TITLE;
     }
 
     @Override
@@ -165,6 +162,8 @@ public class SynthesisDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Supervisor Synthesis";
+
   private static final long serialVersionUID = -622825450495392984L;
 
 }

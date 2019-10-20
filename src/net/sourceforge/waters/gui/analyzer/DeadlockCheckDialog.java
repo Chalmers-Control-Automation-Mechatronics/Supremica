@@ -54,21 +54,18 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
   //# Constructor
   public DeadlockCheckDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Deadlock Check");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected DeadlockChecker createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createDeadlockChecker(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createDeadlockChecker(desFactory);
   }
 
   @Override
@@ -98,6 +95,12 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
     }
 
     @Override
+    protected String getAnalysisName()
+    {
+      return TITLE;
+    }
+
+    @Override
     protected String getFailureDescription()
     {
       return "has a deadlock";
@@ -107,12 +110,6 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
     protected String getSuccessDescription()
     {
       return "is deadlock-free";
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return "Deadlock Check";
     }
 
     @Override
@@ -129,6 +126,8 @@ public class DeadlockCheckDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Deadlock Check";
+
   private static final long serialVersionUID = 7587116260533051091L;
 
 }

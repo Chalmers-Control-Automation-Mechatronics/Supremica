@@ -54,21 +54,18 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
   //# Constructor
   public ControllabilityCheckDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Controllability Check");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected ControllabilityChecker createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createControllabilityChecker(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createControllabilityChecker(desFactory);
   }
 
   @Override
@@ -98,6 +95,12 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
     }
 
     @Override
+    protected String getAnalysisName()
+    {
+      return TITLE;
+    }
+
+    @Override
     protected String getFailureDescription()
     {
       return "is not controllable";
@@ -107,12 +110,6 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
     protected String getSuccessDescription()
     {
       return "is controllable";
-    }
-
-    @Override
-    protected String getAnalysisName()
-    {
-      return "Controllability Check";
     }
 
     @Override
@@ -129,6 +126,8 @@ public class ControllabilityCheckDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Controllability Check";
+
   private static final long serialVersionUID = -4439172093952073552L;
 
 }

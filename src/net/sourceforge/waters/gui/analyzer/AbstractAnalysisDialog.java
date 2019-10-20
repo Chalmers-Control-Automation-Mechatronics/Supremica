@@ -54,6 +54,7 @@ import net.sourceforge.waters.analysis.options.Parameter;
 import net.sourceforge.waters.analysis.options.ParameterJScrollPane;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -78,20 +79,17 @@ public abstract class AbstractAnalysisDialog extends JDialog
   //#########################################################################
   //# Constructor
   /**
-   * Used when using the JComboBOx to switch between multiple algorithms,
-   * generateAnalyzerCombobox() populates JComboBox
+   * Used when using the JComboBox to switch between multiple algorithms,
+   * generateAnalyzerCombobox() populates JComboBox.
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final AnalyzerProductDESContext model)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel)
   {
     super((Frame) panel.getTopLevelAncestor());
-
-    DESContext = model;
+    mDESContext = new AnalyzerProductDESContext(panel);
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
-
-    AllParams = new HashMap<Integer,Parameter>();
-    factory = ProductDESElementFactory.getInstance();
-    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
+    mParameterDB = new HashMap<Integer,Parameter>();
+    mProductDESProxyFactory = ProductDESElementFactory.getInstance();
     generateAnalyzerCombobox();
     generateGUI();
     setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
@@ -99,50 +97,53 @@ public abstract class AbstractAnalysisDialog extends JDialog
   }
 
   /**
-   * Used when only using one algorithm, generateAnalyzerCombobox() not used
+   * Used when only using one algorithm, generateAnalyzerCombobox() not used.
    */
-  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel, final ModelAnalyzer analyzer, final AnalyzerProductDESContext model)
+  public AbstractAnalysisDialog(final WatersAnalyzerPanel panel,
+                                final ModelAnalyzer analyzer)
   {
     super((Frame) panel.getTopLevelAncestor());
-
-    DESContext = model;
+    mDESContext = new AnalyzerProductDESContext(panel);
     mAnalyzerPanel = panel;
     mAutomata = mAnalyzerPanel.getAutomataTable().getOperationArgument();
-
-    AllParams = new HashMap<Integer,Parameter>();
-    factory = ProductDESElementFactory.getInstance();
-    des = AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(), mAutomata, factory);
-
+    mParameterDB = new HashMap<Integer,Parameter>();
+    mProductDESProxyFactory = ProductDESElementFactory.getInstance();
     mAnalyzer = analyzer;
     generateGUI();
     setLocationRelativeTo(mAnalyzerPanel.getTopLevelAncestor());
     setVisible(true);
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  ProductDESProxyFactory getProductDESProxyFactory()
+  {
+    return ProductDESElementFactory.getInstance();
+  }
+
+
   //#########################################################################
   //# Using Parameter Classes
-
   /**
    * Generates the JComboBox that is at the top of the frame, stores the list
    * of all available algorithms only if more than one algorithms are to be used
    */
   public void generateAnalyzerCombobox()
   {
-    final JPanel mSuperviserPanel = new JPanel(new GridLayout(0, 2));
-    final JLabel superviserComboboxLabel = new JLabel("Algorithms");
-    analyzerCombobox = new JComboBox<>();
+    final JPanel mAlgorithmPanel = new JPanel(new GridLayout(0, 2));
+    final JLabel algorithmComboboxLabel = new JLabel("Algorithm");
+    mAnalyzerComboBox = new JComboBox<>();
 
-    for (final ModelAnalyzerFactoryLoader dir : ModelAnalyzerFactoryLoader.values()) {
-      try {
-        final ModelAnalyzer s = createAnalyzer(dir.getModelAnalyzerFactory(), factory);
-
-        if (s != null){
-          analyzerCombobox.addItem(dir);
-          //Store new parameter in database
-          for(final Parameter p : s.getParameters())
-            AllParams.put(p.getID(),p);
+    for (final ModelAnalyzerFactoryLoader loader : ModelAnalyzerFactoryLoader.values()) {
+      final ModelAnalyzer analyzer = createAnalyzer(loader);
+      if (analyzer != null) {
+        mAnalyzerComboBox.addItem(loader);
+        //Store new parameter in database
+        for (final Parameter param : analyzer.getParameters()) {
+          mParameterDB.put(param.getID(), param);
         }
-      } catch (NoClassDefFoundError | ClassNotFoundException | UnsatisfiedLinkError exception) {     }
+      }
     }
 
     //Testing
@@ -164,45 +165,32 @@ public abstract class AbstractAnalysisDialog extends JDialog
       }
     };
 
-    analyzerCombobox.addActionListener(analyzerChanged);
+    mAnalyzerComboBox.addActionListener(analyzerChanged);
 
-    mSuperviserPanel.add(superviserComboboxLabel);
-    mSuperviserPanel.add(analyzerCombobox);
-    add(mSuperviserPanel, BorderLayout.PAGE_START);
+    mAlgorithmPanel.add(algorithmComboboxLabel);
+    mAlgorithmPanel.add(mAnalyzerComboBox);
+    add(mAlgorithmPanel, BorderLayout.PAGE_START);
   }
 
   public void analysisChanged()
   {
-    try {
-      mAnalyzer =
-        createAnalyzer(((ModelAnalyzerFactoryLoader) analyzerCombobox
-          .getSelectedItem()).getModelAnalyzerFactory(), factory);
-    } catch (final ClassNotFoundException exception) {
-      exception.printStackTrace();
-    }
-
+    final int index = mAnalyzerComboBox.getSelectedIndex();
+    final ModelAnalyzerFactoryLoader loader = mAnalyzerComboBox.getItemAt(index);
+    mAnalyzer = createAnalyzer(loader);
     final List<Parameter> newParams = mAnalyzer.getParameters();
-
     storeInDatabase();
     copyFromDatabase(newParams);
-    mScrollParametersPanel.replaceView(newParams, DESContext);
-
+    mScrollParametersPanel.replaceView(newParams, mDESContext);
     //re-packing causes the frame to shrink/increase to preferred size
     pack();
   }
 
   public void generateGUI()
   {
-    //ModelAnalyzer not supplied on construction, JComboBox being used
-    if (mAnalyzer == null) {
-      try {
-        mAnalyzer =
-          createAnalyzer(((ModelAnalyzerFactoryLoader) analyzerCombobox
-            .getSelectedItem()).getModelAnalyzerFactory(), factory);
-      } catch (final ClassNotFoundException exception) {      }
-    }
-
-    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), DESContext);
+    final int index = mAnalyzerComboBox.getSelectedIndex();
+    final ModelAnalyzerFactoryLoader loader = mAnalyzerComboBox.getItemAt(index);
+    mAnalyzer = createAnalyzer(loader);
+    mScrollParametersPanel = new ParameterJScrollPane(mAnalyzer.getParameters(), mDESContext);
 
     // Buttons panel ...
     final ActionListener commithandler = new ActionListener() {
@@ -245,7 +233,7 @@ public abstract class AbstractAnalysisDialog extends JDialog
       mScrollParametersPanel.getParameters();
 
     for (final Parameter p : activeParameters) { //overwrite stored parameters with new version
-      AllParams.put(p.getID(), p);
+      mParameterDB.put(p.getID(), p);
     }
   }
 
@@ -260,21 +248,34 @@ public abstract class AbstractAnalysisDialog extends JDialog
   public void copyFromDatabase(final List<Parameter> parametersToStore)
   {
     for (final Parameter current : parametersToStore)
-      current.updateFromParameter(AllParams.get(current.getID()));
+      current.updateFromParameter(mParameterDB.get(current.getID()));
   }
 
   public void printMap()
   {
-    for (final Entry<Integer,Parameter> entry : AllParams.entrySet()) {
+    for (final Entry<Integer,Parameter> entry : mParameterDB.entrySet()) {
       System.out.println(entry.getValue().toString());
     }
   }
 
   /**
-   * Class specific way to generate a modelAnalyzer
+   * Class-specific way to generate a model analyser.
    */
-  protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory analyzerFactory,
-                                                        ProductDESProxyFactory desFactory);
+  protected abstract ModelAnalyzer createAnalyzer(ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException;
+
+  private ModelAnalyzer createAnalyzer(final ModelAnalyzerFactoryLoader loader)
+  {
+    try {
+      final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+      return createAnalyzer(factory);
+    } catch (NoClassDefFoundError |
+             ClassNotFoundException |
+             UnsatisfiedLinkError |
+             AnalysisConfigurationException exception) {
+      return null;
+    }
+  }
 
 
   protected ModelAnalyzer getAnalyzer()
@@ -293,34 +294,40 @@ public abstract class AbstractAnalysisDialog extends JDialog
     storeInDatabase();
     copyFromDatabase(parameters);
 
-    //commit all of the values to the synthesizer
-    for (final Parameter current : parameters)
+    // commit all of the values to the model analyser
+    for (final Parameter current : parameters) {
       current.commitValue();
-
+    }
     final IDE ide = mAnalyzerPanel.getModuleContainer().getIDE();
+    final ProductDESProxy des =
+      AutomatonTools.createProductDESProxy(mAnalyzerPanel.getModuleContainer().getName(),
+                                           mAutomata, mProductDESProxyFactory);
     final WatersAnalyzeDialog dialog = createAnalyzeDialog(ide, des);
     dispose();
-    if(dialog != null)
+    if (dialog != null) {
       dialog.setVisible(true);
+    }
   }
 
   /**
-   * Generates the pop up dialog that shows the result of using the analyzer
+   * Generates the pop up dialog that shows the result of using the analyser.
    */
-  protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide, ProductDESProxy des);
+  protected abstract WatersAnalyzeDialog createAnalyzeDialog(IDE ide,
+                                                             ProductDESProxy des);
+
 
   //#########################################################################
   //# Data Members
   private ParameterJScrollPane mScrollParametersPanel;
-  private final HashMap<Integer,Parameter> AllParams;
+  private final HashMap<Integer,Parameter> mParameterDB;
   private JPanel mButtonsPanel;
-  private JComboBox<ModelAnalyzerFactoryLoader> analyzerCombobox;
+  private JComboBox<ModelAnalyzerFactoryLoader> mAnalyzerComboBox;
   private final List<AutomatonProxy> mAutomata;
   private final WatersAnalyzerPanel mAnalyzerPanel;
-  private final ProductDESProxyFactory factory;
-  private final ProductDESProxy des;
+  private final ProductDESProxyFactory mProductDESProxyFactory;
   private ModelAnalyzer mAnalyzer;
-  private final AnalyzerProductDESContext DESContext;
+  private final AnalyzerProductDESContext mDESContext;
+
 
   //#########################################################################
   //# Class Constants

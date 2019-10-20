@@ -59,21 +59,18 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
   //# Constructor
   public SynchronousProductDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Synchronous product");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected SynchronousProductBuilder createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createSynchronousProductBuilder(desFactory);
-    } catch (final AnalysisConfigurationException exception) {
-      return null;
-    }
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createSynchronousProductBuilder(desFactory);
   }
 
   @Override
@@ -113,7 +110,7 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     @Override
     protected String getAnalysisName()
     {
-      return "Synchronous Product";
+      return TITLE;
     }
 
     @Override
@@ -165,6 +162,8 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Synchronous Product";
+
   private static final long serialVersionUID = -5945541495761539710L;
 
 }

@@ -58,21 +58,18 @@ public class StateCounterDialog extends AbstractAnalysisDialog
   //# Constructor
   public StateCounterDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("State Counter");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected StateCounter createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createStateCounter(desFactory);
-    } catch (final AnalysisConfigurationException exception) {
-      return null;
-    }
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createStateCounter(desFactory);
   }
 
   @Override
@@ -111,7 +108,7 @@ public class StateCounterDialog extends AbstractAnalysisDialog
     @Override
     protected String getAnalysisName()
     {
-      return "State Counter";
+      return TITLE;
     }
 
     @Override
@@ -151,6 +148,8 @@ public class StateCounterDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Count States";
+
   private static final long serialVersionUID = 1069804247073793761L;
 
 }

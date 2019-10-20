@@ -54,21 +54,18 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
   //# Constructor
   public ControlLoopDialog(final WatersAnalyzerPanel panel)
   {
-    super(panel, new AnalyzerProductDESContext(panel));
-    setTitle("Control Loop");
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.dialog.AbstractAnalysisDialog
   @Override
-  protected ModelAnalyzer createAnalyzer(final ModelAnalyzerFactory analyzerFactory,
-                                         final ProductDESProxyFactory desFactory)
+  protected ControlLoopChecker createAnalyzer(final ModelAnalyzerFactory factory)
+    throws AnalysisConfigurationException
   {
-    try {
-      return analyzerFactory.createControlLoopChecker(desFactory);
-    } catch (final AnalysisConfigurationException exception) {   }
-
-    return null;
+    final ProductDESProxyFactory desFactory = getProductDESProxyFactory();
+    return factory.createControlLoopChecker(desFactory);
   }
 
   @Override
@@ -112,7 +109,7 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
     @Override
     protected String getAnalysisName()
     {
-      return "Control Loop Check";
+      return TITLE;
     }
 
     @Override
@@ -129,5 +126,7 @@ public class ControlLoopDialog extends AbstractAnalysisDialog
 
   //#########################################################################
   //# Class Constants
+  private static final String TITLE = "Loop Check";
+
   private static final long serialVersionUID = -4771975182146634793L;
 }
