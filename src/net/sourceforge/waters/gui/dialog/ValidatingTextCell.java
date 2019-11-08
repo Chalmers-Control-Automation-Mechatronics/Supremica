@@ -173,6 +173,11 @@ public abstract class ValidatingTextCell<T>
     getDocument().addDocumentListener(listener);
   }
 
+  protected FormattedInputHandler<? extends T> getInputHandler()
+  {
+    return mInputHandler;
+  }
+
 
   //#########################################################################
   //# Actions

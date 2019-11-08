@@ -45,12 +45,13 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractSupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
@@ -173,30 +174,41 @@ public class ModularControllabilitySynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.des.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
+    final List<Option<?>> options = super.getOptions(db);
+    final ListIterator<Option<?>> iter = options.listIterator();
     while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.isSameParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis)) {
+      final Option<?> option = iter.next();
+      if (option.hasID(AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_NonblockingSynthesis)) {
         iter.remove();
-        iter.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_NonblockingSynthesis) {
-          @Override
-          public void commitValue() {
-            setNonblockingSynthesis(getValue());
-          }
-        });
+        final Option<?> replacement =
+          db.get(ModularModelVerifierFactory.
+                 OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis);
+        iter.add(replacement);
         break;
       }
     }
-    list.add(new BoolParameter(ParameterIDs.ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors) {
-      @Override
-      public void commitValue() {
-        setRemovingUnnecessarySupervisors(getValue());
-      }
-    });
-    return list;
+    db.append(options, ModularModelVerifierFactory.
+                       OPTION_ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(ModularModelVerifierFactory.
+                     OPTION_SupervisorSynthesizer_NonblockingSynthesis)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setNonblockingSynthesis(boolOption.getValue());
+    } else if (option.hasID(ModularModelVerifierFactory.
+                            OPTION_ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setRemovingUnnecessarySupervisors(boolOption.getValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

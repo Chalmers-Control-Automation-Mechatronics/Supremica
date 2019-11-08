@@ -43,14 +43,14 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSCCControlLoopChecker;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventListParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AbstractControlLoopChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
@@ -167,39 +167,39 @@ public class ModularControlLoopChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new EnumParameter<AutomataGroup.MergeVersion>
-        (ParameterIDs.ModularControlLoopChecker_MergeVersion) {
-      @Override
-      public void commitValue() {
-        setMergeVersion(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.ModularControlLoopChecker_NodeLimit) {
-      @Override
-      public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.ModularControlLoopChecker_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
+    final List<Option<?>> options = super.getOptions(db);
+    // TODO loop events - in superclass ...
+    db.append(options, ModularModelVerifierFactory.
+                       OPTION_ModularControlLoopChecker_MergeVersion);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalTransitionLimit);
+    return options;
+  }
 
-    list.add(new EventListParameter(ParameterIDs.testControlLoopHideParam) {
-      @Override
-      public void commitValue() {
-        setKindTranslator(getKindTranslator());
-      }
-    });
-
-    return list;
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(ModularModelVerifierFactory.
+                     OPTION_ModularControlLoopChecker_MergeVersion)) {
+      final EnumOption<AutomataGroup.MergeVersion> enumOption =
+        (EnumOption<AutomataGroup.MergeVersion>) option;
+      setMergeVersion(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTransitionLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

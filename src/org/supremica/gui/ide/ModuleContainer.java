@@ -116,7 +116,7 @@ public class ModuleContainer
     mWatersAnalyzerPropertyChangeListener =
       new WatersAnalyzerPropertyChangeListener();
     Config.INCLUDE_WATERS_ANALYZER.addPropertyChangeListener
-    (mWatersAnalyzerPropertyChangeListener);
+      (mWatersAnalyzerPropertyChangeListener);
     if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
       mAnalyzerPanel = new WatersAnalyzerPanel(this, "Analyzer");
     } else {

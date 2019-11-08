@@ -55,10 +55,10 @@ import net.sourceforge.waters.analysis.abstraction.SupervisorReductionSimplifier
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynthesizer;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -66,6 +66,7 @@ import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.IsomorphismChecker;
 import net.sourceforge.waters.model.analysis.des.SupervisorTooBigException;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
@@ -298,48 +299,61 @@ public class CompositionalAutomataSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
+    final List<Option<?>> options = super.getOptions(db);
+    final ListIterator<Option<?>> iter = options.listIterator();
     while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.isSameParameter
-           (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
-        iter.add(new EnumParameter<AbstractionProcedureCreator>
-            (ParameterIDs.CompositionalAutomataSynthesizer_AbstractionProcedureCreator) {
-          @Override
-          public void commitValue() {
-            setAbstractionProcedureCreator(getValue());
-          }
-        });
-        iter.add(new EnumParameter<SupervisorReductionMainMethod>
-          (ParameterIDs.SupervisorSynthesizer_SupervisorReductionMainMethod) {
-          @Override
-          public void commitValue() {
-            ProjectingSupervisorReductionFactory.configureSynthesizer
-              (CompositionalAutomataSynthesizer.this, getValue());
-          }
-        });
-        iter.add(new EnumParameter<SupervisorReductionProjectionMethod>
-          (ParameterIDs.SupervisorSynthesizer_SupervisorReductionProjectionMethod) {
-          @Override
-          public void commitValue() {
-            ProjectingSupervisorReductionFactory.configureSynthesizer
-              (CompositionalAutomataSynthesizer.this, getValue());
-          }
-        });
-        iter.add(new BoolParameter
-            (ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled) {
-          @Override
-          public void commitValue() {
-            setSupervisorLocalizationEnabled(getValue());
-          }
-        });
-       break;
+      final Option<?> option = iter.next();
+      if (option.hasID(CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
+        Option<?> addition;
+        addition = db.get(CompositionalModelAnalyzerFactory.
+                          OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator);
+        iter.add(addition);
+        addition = db.get(AbstractModelAnalyzerFactory.
+                          OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod);
+        iter.add(addition);
+        addition = db.get(AbstractModelAnalyzerFactory.
+                          OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod);
+        iter.add(addition);
+        addition = db.get(AbstractModelAnalyzerFactory.
+                          OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled);
+        iter.add(addition);
+        break;
       }
     }
-    return list;
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(CompositionalModelAnalyzerFactory.
+                     OPTION_CompositionalAutomataSynthesizer_AbstractionProcedureCreator)) {
+      final EnumOption<AbstractionProcedureCreator> enumOption =
+        (EnumOption<AbstractionProcedureCreator>) option;
+      setAbstractionProcedureCreator(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod)) {
+      final EnumOption<SupervisorReductionMainMethod> enumOption =
+        (EnumOption<SupervisorReductionMainMethod>) option;
+      ProjectingSupervisorReductionFactory.configureSynthesizer
+        (this, enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod)) {
+      final EnumOption<SupervisorReductionProjectionMethod> enumOption =
+        (EnumOption<SupervisorReductionProjectionMethod>) option;
+      ProjectingSupervisorReductionFactory.configureSynthesizer
+        (this, enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSupervisorLocalizationEnabled(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

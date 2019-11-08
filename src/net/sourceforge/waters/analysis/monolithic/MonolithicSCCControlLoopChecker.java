@@ -43,12 +43,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelVerifier;
 import net.sourceforge.waters.model.analysis.des.ControlLoopChecker;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
@@ -165,7 +171,42 @@ public class MonolithicSCCControlLoopChecker
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ControlLoopChecker_LoopEvents);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalTransitionLimit);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ControlLoopChecker_LoopEvents)) {
+      final EventSetOption eventSetOption = (EventSetOption) option;
+      final KindTranslator translator =
+        new ControlLoopKindTranslator(eventSetOption.getValue());
+      setKindTranslator(translator);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTransitionLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
   @Override
   public boolean supportsNondeterminism()
   {

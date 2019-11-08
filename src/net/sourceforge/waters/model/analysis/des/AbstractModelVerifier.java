@@ -35,9 +35,9 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -144,24 +144,30 @@ public abstract class AbstractModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
-      @Override
-      public void commitValue()
-      {
-        setShortCounterExampleRequested(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelVerifier_DetailedOutputEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelVerifier_ShortCounterExampleRequested);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ModelVerifier_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setShortCounterExampleRequested(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

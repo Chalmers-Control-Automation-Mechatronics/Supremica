@@ -35,6 +35,7 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.ListIterator;
 
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.compiler.ModuleCompiler;
@@ -114,6 +115,11 @@ public interface ModelAnalyzerFactory
   public StateCounter createStateCounter
     (ProductDESProxyFactory factory)
     throws AnalysisConfigurationException;
+
+
+  //#########################################################################
+  //# Options
+  public void registerOptions(OptionMap db);
 
 
   //#########################################################################

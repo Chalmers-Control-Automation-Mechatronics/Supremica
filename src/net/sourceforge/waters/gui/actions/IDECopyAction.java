@@ -102,13 +102,15 @@ public class IDECopyAction
     if (watersOwner != null) {
       final List<? extends Proxy> selection =
         watersOwner.getCurrentSelection();
-      final ModuleContext context = getActiveModuleContext();
-      final Transferable transferable =
-        WatersDataFlavor.createTransferable(selection, context, true);
-      final Clipboard clipboard =
-        Toolkit.getDefaultToolkit().getSystemClipboard();
-      clipboard.setContents(transferable, this);
-      fireClipboardChanged();
+      if (WatersDataFlavor.canCopy(selection)) {
+        final ModuleContext context = getActiveModuleContext();
+        final Transferable transferable =
+          WatersDataFlavor.createTransferable(selection, context, true);
+        final Clipboard clipboard =
+          Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(transferable, this);
+        fireClipboardChanged();
+      }
     } else if (swingOwner != null) {
       mDefaultAction.actionPerformed(event);
       fireClipboardChanged();

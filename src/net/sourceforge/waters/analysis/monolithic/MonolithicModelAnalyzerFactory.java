@@ -37,6 +37,8 @@ import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReduction
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.diagnosis.MonolithicDiagnosabilityVerifier;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
@@ -158,6 +160,20 @@ public class MonolithicModelAnalyzerFactory
   }
 
 
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new BooleanOption
+             (OPTION_MonolithicSynchronousProductBuilder_PruningDeadlocks,
+              "Prune deadlocks",
+              "Stop synchronous product construction when encountering " +
+              "states that are a deadlock in one of the components.",
+              "-prune",
+              false));
+  }
+
+
   //#########################################################################
   //# Inner Class SupervisorReductionArgument
   private static class SupervisorReductionArgument
@@ -252,5 +268,9 @@ public class MonolithicModelAnalyzerFactory
   }
 
 
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_MonolithicSynchronousProductBuilder_PruningDeadlocks =
+    "MonolithicSynchronousProductBuilder.PruningDeadlocks";
 
 }

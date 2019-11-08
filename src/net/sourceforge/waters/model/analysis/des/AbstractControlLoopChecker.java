@@ -34,7 +34,12 @@
 package net.sourceforge.waters.model.analysis.des;
 
 import java.util.Collection;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.model.analysis.kindtranslator.ControlLoopKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.ControllabilityKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.base.ProxyTools;
@@ -110,6 +115,32 @@ public abstract class AbstractControlLoopChecker
                                     final KindTranslator translator)
   {
     super(model, factory, translator);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
+   @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ControlLoopChecker_LoopEvents);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ControlLoopChecker_LoopEvents)) {
+      final EventSetOption eventSetOption = (EventSetOption) option;
+      final KindTranslator translator =
+        new ControlLoopKindTranslator(eventSetOption.getValue());
+      setKindTranslator(translator);
+    } else {
+      super.setOption(option);
+    }
   }
 
 

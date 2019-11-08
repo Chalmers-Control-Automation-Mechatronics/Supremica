@@ -39,13 +39,13 @@ import net.sourceforge.waters.analysis.abstraction.ProjectingSupervisorReduction
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionFactory;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
 import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
@@ -157,78 +157,82 @@ public abstract class AbstractSupervisorSynthesizer
   }
 
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
-      @Override
-      public void commitValue() {
-        setConfiguredDefaultMarking(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
-      @Override
-      public void commitValue() {
-        setNonblockingSynthesis(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_ControllableSynthesis) {
-      @Override
-      public void commitValue()
-      {
-        final KindTranslator translator = getValue() ?
-          IdenticalKindTranslator.getInstance() :
-            ConflictKindTranslator.getInstanceControllable();
-          setKindTranslator(translator);
-      }
-    });
-    list.add(0, new StringParameter(ParameterIDs.SupervisorSynthesizer_OutputName) {
-      @Override
-      public void commitValue() {
-        setOutputName(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_DetailedOutputEnabled) {
-      @Override
-      public void commitValue() {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
-      @Override
-      public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
-    list.add(new EnumParameter<SupervisorReductionMainMethod>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionMainMethod) {
-      @Override
-      public void commitValue() {
-        ProjectingSupervisorReductionFactory.configureSynthesizer
-          (AbstractSupervisorSynthesizer.this, getValue());
-      }
-    });
-    list.add(new EnumParameter<SupervisorReductionProjectionMethod>
-      (ParameterIDs.SupervisorSynthesizer_SupervisorReductionProjectionMethod) {
-      @Override
-      public void commitValue() {
-        ProjectingSupervisorReductionFactory.configureSynthesizer
-          (AbstractSupervisorSynthesizer.this, getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.SupervisorSynthesizer_SupervisorLocalisationEnabled) {
-      @Override
-      public void commitValue() {
-        setSupervisorLocalizationEnabled(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_NonblockingSynthesis);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_ControllableSynthesis);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_OutputName);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_DetailedOutputEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.OPTION_ModelAnalyzer_FinalTransitionLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_NonblockingSynthesis)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setNonblockingSynthesis(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_ControllableSynthesis)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      final KindTranslator translator = boolOption.getBooleanValue() ?
+        IdenticalKindTranslator.getInstance() :
+        ConflictKindTranslator.getInstanceControllable();
+      setKindTranslator(translator);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_OutputName)) {
+      final StringOption stringOption = (StringOption) option;
+      setOutputName(stringOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod)) {
+      final EnumOption<SupervisorReductionMainMethod> enumOption =
+        (EnumOption<SupervisorReductionMainMethod>) option;
+      ProjectingSupervisorReductionFactory.configureSynthesizer
+        (this, enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod)) {
+      final EnumOption<SupervisorReductionProjectionMethod> enumOption =
+        (EnumOption<SupervisorReductionProjectionMethod>) option;
+      ProjectingSupervisorReductionFactory.configureSynthesizer
+        (this, enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSupervisorLocalizationEnabled(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

@@ -35,7 +35,8 @@ package net.sourceforge.waters.model.analysis.des;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -120,9 +121,18 @@ public interface ModelAnalyzer
   public KindTranslator getKindTranslator();
 
 
+  //#########################################################################
+  //# Generic Parameter System
+  /**
+   * Returns a list of configurable parameters supported by this model analyser.
+   */
+  public List<Option<?>> getOptions(OptionMap db);
+
+  public void setOption(Option<?> option);
+
 
   //#########################################################################
-  //# Parameters
+  //# Specific Parameters
   /**
    * Sets whether computation of full output is enabled.
    * If set to <CODE>true</CODE> (the default), the model analyser should
@@ -190,11 +200,6 @@ public interface ModelAnalyzer
    * @see    #setTransitionLimit(int)
    */
   public int getTransitionLimit();
-
-  /**
-   * Returns a list of configurable parameters supported by this model analyser.
-   */
-  public List<Parameter> getParameters();
 
 
   //#########################################################################

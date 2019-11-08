@@ -33,10 +33,12 @@
 
 package net.sourceforge.waters.analysis.options;
 
-public enum EventParameterType {
-  PREVENT_NULL,
-  ALLOW_NULL,
-  DEFAULT_NULL
+
+public interface OptionEditor<T>
+{
+
+  Option<T> getOption();
+
+  public boolean commitValue();
+
 }
-
-

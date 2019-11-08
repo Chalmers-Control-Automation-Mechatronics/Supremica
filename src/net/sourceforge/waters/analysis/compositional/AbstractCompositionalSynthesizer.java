@@ -38,11 +38,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ProductDESResult;
 import net.sourceforge.waters.model.analysis.des.SupervisorSynthesizer;
 import net.sourceforge.waters.model.analysis.kindtranslator.ConflictKindTranslator;
@@ -175,44 +176,51 @@ public abstract class AbstractCompositionalSynthesizer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new EventParameter(ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
-      @Override
-      public void commitValue() {
-        setConfiguredDefaultMarking(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_NonblockingSynthesis) {
-      @Override
-      public void commitValue() {
-        setNonblockingSynthesis(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_ControllableSynthesis) {
-      @Override
-      public void commitValue()
-      {
-        final KindTranslator translator = getValue() ?
-          IdenticalKindTranslator.getInstance() :
-            ConflictKindTranslator.getInstanceControllable();
-          setKindTranslator(translator);
-      }
-    });
-    list.add(0, new StringParameter(ParameterIDs.SupervisorSynthesizer_OutputName) {
-      @Override
-      public void commitValue() {
-        setOutputName(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.SupervisorSynthesizer_DetailedOutputEnabled) {
-      @Override
-      public void commitValue() {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_NonblockingSynthesis);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_ControllableSynthesis);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_OutputName);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_SupervisorSynthesizer_DetailedOutputEnabled);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_NonblockingSynthesis)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setNonblockingSynthesis(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_ControllableSynthesis)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      final KindTranslator translator = boolOption.getBooleanValue() ?
+        IdenticalKindTranslator.getInstance() :
+        ConflictKindTranslator.getInstanceControllable();
+      setKindTranslator(translator);
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_OutputName)) {
+      final StringOption stringOption = (StringOption) option;
+      setOutputName(stringOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

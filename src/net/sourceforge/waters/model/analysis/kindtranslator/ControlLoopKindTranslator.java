@@ -64,7 +64,27 @@ public class ControlLoopKindTranslator
   public ControlLoopKindTranslator
     (final Collection<? extends EventProxy> loopEvents)
   {
+    this(loopEvents, EventKind.CONTROLLABLE);
+  }
+
+  /**
+   * Creates a control loop kind translator
+   * @param  loopEvents  Collection of events to be considered as loop
+   *                     events.
+   * @param  loopKind    The event kind assigned to loop events, either
+   *                     {@link EventKind#CONTROLLABLE} or
+   *                     {@link EventKind#UNCONTROLLABLE}.
+   *                     Non-loop events are assigned the opposite,
+   *                     except for propositions which are unchanged.
+   */
+  public ControlLoopKindTranslator
+    (final Collection<? extends EventProxy> loopEvents,
+     final EventKind loopKind)
+  {
     mLoopEvents = new THashSet<>(loopEvents);
+    mLoopKind = loopKind;
+    mOtherKind = loopKind == EventKind.CONTROLLABLE ?
+      EventKind.UNCONTROLLABLE : EventKind.CONTROLLABLE;
   }
 
 
@@ -77,9 +97,9 @@ public class ControlLoopKindTranslator
     if (event.getKind() == EventKind.PROPOSITION) {
       return EventKind.PROPOSITION;
     } else if (mLoopEvents.contains(event)) {
-      return EventKind.CONTROLLABLE;
+      return mLoopKind;
     } else {
-      return EventKind.UNCONTROLLABLE;
+      return mOtherKind;
     }
   }
 
@@ -87,4 +107,6 @@ public class ControlLoopKindTranslator
   //#########################################################################
   //# Data Members
   private final Set<EventProxy> mLoopEvents;
+  private final EventKind mLoopKind;
+  private final EventKind mOtherKind;
 }

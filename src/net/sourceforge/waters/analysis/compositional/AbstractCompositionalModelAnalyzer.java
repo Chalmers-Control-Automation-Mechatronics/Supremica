@@ -54,12 +54,12 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.FileParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -71,6 +71,7 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -633,86 +634,95 @@ public abstract class AbstractCompositionalModelAnalyzer
     setMonolithicStateLimit(limit);
   }
 
+
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new EnumParameter<PreselectingMethod>(ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod) {
-      @Override
-      public void commitValue() {
-        setPreselectingMethod(getValue());
-      }
-    });
-    list.add(new EnumParameter<SelectionHeuristicCreator>(ParameterIDs.AbstractCompositionalModelAnalyzer_SelectionHeuristic) {
-      @Override
-      public void commitValue() {
-        setSelectionHeuristic(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled) {
-      @Override
-      public void commitValue() {
-        setSubumptionEnabled(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit) {
-      @Override
-      public void commitValue() {
-        setInternalStateLimit(getValue());
-      }
-    });
-    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
-    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit) {
-      @Override
-      public void commitValue() {
-        setInternalTransitionLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit) {
-      @Override
-      public void commitValue() {
-        setMonolithicStateLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit) {
-      @Override
-      public void commitValue() {
-        setMonolithicTransitionLimit(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled) {
-      @Override
-      public void commitValue() {
-        setBlockedEventsEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled) {
-      @Override
-      public void commitValue() {
-        setSelfloopOnlyEventsEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled) {
-      @Override
-      public void commitValue() {
-        setFailingEventsEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks) {
-      @Override
-      public void commitValue() {
-        setPruningDeadlocks(getValue());
-      }
-    });
-    //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
-    list.add(new FileParameter(ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile) {
-      @Override
-      public void commitValue() {
-        setMonolithicDumpFile(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_PreselectingMethod);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_SelectingMethod);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_SubumptionEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_InternalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_InternalTransitionLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalTransitionLimit);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_BlockedEventsEnabled);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_FailingEventsEnabled);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    db.append(options, CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_MonolithicDumpFile);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(CompositionalModelAnalyzerFactory.
+                     OPTION_AbstractCompositionalModelAnalyzer_PreselectingMethod)) {
+      final EnumOption<PreselectingMethod> enumOption =
+        (EnumOption<PreselectingMethod>) option;
+      setPreselectingMethod(enumOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_SelectingMethod)) {
+      final EnumOption<SelectionHeuristicCreator> enumOption =
+        (EnumOption<SelectionHeuristicCreator>) option;
+      setSelectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSubumptionEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalStateLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setMonolithicStateLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setMonolithicTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_BlockedEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setBlockedEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_FailingEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setFailingEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSelfloopOnlyEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_PruningDeadlocks)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setPruningDeadlocks(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelAnalyzer_MonolithicDumpFile)) {
+      final FileOption fileOption = (FileOption) option;
+      setMonolithicDumpFile(fileOption.getValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

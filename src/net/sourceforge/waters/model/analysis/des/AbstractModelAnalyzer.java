@@ -37,7 +37,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.Parameter;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AbstractAbortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -140,6 +141,19 @@ public abstract class AbstractModelAnalyzer
     return mKindTranslator;
   }
 
+
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    return new LinkedList<>();
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+  }
+
+
   @Override
   public void setDetailedOutputEnabled(final boolean enable)
   {
@@ -186,12 +200,6 @@ public abstract class AbstractModelAnalyzer
   public void clearAnalysisResult()
   {
     mAnalysisResult = null;
-  }
-
-  @Override
-  public List<Parameter> getParameters()
-  {
-    return new LinkedList<>();
   }
 
 

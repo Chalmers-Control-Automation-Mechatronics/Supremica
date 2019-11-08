@@ -36,6 +36,10 @@ package net.sourceforge.waters.analysis.bdd;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentEnum;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
@@ -77,7 +81,7 @@ public class BDDModelVerifierFactory
 
   //#########################################################################
   //# Overrides for
-  //# net.sourceforge.waters.model.analysis.AbstractModelVerifierFactory
+  //# net.sourceforge.waters.model.analysis.AbstractModelAnalyzerFactory
   @Override
   protected void addArguments()
   {
@@ -92,7 +96,7 @@ public class BDDModelVerifierFactory
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelVerifierFactory
+  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzerFactory
   @Override
   public BDDConflictChecker createConflictChecker
     (final ProductDESProxyFactory factory)
@@ -126,6 +130,56 @@ public class BDDModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new BDDStateCounter(factory);
+  }
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new EnumOption<BDDPackage>
+             (OPTION_BDDModelAnalyzer_BDDPackage,
+              "BDD package",
+              "The BDD implementation used to manipulate BDDs.",
+              "-pack",
+              BDDPackage.values()));
+    db.add(new PositiveIntOption
+             (OPTION_BDDModelAnalyzer_InitialSize,
+              "Initial BDD table size",
+              "The initial number of BDD nodes to be supported by the BDD package.",
+               "-size",
+               50000));
+    db.add(new PositiveIntOption
+             (OPTION_BDDModelAnalyzer_NodeLimit,
+              "BDD Node limit",
+              "Maximum number of BDD nodes allowed before aborting.",
+               "-limit"));
+    db.add(new PositiveIntOption
+             (OPTION_BDDModelAnalyzer_PartitionSizeLimit,
+              "Partition size limit",
+              "The maximum number of BDD nodes allowed in a transition relation " +
+              "BDD before it is split when partitioning.",
+              "-plimit",
+              10000));
+    db.add(new BooleanOption
+             (OPTION_BDDModelAnalyzer_ReorderingEnabled,
+              "Dynamic variable reordering",
+              "Try to improve the BDD variable ordering between iterations.",
+              "-dynamic",
+              false));
+    db.add(new EnumOption<TransitionPartitioningStrategy>
+             (OPTION_BDDModelAnalyzer_TransitionPartitioningStrategy,
+              "Transition partitioning strategy",
+              "The method used to split the transition relation BDD into " +
+              "disjunctive components.",
+              "-part",
+              TransitionPartitioningStrategy.values()));
+    db.add(new EnumOption<VariableOrdering>
+             (OPTION_BDDModelAnalyzer_VariableOrdering,
+              "Initial variable ordering",
+              "The strategy to determine the initial ordering of the BDD variables.",
+              "-order",
+              VariableOrdering.values()));
   }
 
 
@@ -313,5 +367,23 @@ public class BDDModelVerifierFactory
   //# Class Constants
   private static final String CONFIG_BRIDGE =
     "net.sourceforge.waters.gui.util.ConfigBridge";
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_BDDModelAnalyzer_BDDPackage =
+    "BDDModelAnalyzer.BDDPackage";
+  public static final String OPTION_BDDModelAnalyzer_InitialSize =
+    "BDDModelAnalyzer.InitialSize";
+  public static final String OPTION_BDDModelAnalyzer_NodeLimit =
+    "BDDModelAnalyzer.NodeLimit";
+  public static final String OPTION_BDDModelAnalyzer_PartitionSizeLimit =
+    "BDDModelAnalyzer.PartitionSizeLimit";
+  public static final String OPTION_BDDModelAnalyzer_ReorderingEnabled =
+    "BDDModelAnalyzer.ReorderingEnabled";
+  public static final String OPTION_BDDModelAnalyzer_TransitionPartitioningStrategy =
+    "BDDModelAnalyzer.TransitionPartitioningStrategy";
+  public static final String OPTION_BDDModelAnalyzer_VariableOrdering =
+    "BDDModelAnalyzer.VariableOrdering";
 
 }

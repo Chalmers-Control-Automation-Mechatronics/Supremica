@@ -63,7 +63,7 @@ import javax.swing.JRadioButton;
  * @author Robi Malik
  */
 
-public class IconRadioButton
+public class IconRadioButton<T>
   extends JPanel
   implements ActionListener
 {
@@ -71,31 +71,45 @@ public class IconRadioButton
   //#########################################################################
   //# Constructor
   /**
-   * Creates a new radio button.
+   * Creates a new radio button without accelerator.
    * @param text        The textual label, e.g., "Controllable".
    * @param icon        The icon to be used.
    * @param group       The button group to contain the radio button.
-   * @param accelerator The accelerator key to be used. This should be a
-   *                    lower-case character that appears in the textual
-   *                    label. It will be set as mnemonic (underlined), and
-   *                    a key binding for the look-and-feel's mouseless
-   *                    modifier (usually Alt) together with this character
-   *                    will be created.
    */
-  public IconRadioButton(final String text,
+  public IconRadioButton(final T value,
+                         final String text,
+                         final Icon icon,
+                         final ButtonGroup group)
+  {
+    this(value, text, icon, group, (char) 0);
+  }
+
+  /**
+   * Creates a new radio button with an optional accelerator.
+   * @param text        The textual label, e.g., "Controllable".
+   * @param icon        The icon to be used.
+   * @param group       The button group to contain the radio button.
+   * @param accelerator The accelerator key to be used. This should be either
+   *                    the null character <CODE>'\0'</CODE> to specify no
+   *                    accelerator, or a lower-case character that appears in
+   *                    the textual label. It will be set as mnemonic
+   *                    (underlined), and a key binding for the look-and
+   *                    feel's mouseless modifier (usually Alt) together with
+   *                    this character will be created.
+   */
+  public IconRadioButton(final T value,
+                         final String text,
                          final Icon icon,
                          final ButtonGroup group,
                          final char accelerator)
   {
+    mValue = value;
     final GridBagLayout layout = new GridBagLayout();
     setLayout(layout);
     final GridBagConstraints constraints = new GridBagConstraints();
-    final int code = KeyEvent.getExtendedKeyCodeForChar(accelerator);
-    final int mnemonicIndex = text.toLowerCase().indexOf(accelerator);
     mButton = new JRadioButton();
     mButton.setFocusable(false);
     mButton.setRequestFocusEnabled(false);
-    mButton.setMnemonic(code);
     group.add(mButton);
     constraints.gridx = GridBagConstraints.RELATIVE;
     constraints.gridy = 0;
@@ -103,23 +117,33 @@ public class IconRadioButton
     constraints.weighty = 1.0;
     constraints.fill = GridBagConstraints.HORIZONTAL;
     layout.setConstraints(mButton, constraints);
-    add(mButton);
     final JButton label = new JButton(text, icon);
     final Insets margin = new Insets(0, 0, 0, 0);
     label.setMargin(margin);
     label.setBorderPainted(false);
     label.setContentAreaFilled(false);
     label.setRequestFocusEnabled(false);
-    label.setDisplayedMnemonicIndex(mnemonicIndex);
     label.addActionListener(this);
     constraints.weightx = 1.0;
     layout.setConstraints(label, constraints);
+    if (accelerator != 0) {
+      final int code = KeyEvent.getExtendedKeyCodeForChar(accelerator);
+      mButton.setMnemonic(code);
+      final int mnemonicIndex = text.toLowerCase().indexOf(accelerator);
+      label.setDisplayedMnemonicIndex(mnemonicIndex);
+    }
+    add(mButton);
     add(label);
   }
 
 
   //#########################################################################
   //# Simple Access
+  public T getValue()
+  {
+    return mValue;
+  }
+
   public boolean isSelected()
   {
     return mButton.isSelected();
@@ -152,6 +176,7 @@ public class IconRadioButton
 
   //#########################################################################
   //# Data Members
+  private T mValue;
   private final JRadioButton mButton;
 
 

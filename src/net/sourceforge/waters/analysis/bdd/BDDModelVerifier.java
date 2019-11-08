@@ -52,11 +52,11 @@ import net.sf.javabdd.BDDFactory;
 import net.sf.javabdd.BDDPairing;
 import net.sf.javabdd.BDDVarSet;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.model.analysis.AnalysisAbortException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
@@ -240,6 +240,66 @@ public abstract class BDDModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_BDDPackage);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_InitialSize);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_TransitionPartitioningStrategy);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_PartitionSizeLimit);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_VariableOrdering);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_ReorderingEnabled);
+    db.append(options, BDDModelVerifierFactory.
+                       OPTION_BDDModelAnalyzer_NodeLimit);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(BDDModelVerifierFactory.
+                     OPTION_BDDModelAnalyzer_BDDPackage)) {
+      final EnumOption<BDDPackage> enumOption = (EnumOption<BDDPackage>) option;
+      setBDDPackage(enumOption.getValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_InitialSize)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInitialSize(intOption.getIntValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_TransitionPartitioningStrategy)) {
+      final EnumOption<TransitionPartitioningStrategy> enumOption =
+        (EnumOption<TransitionPartitioningStrategy>) option;
+      setTransitionPartitioningStrategy(enumOption.getValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_PartitionSizeLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setPartitioningSizeLimit(intOption.getIntValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_VariableOrdering)) {
+      final EnumOption<VariableOrdering> enumOption =
+        (EnumOption<VariableOrdering>) option;
+      setVariableOrdering(enumOption.getValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_ReorderingEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setReorderingEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(BDDModelVerifierFactory.
+                            OPTION_BDDModelAnalyzer_NodeLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
+  @Override
   public boolean supportsNondeterminism()
   {
     return true;
@@ -271,54 +331,6 @@ public abstract class BDDModelVerifier
     }
   }
 
-  @Override
-  public List<Parameter> getParameters()
-  {
-    final List<Parameter> list = super.getParameters();
-    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_InitialSize) {
-      @Override
-      public void commitValue()
-      {
-        setInitialSize(getValue());
-      }
-    });
-    list.add(new EnumParameter<TransitionPartitioningStrategy>(ParameterIDs.BDDModelVerifier_TransactionPartitioningStrategy) {
-      @Override
-      public void commitValue()
-      {
-        setTransitionPartitioningStrategy(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_PartitionSizeLimit) {
-      @Override
-      public void commitValue()
-      {
-        setPartitioningSizeLimit(getValue());
-      }
-    });
-    list.add(new EnumParameter<VariableOrdering>(ParameterIDs.BDDModelVerifier_VariableOrdering) {
-      @Override
-      public void commitValue()
-      {
-        setVariableOrdering(getValue());
-      }
-    });
-    list.add(new BoolParameter(ParameterIDs.BDDModelVerifier_ReorderingEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setReorderingEnabled(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.BDDModelVerifier_NodeLimit) {
-      @Override
-      public void commitValue()
-      {
-        setNodeLimit(getValue());
-      }
-    });
-    return list;
-  }
 
 
   //#########################################################################

@@ -43,14 +43,15 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionDiagnostics;
@@ -378,53 +379,62 @@ public class CompositionalConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
+    final List<Option<?>> options = super.getOptions(db);
+    final ListIterator<Option<?>> iter = options.listIterator();
     while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.isSameParameter
-           (ParameterIDs.AbstractCompositionalModelAnalyzer_PreselectingMethod)) {
+      final Option<?> option = iter.next();
+      if (option.hasID(CompositionalModelAnalyzerFactory.
+                       OPTION_AbstractCompositionalModelAnalyzer_PreselectingMethod)) {
         iter.remove();
-        iter.add(new EnumParameter<PreselectingMethod>
-            (ParameterIDs.CompositionalConflictChecker_PreselectingMethod) {
-          @Override
-          public void commitValue()
-          {
-            setPreselectingMethod(getValue());
-          }
-        });
-      } else if (param.isSameParameter
-           (ParameterIDs.AbstractCompositionalModelAnalyzer_SelectionHeuristic)) {
+        final Option<?> replacement = db.get(CompositionalModelAnalyzerFactory.
+                                       OPTION_CompositionalConflictChecker_PreselectingMethod);
+        iter.add(replacement);
+      } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                              OPTION_AbstractCompositionalModelAnalyzer_SelectingMethod)) {
         iter.remove();
-        iter.add(new EnumParameter<SelectionHeuristicCreator>
-            (ParameterIDs.CompositionalConflictChecker_SelectionHeuristic) {
-          @Override
-          public void commitValue()
-          {
-            setSelectionHeuristic(getValue());
-          }
-        });
-      } else if (param.isSameParameter
-           (ParameterIDs.AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
-        iter.add(new EnumParameter<AbstractionProcedureCreator>
-            (ParameterIDs.CompositionalConflictChecker_AbstractionProcedureCreator) {
-          @Override
-          public void commitValue()
-          {
-            setAbstractionProcedureCreator(getValue());
-          }
-        });
+        final Option<?> replacement = db.get(CompositionalModelAnalyzerFactory.
+                                       OPTION_CompositionalConflictChecker_SelectingMethod);
+        iter.add(replacement);
+      } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                              OPTION_AbstractCompositionalModelAnalyzer_SubumptionEnabled)) {
+        final Option<?> addition = db.get(CompositionalModelAnalyzerFactory.
+                                    OPTION_CompositionalConflictChecker_AbstractionProcedureCreator);
+        iter.add(addition);
       }
     }
-    list.add(0, new EventParameter(ParameterIDs.ConflictChecker_ConfiguredDefaultMarking) {
-      @Override
-      public void commitValue() {
-        setConfiguredDefaultMarking(getValue());
-      }
-    });
-    return list;
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ConflictChecker_ConfiguredDefaultMarking);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ConflictChecker_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalConflictChecker_PreselectingMethod)) {
+      final EnumOption<PreselectingMethod> enumOption =
+        (EnumOption<PreselectingMethod>) option;
+      setPreselectingMethod(enumOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalConflictChecker_SelectingMethod)) {
+      final EnumOption<SelectionHeuristicCreator> enumOption =
+        (EnumOption<SelectionHeuristicCreator>) option;
+      setSelectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_CompositionalConflictChecker_AbstractionProcedureCreator)) {
+      final EnumOption<AbstractionProcedureCreator> enumOption =
+        (EnumOption<AbstractionProcedureCreator>) option;
+      setAbstractionProcedureCreator(enumOption.getValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

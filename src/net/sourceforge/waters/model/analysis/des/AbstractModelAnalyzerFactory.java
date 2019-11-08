@@ -45,7 +45,17 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionMainMethod;
+import net.sourceforge.waters.analysis.abstraction.SupervisorReductionProjectionMethod;
 import net.sourceforge.waters.analysis.hisc.HISCCompileMode;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ComponentKindOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
@@ -188,6 +198,157 @@ public abstract class AbstractModelAnalyzerFactory
     throws AnalysisConfigurationException
   {
     throw createUnsupportedOperationException("state counting");
+  }
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    db.add(new PositiveIntOption
+             (OPTION_ModelAnalyzer_FinalStateLimit,
+              "Monolithic state limit",
+              "Maximum number of states in final synchronous product before aborting.",
+              "-fslimit"));
+    db.add(new PositiveIntOption
+             (OPTION_ModelAnalyzer_FinalTransitionLimit,
+              "Monolithic transition limit",
+              "Maximum number of transitions in final synchronous product before aborting.",
+              "-ftlimit"));
+    db.add(new PositiveIntOption
+             (OPTION_ModelAnalyzer_InternalStateLimit,
+              "Internal state limit",
+              "Maximum number of states in intermediate abstraction steps.",
+              "-islimit"));
+    db.add(new PositiveIntOption
+             (OPTION_ModelAnalyzer_InternalTransitionLimit,
+              "Internal transition limit",
+              "Maximum number of transitions in intermediate abstraction steps.",
+              "-itlimit"));
+
+    db.add(new BooleanOption
+             (OPTION_ModelVerifier_DetailedOutputEnabled,
+              "Compute counterexample",
+              "Computate a counterexample if model checking gives a failed result.",
+              "-out",
+              true));
+    db.add(new BooleanOption
+             (OPTION_ModelVerifier_ShortCounterExampleRequested,
+              "Short counterexample",
+              "Try to compute a counterexample that is as short as possible.",
+              "-mince",
+              false));
+
+    db.add(new PropositionOption
+             (OPTION_ConflictChecker_ConfiguredDefaultMarking,
+              "Marking proposition",
+              "The model is considered nonblocking, if it possible to reach a state " +
+              "marked by this proposition from every reachable state.",
+              "-marking",
+              PropositionOption.DefaultKind.PREVENT_NULL));
+    db.add(new PropositionOption
+             (OPTION_ConflictChecker_ConfiguredPreconditionMarking,
+              "Precondition marking",
+              "Precondition marking used for generalised conflict check.",
+              "-premarking",
+              PropositionOption.DefaultKind.DEFAULT_NULL));
+
+    db.add(new EventSetOption
+             (OPTION_ControlLoopChecker_LoopEvents,
+              "Loop events",
+              "Check whether the system permits a loop using the selected events.",
+              "-events",
+              EventKind.CONTROLLABLE));
+
+    db.add(new BooleanOption
+             (OPTION_SupervisorSynthesizer_DetailedOutputEnabled,
+              "Create supervisor automata",
+              "Disable this to suppress the creation of supervisor automata, " +
+              "and only determine whether a supervisor exists.",
+              "-out",
+              true));
+    db.add(new PropositionOption
+             (OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking,
+              "Marking proposition",
+              "If synthesising a nonblocking supervisor, it will be " +
+              "nonblocking with respect to this proposition.",
+              "-marking",
+              PropositionOption.DefaultKind.ALLOW_NULL));
+    db.add(new BooleanOption
+             (OPTION_SupervisorSynthesizer_ControllableSynthesis,
+              "Controllable supervisor",
+              "Synthesise a controllable supervisor.",
+              "-cont",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupervisorSynthesizer_NonblockingSynthesis,
+              "Nonblocking supervisor",
+              "Synthesise a nonblocking supervisor.",
+              "-nbl",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupervisorSynthesizer_NormalSynthesis,
+              "Normal supervisor",
+              "Synthesise a normal supervisor.",
+              "-norm",
+              false));
+    db.add(new StringOption
+             (OPTION_SupervisorSynthesizer_OutputName,
+              "Supervisor name prefix",
+              "Name or name prefix for synthesised supervisors.",
+              "-name",
+              "sup"));
+    db.add(new BooleanOption
+             (OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled,
+              "Localize supervisors",
+              "If using supervisor reduction, create separate supervisors " +
+              "for each controllable event that needs to be disabled.",
+              "-loc",
+              false));
+    db.add(new EnumOption<SupervisorReductionMainMethod>
+             (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
+              "Supervisor reduction method",
+              "Core algorithm to reduce the size of computed supervisors.",
+              "-red",
+              SupervisorReductionMainMethod.values()));
+    db.add(new EnumOption<SupervisorReductionProjectionMethod>
+             (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
+              "Supervisor reduction projection",
+              "Method to reduce the number of events before supervisor reduction.",
+              "-redproj",
+              SupervisorReductionProjectionMethod.values()));
+
+    db.add(new BooleanOption
+             (OPTION_SynchronousProductBuilder_DetailedOutputEnabled,
+              "Build automaton model",
+              "Disable this to suppress the creation of a synchronous product " +
+              "automaton, and only run for statistics.",
+              "-out",
+              true));
+    db.add(new StringOption
+             (OPTION_SynchronousProductBuilder_OutputName,
+              "Output name",
+              "Name for the generated synchronous product automaton",
+              "-name",
+              "sync"));
+    db.add(new ComponentKindOption
+             (OPTION_SynchronousProductBuilder_OutputKind,
+              "Output kind",
+              "Type of the generated synchronous product automaton.",
+              "-kind"));
+    db.add(new BooleanOption
+             (OPTION_SynchronousProductBuilder_PruningDeadlocks,
+              "Prune deadlocks",
+              "Stop synchronous product construction when encountering " +
+              "states that are a deadlock in one of the components.",
+              "-prune",
+              false));
+    db.add(new BooleanOption
+             (OPTION_SynchronousProductBuilder_RemovingSelfloops,
+              "Remove Selfloops",
+              "Remove events that appear only as selfloop on every state," +
+              "as well as propositions that appear on all states, from the result.",
+              "-out",
+              true));
   }
 
 
@@ -749,5 +910,60 @@ public abstract class AbstractModelAnalyzerFactory
   //#########################################################################
   //# Data Members
   private final Map<String,CommandLineArgument> mArgumentMap;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_ModelAnalyzer_FinalStateLimit =
+    "ModelAnalyzer.FinalStateLimit";
+  public static final String OPTION_ModelAnalyzer_FinalTransitionLimit =
+    "ModelAnalyzer.FinalTransitionLimit";
+  public static final String OPTION_ModelAnalyzer_InternalStateLimit =
+    "ModelAnalyzer.InternalStateLimit";
+  public static final String OPTION_ModelAnalyzer_InternalTransitionLimit =
+    "ModelAnalyzer.InternalTransitionLimit";
+
+  public static final String OPTION_ModelVerifier_DetailedOutputEnabled =
+    "ModelVerifier.DetailedOutputEnabled";
+  public static final String OPTION_ModelVerifier_ShortCounterExampleRequested =
+    "ModelVerifier.ShortCounterExampleRequested";
+
+  public static final String OPTION_ConflictChecker_ConfiguredDefaultMarking =
+    "ConflictChecker.ConfiguredDefaultMarking";
+  public static final String OPTION_ConflictChecker_ConfiguredPreconditionMarking =
+    "ConflictChecker.ConfiguredPreconditionMarking";
+
+  public static final String OPTION_ControlLoopChecker_LoopEvents =
+    "ControlLoopChecker.LoopEvents";
+
+  public static final String OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking =
+    "SupervisorSynthesizer.ConfiguredDefaultMarking";
+  public static final String OPTION_SupervisorSynthesizer_ControllableSynthesis =
+    "SupervisorSynthesizer.ControllableSynthesis";
+  public static final String OPTION_SupervisorSynthesizer_DetailedOutputEnabled =
+    "SupervisorSynthesizer.DetailedOutputEnabled";
+  public static final String OPTION_SupervisorSynthesizer_NonblockingSynthesis =
+    "SupervisorSynthesizer.NonblockingSynthesis";
+  public static final String OPTION_SupervisorSynthesizer_NormalSynthesis =
+    "SupervisorSynthesizer.NormalSynthesis";
+  public static final String OPTION_SupervisorSynthesizer_OutputName =
+    "SupervisorSynthesizer.OutputName";
+  public static final String OPTION_SupervisorSynthesizer_SupervisorLocalisationEnabled =
+    "SupervisorSynthesizer.SupervisorLocalisationEnabled";
+  public static final String OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod =
+    "SupervisorSynthesizer.SupervisorReductionMainMethod";
+  public static final String OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod =
+    "SupervisorSynthesizer.SupervisorReductionProjectionMethod";
+
+  public static final String OPTION_SynchronousProductBuilder_DetailedOutputEnabled =
+    "SynchronousProductBuilder.DetailedOutputEnabled";
+  public static final String OPTION_SynchronousProductBuilder_OutputName =
+    "SynchronousProductBuilder.OutputName";
+  public static final String OPTION_SynchronousProductBuilder_OutputKind =
+    "SynchronousProductBuilder.OutputKind";
+  public static final String OPTION_SynchronousProductBuilder_PruningDeadlocks =
+    "SynchronousProductBuilder.PruningDeadlocks";
+  public static final String OPTION_SynchronousProductBuilder_RemovingSelfloops =
+    "SynchronousProductBuilder.RemovingSelfloops";
 
 }

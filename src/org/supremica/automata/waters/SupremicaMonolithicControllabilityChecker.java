@@ -52,9 +52,9 @@ package org.supremica.automata.waters;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.des.ControllabilityChecker;
 import net.sourceforge.waters.model.analysis.des.ControllabilityDiagnostics;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -111,19 +111,24 @@ public class SupremicaMonolithicControllabilityChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter
-      (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant)
-      {
-        @Override
-        public void commitValue()
-        {
-          setEnsuringUncontrollablesInPlant(getValue());
-        }
-      });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(SupremicaModelAnalyzerFactory.
+                     OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setEnsuringUncontrollablesInPlant(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 }

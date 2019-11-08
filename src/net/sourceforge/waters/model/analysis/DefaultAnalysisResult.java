@@ -39,6 +39,7 @@ import java.io.StringWriter;
 import java.util.Formatter;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.base.ProxyTools;
 import net.sourceforge.waters.model.base.WatersException;
 
@@ -367,11 +368,13 @@ public class DefaultAnalysisResult
     }
     @SuppressWarnings("resource")
     final Formatter formatter = new Formatter(writer);
-    if (mRunTime >= 0) {
-      formatter.format("Total runtime: %.3fs\n", 0.001f * mRunTime);
-    }
     if (mCompileTime >= 0) {
       formatter.format("Compile time: %.3fs\n", 0.001f * mCompileTime);
+    }
+    if (mRunTime >= 0) {
+      final String kind = ModelVerifier.class.isAssignableFrom(mAnalyzerClass) ?
+        "Verification" : "Analysis";
+      formatter.format("%s time: %.3fs\n", kind, 0.001f * mRunTime);
     }
     writer.println("Memory usage: " + (mPeakMemoryUsage >> 10) + " KiB");
     if (mTotalNumberOfEvents >= 0) {

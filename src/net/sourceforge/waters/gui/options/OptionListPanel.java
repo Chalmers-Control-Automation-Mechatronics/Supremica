@@ -31,27 +31,57 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.analysis.options;
+package net.sourceforge.waters.gui.options;
 
+import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionEditor;
 
 
-public interface ProductDESContext
+public class OptionListPanel extends JPanel
 {
-  public ProductDESProxy getProductDES();
 
-  public List<AutomatonProxy> getActiveAutomata();
+  //#########################################################################
+  //# Constructors
+  public OptionListPanel(final GUIOptionContext context,
+                         final List<Option<?>> options)
+  {
+    mOptionPanels = new ArrayList<>(options.size());
+    final GridBagLayout layout = new GridBagLayout();
+    final GridBagConstraints constraints = new GridBagConstraints();
+    constraints.gridy = 0;
+    constraints.anchor = GridBagConstraints.WEST;
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    setLayout(layout);
+    for (final Option<?> option : options) {
+      final OptionEditor<?> editor = option.createEditor(context);
+      final OptionPanel<?> panel = (OptionPanel<?>) editor;
+      mOptionPanels.add(panel);
+      final JLabel label = panel.getLabel();
+      constraints.gridx = 0;
+      add(label, constraints);
+      final Component entry = panel.getEntryComponent();
+      constraints.gridx = 1;
+      add(entry, constraints);
+      constraints.gridy++;
+    }
+  }
 
-  public Icon getEventIcon(EventProxy event);
 
-  public Icon getComponentKindIcon(ComponentKind kind);
+  //#########################################################################
+  //# Data Members
+  private final List<OptionPanel<?>> mOptionPanels;
 
-  public String getComponentKindText(final ComponentKind kind);
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = -4843247994676633053L;
 }

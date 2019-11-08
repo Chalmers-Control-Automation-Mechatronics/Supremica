@@ -33,61 +33,60 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.des.EventProxy;
 
-import javax.swing.BoxLayout;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
-public class ParameterJScrollPane extends JScrollPane
+/**
+ * A configurable parameter to pass a proposition event ({@link EventProxy})
+ * to a {@link ModelAnalyzer}.
+ *
+ * @author Brandon Bassett
+ */
+
+public class PropositionOption extends Option<EventProxy>
 {
+  //#########################################################################
+  //# Constructors
+  public PropositionOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption,
+                           final DefaultKind kind)
+  {
+    super(id, shortName, description, commandLineOption, null);
+    mDefaultKind = kind;
+  }
 
 
   //#########################################################################
-  //# Constructors
-  public ParameterJScrollPane(final List<Parameter> p, final ProductDESContext model)
+  //# Simple Access
+  public DefaultKind getDefaultKind()
   {
-    generateViewPort(p, model);
+    return mDefaultKind;
   }
 
-  public void replaceView(final List<Parameter> newParams, final ProductDESContext model)
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  @Override
+  public OptionEditor<EventProxy> createEditor(final OptionContext context)
   {
-    generateViewPort(newParams, model);
+    return context.createPropositionEditor(this);
   }
 
-  private void generateViewPort(final List<Parameter> parameters, final ProductDESContext model) {
 
-    final JPanel newView = new JPanel();
-    final List<ParameterPanel> newParametersPanels = new ArrayList<ParameterPanel>();
-    newView.setLayout(new BoxLayout(newView, BoxLayout.Y_AXIS));
-    //Generate new parameterPanels
-    for(final Parameter param: parameters) {
-      newParametersPanels.add(new ParameterPanel(param, model));
-    }
-    //Store parameterPanels in Panel
-    for (final ParameterPanel panel : newParametersPanels) {
-      newView.add(panel);
-    }
-
-    setViewportView(newView);
+  //#########################################################################
+  //# Inner Enumeration DefaultKind
+  public enum DefaultKind {
+    PREVENT_NULL,
+    ALLOW_NULL,
+    DEFAULT_NULL
   }
 
-  public void commit() {
-    for(final Component c: ((JPanel) getViewport().getComponent(0)).getComponents())
-      ((ParameterPanel) c).commitParameter();
-  }
 
-  public List<Parameter> getParameters() {
+  //#########################################################################
+  //# Data Members
+  private final DefaultKind mDefaultKind;
 
-    final List<Parameter> activeParameters = new ArrayList<>();
-
-    for(final Component c: ((JPanel) getViewport().getComponent(0)).getComponents())
-      activeParameters.add(((ParameterPanel) c).getParameter());
-
-    return activeParameters;
-  }
-
-  private static final long serialVersionUID = 1L;
 }

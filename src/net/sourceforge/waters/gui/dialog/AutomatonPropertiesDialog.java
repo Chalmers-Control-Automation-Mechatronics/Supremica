@@ -155,17 +155,18 @@ public class AutomatonPropertiesDialog extends JDialog
     mNameInput.setToolTipText("Enter automaton name.");
     mKindLabel = new JLabel("Kind:");
     final ButtonGroup group = new ButtonGroup();
-    mPlantButton = new IconRadioButton("Plant", IconAndFontLoader.ICON_PLANT,
-                                       group, 'p');
-    mPropertyButton =
-      new IconRadioButton("Property", IconAndFontLoader.ICON_PROPERTY,
-                          group, 'o');
-    mSpecButton =
-      new IconRadioButton("Specification", IconAndFontLoader.ICON_SPEC,
-                          group, 's');
-    mSupervisorButton =
-      new IconRadioButton("Supervisor", IconAndFontLoader.ICON_SUPERVISOR,
-                          group, 'u');
+    mPlantButton = new IconRadioButton<>
+      (ComponentKind.PLANT, "Plant",
+       IconAndFontLoader.ICON_PLANT, group, 'p');
+    mPropertyButton = new IconRadioButton<>
+      (ComponentKind.PROPERTY, "Property",
+       IconAndFontLoader.ICON_PROPERTY, group, 'o');
+    mSpecButton = new IconRadioButton<>
+      (ComponentKind.SPEC, "Specification",
+       IconAndFontLoader.ICON_SPEC, group, 's');
+    mSupervisorButton = new IconRadioButton<>
+      (ComponentKind.SUPERVISOR, "Supervisor",
+       IconAndFontLoader.ICON_SUPERVISOR, group, 'u');
     switch (mAutomaton.getKind()) {
     case PLANT:
       mPlantButton.setSelected(true);
@@ -419,10 +420,10 @@ public class AutomatonPropertiesDialog extends JDialog
   private JLabel mNameLabel;
   private SimpleExpressionInputCell mNameInput;
   private JLabel mKindLabel;
-  private IconRadioButton mPlantButton;
-  private IconRadioButton mPropertyButton;
-  private IconRadioButton mSpecButton;
-  private IconRadioButton mSupervisorButton;
+  private IconRadioButton<ComponentKind> mPlantButton;
+  private IconRadioButton<ComponentKind> mPropertyButton;
+  private IconRadioButton<ComponentKind> mSpecButton;
+  private IconRadioButton<ComponentKind> mSupervisorButton;
   private AttributesPanel mAttributesPanel;
   private JPanel mErrorPanel;
   private ErrorLabel mErrorLabel;

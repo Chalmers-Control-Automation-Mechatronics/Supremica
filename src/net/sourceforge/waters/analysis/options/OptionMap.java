@@ -33,87 +33,89 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.awt.Component;
 
-import javax.swing.JTextField;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
-
-/**
- * A configurable parameter of a {@link ModelAnalyzer} of <CODE>String</CODE> type.
- *
- * @author Brandon Bassett
- */
-public class StringParameter extends AbstractTextFieldParameter
+public class OptionMap
 {
-  public StringParameter(final StringParameter template)
+
+  //#########################################################################
+  //# Constructors
+  public OptionMap()
   {
-    this(template.getID(), template.getName(),
-         template.getDescription(), template.getValue());
+    this(null);
   }
 
-  StringParameter(final int id, final String name,
-                  final String description, final String value)
+  public OptionMap(final OptionMap parent)
   {
-    super(id, name, description);
-    mValue = value;
+    mParentMap = parent;
+    mMap = new HashMap<>();
   }
 
-  public String getValue()
+
+  //#########################################################################
+  //# Simple Access
+  public Option<?> get(final String id)
   {
-    return mValue;
+    Option<?> param = mMap.get(id);
+    if (param != null) {
+      return param;
+    }
+    if (mParentMap != null) {
+      param = mParentMap.get(id);
+      if (param != null) {
+        param = param.clone();
+        mMap.put(id, param);
+        return param;
+      }
+    }
+    return null;
   }
 
-  public void setValue(final String val)
+  public void add(final Option<?> param)
   {
-    mValue = val;
+    final String id = param.getID();
+    mMap.put(id, param);
   }
 
-  @Override
-  public Component createComponent(final ProductDESContext model)
+
+  //#########################################################################
+  //# Manipulating Option Lists
+  public void append(final List<Option<?>> list, final String id)
   {
-    final JTextField textField = (JTextField) super.createComponent(model);
-    textField.setText(mValue);
-    return textField;
+    final Option<?> option = get(id);
+    assert option != null;
+    list.add(option);
   }
 
-  @Override
-  protected String filterText(final String text)
+  public void prepend(final List<Option<?>> list, final String id)
   {
-    //no filter, return text
-    return text;
+    final Option<?> option = get(id);
+    assert option != null;
+    list.add(0, option);
   }
 
-  @Override
-  public void updateFromGUI(final ParameterPanel panel)
+  public boolean remove(final List<Option<?>> list, final String id)
   {
-    final Component comp = panel.getEntryComponent();
-    final JTextField textField = (JTextField) comp;
-    setValue(textField.getText());
+    final Iterator<Option<?>> iter = list.iterator();
+    while (iter.hasNext()) {
+      final Option<?> option = iter.next();
+      if (option.hasID(id)) {
+        iter.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
-  @Override
-  public void displayInGUI(final ParameterPanel panel)
-  {
-    final Component comp = panel.getEntryComponent();
-    final JTextField textField = (JTextField) comp;
-    textField.setText(mValue);
-  }
-
-  @Override
-  public void updateFromParameter(final Parameter p)
-  {
-    mValue = ((StringParameter) p).getValue();
-  }
-
-  @Override
-  public String toString()
-  {
-    return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
-  }
 
   //#########################################################################
   //# Data Members
-  private String mValue;
+  private final OptionMap mParentMap;
+  private final Map<String,Option<?>> mMap;
+
 }

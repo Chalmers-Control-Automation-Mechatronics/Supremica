@@ -33,84 +33,67 @@
 
 package net.sourceforge.waters.analysis.options;
 
-
-import java.awt.Component;
-
-import javax.swing.JLabel;
-
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer}.
+ * A configurable parameter of a {@link ModelAnalyzer} representing a
+ * positive integer. This parameter is represented as an <CODE>int</CODE>
+ * value, with an allowable range from 0 to {@link Integer#MAX_VALUE}.
+ * The maximum value is typically the default and represents an undefined
+ * parameter value.
  *
- * @author Brandon Bassett
+ * @author Brandon Bassett, Robi Malik
  */
-public abstract class Parameter
-{
 
+public class PositiveIntOption extends Option<Integer>
+{
   //#########################################################################
   //# Constructors
-  protected Parameter(final int id, final String name, final String description)
+  /**
+   * Creates a positive integer parameter with {@link Integer#MAX_VALUE}
+   * as its default.
+   */
+  public PositiveIntOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption)
   {
-    mID = id;
-    mName = name;
-    mDescription = description;
+    this(id, shortName, description, commandLineOption, Integer.MAX_VALUE);
   }
-
-
-  //#########################################################################
-  //# Simple Access
-  public int getID()
-  {
-    return mID;
-  }
-
-  public boolean isSameParameter(final Parameter param)
-  {
-    return mID == param.mID;
-  }
-
-  public String getName()
-  {
-    return mName;
-  }
-
-  public String getDescription()
-  {
-    return mDescription;
-  }
-
-  public void commitValue()
-  {
-  }
-
-  public abstract void updateFromParameter(Parameter p);
-
-
-  //#########################################################################
-  //# GUI
-  public JLabel createLabel()
-  {
-    return new JLabel(mName);
-  }
-
-  public abstract Component createComponent(ProductDESContext model);
 
   /**
-   * Updates parameter value using the component stored in the passed panel
-   * Used when committing a parameter from panel
+   * Creates a positive integer parameter with a specified default.
    */
-  public abstract void updateFromGUI(ParameterPanel panel);
-
-  //To be removed
-  public void displayInGUI(final ParameterPanel panel) {}
+  public PositiveIntOption(final String id,
+                           final String shortName,
+                           final String description,
+                           final String commandLineOption,
+                           final int defaultValue)
+  {
+    super(id, shortName, description, commandLineOption, defaultValue);
+  }
 
 
   //#########################################################################
-  //# Data Members
-  private final int mID;
-  private final String mName;
-  private final String mDescription;
+  //# Type-specific Access
+  public int getIntValue()
+  {
+    return getValue().intValue();
+  }
+
+  public void setValue(final int value)
+  {
+    super.setValue(value);
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.analysis.options.Option
+  @Override
+  public OptionEditor<Integer> createEditor(final OptionContext context)
+  {
+    return context.createPositiveIntEditor(this);
+  }
 
 }

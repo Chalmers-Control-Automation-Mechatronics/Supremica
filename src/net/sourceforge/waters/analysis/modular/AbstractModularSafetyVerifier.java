@@ -35,9 +35,9 @@ package net.sourceforge.waters.analysis.modular;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.des.AbstractSafetyVerifier;
 import net.sourceforge.waters.model.analysis.des.SafetyDiagnostics;
 import net.sourceforge.waters.model.analysis.des.SafetyVerifier;
@@ -137,24 +137,33 @@ abstract class AbstractModularSafetyVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new EnumParameter<ModularHeuristicFactory.Method>(ParameterIDs.AbstractModularSafetyVerifier_HeuristicMethod) {
-      @Override
-      public void commitValue()
-      {
-        setHeuristicMethod(getValue());
-      }
-    });
-    list.add(0, new EnumParameter<ModularHeuristicFactory.Preference>(ParameterIDs.AbstractModularSafetyVerifier_HeuristicPreference) {
-      @Override
-      public void commitValue()
-      {
-        setHeuristicPreference(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, ModularModelVerifierFactory.
+                        OPTION_AbstractModularSafetyVerifier_HeuristicPreference);
+    db.prepend(options, ModularModelVerifierFactory.
+                        OPTION_AbstractModularSafetyVerifier_HeuristicMethod);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(ModularModelVerifierFactory.
+                     OPTION_AbstractModularSafetyVerifier_HeuristicPreference)) {
+      final EnumOption<ModularHeuristicFactory.Preference> enumOption =
+        (EnumOption<ModularHeuristicFactory.Preference>) option;
+      setHeuristicPreference(enumOption.getValue());
+    } else if (option.hasID(ModularModelVerifierFactory.
+                            OPTION_AbstractModularSafetyVerifier_HeuristicMethod)) {
+      final EnumOption<ModularHeuristicFactory.Method> enumOption =
+        (EnumOption<ModularHeuristicFactory.Method>) option;
+      setHeuristicMethod(enumOption.getValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

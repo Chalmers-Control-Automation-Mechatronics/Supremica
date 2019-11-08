@@ -251,16 +251,17 @@ public class EventDeclEditorDialog
       mKindLabel = new JLabel("Kind:");
       mKindGroup = new ButtonGroup();
       mControllableButton =
-        new IconRadioButton("Controllable",
-                            IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE,
-                            mKindGroup, 'c');
+        new IconRadioButton<>(EventKind.CONTROLLABLE, "Controllable",
+                              IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE,
+                              mKindGroup, 'c');
       mUncontrollableButton =
-        new IconRadioButton("Uncontrollable",
-                            IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
-                            mKindGroup, 'u');
+        new IconRadioButton<>(EventKind.UNCONTROLLABLE, "Uncontrollable",
+                              IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE,
+                              mKindGroup, 'u');
       mPropositionButton =
-        new IconRadioButton("Proposition", PropositionIcon.getDefaultMarkedIcon(),
-                            mKindGroup, 'p');
+        new IconRadioButton<>(EventKind.PROPOSITION, "Proposition",
+                              PropositionIcon.getDefaultMarkedIcon(),
+                              mKindGroup, 'p');
       mPropositionButton.setEnabled(advanced);
       switch (template.getKind()) {
       case CONTROLLABLE:
@@ -1383,9 +1384,9 @@ public class EventDeclEditorDialog
   private SimpleExpressionInputCell mNameInput;
   private JLabel mKindLabel;
   private ButtonGroup mKindGroup;
-  private IconRadioButton mControllableButton;
-  private IconRadioButton mUncontrollableButton;
-  private IconRadioButton mPropositionButton;
+  private IconRadioButton<EventKind> mControllableButton;
+  private IconRadioButton<EventKind> mUncontrollableButton;
+  private IconRadioButton<EventKind> mPropositionButton;
   private JCheckBox mObservableButton;
   private JCheckBox mParameterButton;
   private JCheckBox mRequiredButton;

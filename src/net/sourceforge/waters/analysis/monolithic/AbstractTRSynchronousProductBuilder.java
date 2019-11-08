@@ -38,11 +38,11 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.Collection;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.ComponentKindParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ComponentKindOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntArrayBuffer;
@@ -53,6 +53,7 @@ import net.sourceforge.waters.analysis.tr.TRSynchronousProductStateMap;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.AbstractModelBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
@@ -166,45 +167,48 @@ public abstract class AbstractTRSynchronousProductBuilder
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new ComponentKindParameter
-        (ParameterIDs.SynchronousProductBuilder_OutputKind) {
-      @Override
-      public void commitValue() {
-        setOutputKind(getValue());
-      }
-    });
-    list.add(0, new StringParameter
-        (ParameterIDs.SynchronousProductBuilder_OutputName) {
-      @Override
-      public void commitValue() {
-        setOutputName(getValue());
-      }
-    });
-    list.add(0, new BoolParameter
-        (ParameterIDs.SynchronousProductBuilder_DetailedOutputEnabled) {
-      @Override
-      public void commitValue() {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops) {
-      @Override
-      public void commitValue() {
-        setRemovingSelfloops(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.MonolithicSynchronousProductBuilder_PruningDeadlocks) {
-      @Override
-      public void commitValue() {
-        setPruningDeadlocks(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+               OPTION_SynchronousProductBuilder_OutputKind);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+               OPTION_SynchronousProductBuilder_OutputName);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+               OPTION_SynchronousProductBuilder_DetailedOutputEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_RemovingSelfloops);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_SynchronousProductBuilder_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_OutputName)) {
+      final StringOption stringOption = (StringOption) option;
+      setOutputName(stringOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_OutputKind)) {
+      final ComponentKindOption kindOption = (ComponentKindOption) option;
+      setOutputKind(kindOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_RemovingSelfloops)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setRemovingSelfloops(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_PruningDeadlocks)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setPruningDeadlocks(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

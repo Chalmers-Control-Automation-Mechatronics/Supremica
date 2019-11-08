@@ -56,16 +56,17 @@ import java.util.Set;
 
 import net.sourceforge.waters.analysis.compositional.Candidate;
 import net.sourceforge.waters.analysis.monolithic.MonolithicSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.cpp.analysis.NativeConflictChecker;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -438,54 +439,57 @@ public class CompositionalGeneralisedConflictChecker
   }
 
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new EnumParameter<PreselectingHeuristicFactory>
-        (ParameterIDs.CompositionalGeneralisedConflictChecker_PreselectingHeuristic) {
-      @Override
-      public void commitValue() {
-        setPreselectingHeuristicFactory(getValue());
-      }
-    });
-    list.add(new EnumParameter<SelectingHeuristicFactory>
-        (ParameterIDs.CompositionalGeneralisedConflictChecker_SelectingHeuristic) {
-      @Override
-      public void commitValue() {
-        setSelectingHeuristicFactory(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit) {
-      @Override
-      public void commitValue() {
-        setInternalStepNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit) {
-      @Override
-      public void commitValue() {
-        setInternalStepTransitionLimit(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
-    {
-      @Override
-      public void commitValue()
-      {
-        setFinalStepNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter
-        (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit) {
-      @Override
-      public void commitValue() {
-        setFinalStepTransitionLimit(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, GNBModelVerifierFactory.
+              OPTION_CompositionalGeneralisedConflictChecker_PreselectingHeuristic);
+    db.append(options, GNBModelVerifierFactory.
+              OPTION_CompositionalGeneralisedConflictChecker_SelectingHeuristic);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_InternalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_InternalTransitionLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_FinalTransitionLimit);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(GNBModelVerifierFactory.
+                     OPTION_CompositionalGeneralisedConflictChecker_PreselectingHeuristic)) {
+      final EnumOption<PreselectingHeuristicFactory> enumOption =
+        (EnumOption<PreselectingHeuristicFactory>) option;
+      setPreselectingHeuristicFactory(enumOption.getValue());
+    } else if (option.hasID(GNBModelVerifierFactory.
+                            OPTION_CompositionalGeneralisedConflictChecker_SelectingHeuristic)) {
+      final EnumOption<SelectingHeuristicFactory> enumOption =
+        (EnumOption<SelectingHeuristicFactory>) option;
+      setSelectingHeuristicFactory(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalStepNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalStepTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setFinalStepNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setFinalStepTransitionLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

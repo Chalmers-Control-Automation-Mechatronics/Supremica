@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.cpp.analysis;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentFlag;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
@@ -128,6 +131,27 @@ public class NativeModelVerifierFactory
   }
 
 
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new BooleanOption
+             (OPTION_NativeModelAnalyzer_EventTreeEnabled,
+              "Use branching program",
+              "Compile the event enablement condition into a branching program " +
+              "to speed up synchronous product computation.",
+              "-et",
+              true));
+    db.add(new EnumOption<ConflictCheckMode>
+             (OPTION_NativeConflictChecker_ConflictCheckMode,
+              "Conflict check mode",
+              "The strategy used to store or explore the reverse transition relation",
+              "-mode",
+              ConflictCheckMode.values(),
+              ConflictCheckMode.NO_BACKWARDS_TRANSITIONS));
+  }
+
+
   //#########################################################################
   //# Inner Class CommandLineArgumentDumpStateAware
   private static class CommandLineArgumentDumpStateAware
@@ -197,5 +221,13 @@ public class NativeModelVerifierFactory
       }
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_NativeModelAnalyzer_EventTreeEnabled =
+    "NativeModelAnalyzer.EventTreeEnabled";
+  public static final String OPTION_NativeConflictChecker_ConflictCheckMode =
+    "NativeConflictChecker.ConflictCheckMode";
 
 }

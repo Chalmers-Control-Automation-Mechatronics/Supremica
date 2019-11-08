@@ -52,9 +52,9 @@ package org.supremica.automata.waters;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.DefaultVerificationResult;
@@ -193,17 +193,24 @@ public  class SupremicaMonolithicVerifier
   }
 
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter(ParameterIDs.SupremicaMonolithicVerifier_DetailedOutputEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaMonolithicVerifier_DetailedOutputEnabled);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(SupremicaModelAnalyzerFactory.
+                     OPTION_SupremicaMonolithicVerifier_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

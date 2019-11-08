@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.modular;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.cpp.analysis.NativeControllabilityChecker;
 import net.sourceforge.waters.cpp.analysis.NativeLanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
@@ -108,6 +111,68 @@ public class ModularModelVerifierFactory
     (final ProductDESProxyFactory factory)
   {
     return new ModularControllabilitySynthesizer(factory);
+  }
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new EnumOption<ModularHeuristicFactory.Method>
+             (OPTION_AbstractModularSafetyVerifier_HeuristicMethod,
+              "Heuristic Method",
+              "Strategy to select additional components when a subsystem " +
+              "fails the check during modular verification.",
+              "-heuristic",
+              ModularHeuristicFactory.Method.values(),
+              ModularHeuristicFactory.Method.MaxCommonEvents));
+    db.add(new EnumOption<ModularHeuristicFactory.Preference>
+             (OPTION_AbstractModularSafetyVerifier_HeuristicPreference,
+              "Heuristic Preference",
+              "What kind of plants are selected preferentially by the heuristic.",
+              "-preference",
+              ModularHeuristicFactory.Preference.values(),
+              ModularHeuristicFactory.Preference.NOPREF));
+
+    db.add(new BooleanOption
+             (OPTION_ModularControllabilityChecker_CollectsFailedSpecs,
+              "Collect failed specifications",
+              "Continue checking if a specification is found not controllable.",
+              "-collect",
+              false));
+    db.add(new BooleanOption
+             (OPTION_ModularControllabilityChecker_StartsWithSmallestSpec,
+              "Start with smallest spefication",
+              "Sort the specifications by number of states, and start " +
+              "with the smallest.",
+              "-so",
+              true));
+
+    db.add(new BooleanOption
+             (OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis,
+              "Locally nonblocking supervisors",
+              "Attempt to synthesise nonblocking supervisors each time a subsystem " +
+              "is sent for monolithic synthesis. While this may help to remove some " +
+              "blocking states, it does not ensure a globally nonblocking supervisor.",
+              "-nb",
+              false));
+    db.add(new BooleanOption
+             (OPTION_ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors,
+              "Remove unnecessary supervisors",
+              "Check whether new superivsors impose additional constraints over " +
+              "those previously computed, and remove those that do not.",
+              "-remove",
+              true));
+
+    db.add(new EnumOption<AutomataGroup.MergeVersion>
+             (OPTION_ModularControlLoopChecker_MergeVersion,
+              "Selection heuristic",
+              "The heuristic to determine which components to include in " +
+              "subsequent verification attempts based on the counterexample " +
+              "from the previous attempt.",
+              "-heuristic",
+              AutomataGroup.MergeVersion.values(),
+              AutomataGroup.MergeVersion.MaxCommonEvents));
   }
 
 
@@ -219,5 +284,33 @@ public class ModularModelVerifierFactory
   //#########################################################################
   //# Class Variables
   private static ModularModelVerifierFactory theInstance = null;
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String
+    OPTION_AbstractModularSafetyVerifier_HeuristicMethod =
+    "AbstractModularSafetyVerifier.HeuristicMethod";
+  public static final String
+    OPTION_AbstractModularSafetyVerifier_HeuristicPreference =
+    "AbstractModularSafetyVerifier.HeuristicPreference";
+
+  public static final String
+    OPTION_ModularControllabilityChecker_CollectsFailedSpecs =
+    "ModularControllabilityChecker.CollectsFailedSpecs";
+  public static final String
+    OPTION_ModularControllabilityChecker_StartsWithSmallestSpec =
+    "ModularControllabilityChecker.StartsWithSmallestSpec";
+
+  public static final String
+    OPTION_ModularControllabilitySynthesizer_NonblockingSynthesis =
+    "ModularControllabilitySynthesizer.NonblockingSynthesis";
+  public static final String
+    OPTION_ModularControllabilitySynthesizer_RemovingUnnecessarySupervisors =
+    "ModularControllabilitySynthesizer.RemovingUnnecessarySupervisors";
+
+  public static final String
+    OPTION_ModularControlLoopChecker_MergeVersion =
+    "ModularControlLoopChecker.MergeVersion";
 
 }

@@ -59,12 +59,12 @@ import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductResult;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.FileParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.DuplicateFreeQueue;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -76,6 +76,7 @@ import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.EnumFactory;
 import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.EventOnlyKindTranslator;
@@ -399,109 +400,89 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new EnumParameter<TRPreselectionHeuristic>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic) {
-        @Override
-        public void commitValue() {
-          setPreselectionHeuristic(getValue());
-        }
-      });
-    list.add(new EnumParameter<SelectionHeuristic<TRCandidate>>
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic) {
-        @Override
-        public void commitValue() {
-          setSelectionHeuristic(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalStateLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setInternalStateLimit(getValue());
-        }
-      });
-    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setLowerInternalStateLimit, "LowerInternalStateLimit", "LowerInternalStateLimit", 0, Integer.MAX_VALUE));
-    // list.add(new IntParameter(ParameterIDs.AbstractCompositionalSynthesizer_setUpperInternalStateLimit, "UpperInternalStateLimit", "UpperInternalStateLimit", 0, Integer.MAX_VALUE));
-    list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_InternalTransitionLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setInternalTransitionLimit(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicStatelimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setMonolithicStateLimit(getValue());
-        }
-      });
-    list.add(new IntParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicTransitionLimit)
-      {
-        @Override
-        public void commitValue()
-        {
-          setMonolithicTransitionLimit(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_BlockedEventsEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setBlockedEventsEnabled(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_SelfLoopOnlyEventsEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setSelfloopOnlyEventsEnabled(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setAlwaysEnabledEventsEnabled(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_FailingEventsEnabled)
-      {
-        @Override
-        public void commitValue()
-        {
-          setFailingEventsEnabled(getValue());
-        }
-      });
-    //setMonolithicAnalyzer(ModelAnalyzer)  DialogParameter
-    list.add(new FileParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_MonolithicDumpFile)
-      {
-        @Override
-        public void commitValue()
-        {
-          setMonolithicDumpFile(getValue());
-        }
-      });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_InternalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_InternalTransitionLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelAnalyzer_FinalTransitionLimit);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile);
+    return options;
   }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                     OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic)) {
+      final EnumOption<TRPreselectionHeuristic> enumOption =
+        (EnumOption<TRPreselectionHeuristic>) option;
+      setPreselectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic)) {
+      final EnumOption<SelectionHeuristic<TRCandidate>> enumOption =
+        (EnumOption<SelectionHeuristic<TRCandidate>>) option;
+      setSelectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalStateLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_InternalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setInternalTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setMonolithicStateLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setMonolithicTransitionLimit(intOption.getIntValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setBlockedEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setFailingEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSelfloopOnlyEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setAlwaysEnabledEventsEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile)) {
+      final FileOption fileOption = (FileOption) option;
+      setMonolithicDumpFile(fileOption.getValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.Abortable

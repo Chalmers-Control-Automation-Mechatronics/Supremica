@@ -33,66 +33,39 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import java.io.File;
+import java.util.Set;
 
-import javax.swing.JComponent;
-import javax.swing.JPanel;
+import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 
-public class ParameterPanel extends JPanel
+public interface OptionContext
 {
-  public ParameterPanel(final Parameter param, final ProductDESContext model)
-  {
-    setLayout(new BorderLayout());
-    mParameter = param;
-    add(mParameter.createLabel(), BorderLayout.WEST);
-    add(mParameter.createComponent(model), BorderLayout.EAST);
+  public ProductDESProxy getProductDES();
 
-    toolTip(getComponents());
-  }
+  public OptionEditor<Boolean>
+  createBooleanEditor(BooleanOption option);
 
-  /**
-   * Recursively sets tooltip for components
-   * @param StoredComponents is the array of components to have their toolTip set
-   */
-  public void toolTip(final Component[] StoredComponents) {
+  public OptionEditor<ComponentKind>
+  createComponentKindEditor(ComponentKindOption option);
 
-    for (final Component component : StoredComponents)
-      if(component instanceof JPanel) {
-        toolTip(((JPanel) component).getComponents());
-      }
-      else
-        ((JComponent) component).setToolTipText(mParameter.getDescription());
-  }
+  public <E> OptionEditor<E>
+  createEnumEditor(EnumOption<E> option);
 
-  /**
-   * Updates stored parameter with itself
-   */
-  public void commitParameter()
-  {
-    mParameter.updateFromGUI(this);
-  }
+  public OptionEditor<Set<EventProxy>>
+  createEventSetEditor(EventSetOption option);
 
-  //Updates parameter and itself with other panel
-  //no longer used, to be removed
-  public void copyFromPanel(final ParameterPanel panel)
-  {
-    mParameter.updateFromGUI(panel);
-    mParameter.displayInGUI(this);
-  }
+  public OptionEditor<File>
+  createFileEditor(FileOption fileOption);
 
-  public Parameter getParameter()
-  {
-    return mParameter;
-  }
+  public OptionEditor<Integer>
+  createPositiveIntEditor(PositiveIntOption option);
 
-  public Component getEntryComponent()
-  {
-    return getComponents()[1];
-  }
+  public OptionEditor<EventProxy>
+  createPropositionEditor(PropositionOption option);
 
-  //#########################################################################
-  //# Data Members
-  private static final long serialVersionUID = 1L;
-  private final Parameter mParameter;
+  public OptionEditor<String>
+  createStringEditor(StringOption option);
+
 }

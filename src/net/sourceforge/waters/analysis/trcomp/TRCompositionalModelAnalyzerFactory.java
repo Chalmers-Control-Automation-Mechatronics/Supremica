@@ -39,6 +39,10 @@ import java.io.PrintStream;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.compositional.ChainSelectionHeuristic;
 import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.FileOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentBoolean;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentChain;
@@ -137,6 +141,92 @@ public class TRCompositionalModelAnalyzerFactory
   {
     return new TRCompositionalStateCounter();
   }
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled,
+              "Use always enabled events",
+              "Detect events that are enabled in all states outside of the " +
+              "subsystem being abstracted, and use this information to help " +
+              "with minimisation.",
+              "-ae",
+              true));
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled,
+              "Use blocked events",
+              "Detect and remove events known to be globablly disabled.",
+              "-be",
+              true));
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled,
+              "Use failing events",
+              "Detect events that only lead to blocking states and " +
+              "simplify automata based on this information.",
+              "-fe",
+              true));
+    db.add(new FileOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile,
+              "Dump file name",
+              "If set, any abstracted model will be written to this file " +
+              "before being sent for monolithic analysis.",
+              "-dump"));
+    db.add(new EnumOption<TRPreselectionHeuristic>
+             (OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic,
+              "Preselection method",
+              "Preselection heuristic to generate groups of automata to consider " +
+              "for composition.",
+              "-presel",
+              AbstractTRCompositionalModelAnalyzer.getPreselectionHeuristicFactoryStatic()));
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled,
+              "Use selfloop-only events",
+              "Detect events that are appear only as selfloop outside of the " +
+              "subsystem being abstracted, and use this information to help " +
+              "with minimisation.",
+              "-se",
+              true));
+    db.add(new EnumOption<SelectionHeuristic<TRCandidate>>
+             (OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic,
+              "Selection method",
+              "Heuristic to choose the group of automata to compose and simplify " +
+              "from the options produced by the preselection method.",
+              "-sel",
+              AbstractTRCompositionalModelAnalyzer.getSelectionHeuristicFactoryStatic()));
+
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled,
+              "Counterexample debugging",
+              "When computing counterexamples, perform debug checks to ensure " +
+              "that the counterexample is accepted after every abstraction step.",
+              "-tc",
+              false));
+
+    db.add(new EnumOption<TRPreselectionHeuristic>
+             (OPTION_TRCompositionalConflictChecker_PreselectionHeuristic,
+              "Preselection method",
+              "Preselection heuristic to generate groups of automata to consider " +
+              "for composition.",
+              "-presel",
+              TRCompositionalConflictChecker.getPreselectionHeuristicFactoryStatic()));
+    db.add(new EnumOption<SelectionHeuristic<TRCandidate>>
+             (OPTION_TRCompositionalConflictChecker_SelectionHeuristic,
+              "Selection method",
+              "Heuristic to choose the group of automata to compose and simplify " +
+              "from the options produced by the preselection method.",
+              "-sel",
+              TRCompositionalConflictChecker.getSelectionHeuristicFactoryStatic()));
+    db.add(new EnumOption<TRToolCreator<TransitionRelationSimplifier>>
+             (OPTION_TRCompositionalConflictChecker_SimplifierCreator,
+              "Abstraction procedure",
+              "Abstraction procedure to simplify automata during TRCompositional " +
+              "minimisation.",
+              "-method",
+              TRCompositionalConflictChecker.getTRSimplifierFactoryStatic()));
+ }
 
 
   //#########################################################################
@@ -663,5 +753,44 @@ public class TRCompositionalModelAnalyzerFactory
       composer.setMonolithicDumpFile(file);
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_AlwaysEnabledEventsEnabled =
+    "AbstractTRCompositionalModelAnalyzer.AlwaysEnabledEventsEnabled";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled =
+    "AbstractTRCompositionalModelAnalyzer.BlockedEventsEnabled";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_FailingEventsEnabled =
+    "AbstractTRCompositionalModelAnalyzer.FailingEventsEnabled";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile =
+    "AbstractTRCompositionalModelAnalyzer.MonolithicDumpFile";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic =
+    "AbstractTRCompositionalModelAnalyzer.PreselectionHeuristic";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_SelfloopOnlyEventsEnabled =
+    "AbstractTRCompositionalModelAnalyzer.SelfloopOnlyEventsEnabled";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic =
+    "AbstractTRCompositionalModelAnalyzer.SelectionHeuristic";
+
+  public static final String
+    OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled =
+    "AbstractTRCompositionalModelVerifier.TraceCheckingEnabled";
+
+  public static final String
+    OPTION_TRCompositionalConflictChecker_SimplifierCreator =
+    "TRCompositionalConflictChecker.SimplifierCreator";
+  public static final String
+    OPTION_TRCompositionalConflictChecker_PreselectionHeuristic =
+    "TRCompositionalConflictChecker.PreselectionHeuristic";
+  public static final String
+    OPTION_TRCompositionalConflictChecker_SelectionHeuristic =
+    "TRCompositionalConflictChecker.SelectionHeuristic";
 
 }

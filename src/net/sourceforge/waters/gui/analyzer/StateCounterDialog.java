@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -51,7 +52,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * @author Brandon Bassett
  */
-public class StateCounterDialog extends AbstractAnalysisDialog
+public class StateCounterDialog extends ParametrisedAnalysisDialog
 {
 
   //#######################################################################

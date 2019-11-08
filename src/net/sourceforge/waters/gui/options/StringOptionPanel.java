@@ -31,86 +31,85 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.options;
 
-import java.util.List;
-import java.util.Map;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.Icon;
+import javax.swing.JTextField;
 
-import net.sourceforge.waters.analysis.options.ProductDESContext;
-import net.sourceforge.waters.gui.ModuleContext;
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.compiler.context.SourceInfo;
-import net.sourceforge.waters.model.des.AutomatonProxy;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
-import net.sourceforge.waters.model.module.EventDeclProxy;
-
-import org.supremica.gui.ide.ModuleContainer;
+import net.sourceforge.waters.analysis.options.StringOption;
 
 
-public class AnalyzerProductDESContext
-  implements ProductDESContext
+class StringOptionPanel
+  extends OptionPanel<String>
+  implements ActionListener
 {
-
-  //#########################################################################
-  //# Constructor
-  public AnalyzerProductDESContext(final WatersAnalyzerPanel panel)
-  {
-    mModuleContainer = panel.getModuleContainer();
-    mAnalyzerPanel = panel;
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.ProductDESContext
-  @Override
-  public ProductDESProxy getProductDES()
-  {
-    return mModuleContainer.getCompiledDES();
-  }
-
-  @Override
-  public List<AutomatonProxy> getActiveAutomata()
-  {
-    return mAnalyzerPanel.getAutomataTable().getOperationArgument();
-  }
-
-  @Override
-  public Icon getEventIcon(final EventProxy event)
-  {
-    final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(event);
-    if (info == null) {
-      return null;
-    }
-    final Proxy proxy = info.getSourceObject();
-    if (!(proxy instanceof EventDeclProxy)) {
-      return null;
-    }
-    final EventDeclProxy decl = (EventDeclProxy) proxy;
-    final ModuleContext context = mModuleContainer.getModuleContext();
-    return context.getIcon(decl);
-  }
-
-  @Override
-  public Icon getComponentKindIcon(final ComponentKind kind)
-  {
-    return ModuleContext.getComponentKindIcon(kind);
-  }
-
-  @Override
-  public String getComponentKindText(final ComponentKind kind)
-  {
-    return ModuleContext.getComponentKindToolTip(kind);
-  }
-
-
   //#########################################################################
   //# Constructors
-  private final ModuleContainer mModuleContainer;
-  private final WatersAnalyzerPanel mAnalyzerPanel;
+  StringOptionPanel(final GUIOptionContext context,
+                    final StringOption option)
+  {
+    super(context, option);
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  @Override
+  JTextField getEntryComponent()
+  {
+    return (JTextField) super.getEntryComponent();
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.OptionEditor
+  @Override
+  public StringOption getOption()
+  {
+    return (StringOption) super.getOption();
+  }
+
+  @Override
+  public boolean commitValue()
+  {
+    final StringOption option = getOption();
+    final String value = getInputText();
+    option.setValue(value);
+    return true;
+  }
+
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.OptionPanel
+  @Override
+  JTextField createEntryComponent()
+  {
+    final StringOption option = getOption();
+    final String value = option.getValue();
+    final JTextField textField = new JTextField(value);
+    textField.addActionListener(this);
+    textField.setColumns(10);
+    return textField;
+  }
+
+
+  //#########################################################################
+  //# Hooks
+  String getInputText()
+  {
+    final JTextField textField = getEntryComponent();
+    return textField.getText();
+  }
+
+
+  //#########################################################################
+  //# Interface java.awt.event.ActionListener
+  @Override
+  public void actionPerformed(final ActionEvent event)
+  {
+    commitValue();
+  }
 
 }

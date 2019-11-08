@@ -40,7 +40,7 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 /**
  * Enumeration of preselecting heuristics for
  * {@link CompositionalGeneralisedConflictChecker} to facilitate configuration
- * through {@link net.sourceforge.waters.analysis.options.Parameter
+ * through {@link net.sourceforge.waters.analysis.options.Option
  * Parameter} interface.
  *
  * @author Robi Malik

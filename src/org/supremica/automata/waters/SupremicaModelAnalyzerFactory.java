@@ -50,6 +50,9 @@
 
 package org.supremica.automata.waters;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -121,5 +124,115 @@ public class SupremicaModelAnalyzerFactory
   {
     return new SupremicaSynchronousProductBuilder(factory);
   }
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+
+    db.add(new BooleanOption
+             (OPTION_SupremicaMonolithicVerifier_DetailedOutputEnabled,
+              "Print counterexample",
+              "Show trace to bad state as info in log.",
+              "-out",
+              false));
+
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant,
+              "Add uncontrollables to plant",
+              "Treat uncontrollable events that appear in specifications " +
+              "but not in plants as always enabled.",
+              "-aup",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_ExpandingForbiddenStates,
+              "Expand forbidden states",
+              "If enabled, transitions from forbidden states are examined. " +
+              "Otherwise forbidden states are considered terminal.",
+              "-ef",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden,
+              "Forbid uncontrollable states",
+              "Mark uncontrollable states as forbidden in the synchronous composition.",
+              "-fu",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_RememberingDisabledEvents,
+              "Remember disabled events",
+              "Add transitions to a 'dump' state for all events enabled in the plant " +
+              "but disabled by a specification.",
+              "-du",
+              false));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_ShortStateNames,
+              "Short state names",
+              "Use short state instead of detailed state tuple information.",
+              "-short",
+              false));
+    db.add(new StringOption
+             (OPTION_SupremicaSynchronousProductBuilder_StateNameSeparator,
+              "State name separator",
+              "Separator for state tuple components when using long state names.",
+              "-sep",
+               "."));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents,
+              "Synchronise on unobservable events",
+              "If enabled, treat unoberservable as shared events in synchronisation, " +
+              "otherwise allow them to be executed independently by each component.",
+              "-uos",
+              true));
+
+    db.add(new BooleanOption
+             (OPTION_SupremicaSupervisorSynthesizer_Purging,
+              "Purge result",
+              "Remove unreachable states from the synthesised supervisor.",
+              "-pirge",
+              true));
+    db.add(new BooleanOption
+             (OPTION_SupremicaSupervisorSynthesizer_SupervisorReduction,
+              "Reduce supervisors",
+              "Minimize computed supervisors using min-state algorithm.",
+              "-red",
+              false));
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String
+    OPTION_SupremicaMonolithicVerifier_DetailedOutputEnabled =
+    "SupremicaMonolithicVerifier.DetailedOutputEnabled";
+
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant =
+    "SupremicaSynchronousProductBuilder.EnsuringUncontrollablesInPlant";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_ExpandingForbiddenStates =
+    "SupremicaSynchronousProductBuilder.ExpandingForbiddenStates";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden =
+    "SupremicaSynchronousProductBuilder.MarkingUncontrollableStatesAsForbidden";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_RememberingDisabledEvents =
+    "SupremicaSynchronousProductBuilder.RememberingDisabledEvents";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_ShortStateNames =
+    "SupremicaSynchronousProductBuilder.ShortStateNames";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_StateNameSeparator =
+    "SupremicaSynchronousProductBuilder.StateNameSeparator";
+  public static final String
+    OPTION_SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents =
+    "SupremicaSynchronousProductBuilder.SynchronisingOnUnobservableEvents";
+
+  public static final String
+    OPTION_SupremicaSupervisorSynthesizer_Purging =
+    "SupremicaSupervisorSynthesizer.Purging";
+  public static final String
+    OPTION_SupremicaSupervisorSynthesizer_SupervisorReduction =
+    "SupremicaSupervisorSynthesizer.SupervisorReduction";
 
 }

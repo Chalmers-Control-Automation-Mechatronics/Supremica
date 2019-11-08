@@ -33,6 +33,8 @@
 
 package net.sourceforge.waters.analysis.gnonblocking;
 
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentInteger;
 import net.sourceforge.waters.model.analysis.CommandLineArgumentString;
 import net.sourceforge.waters.model.analysis.EnumFactory;
@@ -109,6 +111,27 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
   {
     return new CanonicalGeneralisedConflictChecker(null, factory);
   }*/
+
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    super.registerOptions(db);
+    db.add(new EnumOption<PreselectingHeuristicFactory>
+             (OPTION_CompositionalGeneralisedConflictChecker_PreselectingHeuristic,
+              "Preselection method",
+              "Preselection heuristic to generate groups of automata to consider " +
+              "for composition.",
+              "-presel",
+              PreselectingHeuristicFactory.getInstance()));
+    db.add(new EnumOption<SelectingHeuristicFactory>
+             (OPTION_CompositionalGeneralisedConflictChecker_SelectingHeuristic,
+              "Selection method",
+              "Heuristic to choose the group of automata to compose and simplify " +
+              "from the options produced by the preselection method.",
+              "-sel",
+              SelectingHeuristicFactory.getInstance()));
+  }
 
 
   //#########################################################################
@@ -305,5 +328,15 @@ public class GNBModelVerifierFactory extends AbstractModelAnalyzerFactory
       }
     }
   }
+
+
+  //#########################################################################
+  //# Class Constants
+  public static final String
+    OPTION_CompositionalGeneralisedConflictChecker_PreselectingHeuristic =
+    "CompositionalGeneralisedConflictChecker.PreselectingHeuristic";
+  public static final String
+    OPTION_CompositionalGeneralisedConflictChecker_SelectingHeuristic =
+    "CompositionalGeneralisedConflictChecker.SelectingHeuristic";
 
 }

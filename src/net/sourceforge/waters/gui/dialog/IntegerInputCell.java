@@ -53,6 +53,17 @@ public class IntegerInputCell
   //#########################################################################
   //# Constructors
   /**
+   * Creates an integer input cell for non-negative integers.
+   * The cell created by this constructor accepts values between 0 and
+   * {@link Integer#MAX_VALUE}, where an empty input is interpreted as
+   * {@link Integer#MAX_VALUE}.
+   */
+  public IntegerInputCell()
+  {
+    this(0, Integer.MAX_VALUE, Integer.MAX_VALUE);
+  }
+
+  /**
    * Creates an integer input cell for the given range.
    * This constructor creates an input cell that does not allow an empty input.
    * @param  minValue  The smallest acceptable number to be entered.
@@ -156,11 +167,33 @@ public class IntegerInputCell
         return value;
       } catch (final NumberFormatException exception) {
         final StringBuilder builder = new StringBuilder();
-        builder.append("Please enter an integer between ");
-        builder.append(mMinValue);
-        builder.append(" and ");
-        builder.append(mMaxValue);
-        builder.append('.');
+        if (mMaxValue == Integer.MAX_VALUE) {
+          if (mMinValue == 0) {
+            builder.append("Please enter a non-negative integer.");
+          } else if (mMinValue == Integer.MIN_VALUE) {
+            builder.append("Please enter an integer.");
+          } else {
+            builder.append("Please enter an integer which is at least ");
+            builder.append(mMinValue);
+            builder.append('.');
+          }
+        } else {
+          if (mMinValue == 0) {
+            builder.append("Please enter a non-negative integer which is at most ");
+            builder.append(mMaxValue);
+            builder.append('.');
+          } else if (mMaxValue == Integer.MIN_VALUE) {
+            builder.append("Please enter an integer which is at most ");
+            builder.append(mMaxValue);
+            builder.append('.');
+          } else {
+            builder.append("Please enter an integer between ");
+            builder.append(mMinValue);
+            builder.append(" and ");
+            builder.append(mMaxValue);
+            builder.append('.');
+          }
+        }
         throw new ParseException(builder.toString(), 0);
       }
     }

@@ -33,78 +33,112 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.awt.Component;
-
-import javax.swing.JCheckBox;
 
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer} of <CODE>boolean</CODE> type.
+ * A configurable parameter of a {@link ModelAnalyzer}.
  *
  * @author Brandon Bassett
  */
-public class BoolParameter extends Parameter
+public abstract class Option<T> implements Cloneable
 {
-  public BoolParameter(final BoolParameter template)
+
+  //#########################################################################
+  //# Constructors
+  protected Option(final String id,
+                   final String shortName,
+                   final String description,
+                   final String commandLineOption,
+                   final T defaultValue)
   {
-   this(template.getID(), template.getName(),
-        template.getDescription(), template.getValue());
+    mID = id;
+    mShortName = shortName;
+    mDescription = description;
+    mCommandLineOption = commandLineOption;
+    mDefaultValue = mValue = defaultValue;
   }
 
-  BoolParameter(final int id, final String name,
-                final String description, final boolean value)
+
+  //#########################################################################
+  //# Interface java.lang.Cloneable
+  @Override
+  @SuppressWarnings("unchecked")
+  public Option<T> clone()
   {
-    super(id, name, description);
+    try {
+      return (Option<T>) super.clone();
+    } catch (final CloneNotSupportedException exception) {
+      throw new WatersRuntimeException(exception);
+    }
+  }
+
+
+  //#########################################################################
+  //# Simple Access
+  public String getID()
+  {
+    return mID;
+  }
+
+  public boolean hasID(final String id)
+  {
+    return mID.equals(id);
+  }
+
+  public String getShortName()
+  {
+    return mShortName;
+  }
+
+  public String getDescription()
+  {
+    return mDescription;
+  }
+
+  public String getCommandLineOption()
+  {
+    return mCommandLineOption;
+  }
+
+
+  //#########################################################################
+  //# Value Access
+  public T getDefaultValue()
+  {
+    return mDefaultValue;
+  }
+
+  public T getValue()
+  {
+    return mValue;
+  }
+
+  public void setValue(final T value)
+  {
     mValue = value;
   }
 
-  @Override
-  public Component createComponent(final ProductDESContext model)
+  public void restoreDefaultValue()
   {
-    return new JCheckBox("", mValue);
-  }
-
-  public boolean getValue() {
-      return mValue;
-  }
-
-  public void setValue(final boolean value) {
-      mValue = value;
-  }
-
- //Updates parameter value using the component stored in the passed panel
-  @Override
-  public void updateFromGUI(final ParameterPanel panel)
-  {
-    final Component comp = panel.getEntryComponent();
-    final JCheckBox checkBox = (JCheckBox) comp;
-    mValue = checkBox.isSelected();
+    mValue = mDefaultValue;
   }
 
 
-  @Override
-  public void displayInGUI(final ParameterPanel panel)
-  {
-    final Component comp = panel.getEntryComponent();
-    final JCheckBox checkBox = (JCheckBox) comp;
-    checkBox.setSelected(mValue);
-  }
+  //#########################################################################
+  //# Editor
+  public abstract OptionEditor<T> createEditor(OptionContext context);
 
-  @Override
-  public void updateFromParameter(final Parameter p)
-  {
-    mValue = ((BoolParameter) p).getValue();
-  }
-
-  @Override
-  public String toString()
-  {
-      return ("ID: " + getID() + " Name: " + getName() +" Value: " + getValue());
-  }
 
   //#########################################################################
   //# Data Members
-  private boolean mValue;
+  private final String mID;
+  private final String mShortName;
+  private final String mDescription;
+  private final String mCommandLineOption;
+  private final T mDefaultValue;
+  private T mValue;
+
 }

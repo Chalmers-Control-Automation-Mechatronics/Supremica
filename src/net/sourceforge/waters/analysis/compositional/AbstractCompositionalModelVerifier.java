@@ -43,12 +43,13 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
@@ -325,31 +326,36 @@ public abstract class AbstractCompositionalModelVerifier
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new BoolParameter(ParameterIDs.AbstractCompositionalModelVerifier_TraceCheckingEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setTraceCheckingEnabled(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_ShortCounterExampleRequested) {
-      @Override
-      public void commitValue()
-      {
-        setShortCounterExampleRequested(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.ModelVerifier_DetailedOutputEnabled) {
-      @Override
-      public void commitValue()
-      {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, CompositionalModelAnalyzerFactory.
+                        OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelVerifier_ShortCounterExampleRequested);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ModelVerifier_DetailedOutputEnabled);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ModelVerifier_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setShortCounterExampleRequested(boolOption.getBooleanValue());
+    } else if (option.hasID(CompositionalModelAnalyzerFactory.
+                            OPTION_AbstractCompositionalModelVerifier_TraceCheckingEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setTraceCheckingEnabled(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

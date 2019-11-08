@@ -54,16 +54,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.ComponentKindParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.IntParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
-import net.sourceforge.waters.analysis.options.StringParameter;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.ComponentKindOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.OverflowKind;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.DefaultSynchronousProductResult;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductBuilder;
 import net.sourceforge.waters.model.analysis.des.SynchronousProductResult;
@@ -366,99 +367,96 @@ public class SupremicaSynchronousProductBuilder
   }
 
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new StringParameter
-        (ParameterIDs.SupremicaSynchronousProductBuilder_StateNameSeparator) {
-      @Override
-      public void commitValue() {
-        setStateNameSeparator(getValue());
-      }
-    });
-    list.add(0, new BoolParameter
-        (ParameterIDs.SupremicaSynchronousProductBuilder_ShortStateNames) {
-      @Override
-      public void commitValue() {
-        setUsingShortStateNames(getValue());
-      }
-    });
-    list.add(0, new EventParameter
-        (ParameterIDs.SupervisorSynthesizer_ConfiguredDefaultMarking) {
-      @Override
-      public void commitValue() {
-        setConfiguredDefaultMarking(getValue());
-      }
-    });
-    list.add(0, new ComponentKindParameter
-        (ParameterIDs.SynchronousProductBuilder_OutputKind) {
-      @Override
-      public void commitValue() {
-        setOutputKind(getValue());
-      }
-    });
-    list.add(0, new StringParameter
-        (ParameterIDs.SynchronousProductBuilder_OutputName) {
-      @Override
-      public void commitValue() {
-        setOutputName(getValue());
-      }
-    });
-    list.add(0, new BoolParameter
-        (ParameterIDs.SynchronousProductBuilder_DetailedOutputEnabled) {
-      @Override
-      public void commitValue() {
-        setDetailedOutputEnabled(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SynchronousProductBuilder_RemovingSelfloops) {
-      @Override
-      public void commitValue() {
-        setRemovingSelfloops(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden) {
-      @Override
-      public void commitValue() {
-        setMarkingUncontrollableStatesAsForbidden(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SupremicaSynchronousProductBuilder_ExpandingForbiddenStates) {
-      @Override
-      public void commitValue() {
-        setExpandingForbiddenStates(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SupremicaSynchronousProductBuilder_RememberingDisabledEvents) {
-      @Override
-      public void commitValue() {
-        setRememberingDisabledEvents(getValue());
-      }
-    });
-    list.add(new BoolParameter
-        (ParameterIDs.SupremicaModelAnalyzer_EnsuringUncontrollablesInPlant) {
-      @Override
-      public void commitValue() {
-        setEnsuringUncontrollablesInPlant(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_NodeLimit) {
-      @Override
-      public void commitValue() {
-        setNodeLimit(getValue());
-      }
-    });
-    list.add(new IntParameter(ParameterIDs.ModelAnalyzer_TransitionLimit) {
-      @Override
-      public void commitValue() {
-        setTransitionLimit(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_StateNameSeparator);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_ShortStateNames);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_DetailedOutputEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_OutputName);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_OutputKind);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_SynchronousProductBuilder_RemovingSelfloops);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_ExpandingForbiddenStates);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_RememberingDisabledEvents);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_FinalStateLimit);
+    db.append(options, AbstractModelAnalyzerFactory.
+              OPTION_ModelAnalyzer_FinalTransitionLimit);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(SupremicaModelAnalyzerFactory.
+                     OPTION_SupremicaSynchronousProductBuilder_StateNameSeparator)) {
+      final StringOption stringOption = (StringOption) option;
+      setStateNameSeparator(stringOption.getValue());
+    } else if (option.hasID(SupremicaModelAnalyzerFactory.
+                            OPTION_SupremicaSynchronousProductBuilder_ShortStateNames)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setUsingShortStateNames(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SupervisorSynthesizer_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_OutputName)) {
+      final StringOption stringOption = (StringOption) option;
+      setOutputName(stringOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_OutputKind)) {
+      final ComponentKindOption kindOption = (ComponentKindOption) option;
+      setOutputKind(kindOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_RemovingSelfloops)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setRemovingSelfloops(boolOption.getBooleanValue());
+    } else if (option.hasID(SupremicaModelAnalyzerFactory.
+                            OPTION_SupremicaSynchronousProductBuilder_MarkingUncontrollableStatesAsForbidden)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setMarkingUncontrollableStatesAsForbidden(boolOption.getBooleanValue());
+    } else if (option.hasID(SupremicaModelAnalyzerFactory.
+                            OPTION_SupremicaSynchronousProductBuilder_ExpandingForbiddenStates)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setExpandingForbiddenStates(boolOption.getBooleanValue());
+    } else if (option.hasID(SupremicaModelAnalyzerFactory.
+                            OPTION_SupremicaSynchronousProductBuilder_RememberingDisabledEvents)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setRememberingDisabledEvents(boolOption.getBooleanValue());
+    } else if (option.hasID(SupremicaModelAnalyzerFactory.
+                            OPTION_SupremicaSynchronousProductBuilder_EnsuringUncontrollablesInPlant)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setEnsuringUncontrollablesInPlant(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalStateLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setNodeLimit(intOption.getIntValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelAnalyzer_FinalTransitionLimit)) {
+      final PositiveIntOption intOption = (PositiveIntOption) option;
+      setTransitionLimit(intOption.getIntValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
   @Override

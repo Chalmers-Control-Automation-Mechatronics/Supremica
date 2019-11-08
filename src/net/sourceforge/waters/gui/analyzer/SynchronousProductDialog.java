@@ -34,6 +34,8 @@
 package net.sourceforge.waters.gui.analyzer;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.options.GUIOptionContext;
+import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
@@ -52,7 +54,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * @author George Hewlett, Carly Hona, Brandon Bassett
  */
-public class SynchronousProductDialog extends AbstractAnalysisDialog
+public class SynchronousProductDialog extends ParametrisedAnalysisDialog
 {
 
   //#######################################################################
@@ -128,8 +130,8 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
     {
       final AutomatonResult result = getAnalyzer().getAnalysisResult();
       final AutomatonProxy aut = result.getComputedProxy();
-      //Statistics run
-      if(aut == null) {
+      if (aut == null) {
+        // Statistics run
         final Logger logger = LogManager.getFormatterLogger();
         if (result.getPeakNumberOfTransitions() >= 0) {
           logger.info("Synchronous product has %.0f transitions.",
@@ -139,11 +141,11 @@ public class SynchronousProductDialog extends AbstractAnalysisDialog
           logger.info("Synchronous product has %.0f states.",
                       result.getPeakNumberOfStates());
         }
-
         return "Successfully produced synchronous product. Printing statistics to log.";
-      }
-      else {
-        final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+      } else {
+        final GUIOptionContext context = getContext();
+        final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
+        final AutomataTableModel model = panel.getAutomataTableModel();
         model.insertRow(aut);
         return "Successfully produced synchronous product.";
       }

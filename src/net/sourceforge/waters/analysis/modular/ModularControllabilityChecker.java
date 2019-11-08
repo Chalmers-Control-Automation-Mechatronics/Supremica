@@ -48,9 +48,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sourceforge.waters.analysis.abstraction.TraceFinder;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
@@ -131,25 +131,32 @@ public class ModularControllabilityChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(0, new BoolParameter(ParameterIDs.ModularControllabilityChecker_CollectsFailedSpecs) {
-      @Override
-      public void commitValue()
-      {
-        setCollectsFailedSpecs(getValue());
-      }
-    });
-    list.add(0, new BoolParameter(ParameterIDs.ModularControllabilityChecker_StartsWithSmallestSpec) {
-      @Override
-      public void commitValue()
-      {
-        setStartsWithSmallestSpec(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.prepend(options, ModularModelVerifierFactory.
+                        OPTION_ModularControllabilityChecker_CollectsFailedSpecs);
+    db.prepend(options, ModularModelVerifierFactory.
+                        OPTION_ModularControllabilityChecker_StartsWithSmallestSpec);
+    return options;
   }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(ModularModelVerifierFactory.
+                     OPTION_ModularControllabilityChecker_CollectsFailedSpecs)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setCollectsFailedSpecs(boolOption.getValue());
+    } else if (option.hasID(ModularModelVerifierFactory.
+                            OPTION_ModularControllabilityChecker_StartsWithSmallestSpec)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setStartsWithSmallestSpec(boolOption.getValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
 
   //#########################################################################
   //# Invocation

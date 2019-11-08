@@ -63,13 +63,14 @@ import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.compositional.CompositionalAnalysisResult;
 import net.sourceforge.waters.analysis.compositional.CompositionalConflictCheckResult;
+import net.sourceforge.waters.analysis.compositional.SelectionHeuristic;
 import net.sourceforge.waters.analysis.monolithic.AbstractTRSynchronousProductBuilder;
 import net.sourceforge.waters.analysis.monolithic.TRSynchronousProductBuilder;
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.EnumParameter;
-import net.sourceforge.waters.analysis.options.EventParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -84,6 +85,7 @@ import net.sourceforge.waters.model.analysis.ListedEnumFactory;
 import net.sourceforge.waters.model.analysis.OverflowException;
 import net.sourceforge.waters.model.analysis.VerificationResult;
 import net.sourceforge.waters.model.analysis.des.AbstractConflictChecker;
+import net.sourceforge.waters.model.analysis.des.AbstractModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ConflictChecker;
 import net.sourceforge.waters.model.analysis.des.EventNotFoundException;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -258,51 +260,75 @@ public class TRCompositionalConflictChecker
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    final ListIterator<Parameter> iter = list.listIterator();
+    final List<Option<?>> options = super.getOptions(db);
+    final ListIterator<Option<?>> iter = options.listIterator();
     while (iter.hasNext()) {
-      final Parameter param = iter.next();
-      if (param.isSameParameter
-           (ParameterIDs.AbstractTRCompositionalModelAnalyzer_SelectionHeuristic)) {
-        iter.add(new EnumParameter<TRToolCreator<TransitionRelationSimplifier>>
-            (ParameterIDs.TRCompositionalConflictChecker_SimplifierCreator) {
-          @Override
-          public void commitValue() {
-            setSimplifierCreator(getValue());
-          }
-        });
+      final Option<?> option = iter.next();
+      if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic)) {
+        iter.remove();
+        final Option<?> replacement =
+          db.get(TRCompositionalModelAnalyzerFactory.
+                 OPTION_TRCompositionalConflictChecker_PreselectionHeuristic);
+        iter.add(replacement);
+      } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                              OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic)) {
+        iter.remove();
+        final Option<?> replacement =
+          db.get(TRCompositionalModelAnalyzerFactory.
+                 OPTION_TRCompositionalConflictChecker_SelectionHeuristic);
+        iter.add(replacement);
+        final Option<?> addition =
+          db.get(TRCompositionalModelAnalyzerFactory.
+                 OPTION_TRCompositionalConflictChecker_SimplifierCreator);
+        iter.add(addition);
       }
     }
-    list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredPreconditionMarking)
-      {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredPreconditionMarking(getValue());
-        }
-      });
-    list.add(0, new EventParameter
-      (ParameterIDs.ConflictChecker_ConfiguredDefaultMarking)
-      {
-        @Override
-        public void commitValue()
-        {
-          setConfiguredDefaultMarking(getValue());
-        }
-      });
-    list.add(new BoolParameter
-      (ParameterIDs.AbstractCompositionalModelAnalyzer_PruningDeadlocks)
-      {
-        @Override
-        public void commitValue()
-        {
-          setPruningDeadlocks(getValue());
-        }
-      });
-    return list;
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ConflictChecker_ConfiguredPreconditionMarking);
+    db.prepend(options, AbstractModelAnalyzerFactory.
+                        OPTION_ConflictChecker_ConfiguredDefaultMarking);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ConflictChecker_ConfiguredDefaultMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredDefaultMarking(propOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ConflictChecker_ConfiguredPreconditionMarking)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      setConfiguredPreconditionMarking(propOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalConflictChecker_PreselectionHeuristic)) {
+      final EnumOption<TRPreselectionHeuristic> enumOption =
+        (EnumOption<TRPreselectionHeuristic>) option;
+      setPreselectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalConflictChecker_SelectionHeuristic)) {
+      final EnumOption<SelectionHeuristic<TRCandidate>> enumOption =
+        (EnumOption<SelectionHeuristic<TRCandidate>>) option;
+      setSelectionHeuristic(enumOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalConflictChecker_SimplifierCreator)) {
+      final EnumOption<TRToolCreator<TransitionRelationSimplifier>> enumOption =
+        (EnumOption<TRToolCreator<TransitionRelationSimplifier>>) option;
+      setSimplifierCreator(enumOption.getValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_SynchronousProductBuilder_PruningDeadlocks)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setPruningDeadlocks(boolOption.getValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

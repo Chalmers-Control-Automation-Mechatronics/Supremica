@@ -52,9 +52,9 @@ package org.supremica.automata.waters;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.options.BoolParameter;
-import net.sourceforge.waters.analysis.options.Parameter;
-import net.sourceforge.waters.analysis.options.ParameterIDs;
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.InvalidModelException;
@@ -179,16 +179,24 @@ public abstract class SupremicaModelAnalyzer
   //#########################################################################
   //# Interface net.sourceforge.waters.analysis.ModelAnalyzer
   @Override
-  public List<Parameter> getParameters()
+  public List<Option<?>> getOptions(final OptionMap db)
   {
-    final List<Parameter> list = super.getParameters();
-    list.add(new BoolParameter(ParameterIDs.SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents) {
-      @Override
-      public void commitValue() {
-        setSynchronisingOnUnobservableEvents(getValue());
-      }
-    });
-    return list;
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, SupremicaModelAnalyzerFactory.
+              OPTION_SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(SupremicaModelAnalyzerFactory.
+                     OPTION_SupremicaSynchronousProductBuilder_SynchronisingOnUnobservableEvents)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setSynchronisingOnUnobservableEvents(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
   }
 
 

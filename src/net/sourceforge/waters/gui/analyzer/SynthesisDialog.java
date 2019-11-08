@@ -36,6 +36,8 @@ package net.sourceforge.waters.gui.analyzer;
 import java.util.Collection;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
+import net.sourceforge.waters.gui.options.GUIOptionContext;
+import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
@@ -50,7 +52,7 @@ import org.supremica.gui.ide.IDE;
 /**
  * @author Brandon Bassett, Robi Malik
  */
-public class SynthesisDialog extends AbstractAnalysisDialog
+public class SynthesisDialog extends ParametrisedAnalysisDialog
 {
 
   //#########################################################################
@@ -108,7 +110,9 @@ public class SynthesisDialog extends AbstractAnalysisDialog
       final Collection<? extends AutomatonProxy> supervisors =
         result.getComputedAutomata();
       if (supervisors != null) {
-        final AutomataTableModel model = getWatersAnalyzerPanel().getAutomataTableModel();
+        final GUIOptionContext context = getContext();
+        final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
+        final AutomataTableModel model = panel.getAutomataTableModel();
         model.insertRows(supervisors);
       }
     }
