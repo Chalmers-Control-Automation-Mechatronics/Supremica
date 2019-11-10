@@ -155,7 +155,6 @@ public class SimpleExpressionCompiler
     mAtomicVisitor = new AtomicVisitor();
     mRangeVisitor = new RangeVisitor();
     mEquality = new ModuleEqualityVisitor(false);
-    mSumSimplifier = new SumSimplifier(factory, this);
   }
 
 
@@ -1251,7 +1250,9 @@ public class SimpleExpressionCompiler
     SimpleExpressionProxy eval(final BinaryExpressionProxy expr)
       throws EvalException
     {
-      return mSumSimplifier.normaliseSum(expr);
+      final SumSimplifier simplifier =
+        new SumSimplifier(mFactory, SimpleExpressionCompiler.this);
+      return simplifier.normaliseSum(expr);
     }
 
   }
@@ -1355,7 +1356,9 @@ public class SimpleExpressionCompiler
     SimpleExpressionProxy eval(final UnaryExpressionProxy expr)
       throws EvalException
     {
-      return mSumSimplifier.normaliseSum(expr);
+      final SumSimplifier simplifier =
+        new SumSimplifier(mFactory, SimpleExpressionCompiler.this);
+      return simplifier.normaliseSum(expr);
     }
 
   }
@@ -1648,7 +1651,6 @@ public class SimpleExpressionCompiler
   private final AtomicVisitor mAtomicVisitor;
   private final RangeVisitor mRangeVisitor;
   private final ModuleEqualityVisitor mEquality;
-  private final SumSimplifier mSumSimplifier;
 
   private boolean mIsEvaluating;
   /**

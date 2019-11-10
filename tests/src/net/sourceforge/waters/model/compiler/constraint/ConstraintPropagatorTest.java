@@ -544,6 +544,22 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_sum_12()  // nesting !!!
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("SR");
+    final CompiledIntRange range = createIntRange(1, 2);
+    addVariable("NP", range);
+    addVariable("PCO", range);
+    final String[] constraints = {"NP' == (NP + SR - 1) % PCO + 1",
+                                  "1 >= NP",
+                                  "1 >= NP + SR"};
+    final String[] expected = {"NP == 1",
+                               "NP' == 1 + SR % PCO",
+                               "1 + SR <= 1"};
+    testPropagate(constraints, expected);
+  }
+
 
   public void testPropagate_balllift_1()
     throws EvalException, ParseException
