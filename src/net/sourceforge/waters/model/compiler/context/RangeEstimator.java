@@ -160,6 +160,7 @@ public class RangeEstimator
      final VariableContext context)
     throws EvalException
   {
+    final VariableContext oldContext = mContext;
     try {
       mContext = context;
       return process(expr);
@@ -171,7 +172,7 @@ public class RangeEstimator
         throw exception.getRuntimeException();
       }
     } finally {
-      mContext = null;
+      mContext = oldContext;
     }
   }
 
@@ -781,65 +782,54 @@ public class RangeEstimator
     //#######################################################################
     //# Evaluation
     @Override
-    CompiledIntRange eval(final SimpleExpressionProxy leftexpr,
-                          final CompiledIntRange leftrange,
-                          final SimpleExpressionProxy rightexpr,
-                          final CompiledIntRange rightrange)
+    CompiledIntRange eval(final SimpleExpressionProxy leftExpr,
+                          final CompiledIntRange leftRange,
+                          final SimpleExpressionProxy rightExpr,
+                          final CompiledIntRange rightRange)
     {
-      if (leftrange == null || rightrange == null) {
+      if (leftRange == null || rightRange == null) {
         return null;
       }
-      final int leftlower = leftrange.getLower();
-      final int leftupper = leftrange.getUpper();
-      int rightlower = rightrange.getLower();
-      int rightupper = rightrange.getUpper();
-      if (rightlower == 0) {
-        rightlower = 1;
-      }
-      if (rightupper == 0) {
-        rightupper = -1;
-      }
-      if (leftlower > leftupper || rightlower > rightupper) {
+      final int leftLower = leftRange.getLower();
+      final int leftUpper = leftRange.getUpper();
+      int rightLower = rightRange.getLower();
+      int rightUpper = rightRange.getUpper();
+      if (leftLower > leftUpper || rightLower > rightUpper) {
         return EMPTY_RANGE;
       }
-      if (rightlower < 0) {
-        if (rightupper < 0) {
-          final int aux = rightlower;
-          rightupper = -rightlower;
-          rightlower = -aux;
+      // For negative divisor : a % -b = a % b
+      if (rightLower < 0) {
+        if (rightUpper >= 0) {
+          rightUpper = Math.max(-rightLower, rightUpper);
+          rightLower = 0;
         } else {
-          if (-rightlower > rightupper) {
-            rightupper = -rightlower;
-          }
-          rightlower = 1;
+          final int tmp = rightLower;
+          rightLower = -rightUpper;
+          rightUpper = -tmp;
         }
       }
-      if (leftlower >= 0) {
-        if (leftupper < rightupper) {
-          return leftrange;
-        } else if (leftupper - leftlower + 1 >= rightupper) {
-          return new CompiledIntRange(0, rightupper - 1);
+      // For negative dividend : -a % -b = -(a % b)
+      if (leftLower >= 0) {
+        if (leftUpper < rightLower) {
+          return leftRange;
+        } else if (leftUpper < rightUpper) {
+          return new CompiledIntRange(0, leftUpper);
+        } else {
+          return new CompiledIntRange(0, rightUpper - 1);
         }
-      } else if (leftupper <= 0) {
-        if (-leftlower < rightupper) {
-          return leftrange;
-        } else if (leftupper - leftlower + 1 >= rightupper) {
-          return new CompiledIntRange(1 - rightupper, 0);
+      } else if (leftUpper <= 0) {
+        if (-leftLower < rightLower) {
+          return leftRange;
+        } else if (-leftUpper < rightUpper) {
+          return new CompiledIntRange(leftUpper, 0);
+        } else {
+          return new CompiledIntRange(1 - rightUpper, 0);
         }
+      } else {
+        final int lower = -leftLower < -rightUpper ? leftLower : 1 - rightUpper;
+        final int upper = leftUpper < rightUpper ? leftUpper : rightUpper - 1;
+        return new CompiledIntRange(lower, upper);
       }
-      int lower = leftlower % rightlower;
-      int upper = lower;
-      for (int dividend = leftlower; dividend <= leftupper; dividend++) {
-        for (int divisor = rightlower; divisor <= rightupper; divisor++) {
-          final int mod = dividend % divisor;
-          if (mod < lower) {
-            lower = mod;
-          } else if (mod > upper) {
-            upper = mod;
-          }
-        }
-      }
-      return new CompiledIntRange(lower, upper);
     }
 
   }

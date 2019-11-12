@@ -264,8 +264,9 @@ class EFSMTRSimplifier extends AbstractEFSMAlgorithm
     try {
       final Logger logger = getLogger();
       if (logger.isDebugEnabled()) {
-        logger.debug("Simplifying: " + efsmTR.getName() + " ...");
-        logger.debug(efsmTR.getTransitionRelation().getNumberOfStates() + " states");
+        logger.debug("Simplifying: {} ...", efsmTR.getName());
+        logger.debug("{} states",
+                     efsmTR.getTransitionRelation().getNumberOfStates());
       }
       final long start = System.currentTimeMillis();
       ListBufferTransitionRelation rel = efsmTR.getTransitionRelation();

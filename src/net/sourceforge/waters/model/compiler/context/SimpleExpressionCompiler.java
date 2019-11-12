@@ -985,6 +985,18 @@ public class SimpleExpressionCompiler
           break;
         }
       }
+      if (mVariableContext != null) {
+        final CompiledIntRange rangeLHS =
+          mRangeEstimator.estimateIntRange(simpLHS, mVariableContext);
+        if (rangeLHS != null && rangeLHS.getLower() >= 0) {
+          final CompiledIntRange rangeRHS =
+            mRangeEstimator.estimateIntRange(simpRHS, mVariableContext);
+          if (rangeRHS != null &&
+            rangeLHS.getUpper() < rangeRHS.getLower()) {
+            return createIntConstantProxy(0);
+          }
+        }
+      }
       return createExpression(expr, simpLHS, simpRHS);
     }
 
@@ -1175,6 +1187,18 @@ public class SimpleExpressionCompiler
             return createIntConstantProxy(intLHS % intRHS);
           }
           break;
+        }
+      }
+      if (mVariableContext != null) {
+        final CompiledIntRange rangeLHS =
+          mRangeEstimator.estimateIntRange(simpLHS, mVariableContext);
+        if (rangeLHS != null && rangeLHS.getLower() >= 0) {
+          final CompiledIntRange rangeRHS =
+            mRangeEstimator.estimateIntRange(simpRHS, mVariableContext);
+          if (rangeRHS != null &&
+              rangeLHS.getUpper() < rangeRHS.getLower()) {
+            return simpLHS;
+          }
         }
       }
       return createExpression(expr, simpLHS, simpRHS);

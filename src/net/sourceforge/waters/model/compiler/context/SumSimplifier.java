@@ -170,6 +170,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    * @param  lhs                The left-hand side <I>x</I> of the equation.
    * @param  rhs                The right-hand side <I>sum</I> of the
    *                            equation.
+   * @param  op
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return <CODE>true</CODE> if the equation is already normalised,
    *         <CODE>false</CODE> otherwise. A return value of <CODE>true</CODE>
@@ -179,30 +180,54 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
   public boolean isNormalisedEquation
     (final SimpleExpressionProxy lhs,
      final SimpleExpressionProxy rhs,
+     final BinaryOperator op,
      final Comparator<SimpleExpressionProxy> leadTermComparator)
     throws EvalException
   {
     try {
       setUp();
+      mCurrentSign = 1;
       rhs.acceptVisitor(this);
       if (!mAlreadyNormalised) {
         return false;
       } else if (lhs instanceof IntConstantProxy && mSumOfConstants != 0) {
         return false;
       }
-      recordBasicCounts();
-      for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,Integer>
-           entry : mCountingMap.entrySet()) {
-        if (Math.abs(entry.getValue()) != 1) {
-          return false;
-        }
-        final ProxyAccessor<SimpleExpressionProxy> accessor = entry.getKey();
-        final SimpleExpressionProxy expr = accessor.getProxy();
-        if (leadTermComparator.compare(expr, lhs) <= 0) {
-          return false;
-        }
+      final int numTermsRHS =
+        mNegativeTerms.size() + mPositiveTerms.size();
+      mCurrentSign = -1;
+      mPreviousLiteral = null;
+      lhs.acceptVisitor(this);
+      if (!mAlreadyNormalised) {
+        return false;
       }
-      return true;
+      final int numTermsLHS =
+        mNegativeTerms.size() + mPositiveTerms.size() - numTermsRHS;
+      if (numTermsLHS > 1) {
+        return false;
+      } else if (numTermsLHS == 0 || mNegativeTerms.contains(lhs)) {
+        recordBasicCounts();
+        final boolean symmetric = op.isSymmetric();
+        for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,Integer>
+             entry : mCountingMap.entrySet()) {
+          final ProxyAccessor<SimpleExpressionProxy> accessor = entry.getKey();
+          final SimpleExpressionProxy expr = accessor.getProxy();
+          final int cmp = leadTermComparator.compare(expr, lhs);
+          final int value = entry.getValue();
+          if (cmp == 0) {
+            if (value != -1) {
+              return false;
+            }
+          } else if (value == -1 || symmetric && value == 1) {
+            if (cmp < 0) {
+              return false;
+            }
+          }
+        }
+        return true;
+      } else {
+        return false;
+      }
     } catch (final VisitorException exception) {
       if (exception.getCause() instanceof EvalException) {
         throw (EvalException) exception.getCause();
@@ -229,7 +254,7 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
    *                            fully supported.
    * @param  leadTermComparator The comparator to determine the lead term.
    * @return The normalised sum. This method always returns a new object;
-   *         please use {@link #isNormalisedEquation(SimpleExpressionProxy,SimpleExpressionProxy,Comparator)
+   *         please use {@link #isNormalisedEquation(SimpleExpressionProxy,SimpleExpressionProxy,BinaryOperator,Comparator)
    *         isNormalisedEquation()} to check whether normalisation will
    *         result in change.
    */
@@ -242,13 +267,14 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
   {
     try {
       setUp();
-      mCurrentSign = 1;
-      lhs.acceptVisitor(this);
       mCurrentSign = -1;
+      lhs.acceptVisitor(this);
+      mCurrentSign = 1;
       rhs.acceptVisitor(this);
       recordBasicCounts();
       recordConstantCount();
-      final SimpleExpressionProxy leadTerm = createLeadTerm(leadTermComparator);
+      final SimpleExpressionProxy leadTerm =
+        createLeadTerm(leadTermComparator, op);
       final List<SimpleExpressionProxy> orderedLiterals = getOrderedLiterals();
       final SimpleExpressionProxy normalisedSum =
         createNormalisedSum(orderedLiterals);
@@ -340,7 +366,6 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
   {
     if (mSimplifier == null) {
       recordTerm(expr);
-      checkAlreadyNormalised(expr);
     } else {
       final SimpleExpressionProxy simplified =
         mSimplifier.invokeSimplificationVisitor(expr);
@@ -353,7 +378,6 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
       }
       if (simplified == expr) {
         recordTerm(simplified);
-        checkAlreadyNormalised(simplified);
       } else {
         setNotAlreadyNormalised();
         final SimpleExpressionCompiler simplifier = mSimplifier;
@@ -461,12 +485,15 @@ public class SumSimplifier extends DefaultModuleProxyVisitor
 
 
   private SimpleExpressionProxy createLeadTerm
-    (final Comparator<SimpleExpressionProxy> comparator)
+    (final Comparator<SimpleExpressionProxy> comparator,
+     final BinaryOperator op)
   {
+    final boolean symmetric = op.isSymmetric();
     SimpleExpressionProxy leadTerm = null;
     for (final Map.Entry<ProxyAccessor<SimpleExpressionProxy>,Integer>
          entry : mCountingMap.entrySet()) {
-      if (Math.abs(entry.getValue()) == 1) {
+      final int value = entry.getValue();
+      if (value == -1 || symmetric && value == 1) {
         final ProxyAccessor<SimpleExpressionProxy> accessor = entry.getKey();
         final SimpleExpressionProxy expr = accessor.getProxy();
         if (leadTerm == null || comparator.compare(expr, leadTerm) < 0) {

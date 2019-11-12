@@ -430,6 +430,13 @@ public abstract class AbstractStandardConflictCheckerTest
     runModelVerifier(des, false);
   }
 
+  public void testModel201eBlockingReduction() throws Exception
+  {
+    final ProductDESProxy des =
+      getCompiledDES("tests", "nasty", "model-2-01E-blocking-reduction.wmod");
+    runModelVerifier(des, true);
+  }
+
   public void testOmegaSat01() throws Exception
   {
     final ProductDESProxy des =

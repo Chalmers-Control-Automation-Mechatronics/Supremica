@@ -261,6 +261,19 @@ public class ConstraintPropagatorTest extends TestCase
     testPropagate(constraints, expected);
   }
 
+  public void testPropagate_divide_1()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("SR");
+    final CompiledIntRange range12 = createIntRange(1, 2);
+    addVariable("NP", range12);
+    final CompiledIntRange range68 = createIntRange(6, 8);
+    addVariable("PCO", range68);
+    final String[] constraints = {"NP' == (NP + SR - 1) / PCO + 1"};
+    final String[] expected = {"NP' == 1"};
+    testPropagate(constraints, expected);
+  }
+
   public void testPropagate_enumvar()
     throws EvalException, ParseException
   {
@@ -379,7 +392,7 @@ public class ConstraintPropagatorTest extends TestCase
     addVariable("x", range);
     addVariable("y", range);
     final String[] constraints = {"x > 5", "y == \\ite(x<3, x+1, x-1)"};
-    final String[] expected = {"6 <= x", "y == -1+x"};
+    final String[] expected = {"6 <= x", "x == 1+y"};
     testPropagate(constraints, expected);
   }
 
@@ -404,6 +417,68 @@ public class ConstraintPropagatorTest extends TestCase
     addVariable("z", range);
     final String[] constraints = {"x == y", "z == \\ite(x<y, 1, 0)"};
     final String[] expected = {"x == y", "z == 0"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_mod_1()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(2, 10);
+    addVariable("p", range);
+    final String[] constraints = {"0 == 2 % p"};
+    testPropagate(constraints, constraints);
+  }
+
+  public void testPropagate_mod_2()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange rangeN = createIntRange(1, 2);
+    addVariable("N", rangeN);
+    final CompiledIntRange rangeX = createIntRange(0, 3);
+    addVariable("X", rangeX);
+    final String[] constraints = {"X == 1 % N"};
+    testPropagate(constraints, constraints);
+  }
+
+  public void testPropagate_mod_3()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange rangeN = createIntRange(2, 3);
+    addVariable("N", rangeN);
+    final CompiledIntRange rangeX = createIntRange(0, 3);
+    addVariable("X", rangeX);
+    final String[] constraints = {"X == 1 % N"};
+    final String[] expected = {"X == 1"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_mod_4()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange rangeN = createIntRange(2, 3);
+    addVariable("N", rangeN);
+    final CompiledIntRange rangeX = createIntRange(0, 2);
+    addVariable("X", rangeX);
+    final CompiledIntRange rangeY = createIntRange(0, 4);
+    addVariable("Y", rangeY);
+    final String[] constraints = {"Y == X % N", "Y >= 2"};
+    final String[] expected = {"2 == X % N", "Y == 2"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_mod_5()
+    throws EvalException, ParseException
+  {
+    addBooleanVariable("SR");
+    final CompiledIntRange range = createIntRange(1, 2);
+    addVariable("NP", range);
+    addVariable("PCO", range);
+    final String[] constraints = {"NP' == (NP + SR - 1) % PCO + 1",
+                                  "1 >= NP",
+                                  "1 < NP + SR"};
+    final String[] expected = {"NP == 1",
+                               "SR",
+                               "NP' == 1 + 1 % PCO"};
     testPropagate(constraints, expected);
   }
 
@@ -540,7 +615,7 @@ public class ConstraintPropagatorTest extends TestCase
     addVariable("x", range);
     addVariable("y", range);
     final String[] constraints = {"-(x + y) > 0"};
-    final String[] expected = {"0 < -x - y"};
+    final String[] expected = {"x < -y", "x <= 1"};
     testPropagate(constraints, expected);
   }
 
@@ -555,9 +630,40 @@ public class ConstraintPropagatorTest extends TestCase
                                   "1 >= NP",
                                   "1 >= NP + SR"};
     final String[] expected = {"NP == 1",
-                               "NP' == 1 + SR % PCO",
-                               "1 + SR <= 1"};
+                               "NP' == 1",
+                               "!SR"};
     testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_sum_13()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(-2, 2);
+    addVariable("x", range);
+    addVariable("y", range);
+    final String[] constraints = {"x == y + y"};
+    testPropagate(constraints, constraints);
+  }
+
+  public void testPropagate_sum_14()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(-2, 2);
+    addVariable("x", range);
+    addVariable("y", range);
+    final String[] constraints = {"1 == x + y"};
+    final String[] expected = {"x == 1 - y"};
+    testPropagate(constraints, expected);
+  }
+
+  public void testPropagate_sum_15()
+    throws EvalException, ParseException
+  {
+    final CompiledIntRange range = createIntRange(-2, 2);
+    addVariable("x", range);
+    addVariable("y", range);
+    final String[] constraints = {"1 == x % 2 + x % 3"};
+    testPropagate(constraints, constraints);
   }
 
 

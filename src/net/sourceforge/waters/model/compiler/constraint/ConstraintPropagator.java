@@ -146,6 +146,8 @@ public class ConstraintPropagator
       RelationNormalizationRule.createNegativeRule(factory, optable),
       SumSimplificationRule.createRule(factory, optable.getEqualsOperator()),
       SumSimplificationRule.createRule(factory, optable.getNotEqualsOperator()),
+      SumSimplificationRule.createRule(factory, optable.getLessThanOperator()),
+      SumSimplificationRule.createRule(factory, optable.getLessEqualsOperator()),
       mNormalizer,
       TrueEliminationRule.createRule(factory, optable),
       FalseEliminationRule.createRule(factory, optable),
@@ -159,13 +161,13 @@ public class ConstraintPropagator
     mRewriteRules = new SimplificationRule[] {
       BooleanLiteralRule.createPositiveLiteralRule(factory, optable),
       BooleanLiteralRule.createNegativeLiteralRule(factory, optable),
-      EqualitySubstitutionRule.createRule(factory, optable),
       KnownLiteralReplacementRule.createRule(factory, optable),
-      LeftNotEqualsRestrictionRule.createRule(factory, optable),
       LeftLessThanRestrictionRule.createRule(factory, optable),
       LeftLessEqualsRestrictionRule.createRule(factory, optable),
       RightLessThanRestrictionRule.createRule(factory, optable),
-      RightLessEqualsRestrictionRule.createRule(factory, optable)
+      RightLessEqualsRestrictionRule.createRule(factory, optable),
+      LeftNotEqualsRestrictionRule.createRule(factory, optable),
+      EqualitySubstitutionRule.createRule(factory, optable)
     };
     mSumSimplifier = new SumSimplifier(mFactory);
     mUnprocessedConstraints = new LinkedList<SimpleExpressionProxy>();
@@ -475,11 +477,11 @@ public class ConstraintPropagator
         }
       } else {
         // Now all constraints are normalised.
-        final Iterator<SimpleExpressionProxy> iter =
-          mNormalizedConstraints.iterator();
-        while (iter.hasNext()) {
-          final SimpleExpressionProxy constraint = iter.next();
-          for (final SimplificationRule rule : mRewriteRules) {
+        for (final SimplificationRule rule : mRewriteRules) {
+          final Iterator<SimpleExpressionProxy> iter =
+            mNormalizedConstraints.iterator();
+          while (iter.hasNext()) {
+            final SimpleExpressionProxy constraint = iter.next();
             if (rule.match(constraint, this)) {
               if (rule.isMakingReplacement()) {
                 iter.remove();
@@ -747,6 +749,56 @@ public class ConstraintPropagator
   {
     final Class<?> clazz = getClass();
     return LogManager.getLogger(clazz);
+  }
+
+
+  //#########################################################################
+  //# Debugging
+  @Override
+  public String toString()
+  {
+    if (mIsUnsatisfiable) {
+      return "UNSATISFIABLE";
+    } else {
+      final StringBuilder builder = new StringBuilder();
+      boolean empty = true;
+      if (!mUnprocessedConstraints.isEmpty()) {
+        builder.append("Unprocessed:\n");
+        for (final SimpleExpressionProxy constraint : mUnprocessedConstraints) {
+          builder.append(constraint.toString());
+          builder.append("\n");
+        }
+        empty = false;
+      }
+      if (!mNormalizedConstraints.isEmpty()) {
+        builder.append("Normalised:\n");
+        for (final SimpleExpressionProxy constraint : mNormalizedConstraints) {
+          builder.append(constraint.toString());
+          builder.append("\n");
+        }
+        empty = false;
+      }
+      try {
+        final List<SimpleExpressionProxy> list =
+          new ArrayList<SimpleExpressionProxy>();
+        mContext.addAllConstraints(list, true);
+        addPrimedVariables(list);
+        if (!list.isEmpty()) {
+          builder.append("Context:\n");
+          for (final SimpleExpressionProxy constraint : list) {
+            builder.append(constraint.toString());
+            builder.append("\n");
+          }
+          empty = false;
+        }
+      } catch (final EvalException exception) {
+        builder.append("EvalException caught evaluating context!");
+      }
+      if (empty) {
+        builder.append("No constraints - true");
+      }
+      return builder.toString();
+    }
   }
 
 

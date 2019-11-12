@@ -44,6 +44,8 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.OverflowException;
+import net.sourceforge.waters.model.analysis.OverflowKind;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.compiler.constraint.ConstraintList;
 import net.sourceforge.waters.model.module.ModuleProxyFactory;
@@ -94,6 +96,10 @@ public class EFSMSynchronizer extends AbstractEFSMAlgorithm
       rel2.reconfigure(ListBufferTransitionRelation.CONFIG_SUCCESSORS);
       final int reachableStates1 = rel1.getNumberOfReachableStates();
       final int reachableStates2 = rel2.getNumberOfReachableStates();
+      if ((double) reachableStates1 * (double) reachableStates2 >
+          Integer.MAX_VALUE) {
+        throw new OverflowException(OverflowKind.STATE, Integer.MAX_VALUE);
+      }
       final int finalStateNum = reachableStates1 * reachableStates2;
       final List<SimpleNodeProxy> nodeList1 = efsmTR1.getNodeList();
       final List<SimpleNodeProxy> nodeList2 = efsmTR2.getNodeList();
@@ -222,7 +228,7 @@ public class EFSMSynchronizer extends AbstractEFSMAlgorithm
       final Collection<EFSMVariable> variables1 = efsmTR1.getVariables();
       final Collection<EFSMVariable> variables2 = efsmTR2.getVariables();
       final Collection<EFSMVariable> variables =
-        new THashSet<EFSMVariable>(variables1.size() + variables2.size());
+        new THashSet<>(variables1.size() + variables2.size());
       variables.addAll(variables1);
       variables.addAll(variables2);
       synchResult = new EFSMTransitionRelation(synchRel, synchEventEncoding,

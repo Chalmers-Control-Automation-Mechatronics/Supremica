@@ -91,7 +91,7 @@ class SumSimplificationRule extends SimplificationRule
     final SumPlaceHolder RHS = new SumPlaceHolder(factory, "RHS");
     final SimpleIdentifierProxy lhs = LHS.getIdentifier();
     final SimpleIdentifierProxy rhs = RHS.getIdentifier();
-    final SimpleExpressionProxy template =
+    final BinaryExpressionProxy template =
       factory.createBinaryExpressionProxy(op, lhs, rhs);
     return new SumSimplificationRule(template, LHS, RHS);
   }
@@ -99,11 +99,12 @@ class SumSimplificationRule extends SimplificationRule
 
   //#########################################################################
   //# Constructors
-  private SumSimplificationRule(final SimpleExpressionProxy template,
+  private SumSimplificationRule(final BinaryExpressionProxy template,
                                 final SumPlaceHolder LHS,
                                 final SumPlaceHolder RHS)
   {
     super(template, new PlaceHolder[] {LHS, RHS});
+    mOperator = template.getOperator();
     mLHS = LHS;
     mRHS = RHS;
   }
@@ -126,7 +127,7 @@ class SumSimplificationRule extends SimplificationRule
       final SimpleExpressionProxy rhs = mRHS.getBoundExpression();
       final Comparator<SimpleExpressionProxy> comparator =
         propagator.getEquationComparator();
-      return !simplifier.isNormalisedEquation(lhs, rhs, comparator);
+      return !simplifier.isNormalisedEquation(lhs, rhs, mOperator, comparator);
     } else {
       return false;
     }
@@ -145,13 +146,10 @@ class SumSimplificationRule extends SimplificationRule
     final SumSimplifier simplifier = propagator.getSumSimplifier();
     final SimpleExpressionProxy lhs = mLHS.getBoundExpression();
     final SimpleExpressionProxy rhs = mRHS.getBoundExpression();
-    final BinaryExpressionProxy template =
-      (BinaryExpressionProxy) getTemplate();
-    final BinaryOperator op = template.getOperator();
     final Comparator<SimpleExpressionProxy> comparator =
       propagator.getEquationComparator();
     final SimpleExpressionProxy constraint =
-      simplifier.normaliseEquation(lhs, rhs, op, comparator);
+      simplifier.normaliseEquation(lhs, rhs, mOperator, comparator);
     propagator.addConstraint(constraint);
   }
 
@@ -194,6 +192,7 @@ class SumSimplificationRule extends SimplificationRule
 
   //#########################################################################
   //# Data Members
+  private final BinaryOperator mOperator;
   private final SumPlaceHolder mLHS;
   private final SumPlaceHolder mRHS;
 
