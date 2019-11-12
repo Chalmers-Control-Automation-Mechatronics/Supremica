@@ -34,8 +34,6 @@
 package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -54,7 +52,6 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 
 class PropositionOptionPanel
   extends OptionPanel<EventProxy>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -139,19 +136,9 @@ class PropositionOptionPanel
 
     final JComboBox<EventProxy> comboBox = new JComboBox<>(choices);
     comboBox.setSelectedItem(value);
-    comboBox.addActionListener(this);
     final EventCellRenderer renderer= new EventCellRenderer();
     comboBox.setRenderer(renderer);
     return comboBox;
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 

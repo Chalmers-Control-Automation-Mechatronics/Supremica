@@ -53,7 +53,6 @@ import org.supremica.properties.Config;
 
 class FileOptionPanel
   extends OptionPanel<File>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -117,7 +116,6 @@ class FileOptionPanel
     mCell = new FileInputCell(defaultPath, true);
     mCell.setValue(file);
     mCell.setColumns(15);
-    mCell.addActionListener(this);
     final GUIOptionContext context = getContext();
     mCell.setErrorDisplay(context.getErrorDisplay());
     constraints.weightx = 1.0;
@@ -136,15 +134,6 @@ class FileOptionPanel
     panel.add(button, constraints);
 
     return panel;
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 

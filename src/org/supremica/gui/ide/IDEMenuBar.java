@@ -536,7 +536,7 @@ public class IDEMenuBar
     menu.add(synth);
     menu.addSeparator();
     final Action control =
-      actions.getAction(AnalyzerControlLoopCheckAction.class);
+      actions.getAction(AnalyzerControllabilityCheckAction.class);
     menu.add(control);
     final Action conflict =
       actions.getAction(AnalyzerConflictCheckAction.class);
@@ -545,7 +545,7 @@ public class IDEMenuBar
       actions.getAction(AnalyzerDeadlockCheckAction.class);
     menu.add(deadlock);
     final Action controllability =
-      actions.getAction(AnalyzerControllabilityCheckAction.class);
+      actions.getAction(AnalyzerControlLoopCheckAction.class);
     menu.add(controllability);
     final Action languageInclusion =
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);

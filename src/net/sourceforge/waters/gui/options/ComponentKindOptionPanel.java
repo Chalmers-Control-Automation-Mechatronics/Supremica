@@ -37,8 +37,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -54,7 +52,6 @@ import net.sourceforge.waters.model.des.ProductDESProxy;
 
 class ComponentKindOptionPanel
   extends OptionPanel<ComponentKind>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -138,15 +135,6 @@ class ComponentKindOptionPanel
 
 
   //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
-  }
-
-
-  //#########################################################################
   //# Auxiliary Methods
   private ComponentKind getPreselectedValue()
   {
@@ -189,7 +177,6 @@ class ComponentKindOptionPanel
     if (button.getValue() == value) {
       button.setSelected(true);
     }
-    button.addActionListener(this);
     panel.add(button, constraints);
   }
 

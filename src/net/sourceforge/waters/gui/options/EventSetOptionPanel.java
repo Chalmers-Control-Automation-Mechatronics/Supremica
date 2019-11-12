@@ -51,7 +51,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -98,6 +97,8 @@ class EventSetOptionPanel
   @Override
   public boolean commitValue()
   {
+    final EventSetOption option = getOption();
+    option.setValue(mCurrentValue);
     return true;
   }
 
@@ -150,31 +151,28 @@ class EventSetOptionPanel
     final GUIOptionContext context = getContext();
     final ProductDESProxy des = context.getProductDES();
     final Set<EventProxy> events = des.getEvents();
-    final Set<EventProxy> selected = new THashSet<>(events.size());
+    mCurrentValue = new THashSet<>(events.size());
     for (final EventProxy event : events) {
       if (event.getKind() == defaultKind) {
-        selected.add(event);
+        mCurrentValue.add(event);
       }
     }
-    option.setValue(selected);
   }
 
   private void updateLabel()
   {
-    final EventSetOption option = getOption();
-    final Set<EventProxy> set = option.getValue();
     final StringBuilder builder = new StringBuilder("(");
-    switch (set.size()) {
+    switch (mCurrentValue.size()) {
     case 0:
       builder.append("no event");
       break;
     case 1:
-      final EventProxy event1 = set.iterator().next();
+      final EventProxy event1 = mCurrentValue.iterator().next();
       builder.append(event1.getName());
       break;
     default:
       EventKind combinedKind = null;
-      for (final EventProxy event : set) {
+      for (final EventProxy event : mCurrentValue) {
         final EventKind kind = event.getKind();
         if (combinedKind == null) {
           combinedKind = kind;
@@ -194,10 +192,10 @@ class EventSetOptionPanel
           total++;
         }
       }
-      if (set.size() == total) {
+      if (mCurrentValue.size() == total) {
         builder.append("all ");
       }
-      builder.append(set.size());
+      builder.append(mCurrentValue.size());
       if (combinedKind == EventKind.CONTROLLABLE) {
         builder.append(" controllable");
       } else if (combinedKind == EventKind.UNCONTROLLABLE) {
@@ -218,12 +216,6 @@ class EventSetOptionPanel
     final Component parent = context.getDialogParent();
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
-    if (dialog.getResult() == JOptionPane.OK_OPTION) {
-      final EventSetOption option = getOption();
-      final Set<EventProxy> set = dialog.getSelectedEvents();
-      option.setValue(set);
-      updateLabel();
-    }
   }
 
 
@@ -240,7 +232,6 @@ class EventSetOptionPanel
       final GUIOptionContext context = getContext();
       final ProductDESProxy des = context.getProductDES();
       final EventSetOption option = getOption();
-      final Set<EventProxy> selected = option.getValue();
       setTitle(option.getShortName());
       setLayout(new GridLayout(0, 2));
 
@@ -249,7 +240,7 @@ class EventSetOptionPanel
       for (final EventProxy event : des.getEvents()) {
         if (event.getKind() == EventKind.PROPOSITION) {
           // skip
-        } else if (selected.contains(event)) {
+        } else if (mCurrentValue.contains(event)) {
           mSelectedModel.addElement(event);
         } else {
           mUnselectedModel.addElement(event);
@@ -268,7 +259,8 @@ class EventSetOptionPanel
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          mResult = JOptionPane.OK_OPTION;
+          mCurrentValue = getSelectedEvents();
+          updateLabel();
           dispose();
         }
       });
@@ -277,7 +269,6 @@ class EventSetOptionPanel
         @Override
         public void actionPerformed(final ActionEvent e)
         {
-          mResult = JOptionPane.CANCEL_OPTION;
           dispose();
         }
       });
@@ -314,11 +305,6 @@ class EventSetOptionPanel
 
     //#######################################################################
     //# Simple Access
-    private int getResult()
-    {
-      return mResult;
-    }
-
     private Set<EventProxy> getSelectedEvents()
     {
       final int size = mSelectedModel.getSize();
@@ -377,7 +363,6 @@ class EventSetOptionPanel
     //# Data Members
     private final DefaultListModel<EventProxy> mSelectedModel;
     private final DefaultListModel<EventProxy> mUnselectedModel;
-    private int mResult = JOptionPane.CANCEL_OPTION;
 
     //#######################################################################
     //# Class Constants
@@ -423,6 +408,7 @@ class EventSetOptionPanel
   //#########################################################################
   //# Data Members
   private JTextField mLabel;
+  private Set<EventProxy> mCurrentValue;
 
 
   //#######################################################################

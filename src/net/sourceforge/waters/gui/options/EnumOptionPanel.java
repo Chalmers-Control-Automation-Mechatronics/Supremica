@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Vector;
 
 import javax.swing.JComboBox;
@@ -44,7 +42,6 @@ import net.sourceforge.waters.analysis.options.EnumOption;
 
 class EnumOptionPanel<T>
   extends OptionPanel<T>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -72,7 +69,6 @@ class EnumOptionPanel<T>
     final JComboBox<T> comboBox = new JComboBox<>(vector);
     final T value = option.getValue();
     comboBox.setSelectedItem(value);
-    comboBox.addActionListener(this);
     return comboBox;
   }
 
@@ -94,15 +90,6 @@ class EnumOptionPanel<T>
     final EnumOption<T> option = getOption();
     option.setValue(value);
     return true;
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 }

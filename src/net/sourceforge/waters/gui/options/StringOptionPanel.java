@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JTextField;
 
 import net.sourceforge.waters.analysis.options.StringOption;
@@ -43,7 +40,6 @@ import net.sourceforge.waters.analysis.options.StringOption;
 
 class StringOptionPanel
   extends OptionPanel<String>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -75,7 +71,8 @@ class StringOptionPanel
   public boolean commitValue()
   {
     final StringOption option = getOption();
-    final String value = getInputText();
+    final JTextField textField = getEntryComponent();
+    final String value = textField.getText();
     option.setValue(value);
     return true;
   }
@@ -89,27 +86,8 @@ class StringOptionPanel
     final StringOption option = getOption();
     final String value = option.getValue();
     final JTextField textField = new JTextField(value);
-    textField.addActionListener(this);
     textField.setColumns(10);
     return textField;
-  }
-
-
-  //#########################################################################
-  //# Hooks
-  String getInputText()
-  {
-    final JTextField textField = getEntryComponent();
-    return textField.getText();
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 }

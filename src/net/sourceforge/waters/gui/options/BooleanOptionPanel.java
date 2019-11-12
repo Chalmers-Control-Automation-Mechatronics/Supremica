@@ -33,9 +33,6 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import javax.swing.JCheckBox;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
@@ -43,7 +40,6 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 
 class BooleanOptionPanel
   extends OptionPanel<Boolean>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -70,7 +66,6 @@ class BooleanOptionPanel
     final boolean value = option.getBooleanValue();
     checkBox.setSelected(value);
     checkBox.setRequestFocusEnabled(false);
-    checkBox.addActionListener(this);
     return checkBox;
   }
 
@@ -91,15 +86,6 @@ class BooleanOptionPanel
     final BooleanOption option = getOption();
     option.setValue(value);
     return true;
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 }

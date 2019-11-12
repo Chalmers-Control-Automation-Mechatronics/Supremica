@@ -33,16 +33,12 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.gui.dialog.IntegerInputCell;
 
 
 class PositiveIntOptionPanel
   extends OptionPanel<Integer>
-  implements ActionListener
 {
   //#########################################################################
   //# Constructors
@@ -95,19 +91,9 @@ class PositiveIntOptionPanel
     final IntegerInputCell cell = new IntegerInputCell();
     cell.setValue(value);
     cell.setColumns(10);
-    cell.addActionListener(this);
     final GUIOptionContext context = getContext();
     cell.setErrorDisplay(context.getErrorDisplay());
     return cell;
-  }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent event)
-  {
-    commitValue();
   }
 
 }
