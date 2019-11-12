@@ -80,6 +80,9 @@ class AnalyzerPopupFactory
     popup.addSeparator();
     final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
     popup.add(stateCounter);
+    popup.addSeparator();
+    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
+    popup.add(workbench);
   }
 
 }

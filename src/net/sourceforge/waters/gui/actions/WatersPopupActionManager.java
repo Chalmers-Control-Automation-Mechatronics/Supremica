@@ -440,6 +440,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerCountStatesAction.class);
   }
 
+  public IDEAction getAnalyzerWorkbenchAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerWorkbenchAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;

@@ -136,7 +136,7 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     fireTableRowsInserted(count, count + (insertList.size()-1));
   }
 
-  void insertRow(final AutomatonProxy insert)
+  public void insertRow(final AutomatonProxy insert)
   {
     final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
     autList.add(insert);
