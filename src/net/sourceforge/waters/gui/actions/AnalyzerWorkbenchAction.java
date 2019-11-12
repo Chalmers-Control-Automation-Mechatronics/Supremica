@@ -47,6 +47,7 @@ import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.AutomatonTools;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.expr.EvalException;
 import net.sourceforge.waters.model.marshaller.DocumentManager;
 import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
@@ -88,7 +89,7 @@ public class AnalyzerWorkbenchAction extends WatersAnalyzerAction
   //#########################################################################
   //# Interface java.awt.event.ActionListener
   @Override
-  public void actionPerformed(final ActionEvent arg0)
+  public void actionPerformed(final ActionEvent event)
   {
     final IDE ide = getIDE();
     if (ide != null) {
@@ -97,60 +98,54 @@ public class AnalyzerWorkbenchAction extends WatersAnalyzerAction
       final List<AutomatonProxy> automata = table.getOperationArgument();
       final ProductDESProxyFactory factory = ProductDESElementFactory.getInstance();
       final ProductDESProxy des = AutomatonTools.createProductDESProxy
-      ("workbenchProject", automata, factory);
+        ("workbenchProject", automata, factory);
       final DocumentManager manager = ide.getDocumentManager();
       final ProjectBuildFromWaters builder = new ProjectBuildFromWaters(manager);
 
       final Logger logger = LogManager.getLogger();
-      try
-      {
-        final Project project = builder.build(des);
-        final VisualProject visualProject = new VisualProject();
-        visualProject.setSelectedAutomata(project);
-        final Automata selection = project;
+      Project project;
+      try {
+        project = builder.build(des);
+      } catch (final EvalException exception) {
+        logger.error("Failed to convert automata: " + exception.getMessage());
+        return;
+      }
+      final VisualProject visualProject = new VisualProject();
+      visualProject.setSelectedAutomata(project);
+      final Automata selection = project;
+      if (selection.size() <= 0) {
+        logger.info("No automata selected.");
+        return;
+      }
+      visualProject.addListener(new AutomataListener() {
+        @Override
+        public void updated(final Object o) {}
 
-        if (selection.size() <= 0)
+        @Override
+        public void automatonAdded(final Automata auta, final Automaton automaton)
         {
-          logger.info("No automata selected.");
-          return;
+          final AutomataToWaters atw = new AutomataToWaters(factory, des,
+                                                            AbstractConflictChecker.getMarkingProposition(des));
+          final AutomatonProxy proxy = atw.convertAutomaton(automaton);
+          final AutomataTableModel model = panel.getAutomataTableModel();
+          model.insertRow(proxy);
         }
 
-        visualProject.addListener(new AutomataListener() {
+        @Override
+        public void automatonRemoved(final Automata automata, final Automaton automaton) {}
 
-          @Override
-          public void updated(final Object o) {}
+        @Override
+        public void automatonRenamed(final Automata automata, final Automaton automaton) {}
 
-          @Override
-          public void automatonAdded(final Automata auta, final Automaton automaton)
-          {
-            final AutomataToWaters atw = new AutomataToWaters(factory, des,
-                AbstractConflictChecker.getMarkingProposition(des));
-            final AutomatonProxy proxy = atw.convertAutomaton(automaton);
-            final AutomataTableModel model = panel.getAutomataTableModel();
-            model.insertRow(proxy);
-          }
-
-          @Override
-          public void automatonRemoved(final Automata automata, final Automaton automaton) {}
-
-          @Override
-          public void automatonRenamed(final Automata automata, final Automaton automaton) {}
-
-          @Override
-          public void actionsOrControlsChanged(final Automata automata) {}
-
-        });
-
+        @Override
+        public void actionsOrControlsChanged(final Automata automata) {}
+      });
+      try {
         final Workbench workbench = new Workbench(visualProject, selection);
         workbench.setVisible(true);
+      } catch (final Exception exception) {
+        logger.error("Error starting Workbench.");
       }
-      catch (final Exception ex)
-      {
-          logger.error("Error starting Workbench.");
-      }
-
-
-
     }
   }
 

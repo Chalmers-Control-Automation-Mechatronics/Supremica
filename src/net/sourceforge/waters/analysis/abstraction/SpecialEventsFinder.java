@@ -68,7 +68,7 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
  *     relation.</LI>
  * <LI>The status flag {@link EventStatus#STATUS_ALWAYS_ENABLED} is
  *     set for events that are enabled in every state without an outgoing
- *     tau-transitions, except for deadlock states. This algorithm is based
+ *     tau-transition, except for deadlock states. This algorithm is based
  *     on the assumption that the input automaton is tau-loop free.</LI>
  * </UL>
  *

@@ -46,7 +46,7 @@ import net.sourceforge.waters.model.analysis.AnalysisAbortException;
  * <P>A transition relation simplifier to remove special events.</P>
  *
  * <P>This transition relation simplifier checks the status of all events
- * in the the transition relation and removes or redirects transitions
+ * in the transition relation and removes or redirects transitions
  * as follows.</P>
  *
  * <DL>
