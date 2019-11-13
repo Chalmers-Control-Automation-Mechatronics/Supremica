@@ -40,6 +40,13 @@ import java.util.List;
 import java.util.Map;
 
 
+/**
+ * A collection of options.
+ * An option map acts as a database that maps string identifiers to
+ * {@link Option} objects.
+ *
+ * @author  Robi Malik
+ */
 public class OptionMap
 {
 

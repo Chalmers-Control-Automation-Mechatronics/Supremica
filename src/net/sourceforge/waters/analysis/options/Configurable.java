@@ -33,81 +33,43 @@
 
 package net.sourceforge.waters.analysis.options;
 
-import java.io.File;
-import java.util.Set;
+import java.util.List;
 
-import net.sourceforge.waters.model.base.ComponentKind;
-import net.sourceforge.waters.model.des.EventProxy;
-import net.sourceforge.waters.model.des.ProductDESProxy;
 
 /**
- * <P>A context for editing options.</P>
+ * <P>An interface for algorithms and other objects that can be configured
+ * through the options interface of Waters.</P>
  *
- * <P>The option context is a bridge that allows the creation of option
- * editors ({@link OptionEditor}) for a specific environment. There may
- * be different implementations, for example the {@link
- * net.sourceforge.waters.gui.options.GUIOptionContext GUIOptionContext}
- * creates Swing components to edit each option.</P>
- *
- * <P>Additionally, the option context provides access to a model
- * being analysed ({@link ProductDESProxy}), to support options whose
- * that take their values from the within model.</P>
+ * <P>After obtaining a configurable object, the code can call its
+ * {@link #getOptions(OptionMap) getOptions()} method to obtain the
+ * list of all supported options. Then after editing their values,
+ * e.g., through their respective option editors ({@link OptionEditor}),
+ * the values are sent to the configurable using {@link #setOption(Option)
+ * setOption()}, before starting the algorithm.</P>
  *
  * @author Robi Malik
  */
-public interface OptionContext
+
+public interface Configurable
 {
-  /**
-   * Gets the model being analysed in this context.
-   */
-  public ProductDESProxy getProductDES();
 
   /**
-   * Creates an option editor for a Boolean option.
+   * Returns the options supported by this configurable.
+   * @param  db   Option database containing parameters.
+   * @return List of options from the given database that are supported
+   *         by the configurable. The list should be ordered to support
+   *         reasonable presentation to the user.
    */
-  public OptionEditor<Boolean>
-  createBooleanEditor(BooleanOption option);
+  public List<Option<?>> getOptions(OptionMap db);
 
   /**
-   * Creates an option editor for a component kind option.
+   * Configures the configurable using the given option. This method
+   * retrieves the current value from the option and assigns it to
+   * the configurable.
+   * @param  option  The option to be used, which should be an element
+   *                 of the list returned by a previous call to
+   *                 {@link #getOptions(OptionMap) getOptions()}.
    */
-  public OptionEditor<ComponentKind>
-  createComponentKindEditor(ComponentKindOption option);
-
-  /**
-   * Creates an option editor for an enumeration option.
-   */
-  public <E> OptionEditor<E>
-  createEnumEditor(EnumOption<E> option);
-
-  /**
-   * Creates an option editor for an event set option.
-   */
-  public OptionEditor<Set<EventProxy>>
-  createEventSetEditor(EventSetOption option);
-
-  /**
-   * Creates an option editor for a file option.
-   */
-  public OptionEditor<File>
-  createFileEditor(FileOption fileOption);
-
-  /**
-   * Creates an option editor for a integer option.
-   */
-  public OptionEditor<Integer>
-  createPositiveIntEditor(PositiveIntOption option);
-
-  /**
-   * Creates an option editor for a proposition option.
-   */
-  public OptionEditor<EventProxy>
-  createPropositionEditor(PropositionOption option);
-
-  /**
-   * Creates an option editor for a string option.
-   */
-  public OptionEditor<String>
-  createStringEditor(StringOption option);
+  public void setOption(Option<?> option);
 
 }

@@ -43,7 +43,7 @@ import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 
 
-abstract class OptionPanel<T> implements OptionEditor<T>
+public abstract class OptionPanel<T> implements OptionEditor<T>
 {
   //#########################################################################
   //# Constructors
@@ -84,6 +84,8 @@ abstract class OptionPanel<T> implements OptionEditor<T>
   {
     return mEntryComponent;
   }
+
+  abstract boolean commitValue();
 
 
   //#########################################################################

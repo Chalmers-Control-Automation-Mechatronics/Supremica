@@ -34,11 +34,20 @@
 package net.sourceforge.waters.analysis.options;
 
 
+/**
+ * An object that can assign an option's value through user interaction.
+ * This interface is mainly a marker interface. The specifics how options
+ * are edited are determined by the classes implementing this interface.
+ *
+ * @see  net.sourceforge.waters.gui.options.OptionPanel OptionPanel
+ * @author Robi Malik
+ */
 public interface OptionEditor<T>
 {
 
-  Option<T> getOption();
-
-  public boolean commitValue();
+  /**
+   * Gets the option controlled by this option editor.
+   */
+  public Option<T> getOption();
 
 }

@@ -33,10 +33,7 @@
 
 package net.sourceforge.waters.model.analysis.des;
 
-import java.util.List;
-
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.Configurable;
 import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.AnalysisResult;
@@ -63,7 +60,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public interface ModelAnalyzer
-  extends Abortable
+  extends Abortable, Configurable
 {
 
   //#########################################################################
@@ -119,16 +116,6 @@ public interface ModelAnalyzer
    * checks using the same code.
    */
   public KindTranslator getKindTranslator();
-
-
-  //#########################################################################
-  //# Generic Parameter System
-  /**
-   * Returns a list of configurable parameters supported by this model analyser.
-   */
-  public List<Option<?>> getOptions(OptionMap db);
-
-  public void setOption(Option<?> option);
 
 
   //#########################################################################

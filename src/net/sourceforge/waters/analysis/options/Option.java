@@ -34,14 +34,28 @@
 package net.sourceforge.waters.analysis.options;
 
 
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
 
 /**
- * A configurable parameter of a {@link ModelAnalyzer}.
+ * <P>A configurable parameter of a model analyser or other
+ * {@link Configurable}.</P>
  *
- * @author Brandon Bassett
+ * <P>An option holds a value of specific type as determined by
+ * the type parameter <CODE>T</CODE>, and there are subclasses for each
+ * specific parameter type.</P>
+ *
+ * <P>Every option has a default value and a current value of its type.
+ * Options are identified by an ID string to facilitate storing in
+ * configuration files. They are accompanied by descriptive information
+ * that can be presented to users to explain the option.</P>
+ *
+ * <P>The method {@link #createEditor(OptionContext) createEditor()} can be
+ * used to obtain a user interface to edit the option. This is further
+ * parametrised using an {@link OptionContext} so that different editors
+ * can be requested depending on context (e.g. GUI or command line).</P>
+ *
+ * @author Brandon Bassett, Robi Malik
  */
 public abstract class Option<T> implements Cloneable
 {
@@ -78,26 +92,58 @@ public abstract class Option<T> implements Cloneable
 
   //#########################################################################
   //# Simple Access
+  /**
+   * Gets the ID of this option.
+   * The naming convention for options is
+   * &quot;&langle;<I>prefix</I>&rangle;.&langle;<I>name</I>&rangle;&quot;,
+   * where the <I>prefix</I> corresponds to the name of the class where
+   * the option is defined, and the <I>name</I> corresponds to the methods
+   * used to get and set the option value in that class.
+   * @return A string that uniquely identifies this option.
+   */
   public String getID()
   {
     return mID;
   }
 
+  /**
+   * Checks whether the ID of this option matches the given string.
+   * @param  id  The ID to compare against.
+   * @return <CODE>true</CODE> if the option's ID is equal to the
+   *         argument, <CODE>false</CODE> otherwise.
+   */
   public boolean hasID(final String id)
   {
     return mID.equals(id);
   }
 
+  /**
+   * Gets the short name of this option.
+   * @return A short string identifying the option, typically used as
+   *         a title or in GUI labels.
+   */
   public String getShortName()
   {
     return mShortName;
   }
 
+  /**
+   * Gets the description of this option.
+   * @return A longer string that describes the option, which may consist
+   *         of one more sentences. It is typically used to explain the
+   *         option more detail, e.g., as a tooltip.
+   */
   public String getDescription()
   {
     return mDescription;
   }
 
+  /**
+   * Gets an abbreviated option name.
+   * @return A single word string, starting with a dash
+   *         (&quot;<CODE>-</CODE>&quot;), which can be used to set
+   *         the option through a command line.
+   */
   public String getCommandLineOption()
   {
     return mCommandLineOption;
@@ -106,21 +152,38 @@ public abstract class Option<T> implements Cloneable
 
   //#########################################################################
   //# Value Access
+  /**
+   * Gets the default value of this option.
+   * Every option has a hard-coded default value, which cannot be changed.
+   * @see #getValue()
+   */
   public T getDefaultValue()
   {
     return mDefaultValue;
   }
 
+  /**
+   * Gets the current value of this option.
+   * Initially, every option's value is equal to its default value,
+   * but it can be changed by calling {@link #setValue(Object) setValue()}.
+   * @see #getDefaultValue()
+   */
   public T getValue()
   {
     return mValue;
   }
 
+  /**
+   * Changes the current value of this option to the given new value.
+   */
   public void setValue(final T value)
   {
     mValue = value;
   }
 
+  /**
+   * Restores the current value of this option to its default value.
+   */
   public void restoreDefaultValue()
   {
     mValue = mDefaultValue;
@@ -129,6 +192,14 @@ public abstract class Option<T> implements Cloneable
 
   //#########################################################################
   //# Editor
+  /**
+   * Creates an editor object to facilitate control of the option through
+   * a user interface.
+   * @param  context  The option context that defines the environment
+   *                  in which editing happens. There are different option
+   *                  context for command line or GUI.
+   * @see OptionContext
+   */
   public abstract OptionEditor<T> createEditor(OptionContext context);
 
 
