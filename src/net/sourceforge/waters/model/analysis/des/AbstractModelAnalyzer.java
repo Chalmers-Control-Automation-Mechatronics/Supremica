@@ -98,7 +98,21 @@ public abstract class AbstractModelAnalyzer
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.des.ModelAnalyzer
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    return new LinkedList<>();
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.des.ModelAnalyzer
   @Override
   public ProductDESProxyFactory getFactory()
   {
@@ -140,19 +154,6 @@ public abstract class AbstractModelAnalyzer
   {
     return mKindTranslator;
   }
-
-
-  @Override
-  public List<Option<?>> getOptions(final OptionMap db)
-  {
-    return new LinkedList<>();
-  }
-
-  @Override
-  public void setOption(final Option<?> option)
-  {
-  }
-
 
   @Override
   public void setDetailedOutputEnabled(final boolean enable)

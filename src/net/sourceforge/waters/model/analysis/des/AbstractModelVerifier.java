@@ -78,6 +78,36 @@ public abstract class AbstractModelVerifier
 
 
   //#########################################################################
+  //# Interface net.sourceforge.waters.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelVerifier_DetailedOutputEnabled);
+    db.append(options, AbstractModelAnalyzerFactory.
+                       OPTION_ModelVerifier_ShortCounterExampleRequested);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(AbstractModelAnalyzerFactory.
+                     OPTION_ModelVerifier_DetailedOutputEnabled)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setDetailedOutputEnabled(boolOption.getBooleanValue());
+    } else if (option.hasID(AbstractModelAnalyzerFactory.
+                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setShortCounterExampleRequested(boolOption.getBooleanValue());
+    } else {
+      super.setOption(option);
+    }
+  }
+
+
+  //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.des.ModelVerifier
   @Override
   public void setShortCounterExampleRequested(final boolean req)
@@ -138,36 +168,6 @@ public abstract class AbstractModelVerifier
   public VerificationResult createAnalysisResult()
   {
     return new DefaultVerificationResult(this);
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
-  @Override
-  public List<Option<?>> getOptions(final OptionMap db)
-  {
-    final List<Option<?>> options = super.getOptions(db);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelVerifier_DetailedOutputEnabled);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_ModelVerifier_ShortCounterExampleRequested);
-    return options;
-  }
-
-  @Override
-  public void setOption(final Option<?> option)
-  {
-    if (option.hasID(AbstractModelAnalyzerFactory.
-                     OPTION_ModelVerifier_DetailedOutputEnabled)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setDetailedOutputEnabled(boolOption.getBooleanValue());
-    } else if (option.hasID(AbstractModelAnalyzerFactory.
-                            OPTION_ModelVerifier_ShortCounterExampleRequested)) {
-      final BooleanOption boolOption = (BooleanOption) option;
-      setShortCounterExampleRequested(boolOption.getBooleanValue());
-    } else {
-      super.setOption(option);
-    }
   }
 
 
