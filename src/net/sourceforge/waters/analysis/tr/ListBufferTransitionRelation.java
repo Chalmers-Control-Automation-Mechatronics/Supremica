@@ -2534,6 +2534,57 @@ public class ListBufferTransitionRelation implements EventStatusProvider
     }
   }
 
+  /**
+   * <P>Copies the states and transitions from another transition relation
+   * into this transition relation.</P>
+   * <P>This method copies the status of all events and propositions from the
+   * given transition relation into this transition relation, which requires
+   * that the numbers of events must match. Then it moves the references of
+   * the state and transition buffers so that they are henceforth used by
+   * this transition relation.</P>
+   * <P>The buffers of the argument are invalidated, and the argument should
+   * no longer be used unless it is re-initialised using {@link
+   * #reset(int, int, int)} or {@link #reset(int, int, int, int)}.</P>
+   * @param  rel       The transition relation to be copied and invalidated,
+   *                   which must have the same number of events and
+   *                   propositions as this transition relation.
+   */
+  public void copyFrom(final ListBufferTransitionRelation rel)
+  {
+    mName = rel.mName;
+    mKind = rel.mKind;
+    copyEventStatus(rel.mEventStatus);
+    mStateBuffer = rel.mStateBuffer;
+    mSuccessorBuffer = rel.mSuccessorBuffer;
+    mPredecessorBuffer = rel.mPredecessorBuffer;
+    rel.mStateBuffer = null;
+    rel.mSuccessorBuffer = null;
+    rel.mPredecessorBuffer = null;
+  }
+
+  /**
+   * Assigns the status of all events and propositions in this transition
+   * relation to match the given event status provider.
+   * @param  provider  The event status provider to be copied from, which
+   *                   must have the same number of events and propositions
+   *                   as this transition relation.
+   */
+  public void copyEventStatus(final EventStatusProvider provider)
+  {
+    final int numEvents = getNumberOfProperEvents();
+    assert numEvents == provider.getNumberOfProperEvents();
+    for (int e = 0; e < numEvents; e++) {
+      final byte status = provider.getProperEventStatus(e);
+      setProperEventStatus(e, status);
+    }
+    final int numProps = getNumberOfPropositions();
+    assert numProps == provider.getNumberOfPropositions();
+    for (int p = 0; p < numProps; p++) {
+      final boolean used = provider.isPropositionUsed(p);
+      setPropositionUsed(p, used);
+    }
+  }
+
 
   //#########################################################################
   //# Automaton Simplification

@@ -268,7 +268,7 @@ public class ChainTRSimplifier
     throws AnalysisException
   {
     mIsObservationEquivalentAbstraction = true;
-    ListBufferTransitionRelation rel = getTransitionRelation();
+    final ListBufferTransitionRelation rel = getTransitionRelation();
     final int numProps = rel.getNumberOfPropositions();
     mReducedMarkings = new boolean[numProps];
     boolean result = false;
@@ -277,8 +277,6 @@ public class ChainTRSimplifier
         checkAbort();
         step.setTransitionRelation(rel);
         if (step.run()) {
-          rel = step.getTransitionRelation();
-          setTransitionRelation(rel);
           result = true;
           mIsObservationEquivalentAbstraction &=
             step.isObservationEquivalentAbstraction();

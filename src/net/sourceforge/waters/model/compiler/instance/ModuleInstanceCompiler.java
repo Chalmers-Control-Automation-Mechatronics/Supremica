@@ -760,7 +760,8 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
 
         if (mPrimeSearcher.containsPrime(oldguard))
         {
-          /* Guards with primes are not simplified
+          /* TODO BUG
+           * Guards with primes are not simplified
            * because they are needed to determine
            * the variable alphabet.
            */

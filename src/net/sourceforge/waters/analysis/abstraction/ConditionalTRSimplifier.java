@@ -47,14 +47,14 @@ import net.sourceforge.waters.model.analysis.OverflowException;
  *
  * <P>The conditional simplifier encapsulates a transition relation
  * simplifier chain ({@link ChainTRSimplifier}), which is only used
- * under certain condition. It is possible to program a <I>precondition</I>
+ * under certain conditions. It is possible to program a <I>precondition</I>
  * to prevent the simplification chain to be invoked under certain
  * conditions, and a <I>postcondition</I> to decide whether or not the
  * result of the simplification chain is to be used or discarded.</P>
  *
  * <P>The conditional simplifier can also be configured to guard against
- * overflow conditions. If the encapsulated chain fails due to an overflow
- * or out-of-memory condition, the exception is caught and the input
+ * overflow conditions. If the encapsulated chain then fails due to an
+ * overflow or out-of-memory condition, the exception is caught and the input
  * transition relation is returned unchanged.</P>
  *
  * @author Robi Malik
@@ -241,10 +241,11 @@ public class ConditionalTRSimplifier
     if (!checkPreCondition()) {
       return false;
     }
-    ListBufferTransitionRelation rel = getTransitionRelation();
+    final ListBufferTransitionRelation input = getTransitionRelation();
     final int config = mConditionalChain.getPreferredInputConfiguration();
-    rel = new ListBufferTransitionRelation(rel, config);
-    mConditionalChain.setTransitionRelation(rel);
+    ListBufferTransitionRelation output =
+      new ListBufferTransitionRelation(input, config);
+    mConditionalChain.setTransitionRelation(output);
     final boolean result;
     if (isRecoveringFromOverflow()) {
       try {
@@ -261,11 +262,11 @@ public class ConditionalTRSimplifier
     if (!result) {
       return false;
     }
-    rel = mConditionalChain.getTransitionRelation();
-    if (!checkPostCondition(rel)) {
+    output = mConditionalChain.getTransitionRelation();
+    if (!checkPostCondition(output)) {
       return false;
     }
-    setTransitionRelation(rel);
+    input.copyFrom(output);
     final TRPartition partition = mConditionalChain.getResultPartition();
     setResultPartition(partition);
     mChainWasApplied = true;
