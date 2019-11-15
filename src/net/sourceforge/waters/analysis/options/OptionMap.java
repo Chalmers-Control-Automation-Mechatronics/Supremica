@@ -41,11 +41,16 @@ import java.util.Map;
 
 
 /**
- * A collection of options.
- * An option map acts as a database that maps string identifiers to
- * {@link Option} objects.
+ * <P>A collection of available options.</P>
  *
- * @author  Robi Malik
+ * <P>An option map acts as a database that maps string identifiers to
+ * {@link Option} objects. For persistent storage of options values,
+ * the option map is first initialised with all available options,
+ * typically at program start-up. The initialised option map is then
+ * passed to {@link Configurable} objects, which select the options
+ * stored in it.</P>
+ *
+ * @author Robi Malik
  */
 public class OptionMap
 {
@@ -54,12 +59,6 @@ public class OptionMap
   //# Constructors
   public OptionMap()
   {
-    this(null);
-  }
-
-  public OptionMap(final OptionMap parent)
-  {
-    mParentMap = parent;
     mMap = new HashMap<>();
   }
 
@@ -68,19 +67,7 @@ public class OptionMap
   //# Simple Access
   public Option<?> get(final String id)
   {
-    Option<?> param = mMap.get(id);
-    if (param != null) {
-      return param;
-    }
-    if (mParentMap != null) {
-      param = mParentMap.get(id);
-      if (param != null) {
-        param = param.clone();
-        mMap.put(id, param);
-        return param;
-      }
-    }
-    return null;
+    return mMap.get(id);
   }
 
   public void add(final Option<?> param)
@@ -122,7 +109,6 @@ public class OptionMap
 
   //#########################################################################
   //# Data Members
-  private final OptionMap mParentMap;
   private final Map<String,Option<?>> mMap;
 
 }

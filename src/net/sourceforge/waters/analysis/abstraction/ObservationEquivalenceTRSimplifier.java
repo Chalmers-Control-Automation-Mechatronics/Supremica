@@ -236,6 +236,7 @@ public class ObservationEquivalenceTRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow an
    *          unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
@@ -245,6 +246,7 @@ public class ObservationEquivalenceTRSimplifier
    * Gets the transition limit.
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;
@@ -2161,7 +2163,7 @@ public class ObservationEquivalenceTRSimplifier
    * <P>This simplifier can perform two passes of redundant transition
    * removal.</P>
    *
-   * <P>The first pass is performed before computing the state state partition.
+   * <P>The first pass is performed before computing the state partition.
    * This optional step may improve performance, but fails to remove all
    * redundant transitions if a non-trivial partition is found. Furthermore,
    * it cannot remove tau-transitions correctly if the input transition
@@ -2284,7 +2286,7 @@ public class ObservationEquivalenceTRSimplifier
    *
    * <P>When minimising for observation equivalence, states that have a string
    * of silent events leading to a marked states can be considered as marked
-   * themselves. The marking method controls whether or not such states such
+   * themselves. The marking method controls whether or not such states
    * receive a marking in the output automaton.</P>
    *
    * <P>This setting only takes effect if the initial partition is set up
