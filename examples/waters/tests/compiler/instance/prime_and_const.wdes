@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ProductDES xmlns="http://waters.sourceforge.net/xsd/des" xmlns:B="http://waters.sourceforge.net/xsd/base" Name="prime_and_const">
+<B:Comment>A compiler test that requires simplification of a guard that contains a primed variable and a named constant.</B:Comment>
+<EventList>
+<Event Kind="CONTROLLABLE" Name="a"/>
+<Event Kind="CONTROLLABLE" Name="b"/>
+</EventList>
+<AutomataList>
+<Automaton Kind="PLANT" Name="x">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="0"/>
+<State Name="1"/>
+<State Name="2"/>
+</StateList>
+<TransitionList>
+<Transition Source="0" Event="a" Target="0"/>
+<Transition Source="0" Event="a" Target="1"/>
+<Transition Source="0" Event="b" Target="2"/>
+<Transition Source="1" Event="a" Target="0"/>
+<Transition Source="1" Event="a" Target="1"/>
+<Transition Source="1" Event="b" Target="2"/>
+<Transition Source="2" Event="a" Target="0"/>
+<Transition Source="2" Event="a" Target="1"/>
+<Transition Source="2" Event="b" Target="2"/>
+</TransitionList>
+</Automaton>
+<Automaton Kind="PLANT" Name="plant">
+<EventRefList>
+<EventRef Name="a"/>
+<EventRef Name="b"/>
+</EventRefList>
+<StateList>
+<State Initial="true" Name="S0"/>
+<State Name="S1"/>
+</StateList>
+<TransitionList>
+<Transition Source="S0" Event="a" Target="S1"/>
+<Transition Source="S1" Event="b" Target="S1"/>
+</TransitionList>
+</Automaton>
+</AutomataList>
+</ProductDES>

@@ -669,6 +669,14 @@ public abstract class AbstractCompilerTest extends AbstractWatersTest
     testCompile(module);
   }
 
+  public void testCompile_primeAndConst()
+    throws IOException, WatersException
+  {
+    final ModuleProxy module =
+      loadModule("tests", "compiler", "instance", "prime_and_const");
+    testCompile(module);
+  }
+
   public void testCompile_profisafe_ihost_nonsubsumptions()
     throws IOException, WatersException
   {

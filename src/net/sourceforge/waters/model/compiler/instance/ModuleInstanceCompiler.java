@@ -90,6 +90,7 @@ import net.sourceforge.waters.model.module.EventDeclProxy;
 import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.ExpressionProxy;
 import net.sourceforge.waters.model.module.ForeachProxy;
+import net.sourceforge.waters.model.module.FunctionCallExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.GroupNodeProxy;
 import net.sourceforge.waters.model.module.GuardActionBlockProxy;
@@ -747,74 +748,80 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     (final GuardActionBlockProxy ga)
     throws VisitorException
   {
-    try
-    {
-      final List<SimpleExpressionProxy> oldguards = ga.getGuards();
-      final int numguards = oldguards.size();
-      final List<SimpleExpressionProxy> newguards =
-                             new ArrayList<SimpleExpressionProxy>(numguards);
-
-      for (final SimpleExpressionProxy oldguard : oldguards)
-      {
+    try {
+      final List<SimpleExpressionProxy> oldGuards = ga.getGuards();
+      final int numGuards = oldGuards.size();
+      final List<SimpleExpressionProxy> newGuards = new ArrayList<>(numGuards);
+      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+      final ProxyAccessorSet<IdentifierProxy> oldPrimed =
+        new ProxyAccessorHashSet<>(eq);
+      final ProxyAccessorSet<IdentifierProxy> newPrimed =
+        new ProxyAccessorHashSet<>(eq);
+      for (final SimpleExpressionProxy oldGuard : oldGuards) {
         checkAbort();
-
-        if (mPrimeSearcher.containsPrime(oldguard))
-        {
-          /* TODO BUG
-           * Guards with primes are not simplified
-           * because they are needed to determine
-           * the variable alphabet.
-           */
-          final SimpleExpressionProxy newguard =
-                          (SimpleExpressionProxy) mCloner.getClone(oldguard);
-          mCompilationInfo.add(newguard, oldguard);
-          newguards.add(newguard);
+        mPrimeSearcher.collect(oldGuard, oldPrimed);
+        final SimpleExpressionProxy newGuard =
+          mSimpleExpressionCompiler.simplify(oldGuard,
+                                             mNameSpaceVariablesContext);
+        mPrimeSearcher.collect(newGuard, newPrimed);
+        if (!mSimpleExpressionCompiler.isAtomicValue(newGuard, mContext)) {
+          newGuards.add(newGuard);
+          mCompilationInfo.add(newGuard, oldGuard);
+        } else if (mSimpleExpressionCompiler.getBooleanValue(newGuard)) {
+          // True guards are not added.
+        } else {
+          // If a guard is false, no need for any other guards.
+          newGuards.clear();
+          newGuards.add(newGuard);
+          mCompilationInfo.add(newGuard, oldGuard);
+          newPrimed.clear();
+          oldPrimed.clear();
+          break;
         }
-
-        else
-        {
-          final SimpleExpressionProxy newguard =
-                                    mSimpleExpressionCompiler.simplify
-                                      (oldguard, mNameSpaceVariablesContext);
-          if (!mSimpleExpressionCompiler.isAtomicValue(newguard, mContext)) {
-            newguards.add(newguard);
-          } else if (mSimpleExpressionCompiler.getBooleanValue(newguard)) {
-            // True guards are not added.
-          } else {
-            // If a guard is false, no need for any other guards.
-            newguards.clear();
-            newguards.add(newguard);
-            break;
+      }
+      if (newPrimed.size() < oldPrimed.size()) {
+        // If we have lost primed variables, add them back in ...
+        final List<IdentifierProxy> lost =
+          new ArrayList<>(oldPrimed.size() - newPrimed.size());
+        for (final IdentifierProxy ident : oldPrimed) {
+          if (!newPrimed.containsProxy(ident)) {
+            lost.add(ident);
           }
         }
-      }
-
-      final List<BinaryExpressionProxy> oldactions = ga.getActions();
-      final int numactions = oldactions.size();
-      final List<BinaryExpressionProxy> newactions =
-                            new ArrayList<BinaryExpressionProxy>(numactions);
-
-      for (final BinaryExpressionProxy oldaction : oldactions)
-      {
-        checkAbort();
-        final SimpleExpressionProxy newaction =
-                                  mSimpleExpressionCompiler.simplify
-                                    (oldaction, mNameSpaceVariablesContext);
-
-        if (newaction instanceof BinaryExpressionProxy)
-        {
-          final BinaryExpressionProxy newbinary =
-                                            (BinaryExpressionProxy) newaction;
-          newactions.add(newbinary);
-        } else {
-          throw new TypeMismatchException(oldaction, "ACTION");
+        Collections.sort(lost);
+        for (final IdentifierProxy ident : lost) {
+          final IdentifierProxy clone = ident.clone();
+          final UnaryExpressionProxy lhs = mFactory.createUnaryExpressionProxy
+            (mOperatorTable.getNextOperator(), clone);
+          final SimpleExpressionProxy rhs = lhs.clone();
+          final BinaryExpressionProxy eqn = mFactory.createBinaryExpressionProxy
+            (mOperatorTable.getEqualsOperator(), lhs, rhs);
+          newGuards.add(eqn);
         }
       }
 
-      final GuardActionBlockProxy newga =
-          mFactory.createGuardActionBlockProxy(newguards, newactions, null);
-      mCompilationInfo.add(newga, ga);
-      return newga;
+      final List<BinaryExpressionProxy> oldActions = ga.getActions();
+      final int numActions = oldActions.size();
+      final List<BinaryExpressionProxy> newActions = new ArrayList<>(numActions);
+      for (final BinaryExpressionProxy oldAction : oldActions) {
+        checkAbort();
+        final SimpleExpressionProxy newAction =
+          mSimpleExpressionCompiler.simplify(oldAction,
+                                             mNameSpaceVariablesContext);
+        if (newAction instanceof BinaryExpressionProxy) {
+          final BinaryExpressionProxy newBinary =
+            (BinaryExpressionProxy) newAction;
+          newActions.add(newBinary);
+          mCompilationInfo.add(newBinary, oldAction);
+        } else {
+          throw new TypeMismatchException(oldAction, "ACTION");
+        }
+      }
+
+      final GuardActionBlockProxy newGA =
+        mFactory.createGuardActionBlockProxy(newGuards, newActions, null);
+      mCompilationInfo.add(newGA, ga);
+      return newGA;
     } catch (final EvalException exception) {
       throw wrap(exception);
     }
@@ -970,29 +977,26 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   public Object visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
-    final List<Proxy> parameters = new LinkedList<Proxy>();
-    final List<Proxy> nonparameters = new LinkedList<Proxy>();
+    final List<Proxy> parameters = new LinkedList<>();
+    final List<Proxy> nonParameters = new LinkedList<>();
 
-    for (final ConstantAliasProxy alias : module.getConstantAliasList())
-    {
-      if (alias.getScope() == ScopeKind.LOCAL)
-        nonparameters.add(alias);
-      else
+    for (final ConstantAliasProxy alias : module.getConstantAliasList()) {
+      if (alias.getScope() == ScopeKind.LOCAL) {
+        nonParameters.add(alias);
+      } else {
         parameters.add(alias);
+      }
     }
-
-    for (final EventDeclProxy decl : module.getEventDeclList())
-    {
-      if (decl.getScope() == ScopeKind.LOCAL)
-        nonparameters.add(decl);
-      else
+    for (final EventDeclProxy decl : module.getEventDeclList()) {
+      if (decl.getScope() == ScopeKind.LOCAL) {
+        nonParameters.add(decl);
+      } else {
         parameters.add(decl);
+      }
     }
-
     visitCollection(parameters);
 
-    if (mParameterMap != null && !mParameterMap.isEmpty())
-    {
+    if (mParameterMap != null && !mParameterMap.isEmpty()) {
       // Throw an exception when not all paremeters passed into the module
       // have been consumed, unless compiling in top-level context.
       final CompiledParameterBinding entry =
@@ -1005,7 +1009,7 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
     }
     mParameterMap = null;
 
-    visitCollection(nonparameters);
+    visitCollection(nonParameters);
 
     final List<Proxy> aliases = module.getEventAliasList();
     visitCollection(aliases);
@@ -1359,10 +1363,17 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
   {
     //#######################################################################
     //# Invocation
-    private boolean containsPrime(final SimpleExpressionProxy expr)
+    private void collect(final SimpleExpressionProxy expr,
+                         final ProxyAccessorSet<IdentifierProxy> primedIdentifiers)
       throws VisitorException
     {
-      return (Boolean) expr.acceptVisitor(this);
+      try {
+        mPrimedIdentifiers = primedIdentifiers;
+        mNumPrimes = 0;
+        expr.acceptVisitor(this);
+      } finally {
+        mPrimedIdentifiers = null;
+      }
     }
 
     //#######################################################################
@@ -1372,8 +1383,30 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       throws VisitorException
     {
       final SimpleExpressionProxy lhs = expr.getLeft();
+      lhs.acceptVisitor(this);
       final SimpleExpressionProxy rhs = expr.getRight();
-      return containsPrime(lhs) || containsPrime(rhs);
+      rhs.acceptVisitor(this);
+      return null;
+    }
+
+    @Override
+    public Boolean visitFunctionCallExpressionProxy
+      (final FunctionCallExpressionProxy expr)
+      throws VisitorException
+    {
+      for (final SimpleExpressionProxy arg : expr.getArguments()) {
+        arg.acceptVisitor(this);
+      }
+      return null;
+    }
+
+    @Override
+    public Boolean visitIdentifierProxy(final IdentifierProxy ident)
+    {
+      if (mNumPrimes > 0) {
+        mPrimedIdentifiers.addProxy(ident);
+      }
+      return null;
     }
 
     @Override
@@ -1381,13 +1414,18 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       (final IndexedIdentifierProxy ident)
       throws VisitorException
     {
-      final List<SimpleExpressionProxy> indices = ident.getIndexes();
-      for (final SimpleExpressionProxy index : indices) {
-        if (containsPrime(index)) {
-          return true;
+      visitIdentifierProxy(ident);
+      final int oldNumPrimes = mNumPrimes;
+      try {
+        mNumPrimes = 0;
+        final List<SimpleExpressionProxy> indices = ident.getIndexes();
+        for (final SimpleExpressionProxy index : indices) {
+          index.acceptVisitor(this);
         }
+      } finally {
+        mNumPrimes = oldNumPrimes;
       }
-      return false;
+      return null;
     }
 
     @Override
@@ -1395,29 +1433,48 @@ public class ModuleInstanceCompiler extends DefaultModuleProxyVisitor
       (final QualifiedIdentifierProxy ident)
       throws VisitorException
     {
-      final IdentifierProxy base = ident.getBaseIdentifier();
-      final IdentifierProxy comp = ident.getComponentIdentifier();
-      return containsPrime(base) || containsPrime(comp);
+      visitIdentifierProxy(ident);
+      final int oldNumPrimes = mNumPrimes;
+      try {
+        mNumPrimes = 0;
+        final IdentifierProxy base = ident.getBaseIdentifier();
+        base.acceptVisitor(this);
+        final IdentifierProxy comp = ident.getComponentIdentifier();
+        comp.acceptVisitor(this);
+      } finally {
+        mNumPrimes = oldNumPrimes;
+      }
+      return null;
     }
 
     @Override
     public Boolean visitSimpleExpressionProxy(final SimpleExpressionProxy expr)
     {
-      return false;
+      return null;
     }
 
     @Override
     public Boolean visitUnaryExpressionProxy(final UnaryExpressionProxy expr)
       throws VisitorException
     {
-      final UnaryOperator op = expr.getOperator();
-      if (op == mOperatorTable.getNextOperator()) {
-        return true;
-      } else {
+      final int oldNumPrimes = mNumPrimes;
+      try {
+        final UnaryOperator op = expr.getOperator();
+        if (op == mOperatorTable.getNextOperator()) {
+          mNumPrimes++;
+        }
         final SimpleExpressionProxy subterm = expr.getSubTerm();
-        return containsPrime(subterm);
+        subterm.acceptVisitor(this);
+      } finally {
+        mNumPrimes = oldNumPrimes;
       }
+      return null;
     }
+
+    //#######################################################################
+    //# Data Members
+    private ProxyAccessorSet<IdentifierProxy> mPrimedIdentifiers;
+    private int mNumPrimes;
   }
 
 

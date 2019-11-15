@@ -33,36 +33,134 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PositiveIntOption;
 
 
 /**
- * A factory interface for all types of TR simplifiers.
+ * A default implementation of the {@link TRSimplifierFactory} interface.
  *
  * @author Benjamin Wheeler
  */
 
-public interface TRSimplifierFactory
+public abstract class AbstractTRSimplifierFactory
+  implements TRSimplifierFactory
 {
 
   //#########################################################################
-  //# Object Construction
+  //# Constructors
+  protected AbstractTRSimplifierFactory()
+  {
+    registerTRToolCreators();
+  }
+
 
   //#########################################################################
-  //# Options
-  public void registerOptions(OptionMap db);
-
-
-  //#########################################################################
-  //# Command Line Arguments
+  //# Configuration
 
 
   //#########################################################################
   //# Supremica Options
-  /**
-   * Configures a BDD model verifier from Supremica options, if these
-   * are available.
-   */
-  public void configureFromOptions(TransitionRelationSimplifier analyzer);
+  @Override
+  public void configureFromOptions(final TransitionRelationSimplifier simp)
+  {
+  }
+
+  @Override
+  public void registerOptions(final OptionMap db)
+  {
+    db.add(new PositiveIntOption
+             (OPTION_Abstract_StateLimit,
+              "State Limit",
+              "",
+              "-slimit",
+              Integer.MAX_VALUE));
+    db.add(new PositiveIntOption
+           (OPTION_SubsetConstruction_MaxIncrease,
+            "Max Increase",
+            "",
+            "-maxinc",
+            Integer.MAX_VALUE));
+    db.add(new PositiveIntOption
+           (OPTION_Abstract_TransitionLimit,
+            "Transition Limit",
+            "",
+            "-tlimit",
+            Integer.MAX_VALUE));
+    db.add(new BooleanOption
+           (OPTION_SubsetConstruction_DumpStateAware,
+            "Dump State Aware",
+            "",
+            "-dumpsa",
+            false));
+    db.add(new BooleanOption
+           (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
+            "Failing Events As Self Loops",
+            "",
+            "-fesl",
+            false));
+  }
+
+  //#########################################################################
+  //# Auxiliary Methods
+
+  private void registerTRToolCreators()
+  {
+
+    mToolCreators.add(new TRSimplifierCreator("Subset Construction",
+      "") {
+      @Override
+      public TransitionRelationSimplifier create()
+      {
+        return new SubsetConstructionTRSimplifier();
+      }
+    });
+
+    mToolCreators.add(new TRSimplifierCreator("Special Events",
+      "") {
+      @Override
+      public TransitionRelationSimplifier create()
+      {
+        return new SpecialEventsTRSimplifier();
+      }
+    });
+
+  }
+
+  public List<TRSimplifierCreator> getToolCreators()
+  {
+    return mToolCreators;
+  }
+
+  public static AbstractTRSimplifierFactory getInstance()
+  {
+    if (mInstance == null) {
+      mInstance = new AbstractTRSimplifierFactory() {};
+    }
+    return mInstance;
+  }
+
+
+  //#########################################################################
+  //# Data Members
+  private final List<TRSimplifierCreator> mToolCreators = new ArrayList<>();
+  private static AbstractTRSimplifierFactory mInstance = null;
+
+  //#########################################################################
+  //# Class Constants
+  public static final String OPTION_Abstract_StateLimit =
+    "SubsetConstruction.StateLimit";
+  public static final String OPTION_Abstract_TransitionLimit =
+    "SubsetConstruction.TransitionLimit";
+  public static final String OPTION_SubsetConstruction_MaxIncrease =
+    "SubsetConstruction.MaxIncrease";
+  public static final String OPTION_SubsetConstruction_DumpStateAware =
+    "SubsetConstruction.DumpStateAware";
+  public static final String OPTION_SubsetConstruction_FailingEventsAsSelfLoops =
+    "SubsetConstruction.FailingEventsAsSelfLoops";
 
 }
