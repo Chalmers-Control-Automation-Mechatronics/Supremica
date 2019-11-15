@@ -31,60 +31,83 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.gui.actions;
 
-import javax.swing.JPopupMenu;
+import java.awt.event.ActionEvent;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import javax.swing.Action;
+
+import net.sourceforge.waters.gui.analyzer.AutomataTable;
+import net.sourceforge.waters.gui.analyzer.TRSimplifierDialog;
+import net.sourceforge.waters.gui.observer.EditorChangedEvent;
+
+import org.supremica.gui.ide.IDE;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+/**
+ * The action to invoke the TR Simplifier dialog in the Waters analyser.
+ *
+ * @author Benjamin Wheeler
+ */
+
+public class AnalyzerTRSimplifierAction extends WatersAnalyzerAction
 {
-
   //#########################################################################
   //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  protected AnalyzerTRSimplifierAction(final IDE ide)
   {
-    super(master);
+    super(ide);
+    putValue(Action.NAME, "TR Simplifier...");
+    updateEnabledStatus();
   }
 
+
   //#########################################################################
-  //# Shared Menu Items
+  //# Interface java.awt.event.ActionListener
   @Override
-  protected void addCommonMenuItems()
+  public void actionPerformed(final ActionEvent arg0)
   {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction synchronous = master.getAnalyzerSynchronousProductAction();
-    popup.add(synchronous);
-    final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
-    popup.add(synthesis);
-    popup.addSeparator();
-    final IDEAction controllability =
-      master.getAnalyzerControllabilityCheckAction();
-    popup.add(controllability);
-    final IDEAction conflict = master.getAnalyzerConflictCheckAction();
-    popup.add(conflict);
-    final IDEAction deadlock = master.getAnalyzerDeadlockCheckAction();
-    popup.add(deadlock);
-    final IDEAction controlLoop = master.getAnalyzerControlLoopCheckAction();
-    popup.add(controlLoop);
-    final IDEAction languageInclusion =
-      master.getAnalyzerLanguageInclusionCheckAction();
-    popup.add(languageInclusion);
-    popup.addSeparator();
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(stateCounter);
-    popup.addSeparator();
-    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
-    popup.add(workbench);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
+    final IDE ide = getIDE();
+    if (ide != null) {
+      new TRSimplifierDialog(getAnalyzerPanel());
+    }
   }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.gui.observer.Observer
+  @Override
+  public void update(final EditorChangedEvent event)
+  {
+    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
+      updateEnabledStatus();
+    }
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
+  private void updateEnabledStatus()
+  {
+    final AutomataTable table = getAnalyzerTable();
+    if (table == null) {
+      setEnabled(false);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Apply a TR simplifier to automata");
+    } else if (table.getSelectedRowCount() > 0) {
+      setEnabled(true);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Apply a TR simplifier to the selected automata");
+    } else {
+      setEnabled(table.getRowCount() > 0);
+      putValue(Action.SHORT_DESCRIPTION,
+               "Apply a TR simplifier to all automata");
+    }
+  }
+
+
+  //#########################################################################
+  //# Class Constants
+  private static final long serialVersionUID = 636028154288275788L;
 
 }

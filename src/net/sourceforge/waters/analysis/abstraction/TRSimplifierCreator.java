@@ -31,60 +31,60 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.analysis.abstraction;
 
-import javax.swing.JPopupMenu;
+/**
+ * @author Benjamin Wheeler
+ */
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-
-
-class AnalyzerPopupFactory
-  extends PopupFactory
+public abstract class TRSimplifierCreator
 {
 
   //#########################################################################
-  //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  //# Constructors
+  protected TRSimplifierCreator(final String name, final String description)
   {
-    super(master);
+    mName = name;
+    mDescription = description;
   }
 
+
   //#########################################################################
-  //# Shared Menu Items
+  //# Override for java.lang.Object
   @Override
-  protected void addCommonMenuItems()
+  public String toString()
   {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction synchronous = master.getAnalyzerSynchronousProductAction();
-    popup.add(synchronous);
-    final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
-    popup.add(synthesis);
-    popup.addSeparator();
-    final IDEAction controllability =
-      master.getAnalyzerControllabilityCheckAction();
-    popup.add(controllability);
-    final IDEAction conflict = master.getAnalyzerConflictCheckAction();
-    popup.add(conflict);
-    final IDEAction deadlock = master.getAnalyzerDeadlockCheckAction();
-    popup.add(deadlock);
-    final IDEAction controlLoop = master.getAnalyzerControlLoopCheckAction();
-    popup.add(controlLoop);
-    final IDEAction languageInclusion =
-      master.getAnalyzerLanguageInclusionCheckAction();
-    popup.add(languageInclusion);
-    popup.addSeparator();
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(stateCounter);
-    popup.addSeparator();
-    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
-    popup.add(workbench);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
+    return getName();
   }
+
+
+  //#########################################################################
+  //# Factory Methods
+  /**
+   * Returns the name of the tool created by this tool creator.
+   */
+  public String getName()
+  {
+    return mName;
+  }
+
+  /**
+   * Returns the name of the tool created by this tool creator.
+   */
+  public String getDescription()
+  {
+    return mDescription;
+  }
+
+  /**
+   * Creates a tool to be used by the given model analyser.
+   */
+  public abstract TransitionRelationSimplifier create();
+
+
+  //#########################################################################
+  //# Data Members
+  private final String mName;
+  private final String mDescription;
 
 }

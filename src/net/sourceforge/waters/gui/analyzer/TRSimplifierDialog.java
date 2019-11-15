@@ -33,58 +33,26 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
-import javax.swing.JPopupMenu;
+import net.sourceforge.waters.gui.options.ParametrisedTRSimplifierDialog;
 
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
-
-
-class AnalyzerPopupFactory
-  extends PopupFactory
+/**
+ * @author Benjamin Wheeler
+ */
+public class TRSimplifierDialog extends ParametrisedTRSimplifierDialog
 {
 
   //#########################################################################
   //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
+  public TRSimplifierDialog(final WatersAnalyzerPanel panel)
   {
-    super(master);
+    super(panel);
+    setTitle(TITLE);
   }
 
   //#########################################################################
-  //# Shared Menu Items
-  @Override
-  protected void addCommonMenuItems()
-  {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction synchronous = master.getAnalyzerSynchronousProductAction();
-    popup.add(synchronous);
-    final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
-    popup.add(synthesis);
-    popup.addSeparator();
-    final IDEAction controllability =
-      master.getAnalyzerControllabilityCheckAction();
-    popup.add(controllability);
-    final IDEAction conflict = master.getAnalyzerConflictCheckAction();
-    popup.add(conflict);
-    final IDEAction deadlock = master.getAnalyzerDeadlockCheckAction();
-    popup.add(deadlock);
-    final IDEAction controlLoop = master.getAnalyzerControlLoopCheckAction();
-    popup.add(controlLoop);
-    final IDEAction languageInclusion =
-      master.getAnalyzerLanguageInclusionCheckAction();
-    popup.add(languageInclusion);
-    popup.addSeparator();
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(stateCounter);
-    popup.addSeparator();
-    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
-    popup.add(workbench);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
-  }
+  //# Class Constants
+  private static final String TITLE = "TR Simplifier";
+
+  private static final long serialVersionUID = -4439172093952073552L;
 
 }

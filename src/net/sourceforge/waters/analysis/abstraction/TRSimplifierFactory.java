@@ -31,60 +31,38 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.analyzer;
+package net.sourceforge.waters.analysis.abstraction;
 
-import javax.swing.JPopupMenu;
-
-import net.sourceforge.waters.gui.PopupFactory;
-import net.sourceforge.waters.gui.actions.IDEAction;
-import net.sourceforge.waters.gui.actions.WatersPopupActionManager;
+import net.sourceforge.waters.analysis.options.OptionMap;
 
 
-class AnalyzerPopupFactory
-  extends PopupFactory
+/**
+ * A factory interface for all types of TR simplifiers.
+ *
+ * @author Benjamin Wheeler
+ */
+
+public interface TRSimplifierFactory
 {
 
   //#########################################################################
-  //# Constructor
-  AnalyzerPopupFactory(final WatersPopupActionManager master)
-  {
-    super(master);
-  }
+  //# Object Construction
 
   //#########################################################################
-  //# Shared Menu Items
-  @Override
-  protected void addCommonMenuItems()
-  {
-    super.addCommonMenuItems();
-    final WatersPopupActionManager master = getMaster();
-    final JPopupMenu popup = getPopup();
-    popup.addSeparator();
-    final IDEAction synchronous = master.getAnalyzerSynchronousProductAction();
-    popup.add(synchronous);
-    final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
-    popup.add(synthesis);
-    popup.addSeparator();
-    final IDEAction controllability =
-      master.getAnalyzerControllabilityCheckAction();
-    popup.add(controllability);
-    final IDEAction conflict = master.getAnalyzerConflictCheckAction();
-    popup.add(conflict);
-    final IDEAction deadlock = master.getAnalyzerDeadlockCheckAction();
-    popup.add(deadlock);
-    final IDEAction controlLoop = master.getAnalyzerControlLoopCheckAction();
-    popup.add(controlLoop);
-    final IDEAction languageInclusion =
-      master.getAnalyzerLanguageInclusionCheckAction();
-    popup.add(languageInclusion);
-    popup.addSeparator();
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(stateCounter);
-    popup.addSeparator();
-    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
-    popup.add(workbench);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
-  }
+  //# Options
+  public void registerOptions(OptionMap db);
+
+
+  //#########################################################################
+  //# Command Line Arguments
+
+
+  //#########################################################################
+  //# Supremica Options
+  /**
+   * Configures a BDD model verifier from Supremica options, if these
+   * are available.
+   */
+  public void configureFromOptions(TransitionRelationSimplifier analyzer);
 
 }
