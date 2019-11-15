@@ -42,104 +42,100 @@ import net.sourceforge.waters.analysis.options.PositiveIntOption;
 
 
 /**
- * A default implementation of the {@link TRSimplifierFactory} interface.
+ * A factory class to provide access to all transition relation simplifiers
+ * ({@link TransitionRelationSimplifier}) and their options. Used for
+ * creating GUI.
  *
  * @author Benjamin Wheeler
  */
 
-public abstract class AbstractTRSimplifierFactory
-  implements TRSimplifierFactory
+public class TRSimplifierFactory
 {
 
   //#########################################################################
-  //# Constructors
-  protected AbstractTRSimplifierFactory()
+  //# Constructor
+  private TRSimplifierFactory()
   {
-    registerTRToolCreators();
+    registerSimplifierCreators();
   }
 
 
   //#########################################################################
-  //# Configuration
-
-
-  //#########################################################################
-  //# Supremica Options
-  @Override
-  public void configureFromOptions(final TransitionRelationSimplifier simp)
-  {
-  }
-
-  @Override
+  //# Options
   public void registerOptions(final OptionMap db)
   {
     db.add(new PositiveIntOption
              (OPTION_Abstract_StateLimit,
               "State Limit",
-              "",
-              "-slimit",
+              "The maximum number of states that can be constructed " +
+              "before aborting.",
+              "-slimit"));
+    db.add(new PositiveIntOption
+             (OPTION_Abstract_TransitionLimit,
+              "Transition Limit",
+              "The maximum number of transitions that can be constructed " +
+              "before aborting.",
+              "-tlimit"));
+
+    db.add(new BooleanOption
+             (OPTION_TransitionRelationSimplifier_DumpStateAware,
+              "Dump-state aware",
+              "Do not explore beyond dump states, and ignore dump states " +
+              "to determine whether an event is all selfloops and can be " +
+              "removed.",
+              "-dp",
+              false));
+
+    db.add(new BooleanOption
+             (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
+              "Failing events as selfloops",
+              "Enable this to create selfloops for failing events, " +
+              "disable to create transitions to the dump state instead.",
+              "-fesl",
+              false));
+    db.add(new PositiveIntOption  // TODO this really is a double
+             (OPTION_SubsetConstruction_MaxIncrease,
+              "Max Increase",
+              "The maximum factor by which the number of states may increase " +
+              "before aborting.",
+              "-maxinc",
               Integer.MAX_VALUE));
-    db.add(new PositiveIntOption
-           (OPTION_SubsetConstruction_MaxIncrease,
-            "Max Increase",
-            "",
-            "-maxinc",
-            Integer.MAX_VALUE));
-    db.add(new PositiveIntOption
-           (OPTION_Abstract_TransitionLimit,
-            "Transition Limit",
-            "",
-            "-tlimit",
-            Integer.MAX_VALUE));
-    db.add(new BooleanOption
-           (OPTION_SubsetConstruction_DumpStateAware,
-            "Dump State Aware",
-            "",
-            "-dumpsa",
-            false));
-    db.add(new BooleanOption
-           (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
-            "Failing Events As Self Loops",
-            "",
-            "-fesl",
-            false));
   }
+
 
   //#########################################################################
   //# Auxiliary Methods
-
-  private void registerTRToolCreators()
+  private void registerSimplifierCreators()
   {
-
     mToolCreators.add(new TRSimplifierCreator("Subset Construction",
-      "") {
+      "Make a nondeterministic automaton deterministic using the " +
+      "subset construction algorithm.") {
       @Override
       public TransitionRelationSimplifier create()
       {
         return new SubsetConstructionTRSimplifier();
       }
     });
-
-    mToolCreators.add(new TRSimplifierCreator("Special Events",
-      "") {
+    mToolCreators.add(new TRSimplifierCreator("Hide Events",
+      "Replace local events by the silent event. " +
+      "May also perform other special event simplification.") {
       @Override
       public TransitionRelationSimplifier create()
       {
         return new SpecialEventsTRSimplifier();
       }
     });
-
   }
 
-  public List<TRSimplifierCreator> getToolCreators()
+  public List<TRSimplifierCreator> getSimplifierCreators()
   {
     return mToolCreators;
   }
 
-  public static AbstractTRSimplifierFactory getInstance()
+  public static TRSimplifierFactory getInstance()
   {
     if (mInstance == null) {
-      mInstance = new AbstractTRSimplifierFactory() {};
+      mInstance = new TRSimplifierFactory();
     }
     return mInstance;
   }
@@ -148,19 +144,22 @@ public abstract class AbstractTRSimplifierFactory
   //#########################################################################
   //# Data Members
   private final List<TRSimplifierCreator> mToolCreators = new ArrayList<>();
-  private static AbstractTRSimplifierFactory mInstance = null;
+  private static TRSimplifierFactory mInstance = null;
+
 
   //#########################################################################
   //# Class Constants
   public static final String OPTION_Abstract_StateLimit =
-    "SubsetConstruction.StateLimit";
+    "AbstractTRSimplifier.StateLimit";
   public static final String OPTION_Abstract_TransitionLimit =
-    "SubsetConstruction.TransitionLimit";
+    "AbstractTRSimplifier.TransitionLimit";
+
+  public static final String OPTION_TransitionRelationSimplifier_DumpStateAware =
+    "TransitionRelationSimplifier.DumpStateAware";
+
   public static final String OPTION_SubsetConstruction_MaxIncrease =
-    "SubsetConstruction.MaxIncrease";
-  public static final String OPTION_SubsetConstruction_DumpStateAware =
-    "SubsetConstruction.DumpStateAware";
+    "SubsetConstructionTRSimplifier.MaxIncrease";
   public static final String OPTION_SubsetConstruction_FailingEventsAsSelfLoops =
-    "SubsetConstruction.FailingEventsAsSelfLoops";
+    "SubsetConstructionTRSimplifier.FailingEventsAsSelfLoops";
 
 }

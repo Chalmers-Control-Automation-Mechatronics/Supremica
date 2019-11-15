@@ -109,13 +109,13 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     // Algorithm selector combo box
     final JPanel algorithmPanel = new RaisedDialogPanel();
     algorithmPanel.setLayout(new FlowLayout());
-    final JLabel algorithmComboboxLabel = new JLabel("TR Simplifier");
+    final JLabel algorithmComboboxLabel = new JLabel("Simplifier");
     mAnalyzerComboBox = new JComboBox<>();
 
     final AbstractTRSimplifierFactory factory = AbstractTRSimplifierFactory.getInstance();
     factory.registerOptions(mOptionDB);
     for (final TRSimplifierCreator creator :
-         factory.getToolCreators()) {
+         factory.getSimplifierCreators()) {
       mAnalyzerComboBox.addItem(creator);
     }
 
