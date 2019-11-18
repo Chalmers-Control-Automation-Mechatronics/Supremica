@@ -36,9 +36,6 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.MarkingMode;
-import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
@@ -92,6 +89,54 @@ public class TRSimplifierFactory
               "-dp",
               false));
 
+    db.add(new PropositionOption
+             (OPTION_AbstractMarking_DefaultMarkingID,
+              "Marking proposition",
+              "Default marking used for nonblocking verification or synthesis.",
+              "-marking",
+              PropositionOption.DefaultKind.DEFAULT_NULL));
+    db.add(new PropositionOption
+             (OPTION_AbstractMarking_PreconditionMarkingID,
+              "Precondition marking",
+              "Precondition marking used for generalised conflict check.",
+              "-premarking",
+              PropositionOption.DefaultKind.ALLOW_NULL));
+
+    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.Equivalence>
+             (OPTION_ObservationEquivalence_Equivalence,
+              "Equivalence",
+              "The equivalence relation that defines which states can be merged.",
+              "-equiv",
+              ObservationEquivalenceTRSimplifier.Equivalence.values()));
+    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.TransitionRemoval>
+             (OPTION_ObservationEquivalence_TransitionRemovalMode,
+              "Transition Removal Mode",
+              "The times at which to remove redundant transitions based " +
+              "on observation equicvalence.",
+              "-trm",
+              ObservationEquivalenceTRSimplifier.TransitionRemoval.values()));
+    db.add(new EnumOption<ObservationEquivalenceTRSimplifier.MarkingMode>
+             (OPTION_ObservationEquivalence_MarkingMode,
+              "Marking Mode",
+              "How markings are handled when minimising for " +
+              "observation equivalence.",
+              "-mm",
+              ObservationEquivalenceTRSimplifier.MarkingMode.values()));
+    db.add(new BooleanOption
+             (OPTION_ObservationEquivalence_InfoEnabled,
+              "Use Info Data Structure",
+              "Use the data structures proposed by Fernandez " +
+              "that ensure an O(n log n) runtime but require more memory.",
+              "-eqinfo",
+              false));
+    db.add(new BooleanOption
+             (OPTION_ObservationEquivalence_UsingLocalEvents,
+              "Use Local Events",
+              "Consider all local events as silent " +
+              "(as opposed to only the special event TAU).",
+              "-eqlocal",
+              false));
+
     db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
               "Failing events as selfloops",
@@ -105,57 +150,7 @@ public class TRSimplifierFactory
               "The maximum factor by which the number of states may increase " +
               "before aborting.",
               "-maxinc",
-              Double.MAX_VALUE, 1, Double.MAX_VALUE));
-
-    db.add(new PropositionOption
-           (OPTION_AbstractMarking_PreconditionMarkingID,
-            "Precondition Marking",
-            "",
-            "-premrk",
-            PropositionOption.DefaultKind.DEFAULT_NULL));
-    db.add(new PropositionOption
-           (OPTION_AbstractMarking_DefaultMarkingID,
-            "Default Marking",
-            "",
-            "-defmrk",
-            PropositionOption.DefaultKind.ALLOW_NULL));
-
-    db.add(new EnumOption<Equivalence>(
-      OPTION_ObservationEquivalence_Equivalence,
-      "Equivalence",
-      "",
-      "-equiv",
-      Equivalence.values()));
-    db.add(new EnumOption<TransitionRemoval>(
-      OPTION_ObservationEquivalence_TransitionRemovalMode,
-      "Transition Removal Mode",
-      "",
-      "-eqtrem",
-      TransitionRemoval.values()));
-    db.add(new EnumOption<MarkingMode>(
-      OPTION_ObservationEquivalence_MarkingMode,
-      "Marking Mode",
-      "",
-      "-eqmark",
-      MarkingMode.values()));
-    db.add(new BooleanOption(
-      OPTION_ObservationEquivalence_DumpStateAware,
-      "Dump State Aware",
-      "",
-      "-eqdsa",
-      false));
-    db.add(new BooleanOption(
-      OPTION_ObservationEquivalence_UsingLocalEvents,
-      "Using Local Events",
-      "",
-      "-eqlocal",
-      false));
-    db.add(new BooleanOption(
-      OPTION_ObservationEquivalence_InfoEnabled,
-      "Info Enabled",
-      "",
-      "-eqinfo",
-      false));
+              Double.POSITIVE_INFINITY, 1.0, Double.POSITIVE_INFINITY));
   }
 
 
@@ -163,10 +158,11 @@ public class TRSimplifierFactory
   //# Auxiliary Methods
   private void registerSimplifierCreators()
   {
-    mToolCreators.add(new TRSimplifierCreator("Observation Equivalence",
-      "") {
+    mToolCreators.add(new TRSimplifierCreator("Partition Refinement",
+      "Perform automaton minimisation by partition refinement," +
+      "such as Hopcroft's minimisation algorithm or bisimulation.") {
       @Override
-      public TransitionRelationSimplifier createTRSimplifier()
+      protected TransitionRelationSimplifier createTRSimplifier()
       {
         return new ObservationEquivalenceTRSimplifier();
       }
@@ -175,7 +171,7 @@ public class TRSimplifierFactory
       "Make a nondeterministic automaton deterministic using the " +
       "subset construction algorithm.") {
       @Override
-      public TransitionRelationSimplifier createTRSimplifier()
+      protected TransitionRelationSimplifier createTRSimplifier()
       {
         return new SubsetConstructionTRSimplifier();
       }
@@ -184,7 +180,7 @@ public class TRSimplifierFactory
       "Replace local events by the silent event. " +
       "May also perform other special event simplification.") {
       @Override
-      public TransitionRelationSimplifier createTRSimplifier()
+      protected TransitionRelationSimplifier createTRSimplifier()
       {
         return new SpecialEventsTRSimplifier();
       }

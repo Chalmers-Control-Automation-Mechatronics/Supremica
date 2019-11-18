@@ -41,7 +41,7 @@ import javax.swing.text.DocumentFilter;
 
 
 /**
- * <P>A text field to enter an double within a given range.</P>
+ * <P>A text field to enter a double within a given range.</P>
  *
  * @author Robi Malik, Benjamin Wheeler
  */
@@ -53,31 +53,31 @@ public class DoubleInputCell
   //#########################################################################
   //# Constructors
   /**
-   * Creates an double input cell for non-negative doubles.
+   * Creates a double input cell for non-negative doubles.
    * The cell created by this constructor accepts values between 0 and
-   * {@link Double#MAX_VALUE}, where an empty input is interpreted as
-   * {@link Double#MAX_VALUE}.
+   * {@link Double#POSITIVE_INFINITY}, where an empty input is interpreted as
+   * {@link Double#POSITIVE_INFINITY}.
    */
   public DoubleInputCell()
   {
-    this(0, Double.MAX_VALUE, Double.MAX_VALUE);
+    this(0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
   }
 
   /**
-   * Creates an double input cell for the given range.
+   * Creates a double input cell for the given range.
    * This constructor creates an input cell that does not allow an empty input.
    * @param  minValue  The smallest acceptable number to be entered.
    * @param  maxValue  The largest acceptable number to be entered.
    */
   public DoubleInputCell(final double minValue,
-                          final double maxValue)
+                         final double maxValue)
   {
     super(new DoubleInputHandler(minValue, maxValue));
     setValue(minValue);
   }
 
   /**
-   * Creates an double input cell for the given range.
+   * Creates a double input cell for the given range.
    * @param  minValue  The smallest acceptable number to be entered.
    * @param  maxValue  The largest acceptable number to be entered.
    * @param  nullValue The value returned by the cell if the input is empty.
@@ -87,8 +87,8 @@ public class DoubleInputCell
    *                   null value, it is displayed as an empty string.
    */
   public DoubleInputCell(final double minValue,
-                          final double maxValue,
-                          final double nullValue)
+                         final double maxValue,
+                         final double nullValue)
   {
     super(new DoubleInputHandler(minValue, maxValue, nullValue));
     setValue(nullValue);
@@ -121,8 +121,8 @@ public class DoubleInputCell
     }
 
     private DoubleInputHandler(final double minValue,
-                                final double maxValue,
-                                final double nullValue)
+                               final double maxValue,
+                               final double nullValue)
     {
       mMinValue = minValue;
       mMaxValue = maxValue;
@@ -167,27 +167,27 @@ public class DoubleInputCell
         return value;
       } catch (final NumberFormatException exception) {
         final StringBuilder builder = new StringBuilder();
-        if (mMaxValue == Double.MAX_VALUE) {
+        if (mMaxValue == Double.POSITIVE_INFINITY) {
           if (mMinValue == 0) {
-            builder.append("Please enter a non-negative double.");
-          } else if (mMinValue == Double.MIN_VALUE) {
-            builder.append("Please enter a double.");
+            builder.append("Please enter a non-negative number.");
+          } else if (mMinValue == Double.NEGATIVE_INFINITY) {
+            builder.append("Please enter a number.");
           } else {
-            builder.append("Please enter a double which is at least ");
+            builder.append("Please enter a number which is at least ");
             builder.append(mMinValue);
             builder.append('.');
           }
         } else {
           if (mMinValue == 0) {
-            builder.append("Please enter a non-negative double which is at most ");
+            builder.append("Please enter a non-negative number which is at most ");
             builder.append(mMaxValue);
             builder.append('.');
-          } else if (mMaxValue == Double.MIN_VALUE) {
-            builder.append("Please enter an double which is at most ");
+          } else if (mMaxValue == Double.NEGATIVE_INFINITY) {
+            builder.append("Please enter a number which is at most ");
             builder.append(mMaxValue);
             builder.append('.');
           } else {
-            builder.append("Please enter an double between ");
+            builder.append("Please enter a number between ");
             builder.append(mMinValue);
             builder.append(" and ");
             builder.append(mMaxValue);
@@ -244,11 +244,8 @@ public class DoubleInputCell
         final StringBuilder builder = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
           final char ch = text.charAt(i);
-          if (Character.isDigit(ch)) {
-            builder.append(ch);
-          } else if (ch == '-' && mMinValue < 0) {
-            builder.append(ch);
-          } else if (ch == '.' || ch == 'e' || ch == 'E') {
+          if (Character.isDigit(ch) ||
+              ch == '-'  || ch == '.' || ch == 'e' || ch == 'E') {
             builder.append(ch);
           }
         }
