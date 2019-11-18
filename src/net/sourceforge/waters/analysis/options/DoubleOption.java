@@ -39,9 +39,7 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 /**
  * A configurable parameter of a {@link ModelAnalyzer} representing a
  * double. This parameter is represented as a <CODE>double</CODE>
- * value, with an allowable range from 0 to {@link Double#MAX_VALUE}.
- * The maximum value is typically the default and represents an undefined
- * parameter value.
+ * value.
  *
  * @author Brandon Bassett, Robi Malik, Benjamin Wheeler
  */
@@ -51,39 +49,42 @@ public class DoubleOption extends Option<Double>
   //#########################################################################
   //# Constructors
   /**
-   * Creates a double parameter with {@link Double#MAX_VALUE}
+   * Creates a double parameter with {@link Double#POSITIVE_INFINITY}
    * as its default.
    */
   public DoubleOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption)
+                      final String shortName,
+                      final String description,
+                      final String commandLineOption)
   {
-    this(id, shortName, description, commandLineOption, Double.MAX_VALUE);
+    this(id, shortName, description, commandLineOption,
+         Double.POSITIVE_INFINITY);
   }
 
   /**
    * Creates a double parameter with a specified default.
    */
   public DoubleOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption,
-                           final double defaultValue)
+                      final String shortName,
+                      final String description,
+                      final String commandLineOption,
+                      final double defaultValue)
   {
-    super(id, shortName, description, commandLineOption, defaultValue);
+    this(id, shortName, description, commandLineOption,
+         Double.POSITIVE_INFINITY,
+         Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
   }
 
   /**
    * Creates a double parameter with a specified default and range.
    */
   public DoubleOption(final String id,
-                           final String shortName,
-                           final String description,
-                           final String commandLineOption,
-                           final double defaultValue,
-                           final double minValue,
-                           final double maxValue)
+                      final String shortName,
+                      final String description,
+                      final String commandLineOption,
+                      final double defaultValue,
+                      final double minValue,
+                      final double maxValue)
   {
     super(id, shortName, description, commandLineOption, defaultValue);
     mMinValue = minValue;
@@ -103,6 +104,16 @@ public class DoubleOption extends Option<Double>
     super.setValue(value);
   }
 
+  public double getMin()
+  {
+    return mMinValue;
+  }
+
+  public double getMax()
+  {
+    return mMaxValue;
+  }
+
 
   //#########################################################################
   //# Overrides for net.sourceforge.waters.analysis.options.Option
@@ -112,15 +123,11 @@ public class DoubleOption extends Option<Double>
     return context.createDoubleEditor(this);
   }
 
-  Double mMinValue = null;
-  Double mMaxValue = null;
 
-  public Double getMin() {
-    return mMinValue;
-  }
+  //#########################################################################
+  //# Data Members
+  private final double mMinValue;
+  private final double mMaxValue;
 
-  public Double getMax() {
-    return mMaxValue;
-  }
 
 }

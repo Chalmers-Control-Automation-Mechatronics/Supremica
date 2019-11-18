@@ -60,7 +60,9 @@ public class DoubleInputCell
    */
   public DoubleInputCell()
   {
-    this(0, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+    this(Double.NEGATIVE_INFINITY,
+         Double.POSITIVE_INFINITY,
+         Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -113,7 +115,7 @@ public class DoubleInputCell
     //#######################################################################
     //# Constructors
     private DoubleInputHandler(final double minValue,
-                                final double maxValue)
+                               final double maxValue)
     {
       mMinValue = minValue;
       mMaxValue = maxValue;

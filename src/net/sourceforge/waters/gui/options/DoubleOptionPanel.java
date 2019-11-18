@@ -87,13 +87,10 @@ class DoubleOptionPanel
   {
     final DoubleOption option = getOption();
     final double value = option.getValue();
-    final Double minValue = option.getMin();
-    final Double maxValue = option.getMax();
-    final DoubleInputCell cell;
-    if (minValue != null && maxValue != null) {
-      cell = new DoubleInputCell(minValue, maxValue, Double.POSITIVE_INFINITY);
-    }
-    else cell = new DoubleInputCell();
+    final double minValue = option.getMin();
+    final double maxValue = option.getMax();
+    final DoubleInputCell cell =
+      new DoubleInputCell(minValue, maxValue, Double.POSITIVE_INFINITY);
     cell.setValue(value);
     cell.setColumns(10);
     final GUIOptionContext context = getContext();
