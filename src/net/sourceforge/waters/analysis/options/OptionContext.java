@@ -99,6 +99,12 @@ public interface OptionContext
   createPositiveIntEditor(PositiveIntOption option);
 
   /**
+   * Creates an option editor for a double option.
+   */
+  public OptionEditor<Double>
+  createDoubleEditor(DoubleOption option);
+
+  /**
    * Creates an option editor for a proposition option.
    */
   public OptionEditor<EventProxy>

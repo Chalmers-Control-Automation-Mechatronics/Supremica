@@ -43,6 +43,7 @@ import javax.swing.Icon;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.ComponentKindOption;
+import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.FileOption;
@@ -171,6 +172,13 @@ public class GUIOptionContext implements OptionContext
   createPositiveIntEditor(final PositiveIntOption option)
   {
     return new PositiveIntOptionPanel(this, option);
+  }
+
+  @Override
+  public OptionEditor<Double>
+  createDoubleEditor(final DoubleOption option)
+  {
+    return new DoubleOptionPanel(this, option);
   }
 
   @Override

@@ -39,9 +39,9 @@ import gnu.trove.set.hash.TIntHashSet;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.tr.AbstractStateBuffer;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
@@ -467,7 +467,7 @@ public class SubsetConstructionTRSimplifier
   public void setOption(final Option<?> option)
   {
     if (option.hasID(TRSimplifierFactory.OPTION_SubsetConstruction_MaxIncrease)) {
-      final PositiveIntOption propOption = (PositiveIntOption) option;
+      final DoubleOption propOption = (DoubleOption) option;
       setMaxIncrease(propOption.getValue());
     }
     else if (option.hasID(TRSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {

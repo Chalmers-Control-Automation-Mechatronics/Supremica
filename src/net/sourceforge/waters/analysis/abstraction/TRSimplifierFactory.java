@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimpl
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.MarkingMode;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
@@ -98,13 +99,13 @@ public class TRSimplifierFactory
               "disable to create transitions to the dump state instead.",
               "-fesl",
               false));
-    db.add(new PositiveIntOption  // TODO this really is a double
+    db.add(new DoubleOption
              (OPTION_SubsetConstruction_MaxIncrease,
               "Max Increase",
               "The maximum factor by which the number of states may increase " +
               "before aborting.",
               "-maxinc",
-              Integer.MAX_VALUE));
+              Double.MAX_VALUE, 1, Double.MAX_VALUE));
 
     db.add(new PropositionOption
            (OPTION_AbstractMarking_PreconditionMarkingID,
