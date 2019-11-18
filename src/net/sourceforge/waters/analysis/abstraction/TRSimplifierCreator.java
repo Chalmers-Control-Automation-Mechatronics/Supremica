@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+
 /**
  * @author Benjamin Wheeler
  */
@@ -79,7 +82,14 @@ public abstract class TRSimplifierCreator
   /**
    * Creates a tool to be used by the given model analyser.
    */
-  public abstract TransitionRelationSimplifier create();
+  public TRAutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
+    return new TRAutomatonBuilder(factory, createTRSimplifier());
+  }
+
+  /**
+   * Creates a tool to be used by the given model analyser.
+   */
+  protected abstract TransitionRelationSimplifier createTRSimplifier();
 
 
   //#########################################################################

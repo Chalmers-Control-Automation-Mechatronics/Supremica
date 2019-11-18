@@ -50,6 +50,10 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -277,6 +281,72 @@ public class ObservationEquivalenceTRSimplifier
   public boolean getInfoEnabled()
   {
     return mInitialInfoSize >= 0;
+  }
+
+
+
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRSimplifierFactory.
+              OPTION_AbstractMarking_PreconditionMarkingID);
+    db.append(options, TRSimplifierFactory.
+              OPTION_AbstractMarking_DefaultMarkingID);
+
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_Equivalence);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_TransitionRemovalMode);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_MarkingMode);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_DumpStateAware);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_UsingLocalEvents);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_InfoEnabled);
+    return options;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void setOption(final Option<?> option)
+  {
+
+    if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence)) {
+      final EnumOption<Equivalence> propOption = (EnumOption<Equivalence>) option;
+      final Equivalence value = propOption.getValue();
+      setEquivalence(value);
+    }
+    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode)) {
+      final EnumOption<TransitionRemoval> propOption = (EnumOption<TransitionRemoval>) option;
+      final TransitionRemoval value = propOption.getValue();
+      setTransitionRemovalMode(value);
+    }
+    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode)) {
+      final EnumOption<MarkingMode> propOption = (EnumOption<MarkingMode>) option;
+      final MarkingMode value = propOption.getValue();
+      setMarkingMode(value);
+    }
+    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_DumpStateAware)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      final boolean value = propOption.getValue();
+      setDumpStateAware(value);
+    }
+    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_UsingLocalEvents)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      final boolean value = propOption.getValue();
+      setUsingLocalEvents(value);
+    }
+    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_InfoEnabled)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      final boolean value = propOption.getValue();
+      setInfoEnabled(value);
+    }
+    else {
+      super.setOption(option);
+    }
   }
 
 

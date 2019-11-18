@@ -36,9 +36,14 @@ package net.sourceforge.waters.analysis.abstraction;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.MarkingMode;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.TransitionRemoval;
 import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.EnumOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
+import net.sourceforge.waters.analysis.options.PropositionOption;
 
 
 /**
@@ -100,6 +105,56 @@ public class TRSimplifierFactory
               "before aborting.",
               "-maxinc",
               Integer.MAX_VALUE));
+
+    db.add(new PropositionOption
+           (OPTION_AbstractMarking_PreconditionMarkingID,
+            "Precondition Marking",
+            "",
+            "-premrk",
+            PropositionOption.DefaultKind.DEFAULT_NULL));
+    db.add(new PropositionOption
+           (OPTION_AbstractMarking_DefaultMarkingID,
+            "Default Marking",
+            "",
+            "-defmrk",
+            PropositionOption.DefaultKind.ALLOW_NULL));
+
+    db.add(new EnumOption<Equivalence>(
+      OPTION_ObservationEquivalence_Equivalence,
+      "Equivalence",
+      "",
+      "-equiv",
+      Equivalence.values()));
+    db.add(new EnumOption<TransitionRemoval>(
+      OPTION_ObservationEquivalence_TransitionRemovalMode,
+      "Transition Removal Mode",
+      "",
+      "-eqtrem",
+      TransitionRemoval.values()));
+    db.add(new EnumOption<MarkingMode>(
+      OPTION_ObservationEquivalence_MarkingMode,
+      "Marking Mode",
+      "",
+      "-eqmark",
+      MarkingMode.values()));
+    db.add(new BooleanOption(
+      OPTION_ObservationEquivalence_DumpStateAware,
+      "Dump State Aware",
+      "",
+      "-eqdsa",
+      false));
+    db.add(new BooleanOption(
+      OPTION_ObservationEquivalence_UsingLocalEvents,
+      "Using Local Events",
+      "",
+      "-eqlocal",
+      false));
+    db.add(new BooleanOption(
+      OPTION_ObservationEquivalence_InfoEnabled,
+      "Info Enabled",
+      "",
+      "-eqinfo",
+      false));
   }
 
 
@@ -107,11 +162,19 @@ public class TRSimplifierFactory
   //# Auxiliary Methods
   private void registerSimplifierCreators()
   {
+    mToolCreators.add(new TRSimplifierCreator("Observation Equivalence",
+      "") {
+      @Override
+      public TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new ObservationEquivalenceTRSimplifier();
+      }
+    });
     mToolCreators.add(new TRSimplifierCreator("Subset Construction",
       "Make a nondeterministic automaton deterministic using the " +
       "subset construction algorithm.") {
       @Override
-      public TransitionRelationSimplifier create()
+      public TransitionRelationSimplifier createTRSimplifier()
       {
         return new SubsetConstructionTRSimplifier();
       }
@@ -120,7 +183,7 @@ public class TRSimplifierFactory
       "Replace local events by the silent event. " +
       "May also perform other special event simplification.") {
       @Override
-      public TransitionRelationSimplifier create()
+      public TransitionRelationSimplifier createTRSimplifier()
       {
         return new SpecialEventsTRSimplifier();
       }
@@ -161,5 +224,23 @@ public class TRSimplifierFactory
     "SubsetConstructionTRSimplifier.MaxIncrease";
   public static final String OPTION_SubsetConstruction_FailingEventsAsSelfLoops =
     "SubsetConstructionTRSimplifier.FailingEventsAsSelfLoops";
+  public static final String OPTION_AbstractMarking_PreconditionMarkingID =
+    "AbstractMarkingTRSimplifier.PreconditionID";
+  public static final String OPTION_AbstractMarking_DefaultMarkingID =
+    "AbstractMarkingTRSimplifier.DefaultID";
+
+  public static final String OPTION_ObservationEquivalence_Equivalence =
+    "ObservationEquivalenceSimplifier.Equivalence";
+  public static final String OPTION_ObservationEquivalence_TransitionRemovalMode =
+    "ObservationEquivalenceSimplifier.TransitionRemovalMode";
+  public static final String OPTION_ObservationEquivalence_MarkingMode =
+    "ObservationEquivalenceSimplifier.MarkingMode";
+  //TODO Proposition mask?
+  public static final String OPTION_ObservationEquivalence_DumpStateAware =
+    "ObservationEquivalenceSimplifier.DumpStateAware";
+  public static final String OPTION_ObservationEquivalence_UsingLocalEvents =
+    "ObservationEquivalenceSimplifier.UsingLocalEvents";
+  public static final String OPTION_ObservationEquivalence_InfoEnabled =
+    "ObservationEquivalenceSimplifier.InfoEnabled";
 
 }

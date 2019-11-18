@@ -52,14 +52,12 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 
-import net.sourceforge.waters.analysis.abstraction.AbstractTRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierCreator;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
+import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -68,7 +66,9 @@ import net.sourceforge.waters.gui.transfer.FocusTracker;
 import net.sourceforge.waters.gui.util.DialogCancelAction;
 import net.sourceforge.waters.gui.util.RaisedDialogPanel;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.AutomatonProxy;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -112,7 +112,7 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     final JLabel algorithmComboboxLabel = new JLabel("Simplifier");
     mAnalyzerComboBox = new JComboBox<>();
 
-    final AbstractTRSimplifierFactory factory = AbstractTRSimplifierFactory.getInstance();
+    final TRSimplifierFactory factory = TRSimplifierFactory.getInstance();
     factory.registerOptions(mOptionDB);
     for (final TRSimplifierCreator creator :
          factory.getSimplifierCreators()) {
@@ -187,7 +187,7 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
   {
     final int index = mAnalyzerComboBox.getSelectedIndex();
     final TRSimplifierCreator creator = mAnalyzerComboBox.getItemAt(index);
-    mCurrentAnalyzer = creator.create();
+    mCurrentAnalyzer = creator.createBuilder(mContext.getProductDESProxyFactory());
     final List<Option<?>> params = mCurrentAnalyzer.getOptions(mOptionDB);
     updateParameterList(params);
   }
@@ -236,50 +236,38 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     final WatersAnalyzerPanel panel = mContext.getWatersAnalyzerPanel();
     final AutomataTable table = panel.getAutomataTable();
     final List<AutomatonProxy> automata = table.getOperationArgument();
+    final AutomatonProxy aut = automata.iterator().next();
 
     final AutomataTableModel model = panel.getAutomataTableModel();
 
     final Logger logger = LogManager.getLogger();
-    for (final AutomatonProxy proxy : automata)
-    {
-      try {
-        final TRAutomatonProxy trAut = TRAutomatonProxy.createTRAutomatonProxy(proxy);
 
-        final String nameFormat = "subset(%s)";
-        final String name = String.format(nameFormat, trAut.getName());
-        trAut.setName(name);
+    try {
 
-        final ListBufferTransitionRelation tr = trAut.getTransitionRelation();
+      final ProductDESProxyFactory factory = mContext.getProductDESProxyFactory();
+      final TRSimplifierCreator creator =
+        (TRSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
+      final TRAutomatonBuilder builder = creator.createBuilder(factory);
+      builder.setModel(aut);
 
-        final TransitionRelationSimplifier simp = getTRSimplifier();
-        simp.setTransitionRelation(tr);
-
-        final FocusTracker tracker = ide.getFocusTracker();
-        if (tracker.shouldYieldFocus(this)) {
-          for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
-            optionPanel.commitValue();
-            final Option<?> option = optionPanel.getOption();
-            simp.setOption(option);
-          }
-          simp.run();
-          dispose();
+      final FocusTracker tracker = ide.getFocusTracker();
+      if (tracker.shouldYieldFocus(this)) {
+        for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
+          optionPanel.commitValue();
+          final Option<?> option = optionPanel.getOption();
+          builder.setOption(option);
         }
-
-        model.insertRow(trAut);
-
-      } catch (final AnalysisException exception) {
-        logger.error(exception.getMessage());
-        return;
+        builder.run();
+        final AutomatonProxy result = builder.getComputedAutomaton();
+        model.insertRow(result);
+        dispose();
       }
+
+    } catch (final AnalysisException exception) {
+      logger.error(exception.getMessage());
+      return;
     }
 
-  }
-
-  private TransitionRelationSimplifier getTRSimplifier() {
-    final TRSimplifierCreator creator =
-      (TRSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
-    final TransitionRelationSimplifier simp = creator.create();
-    return simp;
   }
 
 
@@ -290,7 +278,7 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
   private final JPanel mParameterListPanel;
   private final OptionMap mOptionDB;
 
-  private TransitionRelationSimplifier mCurrentAnalyzer;
+  private AutomatonBuilder mCurrentAnalyzer;
   private final List<OptionPanel<?>> mCurrentParameterPanels;
 
 

@@ -454,11 +454,11 @@ public class SubsetConstructionTRSimplifier
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.append(options, AbstractTRSimplifierFactory.
+    db.append(options, TRSimplifierFactory.
                OPTION_SubsetConstruction_MaxIncrease);
-    db.append(options, AbstractTRSimplifierFactory.
-               OPTION_SubsetConstruction_DumpStateAware);
-    db.append(options, AbstractTRSimplifierFactory.
+    db.append(options, TRSimplifierFactory.
+              OPTION_TransitionRelationSimplifier_DumpStateAware);
+    db.append(options, TRSimplifierFactory.
                OPTION_SubsetConstruction_FailingEventsAsSelfLoops);
     return options;
   }
@@ -466,15 +466,15 @@ public class SubsetConstructionTRSimplifier
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(AbstractTRSimplifierFactory.OPTION_SubsetConstruction_MaxIncrease)) {
+    if (option.hasID(TRSimplifierFactory.OPTION_SubsetConstruction_MaxIncrease)) {
       final PositiveIntOption propOption = (PositiveIntOption) option;
       setMaxIncrease(propOption.getValue());
     }
-    else if (option.hasID(AbstractTRSimplifierFactory.OPTION_SubsetConstruction_DumpStateAware)) {
+    else if (option.hasID(TRSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {
       final BooleanOption propOption = (BooleanOption) option;
       setDumpStateAware(propOption.getValue());
     }
-    else if (option.hasID(AbstractTRSimplifierFactory.OPTION_SubsetConstruction_FailingEventsAsSelfLoops)) {
+    else if (option.hasID(TRSimplifierFactory.OPTION_SubsetConstruction_FailingEventsAsSelfLoops)) {
       final BooleanOption propOption = (BooleanOption) option;
       setFailingEventsAsSelfloops(propOption.getValue());
     }

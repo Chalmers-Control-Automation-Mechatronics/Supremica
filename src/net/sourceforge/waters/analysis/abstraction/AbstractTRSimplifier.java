@@ -327,9 +327,9 @@ public abstract class AbstractTRSimplifier
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = new LinkedList<Option<?>>();
-    db.append(options, AbstractTRSimplifierFactory.
+    db.append(options, TRSimplifierFactory.
                OPTION_Abstract_StateLimit);
-    db.append(options, AbstractTRSimplifierFactory.
+    db.append(options, TRSimplifierFactory.
                OPTION_Abstract_TransitionLimit);
     return options;
   }
@@ -345,11 +345,11 @@ public abstract class AbstractTRSimplifier
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(AbstractTRSimplifierFactory.OPTION_Abstract_StateLimit)) {
+    if (option.hasID(TRSimplifierFactory.OPTION_Abstract_StateLimit)) {
       final PositiveIntOption propOption = (PositiveIntOption) option;
       setStateLimit(propOption.getValue());
     }
-    else if (option.hasID(AbstractTRSimplifierFactory.OPTION_Abstract_TransitionLimit)) {
+    else if (option.hasID(TRSimplifierFactory.OPTION_Abstract_TransitionLimit)) {
       final PositiveIntOption propOption = (PositiveIntOption) option;
       setTransitionLimit(propOption.getValue());
     }

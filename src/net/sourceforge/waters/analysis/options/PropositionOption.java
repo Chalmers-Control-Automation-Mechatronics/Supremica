@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.analysis.options;
 
+import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.des.EventProxy;
 
@@ -64,6 +65,10 @@ public class PropositionOption extends Option<EventProxy>
   public DefaultKind getDefaultKind()
   {
     return mDefaultKind;
+  }
+
+  public int getIntegerValue(final EventEncoding enc) {
+    return enc.getEventCode(getValue());
   }
 
 

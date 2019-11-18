@@ -33,6 +33,10 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import java.util.List;
+
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 
 
@@ -144,6 +148,17 @@ public abstract class AbstractMarkingTRSimplifier
   public boolean isDumpStateAware()
   {
     return false;
+  }
+
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRSimplifierFactory.
+              OPTION_AbstractMarking_PreconditionMarkingID);
+    db.append(options, TRSimplifierFactory.
+              OPTION_AbstractMarking_DefaultMarkingID);
+    return options;
   }
 
 
