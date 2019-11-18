@@ -177,7 +177,18 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
 
     pack();
     setLocationRelativeTo(mContext.getIDE());
-    setVisible(true);
+
+    final int numSelected = mContext.getWatersAnalyzerPanel()
+      .getAutomataTable()
+      .getCurrentSelection()
+      .size();
+    if (numSelected == 1) {
+      setVisible(true);
+    }
+    else {
+      LogManager.getLogger().error("Exactly one automaton must be selected.");
+      dispose();
+    }
   }
 
 

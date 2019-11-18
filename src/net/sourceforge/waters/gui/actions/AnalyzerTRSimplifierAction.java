@@ -93,15 +93,15 @@ public class AnalyzerTRSimplifierAction extends WatersAnalyzerAction
     if (table == null) {
       setEnabled(false);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to automata");
-    } else if (table.getSelectedRowCount() > 0) {
+               "Apply a TR simplifier to an automaton");
+    } else if (table.getSelectedRowCount() == 1) {
       setEnabled(true);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to the selected automata");
+               "Apply a TR simplifier to the selected automaton");
     } else {
-      setEnabled(table.getRowCount() > 0);
+      setEnabled(false);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to all automata");
+               "Apply a TR simplifier to an automaton");
     }
   }
 
