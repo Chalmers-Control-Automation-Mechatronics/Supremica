@@ -233,8 +233,6 @@ public class TRSimplifierFactory
   public static final String OPTION_ObservationEquivalence_MarkingMode =
     "ObservationEquivalenceSimplifier.MarkingMode";
   //TODO Proposition mask?
-  public static final String OPTION_ObservationEquivalence_DumpStateAware =
-    "ObservationEquivalenceSimplifier.DumpStateAware";
   public static final String OPTION_ObservationEquivalence_UsingLocalEvents =
     "ObservationEquivalenceSimplifier.UsingLocalEvents";
   public static final String OPTION_ObservationEquivalence_InfoEnabled =

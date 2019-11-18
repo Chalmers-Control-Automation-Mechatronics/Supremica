@@ -91,7 +91,7 @@ class DoubleOptionPanel
     final Double maxValue = option.getMax();
     final DoubleInputCell cell;
     if (minValue != null && maxValue != null) {
-      cell = new DoubleInputCell(minValue, maxValue, Double.MAX_VALUE);
+      cell = new DoubleInputCell(minValue, maxValue, Double.POSITIVE_INFINITY);
     }
     else cell = new DoubleInputCell();
     cell.setValue(value);

@@ -301,7 +301,7 @@ public class ObservationEquivalenceTRSimplifier
     db.append(options, TRSimplifierFactory.
               OPTION_ObservationEquivalence_MarkingMode);
     db.append(options, TRSimplifierFactory.
-              OPTION_ObservationEquivalence_DumpStateAware);
+              OPTION_TransitionRelationSimplifier_DumpStateAware);
     db.append(options, TRSimplifierFactory.
               OPTION_ObservationEquivalence_UsingLocalEvents);
     db.append(options, TRSimplifierFactory.
@@ -329,7 +329,7 @@ public class ObservationEquivalenceTRSimplifier
       final MarkingMode value = propOption.getValue();
       setMarkingMode(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_DumpStateAware)) {
+    else if (option.hasID(TRSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setDumpStateAware(value);
