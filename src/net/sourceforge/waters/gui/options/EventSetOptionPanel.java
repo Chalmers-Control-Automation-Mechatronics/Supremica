@@ -41,6 +41,9 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
@@ -48,6 +51,7 @@ import java.util.Set;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -55,9 +59,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.TransferHandler;
 import javax.swing.border.EmptyBorder;
 
 import net.sourceforge.waters.analysis.options.EventSetOption;
+import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -147,13 +153,13 @@ class EventSetOptionPanel
   private void setInitialValue()
   {
     final EventSetOption option = getOption();
-    final EventKind defaultKind = option.getDefaultKind();
+    final EventSetOption.DefaultKind defaultKind = option.getDefaultKind();
     final GUIOptionContext context = getContext();
     final ProductDESProxy des = context.getProductDES();
     final Set<EventProxy> events = des.getEvents();
     mCurrentValue = new THashSet<>(events.size());
     for (final EventProxy event : events) {
-      if (event.getKind() == defaultKind) {
+      if (defaultKind.isDefault(event.getKind())) {
         mCurrentValue.add(event);
       }
     }
@@ -188,7 +194,7 @@ class EventSetOptionPanel
         final EventKind kind = event.getKind();
         if (kind == combinedKind) {
           total++;
-        } else if (combinedKind == null && kind != EventKind.PROPOSITION) {
+        } else if (combinedKind == null && !EventSetOption.DefaultKind.PROPOSITION.isDefault(kind)) {
           total++;
         }
       }
@@ -196,9 +202,9 @@ class EventSetOptionPanel
         builder.append("all ");
       }
       builder.append(mCurrentValue.size());
-      if (combinedKind == EventKind.CONTROLLABLE) {
+      if (EventSetOption.DefaultKind.CONTROLLABLE.isDefault(combinedKind)) {
         builder.append(" controllable");
-      } else if (combinedKind == EventKind.UNCONTROLLABLE) {
+      } else if (EventSetOption.DefaultKind.UNCONTROLLABLE.isDefault(combinedKind)) {
         builder.append(" uncontrollable");
       }
       builder.append(" events");
@@ -212,7 +218,10 @@ class EventSetOptionPanel
   {
     final GUIOptionContext context = getContext();
     final IDE ide = context.getIDE();
-    final EventListDialog dialog = new EventListDialog(ide);
+    final EventSetOption option = getOption();
+    final EventListDialog dialog = new EventListDialog(ide,
+                                                       option.getSelectedTitle(),
+                                                       option.getUnselectedTitle());
     final Component parent = context.getDialogParent();
     dialog.setLocationRelativeTo(parent);
     dialog.setVisible(true);
@@ -225,20 +234,23 @@ class EventSetOptionPanel
   {
     //#######################################################################
     //# Constructor
-    public EventListDialog(final Frame owner)
+    public EventListDialog(final Frame owner,
+                           final String selectedTitle,
+                           final String unselectedTitle)
     {
       super(owner, true);
 
       final GUIOptionContext context = getContext();
       final ProductDESProxy des = context.getProductDES();
       final EventSetOption option = getOption();
+      final DefaultKind defaultKind = option.getDefaultKind();
       setTitle(option.getShortName());
       setLayout(new GridLayout(0, 2));
 
       mSelectedModel = new DefaultListModel<>();
       mUnselectedModel = new DefaultListModel<>();
       for (final EventProxy event : des.getEvents()) {
-        if (event.getKind() == EventKind.PROPOSITION) {
+        if (!defaultKind.isChoosable(event.getKind())) {
           // skip
         } else if (mCurrentValue.contains(event)) {
           mSelectedModel.addElement(event);
@@ -250,6 +262,15 @@ class EventSetOptionPanel
       final JScrollPane unselectedScroll = new JScrollPane(unselectedList);
       final JList<EventProxy> selectedList = createListView(mSelectedModel);
       final JScrollPane selectedScroll = new JScrollPane(selectedList);
+
+      final TransferHandler unselectedHandler = new EventListTransferHandler(selectedList);
+      unselectedList.setTransferHandler(unselectedHandler);
+      final TransferHandler selectedHandler = new EventListTransferHandler(unselectedList);
+      selectedList.setTransferHandler(selectedHandler);
+
+      unselectedList.setDragEnabled(true);
+      selectedList.setDragEnabled(true);
+
       final JButton selectButton =
         createButton(">>>", unselectedList, mUnselectedModel, mSelectedModel);
       final JButton unselectButton =
@@ -280,8 +301,8 @@ class EventSetOptionPanel
       constraints.weightx = 0;
       constraints.weighty = 0;
       constraints.fill = GridBagConstraints.NONE;
-      add(new JLabel("Non-Loop Events"), constraints);
-      add(new JLabel("Loop Events"), constraints);
+      add(new JLabel(unselectedTitle), constraints);
+      add(new JLabel(selectedTitle), constraints);
 
       constraints.gridy++;
       constraints.weightx = 1;
@@ -402,6 +423,83 @@ class EventSetOptionPanel
     //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = 760104252849112475L;
+  }
+
+
+  //#########################################################################
+  //# Inner Class EventListTransferHandler
+  private class EventListTransferHandler extends TransferHandler {
+
+    //#########################################################################
+    //# Constructors
+    public EventListTransferHandler(final JList<EventProxy> fromList) {
+      mFromList = fromList;
+    }
+
+    //#########################################################################
+    //# Overrides for javax.swing.TransferHandler
+    @Override
+    public boolean canImport(final TransferHandler.TransferSupport info) {
+      if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    protected Transferable createTransferable(final JComponent c)
+    {
+      return new StringSelection("");
+    }
+
+    @Override
+    public int getSourceActions(final JComponent c)
+    {
+      return TransferHandler.MOVE;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean importData(final TransferSupport info)
+    {
+      if (!info.isDrop()) return false;
+
+      final JList<EventProxy> toList = (JList<EventProxy>)info.getComponent();
+      final DefaultListModel<EventProxy> toModel =
+        (DefaultListModel<EventProxy>) toList.getModel();
+      final DefaultListModel<EventProxy> fromModel =
+        (DefaultListModel<EventProxy>) mFromList.getModel();
+
+      for (final EventProxy proxy : mFromList.getSelectedValuesList()) {
+        fromModel.removeElement(proxy);
+        toModel.addElement(proxy);
+      }
+      sortModel(toModel);
+
+      return true;
+    }
+
+    //#######################################################################
+    //# Auxiliary Methods
+    private void sortModel(final DefaultListModel<EventProxy> model)
+    {
+      final Object[] data =  model.toArray();
+      Arrays.sort(data);
+      model.clear();
+      for (final Object o : data) {
+        final EventProxy event = (EventProxy) o;
+        model.addElement(event);
+      }
+    }
+
+    //#######################################################################
+    //# Data Members
+    private final JList<EventProxy> mFromList;
+
+    //#######################################################################
+    //# Class Constants
+    private static final long serialVersionUID = 7742226094815575365L;
+
   }
 
 

@@ -55,18 +55,30 @@ public class EventSetOption extends Option<Set<EventProxy>>
                         final String shortName,
                         final String description,
                         final String commandLineOption,
-                        final EventKind defaultKind)
+                        final DefaultKind defaultKind,
+                        final String selectedTitle,
+                        final String unselectedTitle)
   {
     super(id, shortName, description, commandLineOption, null);
     mDefaultKind = defaultKind;
+    mSelectedTitle = selectedTitle;
+    mUnselectedTitle = unselectedTitle;
   }
 
 
   //#########################################################################
   //# Simple Access
-  public EventKind getDefaultKind()
+  public DefaultKind getDefaultKind()
   {
     return mDefaultKind;
+  }
+
+  public String getSelectedTitle() {
+    return mSelectedTitle;
+  }
+
+  public String getUnselectedTitle() {
+    return mUnselectedTitle;
   }
 
 
@@ -80,7 +92,85 @@ public class EventSetOption extends Option<Set<EventProxy>>
 
 
   //#########################################################################
+  //# Inner Enumeration EventKind
+  public enum DefaultKind {
+
+    CONTROLLABLE {
+      @Override
+      public boolean isDefault(final EventKind ek)
+      {
+        if (ek == EventKind.CONTROLLABLE) {
+          return true;
+        }
+        else return false;
+      }
+      @Override
+      public boolean isChoosable(final EventKind ek)
+      {
+        return ek != EventKind.PROPOSITION;
+      }
+    },
+
+    UNCONTROLLABLE {
+      @Override
+      public boolean isDefault(final EventKind ek)
+      {
+        if (ek == EventKind.UNCONTROLLABLE) {
+          return true;
+        }
+        else return false;
+      }
+      @Override
+      public boolean isChoosable(final EventKind ek)
+      {
+        return ek != EventKind.PROPOSITION;
+      }
+    },
+
+    PROPER_EVENT {
+      @Override
+      public boolean isDefault(final EventKind ek)
+      {
+        if (ek == EventKind.CONTROLLABLE ||
+          ek == EventKind.UNCONTROLLABLE) {
+          return true;
+        }
+        else return false;
+      }
+      @Override
+      public boolean isChoosable(final EventKind ek)
+      {
+        return ek != EventKind.PROPOSITION;
+      }
+    },
+
+    PROPOSITION {
+      @Override
+      public boolean isDefault(final EventKind ek)
+      {
+        if (ek == EventKind.PROPOSITION) {
+          return true;
+        }
+        else return false;
+      }
+      @Override
+      public boolean isChoosable(final EventKind ek)
+      {
+        return ek == EventKind.PROPOSITION;
+      }
+    };
+
+    public abstract boolean isDefault(EventKind ek);
+
+    public abstract boolean isChoosable(EventKind ek);
+
+  }
+
+
+  //#########################################################################
   //# Data Members
-  private final EventKind mDefaultKind;
+  private final DefaultKind mDefaultKind;
+  private final String mSelectedTitle;
+  private final String mUnselectedTitle;
 
 }

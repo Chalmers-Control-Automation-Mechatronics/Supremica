@@ -257,7 +257,9 @@ public abstract class AbstractModelAnalyzerFactory
               "Loop events",
               "Check whether the system permits a loop using the selected events.",
               "-events",
-              EventKind.CONTROLLABLE));
+              EventSetOption.DefaultKind.CONTROLLABLE,
+              "Loop Events",
+              "Non-Loop Events"));
 
     db.add(new BooleanOption
              (OPTION_SupervisorSynthesizer_DetailedOutputEnabled,

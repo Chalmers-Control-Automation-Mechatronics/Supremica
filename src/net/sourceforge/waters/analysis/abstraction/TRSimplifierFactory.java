@@ -39,6 +39,7 @@ import java.util.List;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
+import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
@@ -136,6 +137,15 @@ public class TRSimplifierFactory
               "(as opposed to only the special event TAU).",
               "-eqlocal",
               false));
+
+    db.add(new EventSetOption
+             (OPTION_SpecialEvents_LocalEvents,
+              "Visible Events",
+              "",
+              "-visible",
+              EventSetOption.DefaultKind.PROPER_EVENT,
+              "Visible Events",
+              "Hidden Events"));
 
     db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
@@ -238,4 +248,6 @@ public class TRSimplifierFactory
   public static final String OPTION_ObservationEquivalence_InfoEnabled =
     "ObservationEquivalenceSimplifier.InfoEnabled";
 
+  public static final String OPTION_SpecialEvents_LocalEvents =
+    "SpecialEventsTRSimplifier.LocalEvents";
 }
