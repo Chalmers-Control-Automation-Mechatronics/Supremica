@@ -85,6 +85,8 @@ class AnalyzerPopupFactory
     popup.add(workbench);
     final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
     popup.add(trSimplifier);
+    final IDEAction hide = master.getAnalyzerHideAction();
+    popup.add(hide);
   }
 
 }

@@ -34,11 +34,9 @@
 package net.sourceforge.waters.analysis.tr;
 
 import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PropositionOption;
@@ -46,7 +44,6 @@ import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
-import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
@@ -92,11 +89,6 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
                             OPTION_AbstractMarking_DefaultMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();
-
-    } else if (option.hasID(TRSimplifierFactory.
-                            OPTION_SpecialEvents_LocalEvents)) {
-      final EventSetOption propOption = (EventSetOption) option;
-      mVisibleEvents = propOption.getValue();
     } else {
       mSimp.setOption(option);
     }
@@ -118,26 +110,14 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     if ((config & ListBufferTransitionRelation.CONFIG_ALL) == 0) {
       config ^= ListBufferTransitionRelation.CONFIG_SUCCESSORS;
     }
-    if (mTrAut instanceof TRAutomatonProxy) {
-      mTrAut = new TRAutomatonProxy(mTrAut, config);
+    if (aut instanceof TRAutomatonProxy) {
+      mTrAut = new TRAutomatonProxy((TRAutomatonProxy)aut, config);
     }
     else {
       mTrAut = new TRAutomatonProxy(aut, translator, config);
     }
 
     final EventEncoding enc = mTrAut.getEventEncoding();
-    final EventProxy silent = getFactory().createEventProxy("tau", EventKind.UNCONTROLLABLE);
-    enc.addSilentEvent(silent);
-    if (mVisibleEvents != null) {
-      for (final EventProxy event : mTrAut.getEvents()) {
-        if (!mVisibleEvents.contains(event)) {
-          final int e = enc.getEventCode(event);
-          int status = enc.getProperEventStatus(e);
-          status ^= EventStatus.STATUS_LOCAL;
-          enc.setProperEventStatus(e, status);
-        }
-      }
-    }
     final int preconditionID = enc.getEventCode(mPreconditionMarking);
     final int defaultID = enc.getEventCode(mDefaultMarking);
     mSimp.setPropositions(preconditionID, defaultID);
@@ -170,6 +150,11 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     return true;
   }
 
+  public TRAutomatonProxy getTRAutomaton()
+  {
+    return mTrAut;
+  }
+
 
   //#########################################################################
   //# Data Members
@@ -177,8 +162,6 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
   private EventProxy mPreconditionMarking;
   private EventProxy mDefaultMarking;
-
-  private Set<EventProxy> mVisibleEvents = null;
 
   private TRAutomatonProxy mTrAut;
 

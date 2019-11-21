@@ -56,6 +56,7 @@ import net.sourceforge.waters.gui.actions.AnalyzerControlLoopCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerControllabilityCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerHideAction;
 import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
@@ -561,6 +562,9 @@ public class IDEMenuBar
     final Action trSimplifier =
       actions.getAction(AnalyzerTRSimplifierAction.class);
     menu.add(trSimplifier);
+    final Action hide =
+      actions.getAction(AnalyzerHideAction.class);
+    menu.add(hide);
     add(menu);
   }
 

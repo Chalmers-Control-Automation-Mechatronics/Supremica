@@ -452,6 +452,12 @@ public class WatersPopupActionManager
     return master.getAction(AnalyzerTRSimplifierAction.class);
   }
 
+  public IDEAction getAnalyzerHideAction()
+  {
+    final WatersActionManager master = mIDE.getActions();
+    return master.getAction(AnalyzerHideAction.class);
+  }
+
   //#########################################################################
   //# Data Members
   private final IDE mIDE;

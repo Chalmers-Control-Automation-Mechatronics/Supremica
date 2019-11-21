@@ -123,6 +123,14 @@ public class TRSimplifierFactory
               "observation equivalence.",
               "-mm",
               ObservationEquivalenceTRSimplifier.MarkingMode.values()));
+    db.add(new EventSetOption
+           (OPTION_ObservationEquivalence_PropositionMask,
+            "Propositions",
+            "",//TODO
+            "-propmask",
+            EventSetOption.DefaultKind.PROPOSITION,
+            "Selected Propositions",
+            "Unselected Propositions"));
     db.add(new BooleanOption
              (OPTION_ObservationEquivalence_InfoEnabled,
               "Use Info Data Structure",
@@ -141,7 +149,7 @@ public class TRSimplifierFactory
     db.add(new EventSetOption
              (OPTION_SpecialEvents_LocalEvents,
               "Visible Events",
-              "",
+              "",//TODO
               "-visible",
               EventSetOption.DefaultKind.PROPER_EVENT,
               "Visible Events",
@@ -242,7 +250,8 @@ public class TRSimplifierFactory
     "ObservationEquivalenceSimplifier.TransitionRemovalMode";
   public static final String OPTION_ObservationEquivalence_MarkingMode =
     "ObservationEquivalenceSimplifier.MarkingMode";
-  //TODO Proposition mask?
+  public static final String OPTION_ObservationEquivalence_PropositionMask =
+    "ObservationEquivalenceSimplifier.PropositionMask";
   public static final String OPTION_ObservationEquivalence_UsingLocalEvents =
     "ObservationEquivalenceSimplifier.UsingLocalEvents";
   public static final String OPTION_ObservationEquivalence_InfoEnabled =

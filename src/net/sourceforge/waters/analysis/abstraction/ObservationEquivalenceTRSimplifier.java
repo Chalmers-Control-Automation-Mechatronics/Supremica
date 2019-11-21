@@ -290,16 +290,13 @@ public class ObservationEquivalenceTRSimplifier
   {
     final List<Option<?>> options = super.getOptions(db);
     db.append(options, TRSimplifierFactory.
-              OPTION_AbstractMarking_PreconditionMarkingID);
-    db.append(options, TRSimplifierFactory.
-              OPTION_AbstractMarking_DefaultMarkingID);
-
-    db.append(options, TRSimplifierFactory.
               OPTION_ObservationEquivalence_Equivalence);
     db.append(options, TRSimplifierFactory.
               OPTION_ObservationEquivalence_TransitionRemovalMode);
     db.append(options, TRSimplifierFactory.
               OPTION_ObservationEquivalence_MarkingMode);
+    db.append(options, TRSimplifierFactory.
+              OPTION_ObservationEquivalence_PropositionMask);
     db.append(options, TRSimplifierFactory.
               OPTION_TransitionRelationSimplifier_DumpStateAware);
     db.append(options, TRSimplifierFactory.

@@ -35,10 +35,6 @@ package net.sourceforge.waters.analysis.abstraction;
 
 import gnu.trove.list.array.TIntArrayList;
 
-import java.util.List;
-
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -249,15 +245,6 @@ public class SpecialEventsTRSimplifier
     }
 
     return modified;
-  }
-
-  @Override
-  public List<Option<?>> getOptions(final OptionMap db)
-  {
-    final List<Option<?>> options = super.getOptions(db);
-    db.append(options, TRSimplifierFactory.
-               OPTION_SpecialEvents_LocalEvents);
-    return options;
   }
 
 

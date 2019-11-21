@@ -75,7 +75,7 @@ public class GUIOptionContext implements OptionContext
 
   //#########################################################################
   //# Constructors
-  GUIOptionContext(final WatersAnalyzerPanel panel,
+  public GUIOptionContext(final WatersAnalyzerPanel panel,
                    final Component dialogParent,
                    final ErrorDisplay display)
   {
