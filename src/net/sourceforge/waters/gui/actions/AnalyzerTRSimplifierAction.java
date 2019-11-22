@@ -57,7 +57,7 @@ public class AnalyzerTRSimplifierAction extends WatersAnalyzerAction
   protected AnalyzerTRSimplifierAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "TR Simplifier...");
+    putValue(Action.NAME, "Simplify ...");
     updateEnabledStatus();
   }
 
@@ -90,18 +90,14 @@ public class AnalyzerTRSimplifierAction extends WatersAnalyzerAction
   private void updateEnabledStatus()
   {
     final AutomataTable table = getAnalyzerTable();
-    if (table == null) {
+    if (table == null || table.getSelectedRowCount() != 1) {
       setEnabled(false);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to an automaton");
-    } else if (table.getSelectedRowCount() == 1) {
+               "Apply a simplification algorithm to an automaton");
+    } else {
       setEnabled(true);
       putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to the selected automaton");
-    } else {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Apply a TR simplifier to an automaton");
+               "Apply a simplification algorithm to the selected automaton");
     }
   }
 

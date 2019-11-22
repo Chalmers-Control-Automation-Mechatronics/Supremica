@@ -705,7 +705,8 @@ public class EventEncoding
    *                     {@link EventStatus#STATUS_LOCAL},
    *                     {@link EventStatus#STATUS_ALWAYS_ENABLED},
    *                     {@link EventStatus#STATUS_SELFLOOP_ONLY},
-   *                     {@link EventStatus#STATUS_BLOCKED}, {@link EventStatus#STATUS_FAILING},
+   *                     {@link EventStatus#STATUS_BLOCKED},
+   *                     {@link EventStatus#STATUS_FAILING},
    *                     and {@link EventStatus#STATUS_UNUSED}.
    * @return The event code that was assigned to the event.
    * @throws OverflowException to indicate that the number of propositions
@@ -731,7 +732,7 @@ public class EventEncoding
    * <P>If the encoding already has a silent event, the new event is mapped
    * to the silent event code {@link #TAU}, without adding it to the
    * encoding. This provides a simple means to implement hiding: by adding
-   * a silent event followed by another set events to be hidden. All these
+   * a silent event followed by another set of events to be hidden. All these
    * events will be encoded as {@link #TAU}, and can later all be decoded to
    * the first silent event that was added.</P>
    * @param  event  A new silent event.
