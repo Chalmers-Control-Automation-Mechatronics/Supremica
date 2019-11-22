@@ -36,10 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import gnu.trove.set.hash.THashSet;
 
 import java.awt.Component;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -48,6 +45,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Set;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -104,39 +102,50 @@ public class EventSetPanel extends JPanel
 
     final JButton selectButton =
       createButton("\u25b6", unselectedList, mUnselectedModel, mSelectedModel);
+    selectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     final JButton unselectButton =
       createButton("\u25c0", selectedList, mSelectedModel, mUnselectedModel);
+    unselectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+    final JLabel unselectedLabel = new JLabel(option.getUnselectedTitle());
+    unselectedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    final JLabel selectedLabel = new JLabel(option.getSelectedTitle());
+    selectedLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-    setLayout(new GridBagLayout());
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.insets = INSETS;
-    constraints.gridy = 0;
-    constraints.weightx = 0;
-    constraints.weighty = 0;
-    constraints.fill = GridBagConstraints.NONE;
-    add(new JLabel(option.getUnselectedTitle()), constraints);
-    add(new JLabel(option.getSelectedTitle()), constraints);
+    final JPanel unselectedPanel = new JPanel();
+    unselectedPanel.setLayout(new BoxLayout(unselectedPanel, BoxLayout.Y_AXIS));
+    unselectedPanel.add(unselectedLabel);
+    unselectedPanel.add(unselectedScroll);
+    unselectedPanel.add(selectButton);
 
-    constraints.gridy++;
-    constraints.weightx = 1;
-    constraints.weighty = 1;
-    constraints.fill = GridBagConstraints.BOTH;
-    add(unselectedScroll, constraints);
-    add(selectedScroll, constraints);
+    final JPanel selectedPanel = new JPanel();
+    selectedPanel.setLayout(new BoxLayout(selectedPanel, BoxLayout.Y_AXIS));
+    selectedPanel.add(selectedLabel);
+    selectedPanel.add(selectedScroll);
+    selectedPanel.add(unselectButton);
 
-    constraints.gridy++;
-    constraints.weightx = 0;
-    constraints.weighty = 0;
-    constraints.fill = GridBagConstraints.NONE;
-    add(selectButton, constraints);
-    add(unselectButton, constraints);
-    constraints.gridy++;
+    setLayout(new GridLayout(0, 2));
+    add(unselectedPanel);
+    add(selectedPanel);
 
   }
 
+  public void setSelectedEvents(final Set<EventProxy> selection) {
+    for (int e=0; e<mSelectedModel.getSize(); e++) {
+      final EventProxy event = mSelectedModel.get(e);
+      mUnselectedModel.addElement(event);
+    }
+    mSelectedModel.removeAllElements();
+    for (final EventProxy event : selection) {
+      mUnselectedModel.removeElement(event);
+      mSelectedModel.addElement(event);
+    }
+    sortModel(mSelectedModel);
+    sortModel(mUnselectedModel);
+  }
 
-//#######################################################################
+
+  //#######################################################################
   //# Simple Access
   public Set<EventProxy> getSelectedEvents()
   {
@@ -149,6 +158,7 @@ public class EventSetPanel extends JPanel
     return set;
   }
 
+  
   //#######################################################################
   //# Auxiliary Methods
   private JList<EventProxy> createListView(final DefaultListModel<EventProxy> model)
@@ -202,8 +212,6 @@ public class EventSetPanel extends JPanel
   //#######################################################################
   //# Class Constants
   private static final long serialVersionUID = 7396539823426021453L;
-
-  private static final Insets INSETS = new Insets(2, 4, 2, 4);
 
 
   //#########################################################################

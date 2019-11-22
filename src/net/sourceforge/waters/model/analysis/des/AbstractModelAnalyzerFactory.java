@@ -313,7 +313,7 @@ public abstract class AbstractModelAnalyzerFactory
               "-red",
               SupervisorReductionMainMethod.values()));
     db.add(new EnumOption<SupervisorReductionProjectionMethod>
-             (OPTION_SupervisorSynthesizer_SupervisorReductionMainMethod,
+             (OPTION_SupervisorSynthesizer_SupervisorReductionProjectionMethod,
               "Supervisor reduction projection",
               "Method to reduce the number of events before supervisor reduction.",
               "-redproj",

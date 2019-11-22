@@ -108,7 +108,6 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       final int rowCount = table.getSelectedRowCount();
       if (rowCount == 1) {
         new HiderDialog(ide);
-
       }
     }
   }
@@ -145,9 +144,12 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     }
   }
 
+  //#########################################################################
+  //# Inner Class HiderDialog
+  private class HiderDialog extends JDialog {
 
-  public class HiderDialog extends JDialog {
-
+    //#########################################################################
+    //# Constructors
     public HiderDialog(final IDE ide) {
 
       setTitle("Hide Events");
@@ -166,23 +168,22 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
                                                       ide,
                                                       error);
 
-      final DefaultKind defaultKind = option.getDefaultKind();
       final ProductDESProxy des = context.getProductDES();
       final Set<EventProxy> events = des.getEvents();
+      final AutomatonProxy aut = des.getAutomata().iterator().next();
+      final EventEncoding enc = aut instanceof TRAutomatonProxy ?
+        ((TRAutomatonProxy)aut).getEventEncoding() : new EventEncoding();
+
       final Set<EventProxy> currentValue = new THashSet<>(events.size());
       for (final EventProxy event : events) {
-        if (defaultKind.isDefault(event.getKind())) {
+        final int code = enc.getEventCode(event);
+        final byte status = code != -1 ? enc.getProperEventStatus(code) : 0;
+        if (!EventStatus.isLocalEvent(status)) {
           currentValue.add(event);
         }
       }
 
-      final HiderDialog dialog = this;
-
       mEventPanel = new EventSetPanel(context, option, currentValue);
-
-      final AutomatonProxy aut = des.getAutomata().iterator().next();
-      final EventEncoding enc = aut instanceof TRAutomatonProxy ?
-        ((TRAutomatonProxy)aut).getEventEncoding() : new EventEncoding();
       mStatusPanel = new EventStatusPanel(context, events, enc);
 
       final JPanel pane = new JPanel();
@@ -199,18 +200,19 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
         {
           final Component comp = tabbedPane.getSelectedComponent();
           if (comp == mEventPanel) {
-            //TODO Update from other panel
+            updateEventPanel();
           }
           else {
-            //TODO Update from other panel
+            updateStatusPanel();
           }
         }
       });
 
       final JPanel buttonPane = new JPanel();
       pane.add(buttonPane, BorderLayout.SOUTH);
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+      buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
+      final HiderDialog dialog = this;
       final JButton okButton = new JButton("OK");
       okButton.addActionListener(new ActionListener() {
         @Override
@@ -218,9 +220,9 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
         {
           try {
             if (tabbedPane.getSelectedComponent() == mEventPanel) {
-              dialog.hideEvents(context);
+              updateStatusPanel();
             }
-            else dialog.hideEventsAdvanced(context);
+            dialog.hideEvents(context, enc);
             dispose();
           } catch (final AnalysisException ex) {
             LogManager.getLogger().error(ex.getMessage());
@@ -246,7 +248,10 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
 
     }
 
-    private void hideEventsAdvanced(final GUIOptionContext context) throws AnalysisException {
+    private void hideEvents(final GUIOptionContext context, final EventEncoding enc)
+      throws AnalysisException {
+
+      final ProductDESProxyFactory factory = context.getProductDESProxyFactory();
 
       final AutomatonProxy aut = context.getProductDES()
         .getAutomata()
@@ -257,15 +262,20 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       final KindTranslator translator = IdenticalKindTranslator.getInstance();
 
       final Object[][] data = mStatusPanel.getData();
+      final Set<EventProxy> localEvents = new THashSet<>();
       for (final Object[] row : data) {
         final EventProxy event = (EventProxy) row[0];
-        final int newStatus =
-            (((boolean)row[1]) ? EventStatus.STATUS_LOCAL : 0)
-          ^ (((boolean)row[2]) ? EventStatus.STATUS_SELFLOOP_ONLY : 0)
-          ^ (((boolean)row[3]) ? EventStatus.STATUS_ALWAYS_ENABLED : 0)
-          ^ (((boolean)row[4]) ? EventStatus.STATUS_BLOCKED : 0)
-          ^ (((boolean)row[5]) ? EventStatus.STATUS_FAILING : 0);
-        newEnc.addEvent(event, translator, newStatus);
+        final boolean local = (boolean)row[1];
+        if (local) {
+          localEvents.add(event);
+        } else {
+          final int newStatus =
+            (((boolean)row[2]) ? EventStatus.STATUS_SELFLOOP_ONLY : 0)
+          | (((boolean)row[3]) ? EventStatus.STATUS_ALWAYS_ENABLED : 0)
+          | (((boolean)row[4]) ? EventStatus.STATUS_BLOCKED : 0)
+          | (((boolean)row[5]) ? EventStatus.STATUS_FAILING : 0);
+          newEnc.addEvent(event, translator, newStatus);
+        }
       }
       for (final EventProxy event : aut.getEvents()) {
         if (event.getKind() == EventKind.PROPOSITION) {
@@ -273,52 +283,31 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
         }
       }
 
-
-      final int config = ListBufferTransitionRelation.CONFIG_SUCCESSORS;
-      final TRAutomatonProxy result = new TRAutomatonProxy(aut, newEnc, config);
-
-      final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
-      final AutomataTableModel model = panel.getAutomataTableModel();
-      model.insertRow(result);
-
-    }
-
-    private void hideEvents(final GUIOptionContext context) throws AnalysisException {
-      final Set<EventProxy> visibleEvents = mEventPanel.getSelectedEvents();
-
-      final ProductDESProxyFactory factory = context.getProductDESProxyFactory();
-
-      final AutomatonProxy aut = context.getProductDES()
-        .getAutomata()
-        .iterator()
-        .next();
-
-      final boolean isTR = aut instanceof TRAutomatonProxy;
-      final TRAutomatonProxy trAut = isTR ? (TRAutomatonProxy) aut : null;
-      final EventEncoding enc = isTR ? trAut.getEventEncoding() : null;
-
-      final EventEncoding newEnc = new EventEncoding();
-      final EventProxy silent = factory.createEventProxy("tau", EventKind.UNCONTROLLABLE);
-      newEnc.addSilentEvent(silent);
-      for (final EventProxy event : aut.getEvents()) {
-        if (event.getKind() == EventKind.PROPOSITION) {
-          newEnc.addProposition(event, true);
-        }
-        else if (!visibleEvents.contains(event)) {
-          newEnc.addSilentEvent(event);
-        }
-        else if (isTR) {
-          final int code = enc.getEventCode(event);
-          final int status = enc.getProperEventStatus(code);
-          newEnc.addProperEvent(event, status);
+      if (localEvents.size() != 0) {
+        if (localEvents.contains(enc.getTauEvent())) {
+          newEnc.addSilentEvent(enc.getTauEvent());
         }
         else {
-          if (event.getKind() == EventKind.CONTROLLABLE) {
-            newEnc.addProperEvent(event, EventStatus.STATUS_CONTROLLABLE);
+          //Create new tau
+          for (int n=0; n<1000; n++) {
+            final String name = (n == 0) ? "tau" : "tau:"+n;
+            boolean found = false;
+            for (final EventProxy event : aut.getEvents()) {
+              if (event.getName().equals(name)) {
+                found = true;
+                break;
+              }
+            }
+            if (!found) {
+              final EventProxy silent =
+                factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+              newEnc.addSilentEvent(silent);
+              break;
+            }
           }
-          else {
-            newEnc.addProperEvent(event, 0);
-          }
+        }
+        for (final EventProxy event : localEvents) {
+          newEnc.addSilentEvent(event);
         }
       }
 
@@ -331,9 +320,33 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
 
     }
 
+    private void updateEventPanel() {
+      final Set<EventProxy> visibleEvents = new THashSet<EventProxy>();
+      for (final Object[] row : mStatusPanel.getData()) {
+        final EventProxy event = (EventProxy) row[0];
+        final boolean local = (boolean) row[1];
+        if (!local) {
+          visibleEvents.add(event);
+        }
+      }
+      mEventPanel.setSelectedEvents(visibleEvents);
+    }
+
+    private void updateStatusPanel() {
+      final Set<EventProxy> visibleEvents = mEventPanel.getSelectedEvents();
+      for (final Object[] row : mStatusPanel.getData()) {
+        final EventProxy event = (EventProxy) row[0];
+        row[1] = !visibleEvents.contains(event);
+      }
+    }
+
+    //#########################################################################
+    //# Data Members
     private final EventSetPanel mEventPanel;
     private final EventStatusPanel mStatusPanel;
 
+    //#########################################################################
+    //# Class Constants
     private static final long serialVersionUID = -8543364648387189552L;
 
   }

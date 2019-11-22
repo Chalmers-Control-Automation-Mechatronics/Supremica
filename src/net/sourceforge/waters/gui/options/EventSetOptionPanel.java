@@ -262,7 +262,7 @@ class EventSetOptionPanel
 
       final JPanel buttonPane = new JPanel();
       pane.add(buttonPane, BorderLayout.SOUTH);
-      buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+      buttonPane.setLayout(new FlowLayout(FlowLayout.CENTER));
 
       buttonPane.add(okButton);
       buttonPane.add(cancelButton);

@@ -55,7 +55,9 @@ import net.sourceforge.waters.analysis.options.StringOption;
 import net.sourceforge.waters.gui.ErrorDisplay;
 import net.sourceforge.waters.gui.ModuleContext;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
+import net.sourceforge.waters.gui.util.IconAndFontLoader;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
 import net.sourceforge.waters.model.compiler.context.SourceInfo;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -203,7 +205,23 @@ public class GUIOptionContext implements OptionContext
     final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
     final SourceInfo info = infoMap.get(event);
     if (info == null) {
-      return null;
+      if (event.getKind() == EventKind.CONTROLLABLE) {
+        if (event.isObservable()) {
+          return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE;
+        }
+        else {
+          return IconAndFontLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+        }
+      }
+      else if (event.getKind() == EventKind.UNCONTROLLABLE) {
+        if (event.isObservable()) {
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+        }
+        else {
+          return IconAndFontLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
+        }
+      }
+      else return null;
     }
     final Proxy proxy = info.getSourceObject();
     if (!(proxy instanceof EventDeclProxy)) {

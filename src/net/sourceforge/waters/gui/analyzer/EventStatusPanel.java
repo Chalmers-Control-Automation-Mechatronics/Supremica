@@ -68,6 +68,8 @@ import net.sourceforge.waters.model.des.EventProxy;
 public class EventStatusPanel extends JScrollPane
 {
 
+  //#########################################################################
+  //# Constructors
   public EventStatusPanel(final GUIOptionContext context, final Set<EventProxy> eventSet, final EventEncoding enc)
   {
     final Set<EventProxy> properEventSet = new THashSet<>();
@@ -166,6 +168,16 @@ public class EventStatusPanel extends JScrollPane
 
   }
 
+
+  //#########################################################################
+  //# Simple Access
+  public Object[][] getData() {
+    return mData;
+  }
+
+
+  //#########################################################################
+  //# Auxiliary Methods
   private int getColumnHeaderWidth(final JTable table, final int c)
   {
     final TableColumn tableColumn = table.getColumnModel().getColumn(c);
@@ -184,18 +196,21 @@ public class EventStatusPanel extends JScrollPane
     return comp.getPreferredSize().height;
   }
 
-  public Object[][] getData() {
-    return mData;
-  }
 
+  //#########################################################################
+  //# Inner Class EventRenderer
   private static class EventRenderer extends JLabel implements TableCellRenderer {
 
+    //#########################################################################
+    //# Constructors
     public EventRenderer(final GUIOptionContext context)
     {
       mContext = context;
       setOpaque(true);
     }
 
+    //#########################################################################
+    //# Interface javax.swing.table.TableCellRenderer
     @Override
     public Component getTableCellRendererComponent(final JTable table, final Object value,
                                                    final boolean isSelected,
@@ -216,18 +231,28 @@ public class EventStatusPanel extends JScrollPane
       return this;
     }
 
+    //#########################################################################
+    //# Data Members
     private final GUIOptionContext mContext;
 
+    //#########################################################################
+    //# Class Constants
     private static final long serialVersionUID = 4503571208511104976L;
 
   }
 
+  //#########################################################################
+  //# Inner Class ColorRenderer
   private static class ColorRenderer extends JCheckBox implements TableCellRenderer {
 
+    //#########################################################################
+    //# Constructors
     public ColorRenderer() {
       setHorizontalAlignment(SwingConstants.CENTER);
     }
 
+    //#########################################################################
+    //# Interface Interface javax.swing.table.TableCellRenderer
     @Override
     public Component getTableCellRendererComponent(final JTable table, final Object value,
                                                    final boolean isSelected,
@@ -244,17 +269,25 @@ public class EventStatusPanel extends JScrollPane
       return this;
     }
 
+    //#########################################################################
+    //# Class Constants
     private static final long serialVersionUID = -8561134602306643073L;
 
   }
 
+  //#########################################################################
+  //# Inner Class EventStatusTableModel
   private class EventStatusTableModel extends AbstractTableModel {
 
+    //#########################################################################
+    //# Constructors
     public EventStatusTableModel(final String[] columnNames, final Object[][] data) {
       mColumnNames = columnNames;
       mData = data;
     }
 
+    //#########################################################################
+    //# Interface javax.swing.table.TableModel
     @Override
     public int getRowCount()
     {
@@ -268,25 +301,24 @@ public class EventStatusPanel extends JScrollPane
     }
 
     @Override
-    public String getColumnName(final int c)
-    {
-      return mColumnNames[c];
-    }
-
-    @Override
     public Object getValueAt(final int r, final int c)
     {
       return mData[r][c];
     }
 
+    //#########################################################################
+    //# Overrides for javax.swing.table.AbstractTableModel
     @Override
     public Class<?> getColumnClass(final int c)
     {
       return getValueAt(0, c).getClass();
     }
 
-    private final String[] mColumnNames;
-    private final Object[][] mData;
+    @Override
+    public String getColumnName(final int c)
+    {
+      return mColumnNames[c];
+    }
 
     @Override
     public void setValueAt(final Object value, final int r, final int c) {
@@ -294,13 +326,24 @@ public class EventStatusPanel extends JScrollPane
       fireTableCellUpdated(r, c);
     }
 
+    //#########################################################################
+    //# Data Members
+    private final String[] mColumnNames;
+    private final Object[][] mData;
+
+    //#########################################################################
+    //# Class Constants
     private static final long serialVersionUID = 8729609836711878449L;
 
   }
 
+  //#########################################################################
+  //# Data Members
   private final Object[][] mData;
   private final JTable mTable;
 
+  //#########################################################################
+  //# Class Constants
   private static final long serialVersionUID = -6431481942044924463L;
 
 }
