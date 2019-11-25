@@ -68,6 +68,14 @@ public class TRSimplifierFactory
   //# Options
   public void registerOptions(final OptionMap db)
   {
+    db.add(new BooleanOption
+             (OPTION_TRSimplifierFactory_KeepOriginal,
+              "Keep Original",
+              "Do not remove the input automaton from the analyzer " +
+              "after this operation.",
+              "-keep",
+              true));
+
     db.add(new PositiveIntOption
              (OPTION_Abstract_StateLimit,
               "State Limit",
@@ -124,13 +132,13 @@ public class TRSimplifierFactory
               "-mm",
               ObservationEquivalenceTRSimplifier.MarkingMode.values()));
     db.add(new EventSetOption
-           (OPTION_ObservationEquivalence_PropositionMask,
-            "Propositions",
-            "",//TODO
-            "-propmask",
-            EventSetOption.DefaultKind.PROPOSITION,
-            "Selected Propositions",
-            "Unselected Propositions"));
+             (OPTION_ObservationEquivalence_PropositionMask,
+              "Propositions",
+              "Propositions to be preserved by the equivalence.",
+              "-props",
+              EventSetOption.DefaultKind.PROPOSITION,
+              "Selected Propositions",
+              "Unselected Propositions"));
     db.add(new BooleanOption
              (OPTION_ObservationEquivalence_InfoEnabled,
               "Use Info Data Structure",
@@ -146,15 +154,6 @@ public class TRSimplifierFactory
               "-eqlocal",
               false));
 
-    db.add(new EventSetOption
-             (OPTION_SpecialEvents_LocalEvents,
-              "Visible Events",
-              "",//TODO
-              "-visible",
-              EventSetOption.DefaultKind.PROPER_EVENT,
-              "Visible Events",
-              "Hidden Events"));
-
     db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
               "Failing events as selfloops",
@@ -164,25 +163,19 @@ public class TRSimplifierFactory
               false));
     db.add(new DoubleOption
              (OPTION_SubsetConstruction_MaxIncrease,
-              "Max Increase",
+              "Maximum Increase",
               "The maximum factor by which the number of states may increase " +
               "before aborting.",
               "-maxinc",
               Double.POSITIVE_INFINITY, 1.0, Double.POSITIVE_INFINITY));
 
     db.add(new BooleanOption
-           (OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence,
-            "Use Weak Synthesis Observation Equivalence",
-            "",//TODO
-            "-wsoe",
-            true));
-
-    db.add(new BooleanOption
-           (OPTION_TRSimplifierFactory_KeepOriginal,
-            "Keep Original",
-            "",
-            "-keep",
-            false));
+             (OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence,
+              "Weak Synthesis Observation Equivalence",
+              "Use weak synthesis observation equivalence rather than " +
+              "synthesis observation equivalence.",
+              "-wsoe",
+              true));
   }
 
 
@@ -208,9 +201,9 @@ public class TRSimplifierFactory
         return new SubsetConstructionTRSimplifier();
       }
     });
-    mToolCreators.add(new TRSimplifierCreator("Hide Events",
-      "Replace local events by the silent event. " +
-      "May also perform other special event simplification.") {
+    mToolCreators.add(new TRSimplifierCreator("Special Events",
+      "Hide local events, remove selfloops with selfloop-only events," +
+      "remove blocked events, and redirect failing events.") {
       @Override
       protected TransitionRelationSimplifier createTRSimplifier()
       {
@@ -218,7 +211,8 @@ public class TRSimplifierFactory
       }
     });
     mToolCreators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
-      "") {//TODO
+      "Perform synthesis abstraction using synthesis observation equivalence " +
+      "or weak synthesis observation equivalence.") {
       @Override
       protected TransitionRelationSimplifier createTRSimplifier()
       {

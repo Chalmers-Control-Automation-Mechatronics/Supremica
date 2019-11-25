@@ -177,16 +177,14 @@ public class ProductDESImporter
       final URI location = getOutputLocation(des);
       final Set<EventProxy> events = des.getEvents();
       final int numevents = events.size();
-      final Collection<EventDeclProxy> decls =
-        new ArrayList<EventDeclProxy>(numevents);
+      final Collection<EventDeclProxy> decls = new ArrayList<>(numevents);
       for (final EventProxy event : events) {
         final EventDeclProxy decl = importEventDecl(event);
         decls.add(decl);
       }
       final Set<AutomatonProxy> automata = des.getAutomata();
       final int numautomata = automata.size();
-      final Collection<SimpleComponentProxy> comps =
-        new ArrayList<SimpleComponentProxy>(numautomata);
+      final Collection<SimpleComponentProxy> comps = new ArrayList<>(numautomata);
       for (final AutomatonProxy aut : automata) {
         final SimpleComponentProxy comp = importComponent(aut);
         comps.add(comp);
@@ -214,12 +212,11 @@ public class ProductDESImporter
       final String name = aut.getName();
       final ComponentKind kind = aut.getKind();
       mCurrentEvents = aut.getEvents();
-      mCurrentBlockedEvents = new THashSet<EventProxy>(mCurrentEvents);
+      mCurrentBlockedEvents = new THashSet<>(mCurrentEvents);
       final Set<StateProxy> states = aut.getStates();
       final int numstates = states.size();
-      final Collection<SimpleNodeProxy> nodes =
-        new ArrayList<SimpleNodeProxy>(numstates);
-      mCurrentNodeMap = new HashMap<StateProxy,SimpleNodeProxy>(numstates);
+      final Collection<SimpleNodeProxy> nodes = new ArrayList<>(numstates);
+      mCurrentNodeMap = new HashMap<>(numstates);
       int numInit = 0;
       for (final StateProxy state : states) {
         final SimpleNodeProxy node = importNode(state);

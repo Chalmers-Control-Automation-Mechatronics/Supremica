@@ -64,6 +64,8 @@ class AnalyzerPopupFactory
     popup.add(synchronous);
     final IDEAction synthesis = master.getAnalyzerSynthesizerAction();
     popup.add(synthesis);
+    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
+    popup.add(workbench);
     popup.addSeparator();
     final IDEAction controllability =
       master.getAnalyzerControllabilityCheckAction();
@@ -78,15 +80,12 @@ class AnalyzerPopupFactory
       master.getAnalyzerLanguageInclusionCheckAction();
     popup.add(languageInclusion);
     popup.addSeparator();
-    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
-    popup.add(stateCounter);
-    popup.addSeparator();
-    final IDEAction workbench = master.getAnalyzerWorkbenchAction();
-    popup.add(workbench);
-    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
-    popup.add(trSimplifier);
     final IDEAction hide = master.getAnalyzerHideAction();
     popup.add(hide);
+    final IDEAction trSimplifier = master.getAnalyzerTRSimplifierAction();
+    popup.add(trSimplifier);
+    final IDEAction stateCounter = master.getAnalyzerStateCounterCheckAction();
+    popup.add(stateCounter);
   }
 
 }

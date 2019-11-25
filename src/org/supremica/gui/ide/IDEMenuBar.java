@@ -536,6 +536,9 @@ public class IDEMenuBar
     menu.add(sync);
     final Action synth = actions.getAction(AnalyzerSynthesisAction.class);
     menu.add(synth);
+    final Action workbench =
+      actions.getAction(AnalyzerWorkbenchAction.class);
+    menu.add(workbench);
     menu.addSeparator();
     final Action control =
       actions.getAction(AnalyzerControllabilityCheckAction.class);
@@ -553,18 +556,15 @@ public class IDEMenuBar
       actions.getAction(AnalyzerLanguageInclusionCheckAction.class);
     menu.add(languageInclusion);
     menu.addSeparator();
-    final Action stateCounter =
-      actions.getAction(AnalyzerCountStatesAction.class);
-    menu.add(stateCounter);
-    final Action workbench =
-      actions.getAction(AnalyzerWorkbenchAction.class);
-    menu.add(workbench);
-    final Action trSimplifier =
-      actions.getAction(AnalyzerTRSimplifierAction.class);
-    menu.add(trSimplifier);
     final Action hide =
       actions.getAction(AnalyzerHideAction.class);
     menu.add(hide);
+    final Action simplifier =
+      actions.getAction(AnalyzerTRSimplifierAction.class);
+    menu.add(simplifier);
+    final Action stateCounter =
+      actions.getAction(AnalyzerCountStatesAction.class);
+    menu.add(stateCounter);
     add(menu);
   }
 

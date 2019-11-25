@@ -94,7 +94,8 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
   protected AnalyzerHideAction(final IDE ide)
   {
     super(ide);
-    putValue(Action.NAME, "Hide Events...");
+    putValue(Action.NAME, "Hide Events ...");
+    putValue(Action.SHORT_DESCRIPTION, "Hide events in the selected automaton");
     updateEnabledStatus();
   }
 
@@ -132,26 +133,15 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
   private void updateEnabledStatus()
   {
     final AutomataTable table = getAnalyzerTable();
-    if (table == null) {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Hide events in an automaton");
-    } else if (table.getSelectedRowCount() == 1) {
-      setEnabled(true);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Hide events in the selected automaton");
-    } else {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Hide events in an automaton");
-    }
+    setEnabled(table != null && table.getSelectedRowCount() == 1);
   }
+
 
   //#########################################################################
   //# Inner Class HiderDialog
   private class HiderDialog extends JDialog {
 
-    //#########################################################################
+    //#######################################################################
     //# Constructors
     public HiderDialog(final IDE ide) {
 
@@ -374,7 +364,7 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     }
 
     private String generateTauName(final String baseName,
-                                 final Collection<EventProxy> allEvents) {
+                                   final Collection<EventProxy> allEvents) {
       String name = null;
       for (int n=0; n<1000; n++) {
         name = (n == 0) ? baseName : baseName+":"+n;
@@ -393,7 +383,7 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     }
 
     private void updateEventPanel() {
-      final Set<EventProxy> visibleEvents = new THashSet<EventProxy>();
+      final Set<EventProxy> visibleEvents = new THashSet<>();
       for (final Object[] row : mStatusPanel.getData()) {
         final EventProxy event = (EventProxy) row[0];
         final boolean local = (boolean) row[1];
@@ -412,17 +402,14 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       }
     }
 
-    //#########################################################################
+    //#######################################################################
     //# Data Members
     private final EventSetPanel mEventPanel;
     private final EventStatusPanel mStatusPanel;
-
     private final JCheckBox mKeepOriginalCheckBox;
     private final JCheckBox mPreserveControllabilityCheckBox;
 
-
-
-    //#########################################################################
+    //#######################################################################
     //# Class Constants
     private static final long serialVersionUID = -8543364648387189552L;
 
