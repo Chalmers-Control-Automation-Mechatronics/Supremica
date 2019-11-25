@@ -221,7 +221,7 @@ public interface SelectionOwner
 
   /**
    * Inserts the given items.
-   * This method inserts the given deleted items into the model. This can
+   * This method inserts the given items into the model. This can
    * be used to undo the effects of a previous call to {@link
    * #deleteItems(List) deleteItems()}.
    * @param  inserts A list of {@link InsertInfo} objects as returned by

@@ -212,7 +212,7 @@ public class AutomataTable extends JTable implements SelectionOwner
   public void attach(final Observer observer)
   {
     if (mObservers == null) {
-      mObservers = new LinkedList<Observer>();
+      mObservers = new LinkedList<>();
     }
     mObservers.add(observer);
   }
@@ -416,11 +416,11 @@ public class AutomataTable extends JTable implements SelectionOwner
           count++;
         }
         final AutomatonProxy cloned;
-        if (count == 1)
+        if (count == 1) {
           cloned = cloner.clone(aut);
-        else
+        } else {
           cloned = cloner.clone(aut, newName);
-
+        }
         final InsertInfo insert = new InsertInfo(cloned);
         inserts.add(insert);
       }
@@ -493,8 +493,7 @@ public class AutomataTable extends JTable implements SelectionOwner
       if (p instanceof AutomatonProxy) {
         final AutomatonProxy aut = (AutomatonProxy) p;
         final AutomataTableModel model = getModel();
-        this.scrollRectToVisible(this.getCellRect(model.getIndex(aut), 0,
-                                                  true));
+        scrollRectToVisible(getCellRect(model.getIndex(aut), 0, true));
         break;
       }
     }
