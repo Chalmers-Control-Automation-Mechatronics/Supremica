@@ -33,6 +33,12 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TIntHashSet;
+import gnu.trove.set.hash.TLongHashSet;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayDeque;
@@ -43,6 +49,9 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
@@ -53,12 +62,6 @@ import net.sourceforge.waters.analysis.tr.TauClosure;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.OverflowException;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.set.hash.TIntHashSet;
-import gnu.trove.set.hash.TLongHashSet;
 
 
 /**
@@ -119,6 +122,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
    *          The new transition limit, or {@link Integer#MAX_VALUE} to allow
    *          an unlimited number of transitions.
    */
+  @Override
   public void setTransitionLimit(final int limit)
   {
     mTransitionLimit = limit;
@@ -129,6 +133,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
    *
    * @see #setTransitionLimit(int) setTransitionLimit()
    */
+  @Override
   public int getTransitionLimit()
   {
     return mTransitionLimit;
@@ -155,6 +160,28 @@ public class SynthesisObservationEquivalenceTRSimplifier
   public boolean getUsesWeakSynthesisObservationEquivalence()
   {
     return mWeak;
+  }
+
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, TRSimplifierFactory.
+               OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(TRSimplifierFactory.
+                     OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      setUsesWeakSynthesisObservationEquivalence(propOption.getValue());
+    }
+    else {
+      super.setOption(option);
+    }
   }
 
 

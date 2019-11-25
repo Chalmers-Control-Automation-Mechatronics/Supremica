@@ -87,24 +87,24 @@ public class EventSetPanel extends JPanel
         mUnselectedModel.addElement(event);
       }
     }
-    final JList<EventProxy> unselectedList = createListView(mUnselectedModel);
-    final JScrollPane unselectedScroll = new JScrollPane(unselectedList);
-    final JList<EventProxy> selectedList = createListView(mSelectedModel);
-    final JScrollPane selectedScroll = new JScrollPane(selectedList);
+    mUnselectedList = createListView(mUnselectedModel);
+    final JScrollPane unselectedScroll = new JScrollPane(mUnselectedList);
+    mSelectedList = createListView(mSelectedModel);
+    final JScrollPane selectedScroll = new JScrollPane(mSelectedList);
 
-    final TransferHandler unselectedHandler = new EventListTransferHandler(selectedList);
-    unselectedList.setTransferHandler(unselectedHandler);
-    final TransferHandler selectedHandler = new EventListTransferHandler(unselectedList);
-    selectedList.setTransferHandler(selectedHandler);
+    final TransferHandler unselectedHandler = new EventListTransferHandler(mSelectedList);
+    mUnselectedList.setTransferHandler(unselectedHandler);
+    final TransferHandler selectedHandler = new EventListTransferHandler(mUnselectedList);
+    mSelectedList.setTransferHandler(selectedHandler);
 
-    unselectedList.setDragEnabled(true);
-    selectedList.setDragEnabled(true);
+    mUnselectedList.setDragEnabled(true);
+    mSelectedList.setDragEnabled(true);
 
     final JButton selectButton =
-      createButton("\u25b6", unselectedList, mUnselectedModel, mSelectedModel);
+      createButton("\u25b6", mSelectedList, mUnselectedList);
     selectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
     final JButton unselectButton =
-      createButton("\u25c0", selectedList, mSelectedModel, mUnselectedModel);
+      createButton("\u25c0", mUnselectedList, mSelectedList);
     unselectButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
     final JLabel unselectedLabel = new JLabel(option.getUnselectedTitle());
@@ -144,6 +144,21 @@ public class EventSetPanel extends JPanel
     sortModel(mUnselectedModel);
   }
 
+  public void setListSelection(final Set<EventProxy> selectedEvents, final boolean inverted) {
+    mSelectedList.clearSelection();
+    for (int e=0; e<mSelectedModel.getSize(); e++) {
+      if (inverted != selectedEvents.contains(mSelectedModel.get(e))) {
+        mSelectedList.addSelectionInterval(e, e);
+      }
+    }
+    mUnselectedList.clearSelection();
+    for (int e=0; e<mUnselectedModel.getSize(); e++) {
+      if (inverted != selectedEvents.contains(mUnselectedModel.get(e))) {
+        mUnselectedList.addSelectionInterval(e, e);
+      }
+    }
+  }
+
 
   //#######################################################################
   //# Simple Access
@@ -158,7 +173,7 @@ public class EventSetPanel extends JPanel
     return set;
   }
 
-  
+
   //#######################################################################
   //# Auxiliary Methods
   private JList<EventProxy> createListView(final DefaultListModel<EventProxy> model)
@@ -172,20 +187,31 @@ public class EventSetPanel extends JPanel
   }
 
    private JButton createButton(final String label,
-                                final JList<EventProxy> fromList,
-                                final DefaultListModel<EventProxy> fromModel,
-                                final DefaultListModel<EventProxy> toModel)
+                                final JList<EventProxy> toList,
+                                final JList<EventProxy> fromList)
   {
     final JButton button = new JButton(label);
     button.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
       {
-        for (final EventProxy proxy : fromList.getSelectedValuesList()) {
+        final DefaultListModel<EventProxy> toModel =
+          (DefaultListModel<EventProxy>) toList.getModel();
+        final DefaultListModel<EventProxy> fromModel =
+          (DefaultListModel<EventProxy>) fromList.getModel();
+
+        final Set<EventProxy> selectedEvents =
+          new THashSet<>(fromList.getSelectedValuesList());
+        for (final EventProxy proxy : selectedEvents) {
           fromModel.removeElement(proxy);
           toModel.addElement(proxy);
         }
         sortModel(toModel);
+        for (int e=0; e<toModel.getSize(); e++) {
+          if (selectedEvents.contains(toModel.get(e))) {
+            toList.addSelectionInterval(e, e);
+          }
+        }
       }
     });
     return button;
@@ -205,6 +231,8 @@ public class EventSetPanel extends JPanel
 
   //#######################################################################
   //# Data Members
+  final JList<EventProxy> mSelectedList;
+  final JList<EventProxy> mUnselectedList;
   private final DefaultListModel<EventProxy> mSelectedModel;
   private final DefaultListModel<EventProxy> mUnselectedModel;
   private final GUIOptionContext mContext;
@@ -302,11 +330,18 @@ public class EventSetPanel extends JPanel
       final DefaultListModel<EventProxy> fromModel =
         (DefaultListModel<EventProxy>) mFromList.getModel();
 
-      for (final EventProxy proxy : mFromList.getSelectedValuesList()) {
+      final Set<EventProxy> selectedEvents =
+        new THashSet<>(mFromList.getSelectedValuesList());
+      for (final EventProxy proxy : selectedEvents) {
         fromModel.removeElement(proxy);
         toModel.addElement(proxy);
       }
       sortModel(toModel);
+      for (int e=0; e<toModel.getSize(); e++) {
+        if (selectedEvents.contains(toModel.get(e))) {
+          toList.addSelectionInterval(e, e);
+        }
+      }
 
       return true;
     }

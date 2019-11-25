@@ -169,6 +169,13 @@ public class TRSimplifierFactory
               "before aborting.",
               "-maxinc",
               Double.POSITIVE_INFINITY, 1.0, Double.POSITIVE_INFINITY));
+
+    db.add(new BooleanOption
+           (OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence,
+            "",//TODO
+            "",
+            "-wsoe",
+            false));
   }
 
 
@@ -201,6 +208,14 @@ public class TRSimplifierFactory
       protected TransitionRelationSimplifier createTRSimplifier()
       {
         return new SpecialEventsTRSimplifier();
+      }
+    });
+    mToolCreators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
+      "") {//TODO
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SynthesisObservationEquivalenceTRSimplifier();
       }
     });
   }
@@ -259,4 +274,7 @@ public class TRSimplifierFactory
 
   public static final String OPTION_SpecialEvents_LocalEvents =
     "SpecialEventsTRSimplifier.LocalEvents";
+
+  public static final String OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence =
+    "SynthesisObservationEquivalenceTRSimplifier.UsesWeakSynthesisObservationEquivalence";
 }
