@@ -35,6 +35,7 @@ package net.sourceforge.waters.gui.analyzer;
 
 import gnu.trove.set.hash.THashSet;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
@@ -44,6 +45,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -60,6 +62,8 @@ import javax.swing.border.EmptyBorder;
 import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.EventSetOption.DefaultKind;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
+import net.sourceforge.waters.model.base.EventKind;
+import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 
@@ -124,9 +128,84 @@ public class EventSetPanel extends JPanel
     selectedPanel.add(selectedScroll);
     selectedPanel.add(unselectButton);
 
-    setLayout(new GridLayout(0, 2));
-    add(unselectedPanel);
-    add(selectedPanel);
+    final JPanel eventListPane = new JPanel();
+    eventListPane.setLayout(new GridLayout(0, 2));
+    eventListPane.add(unselectedPanel);
+    eventListPane.add(selectedPanel);
+
+
+    final JPanel buttonPane = new JPanel();
+    buttonPane.setLayout(new GridLayout(0, 2));
+
+    final AutomatonProxy aut = des.getAutomata().iterator().next();
+    final Set<EventProxy> allOtherEvents = context
+      .getWatersAnalyzerPanel()
+      .getAutomataTable()
+      .getAllSelectableItems()
+      .stream()
+      .filter(a->a != aut)
+      .flatMap(a->a.getEvents().stream())
+      .collect(Collectors.toSet());
+
+
+    if (defaultKind != DefaultKind.PROPOSITION) {
+      boolean uncontrollableEventExists = false;
+      boolean unobservableEventExists = false;
+      boolean sharedEventExists = false;
+
+      for (final EventProxy event : aut.getEvents()) {
+        if (event.getKind() == EventKind.PROPOSITION) continue;
+        if (event.getKind() == EventKind.CONTROLLABLE) {
+          mControllableEvents.add(event);
+        } else uncontrollableEventExists = true;
+        if (event.isObservable()) {
+          mObservableEvents.add(event);
+        } else unobservableEventExists = true;
+        if (!allOtherEvents.contains(event)) {
+          mLocalEvents.add(event);
+        } else sharedEventExists = true;
+      }
+
+      addSelectionButtons(buttonPane, mControllableEvents, uncontrollableEventExists,
+                          "Select Controllable", "Select Uncontrollable");
+      addSelectionButtons(buttonPane, mObservableEvents, unobservableEventExists,
+                          "Select Observable", "Select Unobservable");
+      addSelectionButtons(buttonPane, mLocalEvents, sharedEventExists,
+                          "Select Local", "Select Shared");
+    }
+
+    setLayout(new BorderLayout());
+    add(eventListPane, BorderLayout.CENTER);
+    add(buttonPane, BorderLayout.SOUTH);
+
+  }
+
+  private void addSelectionButtons(final JPanel pane,
+                                   final Set<EventProxy> events,
+                                   final boolean otherExists,
+                                   final String givenButtonLabel,
+                                   final String otherButtonLabel) {
+
+    if (events.size() != 0 && otherExists) {
+      final JButton controllableEventsButton = new JButton(givenButtonLabel);
+      controllableEventsButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent e)
+        {
+          setListSelection(events, false);
+        }
+      });
+      pane.add(controllableEventsButton);
+      final JButton uncontrollableEventsButton = new JButton(otherButtonLabel);
+      uncontrollableEventsButton.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(final ActionEvent e)
+        {
+          setListSelection(events, true);
+        }
+      });
+      pane.add(uncontrollableEventsButton);
+    }
 
   }
 
@@ -172,6 +251,12 @@ public class EventSetPanel extends JPanel
     }
     return set;
   }
+
+//  public boolean isKeepOriginal() {
+//
+//  }
+//
+//  //public boolean is
 
 
   //#######################################################################
@@ -236,6 +321,10 @@ public class EventSetPanel extends JPanel
   private final DefaultListModel<EventProxy> mSelectedModel;
   private final DefaultListModel<EventProxy> mUnselectedModel;
   private final GUIOptionContext mContext;
+
+  private final Set<EventProxy> mControllableEvents = new THashSet<EventProxy>();
+  private final Set<EventProxy> mObservableEvents = new THashSet<EventProxy>();
+  private final Set<EventProxy> mLocalEvents = new THashSet<EventProxy>();
 
   //#######################################################################
   //# Class Constants

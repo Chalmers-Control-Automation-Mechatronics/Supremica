@@ -58,6 +58,7 @@ import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -270,7 +271,15 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
         }
         builder.run();
         final AutomatonProxy result = builder.getComputedAutomaton();
-        model.insertRow(result);
+        if (builder.isKeepOriginal()) {
+          model.replaceAutomaton(aut, result);
+        } else {
+          if (result instanceof TRAutomatonProxy) {
+            final String newName = model.getUnusedName(result.getName());
+            ((TRAutomatonProxy)result).setName(newName);
+          }
+          model.insertRow(result);
+        }
         dispose();
       }
 

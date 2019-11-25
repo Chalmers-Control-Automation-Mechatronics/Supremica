@@ -172,9 +172,16 @@ public class TRSimplifierFactory
 
     db.add(new BooleanOption
            (OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence,
+            "Use Weak Synthesis Observation Equivalence",
             "",//TODO
-            "",
             "-wsoe",
+            true));
+
+    db.add(new BooleanOption
+           (OPTION_TRSimplifierFactory_KeepOriginal,
+            "Keep Original",
+            "",
+            "-keep",
             false));
   }
 
@@ -277,4 +284,7 @@ public class TRSimplifierFactory
 
   public static final String OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence =
     "SynthesisObservationEquivalenceTRSimplifier.UsesWeakSynthesisObservationEquivalence";
+
+  public static final String OPTION_TRSimplifierFactory_KeepOriginal =
+    "TransitionRelationSimplifier.KeepOriginal";
 }

@@ -37,6 +37,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PropositionOption;
@@ -74,7 +75,10 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   @Override
   public List<Option<?>> getOptions(final OptionMap db)
   {
-    return mSimp.getOptions(db);
+    final List<Option<?>> options = mSimp.getOptions(db);
+    db.append(options, TRSimplifierFactory.
+              OPTION_TRSimplifierFactory_KeepOriginal);
+    return options;
   }
 
   @Override
@@ -89,6 +93,10 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
                             OPTION_AbstractMarking_DefaultMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();
+    } else if (option.hasID(TRSimplifierFactory.
+                            OPTION_TRSimplifierFactory_KeepOriginal)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      mKeepOriginal = propOption.getValue();
     } else {
       mSimp.setOption(option);
     }
@@ -150,9 +158,8 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     return true;
   }
 
-  public TRAutomatonProxy getTRAutomaton()
-  {
-    return mTrAut;
+  public boolean isKeepOriginal() {
+    return mKeepOriginal;
   }
 
 
@@ -162,6 +169,8 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
 
   private EventProxy mPreconditionMarking;
   private EventProxy mDefaultMarking;
+
+  private boolean mKeepOriginal;
 
   private TRAutomatonProxy mTrAut;
 

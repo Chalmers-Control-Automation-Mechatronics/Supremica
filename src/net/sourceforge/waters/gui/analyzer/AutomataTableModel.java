@@ -42,6 +42,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -141,6 +143,37 @@ public class AutomataTableModel extends AbstractTableModel implements Observer
     final List<AutomatonProxy> autList = new ArrayList<AutomatonProxy>();
     autList.add(insert);
     insertRows(autList);
+  }
+
+  public String getUnusedName(String name)
+  {
+    String nameStart;
+    String nameEnd;
+    int index;
+    if (name.endsWith("]")) {
+      index = name.lastIndexOf('[');
+    } else index = name.length();
+    nameStart = name.substring(0, index);
+    nameEnd = name.substring(index);
+    final Pattern p = Pattern.compile("(.*):(\\d+)$");
+    final Matcher m = p.matcher(nameStart);
+    int startValue = 0;
+    if (m.find()) {
+      final String valueString = m.group(2);
+      try {
+        startValue = Integer.parseInt(valueString);
+      }
+      catch (final NumberFormatException e) {
+        //Default to zero
+      }
+      nameStart = nameStart.substring(0, m.end(1));
+    }
+    for (int n=startValue;; n++) {
+      if (n == 0) name = nameStart + nameEnd;
+      else name = nameStart + ":" + n + nameEnd;
+      if (!containsAutomatonName(name)) break;
+    }
+    return name;
   }
 
   boolean containsAutomatonName(final String name)

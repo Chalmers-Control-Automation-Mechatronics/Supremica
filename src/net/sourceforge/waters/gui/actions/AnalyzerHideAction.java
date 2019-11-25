@@ -43,7 +43,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -246,40 +245,10 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       buttonPane.add(okButton);
       buttonPane.add(cancelButton);
 
+
+
       final JPanel controlPane = new JPanel();
       controlPane.setLayout(new GridLayout(0, 2));
-
-      final Set<EventProxy> allOtherEvents = panel
-        .getAutomataTable()
-        .getAllSelectableItems()
-        .stream()
-        .filter(a->a != aut)
-        .flatMap(a->a.getEvents().stream())
-        .collect(Collectors.toSet());
-
-      boolean uncontrollableEventExists = false;
-      boolean unobservableEventExists = false;
-      boolean sharedEventExists = false;
-      for (final EventProxy event : aut.getEvents()) {
-        if (event.getKind() == EventKind.PROPOSITION) continue;
-        if (event.getKind() == EventKind.CONTROLLABLE) {
-          mControllableEvents.add(event);
-        } else uncontrollableEventExists = true;
-        if (event.isObservable()) {
-          mObservableEvents.add(event);
-        } else unobservableEventExists = true;
-        if (!allOtherEvents.contains(event)) {
-          mLocalEvents.add(event);
-        } else sharedEventExists = true;
-      }
-
-      addSelectionButtons(controlPane, mControllableEvents, uncontrollableEventExists,
-                          "Select Controllable", "Select Uncontrollable");
-      addSelectionButtons(controlPane, mObservableEvents, unobservableEventExists,
-                          "Select Observable", "Select Unobservable");
-      addSelectionButtons(controlPane, mLocalEvents, sharedEventExists,
-                          "Select Local", "Select Shared");
-
       mKeepOriginalCheckBox =
         new JCheckBox("Keep Original", true);
       mKeepOriginalCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -288,6 +257,7 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
         new JCheckBox("Preserve Controllability");
       mPreserveControllabilityCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
       controlPane.add(mPreserveControllabilityCheckBox);
+
 
       final JPanel allButtonsPane = new JPanel();
       pane.add(allButtonsPane, BorderLayout.SOUTH);
@@ -299,35 +269,6 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       setLocationRelativeTo(parent);
       pack();
       setVisible(true);
-
-    }
-
-    private void addSelectionButtons(final JPanel controlPane,
-                                     final Set<EventProxy> events,
-                                     final boolean otherExists,
-                                     final String givenButtonLabel,
-                                     final String otherButtonLabel) {
-
-      if (events.size() != 0 && otherExists) {
-        final JButton controllableEventsButton = new JButton(givenButtonLabel);
-        controllableEventsButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e)
-          {
-            mEventPanel.setListSelection(events, false);
-          }
-        });
-        controlPane.add(controllableEventsButton);
-        final JButton uncontrollableEventsButton = new JButton(otherButtonLabel);
-        uncontrollableEventsButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent e)
-          {
-            mEventPanel.setListSelection(events, true);
-          }
-        });
-        controlPane.add(uncontrollableEventsButton);
-      }
 
     }
 
@@ -424,6 +365,8 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
       final AutomataTableModel model = panel.getAutomataTableModel();
 
       if (mKeepOriginalCheckBox.isSelected()) {
+        final String newName = model.getUnusedName(result.getName());
+        result.setName(newName);
         model.insertRow(result);
       } else {
         model.replaceAutomaton(aut, result);
@@ -474,12 +417,10 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     private final EventSetPanel mEventPanel;
     private final EventStatusPanel mStatusPanel;
 
-    private final Set<EventProxy> mControllableEvents = new THashSet<EventProxy>();
-    private final Set<EventProxy> mObservableEvents = new THashSet<EventProxy>();
-    private final Set<EventProxy> mLocalEvents = new THashSet<EventProxy>();
-
     private final JCheckBox mKeepOriginalCheckBox;
     private final JCheckBox mPreserveControllabilityCheckBox;
+
+
 
     //#########################################################################
     //# Class Constants
