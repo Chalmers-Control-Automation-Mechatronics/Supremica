@@ -970,7 +970,10 @@ public class CompositionalAutomataSynthesizer
                            event.getName());
               final ListBufferTransitionRelation reduced =
                 reduceSupervisorStep2(preReduced, e);
-              final String name = prefix + ":" + event.getName();
+              String name = prefix + ":" + event.getName();
+              if (prefix.contains("[")) {
+                name = '{' + name + '}';
+              }
               reduced.setName(name);
               final AutomatonProxy sup = createSupervisorAutomaton(reduced);
               if (isNewSupervisor(sup, results)) {

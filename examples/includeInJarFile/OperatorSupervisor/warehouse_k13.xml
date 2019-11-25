@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <SupremicaProject name="Warehouse"  major="0"  minor="10" >
-<Automaton name="agv and truck, k=13" type="Supervisor">
+<Automaton name="agv_and_truck_13" type="Supervisor">
 	<Events>
 		<Event id="0" label="agv00"/>
 		<Event id="1" label="agv03"/>

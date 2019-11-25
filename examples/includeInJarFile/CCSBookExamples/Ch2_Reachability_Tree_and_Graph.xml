@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Example from Chapter 2 - Reachability Tree and Graph">
-<Automaton name="Reachability Tree" type="Undefined">
+<Automaton name="ReachabilityTree" type="Undefined">
 	<Events>
 		<Event id="1" label="t1"/>
 		<Event id="2" label="t2"/>

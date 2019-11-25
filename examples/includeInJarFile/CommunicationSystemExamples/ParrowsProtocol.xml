@@ -77,7 +77,7 @@
 		<Transition source="m3" dest="m0" event="timeout"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Desired behaviour" type="Specification">
+<Automaton name="Desired_behaviour" type="Specification">
 	<Events>
 		<Event id="0" label="send"/>
 		<Event id="1" label="receive"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Two Machines and a Buffer" comment="Classical example of uncontrollable specfication. Adapted from 'Supervisory Control of a Class of Discrete Event Processes' by P. Ramadge and M. Wonham">
-<Automaton name="Machine 1" type="Plant">
+<Automaton name="Machine1" type="Plant">
 	<Events>
 		<Event id="l1" label="load1"/>
 		<Event id="u1" label="unload1" controllable="false"/>
@@ -28,7 +28,7 @@
 		<Transition source="b1" dest="b0" event="l2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Machine 2" type="Plant">
+<Automaton name="Machine2" type="Plant">
 	<Events>
 		<Event id="l2" label="load2"/>
 		<Event id="u2" label="unload2" controllable="false"/>

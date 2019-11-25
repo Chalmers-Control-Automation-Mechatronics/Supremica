@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Telecommunications Network" comment="This is a model of a telecommunications network adapted from 'Supervisory Control od Distributed Systems Part I: Modelling, Specification and Synthesis' by J.G. Thistle, R.P. Malhame and H.-H. Hoang. These automata represents Figures 4-7 in the article. This is not the complete model!">
 <!--
-<Automaton name="Old Subscriber i" type="Plant">
+<Automaton name="OldSubscriber" type="Plant">
 	<Events>
 		<Event id="1" label="off-h_i"/>
 		<Event id="2" label="on-h_i"/>
@@ -49,7 +49,7 @@
 	</Transitions>
 </Automaton>
 -->
-<Automaton name="Subscriber i - part 1" type="Plant">
+<Automaton name="Subscriber_Part1" type="Plant">
 	<Events>
 		<Event id="1" label="off_h_i"/>
 		<Event id="2" label="on_h_i"/>
@@ -97,7 +97,7 @@
 		<Transition source="3" dest="4" event="17"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Subscriber i - part 2" type="Plant">
+<Automaton name="Subscriber_Part2" type="Plant">
 	<Events>
 		<Event id="1" label="off_h_i"/>
 		<Event id="2" label="on_h_i"/>
@@ -151,7 +151,7 @@
 		<Transition source="3" dest="0" event="10"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Call waiting i" type="Specification">
+<Automaton name="CallWaiting" type="Specification">
 	<Events>
 		<Event id="2" label="on_h_i"/>
 		<Event id="3" label="on_h_j"/>
@@ -206,7 +206,7 @@
 		<Transition source="3" dest="6" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Three-way calling i" type="Specification">
+<Automaton name="ThreeWayCalling" type="Specification">
 	<Events>
 		<Event id="1" label="on_h_i"/>
 		<Event id="2" label="on_h_j"/>
@@ -243,7 +243,7 @@
 		<Transition source="3" dest="3" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Flash-hook i" type="Specification">
+<Automaton name="FlashHook" type="Specification">
 	<Events>
 		<Event id="1" label="on_h_i"/>
 		<Event id="2" label="on_h_j"/>

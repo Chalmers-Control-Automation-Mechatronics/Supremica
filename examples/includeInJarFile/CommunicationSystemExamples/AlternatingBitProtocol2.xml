@@ -116,7 +116,7 @@
 		<Transition source="ma2" dest="ma4" event="tau_9"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Desired behaviour" type="Specification">
+<Automaton name="Desired_behaviour" type="Specification">
 	<Events>
 		<Event id="0" label="send"/>
 		<Event id="1" label="receive"/>

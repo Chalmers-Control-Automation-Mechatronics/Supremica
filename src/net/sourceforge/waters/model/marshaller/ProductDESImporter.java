@@ -134,7 +134,7 @@ public class ProductDESImporter
 
 
   //#########################################################################
-  //# Entity Resolving
+  //# Configuration
   /**
    * Gets the document manager used by this importer to resolve
    * references to other files. Presently, this is only used to
@@ -153,6 +153,28 @@ public class ProductDESImporter
   public void setDocumentManager(final DocumentManager manager)
   {
     mDocumentManager = manager;
+  }
+
+  /**
+   * Returns whether automaton names are parsed into identifiers.
+   * @see #setParsingAutomatonNames(boolean)
+   */
+  public boolean isParsingAutomatonNames()
+  {
+    return mParsingNames;
+  }
+
+  /**
+   * Configures whether automaton names are parsed into identifiers.
+   * If <CODE>true</CODE>, the default, automaton names are parsed,
+   * otherwise simple identifiers ({@link SimpleIdentifierProxy}) are
+   * created without any check. Parsing produces are more compatible
+   * output, but it may result in errors when converting names that
+   * are not syntactically correct.
+   */
+  public void setParsingAutomatonNames(final boolean parsing)
+  {
+    mParsingNames = parsing;
   }
 
 
@@ -210,6 +232,7 @@ public class ProductDESImporter
     try {
       mCurrentAutomaton = aut;
       final String name = aut.getName();
+      final IdentifierProxy ident = importIdentifier(name);
       final ComponentKind kind = aut.getKind();
       mCurrentEvents = aut.getEvents();
       mCurrentBlockedEvents = new THashSet<>(mCurrentEvents);
@@ -289,8 +312,6 @@ public class ProductDESImporter
       final GraphProxy graph =
         mFactory.createGraphProxy(deterministic, blockedblock,
                                   nodes, edges);
-      final SimpleIdentifierProxy ident =
-        mFactory.createSimpleIdentifierProxy(name);
       final Map<String,String> attribs = aut.getAttributes();
       return mFactory.createSimpleComponentProxy(ident, kind, graph, attribs);
     } finally {
@@ -341,6 +362,18 @@ public class ProductDESImporter
       mFactory.createPlainEventListProxy(idents);
     return mFactory.createSimpleNodeProxy
       (name, list, null, initial, null, null, null);
+  }
+
+  private IdentifierProxy importIdentifier(final String name)
+    throws ParseException
+  {
+    if (mParsingNames) {
+      final IdentifierProxy ident = mExpressionParser.parseIdentifier(name);
+      mEnumSymbolCollector.collect(ident);
+      return ident;
+    } else {
+      return mFactory.createSimpleIdentifierProxy(name);
+    }
   }
 
 
@@ -614,6 +647,7 @@ public class ProductDESImporter
   private final ExpressionParser mExpressionParser;
   private final EnumSymbolCollector mEnumSymbolCollector;
   private DocumentManager mDocumentManager;
+  private boolean mParsingNames = true;
 
   private AutomatonProxy mCurrentAutomaton;
   private Set<EventProxy> mCurrentEvents;

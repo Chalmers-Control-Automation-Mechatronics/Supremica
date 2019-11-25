@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Flexible production cell" comment="From 'Task Description of a Flexible Production Cell with Real Time Properties' by A. Lötzenbeyer and R. Mühlfeld."> 
- <Automaton name="Product A" type="Specification">
+ <Automaton name="ProductA" type="Specification">
   <Events>
    <Event id="p1__b_seg1" label="p1__b_seg1" controllable="true" prioritized="true" />
    <Event id="p1__b_seg2" label="p1__b_seg2" controllable="true" prioritized="true" />
@@ -53,7 +53,7 @@
    <Transition event="p1__b_seg4" source="q_14" dest="q_0" />
   </Transitions>
  </Automaton>
-  <Automaton name="Product B" type="Specification">
+  <Automaton name="ProductB" type="Specification">
    <Events>
     <Event id="p2__b_seg1" label="p2__b_seg1" controllable="true" prioritized="true" />
     <Event id="p2__b_seg2" label="p2__b_seg2" controllable="true" prioritized="true" />

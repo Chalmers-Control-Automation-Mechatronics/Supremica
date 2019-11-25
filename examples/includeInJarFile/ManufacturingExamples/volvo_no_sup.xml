@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="" major="0" minor="9">
-<Automaton name="Safety spec O33 O54nst2" type="Specification">
+<Automaton name="SafetySpec_O33_O54nst2" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="stO54"/>
@@ -15,7 +15,7 @@
 		<Transition source="1" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O33 O79nst2" type="Specification">
+<Automaton name="SafetySpec_O33_O79nst2" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="stO79"/>
@@ -30,7 +30,7 @@
 		<Transition source="1" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O35 O54ong3" type="Specification">
+<Automaton name="SafetySpec_O35_O54ong3" type="Specification">
 	<Events>
 		<Event id="0" label="finO35"/>
 		<Event id="1" label="finO54"/>
@@ -47,7 +47,7 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O35 O79ong3" type="Specification">
+<Automaton name="SafetySpec_O35_O79ong3" type="Specification">
 	<Events>
 		<Event id="0" label="finO35"/>
 		<Event id="1" label="finO79"/>
@@ -64,7 +64,7 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O54 ext1" type="Specification">
+<Automaton name="SafetySpec_O54_ext1" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="finO54"/>
@@ -90,7 +90,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O54 ext1 waitSafe" type="Specification">
+<Automaton name="SafetySpec_O54_ext1_waitSafe" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="finO54"/>
@@ -105,7 +105,7 @@
 		<Transition source="1" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O56 ext1" type="Specification">
+<Automaton name="SafetySpec_O56_ext1" type="Specification">
 	<Events>
 		<Event id="0" label="finO35"/>
 		<Event id="1" label="finO56"/>
@@ -125,7 +125,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O56 ext1 waitSafe" type="Specification">
+<Automaton name="SafetySpec_O56_ext1_waitSafe" type="Specification">
 	<Events>
 		<Event id="0" label="finO31"/>
 		<Event id="1" label="finO32"/>
@@ -146,7 +146,7 @@
 		<Transition source="1" dest="1" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O73 ext1" type="Specification">
+<Automaton name="SafetySpec_O73_ext1" type="Specification">
 	<Events>
 		<Event id="0" label="finO35"/>
 		<Event id="1" label="finO73"/>
@@ -169,7 +169,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O73 ext1 waitSafe" type="Specification">
+<Automaton name="SafetySpec_O73_ext1_waitSafe" type="Specification">
 	<Events>
 		<Event id="0" label="finO31"/>
 		<Event id="1" label="finO35"/>
@@ -187,7 +187,7 @@
 		<Transition source="1" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O79 ext1" type="Specification">
+<Automaton name="SafetySpec_O79_ext1" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="finO79"/>
@@ -213,7 +213,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O79 ext1 waitSafe" type="Specification">
+<Automaton name="SafetySpec_O79_ext1_waitSafe" type="Specification">
 	<Events>
 		<Event id="0" label="finO33"/>
 		<Event id="1" label="finO79"/>
@@ -228,7 +228,7 @@
 		<Transition source="1" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O81 ext1" type="Specification">
+<Automaton name="SafetySpec_O81_ext1" type="Specification">
 	<Events>
 		<Event id="0" label="finO35"/>
 		<Event id="1" label="finO81"/>
@@ -248,7 +248,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Safety spec O81 ext1 waitSafe" type="Specification">
+<Automaton name="SafetySpec_O81_ext1_waitSafe" type="Specification">
 	<Events>
 		<Event id="0" label="finO31"/>
 		<Event id="1" label="finO32"/>

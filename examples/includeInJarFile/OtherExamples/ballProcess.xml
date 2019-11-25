@@ -5,7 +5,7 @@
 	<!-- Progress specs -->
 	<!-- -->
 
-	<Automaton name="Progress spec: Manual or automatic mode" type="Specification">
+	<Automaton name="ProgressSpec_ManualOrAutomaticMode" type="Specification">
 		<Events>
 			<Event id="mode_automatic" label="mode_automatic" controllable="true" prioritized="true" />
 			<Event id="mode_manual" label="mode_manual" controllable="true" prioritized="true" />
@@ -47,7 +47,7 @@
 			<Transition event="mode_automatic" source="q_7" dest="q_7" />
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Progress spec: Gatekeeper (gk)" type="Specification">
+	<Automaton name="ProgressSpec_Gatekeeper" type="Specification">
 		<Events>
 			<Event id="gk_enter_ball" label="gk_enter_ball" controllable="true" prioritized="true" />		
 			<Event id="gk_in_go_out" label="gk_in_go_out" controllable="true" prioritized="true" />
@@ -79,7 +79,7 @@
 			<Transition event="gk_out_go_in" source="q_6" dest="q_0" />						
 		</Transitions>
 	</Automaton>
-	<Automaton name="Progress spec: Elevate and measure (em)" type="Specification">
+	<Automaton name="ProgressSpec_ElevateAndMeasure" type="Specification">
 		<Events>
 			<Event id="em_enter_ball" label="em_enter_ball" controllable="true" prioritized="true" />		
 			<Event id="em_has_ball" label="em_has_ball" controllable="false" prioritized="true" />
@@ -146,7 +146,7 @@
 			<Transition event="em_elevator_release_station" source="q_13" dest="q_0" />			
 		</Transitions>
 	</Automaton>
-	<Automaton name="Progress spec: Measure station - measure" type="Specification">
+	<Automaton name="ProgressSpec_MeasureStation_Meassure" type="Specification">
 		<Events>
 			<Event id="em_measure_start" label="em_measure_start" controllable="true" prioritized="true" />
 			<Event id="em_measure_finished" label="em_measure_finished" controllable="false" prioritized="true" />
@@ -184,7 +184,7 @@
 			<Transition event="em_measure_finished" source="q_6" dest="q_0" />			
 		</Transitions>
 	</Automaton>
-	<Automaton name="Progress spec: Measure station - putter" type="Specification">
+	<Automaton name="ProgressSpec_MeasureStation_Putter" type="Specification">
 		<Events>
 			<Event id="em_putter_start" label="em_putter_start" controllable="true" prioritized="true" />
 			<Event id="em_putter_finished" label="em_putter_finished" controllable="false" prioritized="true" />
@@ -216,7 +216,7 @@
 			<Transition event="em_putter_finished" source="q_6" dest="q_0" />			
 		</Transitions>
 	</Automaton>
-	<Automaton name="Progress spec: Elevate and sort (es)" type="Specification">
+	<Automaton name="ProgressSpec_ElevateAndSort" type="Specification">
 		<Events>
 			<Event id="es_enter_ball" label="es_enter_ball" controllable="true" prioritized="true" />		
 			<Event id="es_got_ball" label="es_got_ball" controllable="true" prioritized="true" />
@@ -316,7 +316,7 @@
 	<!-- Interaction specs -->
 	<!-- -->
 	
-	<Automaton name="Interaction spec: GK and EM" type="Specification">
+	<Automaton name="InteractionSpec_GKandEM" type="Specification">
 		<Events>
 			<Event id="gk_has_ball" label="gk_has_ball" controllable="false" prioritized="true" />		
 			<Event id="em_is_down" label="em_is_down" controllable="false" prioritized="true" />
@@ -345,7 +345,7 @@
 			<Transition event="em_is_up" source="q_5" dest="q_0" />
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Interaction spec: Measure station" type="Specification">
+	<Automaton name="InteractionSpec_MeasureStation" type="Specification">
 		<Events>
 			<Event id="em_measure_allocate_station" label="em_measure_allocate_station" controllable="true" prioritized="true" />
 			<Event id="em_measure_release_station" label="em_measure_release_station" controllable="true" prioritized="true" />
@@ -381,7 +381,7 @@
 			<Transition event="em_go_down" source="q_3" dest="q_3" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Interaction spec: EM and ES" type="Specification">
+	<Automaton name="InteractionSpec_EMandES" type="Specification">
 		<Events>
 			<Event id="em_measure_has_ball" label="em_measure_has_ball" controllable="false" prioritized="true" />		
 			<Event id="es_enter_ball" label="es_enter_ball" controllable="true" prioritized="true" />						
@@ -395,7 +395,7 @@
 			<Transition event="es_enter_ball" source="q_1" dest="q_0" />		
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Interaction spec: ES and lower buffer" type="Specification">
+	<Automaton name="InteractionSpec_ESandLowerBuffer" type="Specification">
 		<Events>
 			<Event id="arm_allocate_lower_buffer" label="arm_allocate_lower_buffer" controllable="true" prioritized="true" />
 			<Event id="arm_release_lower_buffer" label="arm_release_lower_buffer" controllable="true" prioritized="true" />
@@ -423,7 +423,7 @@
 			<Transition event="es_deput_ball_lower" source="q_2" dest="q_2" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Interaction spec: ES and upper buffer" type="Specification">
+	<Automaton name="InteractionSpec_ESandUpperBuffer" type="Specification">
 		<Events>
 			<Event id="arm_allocate_upper_buffer" label="arm_allocate_upper_buffer" controllable="true" prioritized="true" />
 			<Event id="arm_release_upper_buffer" label="arm_release_upper_buffer" controllable="true" prioritized="true" />
@@ -457,7 +457,7 @@
 	<!-- -->
 	<!-- Input signals -->
 	<!-- --> 
-	<Automaton name="Plant: Manual button" type="Plant">
+	<Automaton name="Plant_ManualButton" type="Plant">
 		<Events>
 			<Event id="button_manual_pressed" label="button_manual_pressed" controllable="false" prioritized="true" />
 			<Event id="button_manual_released" label="button_manual_released" controllable="false" prioritized="true" />
@@ -475,7 +475,7 @@
 			<Transition event="mode_manual" source="q_1" dest="q_2" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Automatic button" type="Plant">
+	<Automaton name="Plant_AutomaticButton" type="Plant">
 		<Events>
 			<Event id="button_automatic_pressed" label="button_automatic_pressed" controllable="false" prioritized="true" />
 			<Event id="button_automatic_released" label="button_automatic_released" controllable="false" prioritized="true" />
@@ -492,7 +492,7 @@
 			<Transition event="mode_automatic" source="q_1" dest="q_2" />
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Plant: Gatekeeper - In" type="Plant">
+	<Automaton name="Plant_Gatekeeper_In" type="Plant">
 		<Events>
 			<Event id="go_in" label="gk_in_go_in" />
 			<Event id="go_out" label="gk_in_go_out" />
@@ -512,7 +512,7 @@
 			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Gatekeeper - Out" type="Plant">
+	<Automaton name="Plant_Gatekeeper_Out" type="Plant">
 		<Events>
 			<Event id="go_in" label="gk_out_go_in" />
 			<Event id="go_out" label="gk_out_go_out" />
@@ -532,7 +532,7 @@
 			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Elevator - Measure" type="Plant">
+	<Automaton name="Plant_Elevator_Measure" type="Plant">
 		<Events>
 			<Event id="go_down" label="em_go_down" controllable="true" prioritized="true" />
 			<Event id="go_up" label="em_go_up" controllable="true" prioritized="true" />
@@ -552,7 +552,7 @@
 			<Transition event="is_down" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Measure - Putter" type="Plant">
+	<Automaton name="Plant_Measure_Putter" type="Plant">
 		<Events>
 			<Event id="go_in" label="em_putter_go_in" />
 			<Event id="go_out" label="em_putter_go_out" />
@@ -572,7 +572,7 @@
 			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Disable events" type="Plant">
+	<Automaton name="Plant_DisableEvents" type="Plant">
 		<Events>
 			<Event id="e4" label="gk_in_is_in" />
 			<Event id="e5" label="gk_in_is_out" />
@@ -596,7 +596,7 @@
 	<!-- Extended plants -->
 	<!-- -->
 
-	<Automaton name="Extended Plant: GK and EM" type="Plant">
+	<Automaton name="ExtendedPlant_GKandEM" type="Plant">
 		<Events>
 			<Event id="gk_out_go_out" label="gk_out_go_out" controllable="true" prioritized="true" />
 			<Event id="em_has_ball" label="em_has_ball" controllable="false" prioritized="true" />
@@ -615,7 +615,7 @@
 	<!-- Variables -->
 	<!-- -->
 	
-	<Automaton name="Variable: size of ball" type="Specification">
+	<Automaton name="Variable_SizeOfBall" type="Specification">
 		<Events>
 			<Event id="em_small_ball" label="em_small_ball" controllable="false" prioritized="true" />
 			<Event id="em_large_ball" label="em_large_ball" controllable="false" prioritized="true" />
@@ -643,7 +643,7 @@
 	<!-- Timers -->
 	<!-- -->
 	
-	<Automaton name="Timer: em_timer_before_up" type="Plant">
+	<Automaton name="Timer_em_timer_before_up" type="Plant">
 		<Events>
 			<Event id="em_timer_before_up_start" label="em_timer_before_up_start" controllable="true" prioritized="true" />
 			<Event id="em_timer_before_up_timeout" label="em_timer_before_up_timeout" controllable="false" prioritized="true" />
@@ -658,7 +658,7 @@
 			<Transition event="em_timer_before_up_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: em_timer_before_ballcheck" type="Plant">
+	<Automaton name="Timer_em_timer_before_ballcheck" type="Plant">
 		<Events>
 			<Event id="em_timer_before_ballcheck_start" label="em_timer_before_ballcheck_start" controllable="true" prioritized="true" />
 			<Event id="em_timer_before_ballcheck_timeout" label="em_timer_before_ballcheck_timeout" controllable="false" prioritized="true" />
@@ -673,7 +673,7 @@
 			<Transition event="em_timer_before_ballcheck_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: em_timer_measure" type="Plant">
+	<Automaton name="Timer_em_timer_measure" type="Plant">
 		<Events>
 			<Event id="em_timer_measure_start" label="em_timer_measure_start" controllable="true" prioritized="true" />
 			<Event id="em_timer_measure_timeout" label="em_timer_measure_timeout" controllable="false" prioritized="true" />
@@ -688,7 +688,7 @@
 			<Transition event="em_timer_measure_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: em_timer_before_put" type="Plant">
+	<Automaton name="Timer_em_timer_before_put" type="Plant">
 		<Events>
 			<Event id="em_timer_before_put_start" label="em_timer_before_put_start" controllable="true" prioritized="true" />
 			<Event id="em_timer_before_put_timeout" label="em_timer_before_put_timeout" controllable="false" prioritized="true" />
@@ -703,7 +703,7 @@
 			<Transition event="em_timer_before_put_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: em_timer_putting" type="Plant">
+	<Automaton name="Timer_em_timer_putting" type="Plant">
 		<Events>
 			<Event id="em_timer_putting_start" label="em_timer_putting_start" controllable="true" prioritized="true" />
 			<Event id="em_timer_putting_timeout" label="em_timer_putting_timeout" controllable="false" prioritized="true" />
@@ -718,7 +718,7 @@
 			<Transition event="em_timer_putting_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: es_timer_before_up" type="Plant">
+	<Automaton name="Timer_es_timer_before_up" type="Plant">
 		<Events>
 			<Event id="es_timer_before_up_start" label="es_timer_before_up_start" controllable="true" prioritized="true" />
 			<Event id="es_timer_before_up_timeout" label="es_timer_before_up_timeout" controllable="false" prioritized="true" />
@@ -733,7 +733,7 @@
 			<Transition event="es_timer_before_up_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: es_timer_before_ballcheck" type="Plant">
+	<Automaton name="Timer_es_timer_before_ballcheck" type="Plant">
 		<Events>
 			<Event id="es_timer_before_ballcheck_start" label="es_timer_before_ballcheck_start" controllable="true" prioritized="true" />
 			<Event id="es_timer_before_ballcheck_timeout" label="es_timer_before_ballcheck_timeout" controllable="false" prioritized="true" />
@@ -748,7 +748,7 @@
 			<Transition event="es_timer_before_ballcheck_timeout" source="q_1" dest="q_0" />	
 		</Transitions>
 	</Automaton>
-	<Automaton name="Timer: es_timer_before_deput" type="Plant">
+	<Automaton name="Timer_es_timer_before_deput" type="Plant">
 		<Events>
 			<Event id="es_timer_before_deput_start" label="es_timer_before_deput_start" controllable="true" prioritized="true" />
 			<Event id="es_timer_before_deput_timeout" label="es_timer_before_deput_timeout" controllable="false" prioritized="true" />

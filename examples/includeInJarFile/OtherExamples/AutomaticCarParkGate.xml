@@ -80,7 +80,7 @@
 		<Transition source="2" dest="2" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Control unit" type="Plant">
+<Automaton name="ControlUnit" type="Plant">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_GC" controllable="false"/>
@@ -116,7 +116,7 @@
 		<Transition source="1" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Output close" type="Plant">
+<Automaton name="OutputClose" type="Plant">
 	<Events>
 		<Event id="0" label="nf_cl"/>
 		<Event id="1" label="pf_cl"/>
@@ -130,7 +130,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Output open" type="Plant">
+<Automaton name="OutputOpen" type="Plant">
 	<Events>
 		<Event id="0" label="nf_op"/>
 		<Event id="1" label="pf_op"/>
@@ -144,7 +144,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Functional mode" type="Specification">
+<Automaton name="FunctionalMode" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_GC" controllable="false"/>
@@ -188,7 +188,7 @@
 		<Transition source="4" dest="0" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Closing stop" type="Specification">
+<Automaton name="ClosingStop" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_GC" controllable="false"/>
@@ -220,7 +220,7 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Opening stop" type="Specification">
+<Automaton name="OpeningStop" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_GO" controllable="false"/>
@@ -252,7 +252,7 @@
 		<Transition source="3" dest="2" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="No close and RC" type="Specification">
+<Automaton name="NoCloseAndRC" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_RC" controllable="false"/>
@@ -284,7 +284,7 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="No close and Vehicle" type="Specification">
+<Automaton name="NoCloseAndVehicle" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_V" controllable="false"/>
@@ -316,7 +316,7 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="No close and open" type="Specification">
+<Automaton name="NoCloseAndOpen" type="Specification">
 	<Events>
 		<Event id="0" label="nf_cl"/>
 		<Event id="1" label="nf_op"/>
@@ -339,7 +339,7 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Stability of close" type="Specification">
+<Automaton name="StabilityOfClose" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_cl"/>
@@ -358,7 +358,7 @@
 		<Transition source="2" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Stability of open" type="Specification">
+<Automaton name="StabilityOfOpen" type="Specification">
 	<Events>
 		<Event id="0" label="end"/>
 		<Event id="1" label="nf_op"/>

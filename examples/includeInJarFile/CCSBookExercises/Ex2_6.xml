@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Ex2_6">
-<Automaton name="Man, Wolf, Goat, Cabbage" type="Undefined">
+<Automaton name="ManWolfGoatCabbage" type="Undefined">
 	<Events>
 		<Event id="m"/>
 		<Event id="mw"/>

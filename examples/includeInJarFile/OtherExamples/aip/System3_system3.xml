@@ -565,7 +565,7 @@
 		<Transition source="s0" dest="s1" event="TrnsfToEL3_BD"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l[AS3]NewEvents" type="Plant">
+<Automaton name="l_NewEvents[AS3]" type="Plant">
 	<Events>
 		<Event id="PalletRepd[AS3]" label="PalletRepd[AS3]"/>
 		<Event id="ProcCpl[AS3]" label="ProcCpl[AS3]"/>

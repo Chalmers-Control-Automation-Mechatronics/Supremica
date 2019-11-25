@@ -94,7 +94,7 @@
 		<Transition source="msack1" dest="m" event="tau"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Medium'" type="Plant">
+<Automaton name="Medium2" type="Plant">
 	<Events>
 		<Event id="s0"/>
 		<Event id="rack0"/>

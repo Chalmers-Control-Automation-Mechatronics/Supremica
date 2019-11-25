@@ -63,7 +63,7 @@
 		<Transition source="1" dest="1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="spec2-1" type="Specification">
+<Automaton name="spec2_1" type="Specification">
 	<Events>
 		<Event id="0" label="finished_con" controllable="false"/>
 		<Event id="1" label="finished_tab" controllable="false"/>
@@ -81,7 +81,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="spec2-2" type="Specification">
+<Automaton name="spec2_2" type="Specification">
 	<Events>
 		<Event id="0" label="finished_op" controllable="false"/>
 		<Event id="1" label="finished_tab" controllable="false"/>
@@ -99,7 +99,7 @@
 		<Transition source="1" dest="0" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="spec2-3" type="Specification">
+<Automaton name="spec2_3" type="Specification">
 	<Events>
 		<Event id="0" label="finished_tab" controllable="false"/>
 		<Event id="1" label="finished_test" controllable="false"/>
@@ -117,7 +117,7 @@
 		<Transition source="1" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="spec2-4" type="Specification">
+<Automaton name="spec2_4" type="Specification">
 	<Events>
 		<Event id="0" label="finished_arm" controllable="false"/>
 		<Event id="1" label="finished_tab" controllable="false"/>

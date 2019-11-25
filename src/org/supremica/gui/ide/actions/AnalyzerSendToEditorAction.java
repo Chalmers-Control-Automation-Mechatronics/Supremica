@@ -126,6 +126,7 @@ public class AnalyzerSendToEditorAction extends IDEAction
           container.getSupremicaAnalyzerPanel().getSelectedAutomata();
       final ProductDESImporter importer =
           new ProductDESImporter(ModuleSubjectFactory.getInstance());
+      importer.setParsingAutomatonNames(false);
       final List<InsertInfo> components = new LinkedList<InsertInfo>();
       final List<InsertInfo> decls = new LinkedList<InsertInfo>();
       final Collection<String> addedNames = new THashSet<String>();

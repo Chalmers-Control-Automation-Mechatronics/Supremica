@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Parallel Manufacturing Example" comment="This example was found in Ryan James Leduc's PhD-thesis 'Hierarchical Interface-based Supervisory Control'. The system is controllable and nonblocking.">
 <!-- PLANTS FOR THE HIGH LEVEL -->
-<Automaton name="HighLevel-PackagingSystem" type="Plant">
+<Automaton name="HighLevel_PackagingSystem" type="Plant">
 	<Events>
 		<Event id="take_item" controllable="true"/>
 		<Event id="package" controllable="false"/>
@@ -520,7 +520,7 @@
 </Automaton>
 
 <!-- PLANTS FOR LOW LEVEL 2 -->
-<Automaton name="LowLevel2-PathFlowModel" type="Plant">
+<Automaton name="LowLevel2_PathFlowModel" type="Plant">
 	<Events>
 		<Event id="part_ent_2" controllable="true"/>
 		<Event id="part_arr1_2" controllable="false"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Professors, pen and paper" major="0" minor="9" comment="Two Professors competing for mutual resources, pen and paper. Each Professor can request any of the resources in any order. Both resources are needed simultaneously to work. The spec essentially says that the Professors should be able to work and rest over and over again. Manual synthesis of one supervisor for each spec will lead to a blocking system. Supremica is smarter than that.">
-<Automaton name="Professor 1" type="Plant">
+<Automaton name="Professor1" type="Plant">
 	<Events>
 		<Event id="0" label="paper11"/>
 		<Event id="1" label="pen11"/>
@@ -20,7 +20,7 @@
 		<Transition source="3" dest="1" event="0"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Professor 2" type="Plant">
+<Automaton name="Professor2" type="Plant">
 	<Events>
 		<Event id="0" label="paper21"/>
 		<Event id="1" label="pen21"/>

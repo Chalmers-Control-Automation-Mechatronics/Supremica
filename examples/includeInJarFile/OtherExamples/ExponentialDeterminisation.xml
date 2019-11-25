@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Exponential determinisation" major="0" minor="9" comment="When any of these automata are made deterministic, the state space is increased exponentially, to the worst case size, 2^n-1, where n is the number of states in the nondeterministic automaton.
   To perform determinisation in Supremica, go to the &quot;Analyzer&quot; tab, right-click on an automaton, choose &quot;Minimize&quot; using &quot;Language Equivalence&quot;.">
-<Automaton name="4 states small" type="Plant">
+<Automaton name="four_states_small" type="Plant">
 	<Events>
 		<Event id="0" label="del"/>
 		<Event id="1" label="plus"/>
@@ -27,7 +27,7 @@
 		<Transition source="3" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="5 states small" type="Plant">
+<Automaton name="five_states_small" type="Plant">
 	<Events>
 		<Event id="0" label="del"/>
 		<Event id="1" label="plus"/>
@@ -57,7 +57,7 @@
 		<Transition source="4" dest="0" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="3 states small" type="Plant">
+<Automaton name="three_states_small" type="Plant">
 	<Events>
 		<Event id="0" label="plus"/>
 		<Event id="1" label="shift"/>
@@ -76,7 +76,7 @@
 		<Transition source="2" dest="0" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="4 states" type="Plant">
+<Automaton name="four_states" type="Plant">
 	<Events>
 		<Event id="0" label="a"/>
 		<Event id="1" label="ab"/>
@@ -135,7 +135,7 @@
 		<Transition source="3" dest="3" event="14"/>
 	</Transitions>
 </Automaton>
-<Automaton name="6 states smaller" type="Plant">
+<Automaton name="six_states_smaller" type="Plant">
 	<Events>
 		<Event id="0" label="add"/>
 		<Event id="1" label="sub"/>
@@ -163,7 +163,7 @@
 		<Transition source="5" dest="5" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="3 states" type="Plant">
+<Automaton name="three_states" type="Plant">
 	<Events>
 		<Event id="0" label="a"/>
 		<Event id="1" label="ab"/>
@@ -193,7 +193,7 @@
 		<Transition source="2" dest="2" event="6"/>
 	</Transitions>
 </Automaton>
-<Automaton name="7 states smaller" type="Plant">
+<Automaton name="seven_states_smaller" type="Plant">
 	<Events>
 		<Event id="0" label="add"/>
 		<Event id="1" label="sub"/>
@@ -224,7 +224,7 @@
 		<Transition source="6" dest="6" event="1"/>
 	</Transitions>
 </Automaton>
-<Automaton name="6 states small" type="Plant">
+<Automaton name="six_states_small" type="Plant">
 	<Events>
 		<Event id="0" label="del"/>
 		<Event id="1" label="plus"/>

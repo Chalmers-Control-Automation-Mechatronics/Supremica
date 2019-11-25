@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Simple Manufacturing Example" comment="This example was found in Ryan James Leduc's PhD-thesis 'Hierarchical Interface-based Supervisory Control'. The system is controllable and nonblocking.">
-<Automaton name="HighLevel-PathFlowModel" type="Plant">
+<Automaton name="HighLevel_PathFlowModel" type="Plant">
 	<Events>
 		<Event id="part_ent" controllable="true"/>
 		<Event id="part_arr1" controllable="false"/>
@@ -42,7 +42,7 @@
 		<Transition source="A9" dest="A0" event="fin_exit"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-PackagingSystem" type="Plant">
+<Automaton name="HighLevel_PackagingSystem" type="Plant">
 	<Events>
 		<Event id="take_item" controllable="true"/>
 		<Event id="package" controllable="false"/>
@@ -59,7 +59,7 @@
 		<Transition source="A2" dest="A0" event="allow_exit"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-SequenceTasks" type="Supervisor">
+<Automaton name="HighLevel_SequenceTasks" type="Supervisor">
 	<Events>
 		<Event id="fin_exit" controllable="false"/>
 		<Event id="part_ent" controllable="true"/>
@@ -127,7 +127,7 @@
 		<Transition source="A16" dest="A0" event="str_exit"/>
 	</Transitions>
 </Automaton>
-<Automaton name="HighLevel-ExitBuffer" type="Supervisor">
+<Automaton name="HighLevel_ExitBuffer" type="Supervisor">
 	<Events>
 		<Event id="str_exit" controllable="true"/>
 		<Event id="fin_exit" controllable="false"/>
@@ -147,7 +147,7 @@
 		<Transition source="A1" dest="A0" event="take_item"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Interface HighLevel/LowLevel" type="Interface">
+<Automaton name="Interface_HighLevel_LowLevel" type="Interface">
 	<Events>
 		<Event id="start_pol" controllable="true"/>
 		<Event id="compl_pol" controllable="false"/>
@@ -176,7 +176,7 @@
 		<Transition source="A4" dest="A0" event="compl_case"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-AttachPart" type="Plant">
+<Automaton name="LowLevel_AttachPart" type="Plant">
 	<Events>
 		<Event id="take_pt" controllable="true"/>
 		<Event id="str_ptA" controllable="true"/>
@@ -201,7 +201,7 @@
 		<Transition source="A4" dest="A0" event="ret_pt"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-PolishPart" type="Plant">
+<Automaton name="LowLevel_PolishPart" type="Plant">
 	<Events>
 		<Event id="start_pol" controllable="true"/>
 		<Event id="dip_acid" controllable="true"/>
@@ -222,7 +222,7 @@
 		<Transition source="A2" dest="A0" event="compl_pol"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-AttachCase" type="Plant">
+<Automaton name="LowLevel_AttachCase" type="Plant">
 	<Events>
 		<Event id="start_case" controllable="true"/>
 		<Event id="attch_case" controllable="false"/>
@@ -239,7 +239,7 @@
 		<Transition source="A2" dest="A0" event="compl_case"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-DefineNewEvents" type="Plant">
+<Automaton name="LowLevel_DefineNewEvents" type="Plant">
 	<Events>
 		<Event id="attch_ptA" controllable="true"/>
 		<Event id="attch_ptB" controllable="true"/>
@@ -256,7 +256,7 @@
 		<Transition source="A0" dest="A0" event="finB_attch"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-AffixPart" type="Supervisor">
+<Automaton name="LowLevel_AffixPart" type="Supervisor">
 	<Events>
 		<Event id="attch_ptA" controllable="true"/>
 		<Event id="attch_ptB" controllable="true"/>
@@ -297,7 +297,7 @@
 		<Transition source="A10" dest="A0" event="finB_attch"/>
 	</Transitions>
 </Automaton>
-<Automaton name="LowLevel-PolishingSequence" type="Supervisor">
+<Automaton name="LowLevel_PolishingSequence" type="Supervisor">
 	<Events>
 		<Event id="start_pol" controllable="true"/>
 		<Event id="dip_acid" controllable="true"/>

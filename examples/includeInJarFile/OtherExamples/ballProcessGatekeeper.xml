@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata>
-	<Automaton name="Progress spec: Manual or automatic mode" type="Specification">
+	<Automaton name="ProgressSpec_ManualOrAutomaticMode" type="Specification">
 		<Events>
 			<Event id="mode_automatic" label="mode_automatic" controllable="true" prioritized="true" />
 			<Event id="mode_manual" label="mode_manual" controllable="true" prioritized="true" />
@@ -42,7 +42,7 @@
 			<Transition event="mode_automatic" source="q_7" dest="q_7" />
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Progress spec: Gatekeeper (gk)" type="Specification">
+	<Automaton name="ProgressSpec_Gatekeeper" type="Specification">
 		<Events>
 			<Event id="gk_enter_ball" label="gk_enter_ball" controllable="true" prioritized="true" />		
 			<Event id="gk_in_go_out" label="gk_in_go_out" controllable="true" prioritized="true" />
@@ -74,7 +74,7 @@
 			<Transition event="gk_out_go_in" source="q_6" dest="q_0" />						
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Manual button" type="Plant">
+	<Automaton name="Plant_ManualButton" type="Plant">
 		<Events>
 			<Event id="button_manual_pressed" label="button_manual_pressed" controllable="false" prioritized="true" />
 			<Event id="button_manual_released" label="button_manual_released" controllable="false" prioritized="true" />
@@ -92,7 +92,7 @@
 			<Transition event="mode_manual" source="q_2" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Automatic button" type="Plant">
+	<Automaton name="Plant_AutomaticButton" type="Plant">
 		<Events>
 			<Event id="button_automatic_pressed" label="button_automatic_pressed" controllable="false" prioritized="true" />
 			<Event id="button_automatic_released" label="button_automatic_released" controllable="false" prioritized="true" />
@@ -109,7 +109,7 @@
 			<Transition event="mode_automatic" source="q_2" dest="q_0" />
 		</Transitions>
 	</Automaton>	
-	<Automaton name="Plant: Gatekeeper - In" type="Plant">
+	<Automaton name="Plant_Gatekeeper_In" type="Plant">
 		<Events>
 			<Event id="go_in" label="gk_in_go_in" />
 			<Event id="go_out" label="gk_in_go_out" />
@@ -129,7 +129,7 @@
 			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Gatekeeper - Out" type="Plant">
+	<Automaton name="Plant_Gatekeeper_Out" type="Plant">
 		<Events>
 			<Event id="go_in" label="gk_out_go_in" />
 			<Event id="go_out" label="gk_out_go_out" />
@@ -149,7 +149,7 @@
 			<Transition event="is_in" source="q_0" dest="q_0" />
 		</Transitions>
 	</Automaton>
-	<Automaton name="Plant: Disable events" type="Plant">
+	<Automaton name="Plant_DisableEvents" type="Plant">
 		<Events>
 			<Event id="e4" label="gk_in_is_in" />
 			<Event id="e5" label="gk_in_is_out" />

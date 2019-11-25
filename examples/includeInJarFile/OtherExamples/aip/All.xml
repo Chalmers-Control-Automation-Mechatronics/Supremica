@@ -2094,7 +2094,7 @@
 		<Transition source="1" dest="0" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="l_Intf-DetOpNProc-Robot[AS3]" type="Specification">
+<Automaton name="l_Intf_DetOpNProcRobot[AS3]" type="Specification">
 	<Events>
 		<Event id="0" label="AssmbErr1A[AS3]" controllable="false"/>
 		<Event id="1" label="AssmbErr1B[AS3]" controllable="false"/>

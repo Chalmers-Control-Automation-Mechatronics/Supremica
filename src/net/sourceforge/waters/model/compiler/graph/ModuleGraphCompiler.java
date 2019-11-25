@@ -50,9 +50,6 @@ import net.sourceforge.waters.model.analysis.Abortable;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.base.Proxy;
-import net.sourceforge.waters.model.base.ProxyAccessor;
-import net.sourceforge.waters.model.base.ProxyAccessorHashMap;
-import net.sourceforge.waters.model.base.ProxyAccessorMap;
 import net.sourceforge.waters.model.base.VisitorException;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.compiler.EvalAbortException;
@@ -73,7 +70,6 @@ import net.sourceforge.waters.model.module.EventListExpressionProxy;
 import net.sourceforge.waters.model.module.GraphProxy;
 import net.sourceforge.waters.model.module.IdentifierProxy;
 import net.sourceforge.waters.model.module.LabelBlockProxy;
-import net.sourceforge.waters.model.module.ModuleEqualityVisitor;
 import net.sourceforge.waters.model.module.ModuleProxy;
 import net.sourceforge.waters.model.module.NodeProxy;
 import net.sourceforge.waters.model.module.PlainEventListProxy;
@@ -176,24 +172,22 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
   public ProductDESProxy visitModuleProxy(final ModuleProxy module)
     throws VisitorException
   {
-    try
-    {
-      final ModuleEqualityVisitor eq = new ModuleEqualityVisitor(false);
+    try {
       final String name = mInputModule.getName();
       final String comment = mInputModule.getComment();
 
       // Process event declarations.
       final List<EventDeclProxy> decls = mInputModule.getEventDeclList();
-      final int numevents = decls.size();
-      mGlobalEventsMap = new ProxyAccessorHashMap<>(eq, numevents);
-      mGlobalEventsList = new ArrayList<>(numevents);
+      final int numEvents = decls.size();
+      mGlobalEventsMap = new HashMap<>(numEvents);
+      mGlobalEventsList = new ArrayList<>(numEvents);
       visitCollection(decls);
 
       // Process components.
       final List<Proxy> components = mInputModule.getComponentList();
-      final int numaut = components.size();
-      mAutomataMap = new ProxyAccessorHashMap<>(eq, numaut);
-      mAutomataList = new ArrayList<>(numaut);
+      final int numAut = components.size();
+      mAutomataMap = new HashMap<>(numAut);
+      mAutomataList = new ArrayList<>(numAut);
       visitCollection(components);
 
       return mFactory.createProductDESProxy(name, comment, null,
@@ -222,8 +216,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     final Map<String,String> attribs = decl.getAttributes();
     final EventProxy event =
       mFactory.createEventProxy(name, kind, observable, attribs);
-    addGlobalEvent(ident, event);
-    mCompilationInfo.add(event, decl);
+    addGlobalEvent(name, event, decl);
     return event;
   }
 
@@ -328,8 +321,7 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
       final AutomatonProxy aut =
         mFactory.createAutomatonProxy(name, kind, alphabet, states,
                                       transitions, attribs);
-      addAutomaton(ident, aut);
-      mCompilationInfo.add(aut, comp);
+      addAutomaton(name, aut, comp);
       return aut;
 
     } catch (final EvalException exception) {
@@ -412,16 +404,18 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
     try {
       checkAbort();
       final EventProxy event = findGlobalEvent(ident);
-      addLocalEvent(event);
-      if (mCurrentSource == null) {
-        // Do nothing for blocked events
-      } else if (mCurrentTarget == null) {
-        // Propositions of a state
-        mCurrentSource.addProposition(event);
-      } else {
-        // Label block of an edge
-        mCurrentTarget.addTransitionFrom(mCurrentSource, event,
-                                         mCurrentSource, ident);
+      if (event != null) {
+        addLocalEvent(event);
+        if (mCurrentSource == null) {
+          // Do nothing for blocked events
+        } else if (mCurrentTarget == null) {
+          // Propositions of a state
+          mCurrentSource.addProposition(event);
+        } else {
+          // Label block of an edge
+          mCurrentTarget.addTransitionFrom(mCurrentSource, event,
+                                           mCurrentSource, ident);
+        }
       }
       return event;
     } catch (final NondeterministicModuleException exception) {
@@ -432,48 +426,52 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
   //#########################################################################
   //# Auxiliary Methods
-  private void addGlobalEvent(final IdentifierProxy ident,
-                              final EventProxy event) throws VisitorException
+  private void addGlobalEvent(final String name,
+                              final EventProxy event,
+                              final EventDeclProxy decl)
+    throws VisitorException
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      mGlobalEventsMap.createAccessor(ident);
-    if (mGlobalEventsMap.containsKey(accessor)) {
+    if (mGlobalEventsMap.containsKey(name)) {
       final DuplicateIdentifierException exception =
-        new DuplicateIdentifierException(ident, "event");
-      throw wrap(exception);
+        new DuplicateIdentifierException(name, "event");
+      exception.provideLocation(decl);
+      mCompilationInfo.raiseInVisitor(exception);
     } else {
-      mGlobalEventsMap.put(accessor, event);
+      mGlobalEventsMap.put(name, event);
       mGlobalEventsList.add(event);
+      mCompilationInfo.add(event, decl);
     }
   }
 
   private EventProxy findGlobalEvent(final IdentifierProxy ident)
     throws VisitorException
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      mGlobalEventsMap.createAccessor(ident);
-    final EventProxy event = mGlobalEventsMap.get(accessor);
+    final String name = ident.toString();
+    final EventProxy event = mGlobalEventsMap.get(name);
     if (event != null) {
       return event;
     } else {
       final UndefinedIdentifierException exception =
         new UndefinedIdentifierException(ident, "event");
-      throw wrap(exception);
+      mCompilationInfo.raiseInVisitor(exception);
+      return null;
     }
   }
 
-  private void addAutomaton(final IdentifierProxy ident,
-                            final AutomatonProxy aut) throws VisitorException
+  private void addAutomaton(final String name,
+                            final AutomatonProxy aut,
+                            final SimpleComponentProxy comp)
+    throws VisitorException
   {
-    final ProxyAccessor<IdentifierProxy> accessor =
-      mAutomataMap.createAccessor(ident);
-    if (mAutomataMap.containsKey(accessor)) {
+    if (mAutomataMap.containsKey(name)) {
       final DuplicateIdentifierException exception =
-        new DuplicateIdentifierException(ident, "automaton");
-      throw wrap(exception);
+        new DuplicateIdentifierException(name, "automaton");
+      exception.provideLocation(comp);
+      mCompilationInfo.raiseInVisitor(exception);
     } else {
-      mAutomataMap.put(accessor, aut);
+      mAutomataMap.put(name, aut);
       mAutomataList.add(aut);
+      mCompilationInfo.add(aut, comp);
     }
   }
 
@@ -748,9 +746,9 @@ public class ModuleGraphCompiler extends DefaultModuleProxyVisitor
 
   private boolean mIsOptimizationEnabled = true;
 
-  private ProxyAccessorMap<IdentifierProxy,EventProxy> mGlobalEventsMap;
+  private Map<String,EventProxy> mGlobalEventsMap;
   private List<EventProxy> mGlobalEventsList;
-  private ProxyAccessorMap<IdentifierProxy,AutomatonProxy> mAutomataMap;
+  private Map<String,AutomatonProxy> mAutomataMap;
   private List<AutomatonProxy> mAutomataList;
 
   private SimpleComponentProxy mCurrentComponent;

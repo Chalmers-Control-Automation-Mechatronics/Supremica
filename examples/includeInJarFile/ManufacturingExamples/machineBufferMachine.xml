@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <Automata name="Machine-Buffer-Machine" comment="Classical example. The specification is uncontrollable. Neat example of where 'supervisor reduction' works perfectly. Try modular controllability synthesis, with 'purge' and 'supervisor reduction'.">
-<Automaton name="Machine 1" type="Plant">
+<Automaton name="Machine1" type="Plant">
 	<Events>
 		<Event id="s" label="Start1"/>
 		<Event id="e" label="End1" controllable="false"/>
@@ -57,7 +57,7 @@
 	</Transitions>
 </Automaton>
 -->
-<Automaton name="Prioritize repair of Machine 2" type="Specification">
+<Automaton name="PrioritizeRepairOfMachine2" type="Specification">
 	<Events>
 		<Event id="b2" label="Breakdown2" controllable="false"/>
 		<Event id="r1" label="Repair1"/>
@@ -73,7 +73,7 @@
 		<Transition source="p1" dest="p0" event="r2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Machine 2" type="Plant">
+<Automaton name="Machine2" type="Plant">
 	<Events>
 		<Event id="s" label="Start2"/>
 		<Event id="e" label="End2" controllable="false"/>

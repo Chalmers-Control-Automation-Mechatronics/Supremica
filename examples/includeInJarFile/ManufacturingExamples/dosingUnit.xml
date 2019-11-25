@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Automata name="Dosing Unit" comment="This is a model of a dosing unit in a chemical batch system, adapted from 'Implementation Considerations in Supervisory Control' by P. Dietrich, R. Malik, W.M. Wonham and B.A. Brandin. The system is not controllable but it is nonblocking.">
-<Automaton name="Level measuring sensors" type="Plant">
+<Automaton name="LevelMeasuringSensors" type="Plant">
 	<Events>
 		<Event id="1" label="L1on" controllable="false"/>
 		<Event id="2" label="L2on" controllable="false"/>
@@ -22,7 +22,7 @@
 		<Transition source="a3" dest="a3" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Valve A" type="Plant">
+<Automaton name="ValveA" type="Plant">
 	<Events>
 		<Event id="1" label="openA"/>
 		<Event id="2" label="closeA"/>
@@ -42,7 +42,7 @@
 		<Transition source="a2" dest="a2" event="4"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Valve B" type="Plant">
+<Automaton name="ValveB" type="Plant">
 	<Events>
 		<Event id="1" label="openB"/>
 		<Event id="2" label="closeB"/>
@@ -78,7 +78,7 @@
 		<Transition source="a1" dest="a1" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="No flushing, never jelly" type="Specification">
+<Automaton name="NoFlushing_NeverJelly" type="Specification">
 	<Events>
 		<Event id="1" label="openA"/>
 		<Event id="2" label="openB"/>
@@ -100,7 +100,7 @@
 		<Transition source="a4" dest="a4" event="5"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Empty-full-empty cycle" type="Specification">
+<Automaton name="EmptyFullEmptyCycle" type="Specification">
 	<Events>
 		<Event id="1" label="openA"/>
 		<Event id="2" label="openB"/>
@@ -128,7 +128,7 @@
 		<Transition source="b4" dest="b1" event="7"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Valve A specification" type="Specification">
+<Automaton name="ValveA_Specification" type="Specification">
 	<Events>
 		<Event id="1" label="start" controllable="false"/>
 		<Event id="2" label="stop" controllable="false"/>
@@ -158,7 +158,7 @@
 		<Transition source="1" dest="3" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Valve B specification" type="Specification">
+<Automaton name="ValveB_Specification" type="Specification">
 	<Events>
 		<Event id="1" label="start" controllable="false"/>
 		<Event id="2" label="stop" controllable="false"/>
@@ -188,7 +188,7 @@
 		<Transition source="1" dest="3" event="3"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Start/stop trigger" type="Plant">
+<Automaton name="StartStopTrigger" type="Plant">
 	<Events>
 		<Event id="1" label="start" controllable="false"/>
 		<Event id="2" label="stop" controllable="false"/>
@@ -202,7 +202,7 @@
 		<Transition source="a2" dest="a1" event="2"/>
 	</Transitions>
 </Automaton>
-<Automaton name="Stirrer specification" type="Specification">
+<Automaton name="Stirrer_Specification" type="Specification">
 	<Events>
 		<Event id="1" label="start" controllable="false"/>
 		<Event id="2" label="stop" controllable="false"/>
