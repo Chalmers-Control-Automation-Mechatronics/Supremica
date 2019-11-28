@@ -34,31 +34,39 @@
 package net.sourceforge.waters.gui.options;
 
 import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.Action;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
 
-import net.sourceforge.waters.analysis.abstraction.TRSimplifierCreator;
+import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
+import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
+import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
-import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -74,6 +82,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import org.supremica.automata.waters.SupremicaSimplifierFactory;
 import org.supremica.gui.ide.IDE;
 
 
@@ -107,18 +116,31 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 0.0;
 
+    //Family selector combo box
+    final JLabel familyComboboxLabel = new JLabel("Family");
+    mFamilyComboBox = new JComboBox<>();
+
+    mFamilyComboBox.addItem(TRSimplifierFactory.getInstance());
+    mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
+    //familyComboBox.addItem(ChainSimplifierFactory.getInstance());
+
+    TRSimplifierFactory.getInstance().registerOptions(mOptionDB);
+    SupremicaSimplifierFactory.getInstance().registerOptions(mOptionDB);
+
+    final ActionListener familyChanged = new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent event)
+      {
+        updateSimplifierList();
+        pack();
+      }
+    };
+
+    mFamilyComboBox.addActionListener(familyChanged);
+
     // Algorithm selector combo box
-    final JPanel algorithmPanel = new RaisedDialogPanel();
-    algorithmPanel.setLayout(new FlowLayout());
     final JLabel algorithmComboboxLabel = new JLabel("Simplifier");
     mAnalyzerComboBox = new JComboBox<>();
-
-    final TRSimplifierFactory factory = TRSimplifierFactory.getInstance();
-    factory.registerOptions(mOptionDB);
-    for (final TRSimplifierCreator creator :
-         factory.getSimplifierCreators()) {
-      mAnalyzerComboBox.addItem(creator);
-    }
 
     final ActionListener algorithmChanged = new ActionListener() {
       @Override
@@ -128,11 +150,49 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
         pack();
       }
     };
-
     mAnalyzerComboBox.addActionListener(algorithmChanged);
-    algorithmPanel.add(algorithmComboboxLabel);
-    algorithmPanel.add(mAnalyzerComboBox);
-    add(algorithmPanel, constraints);
+    mAnalyzerComboBox.setRenderer(new ComboboxToolTipRenderer(300));
+
+
+
+    //Description
+    mDescriptionTextArea = new JTextArea();
+    mDescriptionTextArea.setLineWrap(true);
+    mDescriptionTextArea.setWrapStyleWord(true);
+    mDescriptionTextArea.setBackground(null);
+    mDescriptionTextArea.setEditable(false);
+    //Prevent selection
+    for (final MouseListener l : mDescriptionTextArea
+      .getListeners(MouseListener.class)) {
+      mDescriptionTextArea.removeMouseListener(l);
+    }
+
+    //Selection panel
+    final JPanel selectionPanel = new RaisedDialogPanel();
+    selectionPanel.setLayout(new GridBagLayout());
+    add(selectionPanel, constraints);
+    final GridBagConstraints c = new GridBagConstraints();
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridx = 0;
+    c.gridy = 0;
+    c.insets.right = 10;
+    selectionPanel.add(familyComboboxLabel, c);
+    c.gridx++;
+    c.insets.right = 0;
+    selectionPanel.add(mFamilyComboBox, c);
+    c.gridx = 0;
+    c.gridy++;
+    c.insets.right = 10;
+    selectionPanel.add(algorithmComboboxLabel, c);
+    c.gridx++;
+    c.insets.right = 0;
+    selectionPanel.add(mAnalyzerComboBox, c);
+    c.gridx = 0;
+    c.gridy++;
+    c.gridwidth = 2;
+    c.insets.top = 10;
+    selectionPanel.add(mDescriptionTextArea, c);
+
 
     // Parameter list
     mParameterListPanel = new JPanel();
@@ -144,7 +204,8 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     constraints.weighty = 1.0;
     scrollPanel.add(scroll, constraints);
     add(scrollPanel, constraints);
-    showAlgorithmParameters();
+
+    updateSimplifierList();
 
     // Error label
     final JPanel errorPanel = new RaisedDialogPanel();
@@ -198,9 +259,22 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
   private void showAlgorithmParameters()
   {
     final int index = mAnalyzerComboBox.getSelectedIndex();
-    final TRSimplifierCreator creator = mAnalyzerComboBox.getItemAt(index);
+    if (index == -1) return;
+    final AutomatonSimplifierCreator creator = mAnalyzerComboBox.getItemAt(index);
     mCurrentAnalyzer = creator.createBuilder(mContext.getProductDESProxyFactory());
     final List<Option<?>> params = mCurrentAnalyzer.getOptions(mOptionDB);
+    mKeepOriginalOption = new BooleanOption
+      (AutomatonSimplifierFactory.OPTION_AutomatonSimplifierFactory_KeepOriginal,
+       "Keep Original",
+       "Do not remove the input automaton from the analyzer " +
+       "after this operation.",
+       "-keep",
+       true);
+    params.add(mKeepOriginalOption);
+
+    mDescriptionTextArea.setText(creator.getDescription());
+    mDescriptionTextArea.setToolTipText(creator.getDescription());
+
     updateParameterList(params);
   }
 
@@ -228,6 +302,16 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     }
   }
 
+  private void updateSimplifierList() {
+    mAnalyzerComboBox.removeAllItems();
+    final AutomatonSimplifierFactory factory =
+      (AutomatonSimplifierFactory) mFamilyComboBox.getSelectedItem();
+    for (final AutomatonSimplifierCreator creator :
+         factory.getSimplifierCreators()) {
+      mAnalyzerComboBox.addItem(creator);
+    }
+    showAlgorithmParameters();
+  }
 
   //#########################################################################
   //# Simple Access
@@ -257,10 +341,17 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     try {
 
       final ProductDESProxyFactory factory = mContext.getProductDESProxyFactory();
-      final TRSimplifierCreator creator =
-        (TRSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
-      final TRAutomatonBuilder builder = creator.createBuilder(factory);
+      final AutomatonSimplifierCreator creator =
+        (AutomatonSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
+      final AutomatonBuilder builder = creator.createBuilder(factory);
       builder.setModel(aut);
+
+      final boolean keepOriginal = mKeepOriginalOption.getBooleanValue();
+      if (keepOriginal) {
+        final String newName = model.getUnusedName(aut.getName());
+        builder.setOutputName(newName);
+      }
+      else builder.setOutputName(aut.getName());
 
       final FocusTracker tracker = ide.getFocusTracker();
       if (tracker.shouldYieldFocus(this)) {
@@ -271,14 +362,31 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
         }
         builder.run();
         final AutomatonProxy result = builder.getComputedAutomaton();
-        if (builder.isKeepOriginal()) {
-          model.replaceAutomaton(aut, result);
-        } else {
-          if (result instanceof TRAutomatonProxy) {
-            final String newName = model.getUnusedName(result.getName());
-            ((TRAutomatonProxy)result).setName(newName);
-          }
+        if (keepOriginal) {
           model.insertRow(result);
+          final List<AutomatonProxy> autList = new ArrayList<>();
+          autList.add(result);
+          table.clearSelection();
+          table.addToSelection(autList);
+
+          int r = 0;
+          for (;r < model.getRowCount(); r++) {
+            if (result == model.getValueAt(r, 0)) break;
+          }
+          final int row = r;
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run()
+            {
+              final JViewport viewport = (JViewport)table.getParent();
+              final Rectangle rect = table.getCellRect(row, 0, true);
+              final Point pt = viewport.getViewPosition();
+              rect.setLocation(rect.x-pt.x, rect.y-pt.y);
+              table.scrollRectToVisible(rect);
+            }
+          });
+        } else {
+          model.replaceAutomaton(aut, result);
         }
         dispose();
       }
@@ -290,13 +398,48 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
 
   }
 
+  public class ComboboxToolTipRenderer extends DefaultListCellRenderer {
+
+    public ComboboxToolTipRenderer(final int toolTipWidth)
+    {
+      super();
+      mToolTipWidth = toolTipWidth;
+    }
+
+    @Override
+    public Component getListCellRendererComponent(final JList<?> list,
+                                                  final Object value,
+                                                  final int index,
+                                                  final boolean isSelected,
+                                                  final boolean cellHasFocus) {
+      if (value != null) {
+        final AutomatonSimplifierCreator creator = (AutomatonSimplifierCreator) value;
+        final String text = creator.getDescription();
+
+        final String htmlText = "<html><p width=" + mToolTipWidth + ">"
+          + text + "</p></html>";
+
+        list.setToolTipText(htmlText);
+      }
+      return super.getListCellRendererComponent(list, value, index,
+                                                isSelected, cellHasFocus);
+    }
+
+    private final int mToolTipWidth;
+
+    private static final long serialVersionUID = -3041815919444247332L;
+  }
 
   //#########################################################################
-//# Data Members
+  //# Data Members
   private final GUIOptionContext mContext;
-  private final JComboBox<TRSimplifierCreator> mAnalyzerComboBox;
+  private final JComboBox<AutomatonSimplifierFactory> mFamilyComboBox;
+  private final JComboBox<AutomatonSimplifierCreator> mAnalyzerComboBox;
+  private final JTextArea mDescriptionTextArea;
   private final JPanel mParameterListPanel;
   private final OptionMap mOptionDB;
+
+  private BooleanOption mKeepOriginalOption;
 
   private AutomatonBuilder mCurrentAnalyzer;
   private final List<OptionPanel<?>> mCurrentParameterPanels;

@@ -37,12 +37,12 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.des.AbstractAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
 import net.sourceforge.waters.model.des.AutomatonProxy;
@@ -59,6 +59,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  */
 
 public class TRAutomatonBuilder extends AbstractAutomatonBuilder
+  implements AutomatonBuilder
 {
 
   //#########################################################################
@@ -76,8 +77,6 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = mSimp.getOptions(db);
-    db.append(options, TRSimplifierFactory.
-              OPTION_TRSimplifierFactory_KeepOriginal);
     return options;
   }
 
@@ -93,10 +92,6 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
                             OPTION_AbstractMarking_DefaultMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();
-    } else if (option.hasID(TRSimplifierFactory.
-                            OPTION_TRSimplifierFactory_KeepOriginal)) {
-      final BooleanOption propOption = (BooleanOption) option;
-      mKeepOriginal = propOption.getValue();
     } else {
       mSimp.setOption(option);
     }
@@ -139,6 +134,7 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
       final ListBufferTransitionRelation tr = mTrAut.getTransitionRelation();
       mSimp.setTransitionRelation(tr);
       mSimp.run();
+      mTrAut.setName(mOutputName);
       return setProxyResult(mTrAut);
     } finally {
       tearDown();
@@ -158,8 +154,16 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
     return true;
   }
 
-  public boolean isKeepOriginal() {
-    return mKeepOriginal;
+  @Override
+  public void setOutputName(final String name)
+  {
+    mOutputName = name;
+  }
+
+  @Override
+  public String getOutputName()
+  {
+    return mOutputName;
   }
 
 
@@ -170,8 +174,8 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   private EventProxy mPreconditionMarking;
   private EventProxy mDefaultMarking;
 
-  private boolean mKeepOriginal;
-
   private TRAutomatonProxy mTrAut;
+
+  private String mOutputName;
 
 }

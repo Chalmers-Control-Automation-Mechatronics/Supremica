@@ -68,6 +68,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.DuplicateNameException;
@@ -119,6 +120,18 @@ public class AutomataToWaters
     mMarkedAndForbiddenPropositions = new ArrayList<EventProxy>(2);
     mMarkedAndForbiddenPropositions.add(mMarkedProposition);
     mMarkedAndForbiddenPropositions.add(mForbiddenProposition);
+  }
+
+  public AutomataToWaters(final ProductDESProxyFactory factory,
+                          final Map<String, EventProxy> eventMap)
+  {
+    this(factory);
+    mEventMap = eventMap;
+    mEventList = new ArrayList<EventProxy>(eventMap.size());
+    mEventMap.entrySet()
+      .stream()
+      .map(e -> e.getValue())
+      .collect(Collectors.toList());
   }
 
   public AutomataToWaters(final ProductDESProxyFactory factory,

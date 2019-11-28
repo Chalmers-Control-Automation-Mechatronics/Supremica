@@ -79,6 +79,7 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 import org.apache.logging.log4j.LogManager;
 
 import org.supremica.gui.ide.IDE;
+import org.supremica.properties.Config;
 
 
 /**
@@ -310,13 +311,17 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
               uncontrollableEvents.add(event);
             }
           }
-          final String nameC = generateTauName("tauC", aut.getEvents());
-          final String nameU = generateTauName("tauU", aut.getEvents());
+          final String nameC =
+            generateTauName(Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get(),
+                            aut.getEvents());
+          final String nameU =
+            generateTauName(Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get(),
+                            aut.getEvents());
 
           final EventProxy tauC =
-            factory.createEventProxy(nameC, EventKind.CONTROLLABLE);
+            factory.createEventProxy(nameC, EventKind.CONTROLLABLE, false);
           final EventProxy tauU =
-            factory.createEventProxy(nameU, EventKind.UNCONTROLLABLE);
+            factory.createEventProxy(nameU, EventKind.UNCONTROLLABLE, false);
 
           for (final EventProxy event : controllableEvents) {
             newEnc.addEventAlias(event,
@@ -337,9 +342,11 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
             newEnc.addSilentEvent(enc.getTauEvent());
           }
           else {
-            final String name = generateTauName("tau", aut.getEvents());
+            final String name =
+              generateTauName(Config.MINIMIZATION_SILENT_EVENT_NAME.get(),
+                              aut.getEvents());
             final EventProxy silent =
-              factory.createEventProxy(name, EventKind.UNCONTROLLABLE);
+              factory.createEventProxy(name, EventKind.UNCONTROLLABLE, false);
             newEnc.addSilentEvent(silent);
           }
           for (final EventProxy event : localEvents) {

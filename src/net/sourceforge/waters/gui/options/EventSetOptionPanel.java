@@ -130,6 +130,9 @@ class EventSetOptionPanel
       }
     };
     button.addActionListener(listener);
+    if (mCurrentValue.size() == 0) {
+      button.setEnabled(false);
+    }
     constraints.weightx = 0.0;
     panel.add(button, constraints);
 

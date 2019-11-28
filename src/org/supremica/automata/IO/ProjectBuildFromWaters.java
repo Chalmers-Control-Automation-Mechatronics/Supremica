@@ -59,6 +59,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.analysis.kindtranslator.KindTranslator;
@@ -251,6 +252,10 @@ public class ProjectBuildFromWaters
     return Collections.unmodifiableList(mWarnings);
   }
 
+  public void setEventMap(final Map<EventProxy, EventProxy> eventMap) {
+    mEventMap = eventMap;
+  }
+
 
   //#########################################################################
   //# Invocation
@@ -355,6 +360,8 @@ public class ProjectBuildFromWaters
   public Automaton buildWithMarkings(final AutomatonProxy aut)
     throws EvalException
   {
+
+
     final Automaton supaut = new Automaton(aut.getName());
     supaut.setCorrespondingAutomatonProxy(aut);
 
@@ -374,8 +381,12 @@ public class ProjectBuildFromWaters
         marking |= (currWatersEvent == mUsedDefaultMarking);
       } else {
         recordUncontrollableEvent(currWatersEvent, compKind);
-        final LabeledEvent currSupremicaEvent =
+        LabeledEvent currSupremicaEvent =
           new LabeledEvent(currWatersEvent, eventKind);
+        final EventProxy mappedEvent = mEventMap.get(currWatersEvent);
+        if (mappedEvent != null) {
+          currSupremicaEvent = new LabeledEvent(currSupremicaEvent, mappedEvent.getName());
+        }
         currSupremicaAlphabet.addEvent(currSupremicaEvent);
       }
     }
@@ -411,8 +422,9 @@ public class ProjectBuildFromWaters
         supaut.getStateWithName(watersSourceState.getName());
       final State supremicaTargetState =
         supaut.getStateWithName(watersTargetState.getName());
+      final String eventName = mEventMap.getOrDefault(watersEvent, watersEvent).getName();
       final LabeledEvent supremicaEvent =
-        currSupremicaAlphabet.getEvent(watersEvent.getName());
+        currSupremicaAlphabet.getEvent(eventName);
       final Arc currSupremicaArc =
         new Arc(supremicaSourceState, supremicaTargetState, supremicaEvent);
       supaut.addArc(currSupremicaArc);
@@ -646,6 +658,8 @@ public class ProjectBuildFromWaters
   private EventProxy mUsedForbiddenMarking;
   private Collection<EventProxy> mPlantUncontrollableEvents;
   private Collection<EventProxy> mSpecUncontrollableEvents;
+
+  private Map<EventProxy, EventProxy> mEventMap;
 
 
   //#########################################################################

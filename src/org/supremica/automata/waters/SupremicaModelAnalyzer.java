@@ -51,6 +51,7 @@
 package org.supremica.automata.waters;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -283,6 +284,9 @@ public abstract class SupremicaModelAnalyzer
     mSupremicaTask = task;
   }
 
+  protected void setEventMap(final Map<EventProxy, EventProxy> eventMap) {
+    mProjectBuilder.setEventMap(eventMap);
+  }
 
   //#########################################################################
   //# Data Members

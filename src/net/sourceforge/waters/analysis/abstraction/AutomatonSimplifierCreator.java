@@ -33,19 +33,19 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 /**
  * @author Benjamin Wheeler
  */
 
-public abstract class TRSimplifierCreator
+public abstract class AutomatonSimplifierCreator
 {
 
   //#########################################################################
   //# Constructors
-  protected TRSimplifierCreator(final String name, final String description)
+  protected AutomatonSimplifierCreator(final String name, final String description)
   {
     mName = name;
     mDescription = description;
@@ -82,14 +82,7 @@ public abstract class TRSimplifierCreator
   /**
    * Creates a tool to be used by the given model analyser.
    */
-  public TRAutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
-    return new TRAutomatonBuilder(factory, createTRSimplifier());
-  }
-
-  /**
-   * Creates a tool to be used by the given model analyser.
-   */
-  protected abstract TransitionRelationSimplifier createTRSimplifier();
+  public abstract AutomatonBuilder createBuilder(final ProductDESProxyFactory factory);
 
 
   //#########################################################################

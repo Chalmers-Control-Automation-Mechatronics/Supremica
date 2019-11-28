@@ -33,7 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
@@ -43,6 +42,9 @@ import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
+import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
@@ -53,23 +55,30 @@ import net.sourceforge.waters.analysis.options.PropositionOption;
  * @author Benjamin Wheeler
  */
 
-public class TRSimplifierFactory
+public class TRSimplifierFactory extends AutomatonSimplifierFactory
 {
 
   //#########################################################################
   //# Constructor
   private TRSimplifierFactory()
   {
-    registerSimplifierCreators();
+    super();
   }
 
+  @Override
+  public String toString()
+  {
+    return "Transition Relation Simplifiers";
+  }
 
   //#########################################################################
   //# Options
+  @Override
   public void registerOptions(final OptionMap db)
   {
+    super.registerOptions(db);
     db.add(new BooleanOption
-             (OPTION_TRSimplifierFactory_KeepOriginal,
+             (OPTION_AutomatonSimplifierFactory_KeepOriginal,
               "Keep Original",
               "Do not remove the input automaton from the analyzer " +
               "after this operation.",
@@ -181,10 +190,12 @@ public class TRSimplifierFactory
 
   //#########################################################################
   //# Auxiliary Methods
-  private void registerSimplifierCreators()
+  @Override
+  protected void registerSimplifierCreators()
   {
-    mToolCreators.add(new TRSimplifierCreator("Partition Refinement",
-      "Perform automaton minimisation by partition refinement," +
+    final List<AutomatonSimplifierCreator> creators = getSimplifierCreators();
+    creators.add(new TRSimplifierCreator("Partition Refinement",
+      "Perform automaton minimisation by partition refinement, " +
       "such as Hopcroft's minimisation algorithm or bisimulation.") {
       @Override
       protected TransitionRelationSimplifier createTRSimplifier()
@@ -192,7 +203,7 @@ public class TRSimplifierFactory
         return new ObservationEquivalenceTRSimplifier();
       }
     });
-    mToolCreators.add(new TRSimplifierCreator("Subset Construction",
+    creators.add(new TRSimplifierCreator("Subset Construction",
       "Make a nondeterministic automaton deterministic using the " +
       "subset construction algorithm.") {
       @Override
@@ -201,7 +212,7 @@ public class TRSimplifierFactory
         return new SubsetConstructionTRSimplifier();
       }
     });
-    mToolCreators.add(new TRSimplifierCreator("Special Events",
+    creators.add(new TRSimplifierCreator("Special Events",
       "Hide local events, remove selfloops with selfloop-only events," +
       "remove blocked events, and redirect failing events.") {
       @Override
@@ -210,7 +221,7 @@ public class TRSimplifierFactory
         return new SpecialEventsTRSimplifier();
       }
     });
-    mToolCreators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
+    creators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
       "Perform synthesis abstraction using synthesis observation equivalence " +
       "or weak synthesis observation equivalence.") {
       @Override
@@ -219,11 +230,6 @@ public class TRSimplifierFactory
         return new SynthesisObservationEquivalenceTRSimplifier();
       }
     });
-  }
-
-  public List<TRSimplifierCreator> getSimplifierCreators()
-  {
-    return mToolCreators;
   }
 
   public static TRSimplifierFactory getInstance()
@@ -235,9 +241,34 @@ public class TRSimplifierFactory
   }
 
 
+
+  private abstract class TRSimplifierCreator extends AutomatonSimplifierCreator {
+
+    protected TRSimplifierCreator(final String name, final String description)
+    {
+      super(name, description);
+    }
+
+    /**
+     * Creates a tool to be used by the given model analyser.
+     */
+    @Override
+    public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
+      return new TRAutomatonBuilder(factory, createTRSimplifier());
+    }
+
+    /**
+     * Creates a tool to be used by the given model analyser.
+     */
+    protected abstract TransitionRelationSimplifier createTRSimplifier();
+
+  }
+
+
+
+
   //#########################################################################
   //# Data Members
-  private final List<TRSimplifierCreator> mToolCreators = new ArrayList<>();
   private static TRSimplifierFactory mInstance = null;
 
 
@@ -278,7 +309,4 @@ public class TRSimplifierFactory
 
   public static final String OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence =
     "SynthesisObservationEquivalenceTRSimplifier.UsesWeakSynthesisObservationEquivalence";
-
-  public static final String OPTION_TRSimplifierFactory_KeepOriginal =
-    "TransitionRelationSimplifier.KeepOriginal";
 }
