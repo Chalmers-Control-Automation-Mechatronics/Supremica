@@ -244,16 +244,27 @@ public class ProjectBuildFromWaters
     return mEnsuresUncontrollablesInPlant;
   }
 
+  /**
+   * Configures an event map. The event map assigns to each event in the
+   * input model an alternate event to provide a template with different
+   * attributes when creating labelled events in the output. Only the name and
+   * observability status are taken from the event map; the controllability
+   * status is defined by the kind translator.
+   * @param  eventMap   Event map to be used. Events not in the map are left
+   *                    unchanged. A <CODE>null</CODE> map leaves all events
+   *                    unchanged.
+   */
+  public void setEventMap(final Map<EventProxy,EventProxy> eventMap)
+  {
+    mEventMap = eventMap;
+  }
+
 
   //#########################################################################
   //# Simple Access
   public List<String> getWarnings()
   {
     return Collections.unmodifiableList(mWarnings);
-  }
-
-  public void setEventMap(final Map<EventProxy, EventProxy> eventMap) {
-    mEventMap = eventMap;
   }
 
 
@@ -360,8 +371,6 @@ public class ProjectBuildFromWaters
   public Automaton buildWithMarkings(final AutomatonProxy aut)
     throws EvalException
   {
-
-
     final Automaton supaut = new Automaton(aut.getName());
     supaut.setCorrespondingAutomatonProxy(aut);
 
@@ -380,13 +389,10 @@ public class ProjectBuildFromWaters
       } else if (eventKind == EventKind.PROPOSITION) {
         marking |= (currWatersEvent == mUsedDefaultMarking);
       } else {
-        recordUncontrollableEvent(currWatersEvent, compKind);
-        LabeledEvent currSupremicaEvent =
-          new LabeledEvent(currWatersEvent, eventKind);
-        final EventProxy mappedEvent = mEventMap.get(currWatersEvent);
-        if (mappedEvent != null) {
-          currSupremicaEvent = new LabeledEvent(currSupremicaEvent, mappedEvent.getName());
-        }
+        final EventProxy template = getSupremicaEventTemplate(currWatersEvent);
+        recordUncontrollableEvent(template, compKind);
+        final LabeledEvent currSupremicaEvent =
+          new LabeledEvent(template, eventKind);
         currSupremicaAlphabet.addEvent(currSupremicaEvent);
       }
     }
@@ -422,7 +428,8 @@ public class ProjectBuildFromWaters
         supaut.getStateWithName(watersSourceState.getName());
       final State supremicaTargetState =
         supaut.getStateWithName(watersTargetState.getName());
-      final String eventName = mEventMap.getOrDefault(watersEvent, watersEvent).getName();
+      final EventProxy template = getSupremicaEventTemplate(watersEvent);
+      final String eventName = template.getName();
       final LabeledEvent supremicaEvent =
         currSupremicaAlphabet.getEvent(eventName);
       final Arc currSupremicaArc =
@@ -565,6 +572,15 @@ public class ProjectBuildFromWaters
 
   //#########################################################################
   //# Auxiliary Methods
+  private EventProxy getSupremicaEventTemplate(final EventProxy event)
+  {
+    if (mEventMap == null) {
+      return event;
+    } else {
+      return mEventMap.getOrDefault(event, event);
+    }
+  }
+
   private void findMarkingEvents(final Collection<EventProxy> events)
   {
     if (mConfiguredDefaultMarking != null) {
@@ -653,13 +669,13 @@ public class ProjectBuildFromWaters
     PropertySuppressionKindTranslator.getInstance();
   private EventProxy mConfiguredDefaultMarking;
   private boolean mEnsuresUncontrollablesInPlant = false;
+  private Map<EventProxy,EventProxy> mEventMap;
 
   private EventProxy mUsedDefaultMarking;
   private EventProxy mUsedForbiddenMarking;
   private Collection<EventProxy> mPlantUncontrollableEvents;
   private Collection<EventProxy> mSpecUncontrollableEvents;
 
-  private Map<EventProxy, EventProxy> mEventMap;
 
 
   //#########################################################################
