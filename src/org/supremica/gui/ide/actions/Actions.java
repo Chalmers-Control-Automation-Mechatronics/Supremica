@@ -57,6 +57,8 @@ public class Actions extends WatersActionManager
         addAction(new NewAction(ide));
         addAction(new OpenAction(ide));
         addAction(new OpenRASAction(ide));
+        addAction(new OpenFTAction(ide));
+        addAction(new OpenFTSpecAction(ide));
         addAction(new SaveAction(ide));
         addAction(new SaveAsAction(ide));
         addAction(new ImportAction(ide));
@@ -182,6 +184,7 @@ public class Actions extends WatersActionManager
     public IDEAction analyzerRenameAction = new AnalyzerRenameAction(mIDEActions);
     public IDEAction analyzerExportAction = new AnalyzerExportAction(mIDEActions);
     public IDEAction analyzerPlantifyAction = new AnalyzerPlantifyAction(mIDEActions);
+    public IDEAction analyzerComputeMinimalCutSetsAction = new AnalyzerComputeMinimalCutSetsAction(mIDEActions);
 
     // Simulator
     public IDEAction simulatorLaunchAnimatorAction = new SimulatorLaunchAnimatorAction(mIDEActions);

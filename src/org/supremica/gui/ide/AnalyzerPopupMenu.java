@@ -89,6 +89,7 @@ class AnalyzerPopupMenu
         add(ide.getActions().analyzerMinimizeAction.getMenuItem());
         addSeparator();
         add(ide.getActions().analyzerPlantifyAction.getMenuItem());
+        add(ide.getActions().analyzerComputeMinimalCutSetsAction.getMenuItem());
         add(ide.getActions().analyzerEventHiderAction.getMenuItem());
         add(ide.getActions().analyzerPurgeAction.getMenuItem());
         add(ide.getActions().analyzerEnumerateAction.getMenuItem());

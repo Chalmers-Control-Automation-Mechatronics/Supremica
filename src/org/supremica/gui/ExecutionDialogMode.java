@@ -57,13 +57,14 @@ public class ExecutionDialogMode
     public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGFIRSTRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "First run", false, true);
     public static final ExecutionDialogMode VERIFYINGMUTUALNONBLOCKINGSECONDRUN = new ExecutionDialogMode("Verifying mutual nonblocking...", "Second run", false, true);
     public static final ExecutionDialogMode UNINITIALIZED = new ExecutionDialogMode("Uninitialized", "", false, false);
+    public static final ExecutionDialogMode COMPUTEFTMCS = new ExecutionDialogMode("Calculating FT minimal cut sets...", "", false, true);
 
     private final String ID;
     private final String TEXT;
     private final boolean SHOWVALUE;
     private final boolean SHOWPROGRESS;
 
-    private ExecutionDialogMode(String id, String txt, boolean value, boolean progress)
+    private ExecutionDialogMode(final String id, final String txt, final boolean value, final boolean progress)
     {
         this.ID = id;
         this.TEXT = txt;

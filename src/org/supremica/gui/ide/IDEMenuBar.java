@@ -133,6 +133,8 @@ import org.supremica.gui.ide.actions.ExitAction;
 import org.supremica.gui.ide.actions.ImportAction;
 import org.supremica.gui.ide.actions.NewAction;
 import org.supremica.gui.ide.actions.OpenAction;
+import org.supremica.gui.ide.actions.OpenFTAction;
+import org.supremica.gui.ide.actions.OpenFTSpecAction;
 import org.supremica.gui.ide.actions.OpenRASAction;
 import org.supremica.gui.ide.actions.SaveAction;
 import org.supremica.gui.ide.actions.SaveAsAction;
@@ -619,6 +621,10 @@ public class IDEMenuBar
       final Action openRas = actions.getAction(OpenRASAction.class);
       menu.add(openRas);
     }
+    final Action openFT = actions.getAction(OpenFTAction.class);
+    menu.add(openFT);
+    final Action openFTSpec = actions.getAction(OpenFTSpecAction.class);
+    menu.add(openFTSpec);
     final Action save = actions.getAction(SaveAction.class);
     menu.add(save);
     final Action saveas = actions.getAction(SaveAsAction.class);
