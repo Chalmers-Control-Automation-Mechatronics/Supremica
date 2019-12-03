@@ -33,30 +33,14 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import net.sourceforge.waters.analysis.options.Configurable;
-import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-/**
- * @author Benjamin Wheeler
- */
-
-public abstract class AutomatonSimplifierCreator implements Configurable
-{
+public abstract class TRChainCreator {
 
   //#########################################################################
   //# Constructors
-  protected AutomatonSimplifierCreator(final String name, final String description)
+  public TRChainCreator(final String name)
   {
     mName = name;
-    mDescription = description;
   }
-
 
   //#########################################################################
   //# Override for java.lang.Object
@@ -68,63 +52,20 @@ public abstract class AutomatonSimplifierCreator implements Configurable
 
 
   //#########################################################################
-  //# Interface net.sourceforge.waters.analysis.options.Configurable
-  /**
-   * Returns the options supported by this configurable.
-   * @param  db   Option database containing parameters.
-   * @return List of options from the given database that are supported
-   *         by the configurable. The list should be ordered to support
-   *         reasonable presentation to the user.
-   */
-  @Override
-  public List<Option<?>> getOptions(final OptionMap db)
-  {
-    final List<Option<?>> options = new LinkedList<Option<?>>();
-    return options;
-  }
-
-  /**
-   * Configures the configurable using the given option. This method
-   * retrieves the current value from the option and assigns it to
-   * the configurable.
-   * @param  option  The option to be used, which should be an element
-   *                 of the list returned by a previous call to
-   *                 {@link #getOptions(OptionMap) getOptions()}.
-   */
-  @Override
-  public void setOption(final Option<?> option)
-  {
-  }
-
-
-
-  //#########################################################################
   //# Factory Methods
   /**
-   * Returns the name of the tool created by this tool creator.
+   * Returns the name of the chain created by this chain creator.
    */
   public String getName()
   {
     return mName;
   }
 
-  /**
-   * Returns the name of the tool created by this tool creator.
-   */
-  public String getDescription()
-  {
-    return mDescription;
-  }
-
-  /**
-   * Creates a tool to be used by the given model analyser.
-   */
-  public abstract AutomatonBuilder createBuilder(final ProductDESProxyFactory factory);
+  public abstract TransitionRelationSimplifier create();
 
 
-  //#########################################################################
+//#########################################################################
   //# Data Members
   private final String mName;
-  private final String mDescription;
 
 }

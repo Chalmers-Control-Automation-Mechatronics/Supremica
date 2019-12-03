@@ -373,7 +373,7 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
     private String generateTauName(final String baseName,
                                    final Collection<EventProxy> allEvents) {
       String name = null;
-      for (int n=0; n<1000; n++) {
+      for (int n=0;; n++) {
         name = (n == 0) ? baseName : baseName+":"+n;
         boolean found = false;
         for (final EventProxy event : allEvents) {

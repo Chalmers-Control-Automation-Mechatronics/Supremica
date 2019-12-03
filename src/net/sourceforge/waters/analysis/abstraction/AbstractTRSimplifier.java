@@ -194,7 +194,11 @@ public abstract class AbstractTRSimplifier
   @Override
   public void setSimplificationListener(final TRSimplificationListener listener)
   {
-    mListener = listener;
+    if (listener == null) {
+      mListener = this;
+    } else {
+      mListener = listener;
+    }
   }
 
   @Override

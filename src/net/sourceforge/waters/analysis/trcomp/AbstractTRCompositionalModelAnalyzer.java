@@ -1461,29 +1461,18 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   protected ChainTRSimplifier createObservationEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   {
-    final ChainTRSimplifier chain = startAbstractionChain();
-    final TRSimplificationListener listener =
-      new PartitioningListener();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(listener);
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    bisimulator.setSimplificationListener(listener);
-    chain.add(bisimulator);
-    final int precond =
-      getUsedPreconditionMarking() == null ? -1 : PRECONDITION_MARKING;
-    chain.setPropositions(precond, DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final TRSimplificationListener specialEventsListener = getSpecialEventsListener();
+    final TRSimplificationListener listener = new PartitioningListener();
+    final int transitionLimit = getInternalTransitionLimit();
+    final EventProxy usedPreconditionMarking = getUsedPreconditionMarking();
+
+    final ChainTRSimplifier chain =
+      ChainBuilder.createObservationEquivalenceChain(equivalence,
+                                                   listener,
+                                                   specialEventsListener,
+                                                   transitionLimit,
+                                                   usedPreconditionMarking);
+
     return chain;
   }
 

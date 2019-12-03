@@ -42,10 +42,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sourceforge.waters.analysis.abstraction.ActiveEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.AlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
-import net.sourceforge.waters.analysis.abstraction.GNBCoreachabilityTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.IncomingEquivalenceTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.LimitedCertainConflictsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
@@ -1220,95 +1218,24 @@ public class TRCompositionalConflictChecker
     throws AnalysisConfigurationException
   {
     checkForStandardNonblocking();
+
     final int limit = getInternalTransitionLimit();
-    final ChainTRSimplifier chain = startAbstractionChain();
+    final TRSimplificationListener specialEventsListener = getSpecialEventsListener();
     final TRSimplificationListener markingListener = new MarkingListener();
-    final TRSimplificationListener partitioningListener =
-      new PartitioningListener();
-    final TauLoopRemovalTRSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setDumpStateAware(true);
-    loopRemover.setSimplificationListener(partitioningListener);
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier.TransitionRemoval trMode;
-    if (earlyTransitionRemoval) {
-      final TransitionRemovalTRSimplifier transitionRemover =
-        new TransitionRemovalTRSimplifier();
-      transitionRemover.setTransitionLimit(limit);
-      transitionRemover.setSimplificationListener(partitioningListener);
-      chain.add(transitionRemover);
-      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
-    } else {
-      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL;
-    }
-    final MarkingRemovalTRSimplifier markingRemover =
-      new MarkingRemovalTRSimplifier();
-    markingRemover.setSimplificationListener(markingListener);
-    chain.add(markingRemover);
-    if (selfloopSubsumption) {
-      final SelfloopSubsumptionTRSimplifier selfloopRemover =
-        new SelfloopSubsumptionTRSimplifier();
-      selfloopRemover.setTransitionLimit(limit);
-      selfloopRemover.setSimplificationListener(partitioningListener);
-      chain.add(selfloopRemover);
-    }
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    silentInRemover.setDumpStateAware(true);
-    silentInRemover.setSimplificationListener(partitioningListener);
-    chain.add(silentInRemover);
-    final OnlySilentOutgoingTRSimplifier silentOutRemover =
-      new OnlySilentOutgoingTRSimplifier();
-    silentOutRemover.setDumpStateAware(true);
-    silentOutRemover.setSimplificationListener(partitioningListener);
-    chain.add(silentOutRemover);
-    if (certainConflicts) {
-      final LimitedCertainConflictsTRSimplifier certainConflictsRemover =
-        new LimitedCertainConflictsTRSimplifier();
-      final TRSimplificationListener certainConflictsListener =
-        new CertainConflictsListener();
-      certainConflictsRemover.setSimplificationListener(certainConflictsListener);
-      chain.add(certainConflictsRemover);
-    }
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode(trMode);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
-    bisimulator.setTransitionLimit(limit);
-    bisimulator.setDumpStateAware(true);
-    bisimulator.setSimplificationListener(partitioningListener);
-    chain.add(bisimulator);
-    final IncomingEquivalenceTRSimplifier incomingEquivalenceSimplifier =
-      new IncomingEquivalenceTRSimplifier();
-    incomingEquivalenceSimplifier.setSimplificationListener(partitioningListener);
-    chain.add(incomingEquivalenceSimplifier);
-    if (selfloopSubsumption) {
-      final ActiveEventsTRSimplifier activeEventsSimplifier =
-        new ActiveEventsTRSimplifier();
-      activeEventsSimplifier.setTransitionLimit(limit);
-      activeEventsSimplifier.setSimplificationListener(partitioningListener);
-      chain.add(activeEventsSimplifier);
-    }
-    if (nonAlphaDeterminisation) {
-      final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-        new NonAlphaDeterminisationTRSimplifier();
-      nonAlphaDeterminiser.setTransitionRemovalMode
-        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      nonAlphaDeterminiser.setTransitionLimit(limit);
-      nonAlphaDeterminiser.setDumpStateAware(true);
-      nonAlphaDeterminiser.setSimplificationListener(partitioningListener);
-      chain.add(nonAlphaDeterminiser);
-    }
-    final MarkingSaturationTRSimplifier saturator =
-      new MarkingSaturationTRSimplifier();
-    saturator.setSimplificationListener(markingListener);
-    chain.add(saturator);
-    chain.setDefaultMarkingID(DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final TRSimplificationListener partitioningListener = new PartitioningListener();
+    final TRSimplificationListener certainConflictsListener = new CertainConflictsListener();
+
+    final ChainTRSimplifier chain =
+      ChainBuilder.createConflictEquivalenceChain(equivalence,
+                                                certainConflicts,
+                                                earlyTransitionRemoval,
+                                                selfloopSubsumption,
+                                                nonAlphaDeterminisation,
+                                                limit,
+                                                specialEventsListener,
+                                                markingListener,
+                                                partitioningListener,
+                                                certainConflictsListener);
     return chain;
   }
 
@@ -1322,81 +1249,24 @@ public class TRCompositionalConflictChecker
       mUsedPreconditionMarking =
         AbstractConflictChecker.createNewPreconditionMarking(model, factory);
     }
+
+    final boolean hasConfiguredPreconditionMarking = (mUsedPreconditionMarking != null);
     final int limit = getInternalTransitionLimit();
-    final ChainTRSimplifier chain = startAbstractionChain();
+    final TRSimplificationListener specialEventsListener = getSpecialEventsListener();
     final TRSimplificationListener markingListener = new MarkingListener();
-    final TRSimplificationListener omegaRemovalListener =
-      new OmegaRemovalListener();
-    final TRSimplificationListener partitioningListener =
-      new PartitioningListener();
-    final TauLoopRemovalTRSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(partitioningListener);
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier.TransitionRemoval trMode;
-    if (earlyTransitionRemoval) {
-      final TransitionRemovalTRSimplifier transitionRemover =
-        new TransitionRemovalTRSimplifier();
-      transitionRemover.setTransitionLimit(limit);
-      transitionRemover.setSimplificationListener(partitioningListener);
-      chain.add(transitionRemover);
-      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
-    } else {
-      trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL;
-    }
-    final MarkingRemovalTRSimplifier alphaRemover =
-      new MarkingRemovalTRSimplifier();
-    alphaRemover.setSimplificationListener(markingListener);
-    chain.add(alphaRemover);
-    final OmegaRemovalTRSimplifier omegaRemover =
-      new OmegaRemovalTRSimplifier();
-    omegaRemover.setSimplificationListener(omegaRemovalListener);
-    chain.add(omegaRemover);
-    if (mConfiguredPreconditionMarking != null) {
-      final GNBCoreachabilityTRSimplifier nonCoreachableRemover =
-        new GNBCoreachabilityTRSimplifier();
-      nonCoreachableRemover.setSimplificationListener(partitioningListener);
-      chain.add(nonCoreachableRemover);
-    }
-    final SilentIncomingTRSimplifier silentInRemover =
-      new SilentIncomingTRSimplifier();
-    silentInRemover.setRestrictsToUnreachableStates(true);
-    silentInRemover.setSimplificationListener(partitioningListener);
-    chain.add(silentInRemover);
-    final OnlySilentOutgoingTRSimplifier silentOutRemover =
-      new OnlySilentOutgoingTRSimplifier();
-    silentOutRemover.setSimplificationListener(partitioningListener);
-    chain.add(silentOutRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode(trMode);
-    bisimulator.setTransitionLimit(limit);
-    bisimulator.setSimplificationListener(partitioningListener);
-    chain.add(bisimulator);
-    final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
-      new NonAlphaDeterminisationTRSimplifier();
-    nonAlphaDeterminiser.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-    nonAlphaDeterminiser.setTransitionLimit(limit);
-    nonAlphaDeterminiser.setSimplificationListener(partitioningListener);
-    chain.add(nonAlphaDeterminiser);
-    if (mConfiguredPreconditionMarking != null) {
-      final AlphaDeterminisationTRSimplifier alphaDeterminiser =
-        new AlphaDeterminisationTRSimplifier();
-      alphaDeterminiser.setTransitionRemovalMode
-        (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      alphaDeterminiser.setTransitionLimit(limit);
-      alphaDeterminiser.setSimplificationListener(partitioningListener);
-      chain.add(alphaDeterminiser);
-    }
-    final MarkingSaturationTRSimplifier saturator =
-      new MarkingSaturationTRSimplifier();
-    saturator.setSimplificationListener(markingListener);
-    chain.add(saturator);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+    final TRSimplificationListener omegaRemovalListener = new OmegaRemovalListener();
+    final TRSimplificationListener partitioningListener = new PartitioningListener();
+
+    final ChainTRSimplifier chain =
+      ChainBuilder.createGeneralisedNonblockingChain(equivalence,
+                                                   earlyTransitionRemoval,
+                                                   hasConfiguredPreconditionMarking,
+                                                   limit,
+                                                   specialEventsListener,
+                                                   markingListener,
+                                                   omegaRemovalListener,
+                                                   partitioningListener);
+
     return chain;
   }
 

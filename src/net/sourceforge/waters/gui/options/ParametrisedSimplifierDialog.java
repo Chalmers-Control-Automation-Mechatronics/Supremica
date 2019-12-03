@@ -67,6 +67,7 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
@@ -94,11 +95,11 @@ import org.supremica.gui.ide.IDE;
  * @author Benjamin Wheeler
  */
 
-public abstract class ParametrisedTRSimplifierDialog extends JDialog
+public abstract class ParametrisedSimplifierDialog extends JDialog
 {
   //#########################################################################
   //# Constructor
-  public ParametrisedTRSimplifierDialog(final WatersAnalyzerPanel panel)
+  public ParametrisedSimplifierDialog(final WatersAnalyzerPanel panel)
   {
     super(panel.getModuleContainer().getIDE());
     final ErrorLabel errorLabel = new ErrorLabel();
@@ -122,10 +123,11 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
 
     mFamilyComboBox.addItem(TRSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
-    //familyComboBox.addItem(ChainSimplifierFactory.getInstance());
+    mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
 
     TRSimplifierFactory.getInstance().registerOptions(mOptionDB);
     SupremicaSimplifierFactory.getInstance().registerOptions(mOptionDB);
+    ChainSimplifierFactory.getInstance().registerOptions(mOptionDB);
 
     final ActionListener familyChanged = new ActionListener() {
       @Override
@@ -263,6 +265,7 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
     final AutomatonSimplifierCreator creator = mAnalyzerComboBox.getItemAt(index);
     mCurrentAnalyzer = creator.createBuilder(mContext.getProductDESProxyFactory());
     final List<Option<?>> params = mCurrentAnalyzer.getOptions(mOptionDB);
+    params.addAll(creator.getOptions(mOptionDB));
     mKeepOriginalOption = new BooleanOption
       (AutomatonSimplifierFactory.OPTION_AutomatonSimplifierFactory_KeepOriginal,
        "Keep Original",
@@ -343,18 +346,25 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
       final ProductDESProxyFactory factory = mContext.getProductDESProxyFactory();
       final AutomatonSimplifierCreator creator =
         (AutomatonSimplifierCreator) mAnalyzerComboBox.getSelectedItem();
-      final AutomatonBuilder builder = creator.createBuilder(factory);
-      builder.setModel(aut);
-
-      final boolean keepOriginal = mKeepOriginalOption.getBooleanValue();
-      if (keepOriginal) {
-        final String newName = model.getUnusedName(aut.getName());
-        builder.setOutputName(newName);
-      }
-      else builder.setOutputName(aut.getName());
 
       final FocusTracker tracker = ide.getFocusTracker();
       if (tracker.shouldYieldFocus(this)) {
+        for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
+          optionPanel.commitValue();
+          final Option<?> option = optionPanel.getOption();
+          creator.setOption(option);
+        }
+
+        final AutomatonBuilder builder = creator.createBuilder(factory);
+        builder.setModel(aut);
+
+        final boolean keepOriginal = mKeepOriginalOption.getBooleanValue();
+        if (keepOriginal) {
+          final String newName = model.getUnusedName(aut.getName());
+          builder.setOutputName(newName);
+        }
+        else builder.setOutputName(aut.getName());
+
         for (final OptionPanel<?> optionPanel : mCurrentParameterPanels) {
           optionPanel.commitValue();
           final Option<?> option = optionPanel.getOption();
@@ -416,10 +426,13 @@ public abstract class ParametrisedTRSimplifierDialog extends JDialog
         final AutomatonSimplifierCreator creator = (AutomatonSimplifierCreator) value;
         final String text = creator.getDescription();
 
-        final String htmlText = "<html><p width=" + mToolTipWidth + ">"
-          + text + "</p></html>";
+        if (text.length() != 0) {
+          final String htmlText = "<html><p width=" + mToolTipWidth + ">"
+            + text + "</p></html>";
 
-        list.setToolTipText(htmlText);
+          list.setToolTipText(htmlText);
+        }
+        else list.setToolTipText(null);
       }
       return super.getListCellRendererComponent(list, value, index,
                                                 isSelected, cellHasFocus);

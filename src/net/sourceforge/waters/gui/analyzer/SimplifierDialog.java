@@ -31,79 +31,28 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.gui.analyzer;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.Action;
-
-import net.sourceforge.waters.gui.analyzer.AutomataTable;
-import net.sourceforge.waters.gui.analyzer.TRSimplifierDialog;
-import net.sourceforge.waters.gui.observer.EditorChangedEvent;
-
-import org.supremica.gui.ide.IDE;
-
+import net.sourceforge.waters.gui.options.ParametrisedSimplifierDialog;
 
 /**
- * The action to invoke the TR Simplifier dialog in the Waters analyser.
- *
  * @author Benjamin Wheeler
  */
-
-public class AnalyzerTRSimplifierAction extends WatersAnalyzerAction
+public class SimplifierDialog extends ParametrisedSimplifierDialog
 {
+
   //#########################################################################
   //# Constructor
-  protected AnalyzerTRSimplifierAction(final IDE ide)
+  public SimplifierDialog(final WatersAnalyzerPanel panel)
   {
-    super(ide);
-    putValue(Action.NAME, "Simplify ...");
-    updateEnabledStatus();
+    super(panel);
+    setTitle(TITLE);
   }
-
-
-  //#########################################################################
-  //# Interface java.awt.event.ActionListener
-  @Override
-  public void actionPerformed(final ActionEvent arg0)
-  {
-    final IDE ide = getIDE();
-    if (ide != null) {
-      new TRSimplifierDialog(getAnalyzerPanel());
-    }
-  }
-
-
-  //#########################################################################
-  //# Interface net.sourceforge.waters.gui.observer.Observer
-  @Override
-  public void update(final EditorChangedEvent event)
-  {
-    if (event.getKind() == EditorChangedEvent.Kind.SELECTION_CHANGED) {
-      updateEnabledStatus();
-    }
-  }
-
-
-  //#########################################################################
-  //# Auxiliary Methods
-  private void updateEnabledStatus()
-  {
-    final AutomataTable table = getAnalyzerTable();
-    if (table == null || table.getSelectedRowCount() != 1) {
-      setEnabled(false);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Apply a simplification algorithm to an automaton");
-    } else {
-      setEnabled(true);
-      putValue(Action.SHORT_DESCRIPTION,
-               "Apply a simplification algorithm to the selected automaton");
-    }
-  }
-
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = 636028154288275788L;
+  private static final String TITLE = "Simplifier";
+
+  private static final long serialVersionUID = -4439172093952073552L;
 
 }

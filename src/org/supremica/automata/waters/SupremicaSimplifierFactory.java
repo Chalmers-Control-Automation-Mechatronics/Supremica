@@ -99,15 +99,22 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
     final List<AutomatonSimplifierCreator> creators = getSimplifierCreators();
     creators.add(new SupremicaSimplifierCreator
                  ("Language Equivalence",
-                  "",
+                  "Returns a deterministic automaton representing the same\n" +
+                  "language using a minimal number of states and transitions.\n" +
+                  "  If the automaton is nondeterministic, it is first made\n" +
+                  "deterministic.",
                   EquivalenceRelation.LANGUAGEEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Conflict Equivalence",
-                  "",
+                  "This minimization algorithm is experimental! The\n" +
+                  "result may not be minimal but should at least be\n" +
+                  "conflict equivalent to the input.",
                   EquivalenceRelation.CONFLICTEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Supervision Equivalence",
-                  "",
+                  "This minimization algorithm is experimental! The\n" +
+                  "result may not be minimal but should at least be\n" +
+                  "supervision equivalent to the input.",
                   EquivalenceRelation.SUPERVISIONEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Synthesis Abstraction",
