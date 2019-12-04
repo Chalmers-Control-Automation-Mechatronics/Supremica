@@ -62,7 +62,7 @@ import javax.swing.SwingUtilities;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
+import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
@@ -121,11 +121,11 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final JLabel familyComboboxLabel = new JLabel("Family");
     mFamilyComboBox = new JComboBox<>();
 
-    mFamilyComboBox.addItem(TRSimplifierFactory.getInstance());
+    mFamilyComboBox.addItem(StepSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
 
-    TRSimplifierFactory.getInstance().registerOptions(mOptionDB);
+    StepSimplifierFactory.getInstance().registerOptions(mOptionDB);
     SupremicaSimplifierFactory.getInstance().registerOptions(mOptionDB);
     ChainSimplifierFactory.getInstance().registerOptions(mOptionDB);
 

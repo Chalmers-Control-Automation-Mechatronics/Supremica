@@ -50,6 +50,7 @@ import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SelfloopSubsumptionTRSimplifier;
@@ -232,18 +233,11 @@ public class TRCompositionalConflictChecker
       new ListedEnumFactory<TRToolCreator<TransitionRelationSimplifier>>() {
       {
         register(OEQ);
-        register(WOEQ);
         register(NB0);
-        register(NB0w);
         register(NB1);
-        register(NB1w);
-        register(NB1x);
-        register(NB2);
-        register(NB2w, true);
+        register(NB2, true);
         register(NB3);
-        register(NB3w);
         register(GNB);
-        register(GNBw);
       }
     };
   }
@@ -254,6 +248,15 @@ public class TRCompositionalConflictChecker
     return (ConflictChecker) super.getMonolithicAnalyzer();
   }
 
+  public void setUseLimitedCertainConflicts(final boolean conflicts)
+  {
+    mUseLimitedCertainConflicts = conflicts;
+  }
+
+  public boolean isUseLimitedCertainConflicts()
+  {
+    return mUseLimitedCertainConflicts;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
@@ -288,8 +291,10 @@ public class TRCompositionalConflictChecker
                         OPTION_ConflictChecker_ConfiguredPreconditionMarking);
     db.prepend(options, AbstractModelAnalyzerFactory.
                         OPTION_ConflictChecker_ConfiguredDefaultMarking);
-    db.append(options, AbstractModelAnalyzerFactory.
-                       OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    db.append(options,  AbstractModelAnalyzerFactory.
+                        OPTION_SynchronousProductBuilder_PruningDeadlocks);
+    db.append(options,  TRCompositionalModelAnalyzerFactory.
+                        OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts);
     return options;
   }
 
@@ -320,6 +325,10 @@ public class TRCompositionalConflictChecker
       final EnumOption<TRToolCreator<TransitionRelationSimplifier>> enumOption =
         (EnumOption<TRToolCreator<TransitionRelationSimplifier>>) option;
       setSimplifierCreator(enumOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setUseLimitedCertainConflicts(boolOption.getValue());
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_SynchronousProductBuilder_PruningDeadlocks)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -846,9 +855,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         true, false, false, false);
+        (analyzer.isUseWeakObservationEquivalence()
+          ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+            : Equivalence.OBSERVATION_EQUIVALENCE,
+            checker.isUseLimitedCertainConflicts(), false, false, false);
     }
   };
 
@@ -916,9 +926,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true, false, false);
+        (analyzer.isUseWeakObservationEquivalence()
+          ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+            : Equivalence.OBSERVATION_EQUIVALENCE,
+            checker.isUseLimitedCertainConflicts(), true, false, false);
     }
   };
 
@@ -1023,9 +1034,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true, false, true);
+        (analyzer.isUseWeakObservationEquivalence()
+          ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+            : Equivalence.OBSERVATION_EQUIVALENCE,
+            checker.isUseLimitedCertainConflicts(), true, false, true);
     }
   };
 
@@ -1097,9 +1109,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         true, true, true, true);
+        (analyzer.isUseWeakObservationEquivalence()
+          ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+            : Equivalence.OBSERVATION_EQUIVALENCE,
+            checker.isUseLimitedCertainConflicts(), true, true, true);
     }
   };
 
@@ -1168,8 +1181,9 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createGeneralisedNonblockingChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
+        (analyzer.isUseWeakObservationEquivalence()
+          ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+            : Equivalence.OBSERVATION_EQUIVALENCE,
          true);
     }
   };
@@ -1231,11 +1245,16 @@ public class TRCompositionalConflictChecker
                                                 earlyTransitionRemoval,
                                                 selfloopSubsumption,
                                                 nonAlphaDeterminisation,
-                                                limit,
                                                 specialEventsListener,
                                                 markingListener,
                                                 partitioningListener,
                                                 certainConflictsListener);
+
+    chain.setTransitionLimit(limit);
+    chain.setDefaultMarkingID(DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
     return chain;
   }
 
@@ -1261,11 +1280,15 @@ public class TRCompositionalConflictChecker
       ChainBuilder.createGeneralisedNonblockingChain(equivalence,
                                                    earlyTransitionRemoval,
                                                    hasConfiguredPreconditionMarking,
-                                                   limit,
                                                    specialEventsListener,
                                                    markingListener,
                                                    omegaRemovalListener,
                                                    partitioningListener);
+
+    chain.setTransitionLimit(limit);
+    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 
     return chain;
   }
@@ -1460,6 +1483,8 @@ public class TRCompositionalConflictChecker
   // For language inclusion check for generalised nonblocking
   private EventProxy mPreconditionEvent;
   private TRAutomatonProxy mPreconditionPropertyAutomaton;
+
+  private boolean mUseLimitedCertainConflicts = true;
 
 
   //#########################################################################

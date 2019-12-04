@@ -39,7 +39,11 @@ import gnu.trove.stack.TIntStack;
 import gnu.trove.stack.array.TIntArrayStack;
 
 import java.util.BitSet;
+import java.util.List;
 
+import net.sourceforge.waters.analysis.options.BooleanOption;
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
@@ -147,6 +151,32 @@ public class SilentIncomingTRSimplifier
   public boolean getRestrictsToUnreachableStates()
   {
     return mRestrictsToUnreachableStates;
+  }
+
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    db.append(options, StepSimplifierFactory.
+               OPTION_SubsetConstruction_MaxIncrease);
+    db.append(options, StepSimplifierFactory.
+              OPTION_TransitionRelationSimplifier_DumpStateAware);
+    db.append(options, StepSimplifierFactory.
+               OPTION_SubsetConstruction_FailingEventsAsSelfLoops);
+    return options;
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    if (option.hasID(StepSimplifierFactory.
+                     OPTION_SilentIncoming_RestrictsToUnreachableStates)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      setRestrictsToUnreachableStates(propOption.getValue());
+    }
+    else {
+      super.setOption(option);
+    }
   }
 
 

@@ -48,6 +48,7 @@ import java.util.Queue;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
@@ -396,6 +397,15 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     return mOutputCheckingEnabled;
   }
 
+  public void setUseWeakObservationEquivalence(final boolean weak)
+  {
+    mUseWeakObservationEquivalence = weak;
+  }
+
+  public boolean isUseWeakObservationEquivalence()
+  {
+    return mUseWeakObservationEquivalence;
+  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -415,6 +425,8 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                        OPTION_ModelAnalyzer_FinalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_FinalTransitionLimit);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence);
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_BlockedEventsEnabled);
     db.append(options, TRCompositionalModelAnalyzerFactory.
@@ -478,6 +490,10 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                             OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile)) {
       final FileOption fileOption = (FileOption) option;
       setMonolithicDumpFile(fileOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setUseWeakObservationEquivalence(boolOption.getValue());
     } else {
       super.setOption(option);
     }
@@ -1428,8 +1444,9 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       return analyzer.createObservationEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE);
+        (analyzer.isUseWeakObservationEquivalence()
+         ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+         : Equivalence.OBSERVATION_EQUIVALENCE);
     }
   };
 
@@ -1469,9 +1486,15 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     final ChainTRSimplifier chain =
       ChainBuilder.createObservationEquivalenceChain(equivalence,
                                                    listener,
-                                                   specialEventsListener,
-                                                   transitionLimit,
-                                                   usedPreconditionMarking);
+                                                   specialEventsListener);
+
+    chain.setTransitionLimit(transitionLimit);
+
+    final int precond =
+      usedPreconditionMarking == null ? -1 : PRECONDITION_MARKING;
+    chain.setPropositions(precond, DEFAULT_MARKING);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
 
     return chain;
   }
@@ -1713,6 +1736,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   private boolean mAlwaysEnabledEventsEnabled = false;
   private File mMonolithicDumpFile = null;
   private boolean mOutputCheckingEnabled = false;
+  private boolean mUseWeakObservationEquivalence = false;
 
   // Tools
   private TRPreselectionHeuristic mPreselectionHeuristic;

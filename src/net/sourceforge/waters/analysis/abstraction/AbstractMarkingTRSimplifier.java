@@ -154,9 +154,9 @@ public abstract class AbstractMarkingTRSimplifier
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_AbstractMarking_PreconditionMarkingID);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_AbstractMarking_DefaultMarkingID);
     return options;
   }

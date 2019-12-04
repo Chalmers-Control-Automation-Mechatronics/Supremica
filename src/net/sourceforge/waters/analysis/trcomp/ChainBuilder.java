@@ -43,18 +43,18 @@ import net.sourceforge.waters.analysis.abstraction.MarkingRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.MarkingSaturationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.NonAlphaDeterminisationTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.OmegaRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SelfloopSubsumptionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
+import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
-import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.des.EventProxy;
 
 /**
  *
@@ -64,18 +64,16 @@ public class ChainBuilder
 {
 
   public static ChainTRSimplifier createObservationEquivalenceChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
+  (final Equivalence equivalence)
   {
     return createObservationEquivalenceChain(equivalence,
-                                             null, null, 0, null);
+                                             null, null);
   }
 
   public static ChainTRSimplifier createObservationEquivalenceChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+  (final Equivalence equivalence,
    final TRSimplificationListener listener,
-   final TRSimplificationListener specialEventsListener,
-   final int transitionLimit,
-   final EventProxy usedPreconditionMarking)
+   final TRSimplificationListener specialEventsListener)
   {
     final ChainTRSimplifier chain = startAbstractionChain(specialEventsListener);
     final TransitionRelationSimplifier loopRemover =
@@ -89,14 +87,16 @@ public class ChainBuilder
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    bisimulator.setTransitionLimit(transitionLimit);
     bisimulator.setSimplificationListener(listener);
     chain.add(bisimulator);
-    final int precond =
-      usedPreconditionMarking == null ? -1 : PRECONDITION_MARKING;
-    chain.setPropositions(precond, DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_DefaultMarkingID);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_PreconditionMarkingID);
+
     return chain;
   }
 
@@ -110,7 +110,7 @@ public class ChainBuilder
   }
 
   public static ChainTRSimplifier createConflictEquivalenceChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+  (final Equivalence equivalence,
    final boolean certainConflicts,
    final boolean earlyTransitionRemoval,
    final boolean selfloopSubsumption,
@@ -121,16 +121,15 @@ public class ChainBuilder
                                           earlyTransitionRemoval,
                                           selfloopSubsumption,
                                           nonAlphaDeterminisation,
-                                          0, null, null, null, null);
+                                          null, null, null, null);
   }
 
   public static ChainTRSimplifier createConflictEquivalenceChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+  (final Equivalence equivalence,
    final boolean certainConflicts,
    final boolean earlyTransitionRemoval,
    final boolean selfloopSubsumption,
    final boolean nonAlphaDeterminisation,
-   final int limit,
    final TRSimplificationListener specialEventsListener,
    final TRSimplificationListener markingListener,
    final TRSimplificationListener partitioningListener,
@@ -147,7 +146,6 @@ public class ChainBuilder
     if (earlyTransitionRemoval) {
       final TransitionRemovalTRSimplifier transitionRemover =
         new TransitionRemovalTRSimplifier();
-      transitionRemover.setTransitionLimit(limit);
       transitionRemover.setSimplificationListener(partitioningListener);
       chain.add(transitionRemover);
       trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
@@ -161,7 +159,6 @@ public class ChainBuilder
     if (selfloopSubsumption) {
       final SelfloopSubsumptionTRSimplifier selfloopRemover =
         new SelfloopSubsumptionTRSimplifier();
-      selfloopRemover.setTransitionLimit(limit);
       selfloopRemover.setSimplificationListener(partitioningListener);
       chain.add(selfloopRemover);
     }
@@ -188,7 +185,6 @@ public class ChainBuilder
     bisimulator.setTransitionRemovalMode(trMode);
     bisimulator.setMarkingMode
       (ObservationEquivalenceTRSimplifier.MarkingMode.UNCHANGED);
-    bisimulator.setTransitionLimit(limit);
     bisimulator.setDumpStateAware(true);
     bisimulator.setSimplificationListener(partitioningListener);
     chain.add(bisimulator);
@@ -199,7 +195,6 @@ public class ChainBuilder
     if (selfloopSubsumption) {
       final ActiveEventsTRSimplifier activeEventsSimplifier =
         new ActiveEventsTRSimplifier();
-      activeEventsSimplifier.setTransitionLimit(limit);
       activeEventsSimplifier.setSimplificationListener(partitioningListener);
       chain.add(activeEventsSimplifier);
     }
@@ -208,7 +203,6 @@ public class ChainBuilder
         new NonAlphaDeterminisationTRSimplifier();
       nonAlphaDeterminiser.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      nonAlphaDeterminiser.setTransitionLimit(limit);
       nonAlphaDeterminiser.setDumpStateAware(true);
       nonAlphaDeterminiser.setSimplificationListener(partitioningListener);
       chain.add(nonAlphaDeterminiser);
@@ -217,26 +211,32 @@ public class ChainBuilder
       new MarkingSaturationTRSimplifier();
     saturator.setSimplificationListener(markingListener);
     chain.add(saturator);
-    chain.setDefaultMarkingID(DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware);
+
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_PropositionMask);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_PreconditionMarkingID);
+
     return chain;
   }
 
   public static ChainTRSimplifier createGeneralisedNonblockingChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+  (final Equivalence equivalence,
    final boolean earlyTransitionRemoval, final boolean hasConfiguredPreconditionMarking)
   {
     return createGeneralisedNonblockingChain(equivalence, earlyTransitionRemoval,
                                              hasConfiguredPreconditionMarking,
-                                             0, null, null, null, null);
+                                             null, null, null, null);
   }
 
   public static ChainTRSimplifier createGeneralisedNonblockingChain
-  (final ObservationEquivalenceTRSimplifier.Equivalence equivalence,
+  (final Equivalence equivalence,
    final boolean earlyTransitionRemoval,
    final boolean hasConfiguredPreconditionMarking,
-   final int limit,
    final TRSimplificationListener specialEventsListener,
    final TRSimplificationListener markingListener,
    final TRSimplificationListener omegaRemovalListener,
@@ -251,7 +251,6 @@ public class ChainBuilder
     if (earlyTransitionRemoval) {
       final TransitionRemovalTRSimplifier transitionRemover =
         new TransitionRemovalTRSimplifier();
-      transitionRemover.setTransitionLimit(limit);
       transitionRemover.setSimplificationListener(partitioningListener);
       chain.add(transitionRemover);
       trMode = ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER;
@@ -285,14 +284,12 @@ public class ChainBuilder
       new ObservationEquivalenceTRSimplifier();
     bisimulator.setEquivalence(equivalence);
     bisimulator.setTransitionRemovalMode(trMode);
-    bisimulator.setTransitionLimit(limit);
     bisimulator.setSimplificationListener(partitioningListener);
     chain.add(bisimulator);
     final NonAlphaDeterminisationTRSimplifier nonAlphaDeterminiser =
       new NonAlphaDeterminisationTRSimplifier();
     nonAlphaDeterminiser.setTransitionRemovalMode
       (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-    nonAlphaDeterminiser.setTransitionLimit(limit);
     nonAlphaDeterminiser.setSimplificationListener(partitioningListener);
     chain.add(nonAlphaDeterminiser);
     if (hasConfiguredPreconditionMarking) {
@@ -300,7 +297,6 @@ public class ChainBuilder
         new AlphaDeterminisationTRSimplifier();
       alphaDeterminiser.setTransitionRemovalMode
         (ObservationEquivalenceTRSimplifier.TransitionRemoval.AFTER_IF_CHANGED);
-      alphaDeterminiser.setTransitionLimit(limit);
       alphaDeterminiser.setSimplificationListener(partitioningListener);
       chain.add(alphaDeterminiser);
     }
@@ -308,9 +304,13 @@ public class ChainBuilder
       new MarkingSaturationTRSimplifier();
     saturator.setSimplificationListener(markingListener);
     chain.add(saturator);
-    chain.setPropositions(PRECONDITION_MARKING, DEFAULT_MARKING);
-    chain.setPreferredOutputConfiguration
-      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_PropositionMask);
+
     return chain;
   }
 

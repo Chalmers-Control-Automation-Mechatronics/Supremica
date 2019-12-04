@@ -31,19 +31,14 @@
 //# exception.
 //###########################################################################
 
-package org.supremica.automata.waters;
+package net.sourceforge.waters.analysis.abstraction;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
-import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
-import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
-import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
-
-import org.supremica.automata.algorithms.EquivalenceRelation;
 
 
 /**
@@ -54,12 +49,12 @@ import org.supremica.automata.algorithms.EquivalenceRelation;
  * @author Benjamin Wheeler
  */
 
-public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
+public class StepSimplifierFactory extends TRSimplifierFactory
 {
 
   //#########################################################################
   //# Constructor
-  private SupremicaSimplifierFactory()
+  private StepSimplifierFactory()
   {
     super();
   }
@@ -67,7 +62,7 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   @Override
   public String toString()
   {
-    return "Supremica Simplifiers";
+    return "Transition Relation Simplifiers";
   }
 
   //#########################################################################
@@ -76,18 +71,6 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   public void registerOptions(final OptionMap db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
-           (SupremicaAutomatonBuilder.OPTION_SupremicaAutomatonBuilder_AlsoTransitions,
-            "Also minimise number of transitions",
-            "",//TODO
-            "-alsot",
-            true));
-    db.add(new BooleanOption
-           (SupremicaAutomatonBuilder.OPTION_SupremicaAutomatonBuilder_IgnoreMarking,
-            "Ignore marking of states",
-            "",//TODO
-            "-ignorem",
-            false));
   }
 
 
@@ -97,69 +80,78 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   protected void registerSimplifierCreators()
   {
     final List<AutomatonSimplifierCreator> creators = getSimplifierCreators();
-    creators.add(new SupremicaSimplifierCreator
-                 ("Language Equivalence",
-                  "Returns a deterministic automaton representing the same " +
-                  "language using a minimal number of states and transitions. " +
-                  "If the automaton is nondeterministic, it is first made " +
-                  "deterministic.",
-                  EquivalenceRelation.LANGUAGEEQUIVALENCE));
-    creators.add(new SupremicaSimplifierCreator
-                 ("Conflict Equivalence",
-                  "This minimization algorithm is experimental! The " +
-                  "result may not be minimal but should at least be " +
-                  "conflict equivalent to the input.",
-                  EquivalenceRelation.CONFLICTEQUIVALENCE));
-    creators.add(new SupremicaSimplifierCreator
-                 ("Supervision Equivalence",
-                  "This minimization algorithm is experimental! The " +
-                  "result may not be minimal but should at least be " +
-                  "supervision equivalent to the input.",
-                  EquivalenceRelation.SUPERVISIONEQUIVALENCE));
-    creators.add(new SupremicaSimplifierCreator
-                 ("Synthesis Abstraction",
-                  "",
-                  EquivalenceRelation.SYNTHESISABSTRACTION));
-    creators.add(new SupremicaSimplifierCreator
-                 ("Observation Equivalence",
-                  "",
-                  EquivalenceRelation.OBSERVATIONEQUIVALENCE));
+    creators.add(new TRSimplifierCreator("Partition Refinement",
+      "Perform automaton minimisation by partition refinement, " +
+      "such as Hopcroft's minimisation algorithm or bisimulation.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new ObservationEquivalenceTRSimplifier();
+      }
+    });
+    creators.add(new TRSimplifierCreator("Subset Construction",
+      "Make a nondeterministic automaton deterministic using the " +
+      "subset construction algorithm.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SubsetConstructionTRSimplifier();
+      }
+    });
+    creators.add(new TRSimplifierCreator("Special Events",
+      "Hide local events, remove selfloops with selfloop-only events," +
+      "remove blocked events, and redirect failing events.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SpecialEventsTRSimplifier();
+      }
+    });
+    creators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
+      "Perform synthesis abstraction using synthesis observation equivalence " +
+      "or weak synthesis observation equivalence.") {
+      @Override
+      protected TransitionRelationSimplifier createTRSimplifier()
+      {
+        return new SynthesisObservationEquivalenceTRSimplifier();
+      }
+    });
   }
 
-  public static SupremicaSimplifierFactory getInstance()
+  public static StepSimplifierFactory getInstance()
   {
     if (mInstance == null) {
-      mInstance = new SupremicaSimplifierFactory();
+      mInstance = new StepSimplifierFactory();
     }
     return mInstance;
   }
 
 
-  private class SupremicaSimplifierCreator extends AutomatonSimplifierCreator {
+  private abstract class TRSimplifierCreator extends AutomatonSimplifierCreator {
 
-    protected SupremicaSimplifierCreator(final String name,
-                                         final String description,
-                                         final EquivalenceRelation relation)
+    protected TRSimplifierCreator(final String name, final String description)
     {
       super(name, description);
-      mRelation = relation;
     }
 
+    /**
+     * Creates a tool to be used by the given model analyser.
+     */
     @Override
-    public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory)
-    {
-      return new SupremicaAutomatonBuilder(factory, mRelation);
+    public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
+      return new TRAutomatonBuilder(factory, createTRSimplifier());
     }
 
-    private final EquivalenceRelation mRelation;
+    /**
+     * Creates a tool to be used by the given model analyser.
+     */
+    protected abstract TransitionRelationSimplifier createTRSimplifier();
 
   }
 
+
   //#########################################################################
   //# Data Members
-  private static SupremicaSimplifierFactory mInstance = null;
+  private static StepSimplifierFactory mInstance = null;
 
-
-  //#########################################################################
-  //# Class Constants
 }

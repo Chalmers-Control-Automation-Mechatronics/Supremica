@@ -226,7 +226,19 @@ public class TRCompositionalModelAnalyzerFactory
               "minimisation.",
               "-method",
               TRCompositionalConflictChecker.getTRSimplifierFactoryStatic()));
- }
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
+              "Use weak observation equivalence",
+              "",//TODO
+              "",
+              false));
+    db.add(new BooleanOption
+           (OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts,
+            "Use limited certain conflicts",
+            "",//TODO
+            "",
+            true));
+  }
 
 
   //#########################################################################
@@ -778,6 +790,9 @@ public class TRCompositionalModelAnalyzerFactory
   public static final String
     OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic =
     "AbstractTRCompositionalModelAnalyzer.SelectionHeuristic";
+  public static final String
+    OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence =
+    "AbstractTRCompositionalModelAnalyzer.WeakObservationEquivalence";
 
   public static final String
     OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled =
@@ -792,5 +807,8 @@ public class TRCompositionalModelAnalyzerFactory
   public static final String
     OPTION_TRCompositionalConflictChecker_SelectionHeuristic =
     "TRCompositionalConflictChecker.SelectionHeuristic";
+  public static final String
+    OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts =
+    "TRCompositionalConflictChecker.LimtedCertainConflicts";
 
 }

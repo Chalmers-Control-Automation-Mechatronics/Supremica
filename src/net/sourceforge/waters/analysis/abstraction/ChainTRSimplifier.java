@@ -33,9 +33,15 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
+import gnu.trove.set.hash.THashSet;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.model.analysis.AnalysisException;
@@ -93,6 +99,39 @@ public class ChainTRSimplifier
     mSteps.add(step);
     mIsPartitioning &= step.isPartitioning();
     return index;
+  }
+
+  public void blacklistOption(final String id)
+  {
+    if (mBlackListedOptions == null) {
+      mBlackListedOptions = new THashSet<>();
+    }
+    mBlackListedOptions.add(id);
+  }
+
+
+  //#########################################################################
+  //# Interface net.sourceforge.waters.model.analysis.options.Configurable
+  @Override
+  public List<Option<?>> getOptions(final OptionMap db)
+  {
+    final List<Option<?>> options = super.getOptions(db);
+    for (final TransitionRelationSimplifier step : mSteps) {
+      options.addAll((step.getOptions(db)));
+    }
+    return options.stream()
+      .distinct()
+      .filter(o -> mBlackListedOptions == null
+        || !mBlackListedOptions.contains(o.getID()))
+      .collect(Collectors.toList());
+  }
+
+  @Override
+  public void setOption(final Option<?> option)
+  {
+    for (final TransitionRelationSimplifier step : mSteps) {
+      step.setOption(option);
+    }
   }
 
 
@@ -306,5 +345,6 @@ public class ChainTRSimplifier
   private boolean mIsPartitioning;
   private boolean mIsObservationEquivalentAbstraction;
   private boolean[] mReducedMarkings;
+  private Set<String> mBlackListedOptions;
 
 }

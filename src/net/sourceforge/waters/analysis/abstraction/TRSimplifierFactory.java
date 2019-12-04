@@ -33,8 +33,6 @@
 
 package net.sourceforge.waters.analysis.abstraction;
 
-import java.util.List;
-
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.DoubleOption;
 import net.sourceforge.waters.analysis.options.EnumOption;
@@ -42,9 +40,6 @@ import net.sourceforge.waters.analysis.options.EventSetOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
-import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
-import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 
 /**
@@ -55,20 +50,14 @@ import net.sourceforge.waters.model.des.ProductDESProxyFactory;
  * @author Benjamin Wheeler
  */
 
-public class TRSimplifierFactory extends AutomatonSimplifierFactory
+public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
 {
 
   //#########################################################################
   //# Constructor
-  private TRSimplifierFactory()
+  public TRSimplifierFactory()
   {
     super();
-  }
-
-  @Override
-  public String toString()
-  {
-    return "Transition Relation Simplifiers";
   }
 
   //#########################################################################
@@ -77,14 +66,6 @@ public class TRSimplifierFactory extends AutomatonSimplifierFactory
   public void registerOptions(final OptionMap db)
   {
     super.registerOptions(db);
-    db.add(new BooleanOption
-             (OPTION_AutomatonSimplifierFactory_KeepOriginal,
-              "Keep Original",
-              "Do not remove the input automaton from the analyzer " +
-              "after this operation.",
-              "-keep",
-              true));
-
     db.add(new PositiveIntOption
              (OPTION_Abstract_StateLimit,
               "State Limit",
@@ -112,13 +93,13 @@ public class TRSimplifierFactory extends AutomatonSimplifierFactory
               "Marking proposition",
               "Default marking used for nonblocking verification or synthesis.",
               "-marking",
-              PropositionOption.DefaultKind.DEFAULT_NULL));
+              PropositionOption.DefaultKind.PREVENT_NULL));
     db.add(new PropositionOption
              (OPTION_AbstractMarking_PreconditionMarkingID,
               "Precondition marking",
               "Precondition marking used for generalised conflict check.",
               "-premarking",
-              PropositionOption.DefaultKind.ALLOW_NULL));
+              PropositionOption.DefaultKind.DEFAULT_NULL));
 
     db.add(new EnumOption<ObservationEquivalenceTRSimplifier.Equivalence>
              (OPTION_ObservationEquivalence_Equivalence,
@@ -164,6 +145,13 @@ public class TRSimplifierFactory extends AutomatonSimplifierFactory
               false));
 
     db.add(new BooleanOption
+           (OPTION_SilentIncoming_RestrictsToUnreachableStates,
+            "Restricts to Unreachable States",
+            "",//TODO
+            "-rtus",
+            true));
+
+    db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,
               "Failing events as selfloops",
               "Enable this to create selfloops for failing events, " +
@@ -187,91 +175,6 @@ public class TRSimplifierFactory extends AutomatonSimplifierFactory
               true));
   }
 
-
-  //#########################################################################
-  //# Auxiliary Methods
-  @Override
-  protected void registerSimplifierCreators()
-  {
-    final List<AutomatonSimplifierCreator> creators = getSimplifierCreators();
-    creators.add(new TRSimplifierCreator("Partition Refinement",
-      "Perform automaton minimisation by partition refinement, " +
-      "such as Hopcroft's minimisation algorithm or bisimulation.") {
-      @Override
-      protected TransitionRelationSimplifier createTRSimplifier()
-      {
-        return new ObservationEquivalenceTRSimplifier();
-      }
-    });
-    creators.add(new TRSimplifierCreator("Subset Construction",
-      "Make a nondeterministic automaton deterministic using the " +
-      "subset construction algorithm.") {
-      @Override
-      protected TransitionRelationSimplifier createTRSimplifier()
-      {
-        return new SubsetConstructionTRSimplifier();
-      }
-    });
-    creators.add(new TRSimplifierCreator("Special Events",
-      "Hide local events, remove selfloops with selfloop-only events," +
-      "remove blocked events, and redirect failing events.") {
-      @Override
-      protected TransitionRelationSimplifier createTRSimplifier()
-      {
-        return new SpecialEventsTRSimplifier();
-      }
-    });
-    creators.add(new TRSimplifierCreator("Synthesis Observation Equivalence",
-      "Perform synthesis abstraction using synthesis observation equivalence " +
-      "or weak synthesis observation equivalence.") {
-      @Override
-      protected TransitionRelationSimplifier createTRSimplifier()
-      {
-        return new SynthesisObservationEquivalenceTRSimplifier();
-      }
-    });
-  }
-
-  public static TRSimplifierFactory getInstance()
-  {
-    if (mInstance == null) {
-      mInstance = new TRSimplifierFactory();
-    }
-    return mInstance;
-  }
-
-
-
-  private abstract class TRSimplifierCreator extends AutomatonSimplifierCreator {
-
-    protected TRSimplifierCreator(final String name, final String description)
-    {
-      super(name, description);
-    }
-
-    /**
-     * Creates a tool to be used by the given model analyser.
-     */
-    @Override
-    public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory) {
-      return new TRAutomatonBuilder(factory, createTRSimplifier());
-    }
-
-    /**
-     * Creates a tool to be used by the given model analyser.
-     */
-    protected abstract TransitionRelationSimplifier createTRSimplifier();
-
-  }
-
-
-
-
-  //#########################################################################
-  //# Data Members
-  private static TRSimplifierFactory mInstance = null;
-
-
   //#########################################################################
   //# Class Constants
   public static final String OPTION_Abstract_StateLimit =
@@ -292,17 +195,20 @@ public class TRSimplifierFactory extends AutomatonSimplifierFactory
     "AbstractMarkingTRSimplifier.DefaultID";
 
   public static final String OPTION_ObservationEquivalence_Equivalence =
-    "ObservationEquivalenceSimplifier.Equivalence";
+    "ObservationEquivalenceTRSimplifier.Equivalence";
   public static final String OPTION_ObservationEquivalence_TransitionRemovalMode =
-    "ObservationEquivalenceSimplifier.TransitionRemovalMode";
+    "ObservationEquivalenceTRSimplifier.TransitionRemovalMode";
   public static final String OPTION_ObservationEquivalence_MarkingMode =
-    "ObservationEquivalenceSimplifier.MarkingMode";
+    "ObservationEquivalenceTRSimplifier.MarkingMode";
   public static final String OPTION_ObservationEquivalence_PropositionMask =
-    "ObservationEquivalenceSimplifier.PropositionMask";
+    "ObservationEquivalenceTRSimplifier.PropositionMask";
   public static final String OPTION_ObservationEquivalence_UsingLocalEvents =
-    "ObservationEquivalenceSimplifier.UsingLocalEvents";
+    "ObservationEquivalenceTRSimplifier.UsingLocalEvents";
   public static final String OPTION_ObservationEquivalence_InfoEnabled =
-    "ObservationEquivalenceSimplifier.InfoEnabled";
+    "ObservationEquivalenceTRSimplifier.InfoEnabled";
+
+  public static final String OPTION_SilentIncoming_RestrictsToUnreachableStates =
+    "SilentIncomingTRSimplifier.RestrictsToUnreachableStates";
 
   public static final String OPTION_SpecialEvents_LocalEvents =
     "SpecialEventsTRSimplifier.LocalEvents";
