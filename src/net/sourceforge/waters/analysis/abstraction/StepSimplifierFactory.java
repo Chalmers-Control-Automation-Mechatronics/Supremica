@@ -62,7 +62,7 @@ public class StepSimplifierFactory extends TRSimplifierFactory
   @Override
   public String toString()
   {
-    return "Transition Relation Simplifiers";
+    return "Waters Simplifier Steps";
   }
 
   //#########################################################################

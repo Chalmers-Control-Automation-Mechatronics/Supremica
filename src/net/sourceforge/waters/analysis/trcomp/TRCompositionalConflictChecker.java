@@ -242,21 +242,22 @@ public class TRCompositionalConflictChecker
     };
   }
 
+  public void setUsingLimitedCertainConflicts(final boolean conflicts)
+  {
+    mUsingLimitedCertainConflicts = conflicts;
+  }
+
+  public boolean isUsingLimitedCertainConflicts()
+  {
+    return mUsingLimitedCertainConflicts;
+  }
+
   @Override
   public ConflictChecker getMonolithicAnalyzer()
   {
     return (ConflictChecker) super.getMonolithicAnalyzer();
   }
 
-  public void setUseLimitedCertainConflicts(final boolean conflicts)
-  {
-    mUseLimitedCertainConflicts = conflicts;
-  }
-
-  public boolean isUseLimitedCertainConflicts()
-  {
-    return mUseLimitedCertainConflicts;
-  }
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyzer
@@ -285,6 +286,12 @@ public class TRCompositionalConflictChecker
           db.get(TRCompositionalModelAnalyzerFactory.
                  OPTION_TRCompositionalConflictChecker_SimplifierCreator);
         iter.add(addition);
+      } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                              OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
+        final Option<?> addition =
+          db.get(TRCompositionalModelAnalyzerFactory.
+                 OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts);
+        iter.add(addition);
       }
     }
     db.prepend(options, AbstractModelAnalyzerFactory.
@@ -293,8 +300,6 @@ public class TRCompositionalConflictChecker
                         OPTION_ConflictChecker_ConfiguredDefaultMarking);
     db.append(options,  AbstractModelAnalyzerFactory.
                         OPTION_SynchronousProductBuilder_PruningDeadlocks);
-    db.append(options,  TRCompositionalModelAnalyzerFactory.
-                        OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts);
     return options;
   }
 
@@ -328,7 +333,7 @@ public class TRCompositionalConflictChecker
     } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
                             OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts)) {
       final BooleanOption boolOption = (BooleanOption) option;
-      setUseLimitedCertainConflicts(boolOption.getValue());
+      setUsingLimitedCertainConflicts(boolOption.getValue());
     } else if (option.hasID(AbstractModelAnalyzerFactory.
                             OPTION_SynchronousProductBuilder_PruningDeadlocks)) {
       final BooleanOption boolOption = (BooleanOption) option;
@@ -855,10 +860,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (analyzer.isUseWeakObservationEquivalence()
+        (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
-            : Equivalence.OBSERVATION_EQUIVALENCE,
-            checker.isUseLimitedCertainConflicts(), false, false, false);
+          : Equivalence.OBSERVATION_EQUIVALENCE,
+         checker.isUsingLimitedCertainConflicts(), false, false, false);
     }
   };
 
@@ -926,10 +931,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (analyzer.isUseWeakObservationEquivalence()
+        (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
-            checker.isUseLimitedCertainConflicts(), true, false, false);
+            checker.isUsingLimitedCertainConflicts(), true, false, false);
     }
   };
 
@@ -1034,10 +1039,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (analyzer.isUseWeakObservationEquivalence()
+        (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
-            checker.isUseLimitedCertainConflicts(), true, false, true);
+            checker.isUsingLimitedCertainConflicts(), true, false, true);
     }
   };
 
@@ -1109,10 +1114,10 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createConflictEquivalenceChain
-        (analyzer.isUseWeakObservationEquivalence()
+        (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
-            checker.isUseLimitedCertainConflicts(), true, true, true);
+            checker.isUsingLimitedCertainConflicts(), true, true, true);
     }
   };
 
@@ -1181,7 +1186,7 @@ public class TRCompositionalConflictChecker
       final TRCompositionalConflictChecker checker =
         (TRCompositionalConflictChecker) analyzer;
       return checker.createGeneralisedNonblockingChain
-        (analyzer.isUseWeakObservationEquivalence()
+        (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
          true);
@@ -1484,7 +1489,7 @@ public class TRCompositionalConflictChecker
   private EventProxy mPreconditionEvent;
   private TRAutomatonProxy mPreconditionPropertyAutomaton;
 
-  private boolean mUseLimitedCertainConflicts = true;
+  private boolean mUsingLimitedCertainConflicts = true;
 
 
   //#########################################################################

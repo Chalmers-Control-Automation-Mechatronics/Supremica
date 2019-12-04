@@ -91,11 +91,11 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
     final List<Option<?>> options = new LinkedList<>();
     final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
     if (rel != EquivalenceRelation.LANGUAGEEQUIVALENCE) {
-      db.append(options, SupremicaAutomatonBuilder.
+      db.append(options, SupremicaSimplifierFactory.
                 OPTION_SupremicaAutomatonBuilder_AlsoTransitions);
     }
     if (rel != EquivalenceRelation.CONFLICTEQUIVALENCE) {
-      db.append(options, SupremicaAutomatonBuilder.
+      db.append(options, SupremicaSimplifierFactory.
                 OPTION_SupremicaAutomatonBuilder_IgnoreMarking);
     }
     return options;
@@ -104,11 +104,11 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(SupremicaAutomatonBuilder.
-                            OPTION_SupremicaAutomatonBuilder_AlsoTransitions)) {
+    if (option.hasID(SupremicaSimplifierFactory.
+                     OPTION_SupremicaAutomatonBuilder_AlsoTransitions)) {
       final BooleanOption propOption = (BooleanOption) option;
       mMinimizationOptions.setAlsoTransitions(propOption.getValue());
-    } else if (option.hasID(SupremicaAutomatonBuilder.
+    } else if (option.hasID(SupremicaSimplifierFactory.
                             OPTION_SupremicaAutomatonBuilder_IgnoreMarking)) {
       final BooleanOption propOption = (BooleanOption) option;
       mMinimizationOptions.setIgnoreMarking(propOption.getValue());
@@ -371,10 +371,5 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   private static final String TAU_U =
     Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
   private static final String TEMP = "temp_name:";
-
-  public static final String OPTION_SupremicaAutomatonBuilder_AlsoTransitions =
-    "SupremicaAutomatonBuilder.AlsoTransitions";
-  public static final String OPTION_SupremicaAutomatonBuilder_IgnoreMarking =
-    "SupremicaAutomatonBuilder.IgnoreMarking";
 
 }

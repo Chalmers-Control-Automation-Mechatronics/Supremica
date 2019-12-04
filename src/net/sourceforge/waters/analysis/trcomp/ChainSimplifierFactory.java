@@ -72,8 +72,9 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   @Override
   public String toString()
   {
-    return "Chain Relation Simplifiers";
+    return "Waters Simplifier Chains";
   }
+
 
   //#########################################################################
   //# Options
@@ -82,17 +83,19 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   {
     super.registerOptions(db);
     db.add(new BooleanOption
-           (OPTION_ChainSimplifierFactory_LimitedCertainConflicts,
-            "Use Limited Certain Conflicts",
-            "", //TODO
-            "",
-            true));
+             (OPTION_ChainSimplifierFactory_WeakObservationEquivalence,
+              "Use Weak Observation Equivalence",
+              "Use weak observation equivalence rather than ordinary " +
+              "observation equivalence.",
+              "-woeq",
+              false));
     db.add(new BooleanOption
-           (OPTION_ChainSimplifierFactory_WeakObservationEquivalence,
-            "Use Weak Observation Equivalence",
-            "", //TODO
-            "",
-            false));
+             (OPTION_ChainSimplifierFactory_LimitedCertainConflicts,
+              "Use Limited Certain Conflicts",
+              "Include the Limited Certain Conflict Rule " +
+              "in the abstraction sequence.",
+              "-lcc",
+              true));
   }
 
 
@@ -102,7 +105,13 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   protected void registerSimplifierCreators()
   {
     final List<AutomatonSimplifierCreator> creators =  getSimplifierCreators();
-    creators.add(new ChainSimplifierCreator("OEQ", "") {
+    creators.add(new ChainSimplifierCreator
+               ("OEQ",
+                "An abstraction sequence for efficient simplification by " +
+                "observation equivalence or weak observation equivalence, " +
+                "consisting of special events removal, and &tau;-loop removal " +
+                "before invoking observation equivalence or weak observation " +
+                "equivalence.") {
       @Override
       public ChainTRSimplifier create()
       {
@@ -111,24 +120,62 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
       }
     });
     creators.add(new ConflictEquivalenceSimplifierCreator
-                 ("NB0",
-                  "",
-                  false, false, false));
+                   ("NB0",
+                    "An abstraction sequence for standard nonblocking " +
+                    "verification, consisting of special events removal, " +
+                    "&tau;-loop removal, marking removal, Silent Incoming Rule, " +
+                    "Only Silent Outgoing Rule, Incoming equivalence, combined " +
+                    "Silent Continuation and Active Events Rules, optionally " +
+                    "Limited Certain Conflicts Rule, observation equivalence " +
+                    "or weak observation equivalence, and marking saturation.",
+                    false, false, false));
     creators.add(new ConflictEquivalenceSimplifierCreator
-                 ("NB1",
-                  "",
-                  true, false, false));
+                   ("NB1",
+                    "An abstraction sequence for standard nonblocking " +
+                    "verification, consisting of special events removal, " +
+                    "&tau;-loop removal, observation equivalent transition " +
+                    "removal, marking removal, Silent Incoming Rule, " +
+                    "Only Silent Outgoing Rule, Incoming equivalence, combined " +
+                    "Silent Continuation and Active Events Rules, optionally " +
+                    "Limited Certain Conflicts Rule, observation equivalence " +
+                    "or weak observation equivalence, and marking saturation.",
+                    true, false, false));
     creators.add(new ConflictEquivalenceSimplifierCreator
-                 ("NB2",
-                  "",
-                  true, false, true));
+                   ("NB2",
+                    "An abstraction sequence for standard nonblocking " +
+                    "verification, consisting of special events removal, " +
+                    "&tau;-loop removal, observation equivalent transition " +
+                    "removal, marking removal, Silent Incoming Rule, " +
+                    "Only Silent Outgoing Rule, Incoming equivalence, combined " +
+                    "Silent Continuation and Active Events Rules, optionally " +
+                    "Limited Certain Conflicts Rule, observation equivalence " +
+                    "or weak observation equivalence, non-&alpha;-determinisation, " +
+                    "and marking saturation.",
+                    true, false, true));
     creators.add(new ConflictEquivalenceSimplifierCreator
-                 ("NB3",
-                  "",
-                  true, true, true));
+                   ("NB3",
+                    "An abstraction sequence for standard nonblocking " +
+                    "verification, consisting of special events removal, " +
+                    "&tau;-loop removal, observation equivalent transition " +
+                    "removal, selfloop subsumption, marking removal, " +
+                    "Silent Incoming Rule, Only Silent Outgoing Rule, " +
+                    "Incoming equivalence, combined Silent Continuation and " +
+                    "Active Events Rules, optionally Limited Certain Conflicts " +
+                    "Rule, observation equivalence or weak observation " +
+                    "equivalence, non-&alpha;-determinisation, and " +
+                    "marking saturation.",
+                    true, true, true));
 
     creators.add(new GNBSimplifierCreator
-                 ("GNB", "", true));
+                   ("GNB",
+                    "An abstraction sequence for generalised nonblocking " +
+                    "verification, consisting of special events removal, " +
+                    "&tau;-loop removal, marking removal, &omega;-removal, " +
+                    "Silent Incoming Rule, Only Silent Outgoing Rule, " +
+                    "observation equivalence or weak observation equivalence, " +
+                    "non-&alpha; determinisation, &alpha;-determinisation, " +
+                    "and marking saturation.",
+                    true));
   }
 
   public static ChainSimplifierFactory getInstance()

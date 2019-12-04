@@ -139,17 +139,19 @@ public abstract class TRSimplifierFactory extends AutomatonSimplifierFactory
     db.add(new BooleanOption
              (OPTION_ObservationEquivalence_UsingLocalEvents,
               "Use Local Events",
-              "Consider all local events as silent " +
+              "Consider all local events as silent in observation equivalence " +
               "(as opposed to only the special event TAU).",
               "-eqlocal",
               false));
 
     db.add(new BooleanOption
-           (OPTION_SilentIncoming_RestrictsToUnreachableStates,
-            "Restricts to Unreachable States",
-            "",//TODO
-            "-rtus",
-            true));
+             (OPTION_SilentIncoming_RestrictsToUnreachableStates,
+              "Ensure reduction with Silent Incoming Rule",
+              "Apply the Silent Incoming Rule only to &tau;-transitions " +
+              "that lead to a state that becomes unreachable by application " +
+              "of the rule.",
+              "-rtus",
+              true));
 
     db.add(new BooleanOption
              (OPTION_SubsetConstruction_FailingEventsAsSelfLoops,

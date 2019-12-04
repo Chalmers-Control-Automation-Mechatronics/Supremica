@@ -121,9 +121,9 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final JLabel familyComboboxLabel = new JLabel("Family");
     mFamilyComboBox = new JComboBox<>();
 
+    mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(StepSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
-    mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
 
     StepSimplifierFactory.getInstance().registerOptions(mOptionDB);
     SupremicaSimplifierFactory.getInstance().registerOptions(mOptionDB);

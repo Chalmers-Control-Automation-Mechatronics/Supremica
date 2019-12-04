@@ -196,6 +196,13 @@ public class TRCompositionalModelAnalyzerFactory
               "from the options produced by the preselection method.",
               "-sel",
               AbstractTRCompositionalModelAnalyzer.getSelectionHeuristicFactoryStatic()));
+    db.add(new BooleanOption
+             (OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
+              "Use weak observation equivalence",
+              "Use weak observation equivalence rather than ordinary " +
+              "observation equivalence in the abstraction procedure.",
+              "-woeq",
+              false));
 
     db.add(new BooleanOption
              (OPTION_AbstractTRCompositionalModelVerifier_OutputCheckingEnabled,
@@ -227,17 +234,12 @@ public class TRCompositionalModelAnalyzerFactory
               "-method",
               TRCompositionalConflictChecker.getTRSimplifierFactoryStatic()));
     db.add(new BooleanOption
-             (OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
-              "Use weak observation equivalence",
-              "",//TODO
-              "",
-              false));
-    db.add(new BooleanOption
-           (OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts,
-            "Use limited certain conflicts",
-            "",//TODO
-            "",
-            true));
+             (OPTION_TRCompositionalConflictChecker_LimitedCertainConflicts,
+              "Use limited certain conflicts",
+              "Include the Limited Certain Conflicts Rule in the " +
+              "abstraction procedure.",
+              "-lcc",
+              true));
   }
 
 
