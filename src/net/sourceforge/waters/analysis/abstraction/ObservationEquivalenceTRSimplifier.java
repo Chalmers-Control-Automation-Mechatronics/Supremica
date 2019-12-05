@@ -289,19 +289,19 @@ public class ObservationEquivalenceTRSimplifier
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_Equivalence);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_TransitionRemovalMode);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_MarkingMode);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_PropositionMask);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_TransitionRelationSimplifier_DumpStateAware);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_UsingLocalEvents);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
               OPTION_ObservationEquivalence_InfoEnabled);
     return options;
   }
@@ -311,32 +311,32 @@ public class ObservationEquivalenceTRSimplifier
   public void setOption(final Option<?> option)
   {
 
-    if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence)) {
+    if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_Equivalence)) {
       final EnumOption<Equivalence> propOption = (EnumOption<Equivalence>) option;
       final Equivalence value = propOption.getValue();
       setEquivalence(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode)) {
+    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode)) {
       final EnumOption<TransitionRemoval> propOption = (EnumOption<TransitionRemoval>) option;
       final TransitionRemoval value = propOption.getValue();
       setTransitionRemovalMode(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode)) {
+    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode)) {
       final EnumOption<MarkingMode> propOption = (EnumOption<MarkingMode>) option;
       final MarkingMode value = propOption.getValue();
       setMarkingMode(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {
+    else if (option.hasID(StepSimplifierFactory.OPTION_TransitionRelationSimplifier_DumpStateAware)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setDumpStateAware(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_UsingLocalEvents)) {
+    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_UsingLocalEvents)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setUsingLocalEvents(value);
     }
-    else if (option.hasID(TRSimplifierFactory.OPTION_ObservationEquivalence_InfoEnabled)) {
+    else if (option.hasID(StepSimplifierFactory.OPTION_ObservationEquivalence_InfoEnabled)) {
       final BooleanOption propOption = (BooleanOption) option;
       final boolean value = propOption.getValue();
       setInfoEnabled(value);

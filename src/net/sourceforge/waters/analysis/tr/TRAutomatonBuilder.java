@@ -35,7 +35,7 @@ package net.sourceforge.waters.analysis.tr;
 
 import java.util.List;
 
-import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
+import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
@@ -84,11 +84,11 @@ public class TRAutomatonBuilder extends AbstractAutomatonBuilder
   public void setOption(final Option<?> option)
   {
 
-    if (option.hasID(TRSimplifierFactory.
+    if (option.hasID(StepSimplifierFactory.
                      OPTION_AbstractMarking_PreconditionMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mPreconditionMarking = propOption.getValue();
-    } else if (option.hasID(TRSimplifierFactory.
+    } else if (option.hasID(StepSimplifierFactory.
                             OPTION_AbstractMarking_DefaultMarkingID)) {
       final PropositionOption propOption = (PropositionOption) option;
       mDefaultMarking = propOption.getValue();

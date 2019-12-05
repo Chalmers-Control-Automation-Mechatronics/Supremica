@@ -56,6 +56,7 @@ import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.analysis.options.PositiveIntOption;
 import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.options.StringOption;
+import net.sourceforge.waters.analysis.trcomp.TRCompositionalModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.AnalysisException;
 import net.sourceforge.waters.model.analysis.CommandLineArgument;
@@ -351,6 +352,12 @@ public abstract class AbstractModelAnalyzerFactory
               "as well as propositions that appear on all states, from the result.",
               "-out",
               true));
+    db.add(new BooleanOption
+             (TRCompositionalModelAnalyzerFactory.OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence,
+              "Use weak observation equivalence",
+              "",//TODO
+              "",
+            false));
   }
 
 

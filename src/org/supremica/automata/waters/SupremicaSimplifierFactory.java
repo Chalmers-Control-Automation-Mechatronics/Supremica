@@ -61,14 +61,17 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   //# Constructor
   private SupremicaSimplifierFactory()
   {
-    super();
   }
 
+
+  //#########################################################################
+  //# Overrides for java.lang.Object
   @Override
   public String toString()
   {
-    return "Supremica Simplifiers";
+    return "Supremica Minimizers";
   }
+
 
   //#########################################################################
   //# Options
@@ -77,17 +80,18 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   {
     super.registerOptions(db);
     db.add(new BooleanOption
-           (SupremicaAutomatonBuilder.OPTION_SupremicaAutomatonBuilder_AlsoTransitions,
-            "Also minimise number of transitions",
-            "",//TODO
-            "-alsot",
-            true));
+             (OPTION_SupremicaAutomatonBuilder_AlsoTransitions,
+              "Minimise number of transitions",
+              "Minimise the number of transitions in addition to the number " +
+              "of states when simplifying for observation equivalence.",
+              "-oeqt",
+              true));
     db.add(new BooleanOption
-           (SupremicaAutomatonBuilder.OPTION_SupremicaAutomatonBuilder_IgnoreMarking,
-            "Ignore marking of states",
-            "",//TODO
-            "-ignorem",
-            false));
+             (OPTION_SupremicaAutomatonBuilder_IgnoreMarking,
+              "Ignore marking of states",
+              "",//TODO
+              "-ignorem",
+              false));
   }
 
 
@@ -99,23 +103,35 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
     final List<AutomatonSimplifierCreator> creators = getSimplifierCreators();
     creators.add(new SupremicaSimplifierCreator
                  ("Language Equivalence",
-                  "",
+                  "Returns a deterministic automaton representing the same " +
+                  "language using a minimal number of states and transitions. " +
+                  "If the automaton is nondeterministic, it is first made " +
+                  "deterministic.",
                   EquivalenceRelation.LANGUAGEEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Conflict Equivalence",
-                  "",
+                  "This minimization algorithm is experimental! The " +
+                  "result may not be minimal but should at least be " +
+                  "conflict equivalent to the input.",
                   EquivalenceRelation.CONFLICTEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Supervision Equivalence",
-                  "",
+                  "This minimization algorithm is experimental! The " +
+                  "result may not be minimal but should at least be " +
+                  "supervision equivalent to the input.",
                   EquivalenceRelation.SUPERVISIONEQUIVALENCE));
     creators.add(new SupremicaSimplifierCreator
                  ("Synthesis Abstraction",
-                  "",
+                  "Simplifies the automaton based on synthesis " +
+                  "observation equivalence.",
                   EquivalenceRelation.SYNTHESISABSTRACTION));
     creators.add(new SupremicaSimplifierCreator
                  ("Observation Equivalence",
-                  "",
+                  "Computes an observation equivalent automaton with a " +
+                  "minimal number of states, by applying a bisimulation " +
+                  "algorithm after saturating the transition relation " +
+                  "based on silent events. Optionally, the number of " +
+                  "transitions can be minimised afterwards.",
                   EquivalenceRelation.OBSERVATIONEQUIVALENCE));
   }
 
@@ -128,6 +144,8 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   }
 
 
+  //#########################################################################
+  //# Inner Class SupremicaSimplifierCreator
   private class SupremicaSimplifierCreator extends AutomatonSimplifierCreator {
 
     protected SupremicaSimplifierCreator(final String name,
@@ -145,8 +163,8 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
     }
 
     private final EquivalenceRelation mRelation;
-
   }
+
 
   //#########################################################################
   //# Data Members
@@ -155,4 +173,9 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
 
   //#########################################################################
   //# Class Constants
+  public static final String OPTION_SupremicaAutomatonBuilder_AlsoTransitions =
+    "SupremicaAutomatonBuilder.AlsoTransitions";
+  public static final String OPTION_SupremicaAutomatonBuilder_IgnoreMarking =
+    "SupremicaAutomatonBuilder.IgnoreMarking";
+
 }

@@ -48,6 +48,7 @@ import java.util.Queue;
 
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsFinder;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
@@ -396,6 +397,16 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     return mOutputCheckingEnabled;
   }
 
+  public void setUsingWeakObservationEquivalence(final boolean weak)
+  {
+    mUsingWeakObservationEquivalence = weak;
+  }
+
+  public boolean isUsingWeakObservationEquivalence()
+  {
+    return mUsingWeakObservationEquivalence;
+  }
+
 
   //#########################################################################
   //# Interface net.sourceforge.waters.model.analysis.ModelAnalyser
@@ -407,6 +418,8 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                        OPTION_AbstractTRCompositionalModelAnalyzer_PreselectionHeuristic);
     db.append(options, TRCompositionalModelAnalyzerFactory.
                        OPTION_AbstractTRCompositionalModelAnalyzer_SelectionHeuristic);
+    db.append(options, TRCompositionalModelAnalyzerFactory.
+                       OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence);
     db.append(options, AbstractModelAnalyzerFactory.
                        OPTION_ModelAnalyzer_InternalStateLimit);
     db.append(options, AbstractModelAnalyzerFactory.
@@ -478,6 +491,10 @@ public abstract class AbstractTRCompositionalModelAnalyzer
                             OPTION_AbstractTRCompositionalModelAnalyzer_MonolithicDumpFile)) {
       final FileOption fileOption = (FileOption) option;
       setMonolithicDumpFile(fileOption.getValue());
+    } else if (option.hasID(TRCompositionalModelAnalyzerFactory.
+                            OPTION_AbstractTRCompositionalModelAnalyzer_WeakObservationEquivalence)) {
+      final BooleanOption boolOption = (BooleanOption) option;
+      setUsingWeakObservationEquivalence(boolOption.getValue());
     } else {
       super.setOption(option);
     }
@@ -1428,8 +1445,9 @@ public abstract class AbstractTRCompositionalModelAnalyzer
       (final AbstractTRCompositionalModelAnalyzer analyzer)
     {
       return analyzer.createObservationEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE);
+        (analyzer.isUsingWeakObservationEquivalence()
+         ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
+         : Equivalence.OBSERVATION_EQUIVALENCE);
     }
   };
 
@@ -1461,29 +1479,24 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   protected ChainTRSimplifier createObservationEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)
   {
-    final ChainTRSimplifier chain = startAbstractionChain();
-    final TRSimplificationListener listener =
-      new PartitioningListener();
-    final TransitionRelationSimplifier loopRemover =
-      new TauLoopRemovalTRSimplifier();
-    loopRemover.setSimplificationListener(listener);
-    chain.add(loopRemover);
-    final ObservationEquivalenceTRSimplifier bisimulator =
-      new ObservationEquivalenceTRSimplifier();
-    bisimulator.setEquivalence(equivalence);
-    bisimulator.setTransitionRemovalMode
-      (ObservationEquivalenceTRSimplifier.TransitionRemoval.ALL);
-    bisimulator.setMarkingMode
-      (ObservationEquivalenceTRSimplifier.MarkingMode.SATURATE);
-    final int limit = getInternalTransitionLimit();
-    bisimulator.setTransitionLimit(limit);
-    bisimulator.setSimplificationListener(listener);
-    chain.add(bisimulator);
+    final TRSimplificationListener specialEventsListener = getSpecialEventsListener();
+    final TRSimplificationListener listener = new PartitioningListener();
+    final int transitionLimit = getInternalTransitionLimit();
+    final EventProxy usedPreconditionMarking = getUsedPreconditionMarking();
+
+    final ChainTRSimplifier chain =
+      ChainBuilder.createObservationEquivalenceChain(equivalence,
+                                                   listener,
+                                                   specialEventsListener);
+
+    chain.setTransitionLimit(transitionLimit);
+
     final int precond =
-      getUsedPreconditionMarking() == null ? -1 : PRECONDITION_MARKING;
+      usedPreconditionMarking == null ? -1 : PRECONDITION_MARKING;
     chain.setPropositions(precond, DEFAULT_MARKING);
     chain.setPreferredOutputConfiguration
       (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
     return chain;
   }
 
@@ -1724,6 +1737,7 @@ public abstract class AbstractTRCompositionalModelAnalyzer
   private boolean mAlwaysEnabledEventsEnabled = false;
   private File mMonolithicDumpFile = null;
   private boolean mOutputCheckingEnabled = false;
+  private boolean mUsingWeakObservationEquivalence = false;
 
   // Tools
   private TRPreselectionHeuristic mPreselectionHeuristic;

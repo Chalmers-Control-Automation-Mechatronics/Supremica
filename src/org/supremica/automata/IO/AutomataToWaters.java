@@ -123,7 +123,8 @@ public class AutomataToWaters
   }
 
   public AutomataToWaters(final ProductDESProxyFactory factory,
-                          final Map<String, EventProxy> eventMap)
+                          final Map<String, EventProxy> eventMap,
+                          final Set<String> observableSwitchNameSet)
   {
     this(factory);
     mEventMap = eventMap;
@@ -132,6 +133,9 @@ public class AutomataToWaters
       .stream()
       .map(e -> e.getValue())
       .collect(Collectors.toList());
+    if (!observableSwitchNameSet.isEmpty())  {
+      mObservableSwitchNameSet = observableSwitchNameSet;
+    }
   }
 
   public AutomataToWaters(final ProductDESProxyFactory factory,
@@ -281,8 +285,10 @@ public class AutomataToWaters
   //# Auxiliary Methods
   private EventProxy createEvent(final String name,
                                  final EventKind kind,
-                                 final boolean observable)
+                                 boolean observable)
   {
+    observable = mObservableSwitchNameSet == null ? observable
+      : mObservableSwitchNameSet.contains(name) ^ observable;
     final EventProxy found = mEventMap.get(name);
     if (found == null) {
       final EventProxy event =
@@ -404,5 +410,6 @@ public class AutomataToWaters
 
   private List<EventProxy> mEventList;
   private Map<String,EventProxy> mEventMap;
+  private Set<String> mObservableSwitchNameSet = null;
 
 }

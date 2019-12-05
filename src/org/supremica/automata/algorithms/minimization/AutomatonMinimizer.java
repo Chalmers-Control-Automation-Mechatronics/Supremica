@@ -1280,11 +1280,11 @@ public class AutomatonMinimizer
 
      //#########################################################################
 
-     /**
-     * Split an equivalence class according to synthesis observation equivalnce. This
+    /**
+     * Split an equivalence class according to synthesis observation equivalence. This
      * method is used when the event is not controllable and unobservable (DCDS 2011).
-     *@param eqClass the class to be split.
-     *@param e the event that should be considered.
+     * @param eqClass the class to be split.
+     * @param e the event that should be considered.
      */
      private EquivalenceClassHolder splitSynthesisA(final StateSet eqClass,final LabeledEvent e)
     {

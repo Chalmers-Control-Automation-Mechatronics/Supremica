@@ -166,7 +166,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   public List<Option<?>> getOptions(final OptionMap db)
   {
     final List<Option<?>> options = super.getOptions(db);
-    db.append(options, TRSimplifierFactory.
+    db.append(options, StepSimplifierFactory.
                OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence);
     return options;
   }
@@ -174,7 +174,7 @@ public class SynthesisObservationEquivalenceTRSimplifier
   @Override
   public void setOption(final Option<?> option)
   {
-    if (option.hasID(TRSimplifierFactory.
+    if (option.hasID(StepSimplifierFactory.
                      OPTION_SynthesisObservationEquivalence_UsesWeakSynthesisObservationEquivalence)) {
       final BooleanOption propOption = (BooleanOption) option;
       setUsesWeakSynthesisObservationEquivalence(propOption.getValue());
