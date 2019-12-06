@@ -69,9 +69,10 @@ public class WOEQGeneralisedConflictCheckerTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.WOEQ);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.OEQ);
     checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_MustL);
     checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MinSa);
+    checker.setUsingWeakObservationEquivalence(true);
     checker.setInternalStateLimit(5000);
     checker.setMonolithicStateLimit(100000);
     checker.setInternalTransitionLimit(500000);

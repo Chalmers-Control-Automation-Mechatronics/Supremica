@@ -1451,30 +1451,6 @@ public abstract class AbstractTRCompositionalModelAnalyzer
     }
   };
 
-  /**
-   * <P>The abstraction sequence that consists of only weak observation
-   * equivalence. This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> WOEQ =
-    new TRToolCreator<TransitionRelationSimplifier>("WOEQ")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-    {
-      return analyzer.createObservationEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE);
-    }
-  };
-
 
   protected ChainTRSimplifier createObservationEquivalenceChain
     (final ObservationEquivalenceTRSimplifier.Equivalence equivalence)

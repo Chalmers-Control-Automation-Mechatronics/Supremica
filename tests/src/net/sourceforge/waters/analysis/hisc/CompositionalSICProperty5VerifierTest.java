@@ -70,9 +70,10 @@ public class CompositionalSICProperty5VerifierTest
   {
     final TRCompositionalConflictChecker checker =
       new TRCompositionalConflictChecker();
-    checker.setSimplifierCreator(TRCompositionalConflictChecker.GNBw);
+    checker.setSimplifierCreator(TRCompositionalConflictChecker.GNB);
     checker.setPreselectionHeuristic(AbstractTRCompositionalModelAnalyzer.PRESEL_MinT);
     checker.setSelectionHeuristic(AbstractTRCompositionalModelAnalyzer.SEL_MaxL);
+    checker.setUsingWeakObservationEquivalence(true);
     checker.setInternalStateLimit(5000);
     checker.setInternalTransitionLimit(100000);
     checker.setBlockedEventsEnabled(true);

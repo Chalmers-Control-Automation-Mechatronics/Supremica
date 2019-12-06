@@ -874,41 +874,6 @@ public class TRCompositionalConflictChecker
    * <UL>
    * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
    * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
-   *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> NB0w =
-    new TRToolCreator<TransitionRelationSimplifier>("NB0w")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-      throws AnalysisConfigurationException
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, false, false, false);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for standard nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
    * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
    * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
    * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
@@ -935,77 +900,6 @@ public class TRCompositionalConflictChecker
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
             checker.isUsingLimitedCertainConflicts(), true, false, false);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for standard nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
-   *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> NB1w =
-    new TRToolCreator<TransitionRelationSimplifier>("NB1w")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-      throws AnalysisConfigurationException
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, true, false, false);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for standard nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
-   *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> NB1x =
-    new TRToolCreator<TransitionRelationSimplifier>("NB1x")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-      throws AnalysisConfigurationException
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.OBSERVATION_EQUIVALENCE,
-         false, true, false, false);
     }
   };
 
@@ -1054,43 +948,6 @@ public class TRCompositionalConflictChecker
    * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
    * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
    * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
-   *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> NB2w =
-    new TRToolCreator<TransitionRelationSimplifier>("NB2w")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-      throws AnalysisConfigurationException
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, true, false, true);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for standard nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
    * <LI>Selfloop subsumption ({@link SelfloopSubsumptionTRSimplifier})</LI>
    * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
    * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
@@ -1118,44 +975,6 @@ public class TRCompositionalConflictChecker
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
             checker.isUsingLimitedCertainConflicts(), true, true, true);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for standard nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Transition removal ({@link TransitionRemovalTRSimplifier})</LI>
-   * <LI>Selfloop subsumption ({@link SelfloopSubsumptionTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Incoming equivalence ({@link IncomingEquivalenceTRSimplifier};
-   *     Silent Continuation plus Active Events Rules)</LI>
-   * <LI>Certain Conflicts Rule ({@link LimitedCertainConflictsTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> NB3w =
-    new TRToolCreator<TransitionRelationSimplifier>("NB3w")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-      throws AnalysisConfigurationException
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createConflictEquivalenceChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
-         true, true, true, true);
     }
   };
 
@@ -1189,40 +1008,6 @@ public class TRCompositionalConflictChecker
         (analyzer.isUsingWeakObservationEquivalence()
           ? Equivalence.WEAK_OBSERVATION_EQUIVALENCE
             : Equivalence.OBSERVATION_EQUIVALENCE,
-         true);
-    }
-  };
-
-  /**
-   * <P>An abstraction sequence for generalised nonblocking verification.
-   * This tool creator produces a transition relation simplifier
-   * consisting of:</P>
-   * <UL>
-   * <LI>Special events removal ({@link SpecialEventsTRSimplifier})</LI>
-   * <LI>Tau-loop removal ({@link TauLoopRemovalTRSimplifier})</LI>
-   * <LI>Marking removal ({@link MarkingRemovalTRSimplifier})</LI>
-   * <LI>Omega-removal ({@link OmegaRemovalTRSimplifier})</LI>
-   * <LI>Silent Incoming Rule ({@link SilentIncomingTRSimplifier})</LI>
-   * <LI>Only Silent Outgoing Rule ({@link OnlySilentOutgoingTRSimplifier})</LI>
-   * <LI>Weak observation equivalence
-   *     ({@link ObservationEquivalenceTRSimplifier})</LI>
-   * <LI>Non-alpha determinisation ({@link NonAlphaDeterminisationTRSimplifier})</LI>
-   * <LI>Alpha determinisation ({@link AlphaDeterminisationTRSimplifier})</LI>
-   * <LI>Marking saturation ({@link MarkingSaturationTRSimplifier})</LI>
-   * </UL>.
-   */
-  public static final TRToolCreator<TransitionRelationSimplifier> GNBw =
-    new TRToolCreator<TransitionRelationSimplifier>("GNBw")
-  {
-    @Override
-    public TransitionRelationSimplifier create
-      (final AbstractTRCompositionalModelAnalyzer analyzer)
-    {
-      final TRCompositionalConflictChecker checker =
-        (TRCompositionalConflictChecker) analyzer;
-      return checker.createGeneralisedNonblockingChain
-        (ObservationEquivalenceTRSimplifier.
-         Equivalence.WEAK_OBSERVATION_EQUIVALENCE,
          true);
     }
   };
