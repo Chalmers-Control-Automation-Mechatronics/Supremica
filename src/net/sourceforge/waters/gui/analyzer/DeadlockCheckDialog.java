@@ -76,11 +76,19 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
     return new DeadlockCheckPopUpDialog(ide, des);
   }
 
-   @Override
-   protected DeadlockChecker getAnalyzer()
-   {
-     return (DeadlockChecker) super.getAnalyzer();
-   }
+  @Override
+  protected DeadlockChecker getAnalyzer()
+  {
+    return (DeadlockChecker) super.getAnalyzer();
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
 
 
   //#########################################################################
@@ -128,6 +136,7 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Deadlock Check";
+  private static final String OPTION_PREFIX = "analysis.deadlock";
 
   private static final long serialVersionUID = 7587116260533051091L;
 

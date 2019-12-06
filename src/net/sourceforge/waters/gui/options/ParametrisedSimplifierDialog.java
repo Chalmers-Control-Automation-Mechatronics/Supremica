@@ -33,14 +33,15 @@
 
 package net.sourceforge.waters.gui.options;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -56,9 +57,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
+import javax.swing.JTextPane;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
@@ -67,6 +66,7 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionRegistry;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
@@ -105,7 +105,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
 
-    mOptionDB = new OptionMap();
+    final OptionMap optionMap = new OptionMap();
     mCurrentParameterPanels = new LinkedList<>();
 
     final GridBagLayout layout = new GridBagLayout();
@@ -125,9 +125,10 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     mFamilyComboBox.addItem(StepSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
 
-    StepSimplifierFactory.getInstance().registerOptions(mOptionDB);
-    SupremicaSimplifierFactory.getInstance().registerOptions(mOptionDB);
-    ChainSimplifierFactory.getInstance().registerOptions(mOptionDB);
+    StepSimplifierFactory.getInstance().registerOptions(optionMap);
+    SupremicaSimplifierFactory.getInstance().registerOptions(optionMap);
+    ChainSimplifierFactory.getInstance().registerOptions(optionMap);
+    mOptionDB = OptionRegistry.getOptionMap(OPTION_PREFIX, optionMap);
 
     final ActionListener familyChanged = new ActionListener() {
       @Override
@@ -155,22 +156,47 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     mAnalyzerComboBox.addActionListener(algorithmChanged);
     mAnalyzerComboBox.setRenderer(new ComboboxToolTipRenderer(300));
 
-
+    final ParametrisedSimplifierDialog dialog = this;
 
     //Description
-    mDescriptionTextArea = new JTextArea();
-    mDescriptionTextArea.setLineWrap(true);
-    mDescriptionTextArea.setWrapStyleWord(true);
-    mDescriptionTextArea.setBackground(null);
-    mDescriptionTextArea.setEditable(false);
+    mDescriptionTextPane = new JTextPane();
+    mDescriptionTextPane.setContentType("text/html");
+    mDescriptionTextPane.setBackground(new Color(0, 0, 0, 0));
     //Prevent selection
-    for (final MouseListener l : mDescriptionTextArea
+    for (final MouseListener l : mDescriptionTextPane
       .getListeners(MouseListener.class)) {
-      mDescriptionTextArea.removeMouseListener(l);
+      mDescriptionTextPane.removeMouseListener(l);
     }
 
     //Selection panel
     final JPanel selectionPanel = new RaisedDialogPanel();
+    selectionPanel.addComponentListener(new ComponentListener() {
+
+      @Override
+      public void componentShown(final ComponentEvent e) {}
+
+      @Override
+      public void componentResized(final ComponentEvent e)
+      {
+        if (mDescriptionTextToBeSet != null) {
+          final int width = e.getComponent().getSize().width - 2;
+          final String text = "<body width=" + width
+            + " style=\"text-align:justify\">"
+            + mDescriptionTextToBeSet + "</body>";
+          mDescriptionTextToBeSet = null;
+          mDescriptionTextPane.setText(text);
+          mDescriptionTextPane.setVisible(true);
+          dialog.pack();
+        }
+      }
+
+      @Override
+      public void componentMoved(final ComponentEvent e) {}
+
+      @Override
+      public void componentHidden(final ComponentEvent e) {}
+    });
+
     selectionPanel.setLayout(new GridBagLayout());
     add(selectionPanel, constraints);
     final GridBagConstraints c = new GridBagConstraints();
@@ -192,8 +218,8 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     c.gridx = 0;
     c.gridy++;
     c.gridwidth = 2;
-    c.insets.top = 10;
-    selectionPanel.add(mDescriptionTextArea, c);
+    c.insets.top = 5;
+    selectionPanel.add(mDescriptionTextPane, c);
 
 
     // Parameter list
@@ -275,8 +301,9 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
        true);
     params.add(mKeepOriginalOption);
 
-    mDescriptionTextArea.setText(creator.getDescription());
-    mDescriptionTextArea.setToolTipText(creator.getDescription());
+    mDescriptionTextToBeSet = creator.getDescription();
+    mDescriptionTextPane.setVisible(false);
+    mDescriptionTextPane.setToolTipText(creator.getDescription());
 
     updateParameterList(params);
   }
@@ -378,23 +405,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
           autList.add(result);
           table.clearSelection();
           table.addToSelection(autList);
-
-          int r = 0;
-          for (;r < model.getRowCount(); r++) {
-            if (result == model.getValueAt(r, 0)) break;
-          }
-          final int row = r;
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run()
-            {
-              final JViewport viewport = (JViewport)table.getParent();
-              final Rectangle rect = table.getCellRect(row, 0, true);
-              final Point pt = viewport.getViewPosition();
-              rect.setLocation(rect.x-pt.x, rect.y-pt.y);
-              table.scrollRectToVisible(rect);
-            }
-          });
+          table.scrollToVisible(autList);
         } else {
           model.replaceAutomaton(aut, result);
         }
@@ -448,7 +459,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
   private final GUIOptionContext mContext;
   private final JComboBox<AutomatonSimplifierFactory> mFamilyComboBox;
   private final JComboBox<AutomatonSimplifierCreator> mAnalyzerComboBox;
-  private final JTextArea mDescriptionTextArea;
+  private final JTextPane mDescriptionTextPane;
   private final JPanel mParameterListPanel;
   private final OptionMap mOptionDB;
 
@@ -457,9 +468,12 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
   private AutomatonBuilder mCurrentAnalyzer;
   private final List<OptionPanel<?>> mCurrentParameterPanels;
 
+  private String mDescriptionTextToBeSet;
+
 
   //#########################################################################
   //# Class Constants
+  private static final String OPTION_PREFIX = "analysis.simplifier";
   private static final long serialVersionUID = -3610355726871200803L;
 
 }

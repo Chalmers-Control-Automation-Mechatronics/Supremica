@@ -33,6 +33,9 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -86,6 +89,14 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
                                                     final ProductDESProxy des)
   {
     return new SynchronousProductPopUpDialog(ide, des);
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
   }
 
   //#########################################################################
@@ -147,6 +158,11 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
         final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
         final AutomataTableModel model = panel.getAutomataTableModel();
         model.insertRow(aut);
+        final List<AutomatonProxy> list = Arrays.asList(new AutomatonProxy[] {aut});
+        final AutomataTable table = panel.getAutomataTable();
+        panel.getAutomataTable().scrollToVisible(list);
+        table.clearSelection();
+        table.addToSelection(list);
         return "Successfully produced synchronous product.";
       }
     }
@@ -165,6 +181,7 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Synchronous Product";
+  private static final String OPTION_PREFIX = "analysis.synchronousproduct";
 
   private static final long serialVersionUID = -5945541495761539710L;
 

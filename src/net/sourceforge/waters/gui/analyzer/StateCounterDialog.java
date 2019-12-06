@@ -87,6 +87,14 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
   }
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
+
+  //#########################################################################
   //# Inner Class StateCounterPopUpDialog
   private class StateCounterPopUpDialog extends WatersAnalyzeDialog
   {
@@ -150,6 +158,7 @@ public class StateCounterDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Count States";
+  private static final String OPTION_PREFIX = "analysis.statecounter";
 
   private static final long serialVersionUID = 1069804247073793761L;
 

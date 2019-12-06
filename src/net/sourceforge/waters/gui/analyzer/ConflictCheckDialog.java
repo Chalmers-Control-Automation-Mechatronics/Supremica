@@ -76,12 +76,19 @@ public class ConflictCheckDialog extends ParametrisedAnalysisDialog
     return new ConflictCheckPopUpDialog(ide, des);
   }
 
-   @Override
-   protected ConflictChecker getAnalyzer()
-   {
-     return (ConflictChecker) super.getAnalyzer();
-   }
+  @Override
+  protected ConflictChecker getAnalyzer()
+  {
+    return (ConflictChecker) super.getAnalyzer();
+  }
 
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
 
   //#########################################################################
   //# Inner Class ConflictCheckPopUpDialog
@@ -128,6 +135,7 @@ public class ConflictCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Conflict Check";
+  private static final String OPTION_PREFIX = "analysis.conflict";
 
   private static final long serialVersionUID = -4771975182146634793L;
 }

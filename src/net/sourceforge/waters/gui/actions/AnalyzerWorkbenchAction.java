@@ -34,6 +34,7 @@
 package net.sourceforge.waters.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.Action;
@@ -129,6 +130,11 @@ public class AnalyzerWorkbenchAction extends WatersAnalyzerAction
           final AutomatonProxy proxy = atw.convertAutomaton(automaton);
           final AutomataTableModel model = panel.getAutomataTableModel();
           model.insertRow(proxy);
+          final List<AutomatonProxy> list = Arrays.asList(new AutomatonProxy[] {proxy});
+          final AutomataTable table = panel.getAutomataTable();
+          panel.getAutomataTable().scrollToVisible(list);
+          table.clearSelection();
+          table.addToSelection(list);
         }
 
         @Override

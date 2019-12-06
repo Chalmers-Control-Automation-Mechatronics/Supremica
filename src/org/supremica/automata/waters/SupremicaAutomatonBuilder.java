@@ -33,13 +33,10 @@
 
 package org.supremica.automata.waters;
 
-import gnu.trove.set.hash.THashSet;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
@@ -48,12 +45,15 @@ import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.model.analysis.AnalysisException;
+import net.sourceforge.waters.model.analysis.AnalysisResult;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.analysis.des.AutomatonResult;
+import net.sourceforge.waters.model.analysis.des.DefaultAutomatonResult;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
+import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
 import org.supremica.automata.Automata;
@@ -79,7 +79,6 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
     mMinimizationOptions = new MinimizationOptions();
     mMinimizationOptions.setMinimizationType(relation);
     mFactory = factory;
-    mObservableSwitchNameSet = new THashSet<>();
   }
 
 
@@ -98,6 +97,8 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
       db.append(options, SupremicaSimplifierFactory.
                 OPTION_SupremicaAutomatonBuilder_IgnoreMarking);
     }
+    db.append(options, SupremicaSimplifierFactory.
+              OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal);
     return options;
   }
 
@@ -112,6 +113,10 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
                             OPTION_SupremicaAutomatonBuilder_IgnoreMarking)) {
       final BooleanOption propOption = (BooleanOption) option;
       mMinimizationOptions.setIgnoreMarking(propOption.getValue());
+    } else if (option.hasID(SupremicaSimplifierFactory.
+                            OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal)) {
+      final BooleanOption propOption = (BooleanOption) option;
+      mTreatUnobservableEventsAsLocal = propOption.getValue();
     } else {
       //TODO?
     }
@@ -134,33 +139,30 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
       final Automata automata = getSupremicaAutomata();
       final Automaton aut = automata.getAutomatonAt(0);
 
-      final Map<String, EventProxy> backwardsMap = createBackwardsMapping(forwardsMap);
-
       final AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
+
+      final ProductDESProxy context = getModel();
+      final EventProxy defaultMarking = null;//TODO
 
       try {
         final Automaton newAut = minimizer
           .getMinimizedAutomaton(mMinimizationOptions);
         newAut.setName(mOutputName);
         final AutomataToWaters importer =
-          new AutomataToWaters(mFactory, backwardsMap, mObservableSwitchNameSet);
+          new AutomataToWaters(mFactory, context, defaultMarking, forwardsMap);
         mResult = importer.convertAutomaton(newAut);
+        final AutomatonResult result = getAnalysisResult();
+        result.setComputedAutomaton(mResult);
+        return true;
       }
       catch (final Exception e) {
         //TODO
-        e.printStackTrace();
+        throw new AnalysisException(e);
       }
-
-    }
-    catch(final AnalysisException e) {
-      //TODO
-      e.printStackTrace();
     }
     finally {
       tearDown();
     }
-
-    return false;
   }
 
   @Override
@@ -202,8 +204,7 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   @Override
   public AutomatonProxy getComputedProxy()
   {
-    //TODO Throw error if null?
-    return mResult;
+    return getAnalysisResult().getComputedProxy();
   }
 
   @Override
@@ -227,12 +228,17 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   @Override
   public AutomatonResult getAnalysisResult()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return (AutomatonResult) super.getAnalysisResult();
+  }
+
+  @Override
+  public AnalysisResult createAnalysisResult()
+  {
+    return new DefaultAutomatonResult(this.getClass());
   }
 
   //#########################################################################
-  //# Auxilliary Methods
+  //# Auxiliary Methods
   public Map<EventProxy, EventProxy> createForwardsMapping() throws AnalysisException {
     final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
     final boolean tauCU = (rel == EquivalenceRelation.SUPERVISIONEQUIVALENCE
@@ -246,37 +252,36 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
     final Map<EventProxy, EventProxy> eventMap = new HashMap<>();
     if (aut instanceof TRAutomatonProxy) {
 
+      final String tau =
+        Config.MINIMIZATION_SILENT_EVENT_NAME.get();
+      final String tau_c =
+        Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
+      final String tau_u =
+        Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+
       final Map<String, EventProxy> renameToReservedMap = new HashMap<>();
       final Map<String, EventProxy> renameFromReservedMap = new HashMap<>();
-      final Set<EventProxy> observableSwitchSet = new THashSet<>();
-      final String[] reservedNames = new String[] { TAU, TAU_C, TAU_U };
+      final String[] reservedNames = new String[] { tau, tau_c, tau_u };
 
       final TRAutomatonProxy trAut = (TRAutomatonProxy) aut;
       final EventEncoding enc = trAut.getEventEncoding();
       for (final EventProxy event : aut.getEvents()) {
 
         final int code = enc.getEventCode(event);
-        if (code == EventEncoding.TAU) {
-          if (tauCU) throw new AnalysisException("Tau must preserve controllability " +
-        "for this algorithm");
-          renameToReservedMap.put(TAU, event);
-          if (event.isObservable()) observableSwitchSet.add(event);
+        if (!tauCU) {
+          if (code == EventEncoding.TAU) {
+            renameToReservedMap.put(tau, event);
+          }
         }
         else {
           final byte status = enc.getProperEventStatus(code);
           if (EventStatus.isLocalEvent(status)) {
-            if (!tauCU) throw new AnalysisException("Tau must not preserve controllability " +
-          "for this algorithm.");
             if (EventStatus.isControllableEvent(status)) {
-              renameToReservedMap.put(TAU_C, event);
+              renameToReservedMap.put(tau_c, event);
             }
             else {
-              renameToReservedMap.put(TAU_U, event);
+              renameToReservedMap.put(tau_u, event);
             }
-            if (event.isObservable()) observableSwitchSet.add(event);
-          } else {
-            //Normal event
-            if (!event.isObservable()) observableSwitchSet.add(event);
           }
         }
 
@@ -291,18 +296,27 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
         final EventProxy ev = renameToReservedMap.get(name);
         //An event which must be renamed from a reserved name
         final EventProxy en = renameFromReservedMap.get(name);
-        if (ev == en) continue;
-        if (ev != null) {
-          addReplacementEventToMap(eventMap, ev, name, observableSwitchSet);
-        }
-        if (en != null && !renameToReservedMap.containsValue(en)) {
-          final String newName = findUnusedEventName(TEMP+name, aut);
-          addReplacementEventToMap(eventMap, en, newName, observableSwitchSet);
+        if (ev == en) {
+          if (ev != null) {
+            addReplacementEventToMap(eventMap, ev, name, false);
+          }
+        } else {
+          if (ev != null) {
+            addReplacementEventToMap(eventMap, ev, name, false);
+          }
+          if (en != null && !renameToReservedMap.containsValue(en)) {
+            final String newName = findUnusedEventName(TEMP+name, aut);
+            addReplacementEventToMap(eventMap, en, newName, true);
+          }
         }
       }
 
-      for (final EventProxy event : observableSwitchSet) {
-        addReplacementEventToMap(eventMap, event, event.getName(), observableSwitchSet);
+      if (mTreatUnobservableEventsAsLocal) {
+        for (final EventProxy event : aut.getEvents()) {
+          if (!event.isObservable() && eventMap.containsKey(event)) {
+            addReplacementEventToMap(eventMap, event, event.getName(), true);
+          }
+        }
       }
 
     }
@@ -335,17 +349,11 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   private void addReplacementEventToMap(final Map<EventProxy, EventProxy> eventMap,
                                         final EventProxy currentEvent,
                                         final String newName,
-                                        final Set<EventProxy> observableSwitchSet) {
-    final boolean observableSwitch = observableSwitchSet.contains(currentEvent);
+                                        final boolean observable) {
     final EventProxy event = mFactory.createEventProxy(newName,
                                                  currentEvent.getKind(),
-                                                 currentEvent.isObservable()
-                                                 ^ observableSwitch);
+                                                 observable);
     eventMap.put(currentEvent, event);
-    if (observableSwitch) {
-      observableSwitchSet.remove(currentEvent);
-      mObservableSwitchNameSet.add(event.getName());
-    }
   }
 
 //#########################################################################
@@ -355,21 +363,14 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   private final MinimizationOptions mMinimizationOptions;
 
   private boolean mSynchronisingOnUnobservableEvents;
+  private boolean mTreatUnobservableEventsAsLocal;
   private String mOutputName;
   private ComponentKind mComponentKind;
 
   private AutomatonProxy mResult;
 
-  private final Set<String> mObservableSwitchNameSet;
-
   //#########################################################################
   //# Class Constants
-  private static final String TAU =
-    Config.MINIMIZATION_SILENT_EVENT_NAME.get();
-  private static final String TAU_C =
-    Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
-  private static final String TAU_U =
-    Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
   private static final String TEMP = "temp_name:";
 
 }

@@ -92,6 +92,12 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
               "",//TODO
               "-ignorem",
               false));
+    db.add(new BooleanOption
+           (OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal,
+            "Treat unobservable events as local",
+            "",//TODO
+            "-uolocal",
+            false));
   }
 
 
@@ -177,5 +183,7 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
     "SupremicaAutomatonBuilder.AlsoTransitions";
   public static final String OPTION_SupremicaAutomatonBuilder_IgnoreMarking =
     "SupremicaAutomatonBuilder.IgnoreMarking";
+  public static final String OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal =
+    "SupremicaAutomatonBuilder.TreatUnobservableEventsAsLocal";
 
 }

@@ -82,6 +82,14 @@ public class ControlLoopDialog extends ParametrisedAnalysisDialog
      return (ControlLoopChecker) super.getAnalyzer();
    }
 
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
+
 
   //#########################################################################
   //# Inner Class ControlLoopPopUpDialog
@@ -128,6 +136,7 @@ public class ControlLoopDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Loop Check";
+  private static final String OPTION_PREFIX = "analysis.controlloop";
 
   private static final long serialVersionUID = -4771975182146634793L;
 }

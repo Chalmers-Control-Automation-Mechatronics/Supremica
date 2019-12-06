@@ -76,11 +76,19 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
     return new LanguageInclusionCheckPopUpDialog(ide, des);
   }
 
-   @Override
-   protected LanguageInclusionChecker getAnalyzer()
-   {
-     return (LanguageInclusionChecker) super.getAnalyzer();
-   }
+  @Override
+  protected LanguageInclusionChecker getAnalyzer()
+  {
+    return (LanguageInclusionChecker) super.getAnalyzer();
+  }
+
+  //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
 
 
   //#########################################################################
@@ -129,6 +137,7 @@ public class LanguageInclusionCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Language Inclusion Check";
+  private static final String OPTION_PREFIX = "analysis.languageinclusion";
 
   private static final long serialVersionUID = -1921272985614515952L;
 

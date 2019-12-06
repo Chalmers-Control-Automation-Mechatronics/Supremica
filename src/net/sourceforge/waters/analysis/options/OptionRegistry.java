@@ -33,91 +33,40 @@
 
 package net.sourceforge.waters.analysis.options;
 
-
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
 
 /**
- * <P>A collection of available options.</P>
  *
- * <P>An option map acts as a database that maps string identifiers to
- * {@link Option} objects. For persistent storage of options values,
- * the option map is first initialised with all available options,
- * typically at program start-up. The initialised option map is then
- * passed to {@link Configurable} objects, which select the options
- * stored in it.</P>
- *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-public class OptionMap
+public class OptionRegistry
 {
 
-  //#########################################################################
-  //# Constructors
-  public OptionMap()
-  {
-    mMap = new HashMap<>();
+  public static OptionMap getOptionMap(final String prefix) {
+    OptionMap map = mOptionMaps.get(prefix);
+    if (map == null) map = initialiseOptionMap(prefix);
+    return map;
   }
 
-
-  //#########################################################################
-  //# Simple Access
-  public Option<?> get(final String id)
-  {
-    return mMap.get(id);
+  public static OptionMap initialiseOptionMap(final String prefix) {
+    final OptionMap map = new OptionMap();
+    mOptionMaps.put(prefix, map);
+    return map;
   }
 
-  public void add(final Option<?> param)
-  {
-    final String id = param.getID();
-    mMap.put(id, param);
-  }
-
-
-  //#########################################################################
-  //# Manipulating Option Lists
-  public void append(final List<Option<?>> list, final String id)
-  {
-    final Option<?> option = get(id);
-    assert option != null;
-    list.add(option);
-  }
-
-  public void prepend(final List<Option<?>> list, final String id)
-  {
-    final Option<?> option = get(id);
-    assert option != null;
-    list.add(0, option);
-  }
-
-  public boolean remove(final List<Option<?>> list, final String id)
-  {
-    final Iterator<Option<?>> iter = list.iterator();
-    while (iter.hasNext()) {
-      final Option<?> option = iter.next();
-      if (option.hasID(id)) {
-        iter.remove();
-        return true;
-      }
+  public static OptionMap getOptionMap(final String prefix, final OptionMap extras) {
+    final OptionMap map = getOptionMap(prefix);
+    final Set<String> optionNames = extras.getOptionNames();
+    optionNames.removeAll(map.getOptionNames());
+    for (final String name : optionNames) {
+      map.add(extras.get(name));
     }
-    return false;
-  }
-  
-  public Set<String> getOptionNames() {
-    return mMap.entrySet()
-      .stream()
-      .map(e -> e.getKey())
-      .collect(Collectors.toSet());
+    return map;
   }
 
 
-  //#########################################################################
-  //# Data Members
-  private final Map<String,Option<?>> mMap;
+  private static final Map<String, OptionMap> mOptionMaps = new HashMap<>();
 
 }

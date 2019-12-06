@@ -68,7 +68,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import net.sourceforge.waters.model.base.ComponentKind;
 import net.sourceforge.waters.model.base.DuplicateNameException;
@@ -123,25 +122,19 @@ public class AutomataToWaters
   }
 
   public AutomataToWaters(final ProductDESProxyFactory factory,
-                          final Map<String, EventProxy> eventMap,
-                          final Set<String> observableSwitchNameSet)
+                          final ProductDESProxy context,
+                          final EventProxy defaultMarking)
   {
-    this(factory);
-    mEventMap = eventMap;
-    mEventList = new ArrayList<EventProxy>(eventMap.size());
-    mEventMap.entrySet()
-      .stream()
-      .map(e -> e.getValue())
-      .collect(Collectors.toList());
-    if (!observableSwitchNameSet.isEmpty())  {
-      mObservableSwitchNameSet = observableSwitchNameSet;
-    }
+    this(factory, context, defaultMarking, null);
   }
 
   public AutomataToWaters(final ProductDESProxyFactory factory,
                           final ProductDESProxy context,
-                          EventProxy defaultMarking)
+                          EventProxy defaultMarking,
+                          final Map<EventProxy, EventProxy> forwardsMap)
   {
+
+
     mFactory = factory;
     EventProxy forbiddenMarking = null;
     final Collection<EventProxy> events = context.getEvents();
@@ -150,6 +143,8 @@ public class AutomataToWaters
     mEventMap = new HashMap<String,EventProxy>(numEvents);
     for (final EventProxy event : events) {
       final String name = event.getName();
+      final String mappedName = forwardsMap != null
+        ? forwardsMap.getOrDefault(event, event).getName() : name;
       if (event.getKind() == EventKind.PROPOSITION) {
         if (name.equals(EventDeclProxy.DEFAULT_MARKING_NAME)) {
           if (defaultMarking == null) {
@@ -160,7 +155,7 @@ public class AutomataToWaters
         }
       }
       mEventList.add(event);
-      mEventMap.put(name, event);
+      mEventMap.put(mappedName, event);
     }
     mUsingFakeMarking = defaultMarking == null;
     mMarkedProposition = mUsingFakeMarking ?
@@ -285,10 +280,8 @@ public class AutomataToWaters
   //# Auxiliary Methods
   private EventProxy createEvent(final String name,
                                  final EventKind kind,
-                                 boolean observable)
+                                 final boolean observable)
   {
-    observable = mObservableSwitchNameSet == null ? observable
-      : mObservableSwitchNameSet.contains(name) ^ observable;
     final EventProxy found = mEventMap.get(name);
     if (found == null) {
       final EventProxy event =
@@ -296,7 +289,7 @@ public class AutomataToWaters
       mEventMap.put(name, event);
       mEventList.add(event);
       return event;
-    } else if (found.getKind() == kind && found.isObservable() == observable) {
+    } else if (found.getKind() == kind) {
       return found;
     } else {
       final String msg = "Inconsistent occurrences of event '" + name + "'!";
@@ -410,6 +403,5 @@ public class AutomataToWaters
 
   private List<EventProxy> mEventList;
   private Map<String,EventProxy> mEventMap;
-  private Set<String> mObservableSwitchNameSet = null;
 
 }

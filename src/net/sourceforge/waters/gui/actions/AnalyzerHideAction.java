@@ -41,7 +41,9 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -365,6 +367,11 @@ public class AnalyzerHideAction extends WatersAnalyzerAction
         final String newName = model.getUnusedName(result.getName());
         result.setName(newName);
         model.insertRow(result);
+        final List<AutomatonProxy> list = Arrays.asList(new AutomatonProxy[] {result});
+        final AutomataTable table = panel.getAutomataTable();
+        panel.getAutomataTable().scrollToVisible(list);
+        table.clearSelection();
+        table.addToSelection(list);
       } else {
         model.replaceAutomaton(aut, result);
       }

@@ -33,7 +33,9 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
@@ -89,6 +91,15 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
 
 
   //#########################################################################
+  //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+  @Override
+  protected String getOptionPrefix()
+  {
+    return OPTION_PREFIX;
+  }
+
+
+  //#########################################################################
   //# Inner Class SynthesisPopUpDialog
   private class SynthesisPopUpDialog extends WatersAnalyzeDialog
   {
@@ -114,6 +125,11 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
         final WatersAnalyzerPanel panel = context.getWatersAnalyzerPanel();
         final AutomataTableModel model = panel.getAutomataTableModel();
         model.insertRows(supervisors);
+        final AutomataTable table = panel.getAutomataTable();
+        final List<AutomatonProxy> list = new ArrayList<>(supervisors);
+        panel.getAutomataTable().scrollToVisible(list);
+        table.clearSelection();
+        table.addToSelection(list);
       }
     }
 
@@ -167,6 +183,7 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Supervisor Synthesis";
+  private static final String OPTION_PREFIX = "analysis.synthesis";
 
   private static final long serialVersionUID = -622825450495392984L;
 

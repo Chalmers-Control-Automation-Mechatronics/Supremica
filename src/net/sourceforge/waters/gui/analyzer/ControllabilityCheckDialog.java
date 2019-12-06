@@ -82,6 +82,14 @@ public class ControllabilityCheckDialog extends ParametrisedAnalysisDialog
      return (ControllabilityChecker) super.getAnalyzer();
    }
 
+   //#########################################################################
+   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
+   @Override
+   protected String getOptionPrefix()
+   {
+     return OPTION_PREFIX;
+   }
+
 
   //#########################################################################
   //# Inner Class ControllabilityCheckPopUpDialog
@@ -128,6 +136,7 @@ public class ControllabilityCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Controllability Check";
+  private static final String OPTION_PREFIX = "analysis.controllability";
 
   private static final long serialVersionUID = -4439172093952073552L;
 
