@@ -2,8 +2,6 @@ package org.supremica.gui;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 import net.sourceforge.waters.model.analysis.Abortable;
 
@@ -11,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.supremica.automata.Automata;
-import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.algorithms.MinimalCutSetsSynthesizer;
 import org.supremica.gui.ide.actions.IDEActionInterface;
 import org.supremica.util.ActionTimer;
@@ -37,7 +34,6 @@ public class FTMinimalCutSetComputationWorker extends Thread
   private ExecutionDialog executionDialog;
   private boolean abortRequested = false;
   private ActionTimer timer;
-  private List<Set<LabeledEvent>> result;
 
   public FTMinimalCutSetComputationWorker(final IDEActionInterface gui,
                                           final Automata theAutomata)

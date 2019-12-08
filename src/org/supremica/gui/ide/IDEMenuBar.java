@@ -58,9 +58,9 @@ import net.sourceforge.waters.gui.actions.AnalyzerCountStatesAction;
 import net.sourceforge.waters.gui.actions.AnalyzerDeadlockCheckAction;
 import net.sourceforge.waters.gui.actions.AnalyzerHideAction;
 import net.sourceforge.waters.gui.actions.AnalyzerLanguageInclusionCheckAction;
+import net.sourceforge.waters.gui.actions.AnalyzerSimplifierAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynchronousProductAction;
 import net.sourceforge.waters.gui.actions.AnalyzerSynthesisAction;
-import net.sourceforge.waters.gui.actions.AnalyzerSimplifierAction;
 import net.sourceforge.waters.gui.actions.AnalyzerWorkbenchAction;
 import net.sourceforge.waters.gui.actions.GraphLayoutAction;
 import net.sourceforge.waters.gui.actions.GraphSaveEPSAction;
@@ -621,10 +621,6 @@ public class IDEMenuBar
       final Action openRas = actions.getAction(OpenRASAction.class);
       menu.add(openRas);
     }
-    final Action openFT = actions.getAction(OpenFTAction.class);
-    menu.add(openFT);
-    final Action openFTSpec = actions.getAction(OpenFTSpecAction.class);
-    menu.add(openFTSpec);
     final Action save = actions.getAction(SaveAction.class);
     menu.add(save);
     final Action saveas = actions.getAction(SaveAsAction.class);
@@ -634,6 +630,10 @@ public class IDEMenuBar
     menu.addSeparator();
     final Action importAction = actions.getAction(ImportAction.class);
     menu.add(importAction);
+    final Action openFT = actions.getAction(OpenFTAction.class);
+    menu.add(openFT);
+    final Action openFTSpec = actions.getAction(OpenFTSpecAction.class);
+    menu.add(openFTSpec);
     //mFileMenu.add(mIDE.getActions().editorPrintAction.getMenuItem());
     final Action epsprint = actions.getAction(GraphSaveEPSAction.class);
     menu.add(epsprint);

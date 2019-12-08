@@ -32,8 +32,8 @@ public class OpenFTAction extends IDEAction
   {
     super(ide);
     putValue(Action.NAME, "Import FT model ...");
-    putValue(Action.SHORT_DESCRIPTION, "Open/build a FT module");
-    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_OPEN);
+    putValue(Action.SHORT_DESCRIPTION, "Open/build an FT module");
+    putValue(Action.SMALL_ICON, IconAndFontLoader.ICON_TOOL_IMPORT);
   }
 
   //# Interface java.awt.event.ActionListener
@@ -59,8 +59,7 @@ public class OpenFTAction extends IDEAction
       final ModuleSubject module = factory.createModuleProxy(name, null);
 
       /* The actual code to build FT */
-      FTEFABuilder ftBuilder = null;
-      ftBuilder = new FTEFABuilder(selectedFT, module);
+      new FTEFABuilder(selectedFT, module);
 
       final DocumentContainerManager cmanager =
         ide.getDocumentContainerManager();

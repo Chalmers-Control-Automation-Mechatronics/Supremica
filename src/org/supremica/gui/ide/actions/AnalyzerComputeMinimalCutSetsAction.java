@@ -25,6 +25,7 @@ import org.supremica.gui.ide.SupremicaAnalyzerPanel;
 public class AnalyzerComputeMinimalCutSetsAction
   extends IDEAction
 {
+  @SuppressWarnings("unused")
   private final Logger logger =
     LogManager.getLogger(AnalyzerComputeMinimalCutSetsAction.class);
 
