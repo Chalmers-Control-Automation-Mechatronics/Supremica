@@ -49,11 +49,13 @@ import net.sourceforge.waters.analysis.abstraction.OnlySilentOutgoingTRSimplifie
 import net.sourceforge.waters.analysis.abstraction.SelfloopSubsumptionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SilentIncomingTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.SpecialEventsTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.SubsetConstructionTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TRSimplificationListener;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TauLoopRemovalTRSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.abstraction.TransitionRemovalTRSimplifier;
+import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 
 /**
@@ -310,6 +312,51 @@ public class ChainBuilder
     chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
 
     chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_PropositionMask);
+
+    return chain;
+  }
+
+  public static ChainTRSimplifier createProjectionChain() {
+    final ChainTRSimplifier startedAbstractionChain = startAbstractionChain(null);
+    return createProjectionChain(startedAbstractionChain, 0, 0, false, null);
+  }
+
+  public static ChainTRSimplifier createProjectionChain
+    (final ChainTRSimplifier startedAbstractionChain,
+     final int stateLimit,
+     final int transitionLimit,
+     final boolean selfloopOnlyEventsUsed,
+     final TRSimplificationListener listener) {
+    final ChainTRSimplifier chain = startedAbstractionChain;
+    final TransitionRelationSimplifier loopRemover =
+      new TauLoopRemovalTRSimplifier();
+    loopRemover.setSimplificationListener(listener);
+    chain.add(loopRemover);
+    final SubsetConstructionTRSimplifier subset =
+      new SubsetConstructionTRSimplifier();
+    chain.add(subset);
+    subset.setStateLimit(stateLimit);
+    subset.setTransitionLimit(transitionLimit);
+    subset.setSimplificationListener(listener);
+    final ObservationEquivalenceTRSimplifier bisimulator =
+      new ObservationEquivalenceTRSimplifier();
+    final ObservationEquivalenceTRSimplifier.Equivalence eq =
+      selfloopOnlyEventsUsed ?
+      ObservationEquivalenceTRSimplifier.Equivalence.BISIMULATION :
+      ObservationEquivalenceTRSimplifier.Equivalence.DETERMINISTIC_MINSTATE;
+    bisimulator.setEquivalence(eq);
+    bisimulator.setTransitionLimit(transitionLimit);
+    bisimulator.setSimplificationListener(listener);
+    chain.add(bisimulator);
+    chain.setPreferredOutputConfiguration
+      (ListBufferTransitionRelation.CONFIG_SUCCESSORS);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_Equivalence);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_TransitionRemovalMode);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_ObservationEquivalence_MarkingMode);
+
+    chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_DefaultMarkingID);
+    chain.blacklistOption(TRSimplifierFactory.OPTION_AbstractMarking_PreconditionMarkingID);
 
     return chain;
   }

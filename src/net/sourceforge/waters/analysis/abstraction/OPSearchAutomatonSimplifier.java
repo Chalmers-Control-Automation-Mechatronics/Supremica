@@ -59,10 +59,12 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sourceforge.waters.analysis.tr.EventEncoding;
+import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.IntListBuffer;
 import net.sourceforge.waters.analysis.tr.ListBufferTransitionRelation;
 import net.sourceforge.waters.analysis.tr.MemStateProxy;
 import net.sourceforge.waters.analysis.tr.StateEncoding;
+import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
 import net.sourceforge.waters.analysis.tr.TRPartition;
 import net.sourceforge.waters.analysis.tr.TransitionIterator;
 import net.sourceforge.waters.analysis.tr.WatersLongHashingStrategy;
@@ -290,6 +292,21 @@ public class OPSearchAutomatonSimplifier
     setUpStronglyConnectedComponents();
     mOPSearchPhase = false;
     setUpVerifier();
+    if (mHiddenEvents == null && getInputAutomaton() instanceof TRAutomatonProxy) {
+      mHiddenEvents = new THashSet<>();
+      final TRAutomatonProxy trAut = (TRAutomatonProxy) getInputAutomaton();
+      final EventEncoding enc = trAut.getEventEncoding();
+      for (final EventProxy event : trAut.getEvents()) {
+        if (enc.getTauEvent().equals(event)) {
+          mHiddenEvents.add(event);
+        }
+        final int code = enc.getEventCode(event);
+        final byte status = enc.getProperEventStatus(code);
+        if (EventStatus.isLocalEvent(status)) {
+          mHiddenEvents.add(event);
+        }
+      }
+    }
   }
 
   @Override

@@ -40,6 +40,7 @@ import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -87,17 +88,17 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
               "-oeqt",
               true));
     db.add(new BooleanOption
-             (OPTION_SupremicaAutomatonBuilder_IgnoreMarking,
-              "Ignore marking of states",
-              "",//TODO
-              "-ignorem",
-              false));
-    db.add(new BooleanOption
            (OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal,
             "Treat unobservable events as local",
             "",//TODO
             "-uolocal",
             false));
+    db.add(new PropositionOption
+           (OPTION_SupremicaAutomatonBuilder_DefaultMarkingID,
+            "Marking proposition",
+            "Default marking used for nonblocking verification or synthesis.",
+            "-marking",
+            PropositionOption.DefaultKind.ALLOW_NULL));
   }
 
 
@@ -181,9 +182,9 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
   //# Class Constants
   public static final String OPTION_SupremicaAutomatonBuilder_AlsoTransitions =
     "SupremicaAutomatonBuilder.AlsoTransitions";
-  public static final String OPTION_SupremicaAutomatonBuilder_IgnoreMarking =
-    "SupremicaAutomatonBuilder.IgnoreMarking";
   public static final String OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal =
     "SupremicaAutomatonBuilder.TreatUnobservableEventsAsLocal";
+  public static final String OPTION_SupremicaAutomatonBuilder_DefaultMarkingID =
+    "SupremicaAutomatonBuilder.DefaultID";
 
 }

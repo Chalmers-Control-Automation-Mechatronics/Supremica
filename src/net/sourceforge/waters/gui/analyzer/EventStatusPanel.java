@@ -128,6 +128,10 @@ public class EventStatusPanel extends JScrollPane
         else {
           final boolean current = (boolean) mTable.getModel().getValueAt(r, c);
           mTable.getModel().setValueAt(!current, r, c);
+          if (c == 1) {
+            mTable.getModel().setValueAt(!current, r, c+1);
+            mTable.getModel().setValueAt(!current, r, c+2);
+          }
         }
       }
     });

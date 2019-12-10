@@ -33,15 +33,13 @@
 
 package net.sourceforge.waters.gui.options;
 
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -115,7 +113,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     constraints.fill = GridBagConstraints.HORIZONTAL;
     constraints.anchor = GridBagConstraints.CENTER;
     constraints.weightx = 1.0;
-    constraints.weighty = 0.0;
+    constraints.weighty = 1.0;
 
     //Family selector combo box
     final JLabel familyComboboxLabel = new JLabel("Family");
@@ -156,12 +154,10 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     mAnalyzerComboBox.addActionListener(algorithmChanged);
     mAnalyzerComboBox.setRenderer(new ComboboxToolTipRenderer(300));
 
-    final ParametrisedSimplifierDialog dialog = this;
-
     //Description
     mDescriptionTextPane = new JTextPane();
     mDescriptionTextPane.setContentType("text/html");
-    mDescriptionTextPane.setBackground(new Color(0, 0, 0, 0));
+    mDescriptionTextPane.setBackground(getBackground());
     //Prevent selection
     for (final MouseListener l : mDescriptionTextPane
       .getListeners(MouseListener.class)) {
@@ -170,56 +166,49 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
     //Selection panel
     final JPanel selectionPanel = new RaisedDialogPanel();
-    selectionPanel.addComponentListener(new ComponentListener() {
-
-      @Override
-      public void componentShown(final ComponentEvent e) {}
-
-      @Override
-      public void componentResized(final ComponentEvent e)
-      {
-        if (mDescriptionTextToBeSet != null) {
-          final int width = e.getComponent().getSize().width - 2;
-          final String text = "<body width=" + width
-            + " style=\"text-align:justify\">"
-            + mDescriptionTextToBeSet + "</body>";
-          mDescriptionTextToBeSet = null;
-          mDescriptionTextPane.setText(text);
-          mDescriptionTextPane.setVisible(true);
-          dialog.pack();
-        }
-      }
-
-      @Override
-      public void componentMoved(final ComponentEvent e) {}
-
-      @Override
-      public void componentHidden(final ComponentEvent e) {}
-    });
-
     selectionPanel.setLayout(new GridBagLayout());
+    constraints.weighty = 1.0f;
+    constraints.fill = GridBagConstraints.BOTH;
     add(selectionPanel, constraints);
     final GridBagConstraints c = new GridBagConstraints();
     c.fill = GridBagConstraints.HORIZONTAL;
     c.gridx = 0;
     c.gridy = 0;
     c.insets.right = 10;
+    c.weightx = 0.0f;
+    c.weightx = 0;
     selectionPanel.add(familyComboboxLabel, c);
     c.gridx++;
     c.insets.right = 0;
+    c.weightx = 1.0f;
     selectionPanel.add(mFamilyComboBox, c);
     c.gridx = 0;
     c.gridy++;
     c.insets.right = 10;
+    c.weightx = 0.0f;
     selectionPanel.add(algorithmComboboxLabel, c);
     c.gridx++;
     c.insets.right = 0;
+    c.weightx = 1.0f;
     selectionPanel.add(mAnalyzerComboBox, c);
     c.gridx = 0;
     c.gridy++;
     c.gridwidth = 2;
     c.insets.top = 5;
-    selectionPanel.add(mDescriptionTextPane, c);
+    c.weightx = 1.0f;
+    c.weighty = 1.0f;
+    c.fill = GridBagConstraints.BOTH;
+    final JScrollPane scrollDescription = new JScrollPane(mDescriptionTextPane) {
+      @Override
+      public Dimension getPreferredSize()
+      {
+        final Dimension d = super.getPreferredSize();
+        d.width = 0;
+        return d;
+      }
+      private static final long serialVersionUID = -7065386236668370127L;
+    };
+    selectionPanel.add(scrollDescription, c);
 
 
     // Parameter list
@@ -229,7 +218,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final JPanel scrollPanel = new RaisedDialogPanel(0);
     scrollPanel.setLayout(new GridBagLayout());
     constraints.fill = GridBagConstraints.BOTH;
-    constraints.weighty = 1.0;
+    constraints.weighty = 4.0;
     scrollPanel.add(scroll, constraints);
     add(scrollPanel, constraints);
 
@@ -301,9 +290,10 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
        true);
     params.add(mKeepOriginalOption);
 
-    mDescriptionTextToBeSet = creator.getDescription();
-    mDescriptionTextPane.setVisible(false);
-    mDescriptionTextPane.setToolTipText(creator.getDescription());
+    final String text = "<body style='text-align:justify'>"
+      + creator.getDescription() + "</body>";
+    mDescriptionTextPane.setText(text);
+    mDescriptionTextPane.setCaretPosition(0);
 
     updateParameterList(params);
   }
@@ -467,8 +457,6 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
   private AutomatonBuilder mCurrentAnalyzer;
   private final List<OptionPanel<?>> mCurrentParameterPanels;
-
-  private String mDescriptionTextToBeSet;
 
 
   //#########################################################################

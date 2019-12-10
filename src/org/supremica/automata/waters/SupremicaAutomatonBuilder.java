@@ -41,6 +41,7 @@ import java.util.Map;
 import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.EventEncoding;
 import net.sourceforge.waters.analysis.tr.EventStatus;
 import net.sourceforge.waters.analysis.tr.TRAutomatonProxy;
@@ -51,13 +52,16 @@ import net.sourceforge.waters.model.analysis.des.AutomatonResult;
 import net.sourceforge.waters.model.analysis.des.DefaultAutomatonResult;
 import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.base.ComponentKind;
+import net.sourceforge.waters.model.base.EventKind;
 import net.sourceforge.waters.model.des.AutomatonProxy;
 import net.sourceforge.waters.model.des.EventProxy;
 import net.sourceforge.waters.model.des.ProductDESProxy;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
+import org.supremica.automata.Alphabet;
 import org.supremica.automata.Automata;
 import org.supremica.automata.Automaton;
+import org.supremica.automata.LabeledEvent;
 import org.supremica.automata.IO.AutomataToWaters;
 import org.supremica.automata.algorithms.EquivalenceRelation;
 import org.supremica.automata.algorithms.minimization.AutomatonMinimizer;
@@ -89,13 +93,13 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   {
     final List<Option<?>> options = new LinkedList<>();
     final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
+    if (rel != EquivalenceRelation.CONFLICTEQUIVALENCE) {
+      db.append(options, SupremicaSimplifierFactory.
+                OPTION_SupremicaAutomatonBuilder_DefaultMarkingID);
+    }
     if (rel != EquivalenceRelation.LANGUAGEEQUIVALENCE) {
       db.append(options, SupremicaSimplifierFactory.
                 OPTION_SupremicaAutomatonBuilder_AlsoTransitions);
-    }
-    if (rel != EquivalenceRelation.CONFLICTEQUIVALENCE) {
-      db.append(options, SupremicaSimplifierFactory.
-                OPTION_SupremicaAutomatonBuilder_IgnoreMarking);
     }
     db.append(options, SupremicaSimplifierFactory.
               OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal);
@@ -110,9 +114,10 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
       final BooleanOption propOption = (BooleanOption) option;
       mMinimizationOptions.setAlsoTransitions(propOption.getValue());
     } else if (option.hasID(SupremicaSimplifierFactory.
-                            OPTION_SupremicaAutomatonBuilder_IgnoreMarking)) {
-      final BooleanOption propOption = (BooleanOption) option;
-      mMinimizationOptions.setIgnoreMarking(propOption.getValue());
+                            OPTION_SupremicaAutomatonBuilder_DefaultMarkingID)) {
+      final PropositionOption propOption = (PropositionOption) option;
+      mDefaultMarking = propOption.getValue();
+      mMinimizationOptions.setIgnoreMarking(mDefaultMarking == null);
     } else if (option.hasID(SupremicaSimplifierFactory.
                             OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal)) {
       final BooleanOption propOption = (BooleanOption) option;
@@ -142,22 +147,22 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
       final AutomatonMinimizer minimizer = new AutomatonMinimizer(aut);
 
       final ProductDESProxy context = getModel();
-      final EventProxy defaultMarking = null;//TODO
+
+      createAlphabet(forwardsMap);
 
       try {
         final Automaton newAut = minimizer
           .getMinimizedAutomaton(mMinimizationOptions);
         newAut.setName(mOutputName);
         final AutomataToWaters importer =
-          new AutomataToWaters(mFactory, context, defaultMarking, forwardsMap);
+          new AutomataToWaters(mFactory, context, mDefaultMarking, forwardsMap);
         mResult = importer.convertAutomaton(newAut);
         final AutomatonResult result = getAnalysisResult();
         result.setComputedAutomaton(mResult);
         return true;
       }
       catch (final Exception e) {
-        //TODO
-        throw new AnalysisException(e);
+        throw new AnalysisException(e.getMessage(), e);
       }
     }
     finally {
@@ -240,87 +245,76 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   //#########################################################################
   //# Auxiliary Methods
   public Map<EventProxy, EventProxy> createForwardsMapping() throws AnalysisException {
-    final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
-    final boolean tauCU = (rel == EquivalenceRelation.SUPERVISIONEQUIVALENCE
-      || rel == EquivalenceRelation.SYNTHESISABSTRACTION);
-
+//    final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
+//    final boolean tauCU = (rel == EquivalenceRelation.SUPERVISIONEQUIVALENCE
+//      || rel == EquivalenceRelation.SYNTHESISABSTRACTION);
+    System.out.println("=====================");
+    System.out.println("TUAL: " + mTreatUnobservableEventsAsLocal);
     final AutomatonProxy aut = getModel()
       .getAutomata()
       .iterator()
       .next();
 
+
     final Map<EventProxy, EventProxy> eventMap = new HashMap<>();
-    if (aut instanceof TRAutomatonProxy) {
 
-      final String tau =
-        Config.MINIMIZATION_SILENT_EVENT_NAME.get();
-      final String tau_c =
-        Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get();
-      final String tau_u =
-        Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get();
+    final String[] reservedNames = new String[] {
+      Config.MINIMIZATION_SILENT_EVENT_NAME.get(),
+      Config.MINIMIZATION_SILENT_CONTROLLABLE_EVENT_NAME.get(),
+      Config.MINIMIZATION_SILENT_UNCONTROLLABLE_EVENT_NAME.get()
+    };
 
-      final Map<String, EventProxy> renameToReservedMap = new HashMap<>();
-      final Map<String, EventProxy> renameFromReservedMap = new HashMap<>();
-      final String[] reservedNames = new String[] { tau, tau_c, tau_u };
-
-      final TRAutomatonProxy trAut = (TRAutomatonProxy) aut;
-      final EventEncoding enc = trAut.getEventEncoding();
-      for (final EventProxy event : aut.getEvents()) {
-
-        final int code = enc.getEventCode(event);
-        if (!tauCU) {
-          if (code == EventEncoding.TAU) {
-            renameToReservedMap.put(tau, event);
-          }
-        }
-        else {
-          final byte status = enc.getProperEventStatus(code);
-          if (EventStatus.isLocalEvent(status)) {
-            if (EventStatus.isControllableEvent(status)) {
-              renameToReservedMap.put(tau_c, event);
-            }
-            else {
-              renameToReservedMap.put(tau_u, event);
-            }
-          }
-        }
-
-        for (final String name : reservedNames) {
-          if (event.getName().equals(name)) renameFromReservedMap.put(name, event);
-        }
-
-      }
-
+    final EventEncoding enc = aut instanceof TRAutomatonProxy
+      ? ((TRAutomatonProxy)aut).getEventEncoding() : null;
+    for (final EventProxy event : aut.getEvents()) {
+      if (event.getKind() == EventKind.PROPOSITION) continue;
+      boolean isReservedName = false;
       for (final String name : reservedNames) {
-        //An event which must be renamed to a reserved name
-        final EventProxy ev = renameToReservedMap.get(name);
-        //An event which must be renamed from a reserved name
-        final EventProxy en = renameFromReservedMap.get(name);
-        if (ev == en) {
-          if (ev != null) {
-            addReplacementEventToMap(eventMap, ev, name, false);
-          }
-        } else {
-          if (ev != null) {
-            addReplacementEventToMap(eventMap, ev, name, false);
-          }
-          if (en != null && !renameToReservedMap.containsValue(en)) {
-            final String newName = findUnusedEventName(TEMP+name, aut);
-            addReplacementEventToMap(eventMap, en, newName, true);
-          }
+        if (event.getName().equals(name)) {
+          isReservedName = true;
+          break;
         }
+      }
+      final String newName = isReservedName
+        ? findUnusedEventName(TEMP+event.getName(), aut)
+        : event.getName();
+
+      if (enc != null && !mTreatUnobservableEventsAsLocal) {
+        final int code = enc.getEventCode(event);
+        final byte status = enc.getProperEventStatus(code);
+        if (EventStatus.isLocalEvent(status)) {
+          System.out.println("Local: "+event.getName());
+          if (isReservedName || event.isObservable()) {
+            addReplacementEventToMap(eventMap, event, newName, false);
+          }
+          continue;
+        }
+        System.out.println("Not local: "+event.getName());
       }
 
       if (mTreatUnobservableEventsAsLocal) {
-        for (final EventProxy event : aut.getEvents()) {
-          if (!event.isObservable() && eventMap.containsKey(event)) {
-            addReplacementEventToMap(eventMap, event, event.getName(), true);
-          }
+        if (isReservedName) {
+          addReplacementEventToMap(eventMap, event, newName, event.isObservable());
         }
+      }
+      else if (isReservedName || !event.isObservable()) {
+        addReplacementEventToMap(eventMap, event, newName, true);
       }
 
     }
     return eventMap;
+  }
+
+  public void createAlphabet(final Map<EventProxy, EventProxy> forwardsMap) {
+    final Alphabet alphabet = new Alphabet();
+    for (final EventProxy event : getModel().getEvents()) {
+      final EventProxy mappedEvent = forwardsMap.getOrDefault(event, event);
+      if (mappedEvent.isObservable()) {
+        alphabet.add(new LabeledEvent(mappedEvent));
+      }
+      System.out.println("Event: "+mappedEvent);
+    }
+    mMinimizationOptions.setTargetAlphabet(alphabet);
   }
 
   public Map<String, EventProxy> createBackwardsMapping(final Map<EventProxy, EventProxy> forwardsMap) {
@@ -354,6 +348,7 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
                                                  currentEvent.getKind(),
                                                  observable);
     eventMap.put(currentEvent, event);
+    System.out.println(currentEvent + " -> " + event);
   }
 
 //#########################################################################
@@ -364,6 +359,7 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
 
   private boolean mSynchronisingOnUnobservableEvents;
   private boolean mTreatUnobservableEventsAsLocal;
+  private EventProxy mDefaultMarking;
   private String mOutputName;
   private ComponentKind mComponentKind;
 

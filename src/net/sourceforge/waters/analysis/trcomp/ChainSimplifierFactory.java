@@ -37,6 +37,7 @@ import java.util.List;
 
 import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
 import net.sourceforge.waters.analysis.abstraction.ChainTRSimplifier;
+import net.sourceforge.waters.analysis.abstraction.OPSearchAutomatonSimplifier;
 import net.sourceforge.waters.analysis.abstraction.ObservationEquivalenceTRSimplifier.Equivalence;
 import net.sourceforge.waters.analysis.abstraction.TRSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.TransitionRelationSimplifier;
@@ -47,6 +48,7 @@ import net.sourceforge.waters.analysis.options.PropositionOption;
 import net.sourceforge.waters.analysis.tr.TRAutomatonBuilder;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
 import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
+import net.sourceforge.waters.model.analysis.kindtranslator.IdenticalKindTranslator;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 import net.sourceforge.waters.model.des.ProductDESProxyFactory;
 
@@ -176,6 +178,24 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
                     "non-&alpha; determinisation, &alpha;-determinisation, " +
                     "and marking saturation.",
                     true));
+    creators.add(new ChainSimplifierCreator
+                 ("PROJ",
+                  "") {//TODO
+      @Override
+      public ChainTRSimplifier create()
+      {
+        return ChainBuilder.createProjectionChain();
+      }
+    });
+    creators.add(new AutomatonSimplifierCreator
+                 ("OP",
+                  "") {//TODO
+      @Override
+      public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory)
+      {
+        return new OPSearchAutomatonSimplifier(factory, IdenticalKindTranslator.getInstance());
+      }
+    });
   }
 
   public static ChainSimplifierFactory getInstance()
