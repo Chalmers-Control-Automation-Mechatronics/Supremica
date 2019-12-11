@@ -57,12 +57,12 @@ public class FTSpecEFABuilder
       bReader = new BufferedReader(fReader);
       String formula = null;
       while((formula = bReader.readLine()) != null) {
-        StringTokenizer st = new StringTokenizer(formula, "->");
+        StringTokenizer st = new StringTokenizer(formula, "CAUSING");
         final String premise = st.nextToken();
         // 1. Assume that the conclusion is always system failure location
         //    others are possible but are not implemented.
         // 2. Only "&" is considered, since "|" can be split.
-        st = new StringTokenizer(premise, "&");
+        st = new StringTokenizer(premise, "AND");
         final String specName =
           FTSpecEFABuilder.SPEC_PREFIX + FTSpecEFABuilder.specCounter;
         spec2Events.put(specName, new HashSet<String>());
