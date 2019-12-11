@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -93,9 +94,9 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected String getOptionPrefix()
+  protected OptionMap getOptionMap()
   {
-    return OPTION_PREFIX;
+    return OptionMap.Synthesis;
   }
 
 
@@ -183,7 +184,6 @@ public class SynthesisDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Supervisor Synthesis";
-  private static final String OPTION_PREFIX = "analysis.synthesis";
 
   private static final long serialVersionUID = -622825450495392984L;
 

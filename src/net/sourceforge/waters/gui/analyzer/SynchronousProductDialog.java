@@ -36,6 +36,7 @@ package net.sourceforge.waters.gui.analyzer;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.options.GUIOptionContext;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -94,9 +95,9 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected String getOptionPrefix()
+  protected OptionMap getOptionMap()
   {
-    return OPTION_PREFIX;
+    return OptionMap.SynchronousProduct;
   }
 
   //#########################################################################
@@ -181,7 +182,6 @@ public class SynchronousProductDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Synchronous Product";
-  private static final String OPTION_PREFIX = "analysis.synchronousproduct";
 
   private static final long serialVersionUID = -5945541495761539710L;
 

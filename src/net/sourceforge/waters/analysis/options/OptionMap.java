@@ -34,12 +34,22 @@
 package net.sourceforge.waters.analysis.options;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
+import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
+import net.sourceforge.waters.model.base.WatersRuntimeException;
+
+import org.supremica.automata.waters.SupremicaSimplifierFactory;
 
 
 /**
@@ -54,16 +64,65 @@ import java.util.stream.Collectors;
  *
  * @author Robi Malik
  */
-public class OptionMap
+public enum OptionMap
 {
+
+  ConflictCheck
+    ("conflictchecker", 0),
+  ControllabilityCheck
+    ("conflictchecker", 0),
+  ControlLoop
+    ("conflictchecker", 0),
+  DeadlockCheck
+    ("conflictchecker", 0),
+  LanguageInclusion
+    ("conflictchecker", 0),
+  StateCounter
+    ("conflictchecker", 0),
+  SynchronousProduct
+    ("conflictchecker", 0),
+  Synthesis
+    ("conflictchecker", 0),
+
+  Simplifier
+    ("simplifier",
+     StepSimplifierFactory.class.getName(),
+     SupremicaSimplifierFactory.class.getName(),
+     ChainSimplifierFactory.class.getName());
 
   //#########################################################################
   //# Constructors
-  public OptionMap()
-  {
+  private OptionMap(final String prefix) {
     mMap = new HashMap<>();
+    //TODO Read
   }
 
+  private OptionMap(final String prefix, final String... classNames) {
+    this(prefix);
+    for (final String className : classNames) {
+      registerOptions(className);
+    }
+  }
+
+  private OptionMap(final String prefix, final int n) {
+    this(prefix);
+    for (final ModelAnalyzerFactoryLoader loader :
+      ModelAnalyzerFactoryLoader.values()) {
+     try {
+       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+       //TODO Check for analyzer
+       //final ModelAnalyzer analyzer = createAnalyzer(factory);
+       //if (analyzer != null) {
+       factory.registerOptions(this);
+       //  mAnalyzerComboBox.addItem(loader);
+       //}
+     } catch (NoClassDefFoundError |
+              ClassNotFoundException |
+              UnsatisfiedLinkError exception) {
+       // skip this factory
+     }
+    }
+  }
 
   //#########################################################################
   //# Simple Access
@@ -107,12 +166,31 @@ public class OptionMap
     }
     return false;
   }
-  
+
   public Set<String> getOptionNames() {
     return mMap.entrySet()
       .stream()
       .map(e -> e.getKey())
       .collect(Collectors.toSet());
+  }
+
+  public void registerOptions(final String className) {
+    try {
+      final ClassLoader loader = getClass().getClassLoader();
+      final Class<?> clazz = loader.loadClass(className);
+      final Method method = clazz.getMethod("getInstance");
+      final Object factory = method.invoke(null);
+      final Method methodRegister = clazz.getMethod("registerOptions", OptionMap.class);
+      methodRegister.invoke(factory, this);
+    } catch (final SecurityException |
+             NoSuchMethodException |
+             IllegalAccessException |
+             InvocationTargetException |
+             ClassCastException |
+             UnsatisfiedLinkError |
+             ClassNotFoundException exception) {
+      throw new WatersRuntimeException(exception);
+    }
   }
 
 

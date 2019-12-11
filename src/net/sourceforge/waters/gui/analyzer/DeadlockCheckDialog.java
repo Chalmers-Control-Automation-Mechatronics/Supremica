@@ -33,6 +33,7 @@
 
 package net.sourceforge.waters.gui.analyzer;
 
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog;
@@ -85,9 +86,9 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Overrides for net.sourceforge.waters.gui.options.ParametrisedAnalysisDialog
   @Override
-  protected String getOptionPrefix()
+  protected OptionMap getOptionMap()
   {
-    return OPTION_PREFIX;
+    return OptionMap.DeadlockCheck;
   }
 
 
@@ -136,7 +137,6 @@ public class DeadlockCheckDialog extends ParametrisedAnalysisDialog
   //#########################################################################
   //# Class Constants
   private static final String TITLE = "Deadlock Check";
-  private static final String OPTION_PREFIX = "analysis.deadlock";
 
   private static final long serialVersionUID = 7587116260533051091L;
 

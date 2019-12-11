@@ -64,7 +64,6 @@ import net.sourceforge.waters.analysis.options.BooleanOption;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.options.OptionRegistry;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
 import net.sourceforge.waters.gui.analyzer.AutomataTable;
 import net.sourceforge.waters.gui.analyzer.AutomataTableModel;
@@ -103,7 +102,7 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
 
-    final OptionMap optionMap = new OptionMap();
+    mOptionDB = OptionMap.Simplifier;
     mCurrentParameterPanels = new LinkedList<>();
 
     final GridBagLayout layout = new GridBagLayout();
@@ -122,11 +121,6 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
     mFamilyComboBox.addItem(ChainSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(StepSimplifierFactory.getInstance());
     mFamilyComboBox.addItem(SupremicaSimplifierFactory.getInstance());
-
-    StepSimplifierFactory.getInstance().registerOptions(optionMap);
-    SupremicaSimplifierFactory.getInstance().registerOptions(optionMap);
-    ChainSimplifierFactory.getInstance().registerOptions(optionMap);
-    mOptionDB = OptionRegistry.getOptionMap(OPTION_PREFIX, optionMap);
 
     final ActionListener familyChanged = new ActionListener() {
       @Override
@@ -461,7 +455,6 @@ public abstract class ParametrisedSimplifierDialog extends JDialog
 
   //#########################################################################
   //# Class Constants
-  private static final String OPTION_PREFIX = "analysis.simplifier";
   private static final long serialVersionUID = -3610355726871200803L;
 
 }

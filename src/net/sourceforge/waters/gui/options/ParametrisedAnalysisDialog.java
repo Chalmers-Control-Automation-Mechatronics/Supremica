@@ -55,7 +55,6 @@ import javax.swing.JScrollPane;
 import net.sourceforge.waters.analysis.options.Option;
 import net.sourceforge.waters.analysis.options.OptionEditor;
 import net.sourceforge.waters.analysis.options.OptionMap;
-import net.sourceforge.waters.analysis.options.OptionRegistry;
 import net.sourceforge.waters.gui.analyzer.WatersAnalyzerPanel;
 import net.sourceforge.waters.gui.dialog.ErrorLabel;
 import net.sourceforge.waters.gui.dialog.WatersAnalyzeDialog;
@@ -91,7 +90,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     final ErrorLabel errorLabel = new ErrorLabel();
     mContext = new GUIOptionContext(panel, this, errorLabel);
 
-    final OptionMap optionMap = new OptionMap();
+    mOptionDB = getOptionMap();
     mCurrentParameterPanels = new LinkedList<>();
 
     final GridBagLayout layout = new GridBagLayout();
@@ -114,7 +113,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
         final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
         final ModelAnalyzer analyzer = createAnalyzer(factory);
         if (analyzer != null) {
-          factory.registerOptions(optionMap);
+//          factory.registerOptions(optionMap);
           mAnalyzerComboBox.addItem(loader);
         }
       } catch (NoClassDefFoundError |
@@ -124,7 +123,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
         // skip this factory
       }
     }
-    mOptionDB = OptionRegistry.getOptionMap(getOptionPrefix(), optionMap);
+//    mOptionDB = OptionRegistry.getOptionMap(getOptionPrefix(), optionMap);
     final ActionListener algorithmChanged = new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent event)
@@ -247,7 +246,7 @@ public abstract class ParametrisedAnalysisDialog extends JDialog
     return mContext.getProductDESProxyFactory();
   }
 
-  protected abstract String getOptionPrefix();
+  protected abstract OptionMap getOptionMap();
 
 
   //#########################################################################
