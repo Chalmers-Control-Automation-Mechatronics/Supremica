@@ -88,17 +88,19 @@ public class SupremicaSimplifierFactory extends AutomatonSimplifierFactory
               "-oeqt",
               true));
     db.add(new BooleanOption
-           (OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal,
-            "Treat unobservable events as local",
-            "",//TODO
-            "-uolocal",
-            false));
+             (OPTION_SupremicaAutomatonBuilder_TreatUnobservableEventsAsLocal,
+              "Treat unobservable events as local",
+              "Consider the unobservable events of the automaton as local " +
+              "as per Supremica semantics. Local events produced by hiding " +
+              "have no significance with this option.",
+              "-unobs",
+              false));
     db.add(new PropositionOption
-           (OPTION_SupremicaAutomatonBuilder_DefaultMarkingID,
-            "Marking proposition",
-            "Default marking used for nonblocking verification or synthesis.",
-            "-marking",
-            PropositionOption.DefaultKind.ALLOW_NULL));
+             (OPTION_SupremicaAutomatonBuilder_DefaultMarkingID,
+              "Marking proposition",
+              "Default marking used for nonblocking verification or synthesis.",
+              "-marking",
+              PropositionOption.DefaultKind.ALLOW_NULL));
   }
 
 

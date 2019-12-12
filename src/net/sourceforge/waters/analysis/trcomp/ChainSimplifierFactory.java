@@ -108,12 +108,12 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
   {
     final List<AutomatonSimplifierCreator> creators =  getSimplifierCreators();
     creators.add(new ChainSimplifierCreator
-               ("OEQ",
-                "An abstraction sequence for efficient simplification by " +
-                "observation equivalence or weak observation equivalence, " +
-                "consisting of special events removal, and &tau;-loop removal " +
-                "before invoking observation equivalence or weak observation " +
-                "equivalence.") {
+                   ("OEQ",
+                    "An abstraction sequence for efficient simplification by " +
+                    "observation equivalence or weak observation equivalence, " +
+                    "consisting of special events removal, and &tau;-loop removal " +
+                    "before invoking observation equivalence or weak observation " +
+                    "equivalence.") {
       @Override
       public ChainTRSimplifier create()
       {
@@ -179,8 +179,12 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
                     "and marking saturation.",
                     true));
     creators.add(new ChainSimplifierCreator
-                 ("PROJ",
-                  "") {//TODO
+                   ("Language Equivalence",
+                    "Compute the minimal deterministic automaton representing " +
+                    "the same language as the automaton being simplified. " +
+                    "It is computed by a sequence of &tau;-loop removal, " +
+                    "subset construction, and Hopcroft's minimisation " +
+                    "algorithm.") {
       @Override
       public ChainTRSimplifier create()
       {
@@ -188,8 +192,11 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
       }
     });
     creators.add(new AutomatonSimplifierCreator
-                 ("OP",
-                  "") {//TODO
+                   ("OP-Search",
+                    "Use the OP-search algorithm to compute a subset of the " +
+                    "local events of the automaton that satisfies the " +
+                    "observer property, and simplify the automaton by " +
+                    "projecting out these event.") {
       @Override
       public AutomatonBuilder createBuilder(final ProductDESProxyFactory factory)
       {
@@ -333,9 +340,9 @@ public class ChainSimplifierFactory extends TRSimplifierFactory
             mSelfloopSubsumption,
             mNonAlphaDeterminisation);
         return simp;
-      } catch(final AnalysisConfigurationException e) {
-        //TODO
-        throw new WatersRuntimeException(e);
+      } catch (final AnalysisConfigurationException exception) {
+        //TODO Declare to throw AnalysisConfigurationException, catch in GUI
+        throw new WatersRuntimeException(exception);
       }
     }
 
