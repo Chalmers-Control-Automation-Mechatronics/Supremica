@@ -49,8 +49,6 @@ import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
 
-import org.supremica.automata.waters.SupremicaSimplifierFactory;
-
 
 /**
  * <P>A collection of available options.</P>
@@ -62,49 +60,53 @@ import org.supremica.automata.waters.SupremicaSimplifierFactory;
  * passed to {@link Configurable} objects, which select the options
  * stored in it.</P>
  *
- * @author Robi Malik
+ * @author Robi Malik, Benjamin Wheeler
  */
 public enum OptionMap
 {
 
   ConflictCheck
-    ("conflictchecker", 0),
+    ("waters.analysis.conflict", 0),
   ControllabilityCheck
-    ("conflictchecker", 0),
+    ("waters.analysis.controllability", 0),
   ControlLoop
-    ("conflictchecker", 0),
+    ("waters.analysis.loop", 0),
   DeadlockCheck
-    ("conflictchecker", 0),
+    ("waters.analysis.deadlock", 0),
   LanguageInclusion
-    ("conflictchecker", 0),
+    ("waters.analysis.languageinclusion", 0),
   StateCounter
-    ("conflictchecker", 0),
+    ("waters.analysis.statecount", 0),
   SynchronousProduct
-    ("conflictchecker", 0),
+    ("waters.analysis.syncprod", 0),
   Synthesis
-    ("conflictchecker", 0),
+    ("waters.analysis.synthesis", 0),
 
   Simplifier
-    ("simplifier",
+    ("waters.analysis.simplification",
      StepSimplifierFactory.class.getName(),
-     SupremicaSimplifierFactory.class.getName(),
+     "org.supremica.automata.waters.SupremicaSimplifierFactory",
      ChainSimplifierFactory.class.getName());
+
 
   //#########################################################################
   //# Constructors
-  private OptionMap(final String prefix) {
+  private OptionMap(final String prefix)
+  {
     mMap = new HashMap<>();
     //TODO Read
   }
 
-  private OptionMap(final String prefix, final String... classNames) {
+  private OptionMap(final String prefix, final String... classNames)
+  {
     this(prefix);
     for (final String className : classNames) {
       registerOptions(className);
     }
   }
 
-  private OptionMap(final String prefix, final int n) {
+  private OptionMap(final String prefix, final int dummy)
+  {
     this(prefix);
     for (final ModelAnalyzerFactoryLoader loader :
       ModelAnalyzerFactoryLoader.values()) {
@@ -123,6 +125,7 @@ public enum OptionMap
      }
     }
   }
+
 
   //#########################################################################
   //# Simple Access
