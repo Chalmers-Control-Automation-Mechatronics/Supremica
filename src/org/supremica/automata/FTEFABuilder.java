@@ -49,10 +49,14 @@ public class FTEFABuilder
   static HashMap<String, String> specialCharRep = new HashMap<>();
   {
     specialCharRep.put(" ", "_");
+    specialCharRep.put(".", "_");
     specialCharRep.put(">", "gt");
     specialCharRep.put(":", "_");
     specialCharRep.put("&", "_and_");
     specialCharRep.put("w/o", "without");
+    specialCharRep.put("(", "_");
+    specialCharRep.put(")", "_");
+    specialCharRep.put("\"", "_");
   }
 
   static public String replaceSpecialChars(final String name) {
@@ -66,6 +70,7 @@ public class FTEFABuilder
 
   private final HashMap<String, BasicEventNode> basicEventName2Node;
   private final HashMap<String, NoBasicEventNode> nonBasicEventName2Node;
+  private final HashMap<String, NoBasicEventNode> annonymousNonBasicEvent2Node;
 
   final static String PREFIX  = "/SystemWeaver4/Items/";
 
@@ -81,6 +86,7 @@ public class FTEFABuilder
     this.ftInXml = ftInXml;
     this.basicEventName2Node = new HashMap<>();
     this.nonBasicEventName2Node = new HashMap<>();
+    this.annonymousNonBasicEvent2Node = new HashMap<>();
 
     logger.info("Parsing the FT file: " + ftInXml.getName() + "...");
     buildInternalFT();
@@ -164,37 +170,72 @@ public class FTEFABuilder
     final String andGateExp = PREFIX + "Item[@sid='2CLD']";
     // read node list for and gates
     try {
-      final NodeList nodeList =
-        (NodeList) xPath.compile(andGateExp).evaluate(xmlDocument,
-                                                      XPathConstants.NODESET);
-      for(int i = 0; i < nodeList.getLength(); i++) {
+      final NodeList nodeList = (NodeList) xPath.compile(andGateExp)
+        .evaluate(xmlDocument, XPathConstants.NODESET);
+      for (int i = 0; i < nodeList.getLength(); i++) {
         // AND item node
         final Node n = nodeList.item(i);
+        // get the id field
+        final String id =
+          n.getAttributes().getNamedItem("id").getFirstChild().getNodeValue();
 
         // Naming the gate is random ...
         final ANDGateNode andGateNode = new ANDGateNode("AND-" + i);
 
+        // The parent of this and gate might be an intermediate event another gate.
+        // In the former case, check if a NoBasicEventNode for the intermediate event
+        // is already instantiated. If not, instantiate one and put the name-object
+        // in the map. In the latter case, a dummy intermediate event has to be created.
+        // The event can be named by the id field (for now).
+
         // get the non basic event (parent) of this gate node
-        final Node nonBasicEventNode = n.getFirstChild().getChildNodes().item(0);
-        final String eventName = nonBasicEventNode.getNodeValue();
-        logger.debug("Non basic event for AND: " + eventName);
-        if (nonBasicEventName2Node.containsKey(eventName)) {
-          final NoBasicEventNode eventNode = nonBasicEventName2Node.get(eventName);
-          eventNode.setGate(andGateNode);
+        final Node parent = n.getFirstChild().getChildNodes().item(0);
+        final String parentName = parent.getNodeValue();
+
+        logger.debug("Parent name is: " + parentName);
+
+        if (parentName.equals("AND")) {
+          logger.debug("Anonymous and gate with id = " + id);
+          if (annonymousNonBasicEvent2Node.containsKey(id)) {
+            final NoBasicEventNode dummyEventNode =
+              annonymousNonBasicEvent2Node.get(id);
+            dummyEventNode.setGate(andGateNode);
+          } else {
+            final NoBasicEventNode dummyEventNode = new NoBasicEventNode(id);
+            dummyEventNode.setGate(andGateNode);
+            annonymousNonBasicEvent2Node.put(id, dummyEventNode);
+          }
         } else {
-          final NoBasicEventNode eventNode = new NoBasicEventNode(eventName);
-          eventNode.setGate(andGateNode);
-          nonBasicEventName2Node.put(eventName, eventNode);
+          final String eventName = parentName;
+          logger.debug("Non basic event for AND: " + eventName);
+          if (nonBasicEventName2Node.containsKey(eventName)) {
+            final NoBasicEventNode eventNode =
+              nonBasicEventName2Node.get(eventName);
+            eventNode.setGate(andGateNode);
+          } else {
+            final NoBasicEventNode eventNode =
+              new NoBasicEventNode(eventName);
+            eventNode.setGate(andGateNode);
+            nonBasicEventName2Node.put(eventName, eventNode);
+          }
         }
 
         // deal with the children of this and gate
         final String partGroups = "PartGroups";
         int k = 0;
         final NodeList children = n.getChildNodes();
-        for(k = 0; k < children.getLength(); k++) {
+        for (k = 0; k < children.getLength(); k++) {
           if (children.item(k).getNodeName().equals(partGroups)) {
             break;
           }
+        }
+        if (k == children.getLength()) {
+          // we assume that a gate w/o child always connects to a intermediate event
+          // in this case, we don't need to consider this gate, and we need to
+          // convert the intermediate event to a basic event
+          nonBasicEventName2Node.remove(parentName);
+          basicEventName2Node.put(parentName, new BasicEventNode(parentName));
+          continue;
         }
         // k is the index of partsGroup
         final Node partGroupsNode = children.item(k);
@@ -204,7 +245,7 @@ public class FTEFABuilder
           // each partGroup
           final Node partGroupNode = partGroupNodes.item(j);
 
-          if(!partGroupNode.getAttributes().getNamedItem("sid")
+          if (!partGroupNode.getAttributes().getNamedItem("sid")
             .getFirstChild().getNodeValue().equals("2IFI"))
             continue;
 
@@ -216,13 +257,36 @@ public class FTEFABuilder
             final Node partNode = partNodes.item(ii);
             final Node nameNode = partNode.getFirstChild();
             final String name = nameNode.getFirstChild().getNodeValue();
-            if (basicEventName2Node.containsKey(name)) {
+            // name can be 1. AND
+            //             2. OR
+            //             3. A basic event name
+            //             4. An intermediate event (has been created or not)
+            // For case 1 and 2, we get the value of attribute id of DefObj node
+            // and retrieve the dummy event node from annonymousNonBasicEvent2Node
+
+            if (name.equals("AND") || name.equals("OR")) {
+              // it seems that 3rd child is DefObj
+              final Node defObjNode =
+                nameNode.getNextSibling().getNextSibling();
+              final Node cidNode =
+                defObjNode.getAttributes().getNamedItem("id");
+              final String cid = cidNode.getFirstChild().getNodeValue();
+              // check the existence of cid in annonymousNonBasicEvent2Node
+              if (annonymousNonBasicEvent2Node.containsKey(cid)) {
+                final NoBasicEventNode dummyEventNode =
+                  annonymousNonBasicEvent2Node.get(cid);
+                andGateNode.addChild(dummyEventNode);
+              } else {
+                final NoBasicEventNode dummyEventNode =
+                  new NoBasicEventNode(cid);
+                andGateNode.addChild(dummyEventNode);
+                annonymousNonBasicEvent2Node.put(cid, dummyEventNode);
+              }
+            } else if (basicEventName2Node.containsKey(name)) {
               andGateNode.addChild(basicEventName2Node.get(name));
-            }
-            else if(nonBasicEventName2Node.containsKey(name)) {
+            } else if (nonBasicEventName2Node.containsKey(name)) {
               andGateNode.addChild(nonBasicEventName2Node.get(name));
-            }
-            else {
+            } else {
               // it is an intermediate event that has not been built
               final NoBasicEventNode nben = new NoBasicEventNode(name);
               andGateNode.addChild(nben);
@@ -231,7 +295,6 @@ public class FTEFABuilder
             logger.debug("AND Child event: " + name);
           }
         }
-
       }
     } catch (final XPathExpressionException exception) {
       exception.printStackTrace();
@@ -248,21 +311,47 @@ public class FTEFABuilder
       for(int i = 0; i < nodeList.getLength(); i++) {
         // OR item node
         final Node n = nodeList.item(i);
+        // get the id field
+        final String id =
+          n.getAttributes().getNamedItem("id").getFirstChild().getNodeValue();
 
         // Naming the gate is random ...
         final ORGateNode orGateNode = new ORGateNode("OR-" + i);
 
+        // The parent of this and gate might be an intermediate event or another gate.
+        // In the former case, check if a NoBasicEventNode for the intermediate event
+        // is already instantiated. If not, instantiate one and put the name-object
+        // in the map. In the latter case, a dummy intermediate event has to be created.
+        // The event can be named by the id field (for now).
+
         // get the non basic event (parent) of this gate node
-        final Node nonBasicEventNode = n.getFirstChild().getChildNodes().item(0);
-        final String eventName = nonBasicEventNode.getNodeValue();
-        logger.debug("Non basic event for OR: " + eventName);
-        if (nonBasicEventName2Node.containsKey(eventName)) {
-          final NoBasicEventNode eventNode = nonBasicEventName2Node.get(eventName);
-          eventNode.setGate(orGateNode);
+        final Node parent = n.getFirstChild().getChildNodes().item(0);
+        final String parentName = parent.getNodeValue();
+
+        if (parentName.equals("OR")) {
+          logger.debug("Anonymous or gate with id = " + id);
+          if (annonymousNonBasicEvent2Node.containsKey(id)) {
+            final NoBasicEventNode dummyEventNode =
+              annonymousNonBasicEvent2Node.get(id);
+            dummyEventNode.setGate(orGateNode);
+          } else {
+            final NoBasicEventNode dummyEventNode = new NoBasicEventNode(id);
+            dummyEventNode.setGate(orGateNode);
+            annonymousNonBasicEvent2Node.put(id, dummyEventNode);
+          }
         } else {
-          final NoBasicEventNode eventNode = new NoBasicEventNode(eventName);
-          eventNode.setGate(orGateNode);
-          nonBasicEventName2Node.put(eventName, eventNode);
+          final String eventName = parentName;
+          logger.debug("Non basic event for OR: " + eventName);
+          if (nonBasicEventName2Node.containsKey(eventName)) {
+            final NoBasicEventNode eventNode =
+              nonBasicEventName2Node.get(eventName);
+            eventNode.setGate(orGateNode);
+          } else {
+            final NoBasicEventNode eventNode =
+              new NoBasicEventNode(eventName);
+            eventNode.setGate(orGateNode);
+            nonBasicEventName2Node.put(eventName, eventNode);
+          }
         }
 
         // deal with the children of this and gate
@@ -274,6 +363,17 @@ public class FTEFABuilder
             break;
           }
         }
+
+        if (k == children.getLength()) {
+          // we assume that a gate w/o child always connects to a intermediate event
+          // in this case, we don't need to consider this gate, and we need to
+          // convert the intermediate event to a basic event
+          nonBasicEventName2Node.remove(parentName);
+          basicEventName2Node.put(parentName,
+                                  new BasicEventNode(parentName));
+          continue;
+        }
+
         // k is the index of partsGroup
         final Node partGroupsNode = children.item(k);
         // find all partGroup nodes under partGroupsNode
@@ -294,7 +394,31 @@ public class FTEFABuilder
             final Node partNode = partNodes.item(ii);
             final Node nameNode = partNode.getFirstChild();
             final String name = nameNode.getFirstChild().getNodeValue();
-            if (basicEventName2Node.containsKey(name)) {
+            // name can be 1. AND
+            //             2. OR
+            //             3. A basic event name
+            //             4. An intermediate event (has been created or not)
+            // For case 1 and 2, we get the value of attribute id of DefObj node
+            // and retrieve the dummy event node from annonymousNonBasicEvent2Node
+            if (name.equals("AND") || name.equals("OR")) {
+              // it seems that 3rd child is DefObj
+              final Node defObjNode =
+                nameNode.getNextSibling().getNextSibling();
+              final Node cidNode =
+                defObjNode.getAttributes().getNamedItem("id");
+              final String cid = cidNode.getFirstChild().getNodeValue();
+              // check the existence of cid in annonymousNonBasicEvent2Node
+              if (annonymousNonBasicEvent2Node.containsKey(cid)) {
+                final NoBasicEventNode dummyEventNode =
+                  annonymousNonBasicEvent2Node.get(cid);
+                orGateNode.addChild(dummyEventNode);
+              } else {
+                final NoBasicEventNode dummyEventNode =
+                  new NoBasicEventNode(cid);
+                orGateNode.addChild(dummyEventNode);
+                annonymousNonBasicEvent2Node.put(cid, dummyEventNode);
+              }
+            } else if (basicEventName2Node.containsKey(name)) {
               orGateNode.addChild(basicEventName2Node.get(name));
             }
             else if(nonBasicEventName2Node.containsKey(name)) {
@@ -360,6 +484,7 @@ public class FTEFABuilder
           // add locations
           final String source = "Init";
           final String target = LOCATION_PREFIX + currNodeName;
+          logger.debug("Target: " + target);
           efa.addState(source, false, true, false);
           if (currNode == root) {
             efa.addState(target, true, false, false);
