@@ -149,6 +149,9 @@ public abstract class Option<T> implements Cloneable
     return mCommandLineOption;
   }
 
+  public boolean isPersistent() {
+    return true;
+  }
 
   //#########################################################################
   //# Value Access

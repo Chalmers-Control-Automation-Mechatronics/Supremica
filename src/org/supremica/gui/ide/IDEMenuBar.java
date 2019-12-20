@@ -83,6 +83,7 @@ import net.sourceforge.waters.gui.actions.InsertParameterBindingAction;
 import net.sourceforge.waters.gui.actions.InsertSimpleComponentAction;
 import net.sourceforge.waters.gui.actions.InsertVariableAction;
 import net.sourceforge.waters.gui.actions.InstantiateModuleAction;
+import net.sourceforge.waters.gui.actions.OptionsAction;
 import net.sourceforge.waters.gui.actions.RecompileAction;
 import net.sourceforge.waters.gui.actions.ShowGraphAction;
 import net.sourceforge.waters.gui.actions.ShowModuleCommentAction;
@@ -763,6 +764,11 @@ public class IDEMenuBar
     final JMenu menu = new JMenu("Configure");
     menu.setMnemonic(KeyEvent.VK_G);
     menu.add(actions.analyzerOptionsAction.getMenuItem());
+    addProperty(Config.INCLUDE_WATERS_ANALYZER);
+    if (Config.INCLUDE_WATERS_ANALYZER.isTrue()) {
+      final Action options = actions.getAction(OptionsAction.class);
+      menu.add(options);
+    }
     add(menu);
   }
 

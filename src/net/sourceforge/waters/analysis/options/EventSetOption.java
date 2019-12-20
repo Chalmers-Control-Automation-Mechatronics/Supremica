@@ -90,6 +90,12 @@ public class EventSetOption extends Option<Set<EventProxy>>
     return context.createEventSetEditor(this);
   }
 
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Inner Enumeration EventKind

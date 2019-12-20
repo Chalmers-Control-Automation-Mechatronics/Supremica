@@ -31,32 +31,14 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
-
-import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-
-import org.supremica.gui.ide.IDE;
-
+package net.sourceforge.waters.gui.options;
 
 /**
- * The action to invoke the controllability check through the editor's
- * Verify menu.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class VerifyControllabilityAction extends WatersVerificationAction
-{
-
-  //#########################################################################
-  //# Constructors
-  protected VerifyControllabilityAction(final IDE ide)
-  {
-    super(ide, AnalysisOperation.CONTROLLABILITY_CHECK);
-  }
-
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -1008097797553564719L;
-
+public interface OptionContainer {
+  public void commitOptions();
+  public void search(SearchQuery query);
+  public boolean selectOption(OptionPanel<?> panel);
 }

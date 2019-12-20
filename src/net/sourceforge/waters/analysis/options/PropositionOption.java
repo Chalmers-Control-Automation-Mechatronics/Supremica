@@ -80,6 +80,12 @@ public class PropositionOption extends Option<EventProxy>
     return context.createPropositionEditor(this);
   }
 
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
+
 
   //#########################################################################
   //# Inner Enumeration DefaultKind

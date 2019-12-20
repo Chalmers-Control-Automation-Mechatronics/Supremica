@@ -33,21 +33,32 @@
 
 package net.sourceforge.waters.analysis.options;
 
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierCreator;
+import net.sourceforge.waters.analysis.abstraction.AutomatonSimplifierFactory;
 import net.sourceforge.waters.analysis.abstraction.StepSimplifierFactory;
 import net.sourceforge.waters.analysis.trcomp.ChainSimplifierFactory;
+import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.EnumFactory;
+import net.sourceforge.waters.model.analysis.ListedEnumFactory;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.model.analysis.des.AutomatonBuilder;
+import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
 import net.sourceforge.waters.model.base.WatersRuntimeException;
+import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.plain.des.ProductDESElementFactory;
 
 
 /**
@@ -66,24 +77,25 @@ public enum OptionMap
 {
 
   ConflictCheck
-    ("waters.analysis.conflict", 0),
+    ("waters.analysis/conflict", AnalysisOperation.CONFLICT_CHECK),
   ControllabilityCheck
-    ("waters.analysis.controllability", 0),
+    ("waters.analysis/controllability", AnalysisOperation.CONTROLLABILITY_CHECK),
   ControlLoop
-    ("waters.analysis.loop", 0),
+    ("waters.analysis/loop", AnalysisOperation.CONTROL_LOOP_CHECK),
   DeadlockCheck
-    ("waters.analysis.deadlock", 0),
+    ("waters.analysis/deadlock", AnalysisOperation.DEADLOCK_CHECK),
   LanguageInclusion
-    ("waters.analysis.languageinclusion", 0),
+    ("waters.analysis/languageinclusion", AnalysisOperation.LANGUAGE_INCLUSION_CHECK),
   StateCounter
-    ("waters.analysis.statecount", 0),
+    ("waters.analysis/statecount", AnalysisOperation.STATE_COUNTER),
   SynchronousProduct
-    ("waters.analysis.syncprod", 0),
+    ("waters.analysis/syncprod", AnalysisOperation.SYNCHRONOUS_PRODUCT),
   Synthesis
-    ("waters.analysis.synthesis", 0),
+    ("waters.analysis/synthesis", AnalysisOperation.SUPERVISOR_SYNTHESIZER),
 
   Simplifier
-    ("waters.analysis.simplification",
+    ("waters.analysis/simplification",
+     0L,
      StepSimplifierFactory.class.getName(),
      "org.supremica.automata.waters.SupremicaSimplifierFactory",
      ChainSimplifierFactory.class.getName());
@@ -91,39 +103,101 @@ public enum OptionMap
 
   //#########################################################################
   //# Constructors
-  private OptionMap(final String prefix)
+  private OptionMap(final String identifier)
   {
+
     mMap = new HashMap<>();
+    mIdentifier = identifier;
+    mTopOptionSubset = new OptionSubset(true);
     //TODO Read
   }
 
-  private OptionMap(final String prefix, final String... classNames)
+  private OptionMap(final String identifier, final String... classNames)
   {
-    this(prefix);
+    this(identifier);
     for (final String className : classNames) {
       registerOptions(className);
     }
   }
 
-  private OptionMap(final String prefix, final int dummy)
-  {
-    this(prefix);
+  private OptionMap(final String identifier,
+                    final long dummy,
+                    final String... classNames) {
+    this(identifier);
+
+    mTopOptionSubset.setTitle("Family");
+
+    for (final String className : classNames) {
+      try {
+        final ClassLoader loader = getClass().getClassLoader();
+        final Class<?> clazz = loader.loadClass(className);
+        final Method method = clazz.getMethod("getInstance");
+        final AutomatonSimplifierFactory factory =
+          (AutomatonSimplifierFactory) method.invoke(null);
+        factory.registerOptions(this);
+
+        final OptionSubset factorySubset = new OptionSubset();
+        mTopOptionSubset.addSubset(factory, factorySubset);
+        factorySubset.setTitle("Simplifier");
+        for (final AutomatonSimplifierCreator creator :
+            factory.getSimplifierCreators()) {
+          final OptionSubset simplifierSubset = new OptionSubset();
+          factorySubset.addSubset(creator, simplifierSubset);
+          simplifierSubset.setDescription(creator.getDescription());
+          for (final Option<?> option : creator.getOptions(this)) {
+            simplifierSubset.getOptionNames().add(option.getID());
+          }
+          final AutomatonBuilder builder = creator.createBuilder
+            (ProductDESElementFactory.getInstance());
+          for (final Option<?> option : builder.getOptions(this)) {
+            simplifierSubset.getOptionNames().add(option.getID());
+          }
+        }
+        factorySubset.buildSelectedObjectOption(null);//TODO Load
+      } catch (NoClassDefFoundError |
+               ClassNotFoundException |
+               UnsatisfiedLinkError |
+               NoSuchMethodException |
+               SecurityException |
+               IllegalAccessException |
+               IllegalArgumentException |
+               InvocationTargetException exception) {
+        // skip this factory
+      }
+      mTopOptionSubset.buildSelectedObjectOption(null);//TODO Load
+    }
+
+  }
+
+  private OptionMap(final String identifier, final AnalysisOperation operation) {
+    this(identifier);
+
+    mTopOptionSubset.setTitle("Algorithm");
+
     for (final ModelAnalyzerFactoryLoader loader :
       ModelAnalyzerFactoryLoader.values()) {
-     try {
-       final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
-       //TODO Check for analyzer
-       //final ModelAnalyzer analyzer = createAnalyzer(factory);
-       //if (analyzer != null) {
-       factory.registerOptions(this);
-       //  mAnalyzerComboBox.addItem(loader);
-       //}
-     } catch (NoClassDefFoundError |
-              ClassNotFoundException |
-              UnsatisfiedLinkError exception) {
-       // skip this factory
-     }
+      try {
+        final ModelAnalyzerFactory factory = loader.getModelAnalyzerFactory();
+
+        final ProductDESProxyFactory desFactory =
+          ProductDESElementFactory.getInstance();
+        final ModelAnalyzer analyzer =
+          operation.createModelAnalyzer(factory, desFactory);
+
+        if (analyzer != null) {
+          final OptionSubset algorithmSubset = new OptionSubset();
+          mTopOptionSubset.addSubset(loader, algorithmSubset);
+          factory.registerOptions(this);
+          for (final Option<?> option : analyzer.getOptions(this)) {
+            algorithmSubset.getOptionNames().add(option.getID());
+          }
+        }
+      } catch (ClassNotFoundException |
+               AnalysisConfigurationException exception) {
+        // skip this factory
+      }
     }
+    mTopOptionSubset.buildSelectedObjectOption(null);
   }
 
 
@@ -138,6 +212,22 @@ public enum OptionMap
   {
     final String id = param.getID();
     mMap.put(id, param);
+  }
+
+  public String getIdentifier() {
+    return mIdentifier;
+  }
+
+  public String getPrefix() {
+    return mIdentifier.replace('/', '.');
+  }
+
+  public boolean hasSubsets() {
+    return mTopOptionSubset.hasSubsets();
+  }
+
+  public OptionSubset getTopOptionSubset() {
+    return mTopOptionSubset;
   }
 
 
@@ -183,7 +273,8 @@ public enum OptionMap
       final Class<?> clazz = loader.loadClass(className);
       final Method method = clazz.getMethod("getInstance");
       final Object factory = method.invoke(null);
-      final Method methodRegister = clazz.getMethod("registerOptions", OptionMap.class);
+      final Method methodRegister = clazz.getMethod("registerOptions",
+                                                    OptionMap.class);
       methodRegister.invoke(factory, this);
     } catch (final SecurityException |
              NoSuchMethodException |
@@ -196,9 +287,140 @@ public enum OptionMap
     }
   }
 
+  public static OptionMap getOptionMap(final String prefix) {
+    for (final OptionMap map : OptionMap.values()) {
+      if (map.getPrefix().equals(prefix)) return map;
+    }
+    return null;
+  }
+
+  public static class OptionSubset
+  {
+
+    private OptionSubset(final boolean root)
+    {
+      this();
+      if (root) mSelectorKey = "subsetselector";
+    }
+
+    private OptionSubset()
+    {
+      mTitle = "";
+      mSubsetMap = new HashMap<>();
+      mSubsetKeys = new LinkedList<>();
+      mOptionNames = new LinkedList<>();
+    }
+
+    public List<Object> getSubsetKeys()
+    {
+      return mSubsetKeys;
+    }
+
+    public OptionSubset getSubset(final Object key)
+    {
+      return mSubsetMap.get(key);
+    }
+
+    public List<String> getOptionNames()
+    {
+      return mOptionNames;
+    }
+
+    public boolean hasSubsets()
+    {
+      return mSubsetMap.size() != 0;
+    }
+
+    public void setTitle(final String title)
+    {
+      mTitle = title;
+    }
+
+    public String getTitle() {
+      return mTitle;
+    }
+
+    public void setDescription(final String description)
+    {
+      mDescription = description;
+    }
+
+    public String getDescription()
+    {
+      return mDescription;
+    }
+
+    public void setSelectorKey(final String key)
+    {
+      mSelectorKey = key;
+    }
+
+    public String getSelectorKey()
+    {
+      return mSelectorKey;
+    }
+
+    private void addSubset(final Object key, final OptionSubset subset)
+    {
+      addSubset(key, subset, v -> v.toString());
+    }
+
+    private void addSubset(final Object key, final OptionSubset subset,
+                           final Function<Object, String> keyTranslator)
+    {
+      mSubsetMap.put(key, subset);
+      mSubsetKeys.add(key);
+      final String selectorKey = getSelectorKey() + '.' +
+        keyTranslator.apply(key);
+      subset.setSelectorKey(selectorKey);
+    }
+
+    private void buildSelectedObjectOption(final Object defaultKey)
+    {
+
+      final EnumFactory<Object> enumFactory =
+        new ListedEnumFactory<Object>() {
+        {
+          for (final Object key : mSubsetKeys) {
+            register(key, key == defaultKey);
+          }
+        }
+      };
+
+      final String id = getSelectorKey();
+      mSelectedObjectOption = new EnumOption<Object>(id,
+        null, null, null,
+        enumFactory);
+    }
+
+    public void setSelected(final Object value)
+    {
+      if (mSelectedObjectOption == null) return;
+      mSelectedObjectOption.setValue(value);
+    }
+
+    public Object getSelected() {
+      return mSelectedObjectOption.getValue();
+    }
+
+    private final Map<Object, OptionSubset> mSubsetMap;
+    private final List<Object> mSubsetKeys;
+    private final List<String> mOptionNames;
+    private String mTitle;
+    private String mDescription;
+    private String mSelectorKey;
+    private EnumOption<Object> mSelectedObjectOption;
+
+  }
+
 
   //#########################################################################
   //# Data Members
-  private final Map<String,Option<?>> mMap;
+  private final Map<String, Option<?>> mMap;
+  private final String mIdentifier;
+
+  private final OptionSubset mTopOptionSubset;
+
+
 
 }

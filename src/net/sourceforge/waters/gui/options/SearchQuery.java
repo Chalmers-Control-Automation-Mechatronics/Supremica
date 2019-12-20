@@ -31,32 +31,72 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.gui.options;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
-
-import org.supremica.gui.ide.IDE;
-
+import java.util.LinkedList;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 
 /**
- * The action to invoke the controllability check through the editor's
- * Verify menu.
  *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class VerifyControllabilityAction extends WatersVerificationAction
+public class SearchQuery
 {
 
-  //#########################################################################
-  //# Constructors
-  protected VerifyControllabilityAction(final IDE ide)
-  {
-    super(ide, AnalysisOperation.CONTROLLABILITY_CHECK);
+  public void setPattern(final String regex) throws PatternSyntaxException {
+    mRegex = regex;
+    mPattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+    startNewSearch();
   }
 
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -1008097797553564719L;
+  public boolean matches(final String value) {
+    return mPattern.matcher(value).find();
+  }
+
+  public OptionPanel<?> getLastMatched() {
+    return mLastMatched;
+  }
+
+  public void addResult(final OptionPanel<?> result) {
+    mResults.add(result);
+  }
+
+  public OptionPanel<?> getResult() {
+    mNewSearch = false;
+    if (mResults == null) return null;
+    if (mResultIndex < 0) {
+      mResults = mResults.stream().distinct().collect(Collectors.toList());
+      mResultIndex = 0;
+    }
+    if (mResults.size() == 0) return null;
+    if (mResultIndex == mResults.size()) mResultIndex = 0;
+    mLastMatched = mResults.get(mResultIndex);
+    mResultIndex++;
+    return mLastMatched;
+  }
+
+  public void startNewSearch() {
+    mNewSearch = true;
+    mResultIndex = -1;
+    mResults = new LinkedList<>();
+  }
+
+  public boolean isNewSearch() {
+    return mNewSearch;
+  }
+
+  public String getRegex() {
+    return mRegex;
+  }
+
+  private String mRegex;
+  private Pattern mPattern;
+  private OptionPanel<?> mLastMatched;
+  private List<OptionPanel<?>> mResults;
+  private int mResultIndex = -1;
+  private boolean mNewSearch = true;
 
 }

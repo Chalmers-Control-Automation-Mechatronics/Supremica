@@ -245,11 +245,6 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
   //#########################################################################
   //# Auxiliary Methods
   public Map<EventProxy, EventProxy> createForwardsMapping() throws AnalysisException {
-//    final EquivalenceRelation rel = mMinimizationOptions.getMinimizationType();
-//    final boolean tauCU = (rel == EquivalenceRelation.SUPERVISIONEQUIVALENCE
-//      || rel == EquivalenceRelation.SYNTHESISABSTRACTION);
-    System.out.println("=====================");
-    System.out.println("TUAL: " + mTreatUnobservableEventsAsLocal);
     final AutomatonProxy aut = getModel()
       .getAutomata()
       .iterator()
@@ -283,13 +278,11 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
         final int code = enc.getEventCode(event);
         final byte status = enc.getProperEventStatus(code);
         if (EventStatus.isLocalEvent(status)) {
-          System.out.println("Local: "+event.getName());
           if (isReservedName || event.isObservable()) {
             addReplacementEventToMap(eventMap, event, newName, false);
           }
           continue;
         }
-        System.out.println("Not local: "+event.getName());
       }
 
       if (mTreatUnobservableEventsAsLocal) {
@@ -312,7 +305,6 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
       if (mappedEvent.isObservable()) {
         alphabet.add(new LabeledEvent(mappedEvent));
       }
-      System.out.println("Event: "+mappedEvent);
     }
     mMinimizationOptions.setTargetAlphabet(alphabet);
   }
@@ -348,7 +340,6 @@ public class SupremicaAutomatonBuilder extends SupremicaModelAnalyzer
                                                  currentEvent.getKind(),
                                                  observable);
     eventMap.put(currentEvent, event);
-    System.out.println(currentEvent + " -> " + event);
   }
 
 //#########################################################################

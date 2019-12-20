@@ -39,6 +39,7 @@ import javax.swing.Action;
 
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.LanguageInclusionChecker;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelVerifier;
@@ -76,7 +77,7 @@ public class VerifyLanguageInclusionAction extends WatersVerificationAction
 
   public VerifyLanguageInclusionAction(final IDE ide, final NamedProxy aut)
   {
-    super(ide);
+    super(ide, AnalysisOperation.LANGUAGE_INCLUSION_CHECK);
     mNamedProxy = aut;
     if (mNamedProxy == null) {
       putValue(Action.NAME, "Check all properties");

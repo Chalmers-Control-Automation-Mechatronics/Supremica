@@ -31,4 +31,10 @@ public class ComponentKindOption extends Option<ComponentKind>
     return context.createComponentKindEditor(this);
   }
 
+  @Override
+  public boolean isPersistent()
+  {
+    return false;
+  }
+
 }

@@ -81,15 +81,21 @@ public class GUIOptionContext implements OptionContext
                    final Component dialogParent,
                    final ErrorDisplay display)
   {
-    mModuleContainer = panel.getModuleContainer();
     mAnalyzerPanel = panel;
     mDialogParent = dialogParent;
     mErrorDisplay = display;
-    final String name = mModuleContainer.getName();
-    final List<AutomatonProxy> automata =
-      panel.getAutomataTable().getOperationArgument();
-    final ProductDESProxyFactory factory = getProductDESProxyFactory();
-    mDES = AutomatonTools.createProductDESProxy(name, automata, factory);
+    if (panel != null ) {
+      mModuleContainer = panel.getModuleContainer();
+      final String name = mModuleContainer.getName();
+      final List<AutomatonProxy> automata =
+        panel.getAutomataTable().getOperationArgument();
+      final ProductDESProxyFactory factory = getProductDESProxyFactory();
+      mDES = AutomatonTools.createProductDESProxy(name, automata, factory);
+    }
+    else {
+      mModuleContainer = null;
+      mDES = null;
+    }
   }
 
 
@@ -202,34 +208,37 @@ public class GUIOptionContext implements OptionContext
   //# Graphics and Icons
   public Icon getEventIcon(final EventProxy event)
   {
-    final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
-    final SourceInfo info = infoMap.get(event);
-    if (info == null) {
-      if (event.getKind() == EventKind.CONTROLLABLE) {
-        if (event.isObservable()) {
-          return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE;
+    if (mModuleContainer != null) {
+      final Map<Object,SourceInfo> infoMap = mModuleContainer.getSourceInfoMap();
+      final SourceInfo info = infoMap.get(event);
+      if (info == null) {
+        if (event.getKind() == EventKind.CONTROLLABLE) {
+          if (event.isObservable()) {
+            return IconAndFontLoader.ICON_CONTROLLABLE_OBSERVABLE;
+          }
+          else {
+            return IconAndFontLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+          }
         }
-        else {
-          return IconAndFontLoader.ICON_CONTROLLABLE_UNOBSERVABLE;
+        else if (event.getKind() == EventKind.UNCONTROLLABLE) {
+          if (event.isObservable()) {
+            return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
+          }
+          else {
+            return IconAndFontLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
+          }
         }
+        else return null;
       }
-      else if (event.getKind() == EventKind.UNCONTROLLABLE) {
-        if (event.isObservable()) {
-          return IconAndFontLoader.ICON_UNCONTROLLABLE_OBSERVABLE;
-        }
-        else {
-          return IconAndFontLoader.ICON_UNCONTROLLABLE_UNOBSERVABLE;
-        }
+      final Proxy proxy = info.getSourceObject();
+      if (!(proxy instanceof EventDeclProxy)) {
+        return null;
       }
-      else return null;
+      final EventDeclProxy decl = (EventDeclProxy) proxy;
+      final ModuleContext context = mModuleContainer.getModuleContext();
+      return context.getIcon(decl);
     }
-    final Proxy proxy = info.getSourceObject();
-    if (!(proxy instanceof EventDeclProxy)) {
-      return null;
-    }
-    final EventDeclProxy decl = (EventDeclProxy) proxy;
-    final ModuleContext context = mModuleContainer.getModuleContext();
-    return context.getIcon(decl);
+    else return null;
   }
 
 

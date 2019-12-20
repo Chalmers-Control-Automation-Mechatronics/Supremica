@@ -37,10 +37,13 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import net.sourceforge.waters.analysis.options.Option;
+import net.sourceforge.waters.analysis.options.OptionMap;
 import net.sourceforge.waters.gui.compiler.CompilationObserver;
 import net.sourceforge.waters.gui.dialog.WatersVerificationDialog;
 import net.sourceforge.waters.gui.observer.EditorChangedEvent;
 import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzer;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
 import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactoryLoader;
@@ -69,7 +72,13 @@ public abstract class WatersVerificationAction
   //# Constructor
   protected WatersVerificationAction(final IDE ide)
   {
+    this(ide, null);
+  }
+
+  protected WatersVerificationAction(final IDE ide, final AnalysisOperation operation)
+  {
     super(ide);
+    mOperation = operation;
     ide.attach(this);
     putValue(Action.NAME, getCheckName() + " check");
     putValue(Action.SHORT_DESCRIPTION,
@@ -144,8 +153,18 @@ public abstract class WatersVerificationAction
   ModelAnalyzerFactory getModelAnalyzerFactory()
     throws ClassNotFoundException
   {
-    final ModelAnalyzerFactoryLoader loader =
-      Config.GUI_ANALYZER_USED_FACTORY.get();
+    final ModelAnalyzerFactoryLoader loader;
+    if (Config.INCLUDE_WATERS_ANALYZER.isTrue() && mOperation != null) {
+      final String optionMapName =
+        mOperation.getOptionMapPrefix();
+      loader = (ModelAnalyzerFactoryLoader) OptionMap
+        .getOptionMap(optionMapName)
+        .getTopOptionSubset()
+        .getSelected();
+    } else {
+      loader = Config.GUI_ANALYZER_USED_FACTORY.get();
+    }
+
     return loader.getModelAnalyzerFactory();
   }
 
@@ -170,12 +189,37 @@ public abstract class WatersVerificationAction
 
   //#########################################################################
   // # Abstract Methods
-  protected abstract String getCheckName();
-  protected abstract String getFailureDescription();
-  protected abstract String getSuccessDescription();
-  protected abstract ModelVerifier createModelVerifier
-    (ModelAnalyzerFactory factory, ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException;
+  protected String getCheckName()
+  {
+    return mOperation.getAnalysisName();
+  }
+
+  protected String getFailureDescription()
+  {
+    return mOperation.getFailureDescription();
+  }
+
+  protected String getSuccessDescription()
+  {
+    return mOperation.getSuccessDescription();
+  }
+
+  protected ModelVerifier createModelVerifier
+    (final ModelAnalyzerFactory factory,
+     final ProductDESProxyFactory desFactory)
+    throws AnalysisConfigurationException
+  {
+    final ModelVerifier verifier = (ModelVerifier)
+      mOperation.createModelAnalyzer(factory, desFactory);
+    final String prefix = mOperation.getOptionMapName().replace('/', '.');
+    final OptionMap map = OptionMap.getOptionMap(prefix);
+    if (map != null && verifier != null) {
+      for (final Option<?> option : verifier.getOptions(map)) {
+        if (option.isPersistent()) verifier.setOption(option);
+      }
+    }
+    return verifier;
+  }
 
 
   //#########################################################################
@@ -224,6 +268,7 @@ public abstract class WatersVerificationAction
     private static final long serialVersionUID = -3327360941008729348L;
   }
 
+  private final AnalysisOperation mOperation;
 
   //#########################################################################
   //# Class Constants

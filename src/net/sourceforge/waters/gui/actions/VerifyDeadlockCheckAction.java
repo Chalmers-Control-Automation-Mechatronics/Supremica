@@ -33,10 +33,7 @@
 
 package net.sourceforge.waters.gui.actions;
 
-import net.sourceforge.waters.model.analysis.AnalysisConfigurationException;
-import net.sourceforge.waters.model.analysis.des.ModelAnalyzerFactory;
-import net.sourceforge.waters.model.analysis.des.ModelVerifier;
-import net.sourceforge.waters.model.des.ProductDESProxyFactory;
+import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
 
 import org.supremica.gui.ide.IDE;
 
@@ -54,38 +51,8 @@ public class VerifyDeadlockCheckAction extends WatersVerificationAction
   //# Constructor
   protected VerifyDeadlockCheckAction(final IDE ide)
   {
-    super(ide);
+    super(ide, AnalysisOperation.DEADLOCK_CHECK);
   }
-
-
-  //#########################################################################
-  //# Overrides for net.sourceforge.waters.gui.actions.WatersAnalyzeAction
-  @Override
-  protected String getCheckName()
-  {
-    return "Deadlock";
-  }
-
-  @Override
-  protected String getFailureDescription()
-  {
-    return "has a deadlock";
-  }
-
-  @Override
-  protected ModelVerifier createModelVerifier(final ModelAnalyzerFactory factory,
-                                           final ProductDESProxyFactory desFactory)
-    throws AnalysisConfigurationException
-  {
-    return factory.createDeadlockChecker(desFactory);
-  }
-
-  @Override
-  protected String getSuccessDescription()
-  {
-    return "is deadlock-free";
-  }
-
 
   //#########################################################################
   //# Class Constants

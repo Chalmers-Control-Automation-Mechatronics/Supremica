@@ -31,32 +31,30 @@
 //# exception.
 //###########################################################################
 
-package net.sourceforge.waters.gui.actions;
+package net.sourceforge.waters.gui.analyzer;
 
-import net.sourceforge.waters.model.analysis.des.AnalysisOperation;
+import net.sourceforge.waters.gui.options.ParametrisedOptionsDialog;
 
 import org.supremica.gui.ide.IDE;
 
-
 /**
- * The action to invoke the controllability check through the editor's
- * Verify menu.
- *
- * @author Robi Malik
+ * @author Benjamin Wheeler
  */
-
-public class VerifyControllabilityAction extends WatersVerificationAction
+public class OptionsDialog extends ParametrisedOptionsDialog
 {
 
   //#########################################################################
-  //# Constructors
-  protected VerifyControllabilityAction(final IDE ide)
+  //# Constructor
+  public OptionsDialog(final IDE ide)
   {
-    super(ide, AnalysisOperation.CONTROLLABILITY_CHECK);
+    super(ide);
+    setTitle(TITLE);
   }
 
   //#########################################################################
   //# Class Constants
-  private static final long serialVersionUID = -1008097797553564719L;
+  private static final String TITLE = "Options";
+
+  private static final long serialVersionUID = 2600506294877284306L;
 
 }
