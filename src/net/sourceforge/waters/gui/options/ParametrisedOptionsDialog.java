@@ -88,7 +88,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
     constraints.weightx = 1.0;
     constraints.weighty = 1.0;
 
-    mTopTabbedPane = new TabbedPane();
+    mTopTabbedPane = new OptionTabbedPane();
     for (final OptionMap map : OptionMap.values()) {
       mTopTabbedPane.populateOptions(mContext, map, map.getIdentifier());
     }
@@ -201,7 +201,7 @@ public abstract class ParametrisedOptionsDialog extends JDialog
   private final IDE mIde;
   private final GUIOptionContext mContext;
 
-  private final TabbedPane mTopTabbedPane;
+  private final OptionTabbedPane mTopTabbedPane;
   private final SearchQuery mQuery;
 
   //#########################################################################

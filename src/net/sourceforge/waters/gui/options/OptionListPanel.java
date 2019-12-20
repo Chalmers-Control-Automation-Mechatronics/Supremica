@@ -36,52 +36,117 @@ package net.sourceforge.waters.gui.options;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.ArrayList;
+import java.awt.Insets;
+import java.awt.Rectangle;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import net.sourceforge.waters.analysis.options.Option;
-import net.sourceforge.waters.analysis.options.OptionEditor;
+import net.sourceforge.waters.analysis.options.OptionMap;
+import net.sourceforge.waters.analysis.options.OptionMap.OptionSubset;
 
+/**
+ *
+ * @author Benjamin Wheeler
+ */
+public class OptionListPanel extends JScrollPane implements OptionContainer {
 
-public class OptionListPanel extends JPanel
-{
-
-  //#########################################################################
-  //# Constructors
   public OptionListPanel(final GUIOptionContext context,
-                         final List<Option<?>> options)
+                    final OptionMap map,
+                    final Map<String, OptionPanel<?>> optionPanels,
+                    final OptionSubset subset) {
+    super();
+    mSharedOptionPanels = optionPanels != null ? optionPanels
+      : new HashMap<>();
+    mOptionPanels = new LinkedList<>();
+    populateOptions(context, map, subset);
+  }
+
+  public OptionListPanel(final GUIOptionContext context, final OptionMap map) {
+    this(context, map, null, map.getTopOptionSubset());
+  }
+
+  public void populateOptions(final GUIOptionContext context,
+                              final OptionMap map,
+                              final OptionSubset subset)
   {
-    mOptionPanels = new ArrayList<>(options.size());
-    final GridBagLayout layout = new GridBagLayout();
+    final JPanel internalPane = new JPanel();
+    setViewportView(internalPane);
+
+    internalPane.setLayout(new GridBagLayout());
     final GridBagConstraints constraints = new GridBagConstraints();
     constraints.gridy = 0;
     constraints.anchor = GridBagConstraints.WEST;
     constraints.fill = GridBagConstraints.HORIZONTAL;
-    setLayout(layout);
-    for (final Option<?> option : options) {
-      final OptionEditor<?> editor = option.createEditor(context);
-      final OptionPanel<?> panel = (OptionPanel<?>) editor;
-      mOptionPanels.add(panel);
-      final JLabel label = panel.getLabel();
-      constraints.gridx = 0;
-      add(label, constraints);
-      final Component entry = panel.getEntryComponent();
-      constraints.gridx = 1;
-      add(entry, constraints);
-      constraints.gridy++;
+    constraints.insets = new Insets(0, 2, 0, 2);
+    constraints.weightx = constraints.weighty = 1.0;
+
+    mOptionPanels.clear();
+    final boolean persistentOnly = context.getWatersAnalyzerPanel() == null;
+    for (final String name : subset.getOptionNames()) {
+      final Option<?> option = map.get(name);
+      if (!persistentOnly || option.isPersistent()) {
+        OptionPanel<?> panel = mSharedOptionPanels.get(option.getID());
+        if (panel == null) {
+          panel = (OptionPanel<?>) option.createEditor(context);
+        }
+        mSharedOptionPanels.put(option.getID(), panel);
+        mOptionPanels.add(panel);
+        final JLabel label = panel.getLabel();
+        constraints.gridx = 0;
+        internalPane.add(label, constraints);
+        final Component entry = panel.getEntryComponent();
+        constraints.gridx = 1;
+        internalPane.add(entry, constraints);
+        constraints.gridy++;
+      }
+    }
+    revalidate();
+  }
+
+  @Override
+  public void commitOptions()
+  {
+    for (final OptionPanel<?> panel : mOptionPanels) {
+      panel.commitValue();
     }
   }
 
+  @Override
+  public void search(final SearchQuery query)
+  {
+    for (final OptionPanel<?> panel : mOptionPanels) {
+      if (query.matches(panel.getLabel().getText())) {
+        query.addResult(panel);
+      }
+    }
+  }
 
-  //#########################################################################
-  //# Data Members
+  @Override
+  public boolean selectOption(final OptionPanel<?> panel)
+  {
+    if (mOptionPanels.contains(panel)) {
+      final Rectangle bounds = panel.getLabel().getBounds();
+      bounds.x -= 2;
+      bounds.y-= 2;
+      bounds.width += 4;
+      bounds.height += 4;
+      ((JComponent)panel.getLabel().getParent()).scrollRectToVisible(bounds);
+      return true;
+    }
+    return false;
+  }
+
+  private final Map<String, OptionPanel<?>> mSharedOptionPanels;
   private final List<OptionPanel<?>> mOptionPanels;
 
+  private static final long serialVersionUID = 1843000430507667498L;
 
-  //#########################################################################
-  //# Class Constants
-  private static final long serialVersionUID = -4843247994676633053L;
 }

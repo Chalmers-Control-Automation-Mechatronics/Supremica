@@ -61,14 +61,14 @@ import net.sourceforge.waters.analysis.options.OptionMap.OptionSubset;
  *
  * @author Benjamin Wheeler
  */
-public class OptionSelectorPane extends JPanel implements OptionContainer {
+public class OptionGroupPanel extends JPanel implements OptionContainer {
 
-  public OptionSelectorPane(final GUIOptionContext context,
+  public OptionGroupPanel(final GUIOptionContext context,
                       final OptionMap map) {
     this(context, map, new HashMap<>(), map.getTopOptionSubset());
   }
 
-  public OptionSelectorPane(final GUIOptionContext context,
+  public OptionGroupPanel(final GUIOptionContext context,
                       final OptionMap map,
                       final Map<String, OptionPanel<?>> optionPanels,
                       final OptionSubset subset) {
@@ -167,7 +167,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
                 mComboBoxes.get(selectedSubset);
               this.actionPerformed(new ActionEvent(selectedComboBox, 0, "sub"));
             } else {
-              final OptionPane pane = mOptionPanes.get(selectedSubset);
+              final OptionListPanel pane = mOptionPanes.get(selectedSubset);
               pane.populateOptions(context, map, selectedSubset);
               constraints.gridy = 1;
               constraints.weighty = 1.0;
@@ -228,7 +228,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
         comboBox.setSelectedItem(selectedkey);
       }
     } else {
-      final OptionPane pane = new OptionPane(context, map,
+      final OptionListPanel pane = new OptionListPanel(context, map,
                                        optionPanels, subset);
       mOptionPanes.put(subset, pane);
     }
@@ -242,7 +242,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
       final Object selected = entry.getValue().getSelectedItem();
       entry.getKey().setSelected(selected);
     }
-    for (final OptionPane pane : mOptionPanes.values()) {
+    for (final OptionListPanel pane : mOptionPanes.values()) {
       pane.commitOptions();
     }
   }
@@ -263,7 +263,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
         search(query, subset.getSubset(key));
       }
     } else {
-      final OptionPane pane = mOptionPanes.get(subset);
+      final OptionListPanel pane = mOptionPanes.get(subset);
       pane.search(query);
     }
   }
@@ -291,7 +291,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
         }
       }
     } else {
-      final OptionPane pane = mOptionPanes.get(subset);
+      final OptionListPanel pane = mOptionPanes.get(subset);
       return pane.selectOption(panel);
     }
     return false;
@@ -344,7 +344,7 @@ public class OptionSelectorPane extends JPanel implements OptionContainer {
   }
 
 
-  private final Map<OptionSubset, OptionPane> mOptionPanes;
+  private final Map<OptionSubset, OptionListPanel> mOptionPanes;
   private final Map<OptionSubset, JComboBox<Object>> mComboBoxes;
   private final OptionSubset mRootSubset;
 

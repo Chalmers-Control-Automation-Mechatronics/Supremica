@@ -47,10 +47,10 @@ import net.sourceforge.waters.analysis.options.OptionMap;
  *
  * @author Benjamin Wheeler
  */
-public class TabbedPane extends JTabbedPane implements OptionContainer
+public class OptionTabbedPane extends JTabbedPane implements OptionContainer
 {
 
-  public TabbedPane()
+  public OptionTabbedPane()
   {
     super();
     mTabbedPanes = new HashMap<>();
@@ -72,9 +72,9 @@ public class TabbedPane extends JTabbedPane implements OptionContainer
     final int catIndex = identifier.indexOf('/');
     if (catIndex != -1) {
       final String title = identifier.substring(0, catIndex);
-      TabbedPane pane = mTabbedPanes.get(title);
+      OptionTabbedPane pane = mTabbedPanes.get(title);
       if (pane == null) {
-        pane = new TabbedPane();
+        pane = new OptionTabbedPane();
         addTab(title, pane);
         mTabbedPanes.put(title, pane);
         optionChildren.add(pane);
@@ -82,11 +82,11 @@ public class TabbedPane extends JTabbedPane implements OptionContainer
       pane.populateOptions(context, map, identifier.substring(catIndex + 1));
     } else {
       if (!map.hasSubsets()) {
-        final OptionPane pane = new OptionPane(context, map);
+        final OptionListPanel pane = new OptionListPanel(context, map);
         addTab(identifier, pane);
         optionChildren.add(pane);
       } else {
-        final OptionSelectorPane pane = new OptionSelectorPane(context, map);
+        final OptionGroupPanel pane = new OptionGroupPanel(context, map);
         addTab(identifier, pane);
         optionChildren.add(pane);
       }
@@ -120,7 +120,7 @@ public class TabbedPane extends JTabbedPane implements OptionContainer
     return false;
   }
 
-  private final Map<String, TabbedPane> mTabbedPanes;
+  private final Map<String, OptionTabbedPane> mTabbedPanes;
   private final List<OptionContainer> optionChildren;
 
   private static final long serialVersionUID = 5842441972089354096L;
